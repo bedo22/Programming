@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0005 — The Camps · How Real Products Ship UI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 5 · The Exploration Journey · Episode 5 of 14 · Ecosystem (2/3)</p>
+  <h1>The Camps — How Real Products Ship UI</h1>
+  <p class="meta">Knowing the atoms, you might assume "frontend" means one thing — a React single-page app. It doesn't. Real products ship UI in different camps, each optimizing for something different. Knowing the camp tells you where the JS lives. Anchored to <a href="../reference/frontend-camps-survey.html">Frontend Camps Survey</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0004-js-across-stacks.html">Lesson 4</a> showed JS running across stacks. But on the <em>frontend</em> stack specifically, not everyone builds the same way. This lesson is a map of the camps you'll actually meet at work — not a tutorial in any one of them. Next, <a href="./0006-the-class-to-hooks-revolution.html">Lesson 6</a> dives into React's own internal revolution. See the <a href="../PLAN.md">plan</a>.</p>
+</section>
+
+<h2>1. Frontend is not one thing</h2>
+<p>If your only exposure is a Vite + React tutorial, you'd think "frontend" is a single-page app: a mostly-empty HTML page that downloads a big JavaScript bundle and renders everything in the browser. That is <em>one</em> camp. It is not the only one.</p>
+<p>At work you will open repositories that look nothing like that. Some are WordPress themes that render HTML on the server and use jQuery for a carousel. Some are Astro sites that ship almost no JavaScript. Some are Next.js apps where the server renders part of the UI and the browser renders the rest. These are not lesser or greater — they are <em>different camps</em>, each optimized for a different constraint. The reference doc calls them centers of gravity, not exclusive clubs.</p>
+
+<h2>2. The five camps</h2>
+<p>The reference doc maps roughly five camps. What distinguishes them is the <strong>unit of work</strong> and the <strong>JS load strategy</strong> — where the JavaScript lives, and how much of it ships to the user.</p>
+<ul>
+  <li><strong>CMS / classic server</strong> — the server owns the document (PHP, Rails, Django). JS is optional sugar for forms and widgets. The page is real HTML on every request.</li>
+  <li><strong>HTML-first</strong> — server HTML plus small interactive "islands." Ship almost no framework. (Astro is the flagship.) The document is the product; JS is a garnish.</li>
+  <li><strong>SPA (single-page app)</strong> — a client app shell. A large initial JS bundle downloads, then the browser owns the UI and re-renders on navigation without round-trips. (Classic Vite + React.)</li>
+  <li><strong>Meta-framework</strong> — route + data + UI together, split between server and browser. The framework decides what ships where. (Next.js, Nuxt.)</li>
+  <li><strong>WASM / systems UI</strong> — a compiled module does the heavy logic; JS is glue. (Figma-ish, games, heavy visualization.)</li>
+</ul>
+
+<h2>3. The thing that confuses everyone: camps overlap</h2>
+<p>Here is the part that breaks the tidy mental model. These camps are <em>not</em> exclusive boxes. A Next.js app is a meta-framework, yet on some routes it behaves exactly like an SPA. A WordPress site can host a React admin SPA inside it. An Astro site (HTML-first) can embed a React island that is, locally, an SPA.</p>
+<p>So treat the labels as <strong>centers of gravity</strong>, not walls. You don't ask "is this camp A or camp B?" — you ask "what is the <em>dominant</em> pattern here, and where does the JS actually live?" That question tells you which mental model applies, how much ships, and whether your React intuition holds as-is or needs adjusting.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="cms" data-explain="A server that owns the document and renders HTML per request, with JS as optional sugar, is the CMS / classic-server camp (WordPress, PHP, Rails, Django). The page is real HTML; JS is a garnish.">
+  <summary>A WordPress site renders HTML on the server per request; JS is optional sugar for forms. Which camp is this?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="cms"> The CMS, classic server camp</label>
+      <label><input type="radio" name="q1" value="spa"> The single-page app camp</label>
+      <label><input type="radio" name="q1" value="html"> The HTML-first island camp</label>
+      <label><input type="radio" name="q1" value="wasm"> The WebAssembly systems camp</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="js" data-explain="Camps differ most by unit of work and JS load strategy — where the JS lives (server or browser) and how much ships. That single axis determines your whole mental model on a codebase.">
+  <summary>What most distinguishes one frontend camp from another?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="js"> Where the JS lives and ships</label>
+      <label><input type="radio" name="q2" value="lang"> Which language the codebase uses</label>
+      <label><input type="radio" name="q2" value="host"> Which cloud host it deploys to</label>
+      <label><input type="radio" name="q2" value="budget"> Which design budget it follows</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="gravity" data-explain="Camps overlap — a Next.js app can be a meta-framework and behave like an SPA on some routes. Labels are centers of gravity, not exclusive walls. Recognize the dominant pattern; don't force a single box.">
+  <summary>A Next.js app renders some routes on the server and behaves like an SPA on others. Camp labels are best treated as what?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="gravity"> Centers of gravity, never hard walls</label>
+      <label><input type="radio" name="q3" value="rules"> Strict rules that you never cross</label>
+      <label><input type="radio" name="q3" value="ranks"> Quality ranks from best to worst</label>
+      <label><input type="radio" name="q3" value="phases"> Historical phases to read in order</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold a map of how real products ship UI: five camps — <strong>CMS, HTML-first, SPA, meta-framework, WASM</strong> — distinguished most by <em>where the JS lives and how much ships</em>. The crucial nuance: camps <strong>overlap</strong>; they're centers of gravity, not walls. At work, you don't ask "which camp is this exclusively?" — you ask "what's the dominant pattern, and where does the JS actually live?" That recognition keeps you from forcing one mental model onto every codebase.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/frontend-camps-survey.html">Frontend Camps Survey</a> — every camp in detail (what you'll see in code, when it wins/loses), plus the signals and AI-layer sections.</li>
+    <li><strong>Next lesson:</strong> <a href="./0006-the-class-to-hooks-revolution.html">Lesson 6 — The Class→Hooks Revolution</a> — zooming inside React itself: the biggest mental-model shift in its history.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="../reference/frontend-camps-survey.html">Frontend Camps Survey (this workspace)</a> — the reference this lesson is built on; for the live industry picture, see the annual <a href="https://stateofjs.com/">State of JS</a> survey.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"If camps overlap so much, how do I actually tell which one a codebase is in?"</li>
+    <li>"Is the SPA camp dying, given everyone's moving server-side again?"</li>
+    <li>"Which camp should I default to for a new project?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 5 · <a href="../reference/frontend-camps-survey.html">Reference: Frontend Camps Survey</a></span>
+  <span>Next → <a href="./0006-the-class-to-hooks-revolution.html">Lesson 6 · The Class→Hooks Revolution</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

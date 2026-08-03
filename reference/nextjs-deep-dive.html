@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Next.js Deep Dive — Reference</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Meta-framework on top of React</p>
+  <h1>Next.js deep dive</h1>
+  <p class="meta">RSC, App Router, caching, Turbopack, and AI-era patterns — tied back to the function+hooks model. Read this after the paradigm doc, before assuming every React file is a client component.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>After Create React App was sunset (Feb 2025), React's own docs steer new apps toward a framework. In job postings and greenfield React work, that framework is often <strong>Next.js</strong> (Vercel). This doc is not a tutorial that replaces nextjs.org — it is a map for a C++-background JS learner who already understands functions, closures, and hooks, and needs to read Next code without drowning.</p>
+  <p>Prerequisites in this workspace: <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm shift</a> (especially §18.2 RSC and §18.1 compiler), and <a href="./re-render-box-model.html">re-render box model</a>. Landscape context: <a href="./frontend-camps-survey.html">frontend camps survey</a> §5.</p>
+</section>
+
+<h2>1. What Next.js is (and is not)</h2>
+
+<p><strong>Is:</strong> a React meta-framework — routing, rendering strategies, data fetching conventions, bundling, and production optimizations around React.</p>
+<p><strong>Is not:</strong> a replacement for React's component model. Client components still use the same hooks, closures, and per-render boxes you already studied. Next decides <em>where</em> code runs and <em>how</em> routes load data; React still decides how UI updates from state.</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>Who owns it</th><th>Your mental model</th></tr></thead>
+  <tbody>
+    <tr><td>UI update from state</td><td>React</td><td>Function+hooks, box model</td></tr>
+    <tr><td>URL → tree of components</td><td>Next App Router</td><td>Filesystem routes under <code>app/</code></td></tr>
+    <tr><td>Server vs browser process</td><td>RSC + <code>"use client"</code></td><td>Two Reacts (data vs state)</td></tr>
+    <tr><td>Caching / revalidation</td><td>Next cache model</td><td>HTTP + framework cache semantics</td></tr>
+    <tr><td>Bundling / HMR / prod build</td><td>Turbopack / Webpack</td><td>Tooling — rarely hand-edited</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Pages Router vs App Router</h2>
+
+<p>Next had two successive routing systems. You will meet both in the wild.</p>
+
+<table>
+  <thead><tr><th></th><th>Pages Router (<code>pages/</code>)</th><th>App Router (<code>app/</code>)</th></tr></thead>
+  <tbody>
+    <tr><td>Era</td><td>Classic Next (widely deployed)</td><td>Current default for new apps</td></tr>
+    <tr><td>Data APIs</td><td><code>getServerSideProps</code>, <code>getStaticProps</code></td><td>async Server Components, <code>fetch</code> cache, server actions</td></tr>
+    <tr><td>Layouts</td><td>Custom <code>_app</code> / nested HOCs</td><td>Nested <code>layout.tsx</code> that preserve state</td></tr>
+    <tr><td>RSC</td><td>No (client React tree after data props)</td><td>Yes — server components by default</td></tr>
+    <tr><td>File conventions</td><td><code>pages/about.js</code> → <code>/about</code></td><td><code>app/about/page.tsx</code> → <code>/about</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Reading tip:</strong> if you see <code>getServerSideProps</code>, you are in Pages Router. If you see <code>async function Page()</code> at the top of a route file with no <code>"use client"</code>, you are in App Router Server Components. Do not mix the mental models.</p>
+
+<h2>3. App Router file conventions (the vocabulary)</h2>
+
+<p>Under <code>app/</code>, filenames are special:</p>
+<ul>
+  <li><code>page.tsx</code> — the UI for a route segment (required for that URL to exist).</li>
+  <li><code>layout.tsx</code> — wraps pages; <strong>does not remount</strong> on navigation between child routes (state in a layout survives).</li>
+  <li><code>loading.tsx</code> — Suspense fallback for the segment while server content loads.</li>
+  <li><code>error.tsx</code> — error boundary for the segment (must be a client component).</li>
+  <li><code>not-found.tsx</code> — 404 UI for the segment.</li>
+  <li><code>route.ts</code> — HTTP handlers (REST-style endpoints) instead of a page.</li>
+  <li><code>template.tsx</code> — like layout but <em>remounts</em> on navigation (rarer).</li>
+  <li><code>default.tsx</code> — parallel route fallbacks (advanced).</li>
+</ul>
+
+<pre><code>app/
+  layout.tsx          <span class="comment-line">// root shell (html/body, nav)</span>
+  page.tsx            <span class="comment-line">// /</span>
+  blog/
+    layout.tsx        <span class="comment-line">// wraps all /blog/*</span>
+    page.tsx          <span class="comment-line">// /blog</span>
+    [slug]/
+      page.tsx        <span class="comment-line">// /blog/:slug  (dynamic)</span>
+      loading.tsx
+</code></pre>
+
+<p>Dynamic segments: <code>[id]</code>, catch-alls <code>[...slug]</code>, optional catch-alls <code>[[...slug]]</code>. Route groups <code>(marketing)</code> organize folders without affecting the URL.</p>
+
+<h2>4. Server Components vs Client Components</h2>
+
+<p>This is the load-bearing idea. Default in <code>app/</code>: <strong>Server Component</strong>. You opt into the browser with the directive:</p>
+
+<pre><code><span class="comment-line">// app/counter.tsx — must run in the browser (hooks, events, window)</span>
+"use client";
+
+import { useState } from "react";
+
+export function Counter() {
+  const [n, setN] = useState(0);           <span class="comment-line">// box model applies here</span>
+  return &lt;button onClick={() =&gt; setN(n + 1)}&gt;{n}&lt;/button&gt;;
+}
+</code></pre>
+
+<pre><code><span class="comment-line">// app/posts/page.tsx — Server Component (default). No hooks. Can use secrets/fs/db.</span>
+import { Counter } from "../counter";
+import { db } from "@/lib/db";
+
+export default async function PostsPage() {
+  const posts = await db.post.findMany();  <span class="comment-line">// runs on the server</span>
+  return (
+    &lt;main&gt;
+      &lt;ul&gt;{posts.map(p =&gt; &lt;li key={p.id}&gt;{p.title}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;Counter /&gt;                          <span class="comment-line">// client island inside server page</span>
+    &lt;/main&gt;
+  );
+}
+</code></pre>
+
+<h3>Rules that prevent confusion</h3>
+<ol>
+  <li><strong>Server Components cannot use hooks or browser APIs.</strong> No <code>useState</code>, no <code>useEffect</code>, no <code>window</code>. They render once per request (or at build time) — there is no re-render loop.</li>
+  <li><strong>Client Components cannot import server-only modules</strong> (db clients, private env without <code>NEXT_PUBLIC_</code>). Data flows server → client as props (serializable).</li>
+  <li><strong>Composition direction:</strong> server can render client children. Client can render server children only via patterns like passing server components as <code>children</code> or slots — not by importing a server file into a client file.</li>
+  <li><strong>Everything your paradigm doc taught still applies on the client side of the line.</strong> RSC does not replace hooks; it shrinks how much of the tree needs them.</li>
+</ol>
+
+<blockquote class="callout">
+  <p><strong>Dan Abramov's formula</strong> (paradigm doc §18.2): client is <code>UI = f(state)</code>; server is <code>UI = f(data)</code>; together <code>UI = f(data, state)</code>. When reading a file, ask first: <em>which function am I in?</em></p>
+</blockquote>
+
+<h2>5. Data fetching patterns</h2>
+
+<h3>5.1 async Server Components + <code>fetch</code></h3>
+<p>In App Router, <code>fetch</code> is integrated with Next's cache (behavior has evolved across versions — always check the version of the app you are reading). Typical shape:</p>
+<pre><code>async function getUser(id) {
+  const res = await fetch(`https://api.example.com/users/${id}`, {
+    next: { revalidate: 60 },   <span class="comment-line">// ISR-style: revalidate every 60s</span>
+  });
+  if (!res.ok) throw new Error("Failed");
+  return res.json();
+}
+</code></pre>
+
+<h3>5.2 Direct backend access</h3>
+<p>Server Components can call databases, file systems, and internal services directly — no need to expose a public REST route for your own page data. That is a major reason RSC exists: colocate data and UI without shipping the query client to the browser.</p>
+
+<h3>5.3 Server Actions</h3>
+<p>Functions marked with <code>"use server"</code> can be passed to client components as callbacks (e.g. form <code>action</code>). They run on the server when invoked. Treat them as <strong>public endpoints</strong> — validate inputs, auth, and never hardcode secrets (paradigm doc §18.4 RSC CVEs).</p>
+
+<pre><code><span class="comment-line">// app/actions.ts</span>
+"use server";
+
+export async function updateTitle(formData) {
+  const title = formData.get("title");
+  <span class="comment-line">// validate + auth + db write</span>
+}
+</code></pre>
+
+<h2>6. Caching mental model (including Cache Components)</h2>
+
+<p>Next's cache story is the part that confuses experienced SPA developers most. Rough layers:</p>
+<ul>
+  <li><strong>Request memoization</strong> — duplicate <code>fetch</code> calls during one server render can dedupe.</li>
+  <li><strong>Data cache</strong> — persisted results across requests (with revalidation tags / time).</li>
+  <li><strong>Full route cache</strong> — static HTML/RSC payload for a route when it can be produced ahead of time.</li>
+  <li><strong>Router cache (client)</strong> — client-side session cache of visited segments for snappy back/forward.</li>
+</ul>
+
+<p><strong>Cache Components</strong> (the direction of modern Next): make caching explicit and compositional — mark which parts of the tree are cacheable static shells vs dynamic holes, instead of hoping global defaults match your intent. Read the project's Next major version docs for the exact APIs (<code>use cache</code>, dynamic APIs like <code>cookies()</code> / <code>headers()</code> that opt a subtree into dynamic rendering, etc.). The stable idea across versions:</p>
+
+<blockquote class="callout">
+  <p><strong>Static vs dynamic is a tree property.</strong> Using request-specific data (<code>cookies</code>, <code>headers</code>, uncached <code>fetch</code>, search params in some modes) forces dynamic rendering for that segment. Pure data with revalidation can be static or ISR-like. When a page "always hits the server" in production, search for those dynamic signals before blaming the host.</p>
+</blockquote>
+
+<p>Practical debugging questions when a page is slow or stale:</p>
+<ol>
+  <li>Is this segment static, ISR, or dynamic?</li>
+  <li>What tag / time revalidates the data?</li>
+  <li>Am I looking at CDN HTML, server render, or client router cache?</li>
+</ol>
+
+<h2>7. Turbopack and the build toolchain</h2>
+
+<p><strong>Turbopack</strong> is Next's Rust-based bundler (Webpack successor path). Dev HMR and production builds increasingly default to it in current Next majors. For you as a reader of application code:</p>
+<ul>
+  <li>You rarely configure Turbopack day to day; you notice it when builds are fast or when a plugin is Webpack-only and breaks under Turbopack.</li>
+  <li>Next.js mid-2026 line (e.g. 16.x family announcements) emphasized faster navigation and experimental / expanding React Compiler integration — align local docs with the repo's locked Next version.</li>
+  <li>Pin framework versions in production; read security and canary notes before jumping majors (monthly security cadence culture in the Next ecosystem after the RSC CVE wave).</li>
+</ul>
+
+<p>Related: the <strong>React Compiler</strong> (paradigm doc §18.1) can run in Next pipelines so client components need less hand-written <code>useMemo</code> / <code>useCallback</code>. Treat compiler upgrades like React upgrades — exact versions, full test runs.</p>
+
+<h2>8. Navigation, streaming, and UX primitives</h2>
+
+<ul>
+  <li><code>&lt;Link&gt;</code> — client navigation with prefetch of static routes.</li>
+  <li><code>useRouter</code> / <code>usePathname</code> / <code>useSearchParams</code> — client-only navigation APIs (<code>"use client"</code>).</li>
+  <li><strong>Streaming</strong> — Server Components can stream HTML/RSC payload; <code>loading.tsx</code> and <code>Suspense</code> define what the user sees while a slow subtree resolves.</li>
+  <li><strong>Instant / optimistic navigation trends</strong> — modern Next versions invest in making route transitions feel SPA-fast while keeping server rendering benefits. When you see "navigation is instant but data pops in later," that is streaming + shell layouts, not a bug by default.</li>
+</ul>
+
+<p>React 19.2 pieces you may meet inside Next apps (paradigm doc §18.6): <code>useEffectEvent</code>, <code>&lt;Activity&gt;</code> — framework and React versions must both support them.</p>
+
+<h2>9. Auth, env, and security (frontend-adjacent)</h2>
+
+<ul>
+  <li><code>process.env.NEXT_PUBLIC_*</code> — inlined into the client bundle. Anything secret must be server-only env <em>without</em> that prefix.</li>
+  <li>Server Actions and Route Handlers = attack surface. Validate like public APIs. Auth checks on the server, not only hidden UI.</li>
+  <li>After the Dec 2025 – Jan 2026 RSC protocol CVEs, production teams pin React/Next, subscribe to security advisories, and schedule patches. Do not invent your own RSC serializer.</li>
+</ul>
+
+<h2>10. AI readiness (product features, not hype)</h2>
+
+<p>Next is a common host for AI product UI because streaming and server boundaries fit LLM apps:</p>
+<ul>
+  <li><strong>Streaming responses</strong> from Route Handlers or Server Actions into client components (chat tokens).</li>
+  <li><strong>Server-only keys</strong> for model providers — never <code>NEXT_PUBLIC_</code> for API secrets.</li>
+  <li><strong>Vercel AI SDK</strong> (and similar) patterns: <code>useChat</code>-style client hooks + server route that calls the model. The React side is still hooks and closures; the new piece is async streams.</li>
+  <li><strong>RSC for tool results</strong> — render model-produced structured UI on the server when you do not need client interactivity for that subtree.</li>
+</ul>
+
+<p>If you are building AI features into an app in this workspace's broader skill ecosystem, prefer a deliberate provider choice and keep secrets server-side. The frontend skill remains: render loading/error/partial states without stale closures.</p>
+
+<h2>11. What you will actually read at work — a checklist</h2>
+
+<ol>
+  <li>Is this <code>pages/</code> or <code>app/</code>?</li>
+  <li>Does the file start with <code>"use client"</code>? If no, assume server; look for hooks — if hooks exist without the directive, something is wrong or you are not in App Router.</li>
+  <li>Where does data come from — <code>fetch</code>, db, props from a parent server component, or a client-side React Query call?</li>
+  <li>Is there a Server Action on this form?</li>
+  <li>Which layout owns the chrome, and will its state survive this navigation?</li>
+  <li>Is the bug a React box-model bug (client) or a cache/dynamic-rendering bug (Next)?</li>
+</ol>
+
+<pre><code><span class="comment-line">// Decision sketch when debugging "UI shows old data"</span>
+<span class="comment-line">// 1) Client state? → box model, deps, React Query keys</span>
+<span class="comment-line">// 2) Server Component props? → revalidate / cache tags / dynamic APIs</span>
+<span class="comment-line">// 3) Router cache? → refresh / hard navigation test</span>
+<span class="comment-line">// 4) CDN? → deployment / purge / ISR window</span>
+</code></pre>
+
+<h2>12. How this ties back to the lessons</h2>
+
+<table>
+  <thead><tr><th>JS / React idea</th><th>Where it shows up in Next</th></tr></thead>
+  <tbody>
+    <tr><td>Modules (Lesson 11)</td><td>Server-only modules vs shared modules; accidental client import of db is a classic bug</td></tr>
+    <tr><td>Closures + hooks</td><td>Client components only — same as SPA React</td></tr>
+    <tr><td><code>this</code> / classes</td><td>Legacy components inside a Next app; still readable via paradigm §15</td></tr>
+    <tr><td>Async / promises</td><td>async Server Components, streaming, Server Actions</td></tr>
+    <tr><td>Error handling</td><td><code>error.tsx</code>, try/catch in server functions, <code>notFound()</code></td></tr>
+  </tbody>
+</table>
+
+<p>You do not need to "finish Next" before the HackerRank cert. You need Next literacy when the mission shifts fully to reading work code. Cert first remains the mission order.</p>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+  <p>Next.js is React plus routing, server/client split, caching, and tooling. App Router defaults to Server Components; <code>"use client"</code> marks the boundary where your hooks mental model applies. Caching and dynamic APIs explain many "why is this static/dynamic?" mysteries. Turbopack and the React Compiler are toolchain layers. AI features are mostly streaming + server secrets + normal React UI. Security: Server Actions are public endpoints. For the wider non-Next landscape see the <a href="./frontend-camps-survey.html">camps survey</a>; for money paths that use these skills see <a href="./frontend-income-markets.html">income markets</a>.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Next.js deep dive</span>
+  <span>Mission: read JS/React at work</span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

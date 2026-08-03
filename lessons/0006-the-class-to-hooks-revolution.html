@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0006 — The Class→Hooks Revolution · React's Biggest Shift</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 6 · The Exploration Journey · Episode 6 of 14 · Ecosystem (3/3, finale)</p>
+  <h1>The Class→Hooks Revolution — React's Biggest Mental-Model Shift</h1>
+  <p class="meta">For its first five years, React components were classes: <code>this</code>, <code>bind</code>, lifecycle methods. Then in 2018 the team introduced hooks and made functions the default. The counterintuitive part: functions already existed — they just couldn't hold state. Anchored to <a href="../reference/class-to-hooks-paradigm-shift.html">the paradigm-shift reference</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>This is the Ecosystem finale. It leans directly on <a href="./0003-what-is-state.html">Lesson 3</a> — the class→hooks story is, at bottom, the story of <em>where state lives</em>. It also sets up the frontier (<a href="./0009-react-2024-and-beyond.html">Lesson 9</a>), where the compiler finishes what hooks started. See the <a href="../PLAN.md">plan</a>.</p>
+</section>
+
+<h2>1. React's first model: classes</h2>
+<p>When React shipped in <strong>2013</strong>, a component was a <strong>class</strong>. It extended <code>React.Component</code>, held its state in <code>this.state</code>, mutated it with <code>this.setState</code>, and ran side effects in <strong>lifecycle methods</strong> with names like <code>componentDidMount</code>, <code>componentDidUpdate</code>, and <code>componentWillUnmount</code>. To pass a handler safely you had to <code>bind(this)</code> in the constructor — a ceremony every React dev memorized.</p>
+<p>This worked. Facebook ran on it. But over five years of maintaining tens of thousands of components, the React team watched the same three pains repeat at scale.</p>
+
+<h2>2. The three problems, and the counterintuitive catch</h2>
+<p>The React team's own 2018 post, <em>Introducing Hooks</em>, named three problems they'd watched repeat across tens of thousands of components:</p>
+<ul>
+  <li><strong>Hard to reuse stateful logic.</strong> To share behavior (say, "subscribe to a friend's online status"), you wrapped components in layers of higher-order components and render props — "wrapper hell" in the DevTools tree.</li>
+  <li><strong>Giant, hard-to-follow components.</strong> One component's unrelated concerns (fetching, subscriptions, timers) were split across <code>componentDidMount</code>, <code>componentDidUpdate</code>, and <code>componentWillUnmount</code> — the same concern scattered across three methods.</li>
+  <li><strong>Classes confuse people and machines.</strong> <code>this</code>, <code>bind</code>, <code>super()</code>, and <code>constructor</code> were a tax every learner paid; they were also hard for tools to optimize.</li>
+</ul>
+<p>Here's the counterintuitive catch that most summaries skip: <strong>React already had function components before hooks — and they were not enough.</strong> Early function components were <em>stateless</em>: they could return JSX from props, but they couldn't hold state or run side effects. So for anything real, you still needed a class. Functions alone weren't the answer — functions lacked the <em>powers</em> that made them usable for real components.</p>
+
+<h2>3. Hooks: giving functions the missing powers</h2>
+<p>Hooks (2018) are the missing piece. <code>useState</code> lets a function <strong>hold state</strong> across renders; <code>useEffect</code> lets it <strong>run side effects</strong> and clean them up. Now a function component could do everything a class could — and the three problems dissolved:</p>
+<ul>
+  <li><strong>Reuse → custom hooks.</strong> Extract stateful logic into a function that calls hooks; any component calls it. No wrappers, no nesting.</li>
+  <li><strong>Giant components → one effect per concern.</strong> Setup and cleanup for one concern live together in one <code>useEffect</code>; unrelated concerns get separate effects.</li>
+  <li><strong>No <code>this</code>.</strong> The function's locals (including the setter from <code>useState</code>) are ordinary variables. No <code>this</code> to lose, no <code>bind</code>.</li>
+</ul>
+<p>And recall <a href="./0003-what-is-state.html">Lesson 3</a>: state is just a variable that persists and matters across events. With hooks, the variable didn't change kind — it just <em>moved</em>. In a class, state lived in <code>this.state</code> (the instance). With hooks, state lives in a <strong>React-owned slot</strong>, indexed by the order you called <code>useState</code>. Same variable, different owner. The component asks React to remember; React holds the real cell.</p>
+
+
+<blockquote class="callout">
+  <p><strong>The deepest reason.</strong> Function components <em>capture</em> the rendered values — each render has its own box for props and state, and a handler closes over that box, which doesn't change. Classes read <code>this.props</code>, which React <em>mutates</em> on every render. So a delayed handler (say, an alert 3 seconds after a click) shows the right person with functions and the wrong person with classes. You can't fix it by binding — binding pins <code>this</code>, but the bug is that <code>this</code> mutates. The fix is to capture, which is exactly what closures do. This is why the shift was deeper than "functions are tidier."</p>
+</blockquote>
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="reuse" data-explain="Officially (React, 'Introducing Hooks,' 2018): hard to reuse stateful logic (wrapper hell of HOCs), giant components with logic split across lifecycles, and confusing classes/this.">
+  <summary>The React team introduced Hooks to solve which problems with classes?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="reuse"> Reuse, giant components, this</label>
+      <label><input type="radio" name="q1" value="speed"> Speed, memory, and startup</label>
+      <label><input type="radio" name="q1" value="size"> Bundle size, parsing, cache</label>
+      <label><input type="radio" name="q1" value="syntax"> Syntax, naming, and styling</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="stateless" data-explain="Functions existed before hooks but were stateless and effect-less — they couldn't hold state or run side effects. Hooks (useState, useEffect) gave functions those powers, which is what made them viable for real components.">
+  <summary>Why weren't function components enough on their own to replace classes?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="stateless"> They couldn't hold state or effects</label>
+      <label><input type="radio" name="q2" value="slow"> They were much slower to render</label>
+      <label><input type="radio" name="q2" value="strict"> They were too strict to use</label>
+      <label><input type="radio" name="q2" value="typed"> They had no static type checks</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+<details class="quiz" data-answer="slot" data-explain="React owns the state in an internal slot indexed by call order; useState reads/writes it. The component never sees the real cell — same variable, different owner (this is Lesson 3's 'where state lives' applied).">
+  <summary>With hooks, where does a component's state actually live?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="slot"> In a React-owned slot, per call</label>
+      <label><input type="radio" name="q3" value="local"> In the function's own local variable</label>
+      <label><input type="radio" name="q3" value="global"> In a single global variable only</label>
+      <label><input type="radio" name="q3" value="class"> In a shared class instance field</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold React's biggest shift: classes (2013, <code>this</code>/<code>bind</code>/lifecycles) gave way to <strong>functions + hooks</strong> (2018) because hooks gave functions the two powers they lacked — <code>useState</code> (state) and <code>useEffect</code> (effects) — dissolving wrapper hell, giant components, and <code>this</code>. The counterintuitive key: <em>functions already existed; they just couldn't hold state until hooks.</em> And the deepest reason is that functions <strong>capture</strong> rendered values (correct) while <code>this</code> <strong>mutates</strong> (buggy). Per Lesson 3, state just moved from the class instance to a React-owned slot — same variable, different owner. Classes remain in the spec, but no one teaches them first anymore.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/class-to-hooks-paradigm-shift.html">The Class-to-Function Paradigm Shift</a> — the four eras in full, the stale-closure "problem," the lifecycle→synchronization model, and how the compiler finishes the job.</li>
+    <li><strong>Next lesson:</strong> <a href="./0007-the-rhythm.html">Lesson 7 — The Rhythm</a> — the Practice movement begins: the Model→View→Flow loop developers run on every feature.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="https://legacy.reactjs.org/docs/hooks-intro.html">React — Introducing Hooks (2018)</a> (the official motivation: the three problems with classes) and <a href="https://overreacted.io/how-are-function-components-different-from-classes/">Abramov — How are function components different from classes?</a> (the capture-vs-mutate insight).</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"If functions capture values, what's the 'stale closure' bug people complain about with hooks?"</li>
+    <li>"Will I still need to read class components at work?"</li>
+    <li>"What does the React Compiler change about all this?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 6 · <a href="../reference/class-to-hooks-paradigm-shift.html">Reference: Class-to-Function Paradigm Shift</a></span>
+  <span>Next → <a href="./0007-the-rhythm.html">Lesson 7 · The Rhythm</a></span>
+</footer>
+
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

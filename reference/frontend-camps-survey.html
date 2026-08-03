@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontend Camps Survey — Reference</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Technical landscape, not a how-to</p>
+  <h1>Frontend camps survey</h1>
+  <p class="meta">A map of how real products ship UI in 2026: CMS, HTML-first, SPA, meta-frameworks, WASM, TypeScript, and the AI layer. Read this to recognize which camp a codebase is in — not to pick a religion.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+   <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm doc</a> answers: how does React think about components? This doc answers a different question: <em>what is the rest of the frontend world doing?</em> At work you will open repos that are not "a Vite React SPA." Some are WordPress themes with a React island. Some are Astro sites. Some are <a href="./angular-evolution.html">Angular monorepos</a>. Some are Next.js apps with Server Components. For the JS language foundation behind all of them, see <a href="./javascript-the-language.html">JavaScript: The Language</a>. Knowing the camps saves you from assuming every frontend is the same mental model.</p>
+  <p>Survey depth, not tutorials. Each section: what the camp optimizes for, what you will see in code, and when it wins or loses.</p>
+</section>
+
+<h2>0. How to use this map</h2>
+
+<table>
+  <thead><tr><th>Camp</th><th>Unit of work</th><th>Default runtime</th><th>JS load strategy</th></tr></thead>
+  <tbody>
+    <tr><td><strong>CMS / classic server</strong></td><td>Page / template</td><td>Server (PHP, Rails, Django…)</td><td>Optional progressive enhancement</td></tr>
+    <tr><td><strong>HTML-first</strong></td><td>Document + small islands</td><td>Server HTML, sparse client JS</td><td>Ship almost no framework</td></tr>
+    <tr><td><strong>SPA</strong></td><td>Client app shell</td><td>Browser (after first download)</td><td>Large initial JS; client owns UI</td></tr>
+    <tr><td><strong>Meta-framework</strong></td><td>Route + data + UI</td><td>Server + browser split</td><td>Framework decides what ships where</td></tr>
+    <tr><td><strong>WASM / systems UI</strong></td><td>Compiled module</td><td>Browser (or edge) + native-ish code</td><td>JS as glue; heavy logic elsewhere</td></tr>
+  </tbody>
+</table>
+
+<p>These camps overlap. A "Next.js app" is a meta-framework that can still behave like a SPA on some routes. A WordPress site can host a React admin SPA. Treat the labels as <em>centers of gravity</em>, not exclusive clubs.</p>
+
+<blockquote class="callout">
+  <p><strong>Mission fit.</strong> Your mission is still JS fundamentals → read React at work. This survey is orientation for that second half. You do not need to master every camp. You need to open a repo and say: "this is HTML-first with Preact islands" or "this is an App Router RSC app" without panicking.</p>
+</blockquote>
+
+<p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+
+<h2>1. Camp A — CMS and classic server-rendered apps</h2>
+
+<p>The oldest industrial pattern: the server owns the document. PHP (WordPress, Laravel), Rails, Django, ASP.NET MVC, and similar stacks render HTML on each request. JavaScript is optional sugar for forms, carousels, and admin widgets.</p>
+
+<h3>What you will see</h3>
+<ul>
+  <li>Template files (<code>.php</code>, <code>.erb</code>, <code>.jinja</code>) with HTML and server variables mixed.</li>
+  <li>jQuery or vanilla DOM scripts in theme folders — still extremely common in WordPress.</li>
+  <li>A separate "headless CMS" variant: Contentful, Sanity, Strapi, WordPress REST/GraphQL — content API + a frontend built in another camp.</li>
+  <li>Admin UIs that are full SPAs (Gutenberg, custom dashboards) sitting on top of a classic backend.</li>
+</ul>
+
+<h3>When it wins</h3>
+<ul>
+  <li>Content sites, marketing, blogs, e-commerce catalogs with heavy editorial workflows.</li>
+  <li>Teams whose primary skill is backend or content operations, not SPA architecture.</li>
+  <li>SEO-critical pages where "HTML in the first response" is non-negotiable and the team already knows the CMS.</li>
+</ul>
+
+<h3>When it loses</h3>
+<ul>
+  <li>Highly interactive product UI (real-time boards, design tools, complex client state).</li>
+  <li>Cross-platform product sharing logic with mobile (React Native, etc.).</li>
+</ul>
+
+<p><strong>Reading tip for a JS learner:</strong> do not confuse "there is a <code>script</code> tag" with "this is a React app." Trace who owns the first paint: if the server sent full HTML of the page content, you are in Camp A (or B), even if a React widget mounts later.</p>
+
+<h2>2. Camp B — HTML-first and islands</h2>
+
+<p>HTML-first frameworks treat the document as the product and JavaScript as a precision tool. The modern flagship is <strong>Astro</strong>: ship zero JS by default; opt into "islands" of interactivity (React, Preact, Svelte, Vue, Solid) only where needed. Related family: <strong>HTMX</strong> / Alpine / server-driven UI — keep logic on the server, swap HTML fragments over the wire.</p>
+
+<h3>What you will see</h3>
+<ul>
+  <li>Most routes are static or server-rendered HTML with almost no client bundle.</li>
+  <li><code>client:load</code> / <code>client:visible</code> style directives on components (Astro) — explicit hydration boundaries.</li>
+  <li>Preact chosen over React for islands because ~3.5&nbsp;kB matters when the rest of the page is static (see paradigm doc §18.5b).</li>
+  <li>HTMX attributes like <code>hx-get</code>, <code>hx-swap</code> — partial page updates without a client router.</li>
+</ul>
+
+<h3>When it wins</h3>
+<ul>
+  <li>Marketing sites, docs, blogs, content-heavy product marketing with a few interactive widgets.</li>
+  <li>Performance budgets and Core Web Vitals as primary KPIs.</li>
+  <li>Teams tired of shipping a 200&nbsp;kB framework for a contact form.</li>
+</ul>
+
+<h3>When it loses</h3>
+<ul>
+  <li>App-like products where almost every pixel is interactive state (Figma-class tools, dashboards with dense client state).</li>
+  <li>When the "island" graph grows until you reinvent a SPA poorly.</li>
+</ul>
+
+<pre><code><span class="comment-line">// Astro mental model (pseudo) — HTML first, island second</span>
+---
+<span class="comment-line">// frontmatter runs on the server / at build</span>
+const posts = await getPosts();
+---
+&lt;h1&gt;Blog&lt;/h1&gt;
+{posts.map(p =&gt; &lt;article&gt;{p.title}&lt;/article&gt;)}
+
+<span class="comment-line">// only this island ships client JS</span>
+&lt;SearchBox client:load /&gt;
+</code></pre>
+
+<p>Related names you will hear: <strong>Enhance</strong>, <strong>11ty</strong> + islands, <strong>Fresh</strong> (Deno), partial hydration experiments across the ecosystem. The shared slogan: <em>default to HTML; earn your JavaScript.</em></p>
+
+<h2>3. Camp C — Client SPAs</h2>
+
+<p>Single-Page Applications: the browser downloads an app shell; client-side routing swaps views; the server is mostly an API. This is the model Create React App trained a generation on, and it still powers huge product UIs.</p>
+
+<h3>What you will see</h3>
+<ul>
+  <li><code>react-router</code> / Vue Router / Angular Router owning navigation.</li>
+  <li>A <code>fetch</code> / React Query / SWR layer talking to REST or GraphQL.</li>
+  <li>Vite (or Webpack legacy) as the bundler; "just a SPA" without a full-stack framework.</li>
+  <li>State libraries: Redux, Zustand, Pinia, NgRx — because the client owns long-lived state.</li>
+</ul>
+
+<h3>When it wins</h3>
+<ul>
+  <li>Authenticated products behind a login wall (SEO less critical).</li>
+  <li>Highly interactive UI where the server would thrash if it re-rendered every interaction.</li>
+  <li>Teams that already have a strong API backend and want a clean client/server split.</li>
+</ul>
+
+<h3>When it loses</h3>
+<ul>
+  <li>Public content pages that need fast first paint and crawlable HTML without extra SSR work.</li>
+  <li>Greenfield 2025+ apps where the React team itself now recommends a framework (CRA sunset Feb 2025 — paradigm doc §18.6).</li>
+</ul>
+
+<p><strong>Important 2026 nuance:</strong> SPA is not dead. "SPA as the default starter" is dead. Many production apps remain SPAs; new React guidance pushes Next.js, React Router framework mode, or Expo for apps that need routing + data + deployment conventions.</p>
+
+<h2>4. Camp D — Meta-frameworks (the industrial default for new React)</h2>
+
+<p>A meta-framework is a framework <em>around</em> a UI library: routing, data loading, rendering strategy, bundling, and often deployment. For React, that means <strong>Next.js</strong> first, then Remix / React Router framework mode, and mobile-adjacent <strong>Expo</strong>. Outside React: Nuxt (Vue), SvelteKit, Angular's modern CLI+SSR path, SolidStart, Qwik City.</p>
+
+<h3>What you will see</h3>
+<ul>
+  <li>File-system or config-based routing (<code>app/</code> in Next.js App Router).</li>
+  <li>Server Components / loaders / actions — data close to the server, UI split across processes (paradigm doc §18.2).</li>
+  <li>Caching and revalidation as first-class concepts, not afterthoughts.</li>
+  <li>Deploy targets that assume the framework (Vercel, Netlify, Cloudflare adapters, self-hosted Node).</li>
+</ul>
+
+<h3>When it wins</h3>
+<ul>
+  <li>Product + marketing in one codebase.</li>
+  <li>Teams that want conventions for data fetching, code splitting, and SEO without inventing them.</li>
+  <li>Anything that benefits from RSC: less client JS for data-heavy pages, direct server resource access.</li>
+</ul>
+
+<h3>When it loses</h3>
+<ul>
+  <li>Tiny widgets or pure static sites (Camp B is lighter).</li>
+  <li>Teams that need total control of a bespoke SPA architecture and already have it working.</li>
+  <li>When framework abstractions leak and the team does not yet understand the split-process model — debugging cost spikes.</li>
+</ul>
+
+<p>Deep dive for the React path you are on: <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a>.</p>
+
+<h2>5. Camp E — The other major UI libraries (signals world)</h2>
+
+<p>Not everything is React. By 2026 the non-React mainstream largely standardized on <strong>signals</strong> (or signal-like runes) for fine-grained updates:</p>
+
+<table>
+  <thead><tr><th>Stack</th><th>Reactivity unit</th><th>Notes for a React reader</th></tr></thead>
+  <tbody>
+     <tr><td><strong>Angular</strong> (v17+ → v22)</td><td>Signals + (still) zone.js legacy</td><td>Enterprise default in many shops; Signals+Vite in modern setups. <a href="./angular-evolution.html">Full evolution doc</a>.</td></tr>
+    <tr><td><strong>Vue 3</strong></td><td><code>ref</code> / <code>reactive</code> (signal-like)</td><td>Template + Composition API; gentler learning curve for many teams</td></tr>
+    <tr><td><strong>Svelte 5</strong></td><td>Runes (<code>$state</code>, etc.)</td><td>Compiler-first; less runtime framework in the browser</td></tr>
+    <tr><td><strong>Solid</strong></td><td><code>createSignal</code></td><td>JSX like React, reactivity like signals — no virtual DOM re-render model</td></tr>
+    <tr><td><strong>Preact</strong></td><td>Hooks + <code>@preact/signals</code> add-on</td><td>React-shaped API, web-first, tiny; paradigm doc §18.5b</td></tr>
+  </tbody>
+</table>
+
+<p>React's answer remains the Compiler + re-render model, not signals-as-public-API (paradigm doc §18.5). <strong>Do not translate 1:1.</strong> In signals frameworks, changing a cell updates bindings; the component function often does not re-run top-to-bottom the way a React function component does.</p>
+
+<blockquote class="callout">
+  <p><strong>C++ analogy.</strong> React re-render ≈ recomputing a pure function of state and diffing the result. Signals ≈ dirty-flagging dependent nodes in a graph and updating only those nodes. Both can implement the same UI; the debugging stories differ.</p>
+</blockquote>
+
+<h2>5b. Mental models — how camp practitioners actually reason</h2>
+
+<p>Each camp trains a different mental model. If you only know the React re-render model, you will misread code in other camps. Here is how practitioners in each camp actually think:</p>
+
+<table>
+  <thead><tr><th>Camp</th><th>Core mental model</th><th>What "change" means</th><th>Debugging intuition</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>CMS / Classic (A)</strong></td>
+      <td>Page = template + data. Server re-renders full page on state change.</td>
+      <td>Full round-trip or partial fragment swap.</td>
+      <td>Trace the template + controller. No client hydration.</td>
+    </tr>
+    <tr>
+      <td><strong>HTML-first / Islands (B)</strong></td>
+      <td>Static document with precision holes for interactivity.</td>
+      <td>Only the island re-renders; rest is inert HTML.</td>
+      <td>Find the <code>client:*</code> directive → that's your React/Preact boundary.</td>
+    </tr>
+    <tr>
+      <td><strong>SPA React (C)</strong></td>
+      <td>UI = f(state). Re-render = re-run component function + diff.</td>
+      <td>State change → component re-runs → children re-render (unless memoized).</td>
+      <td>React DevTools: why did this re-render? Closure staleness? Missing memo?</td>
+    </tr>
+    <tr>
+      <td><strong>Meta-framework RSC (D)</strong></td>
+      <td>Server components = pure functions per request. Client components = React model.</td>
+      <td>Server: new request = fresh function. Client: same as SPA.</td>
+      <td>Check <code>"use client"</code> boundary. Server logs ≠ client logs.</td>
+    </tr>
+    <tr>
+      <td><strong>Signals (E)</strong></td>
+      <td>Reactive graph: cells (signals) → derived (computed) → effects. No component re-run.</td>
+      <td>Write to signal → only subscribers update. Component function often runs once.</td>
+      <td>Signal DevTools: which signals changed? Which effects fired? No "render count".</td>
+    </tr>
+    <tr>
+      <td><strong>WASM (F)</strong></td>
+      <td>Foreign language runtime. JS = glue; logic = compiled module.</td>
+      <td>Call exported function → get result. No reactivity in WASM.</td>
+      <td>Profile the WASM module (perfetto, wasm-bugs). JS side is thin.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Transfer trap:</strong> bringing React's "re-render" mental model to signals frameworks causes over-subscription (treating signals like state, reading in render). Bringing signals "dirty flag" model to React causes missing memoization. Learn the camp's native model first.</p>
+
+<h2>6. Camp F — WASM and non-JS UI engines</h2>
+
+<p>WebAssembly lets languages like Rust, C++, C#, and Zig run in the browser (and on the edge) at near-native speed. Frontend use cases cluster around:</p>
+<ul>
+  <li><strong>Heavy compute in the client:</strong> image/video codecs, CAD, games, crypto, data viz pipelines.</li>
+  <li><strong>Porting existing C++ engines</strong> to the web (your background is an asset here).</li>
+  <li><strong>Edge logic</strong> where cold starts and CPU matter (some Cloudflare / Wasmtime deployments).</li>
+</ul>
+
+<p>JS still usually owns the DOM glue. Frameworks like Yew / Leptos (Rust), Blazor (C#), and custom engines exist, but most production "WASM frontends" are hybrid: React/Vue shell + WASM modules for hot paths.</p>
+
+<p><strong>When it wins:</strong> algorithmic bulk that would jank on the main thread in plain JS. <strong>When it loses:</strong> ordinary forms and CRUD — the toolchain tax is not worth it.</p>
+
+<h2>7. The TypeScript shift</h2>
+
+<p>TypeScript is no longer "nice to have" in industrial frontend. Stack Overflow surveys have shown JavaScript as the most-used language for years running, with TypeScript as the typed layer most professional teams adopt for app code. For the full JS-vs-everything story across backend/mobile/embedded/AI, see <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>. Practical reality in 2026:</p>
+<ul>
+  <li>New Next.js / Vite / Angular scaffolds default to TypeScript or offer it first.</li>
+  <li>Library types ship in the package; <code>any</code> is a code-review smell, not a strategy.</li>
+  <li>Your mission still correctly stays in <strong>plain JS first</strong> — types sit on top of the mental models you are building (scope, closures, <code>this</code>, modules). Learning TS before those models is memorizing annotations for behavior you cannot yet predict.</li>
+</ul>
+
+<p>When you do add TS later: start with <code>strict</code>, type function boundaries and data from APIs, leave local inference alone. The cert does not require TypeScript; work code often will.</p>
+
+<h2>8. The AI-era layer (tooling, not a UI camp)</h2>
+
+<p>AI did not invent a new rendering model. It changed <em>how code is produced and reviewed</em>:</p>
+<ul>
+  <li><strong>Copilots and agents</strong> generate components, tests, and refactors — quality still depends on the human who can read closures and deps arrays.</li>
+  <li><strong>AI product features</strong> in apps: chat UIs, streaming tokens, tool-calling frontends — usually still React/Vue components over SSE/WebSocket.</li>
+  <li><strong>AI training / annotation work</strong> as an income path for people who can evaluate code and UI quality — see <a href="./frontend-income-markets.html">Frontend income markets</a>.</li>
+</ul>
+
+<p>Stack Overflow's 2024 survey already showed large majorities of developers using AI tools at work. By 2026 that is ambient. The differentiator is not "can you prompt"; it is "can you tell when the generated hook is wrong." That is why this workspace drills JS fundamentals before framework fashion.</p>
+
+<h2>9. Market gravity (who hires which camp)</h2>
+
+<table>
+  <thead><tr><th>Employer shape</th><th>Common stack gravity</th></tr></thead>
+  <tbody>
+    <tr><td>Startups / product SaaS</td><td>React + Next.js or SPA; TypeScript</td></tr>
+    <tr><td>Enterprise / government</td><td>Angular or React; sometimes Vue; heavy process</td></tr>
+    <tr><td>Agencies / marketing sites</td><td>WordPress, Webflow, Astro, Next marketing sites</td></tr>
+    <tr><td>Design-system / platform teams</td><td>React (or Vue) component libraries, Storybook</td></tr>
+    <tr><td>Game / tools / CAD-in-browser</td><td>WASM + thin JS shell</td></tr>
+    <tr><td>Content publishers</td><td>CMS + HTML-first or meta-framework SSG</td></tr>
+  </tbody>
+</table>
+
+<p>HackerRank's Developer Skills Report and industry surveys consistently put JavaScript at the center of hiring screens; framework keywords rotate (React stays dominant; Next.js appears more in postings each year; Angular holds enterprise niches). For income streams that use these skills, not just stack fashion, read <a href="./frontend-income-markets.html">Frontend income markets</a>.</p>
+
+<h2>3b. Migration paths between camps</h2>
+
+<p>Teams rarely stay in one camp forever. Common migrations and their friction points:</p>
+
+<table>
+  <thead><tr><th>From → To</th><th>Trigger</th><th>Target state</th><th>Steps</th><th>Risks</th><th>Success signals</th><th>Timeline</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>CMS (A) → HTML-first islands (B)</td>
+      <td>Interactive needs exceed jQuery; editorial workflow must stay</td>
+      <td>Astro + Preact islands on top of CMS</td>
+      <td>1) Add Astro as page renderer. 2) Migrate templates to .astro. 3) Add client:load islands for widgets. 4) Keep CMS content API.</td>
+      <td>CMS preview breaks; dual rendering budget</td>
+      <td>Zero-JS pages score 90+ Lighthouse; islands hydrate <100ms</td>
+      <td>2–4 sprints</td>
+    </tr>
+    <tr>
+      <td>HTML-first (B) → Meta-framework (D)</td>
+      <td>Need SSR for SEO/auth; islands become too many</td>
+      <td>Next.js App Router (RSC + client boundaries)</td>
+      <td>1) Add Next.js in subdirectory. 2) Migrate Astro pages to App Router. 3) Mark interactive components "use client". 4) Move data fetching to Server Components.</td>
+      <td>Hydration mismatches; RSC mental model shift</td>
+      <td>First paint <1.5s; SEO traffic stable; auth works</td>
+      <td>3–6 sprints</td>
+    </tr>
+    <tr>
+      <td>SPA React (C) → Meta-framework (D)</td>
+      <td>SEO/LCP pressure; bundle too large; team wants RSC</td>
+      <td>Next.js or Remix with gradual adoption</td>
+      <td>1) Add framework alongside SPA. 2) Migrate routes one by one. 3) Extract shared UI to components. 4) Enable RSC for data-heavy pages.</td>
+      <td>Route-level dual maintenance; cache invalidation bugs</td>
+      <td>Bundle -40%; LCP <2.5s; no regression in Core Web Vitals</td>
+      <td>4–8 sprints</td>
+    </tr>
+    <tr>
+      <td>Angular (C/D) → React/Next.js (C/D)</td>
+      <td>Hiring pool; ecosystem momentum; team preference</td>
+      <td>Strangler fig: new features in Next.js, legacy in Angular</td>
+      <td>1) Micro-frontend or iframe shell. 2) Shared design tokens. 3) New routes in Next.js. 4) Incremental Angular route retirement.</td>
+      <td>Two runtimes; shared state sync; CSS conflicts</td>
+      <td>Zero Angular bugs in new features; team velocity ↑</td>
+      <td>6–18 months</td>
+    </tr>
+    <tr>
+      <td>Signals library (E) → React (C/D)</td>
+      <td>Team standardization; React ecosystem need</td>
+      <td>Rewrite or interop layer</td>
+      <td>1) Map signals to hooks. 2) Shared component library. 3) Route-by-route migration.</td>
+      <td>Reactivity model mismatch; derived state bugs</td>
+      <td>No signal-specific bugs in migrated code</td>
+      <td>3–6 sprints</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Big-bang rewrites. Every successful migration in the table above is incremental, route-by-route, or island-by-island. The camp boundaries in the survey table (§0) are centers of gravity — not walls.</p>
+
+<h2>10. How the camps relate to your React mental model</h2>
+
+<table>
+  <thead><tr><th>Camp</th><th>Does the re-render box model apply?</th></tr></thead>
+  <tbody>
+    <tr><td>CMS + jQuery</td><td>Mostly no — imperative DOM updates</td></tr>
+    <tr><td>HTML-first islands (React/Preact)</td><td>Yes, inside each island</td></tr>
+    <tr><td>SPA React</td><td>Yes — full model from paradigm + box-model docs</td></tr>
+    <tr><td>Next.js client components</td><td>Yes — same as SPA React</td></tr>
+    <tr><td>Next.js server components</td><td>Partial — functions run once per request/build; no hooks loop</td></tr>
+    <tr><td>Angular / Vue / Svelte signals</td><td>Different reactivity; do not force React's model</td></tr>
+    <tr><td>WASM modules</td><td>No — different language runtime; JS glue may still use React</td></tr>
+  </tbody>
+</table>
+
+<p>Companion docs:</p>
+<ul>
+  <li><a href="./class-to-hooks-paradigm-shift.html">Class-to-hooks paradigm shift</a> — React's own arc through 2026.</li>
+  <li><a href="./re-render-box-model.html">Re-render box model</a> — closures applied to re-renders.</li>
+  <li><a href="./nextjs-deep-dive.html">Next.js deep dive</a> — the meta-framework you are most likely to meet on a React job.</li>
+  <li><a href="./frontend-income-markets.html">Frontend income markets</a> — demand-side: jobs, freelance, AI annotation, Egypt remote context.</</ul>
+
+---
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>The camp survey is only as useful as the tooling that makes its boundaries visible, testable, and migratable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Camp Identification & Framework Detection</strong></td>
+      <td>Wappalyzer, BuiltWith, Framework Detector (Astro), @astrojs/compiler, custom heuristics</td>
+      <td>Unknown codebase → recognized camp + version + config</td>
+      <td>Detection accuracy; False positive rate; Time to identify; Config coverage</td>
+    </tr>
+    <tr>
+      <td><strong>Migration Tooling (Camp-to-Camp)</strong></td>
+      <td>Astro Islands migration, Next.js Codemods, React → Svelte/Vue/Solid codemods, @vue/compiler-sfc, Svelte migrate, Mitosis, Qwik CLI</td>
+      <td>Source camp → target camp with working, idiomatic code</td>
+      <td>Idiomaticity score; Test pass rate; Manual fix %; Review latency</td>
+    </tr>
+    <tr>
+      <td><strong>Bundle Analysis & Budget Enforcement</strong></td>
+      <td>webpack-bundle-analyzer, Vite Bundle Analyzer, next-bundle-analyzer, @next/bundle-analyzer, bundlesize, ci-size</td>
+      <td>Unknown bundle → measured, budgeted, gated</td>
+      <td>Budget pass/fail; Bundle size trend; Chunk count; Duplicate detection</td>
+    </tr>
+    <tr>
+      <td><strong>Island / Partial Hydration Tooling</strong></td>
+      <td>Astro (client:* directives), Qwik (resumable), Fresh (Preact), Marko, Elder.js, 11ty + islands</td>
+      <td>Full hydration → island-based selective hydration</td>
+      <td>Interactive bytes %; Hydration time; TTI; Island count; Config complexity</td>
+    </tr>
+    <tr>
+      <td><strong>TypeScript Migration & Type Safety</strong></td>
+      <td>ts-migrate, TS Morph, tsc --isolatedModules, type-fest, Zod, Valibot, ArkType</td>
+      <td>JS/loose TS → camp-idiomatic strict TS</td>
+      <td>Any %; Type coverage; Migration velocity; Runtime error reduction</td>
+    </tr>
+    <tr>
+      <td><strong>Reactivity Model Comparison</strong></td>
+      <td>React DevTools, Svelte DevTools, Vue DevTools, Solid DevTools, @preact/signals-devtools, Knip</td>
+      <td>Wrong mental model → camp-appropriate reactivity understanding</td>
+      <td>Re-render count; Derived state accuracy; Signal/hook parity; Debug time</td>
+    </tr>
+    <tr>
+      <td><strong>AI-Assisted Camp Translation</strong></td>
+      <td>GitHub Copilot, Cursor, Sourcegraph Cody, Continue, Cody, Windsurf, Cline</td>
+      <td>"Translate this component to camp X" → working, idiomatic target code</td>
+      <td>Idiomaticity score; Test pass rate; Manual fix %; Review latency</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with Camp Identification + Framework Detection (the "minimum viable survey toolkit"). Add Migration Tooling when camp transition is decided. Add Bundle Analysis when performance budget exists. Add Island Tooling when HTML-first/Partial Hydration is target. Add AI-Assisted Translation when team knows source camp but not target. The tool serves the migration — not the reverse.</p>
+
+---
+
+<p>Companion docs:</p>
+<ul>
+  <li><a href="./class-to-hooks-paradigm-shift.html">Class-to-hooks paradigm shift</a> — React's own arc through 2026.</li>
+  <li><a href="./re-render-box-model.html">Re-render box model</a> — closures applied to re-renders.</li>
+  <li><a href="./nextjs-deep-dive.html">Next.js deep dive</a> — the meta-framework you are most likely to meet on a React job.</li>
+  <li><a href="./frontend-income-markets.html">Frontend income markets</a> — demand-side: jobs, freelance, AI annotation, Egypt remote context.</</ul>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+  <p>You can place a codebase into a camp (CMS, HTML-first, SPA, meta-framework, signals library, WASM hybrid), know what each optimizes for, and know whether your React closure mental model applies as-is, applies only on the client island, or should be set aside. The point is recognition at work — not converting every project to your favorite camp.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Frontend camps survey</span>
+  <span>Mission: read JS/React at work</span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

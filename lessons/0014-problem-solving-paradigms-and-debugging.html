@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0014 — Problem-Solving: Paradigms + Debugging · The Tools and the Application</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 3 · The Exploration Journey · Bridge (3/4)</p>
+  <h1>Problem-Solving — Paradigms + Debugging</h1>
+  <p class="meta">Pólya's phases tell you when. CT tells you what. Heuristics tell you how. This lesson gives you the <em>tools</em> (six algorithm paradigms) and the <em>application</em> (debugging as inverted problem-solving, plus the "Look back" phase everyone skips). Anchored to <a href="../reference/problem-solving.html">Problem-Solving</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0013-problem-solving-computational-thinking.html">Lesson 13</a> gave you the lens (computational thinking), the moves (heuristics), and the monitor (metacognition). This lesson gives you the <strong>paradigms</strong> — the fundamental approaches to designing an algorithm — and the <strong>application</strong>: debugging (the same four phases, inverted) and the "Look back" phase that builds long-term skill. This is the final problem-solving lesson; next, we deepen the rhythm (L15).</p>
+</section>
+
+<h2>1. The tools — six algorithm design paradigms</h2>
+<p>During Phase 2 (Devise a plan), after you've decomposed and recognized patterns, you need to choose a <strong>paradigm</strong> — a fundamental approach to designing the algorithm. There is no single optimal algorithm for all problems; there are paradigms, each fitting a different class of problem. Recognizing which paradigm a problem calls for is itself a pattern-recognition skill built through practice.</p>
+<table>
+  <thead><tr><th>Paradigm</th><th>When to use it</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Brute force</strong></td><td><em>Always start here</em> if the input is small. Get it correct first, optimize later.</td><td>Find all pairs that sum to N (nested loop)</td></tr>
+    <tr><td><strong>Greedy</strong></td><td>When local optimum = global optimum. Prove it works before trusting it.</td><td>Minimum coin change (certain systems)</td></tr>
+    <tr><td><strong>Divide &amp; conquer</strong></td><td>When sub-problems are <strong>independent</strong> (solving one doesn't depend on another).</td><td>Merge sort, binary search</td></tr>
+    <tr><td><strong>Dynamic programming</strong></td><td>When sub-problems <strong>overlap</strong> (the same sub-problem appears multiple times).</td><td>Fibonacci, knapsack, edit distance</td></tr>
+    <tr><td><strong>Backtracking</strong></td><td>When you need to explore all possibilities but can prune early.</td><td>N-Queens, Sudoku solver</td></tr>
+    <tr><td><strong>Hash table</strong></td><td>When you need fast lookup, counting, or deduplication. Often the upgrade from brute force O(n²) → O(n).</td><td><strong>Your word-frequency counter</strong>, two-sum</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The critical distinction — D&amp;C vs DP:</strong> Divide &amp; Conquer is for <em>independent</em> sub-problems (merge sort: each half is sorted independently). Dynamic Programming is for <em>overlapping</em> sub-problems (Fibonacci: fib(5) needs fib(4) and fib(3), but fib(4) also needs fib(3) — so you store fib(3) rather than recomputing). If the sub-problems don't overlap, use D&amp;C. If they do, use DP. This single distinction is one of the most tested in interviews and competitions.</p>
+</blockquote>
+
+<p><strong>Your HackerRank word-frequency counter uses the hash table paradigm</strong> — you intuitively recognized that counting occurrences is a hash-map problem, not a brute-force "search the array each time" problem. The skill to build: solve enough problems that you start recognizing the paradigm from the problem statement, before you even plan the steps.</p>
+
+<h2>2. Debugging — the same four phases, inverted</h2>
+<p>Debugging <em>is</em> problem-solving. The problem is simply: "Why doesn't this code do what I expect?" It follows Pólya's four phases, but the direction is inverted — you start from the symptom (the wrong output) and work backwards to the cause. Recognizing debugging as problem-solving (not a separate ad-hoc activity) is what separates systematic debuggers from people who randomly change things and hope.</p>
+<ul>
+  <li><strong>Rubber duck debugging</strong> (Hunt &amp; Thomas, 1999) — explain your code, line by line, to an inanimate object. The act of explaining <em>forces you to articulate your assumptions</em> — and the bug is almost always in an assumption you didn't realize you were making. This is Phase 1 (Understand) applied to your own code.</li>
+  <li><strong>Hypothesis-driven debugging</strong> — the scientific method: Observe → Hypothesize → Predict → Test → Conclude. Don't change code until you've confirmed the cause. The anti-pattern is changing code without a hypothesis — "let me try removing this line" — which is guessing, not debugging.</li>
+  <li><strong>Binary search debugging</strong> — when a bug is somewhere in a large codebase, apply divide &amp; conquer: put a checkpoint in the middle. Is the state correct there? If yes, the bug is in the second half. If no, it's in the first half. The same algorithm paradigm applied to the debugging process itself.</li>
+</ul>
+
+<h2>3. The "Look back" phase — what everyone skips</h2>
+<p>Phase 4 (Look back) is the phase that builds the most long-term skill and is the most consistently skipped. After a solution passes, the temptation is to move on immediately. Resist it. The minutes you spend here compound into the pattern recognition that makes future problems faster.</p>
+<p>Three things to do during Look back:</p>
+<ul>
+  <li><strong>Check edge cases.</strong> Empty input, single element, all-same, maximum size, boundary values, null/undefined. For your word-frequency counter: what if the string is empty? ("".split(" ") gives [""] not [] — a bug.) What about numbers? Contractions like "don't"?</li>
+  <li><strong>Ask "can I derive it differently?"</strong> Is there a simpler approach? A more efficient one? A more general one? For word-frequency: could you use <code>reduce</code> instead of a <code>for</code> loop? Could you make it a reusable <code>countOccurrences(tokens)</code> function?</li>
+  <li><strong>File the pattern.</strong> What category does this problem belong to? What signal in the problem statement told you the approach? For word-frequency: "count occurrences" → hash map paradigm. Filed under: hash-map / frequency-counting. Next time you see "count how many times each character appears," you'll recognize it instantly.</li>
+</ul>
+<p><strong>This is how pattern recognition is built</strong> — not by reading about patterns, but by <em>filing</em> them after solving. Each filed pattern is one more entry in your mental lookup table. After 50 problems, you'll recognize categories from the problem statement. After 200, from the first sentence.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="overlapping" data-explain="Dynamic Programming is for overlapping sub-problems — the same sub-problem appears multiple times (e.g., Fibonacci: fib(4) and fib(5) both need fib(3)). Divide & Conquer is for independent sub-problems (e.g., merge sort: each half is sorted independently). The distinction is overlapping vs independent.">
+  <summary>What distinguishes dynamic programming from divide and conquer?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="overlapping"> Sub-problems overlap vs are independent</label>
+      <label><input type="radio" name="q1" value="recursion"> DP uses recursion, D&C does not</label>
+      <label><input type="radio" name="q1" value="speed"> DP is always faster than D&C</label>
+      <label><input type="radio" name="q1" value="memory"> D&C uses more memory than DP</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="hypothesis" data-explain="Hypothesis-driven debugging is the scientific method: Observe → Hypothesize → Predict → Test → Conclude. You don't change code until you've confirmed the cause. The anti-pattern is changing code without a hypothesis — guessing, not debugging.">
+  <summary>What is the core of systematic (hypothesis-driven) debugging?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="hypothesis"> Form a hypothesis before changing code</label>
+      <label><input type="radio" name="q2" value="brute-force"> Try removing lines until it works</label>
+      <label><input type="radio" name="q2" value="restart"> Restart the dev server and refresh</label>
+      <label><input type="radio" name="q2" value="rewrite"> Rewrite the entire function from scratch</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="file-the-pattern" data-explain="Pattern filing — asking "what category does this problem belong to? what signal told me the approach?" — is how pattern recognition is built. Each filed pattern is an entry in your mental lookup table. After 50 problems, you recognize categories from the problem statement; after 200, from the first sentence.">
+  <summary>What is the most important action in the "Look back" phase for building long-term skill?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="file-the-pattern"> File the pattern for future recognition</label>
+      <label><input type="radio" name="q3" value="refactor-code"> Refactor the code to be shorter</label>
+      <label><input type="radio" name="q3" value="add-comments"> Add comments explaining each line</label>
+      <label><input type="radio" name="q3" value="delete-tests"> Delete the test cases to clean up</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>tools and the application</strong>: six algorithm paradigms (brute force, greedy, D&amp;C, DP, backtracking, hash table) with the critical D&amp;C-vs-DP distinction; debugging as inverted problem-solving (rubber duck, hypothesis-driven, binary search); and the "Look back" phase — edge cases, "can I derive it differently?", and pattern filing. The deepest insight: <strong>pattern recognition isn't built by reading about patterns — it's built by filing them after solving.</strong> Each filed pattern is an entry in your mental lookup table. After 50 problems, you'll recognize the category from the problem statement. After 200, from the first sentence. That's the compounding return on the Look-back phase everyone skips.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/problem-solving.html">Problem-Solving</a> — the full paradigm table with examples (§7), the edge case catalog (§10), the fluency-vs-storage-strength section on how to use HackerRank/LeetCode correctly (§11), and the "right questions" catalog (§12).</li>
+    <li><strong>Next lesson:</strong> <a href="./0015-the-rhythm-deepened.html">Lesson 15 — The Rhythm Deepened</a> — why the Model→View→Flow loop works (working memory, cognitive load), how it fails (8 failure modes), and what stays constant (8 principles). The deepening you come back to after trying the loop on a real feature.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory. Then, on your next challenge, consciously name the paradigm before you code, and file the pattern after you pass.</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/Competitive_programming">Competitive programming (Wikipedia)</a> — the tradition that codified the paradigm categories. And <a href="https://en.wikipedia.org/wiki/Rubber_duck_debugging">Rubber duck debugging (Wikipedia)</a> — Hunt &amp; Thomas's technique from <em>The Pragmatic Programmer</em> (1999).</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I prove a greedy approach works before trusting it?"</li>
+    <li>"What's a real example of binary search debugging in a React app?"</li>
+    <li>"How do I organize my filed patterns — a notebook? An Anki deck?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 3 · <a href="../reference/problem-solving.html">Reference: Problem-Solving</a></span>
+  <span>Next → <a href="./0015-the-rhythm-deepened.html">Lesson 15 · The Rhythm Deepened</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Developers Think When Building a Frontend Feature</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Frontend engineering — the mental model behind the code</p>
+  <h1>How Developers Think When Building a Frontend Feature</h1>
+  <p class="meta">The three-thread mental loop (Model → View → Flow), why it's a rhythm not an algorithm, the history of the spiral from Boehm to React, the vocabulary of wireframes/prototypes/MVPs, and what "sketching the data shape" actually means with concrete examples. Read this before you start any non-trivial UI feature.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> This doc is the <em>implementation loop</em> (layer 3). Upstream:</p>
+  <ul>
+    <li><a href="./design-thinking.html">Design Thinking</a> — discovers <em>what problem</em> to solve (desirability/feasibility/viability).</li>
+    <li><a href="./system-design.html">System Design</a> — decides <em>how the solution fits together</em> at scale (services, data ownership, consistency, failure domains).</li>
+  </ul>
+  <p>Loop siblings that influence execution:</p>
+  <ul>
+    <li><a href="./api-design.html">API Design</a> — the contract layer the loop consumes; bad contracts force paper-over code (loading states, retries, type assertions).</li>
+    <li><a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — the rendering layer the loop produces; UI/UX sets the guardrails (state visibility, a11y, motion, error affordances) the loop implements within.</li>
+    <li><a href="./html-and-css.html">HTML & CSS</a> — the platform substrate the loop emits and styles; the primitives (<code><button></code>, <code><input></code>, Grid, Flex, cascade, custom properties) are the loop's raw material.</li>
+    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+  </ul>
+  <p>This doc executes inside the boundaries those layers set.</p>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>Most tutorials teach <em>syntax</em> — how to write a component, how to call <code>useState</code>, how to style with CSS. Almost none teach the <em>thinking process</em> that precedes the code: how an experienced developer breaks down a feature into data, structure, and behavior, cycles through them, and knows when to stop. This doc captures that process in full — the loop, its history, its vocabulary, and the single most important upfront decision: the data shape. If you've ever stared at a blank file wondering "where do I even start?", this is the map.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone, but most useful <em>after</em> you understand the platform (<a href="./html-and-css.html">HTML &amp; CSS</a>) and the language (<a href="./javascript-the-language.html">JavaScript: The Language</a>), and <em>before</em> you start any non-trivial UI feature. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./design-thinking.html">Design Thinking</a> — discovers <em>what problem</em> to solve; this doc assumes the problem is given.</li>
+  <li>Upstream to <a href="./problem-solving.html">Problem-Solving</a> — finds <em>how to solve the problem</em>; this doc assumes the solution is known and implements it as a feature.</li>
+  <li>Upstream to <a href="./system-design.html">System Design</a> — decides the macro structure; this doc operates at the micro (single feature) scale.</li>
+  <li>Sibling to <a href="./api-design.html">API Design</a> — the contract layer the loop consumes.</li>
+  <li>Sibling to <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> — the rendering guardrails the loop implements within.</li>
+  <li>Substrate: <a href="./html-and-css.html">HTML &amp; CSS</a> — the primitives the loop emits and styles.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+</ul>
+
+<p><strong>If you've ever stared at a blank file wondering "where do I even start?" — this is the map.</strong> Read §1 (the three threads), §2–§5 (the rounds), and §13 (the worked example) first. Then come back for the theory (§1e) and the failure modes (§13b) when you've tried the loop on a real feature.</p>
+
+<h2>1b. Definition — what the dev loop <em>is</em> and what it is <em>not</em></h2>
+
+<h3>What it is</h3>
+<p>The development loop is the <strong>implementation rhythm</strong> that turns a known solution into a working UI feature. It is three threads — Model (data/state), View (structure/layout), Flow (events/logic) — cycled in rounds (Skeleton → Deepen → Polish), each round deeper than the last. It produces <em>working code</em> — the feature itself. The rhythm is universal: the same Model→View→Flow cycle applies whether you're building a todo list, a dashboard, or a complex form.</p>
+
+<h3>What it is not</h3>
+<ul>
+  <li><strong>Not problem-solving.</strong> Problem-solving (see <a href="./problem-solving.html">that reference</a>) finds the <em>solution</em> — the algorithm, the plan, the verified logic. The dev loop takes that solution and <em>implements</em> it as a feature. A HackerRank challenge needs problem-solving; a React feature needs problem-solving <em>then</em> the dev loop.</li>
+  <li><strong>Not system design.</strong> System design structures the solution <em>across services and boundaries</em> (see <a href="./system-design.html">that reference</a>). The dev loop structures the solution <em>within one feature</em> — the data shape, the component tree, the event flow.</li>
+  <li><strong>Not the SDLC.</strong> The SDLC is a project-scale phase model (Requirements → Design → Implementation → Testing → Deployment). The dev loop is smaller and older — it's the rhythm of a single feature, a single afternoon's work. As §9 shows, it predates every named methodology.</li>
+  <li><strong>Not a fixed algorithm.</strong> You can't write down "step 1: do this, step 2: do that" for building a feature — the steps change as you learn. It's a <strong>rhythm</strong>: you cycle through the threads, you feel the friction, you deepen when it creaks. See §10 for why.</li>
+  <li><strong>Not just for React.</strong> The three-thread loop predates React — it applies to Vue, Svelte, Angular, even vanilla JS. React just made it <em>visible</em> because a component is a small enough unit to round-trip in an hour.</li>
+</ul>
+
+<h3>Well-defined vs wicked — where the loop lives</h3>
+<p>The dev loop lives squarely in <strong>wicked problem</strong> territory (see <a href="./problem-solving.html">Problem-Solving §1</a>): the requirements evolve, the success criteria are subjective ("does it look right?"), and there's no clear stopping rule — only better or worse. This is why it's a rhythm, not an algorithm. A HackerRank challenge (well-defined) gets an algorithm; a UI feature (wicked) gets a rhythm. Both use the same underlying thinking process (Pólya's four phases), but they converge to different output types.</p>
+
+<h2>1c. Evolution — constraint inversions across the same idea</h2>
+
+<p>Like every discipline on this shelf, the dev loop evolved through constraint inversions — moments when a constraint changed and the old approach stopped being sufficient.</p>
+
+<table>
+  <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Waterfall → Spiral</strong></td><td>"Design everything upfront, build once" (Royce, 1970 — though he warned against it)</td><td>"Design in narrowing spirals, each cycle deeper" (Boehm, 1986)</td><td>The constraint: requirements change. You can't know everything upfront. The spiral model made it explicit: Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper. This is the named ancestor of "Skeleton → Deepen → Polish."</td></tr>
+    <tr><td><strong>Project-scale → Feature-scale</strong></td><td>The loop ran at project scale (sprints, releases)</td><td>The component model made the loop visible at feature scale (an afternoon's work)</td><td>React (2013+) made components small enough to round-trip in an hour. The rhythm that Boehm named at project scale moved down to the single-feature scale. "Skeleton → Deepen → Polish" is now how one React component gets written.</td></tr>
+    <tr><td><strong>Manual → Hot reload</strong></td><td>Feedback loop: edit → compile → refresh → see result (seconds to minutes)</td><td>Feedback loop: edit → see result instantly (milliseconds)</td><td>Vite, Next.js dev server, Fast Refresh. The tighter the feedback loop, the faster you learn. This is why the rounds (Skeleton → Deepen → Polish) work at all — you can cycle through them in minutes, not days.</td></tr>
+    <tr><td><strong>Class → Function + Hooks</strong></td><td>State lived in class instances (this.state, this.setState)</td><td>State lives in hook slots (useState, useReducer)</td><td>Hooks (2018) dissolved the class/function boundary. The loop didn't change — but the implementation got simpler. See <a href="./class-to-hooks-paradigm-shift.html">Class to Hooks</a>.</td></tr>
+    <tr><td><strong>Client-only → Server + Client</strong></td><td>The loop ran entirely in the browser (SPA)</td><td>The Model thread now splits across server and client (RSC, Next.js)</td><td>Server Components (2023+) changed where the Model thread runs. The loop is the same (Model → View → Flow), but the Model is now partially server-rendered. See <a href="./react-2024-and-beyond.html">React 2024+</a> and <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a>.</td></tr>
+    <tr><td><strong>Unaided → AI-assisted</strong></td><td>You skeleton every feature from scratch</td><td>AI can scaffold the skeleton (Round 1) for common patterns</td><td>AI tools (Copilot, ChatGPT) can generate the skeleton pass. But the Deepen and Polish rounds still need human judgment — the "feel the friction" signal is the human's job. The loop's shape doesn't change; what each round <em>produces</em> shifts.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The pattern:</strong> the loop's <em>shape</em> (three threads, cycled in rounds) has been stable since Boehm named it in 1986. What changes is the <em>scale</em> (project → feature), the <em>speed</em> (days → milliseconds), the <em>where</em> (client → server+client), and the <em>who</em> (human → human+AI). The rhythm survives because it's the shape of iterative work itself, not a tool.</p>
+
+<h2>1d. Intersection with neighbors — where it borders other practices</h2>
+
+<p>The dev loop sits between the layer that finds the solution and the layer that renders it. Every neighbor is a sibling, not a substitute.</p>
+
+<table>
+  <thead><tr><th>Neighbor</th><th>Relationship</th><th>What each layer owns</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./design-thinking.html">Design Thinking</a> <em>(upstream)</em></td><td>Design Thinking finds the problem; the dev loop builds the solution.</td><td>Design Thinking: "What problem should I solve?" (desirability, feasibility, viability). Dev loop: "How do I build this feature?" (Model → View → Flow).</td></tr>
+    <tr><td><a href="./problem-solving.html">Problem-Solving</a> <em>(upstream)</em></td><td>Problem-solving finds the algorithm; the dev loop implements it as a feature.</td><td>Problem-solving: the plan, the verified logic. Dev loop: turns that plan into working UI code — data shape, component tree, event handlers.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a> <em>(upstream)</em></td><td>System design structures across boundaries; the dev loop structures within one feature.</td><td>System design: services, data ownership, consistency — the macro. Dev loop: the data shape, component state, event flow — the micro.</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a> <em>(sibling)</em></td><td>The loop consumes the API contract; bad contracts force "paper-over code."</td><td>API design: the contract (resources, errors, pagination). Dev loop: the loading states, retries, error handling that consume the contract.</td></tr>
+    <tr><td><a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> <em>(sibling)</em></td><td>UI/UX sets the guardrails; the loop implements within them.</td><td>UI/UX: state visibility, accessibility, motion, error affordances. Dev loop: implements those guardrails in code.</td></tr>
+    <tr><td><a href="./html-and-css.html">HTML &amp; CSS</a> <em>(substrate)</em></td><td>The loop emits HTML and styles it with CSS.</td><td>HTML &amp; CSS: the primitives (semantic elements, Grid, Flex, cascade, custom properties). Dev loop: uses those primitives to build the View thread.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The boundary rule:</strong> if you're deciding <em>what</em> to build, that's Design Thinking. If you're deciding <em>how to solve the problem</em>, that's Problem-Solving. If you're deciding <em>how the solution fits at scale</em>, that's System Design. If you're <em>building the feature</em>, that's the dev loop. Each layer feeds the next.</p>
+
+<h2>1e. Underlying theory — why the loop works (the cognitive science)</h2>
+
+<p>The three-thread loop wasn't derived from cognitive science — it was derived from practice, from decades of developers noticing what works. But cognitive science explains <em>why</em> it works, providing the theoretical foundation.</p>
+
+<h3>Working memory limitations — why you can't hold all three threads at once</h3>
+<p>Working memory is severely limited (Miller 1956: ~7±2 items; Cowan 2001: ~4). You cannot simultaneously hold the data shape (Model), the component tree (View), <em>and</em> the event flow (Flow) in working memory while also writing code. The loop is the workaround: you focus on one thread at a time, holding the others lightly, and cycle through them. Each pass is shallow enough to fit in working memory. This is the same principle as Pólya's "offload to external representation" (see <a href="./problem-solving.html">Problem-Solving §1e</a>) — the rounds let you externalize one thread while holding another.</p>
+
+<h3>Cognitive load theory — why shallow-then-deep beats all-at-once</h3>
+<p>Sweller's cognitive load theory (1980s) identifies three types of mental effort: intrinsic (the problem's difficulty), extraneous (how info is presented), and germane (effort to build schemas). Building a feature all-at-once maximizes extraneous load — you're juggling data, layout, <em>and</em> logic simultaneously. The rounds reduce extraneous load: in Round 1 (Skeleton) you only deal with the simplest possible data + one element + one event. As you deepen, you add one thread at a time, keeping total load within working memory capacity. <strong>The rounds are a cognitive load management strategy.</strong></p>
+
+<h3>Feedback loops — why hot reload changed everything</h3>
+<p>A feedback loop uses information about current status to influence future status (<a href="https://en.wikipedia.org/wiki/Feedback">Wikipedia</a>). The tighter the loop, the faster you learn. Before hot reload (Vite, Fast Refresh), the feedback loop was: edit → compile → refresh → see result (seconds to minutes). After: edit → see result (milliseconds). This is why the frontend loop works at the feature scale — you can cycle through Skeleton → Deepen → Polish in minutes because you see each change instantly. Boehm's spiral model (1986) worked at project scale because the feedback loop was months; React works at feature scale because the feedback loop is milliseconds.</p>
+
+<h3>The "feel the friction" signal — metacognition in the loop</h3>
+<p>The signal to move from one round to the next — "feel the friction" — is a metacognitive judgment, not a mechanical rule. This is Schoenfeld's metacognition (see <a href="./problem-solving.html">Problem-Solving §5</a>) applied to feature building: you monitor your own progress and decide "this round is creaking, it's time to deepen." You can't turn it into a checklist because a checklist assumes you know <em>what to do next</em> — the loop assumes you know <em>what's missing</em>, which is an aesthetic judgment. Senior devs have internalized this signal through hundreds of iterations; juniors build it through deliberate practice (§8).</p>
+
+<h3>The spiral model — the formal ancestor</h3>
+<p>Barry Boehm's spiral model (1986, <a href="https://en.wikipedia.org/wiki/Spiral_model">Wikipedia</a>) is the named ancestor of the frontend loop. Each spiral cycle has four quadrants: Plan → Risk Analysis → Engineering → Evaluation. You go around, each cycle deeper. The spiral is risk-driven: the level of detail in each cycle is determined by the risks you need to resolve. The frontend loop inherits this: Round 1 (Skeleton) resolves the risk "does the data shape work?"; Round 2 (Deepen) resolves "does the UI look right?"; Round 3 (Polish) resolves "does it handle edge cases?"</p>
+
+<h3>IID — older than waterfall</h3>
+<p>Larman and Basili's 2003 IEEE paper (<a href="https://en.wikipedia.org/wiki/Iterative_and_incremental_development">Wikipedia</a>) traced iterative and incremental development back to the 1950s — it's <em>older</em> than Waterfall. Project Mercury (NASA) code was built iteratively. The spiral didn't invent the loop; it <em>named</em> what good developers already did. The frontend loop is the same pattern, at a different scale — the latest inversion in an 80-year lineage of iterative practice.</p>
+
+
+<h2>1. The three-thread mental model — not a sequence, a loop</h2>
+
+<p>When a senior developer sits down to build a feature, they do <strong>not</strong> follow a waterfall: "first structure, then layout, then functionality." Instead they hold <strong>three intertwined threads</strong> and cycle through them, each pass deeper than the last:</p>
+
+<div class="callout">
+  <pre style="margin:0; font-size:.9rem; line-height:1.4;">
+┌─────────────────────────────────────────────────────────────┐
+│  THREAD 1: MODEL        │  THREAD 2: VIEW          │ THREAD 3: FLOW   │
+│  Data structures        │  Structure + Layout      │  Events, data    │
+│  State shape            │  Visual hierarchy        │  movement, logic │
+│  (what the app "knows") │  (what the user "sees")  │  (what happens)  │
+└─────────────────────────────────────────────────────────────┘
+                    ↑_____________________________↓
+                     You cycle these, round by round
+  </pre>
+</div>
+
+<p>Each round touches all three threads, but at a different <em>fidelity</em>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Round</th>
+      <th>Name</th>
+      <th>Model thread</th>
+      <th>View thread</th>
+      <th>Flow thread</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Clarify</td>
+      <td>What data does the system hold? Where does it come from/go?</td>
+      <td>What does the user see and do?</td>
+      <td>What are the entry/exit points? What triggers what?</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Skeleton</td>
+      <td>Pick simplest structures (array, plain object). Defer Map/Set.</td>
+      <td>Semantic HTML only. No CSS. Just structure.</td>
+      <td>Name handlers, wire empty functions, one state setter.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Deepen</td>
+      <td>Upgrade structures where pain appears (O(1) lookups → Map).</td>
+      <td>Full styling. Responsive. Accessibility.</td>
+      <td>Real logic. Async, error states, edge cases.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Polish</td>
+      <td>Performance: memo, virtualize, index only if measured.</td>
+      <td>Micro-interactions, loading skeletons, empty states.</td>
+      <td>Debounce, retries, analytics, defensive guards.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Key insight:</strong> You do <em>not</em> finish Thread 1 before starting Thread 2. You sketch the data shape (Thread 1), immediately write the skeleton HTML (Thread 2), immediately stub the click handler (Thread 3) — then you go around again. The threads are intertwined because <em>each one constrains the others</em>. The data shape determines what UI is even possible; the UI structure reveals missing fields in the data; the event flow exposes derived state you forgot to model.</p>
+
+---
+
+<h2>2. Round 0 — The three clarifying questions (the hardest part)</h2>
+
+<p>Before any code, before any HTML, you answer these three questions. This is where the data shape <em>starts</em> — not because you're designing algorithms, but because the shape of the data determines everything downstream.</p>
+
+<ol>
+  <li><strong>What does the user see and do?</strong> — "A list of products. User clicks 'Add to cart'. Cart badge updates."</li>
+  <li><strong>What data does the system hold?</strong> — "Products have id, name, price, image. Cart is a list of product ids + quantities."</li>
+  <li><strong>Where does the data come from and go?</strong> — "Products from an API. Cart stays in local state (maybe localStorage)."</li>
+</ol>
+
+<p><strong>Do developers think about algorithms at the start?</strong></p>
+
+<p>For frontend, usually <strong>no</strong> — unless the feature involves search, sort, filtering, or complex state transitions. Most frontend "logic" is CRUD (create, read, update, delete) + UI wiring. You think about algorithms when <em>performance bites you</em>: "this list has 10,000 items, render is slow, I need virtualization or a better data structure." The default posture: start with the simplest structure, upgrade only when you feel the pain.</p>
+
+---
+
+<h2>3. Round 1 — Skeleton pass (the thinnest end-to-end slice)</h2>
+
+<p>You touch all three threads with the <strong>cheapest</strong> version of each. The goal: a working end-to-end path, however minimal.</p>
+
+<h3>Thread 1: Model — Data shape and state decisions</h3>
+
+<ul>
+  <li>Finalize the data shape. Often a TypeScript interface or a sketch on paper.</li>
+  <li>Identify <strong>what state the component holds</strong> vs <strong>what it receives as props</strong>.</li>
+  <li>Pick the data structures: plain objects, arrays, <code>Map</code>, <code>Set</code> — whatever fits <em>right now</em>.</li>
+</ul>
+
+<p><strong>Example — a product cart:</strong></p>
+
+<pre><code>Product = { id, name, price, image }
+Cart = Map<productId, quantity>   ← or just an array, decide later
+</code></pre>
+
+<p><strong>How you decide the structure:</strong></p>
+<ul>
+  <li>Start with the <strong>simplest</strong> version (array of objects).</li>
+  <li>Upgrade to <code>Map</code> only when you need fast lookups ("is this in the cart?" → <code>Map.has</code> is O(1)).</li>
+  <li>You don't design ahead for performance you don't yet need (YAGNI — You Aren't Gonna Need It).</li>
+</ul>
+
+<h3>Thread 2: View — Structure + Layout</h3>
+
+<p>This is where you write <strong>HTML structure</strong> — semantic tags, not styled yet. Layout comes right after or interleaved with structure.</p>
+
+<p><strong>Do devs use templates?</strong> Yes — constantly. You almost never start from a blank file:</p>
+<ul>
+  <li><strong>Framework templates</strong>: <code>npx create-react-app</code>, <code>npm create vite</code>, Next.js starter — scaffolds the folder structure.</li>
+  <li><strong>Component conventions</strong>: your team has patterns — "a list component maps over an array and renders <code><ListItem></code> for each."</li>
+  <li><strong>Design systems / UI libraries</strong>: Material UI, shadcn/ui, Tailwind UI — you compose pre-built buttons, cards, dialogs instead of building them from scratch. This is the closest thing to "layout templates."</li>
+  <li><strong>Copy-paste from your own codebase</strong>: the last <code>ProductCard</code> you wrote is your template for the next one.</li>
+</ul>
+
+<p>So the structure isn't chosen in isolation — it's an <strong>inheritance chain</strong>:</p>
+
+<pre><code>framework layout → project convention → component pattern → your variation
+</code></pre>
+
+<p><strong>Layout specifically:</strong> You rarely invent layouts. You reach for the same small set of CSS patterns: <strong>flexbox</strong> for one-direction (rows/columns), <strong>grid</strong> for two-direction (galleries, dashboards). The decision is "flex or grid?" then "how many columns?" — not "what novel layout should I invent?"</p>
+
+<h3>Thread 3: Flow — Events + Data Movement</h3>
+
+<ul>
+  <li>Wire up the <strong>skeleton of behavior</strong>: a click handler that does nothing yet, a state setter that just holds a value.</li>
+  <li>You <strong>name the functions</strong> ("addToCart", "removeFromCart") before you fill them in.</li>
+  <li>This is where you think about the <strong>data flow</strong>: "user clicks → component calls addToCart → cart state updates → badge re-renders."</li>
+</ul>
+
+<p><strong>Declarative vs imperative:</strong> If you're using React, the flow is: <strong>state changes → React re-renders → DOM updates</strong>. You don't manually touch the DOM. This is called <strong>declarative flow</strong> and it's the biggest mental shift in modern frontend.</p>
+
+---
+
+<h2>4. Round 2 — Deepening pass (make it real)</h2>
+
+<p>Now you go back through each thread and make the skeleton real:</p>
+
+<table>
+  <thead>
+    <tr><th>The rough version</th><th>Becomes the real version</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>function addToCart() {}</code> (empty)</td><td>Handles the event, updates the Map, deals with duplicates</td></tr>
+    <tr><td><code><div class="product"></code> bare</td><td>Styled card with image, name, price, button</td></tr>
+    <tr><td>Array for cart</td><td>Decided: array is fine, or Map if lookups get frequent</td></tr>
+    <tr><td>No loading state</td><td>Added: <code>loading</code>, <code>error</code>, <code>data</code> states for async</td></tr>
+    <tr><td>Hardcoded data</td><td>Replaced with <code>useEffect</code> → <code>fetch</code> → state</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>5. Round 3 — Edge cases and polish (the difference between works and ships)</h2>
+
+<ul>
+  <li>What if the API fails? (→ error state)</li>
+  <li>What if the list is empty? (→ empty state)</li>
+  <li>What if the user clicks twice? (→ debounce, disabled state)</li>
+  <li>Accessibility: keyboard nav, aria labels, focus management</li>
+  <li>Performance: memoization, lazy loading, virtualization <strong>only if needed</strong></li>
+</ul>
+
+---
+
+<h2>5b. Mental models — how developers actually reason across rounds</h2>
+
+<p>The loop in §1–§5 is a sequence of <em>passes</em>, but the developer's mental model is more like a <strong>triple-thread</strong>: a thread for "is this <em>correct</em>?" a thread for "is this <em>complete</em>?" and a thread for "is this <em>cheap</em>?" Different camps weight these threads differently.</p>
+
+<table>
+  <thead><tr><th>Camp</th><th>Dominant thread</th><th>What "done" means</th><th>What gets cut first</th><th>Failure mode</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Junior / bootcamp</strong></td>
+      <td>"Does it run?"</td>
+      <td>The screenshot matches the mockup</td>
+      <td>Edge cases, error states</td>
+      <td>Works on happy path; crashes in production</td>
+    </tr>
+    <tr>
+      <td><strong>Mid-level generalist</strong></td>
+      <td>"Is it feature-complete?"</td>
+      <td>All listed requirements ship, nothing is broken</td>
+      <td>Performance, refactor</td>
+      <td>Feature-creep without ownership of cost</td>
+    </tr>
+    <tr>
+      <td><strong>Senior generalist</strong></td>
+      <td>"Will this still be maintainable in 18 months?"</td>
+      <td>Tests exist, seams are clear, naming carries intent</td>
+      <td>Speed-to-ship if the cost is just "code volume"</td>
+      <td>Over-engineering for problems that never materialize</td>
+    </tr>
+    <tr>
+      <td><strong>Performance specialist</strong></td>
+      <td>"Is it cheap to run?"</td>
+      <td>Profiled numbers, not assumptions</td>
+      <td>Polish, micro-features</td>
+      <td>Optimization for code paths nobody executes</td>
+    </tr>
+    <tr>
+      <td><strong>Architect</strong></td>
+      <td>"Will the next team be able to extend this?"</td>
+      <td>Bounded contexts, named seams, ADR's written</td>
+      <td>Premature detail; anything below the seam</td>
+      <td>Seam-obsession; the seam becomes the product</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The loop is the same for all camps; the weighting differs.</strong> Knowing <em>which thread you are neglecting</em> is half the diagnostic. If you ship a feature in two days and it crashes in production, you skipped the "complete" thread. If you ship a feature in two weeks and nobody can read the code, you skipped the "maintainable" thread. The loop is not a checklist — it is a <em>set of competing demands</em>, and seniority is the ability to <em>balance</em> them under time pressure.</p>
+
+---
+
+<h2>6. Where data structures & algorithms actually show up in frontend</h2>
+
+<p>You don't start with "what algorithm should I use?" You start with "what's the simplest structure?" and only reach for a specific algorithm when you <em>feel the pain</em> — slow rendering, sluggish search, duplicate logic.</p>
+
+<table>
+  <thead>
+    <tr><th>Feature</th><th>Data structure thinking</th><th>Algorithm thinking</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>A dropdown menu</td><td>Tree (nested menu items)</td><td>DFS to find a node, BFS for flattening</td></tr>
+    <tr><td>Filterable product grid</td><td>Array + Set (for active filters)</td><td>Filtering predicate, maybe debounce</td></tr>
+    <tr><td>Drag-and-drop list</td><td>Array reordering</td><td>Insertion/deletion at index</td></tr>
+    <tr><td>Autocomplete search</td><td>Trie (rare), or just <code>startsWith</code> filter</td><td>Debounce + memoization</td></tr>
+    <tr><td>Infinite scroll</td><td>Array + windowing</td><td>Intersection Observer, virtual rendering</td></tr>
+    <tr><td>Form with validation</td><td>Object graph of fields + errors</td><td>Validation rules per field</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>7. The honest truth about how senior devs work</h2>
+
+<ol>
+  <li><strong>They copy first, understand later.</strong> They've seen the pattern (list, form, modal, dashboard) dozens of times. They skeleton it from muscle memory, then adapt.</li>
+  <li><strong>They defer decisions.</strong> "I'll use an array, change to Map if needed" — not "let me design the optimal cart structure."</li>
+  <li><strong>They don't separate thinking into threads</strong> the way this doc draws them — it becomes one fluid loop because they've internalized it.</li>
+  <li><strong>Structure follows state, not the other way around.</strong> The shape of your data determines your component tree. Get the data shape right and the UI structure often falls out naturally.</li>
+  <li><strong>They do the simplest thing that could possibly work, then refactor.</strong> Premature optimization is the cardinal sin.</li>
+</ol>
+
+---
+
+<h2>8. Your takeaway — the deliberate practice loop</h2>
+
+<p>If you're learning, practice the <strong>skeleton → deepen → polish</strong> loop deliberately:</p>
+
+<ol>
+  <li><strong>Pick a small feature</strong> (e.g., a todo list).</li>
+  <li><strong>Sketch the data shape</strong> on paper before coding (what does a todo look like? where is it stored?).</li>
+  <li><strong>Build the skeleton HTML</strong> — semantic, unstyled.</li>
+  <li><strong>Add one piece of flow</strong> — adding a todo.</li>
+  <li><strong>Add a second bit</strong> — toggling complete.</li>
+  <li><strong>Add a third</strong> — deleting.</li>
+  <li><strong>Now style it fully</strong>.</li>
+  <li><strong>Now handle edge cases</strong> — empty list, double-submit.</li>
+</ol>
+
+<p>That loop — shallow all three, then deepen, then deepen again — is the algorithm. It's not a template you download, it's a rhythm you develop by doing it 50 times.</p>
+
+---
+
+<h2>9. What is this process called? — Entity types and terminology</h2>
+
+<p>The loop described above (Model → View → Flow, shallow then deepen) is <strong>not the SDLC</strong>. It's smaller and older than any named methodology. Here's the map:</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>Scale</th><th>What it covers</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>SDLC</strong> (Software Development Life Cycle)</td>
+      <td>Whole project, months to years</td>
+      <td>Requirements → Design → Implementation → Testing → Deployment → Maintenance. A <strong>phase model</strong> — you move forward through phases.</td>
+    </tr>
+    <tr>
+      <td><strong>Methodology</strong> (Agile, Waterfall, Spiral)</td>
+      <td>Project, weeks to months</td>
+      <td><em>How</em> you navigate the SDLC — Agile does it in small loops called sprints, Waterfall does it once top-to-bottom.</td>
+    </tr>
+    <tr>
+      <td><strong>Workflow</strong></td>
+      <td>Team, hours to weeks</td>
+      <td>Who does what in what order with what tools — "open ticket → branch → PR → review → merge." A coordination pattern.</td>
+    </tr>
+    <tr>
+      <td><strong>Best practice</strong></td>
+      <td>Task, minutes to hours</td>
+      <td>A habit that works — "name booleans with <code>is</code>/<code>has</code>", "validate at the trust boundary." A rule of thumb, not a sequence.</td>
+    </tr>
+    <tr>
+      <td><strong>The loop I described</strong></td>
+      <td>Single feature, minutes to hours</td>
+      <td>A <strong>micro-process</strong> — smaller than a workflow, bigger than a best practice. It's a <em>thinking rhythm</em> for one unit of work.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>So the honest answer: <strong>it doesn't have one canonical name</strong> because it sits below the SDLC/methodology layer. The closest named things are:</p>
+
+<ul>
+  <li><strong>"Spiral development"</strong> (Barry Boehm, 1986) — the ancestor concept: iterate through risk-driven loops, each deeper than the last. My "shallow → deepen → polish" is the spiral pattern at feature scale.</li>
+  <li><strong>"Incremental development"</strong> — build the thinnest end-to-end slice, then add. The "skeleton pass" is the thinnest slice.</li>
+  <li><strong>"Iterative and incremental development" (IID)</strong> — the formal name in the literature. Craig Larman and Victor Basili wrote the canonical history of it.</li>
+  <li><strong>Inside Agile/Scrum</strong>: it shows up as the <strong>"sprout → grow → harden"</strong> rhythm within a sprint. Not official Scrum vocabulary, but it's how practitioners describe it.</li>
+  <li><strong>Inside Lean UX / design</strong>: it's called <strong>"build-measure-learn"</strong> (Eric Ries, <em>The Lean Startup</em>, 2011) — same loop with a feedback step bolted on.</li>
+</ul>
+
+<p>So the entity type is: a <strong>micro-process</strong> — a thinking rhythm at the task level, below SDLC, below methodology, below workflow. It's more cousin to a best practice than to a methodology, but it has <em>sequence</em> (which best practices don't) and <em>looping</em> (which Waterfall doesn't).</p>
+
+---
+
+<h2>10. Why is it a rhythm, not a structured algorithm?</h2>
+
+<p>Because a structured algorithm has <strong>predefined inputs, deterministic steps, and a fixed termination condition</strong>. QuickSort is a structured algorithm: give it an array, it sorts it, you're done. The steps are the same every time.</p>
+
+<p>The model-view-flow loop fails all three:</p>
+
+<ul>
+  <li><strong>Inputs aren't predefined.</strong> You don't know what the feature really <em>is</em> when you start. Part of the loop is discovering that. A feature starts as "make a cart" and becomes "make a cart with quantity editing, persisted across sessions, with a max-items alert" — you discover the scope by building it.</li>
+  <li><strong>Steps aren't deterministic.</strong> There's no rule that says "now do Round 2 of the View thread." You do it when you <em>feel the friction</em> — when the skeleton is too ugly to leave, when the data shape is too wrong to keep going. Senior devs <em>feel</em> the friction; juniors need checklists until they develop the feel.</li>
+  <li><strong>There's no fixed termination.</strong> "Done" is a judgment call: is this good enough to ship? That's a <em>taste</em> decision, not a predicate check. (If you work in a regulated domain — medical, aerospace — you do have termination criteria, which is why those fields <em>do</em> have structured algorithms like MC/DC coverage. Frontend doesn't.)</li>
+</ul>
+
+<p>A <strong>rhythm</strong> is a pattern you internalize so you can improvise around it. Like playing jazz: there's a chord progression, but what you actually play depends on what just happened. Senior devs play the codebase. Juniors play the sheet music. The loop is the chord progression.</p>
+
+<p>This is why it resists being turned into a checklist that you follow robotically: a checklist assumes you know <em>what to do next</em> — the loop assumes you know <em>what's missing</em>, which is an aesthetic judgment, not a mechanical one.</p>
+
+---
+
+<h2>11. History of this loop — from NASA to React</h2>
+
+<p>The thread runs through the whole history of software:</p>
+
+<table>
+  <thead>
+    <tr><th>Year / Era</th><th>Name / Event</th><th>What it contributed</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1960s–70s</strong></td>
+      <td>Waterfall (Winston Royce, 1970)</td>
+      <td>The myth was: design everything upfront, build once. Royce's paper actually <em>warned against</em> doing it as a single pass — people read the diagram, skipped his warning. Worked fine when bug fixes meant reordering punch cards.</td>
+    </tr>
+    <tr>
+      <td><strong>1986</strong></td>
+      <td>Spiral Model (Barry Boehm)</td>
+      <td>First formal "loop" model. Each spiral cycle has four quadrants: Plan → Risk Analysis → Engineering → Evaluation. You go around, each cycle deeper. The named ancestor of "skeleton → deepen → polish."</td>
+    </tr>
+    <tr>
+      <td><strong>1980s–90s</strong></td>
+      <td>IID — Iterative & Incremental Development</td>
+      <td>Larman & Basili's 2003 IEEE paper traced this back to the 1950s — it's <em>older</em> than Waterfall. Project Mercury (NASA) code was built iteratively. The spiral didn't invent the loop; it <em>named</em> what good devs already did.</td>
+    </tr>
+    <tr>
+      <td><strong>1999</strong></td>
+      <td>Extreme Programming / XP (Kent Beck)</td>
+      <td>"Make it work, make it right, make it fast." That's the same three rounds, in code form: working skeleton → refactor for clarity → optimize for performance. Beck explicitly said he took it from the Smalltalk community's rhythm of "spike → stabilize → harden."</td>
+    </tr>
+    <tr>
+      <td><strong>2001</strong></td>
+      <td>Agile Manifesto</td>
+      <td>Institutionalized the loop at sprint scale. Two-week spirals.</td>
+    </tr>
+    <tr>
+      <td><strong>2011</strong></td>
+      <td>Lean Startup (Eric Ries)</td>
+      <td>"Build-measure-learn" externalized the loop to <em>product discovery</em> (build the thinnest slice, see if users want it, decide whether to deepen).</td>
+    </tr>
+    <tr>
+      <td><strong>2015–now</strong></td>
+      <td>Modern frontend (React, Vue, Svelte)</td>
+      <td>Component model made the loop <em>visible in code</em> — because a component is a small enough unit to round-trip in an hour, the rhythm moved from project scale down to feature scale. "Skeleton → deepen → polish" is now how a single React component gets written, not just how a project gets run.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>So: Boehm <em>named</em> it (spiral), Beck <em>operationalized</em> it (XP), Agile <em>institutionalized</em> it (sprints), and React <em>made it work at the component scale</em>. What this doc describes is the bottom of that stack — the same pattern, but at the scale of an afternoon's work.</p>
+
+---
+
+<h2>12. The vocabulary map — wireframe, mockup, prototype, MVP, rough draft, versioning</h2>
+
+<p>You hear a lot of names because <strong>the same loop runs at different scales</strong> with different vocabulary. Here's the complete map:</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>Scale</th><th>Fidelity</th><th>Disposability</th><th>Used for</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Sketch</strong></td>
+      <td>Minutes</td>
+      <td>Low (paper, whiteboard)</td>
+      <td>Disposable</td>
+      <td>Thinking. You throw it away once you understand the problem.</td>
+    </tr>
+    <tr>
+      <td><strong>Wireframe</strong></td>
+      <td>Hours</td>
+      <td>Low (grey boxes, no color)</td>
+      <td>Disposable-ish</td>
+      <td><em>Structure</em> of pages — what goes where, no visual design. The "skeleton pass" at the page level.</td>
+    </tr>
+    <tr>
+      <td><strong>Mockup</strong></td>
+      <td>Hours–days</td>
+      <td>High visual, no behavior</td>
+      <td>Kept as reference</td>
+      <td><em>Look</em> — colors, fonts, spacing, real-ish content. Static. Still no flow.</td>
+    </tr>
+    <tr>
+      <td><strong>Prototype</strong></td>
+      <td>Days</td>
+      <td>Variable (often clickable)</td>
+      <td>Meant to be thrown away</td>
+      <td><em>Flow</em> — you can click through, see how it feels. Figma prototypes, clickable mockups. The deepening pass at UX scale.</td>
+    </tr>
+    <tr>
+      <td><strong>PoC (Proof of Concept)</strong></td>
+      <td>Days</td>
+      <td>Throwaway code</td>
+      <td>Disposable</td>
+      <td><em>Will this even work?</em> — technical risk reduction, never shipped.</td>
+    </tr>
+    <tr>
+      <td><strong>Spike</strong> (Agile term)</td>
+      <td>Hours–days</td>
+      <td>Throwaway code</td>
+      <td>Disposable</td>
+      <td><em>What's the real cost/shape of this feature?</em> — you build it to throw it away so you can estimate the real one.</td>
+    </tr>
+    <tr>
+      <td><strong>MVP (Minimum Viable Product)</strong></td>
+      <td>Weeks–months</td>
+      <td>Production-quality small slice</td>
+      <td><strong>Shipped, kept</strong></td>
+      <td>The smallest version users will actually use. <strong>Not</strong> disposable — this <em>is</em> the product, just small.</td>
+    </tr>
+    <tr>
+      <td><strong>Rough draft</strong></td>
+      <td>Informal term</td>
+      <td>Whatever</td>
+      <td>Variable</td>
+      <td>Just means "first pass, expect to revise." A cross-scale, cross-fidelity term.</td>
+    </tr>
+    <tr>
+      <td><strong>Version</strong></td>
+      <td>Any scale</td>
+      <td>Marker of history</td>
+      <td>Cumulative</td>
+      <td>The artifact's <em>history</em>. v1, v2, v3 — each version is a checkpoint, you can go back. Doesn't say anything about fidelity, only about <em>sequence</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>Release</strong></td>
+      <td>Project scale</td>
+      <td>Production-ready</td>
+      <td>Branded, public</td>
+      <td>The subset of versions you actually ship to users. v1.0.0, v2.0.0.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The three axes — locate any artifact on these</h3>
+
+<p>Three independent axes you can locate any artifact on:</p>
+
+<ol>
+  <li><strong>Fidelity</strong> — how real does it look/feel? (sketch: low, mockup: high)</li>
+  <li><strong>Disposability</strong> — is this meant to be thrown away? (PoC: yes, MVP: no)</li>
+  <li><strong>Behavior</strong> — does it do anything, or just sit there? (mockup: static, prototype: clickable)</li>
+</ol>
+
+<p><strong>Visual summary:</strong></p>
+
+<pre style="font-size:.8rem; line-height:1.4; background:var(--code-bg); padding:1rem; border-radius:4px; overflow-x:auto;">
+   energy ↓                          disposable
+   ───────────────────────────────────────────
+   sketch     wireframe    mockup    prototype    POC/spike
+     ↑ (thinking)                      ↑ (deciding)
+                                                     │
+   ───────────────────────────────────────────
+                              production-worthy
+                                   MVP      ─────►  v1.0  v1.1  v2.0  (versions/releases)
+                                     ↑ (shipping, kept)
+</pre>
+
+<p>"Wireframe" = high disposability + low fidelity + no behavior. "Prototype" = medium disposability + variable fidelity + clickable. "MVP" = low disposability + production fidelity + fully working. They are <strong>not</strong> synonyms — they're the same loop at different points on those axes.</p>
+
+<p><strong>Versioning</strong> is orthogonal to all of it: it's the <em>history</em> of any artifact at any fidelity. A wireframe can have v3. A release can have v3. Versioning isn't part of the loop; it's the bookkeeping of the loop.</p>
+
+---
+
+<h2>12b. Principles — the shared constants</h2>
+
+<p>Across every framework, every era, every tool, certain principles don't change. These are the constants that survive React, Vue, Svelte, and whatever comes next.</p>
+
+<table>
+  <thead><tr><th>Principle</th><th>Why it's constant</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Cycle, don't waterfall</strong></td><td>You can't know everything upfront. Requirements change, data shapes evolve, UIs look different once rendered. The spiral (Boehm 1986) and IID (Larman &amp; Basili 2003) proved this empirically: iterative beats upfront-design for wicked problems. The rounds (Skeleton → Deepen → Polish) are the same principle at feature scale.</td></tr>
+    <tr><td><strong>Feel the friction to know when to deepen</strong></td><td>The signal to move from one round to the next is metacognitive (§1e). You can't checklist it — it's an aesthetic judgment about what's missing. Senior devs have internalized it; juniors build it through practice (§8). This is Schoenfeld's metacognition applied to feature building.</td></tr>
+    <tr><td><strong>Sketch the data shape first</strong></td><td>The data shape determines the component tree (§13). Getting it wrong costs minutes if caught early, hours if caught late. This is the same "structure before code" principle as stepwise refinement (Problem-Solving §6) — the shape is the contract; the code fills it.</td></tr>
+    <tr><td><strong>Derived state is never stored</strong></td><td>If a value can be computed from other state (filtered list, active count), don't store it — recompute it. Storing derived state is the most common frontend bug: two sources of truth that drift apart. This is invariant across React, Vue, Svelte.</td></tr>
+    <tr><td><strong>Thinnest end-to-end slice first</strong></td><td>Round 1 (Skeleton) is the thinnest slice that works end-to-end: one piece of data, one element, one event. Not "build all the data then all the UI then all the logic" — that's waterfall in disguise. The thinnest slice validates the data shape and the flow before you invest in depth.</td></tr>
+    <tr><td><strong>Structure follows state</strong></td><td>The shape of your data determines your component tree. Get the data shape right and the UI structure often falls out naturally. This is why §7 says "seniors defer decisions" — they sketch the data, let the structure emerge, and refactor when the data shape proves wrong.</td></tr>
+    <tr><td><strong>Do the simplest thing that could possibly work, then refactor</strong></td><td>Premature optimization is the cardinal sin (§7). Start with an array, change to Map if needed. Start with plain CSS, reach for Tailwind if the pain appears. The loop's rounds are designed for this: Round 1 is the simplest thing; Round 2 is where you upgrade.</td></tr>
+    <tr><td><strong>Defer decisions until you need them</strong></td><td>"I'll use an array, change to Map if needed" — not "let me design the optimal cart structure." Seniors defer because they know the data shape will evolve once they see it rendered. Deciding too early locks you into a structure that may be wrong.</td></tr>
+  </tbody>
+</table>
+
+
+<h2>13. "Sketching the data shape" — what it actually means, with a full worked example</h2>
+
+<p>This is the part that confuses everyone, and it's the most important one. The data shape is <strong>the structure of the values your program holds in memory while running</strong>. Not the database, not the API response, not the UI — <em>what your code is actually pushing around</em>. It's the answer to: "what kind of value is at the heart of this feature?"</p>
+
+<p>It has <strong>nothing to do with visual layout</strong>. It's about the <strong>logical skeleton</strong> of the information. If your program were a body, the data shape is the bones — the UI is the skin. You don't design a face before you know if it's a fish or a human.</p>
+
+---
+
+<h3>Worked example: "I'm building a todo app"</h3>
+
+<p>The naive instinct is to start writing HTML — "I'll have an input box, a button, a list." <strong>Wrong.</strong> You freeze the input box before you know what it's supposed to capture.</p>
+
+<p>What you do instead:</p>
+
+<h4>Step 1 — Name the nouns</h4>
+
+<p>What are the things this app is <em>about</em>? Not UI elements — the real things.</p>
+
+<ul>
+  <li>A <strong>todo</strong> — a single task to do</li>
+  <li>A <strong>list of todos</strong> — the collection</li>
+  <li>(Maybe) a <strong>filter</strong> — "all / active / completed"</li>
+</ul>
+
+<h4>Step 2 — Give each noun a shape</h4>
+
+<p>A single todo. What fields does it have? You might sketch on paper:</p>
+
+<pre><code>todo = {
+  id:      ???      ← what identifies it? number? string? uuid?
+  text:    string   ← the task description
+  done:    boolean  ← is it complete?
+  when:    Date     ← when was it created?
+}
+</code></pre>
+
+<p>Now you have <strong>decisions to make</strong>, and making them now (before code) is cheap:</p>
+
+<ul>
+  <li><code>id</code> — number is fine for 10 items, but what if I add persistence later? UUIDs are safer. <em>Decide.</em></li>
+  <li><code>done</code> — boolean is simple, but what if I want "in progress"? Maybe it should be a status enum. <em>Decide.</em> For an MVP, boolean is fine.</li>
+  <li><code>when</code> — do I need this for an MVP? Maybe skip. <em>Decide.</em></li>
+</ul>
+
+<p>This is what "sketching the data shape" looks like — <strong>writing down the fields, deciding their types, deferring or committing to each</strong>.</p>
+
+<h4>Step 3 — Give the collection a shape</h4>
+
+<p>How do you hold many todos? The options:</p>
+
+<pre><code>Option A:  todos: Todo[]                  ← an array
+Option B:  todos: Map<id, Todo>           ← keyed by id
+Option C:  todos: { [id]: Todo }          ← object as a map
+</code></pre>
+
+<p>Each has consequences:</p>
+
+<ul>
+  <li><strong>Array</strong> — simplest. Adding is <code>push</code>. Finding by id is <code>find</code> (linear scan, O(n)). Fine for 50 todos, painful for 50,000.</li>
+  <li><strong>Map</strong> — adding by id is <code>set</code> (O(1)). Finding is <code>has</code>/<code>get</code> (O(1)). Better when "is this id in the list?" matters often (like checking for duplicates).</li>
+  <li><strong>Object-as-map</strong> — works, but keys must be strings, and you inherit <code>Object.prototype</code> noise. Map is cleaner.</li>
+</ul>
+
+<p>For a todo app MVP, you pick <strong>array</strong> — because you'll render the list in order, and iterating an array is trivial. You note on the sketch: "if we ever do 10k+ items, re-evaluate." <strong>That note is the sketch's whole point</strong> — you record the assumption so you can revisit it.</p>
+
+<h4>Step 4 — Sketch the operations</h4>
+
+<p>Now describe what the user does to this shape — not in code, in plain operations:</p>
+
+<pre><code>- add a new todo       → push {id, text: "buy milk", done: false} to array
+- toggle a todo        → find by id, flip done
+- delete a todo        → find by id, remove from array
+- filter by status     → array.filter(t => t.done === false)
+- count active         → array.filter(...).length          ← or, cache this
+</code></pre>
+
+<p>You don't write the code. You just check: are these operations <em>natural</em> on the shape I picked? If you'd picked a <code>Map<id, Todo></code>, "filter by status" would be awkward (you'd have to iterate values). If you'd picked an array, "is id X in the list?" would be awkward (you'd scan). The sketch surfaces these <em>frictions before you've written a line of code</em>.</p>
+
+<h4>Step 5 — Sketch the components at the level of "what state does each one hold?"</h4>
+
+<p>Only now do you start thinking about the UI:</p>
+
+<pre><code><App>
+  state: todos (array), currentFilter ("all"|"active"|"completed")
+<Header>
+  state: nothing (just shows count, derived from todos)
+<NewTodoInput>
+  state: draftText (string — what's currently in the box)
+<TodoList>
+  state: nothing (receives todos + filter as props, derives the filtered list)
+<TodoItem>
+  state: nothing (receives one todo, calls back on toggle/delete)
+</code></pre>
+
+<p>Notice the wiring <strong>falls out of the data shape</strong>:</p>
+
+<ul>
+  <li>You hold <code>todos</code> at the App level because multiple components need it (header count, list rendering, item actions).</li>
+  <li>You hold <code>draftText</code> locally at <code>NewTodoInput</code> because only that input cares about the half-typed text.</li>
+  <li>You <em>don't</em> hold "filtered list" as state — you <em>derive</em> it. Storing derived values is one of the most common bugs in frontend state.</li>
+</ul>
+
+<p>A senior dev does this in their head in 30 seconds. A junior does it on paper. The point isn't the artifact — the point is the <strong>thinking</strong>: forcing yourself to ask "what is this thing made of?" <em>before</em> you commit code to a particular shape.</p>
+
+---
+
+<h3>Why data shape first — three reasons</h3>
+
+<ol>
+  <li><strong>The shape determines the UI structure, not the other way around.</strong> If your core data is a tree (categories nested in categories), your UI <em>will</em> have recursion in it somewhere. If your core data is a flat list, the UI will be flat. Knowing the shape tells you what UI is even possible.</li>
+  <li><strong>Changing the data shape late is expensive.</strong> If you build the UI around an array and then realize you need O(1) lookups, you have to plumb a Map through every component. If you sketch it first, you've lost 30 minutes. If you discover it after writing 500 lines of UI, you've lost a day.</li>
+  <li><strong>The shape exposes the decisions that matter.</strong> "Boolean or enum?" "Array or Map?" "Where does this state live?" are decisions that won't <em>show up</em> if you just start writing HTML. They're invisible until they bite. Sketching the data shape shines a light on them early.</li>
+</ol>
+
+---
+
+<h3>Second example — even simpler: a search box</h3>
+
+<p>You're building a search box. Naive: write an input. Smart: sketch first.</p>
+
+<pre><code>state:
+  query: string              ← what's in the box right now
+  results: Product[]        ← what the search returned
+  status: "idle" | "loading" | "done" | "error"   ← key insight
+  └─ do you have status as a separate field, or pack it into results?
+     packing it (e.g. results = null while loading) is a bug factory
+     — separate field is the senior move
+</code></pre>
+
+<p>That tiny sketch — three fields — determines that you won't make the classic junior mistake of using <code>results === null</code> to mean "still loading" and then getting confused about "loading" vs "loaded but empty results." You saw the trap <em>before writing code</em>.</p>
+
+<p><strong>This is what sketching the data shape buys you</strong>: you see the traps while they cost minutes, not days.</p>
+
+---
+
+<h2>13b. The most common failure modes</h2>
+
+<p>These are the characteristic ways the dev loop goes wrong — the traps that catch practitioners at every level, from junior to senior.</p>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Premature polishing</strong></td><td>You start styling (Round 3) before the skeleton works (Round 1). Two hours in, you have a beautiful button that doesn't do anything, and the data shape is wrong — so the styling has to be redone.</td><td>Force yourself through Round 1 first: the thinnest end-to-end slice that works, unstyled. Only start styling when the data shape and flow are validated.</td></tr>
+    <tr><td><strong>Over-planning (analysis paralysis)</strong></td><td>You spend an hour designing the perfect data shape on paper, trying to anticipate every field and operation. But you can't know until you see it rendered — the shape evolves.</td><td>Sketch the data shape (§13) but timebox it: 5-10 minutes, not an hour. The sketch is a starting point, not a final design. The loop will refine it.</td></tr>
+    <tr><td><strong>Skipping the data-shape sketch</strong></td><td>You jump straight to code: "I'll figure out the data as I go." Result: you build a component tree for the wrong data shape, and refactoring it costs hours.</td><td>Always sketch first — nouns, fields, collection type, operations. Even 2 minutes of sketching catches the "loading vs empty" trap before it costs days (§13).</td></tr>
+    <tr><td><strong>Storing derived state</strong></td><td>You store a filtered list in state alongside the full list. Now you have two sources of truth. When the full list changes, the filtered list drifts — the most common frontend bug.</td><td>Derived values are computed at render time, never stored. <code>const visible = items.filter(i => i.active)</code> — not <code>const [visible, setVisible] = useState(...)</code>. See §14 checklist.</td></tr>
+    <tr><td><strong>Waterfall in disguise</strong></td><td>You build all the data layer, then all the components, then all the events. It <em>feels</em> like progress, but you haven't seen anything work end-to-end until the end — and by then, the data shape is baked in and wrong.</td><td>The rounds are <em>rounds</em>, not phases. Round 1 should be a working slice — data + one element + one event — not "finish the data layer." Cycle through all three threads shallowly, then deepen.</td></tr>
+    <tr><td><strong>Copy-paste without understanding</strong></td><td>You copy a pattern (a modal, a form, a list) from a previous component or Stack Overflow. It works, but you don't understand why. When it breaks, you can't debug it.</td><td>Copy first, understand later is OK for seniors (§7) who've internalized the patterns. But if you're learning: build the skeleton yourself, then compare to the copied version. The effort builds the schema (Problem-Solving §1f).</td></tr>
+    <tr><td><strong>Premature optimization</strong></td><td>You reach for useMemo, useCallback, React.memo, or a state management library before the feature works. Each adds complexity; each is a decision you can defer until you feel the pain of not having it.</td><td>Do the simplest thing first (§7). An array, a useState, a plain function. Reach for optimization tools only when you <em>feel the friction</em> — slow rendering, duplicate logic, prop drilling. The React Compiler (§13d) is increasingly automating this.</td></tr>
+    <tr><td><strong>Not feeling the friction</strong></td><td>You follow the rounds mechanically — "I'm on Round 2 now" — without noticing what's actually creaking. You deepen the wrong thing, or skip deepening where it matters.</td><td>The "feel the friction" signal is metacognitive (§1e). Build it through deliberate practice (§8): build 50 features, each time noticing what made you want to deepen. Over time, the signal becomes automatic.</td></tr>
+  </tbody>
+</table>
+
+<h2>13c. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>The dev loop is only as fast as its feedback loop allows. Here's the catalog of tools that make the loop work, with decision metrics for choosing the right ones.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tool</th><th>Best for</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2"><strong>Data-shape sketching</strong></td><td><strong>Pen and paper</strong></td><td>Round 0 (clarifying questions), the data-shape sketch (§13).</td><td>The single most important tool. Offloads working memory (§1e). No setup, no distraction, no AI doing the thinking for you. Always start here.</td></tr>
+    <tr><td>TypeScript types / JSDoc</td><td>Externalizing the data shape into the code.</td><td>Use after the paper sketch. TypeScript types are executable documentation — they catch shape mismatches at compile time. If you're not using TS, JSDoc is the lighter alternative.</td></tr>
+    <tr><td rowspan="2"><strong>Wireframing</strong></td><td>Excalidraw / pen and paper</td><td>Quick, disposable sketches of the View thread.</td><td>High disposability + low fidelity. Perfect for Round 0/1 — you're sketching structure, not pixel-perfect design. Throw away after the skeleton works.</td></tr>
+    <tr><td>Figma</td><td>Higher-fidelity mockups, design systems.</td><td>Use when the View thread needs real visual design (Round 2-3). Not needed for the skeleton pass. Overkill for a todo list; essential for a dashboard.</td></tr>
+    <tr><td rowspan="2"><strong>Prototyping / dev server</strong></td><td>Vite</td><td>Instant hot reload — the tight feedback loop that makes feature-scale iteration possible.</td><td>The default. Millisecond feedback is why the rounds work at all (§1e). If your dev server takes more than 1 second to reload, fix that first — slow feedback kills the loop.</td></tr>
+    <tr><td>Next.js dev server</td><td>Same, but with server components.</td><td>Use when the Model thread is server-rendered (RSC). The loop is the same; the feedback loop is slightly longer because of server compilation, but still fast enough for feature-scale iteration.</td></tr>
+    <tr><td rowspan="2"><strong>State management</strong></td><td>useState / useReducer</td><td>Component-level state. The default.</td><td>Start here always. useState for simple values, useReducer for complex state transitions. Don't reach for a library until you feel the friction of prop drilling or shared state.</td></tr>
+    <tr><td>Zustand / Redux / Jotai</td><td>Cross-component shared state.</td><td>Reach only when prop drilling becomes painful (the "feel the friction" signal). Zustand is the lightest; Redux is the heaviest (and most over-adopted). The React Compiler (§13d) may reduce the need for some of these.</td></tr>
+    <tr><td rowspan="2"><strong>Debugging</strong></td><td>React DevTools</td><td>Inspecting component tree, state, props.</td><td>Essential for Round 2-3. Lets you see the Model and View threads live. The "Inspect" tool shows you what state each component holds.</td></tr>
+    <tr><td>Browser DevTools</td><td>Inspecting the DOM, network, console.</td><td>For the Flow thread — seeing what events fire, what the API returns, what the DOM looks like. See <a href="./html-and-css.html">HTML &amp; CSS</a> §5b for the platform-level mental model.</td></tr>
+    <tr><td><strong>AI tools</strong></td><td>Copilot, ChatGPT</td><td>Scaffolding the skeleton (Round 1), generating boilerplate.</td><td><strong>Use with caution.</strong> AI can scaffold Round 1 for common patterns (todo list, form, table), but the Deepen and Polish rounds need human judgment — the "feel the friction" signal is yours, not the AI's. Never let AI generate the data-shape sketch — that's the decision that catches traps (§13). See <a href="./problem-solving.html">Problem-Solving §13c</a> for the same caution.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The one tool that matters most: pen and paper.</strong> The data-shape sketch (§13) is the single most important upfront decision, and it should happen on paper before any code. No tool substitutes for the act of writing "what are the nouns? what fields? what collection type?" by hand. The tightest feedback loop is between your pen and your brain.</p>
+</blockquote>
+
+<h2>13d. The future — where the dev loop is heading</h2>
+
+<h3>React Compiler: automating the optimization round</h3>
+<p>The <a href="https://react.dev/learn/react-compiler">React Compiler</a> (2024+) automatically handles memoization — the manual <code>useMemo</code>, <code>useCallback</code>, and <code>React.memo</code> that developers reach for in Round 2-3. This doesn't change the loop's shape (you still cycle Model → View → Flow), but it changes what <em>Round 2 (Deepen)</em> produces: instead of manually optimizing re-renders, the compiler does it for you. The human's Round 2 shifts from "performance optimization" to "making the data and flow right" — which is where the judgment actually matters.</p>
+
+<h3>Server Components: the Model thread splits</h3>
+<p>React Server Components (RSC, 2023+) changed where the Model thread runs. Before: the entire loop ran in the browser (SPA). After: the Model thread partially runs on the server (data fetching, rendering), and the View/Flow threads run on the client (interactivity). The loop is the same (Model → View → Flow), but the boundary shifted. See <a href="./react-2024-and-beyond.html">React 2024+</a> and <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a>. The implication for the loop: the data-shape sketch (§13) now needs to account for what's server-side vs client-side — a new dimension in Round 0.</p>
+
+<h3>AI scaffolding: the skeleton round gets automated</h3>
+<p>AI tools (Copilot, ChatGPT) can now generate the skeleton (Round 1) for common patterns — a todo list, a form, a table with sorting. This doesn't eliminate Round 1; it changes what the human does in it: <em>reviewing</em> the AI's skeleton against the data-shape sketch, rather than writing it from scratch. The Deepen and Polish rounds still need human judgment — the "feel the friction" signal (§1e) is the human's job, not the AI's. But the fluency trap (see <a href="./problem-solving.html">Problem-Solving §11</a>) intensifies: AI makes it easy to feel you understand the feature without building the schema that lets you <em>improvise</em> when it breaks.</p>
+
+<h3>The enduring rhythm</h3>
+<p>Frameworks change. React becomes Next.js becomes whatever comes next. But the three-thread loop (Model → View → Flow, cycled in rounds) has survived from Boehm's spiral model (1986) through XP (1999) through Agile (2001) through React (2013) through Server Components (2023) through the React Compiler (2024). The rhythm survives because it's the shape of iterative work itself — the same pattern that Larman and Basili traced back to the 1950s, applied at the scale of a single afternoon's work. Learn the rhythm once, and it serves you across every framework, every era. That's why this reference exists: not to teach you React, but to teach you the thinking process that generates features — the one skill that compounds across your entire career.</p>
+
+
+<h2>14. Summary — the complete mental checklist</h2>
+
+<p>Next time you sit down to build a feature, run this checklist. If you can answer each, you're ready to code. If not, sketch until you can.</p>
+
+<table>
+  <thead>
+    <tr><th>Question</th><th>If you can't answer…</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>What are the <strong>nouns</strong> in this feature? (todo, cart, product, user…)</td><td>Sketch the domain model first</td></tr>
+    <tr><td>What <strong>fields</strong> does each noun have? What are their types?</td><td>Sketch the data shape (Step 2)</td></tr>
+    <tr><td>What <strong>collection type</strong> holds the nouns? (array, Map, Set…)</td><td>Sketch the collection shape (Step 3)</td></tr>
+    <tr><td>What <strong>operations</strong> does the user perform on the data?</td><td>Sketch the operations (Step 4)</td></tr>
+    <tr><td>Are those operations <strong>natural</strong> on your chosen structure?</td><td>Reconsider the structure</td></tr>
+    <tr><td>What <strong>state lives where</strong> in the component tree?</td><td>Sketch the component state (Step 5)</td></tr>
+    <tr><td>What is <strong>derived</strong> (not stored)?</td><td>Mark it derived — don't put in state</td></tr>
+    <tr><td>What's the <strong>thinnest end-to-end slice</strong> I can build first?</td><td>That's your Round 1 (Skeleton)</td></tr>
+  </tbody>
+</table>
+
+<p>Print this table. Put it on your wall. Run it before every feature. The first five rows are "sketch the data shape." The last three are "the loop." That's the entire method.</p>
+
+---
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.sei.cmu.edu/publications/1986-spiral-model/">Boehm, B. (1986). "A Spiral Model of Software Development and Enhancement."</a> ·
+  <a href="https://ieeexplore.ieee.org/document/1188961">Larman, C. & Basili, V. (2003). "Iterative and Incremental Development: A Brief History."</a> ·
+  <a href="https://www.amazon.com/Extreme-Programming-Explained-Embrace-Change/dp/0321278658">Beck, K. (1999). <em>Extreme Programming Explained</em>.</a> ·
+  <a href="https://agilemanifesto.org/">Agile Manifesto (2001)</a> ·
+  <a href="https://theleanstartup.com/">Ries, E. (2011). <em>The Lean Startup</em>.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a real feature you built — show me the actual paper sketch you made for the data shape, and where the final code diverged from it."</li>
+    <li>"When you feel the friction to move from Round 1 to Round 2 on the View thread — what specifically are you noticing? Is it a visual thing, an accessibility thing, a responsiveness thing?"</li>
+    <li>"How do you teach a junior to 'feel the friction' instead of following a checklist? What exercises build that muscle?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · How Developers Think When Building a Frontend Feature</span>
+  <span>Upstream: <a href="./design-thinking.html">Design Thinking</a> · <a href="./system-design.html">System Design</a> · Loop siblings: <a href="./api-design.html">API Design</a> · <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> · Mission: HackerRank JS Basic + reading JS/React at work · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

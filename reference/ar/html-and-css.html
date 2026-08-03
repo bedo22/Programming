@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML و CSS — طبقة المنصة بين المتصفح والمكون</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · هندسة المنصة — الطبقة بين المتصفح والمكون</p>
+  <h1>HTML و CSS — طبقة المنصة بين المتصفح والمكون</h1>
+  <p class="meta">العقد الذي ينفذه المتصفح: بنية المستند، التدرج، التخطيط، السمات، وشجرة إمكانية الوصول. وثائق شقيقة: <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> (انضباط العرض الذي يعيش داخل هذه الركيزة)، <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> (حلقة التنفيذ التي تستهلك هذه العناصر الأولية)، <a href="./javascript-the-language.html">JavaScript: اللغة</a> (اللغة التي تتلاعب بهذه الركيزة)، <a href="./system-design.html">التصميم المعماري</a> (الطبقة المعمارية التي تعمل استراتيجية عرضها على هذه المنصة)، <a href="./frontend-camps-survey.html">مسح معسكرات الواجهات الأمامية</a> (خيارات الأطر تستخلص هذه الطبقة بشكل مختلف).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا هذا المستند منفصل</h3>
+  <p>معظم الدروس تعلم "اختصار flexbox" أو "CSS Grid في 15 دقيقة". HTML و CSS يبدأ بـ <em>ما هو عقد المنصة الذي تتلاعب به كل قاعدة CSS؟</em> إنه انضباط مستقل بتاريخه وخوارزمياته وأوضاع فشله — ليس "تنسيقاً" كزينة، ليس "Tailwind ضد CSS-in-JS" كدين، ليس "HTML الدلالي" كقائمة تحقق. يلتقط هذا المستند إياه كاهتمام هندسي من الدرجة الأولى: ركيزة العرض التصريحية، المتدرجة، القابلة للوصول افتراضياً، التي قرارات UI/UX تتحقق عليها، وحلقة المطور تنفذ ضدها، و JavaScript تتلاعب بها. إذا صححت يوماً إزاحة تخطيط، أو حرب تحديدية، أو كسر الوضع الداكن، أو قارئ شاشة يقرأ "زر" على <code><div></code> — فهذه هي الطبقة التي فاتتك.</p>
+</section>
+
+<h2>٠. كيف تستخدم هذا المستند</h2>
+
+<p>ترتيب القراءة: مستقل. روابط تقاطعية:</p>
+<ul>
+  <li>أعلى إلى <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> — UI/UX يقرر ما <em>يجب أن يكون</em> الشيء المعروض؛ HTML و CSS هي الركيزة التي يعرض <em>عليها</em>. مصفوفة رؤية الحالة (§9 في UI/UX) تُرسم مباشرة إلى حالات HTML (<code>aria-busy</code>، <code>aria-invalid</code>) وحالات CSS (<code>:hover</code>، <code>:focus-visible</code>، <code>[data-loading]</code>).</li>
+  <li>أسفل إلى <a href="./how-developers-think-frontend.html">كيف يفكر المطورون عند بناء ميزة واجهة أمامية</a> — حلقة المطور تبني المكونات باستخدام عناصر HTML وقواعد CSS كعناصر أولية. قرارات الحلقة "الشكل" (API المكون، شكل الحالة) مقيدة بما تجعل المنصة قابلاً للتعبير.</li>
+  <li>تقاطعي مع <a href="./javascript-the-language.html">JavaScript: اللغة</a> — JS تتلاعب بـ DOM (شجرة HTML في الذاكرة) و CSSOM (ورقة أنماط CSS في الذاكرة). هذا المستند يشرح ما <em>هاتان الشجرتان</em> وكيف يحل التدرج قبل أن تلمسها JS.</li>
+  <li>تقاطعي مع <a href="./system-design.html">التصميم المعماري</a> — استراتيجية العرض (SSR، RSC، Islands، SPA) هي قرار حول <em>من يصدر HTML الأولي ومتى يصل CSS</em>. عقد المنصة (تحليل HTML، حظر CSS، تحميل الخطوط) هو الحقيقة الأساسية التي تفاوض كل استراتيجية معها.</li>
+  <li>سياق من <a href="./frontend-camps-survey.html">مسح معسكرات الواجهات الأمامية</a> — كل معسكر (React، Vue، Svelte، Solid، Qwik، Astro) هو استخلاص مختلف فوق نفس الركيزة. الركيزة لا تتغير؛ تسرب الاستخلاص هو ما يختلف.</li>
+  <li>مرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع وثائق المراجع.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>إجابة الشجرتين لـ "ما هي منصة الويب؟"</strong></p>
+  <ul>
+    <li><strong>DOM (نموذج كائن المستند)</strong> — شجرة HTML المحللة. عناصر، سمات، عقد نصية. البنية التي يعرضها المتصفح لـ JavaScript. <code>document.querySelector('article')</code> يعيد عقدة DOM.</li>
+    <li><strong>AOM (نموذج كائن إمكانية الوصول) / شجرة إمكانية الوصول</strong> — شجرة موازية مشتقة من DOM، مفلترة للدوال. <code><button></code> تصبح عقدة <code>role="button"</code>؛ <code><div onclick></code> تصبح عقدة عامة بلا دور. قارئات الشاشة تتنقل <em>هذه</em> الشجرة، لا DOM.</li>
+  </ul>
+  <p>CSS تعمل على بنية ثالثة: <strong>شجرة العرض</strong> (DOM + قيم محسوبة → صناديق). التدرج، التخطيط، الرسم، والتركيب يحدثون هنا. ثلاث شجرات، مصدر واحد: HTML الذي تكتبه.</p>
+</blockquote>
+
+---
+
+<h2>١. تعريف — ما <em>هو</em> HTML و CSS وما <em>ليس</em> به</h2>
+
+<h3>ما هو</h3>
+
+<p>HTML و CSS هو <strong>عقد عرض تصريحي، متدرج، قابل للوصول افتراضياً لمنصة الويب</strong>. ينتج قرارات — لا تعليمات إجرائية — تحدد:</p>
+
+<ul>
+  <li><strong>بنية المستند ودلالاته</strong> — ما العناصر الموجودة، كيف تتداخل، ما تعني (<code><article></code> مقابل <code><section></code> مقابل <code><div></code>). DOM هو نتيجة التحليل؛ AOM هو الإسقاط الدلالي.</li>
+  <li><strong>خوارزمية التدرج</strong> — كيف تتنافس الإعلانات: المصدر (وكيل المستخدم / المستخدم / المؤلف)، الأهمية (<code>!important</code>)، التحديدية، ترتيب المصدر، قرب النطاق، طبقات التدرج. حتمية، قابلة للفحص، غير إجرائية.</li>
+  <li><strong>نموذج الصندوق وسياقات التنسيق</strong> — كل عنصر يولد صناديق (محتوى، حشو، حد، هامش). الصناديق تشارك في سياقات تنسيق (التدفق العادي، flex، grid، table، ruby). التخطيط هو حل قيود على الصناديق.</li>
+  <li><strong>التنسيق البصري والسمات</strong> — اللون، الطباعة، المسافات، الحركة، الظلال، الحدود، المرشحات، أوضاع المزج. معبرة كقيم محسوبة على الصناديق.</li>
+  <li><strong>كشف الحالة</strong> — فئات مزيفة (<code>:hover</code>، <code>:focus-visible</code>، <code>:disabled</code>، <code>:valid</code>، <code>:placeholder-shown</code>)، محددات السمات (<code>[aria-busy="true"]</code>، <code>[data-state="loading"]</code>)، استعلامات الحاوية (<code>@container</code>). المنصة تكشف الحالة؛ CSS تختارها.</li>
+  <li><strong>التجاوب والتحجيم الجوهري</strong> — استعلامات الوسائط (<code>@media</code>)، استعلامات الحاوية (<code>@container</code>)، <code>min()</code>/<code>max()</code>/<code>clamp()</code>، <code>fit-content</code>، <code>min-content</code>، <code>max-content</code>. التخطيط يتكيف مع القيود بدون JS.</li>
+  <li><strong>إمكانية الوصول كافتراض</strong> — HTML الدلالي <em>هو</em> API إمكانية الوصول. <code><label for></code>، <code><fieldset></code>/<code><legend></code>، <code>aria-*</code> فقط عند وجود فجوة دلالية. خط أساس WCAG 2.2 AA.</li>
+</ul>
+
+<p>هذه القرارات <strong>مكلفة للتغيير لاحقاً</strong>. إعادة هيكلة CSS تمس كل مكون. تدقيق دلالات HTML يمس كل قالب. كلما دخلت قرارات المنصة أبكر، كان النظام أرخص.</p>
+
+<h3>ما ليس به</h3>
+
+<table>
+  <thead><tr><th>مخلوط مع</th><th>ما ذاك</th><th>الفرق</th></tr></thead>
+  <tbody>
+    <tr><td>CSS كـ "لغة تنسيق"</td><td>ألوان، خطوط، مسافات، "جعله يبدو جيداً"</td><td>CSS هي <em>لغة حل قيود لتخطيط الصناديق</em>. التنسيق خرج واحد؛ التخطيط، السمات، كشف الحالة، وتكامل شجرة a11y يخرجات أخرى.</td></tr>
+    <tr><td>Tailwind / Bootstrap / CSS-in-JS</td><td>فئات مساعدة، أطر مكونات، حقن أنماط وقت تشغيل، استخراج صفر وقت تشغيل</td><td>أدوات هي <em>استخلاصات تأليف</em>؛ عقد المنصة (التدرج، التحديدية، التوريث، القيم المحسوبة) هو ما كلها تُترجم <em>إليه</em>. العقد لا يتغير عند تغير الأداة.</td></tr>
+    <tr><td>HTML الدلالي كـ "قائمة تحقق SEO"</td><td><code><h1></code> للترتيب، <code><article></code> للزواحف</td><td>HTML الدلالي <em>هو شجرة إمكانية الوصول</em>. قارئات الشاشة، أوضاع القارئ، RSS، Safari Reader، Windows High Contrast — كلها تستهلك AOM. SEO أثر جانبي.</td></tr>
+    <tr><td>HTML كـ "لغة قوالب"</td><td>ترميز، حلقات، شروط، أجزاء (Jinja، Blade، JSX، قوالب Vue)</td><td>القوالب <em>تنتج</em> HTML. HTML هو <em>تنسيق الخرج</em> الذي يحلله المتصفح. المنصة ترى فقط النتيجة المسلسلة.</td></tr>
+    <tr><td>متغيرات CSS = سمات</td><td><code>--color-primary: blue</code> متبدلة للوضع الداكن</td><td>الخصائص المخصصة هي <em>قيم تشارك في التدرج</em>. تورث، لها بدائل، يمكن تجاوزها لكل فرع فرعي. السمات حالة استخدام؛ التخطيط الخوارزمي (calc مع متغيرات) آخر.</td></tr>
+    <tr><td>التخطيط = Flexbox أو Grid</td><td>اختيار <code>display: flex</code> مقابل <code>display: grid</code></td><td>التخطيط هو <em>نظام سياق التنسيق بالكامل</em>: التدفق العادي، الطفو، التموضع، flex، grid، table، ruby، متعدد الأعمدة، masonry. الاختيار لا رجعة فيه تقريباً لكل جذر سياق تنسيق.</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>٢. تاريخ — من مستندات SGML إلى المعيار الحي</h2>
+
+<table>
+  <thead><tr><th>الفترة</th><th>الإنجاز</th><th>شخصيات / أعمال رئيسية</th><th>ما تغير</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1989–1991</strong></td>
+      <td>HTML في CERN، تراث SGML</td>
+      <td>Tim Berners-Lee، Dan Connolly (SGML)، مجموعة عمل IETF HTML</td>
+      <td>HTML كتطبيق SGML. <code><a></code>، <code><p></code>، <code><h1-h6></code>، <code><ul></code>/<code><ol></code>، <code><img></code>. لا تخطيط، لا تنسيق. مستندات مرتبطة بـ URLs.</td>
+    </tr>
+    <tr>
+      <td><strong>1994–1996</strong></td>
+      <td>اقتراح CSS 1، "إضافات" نتسكيب</td>
+      <td>Håkon Wium Lie، Bert Bos (CSS)، نتسكيب (<code><font></code>، <code><center></code>، <code>bgcolor</code>)</td>
+      <td>CSS 1 (1996): التدرج، التوريث، نموذج الصندوق، فئات مزيفة. نتسكيب شحنت HTML تنفيذي — تباعد "حرب المتصفحات".</td>
+    </tr>
+    <tr>
+      <td><strong>1997–1999</strong></td>
+      <td>HTML 4، CSS 2، عملية W3C</td>
+      <td>مجموعة عمل W3C HTML، مجموعة عمل CSS، Dave Raggett (HTML 4)</td>
+      <td>HTML 4: إطارات، سكريبتات، أوراق أنماط، <code><div></code>/<code><span></code>، سمات إمكانية الوصول (<code>alt</code>، <code>longdesc</code>). CSS 2: تموضع، أنواع وسائط، <code>@media</code>، محتوى مولد.</td>
+    </tr>
+    <tr>
+      <td><strong>2000–2006</strong></td>
+      <td>XHTML 1.x، CSS 2.1، منعطف "وضع المعايير"</td>
+      <td>W3C (XHTML)، مجموعة عمل CSS (2.1)، WaSP (مشروع معايير الويب)، Jeffrey Zeldman، Eric Meyer</td>
+      <td>XHTML = HTML بصيغة XML (صارم، فشل التبني). CSS 2.1 = مجموعة فرعية قابلة للتنفيذ (10 سنوات لـ REC). تبديل DOCTYPE: "وضع المعايير" مقابل "وضع الشذوذ". تخطيط بلا جداول عبر الطفو + الإزالة.</td>
+    </tr>
+    <tr>
+      <td><strong>2004–2008</strong></td>
+      <td>نماذج WHATWG، HTML5، وحدات CSS3</td>
+      <td>Ian Hickson (WHATWG)، Apple/Mozilla/Opera، مواصفات "HTML5" لـ Hixie، مجموعة عمل CSS (وحدات)</td>
+      <td>نماذج WHATWG: <code><input type="email/date/range"></code>، <code><canvas></code>، <code><video></code>، <code><section></code>/<code><article></code>. CSS3 تنقسم لوحدات (محددات، صندوق، نص، لون، UI، Flexbox، Grid).</td>
+    </tr>
+    <tr>
+      <td><strong>2009–2014</strong></td>
+      <td>Flexbox، Grid، خصائص مخصصة، عصر "CSS الحديث"</td>
+      <td>Tab Atkins (Flexbox/Grid)، Elika Etemad (fantasai)، Léonie Watson (a11y)، مجموعة عمل CSS</td>
+      <td>Flexbox (مسودة 2009 → REC 2018). Grid (مسودة 2011 → REC 2018). خصائص مخصصة (مسودة 2012 → REC 2018). استعلامات الميزات (<code>@supports</code>). بادئات (-webkit-، -moz-) كألم هجرة.</td>
+    </tr>
+    <tr>
+      <td><strong>2014–2018</strong></td>
+      <td>HTML 5.1/5.2، خط الأساس Interop، CSS Houdini</td>
+      <td>تقارب W3C/WHATWG (2019)، Interop 2022+ (Apple، Google، Microsoft، Mozilla، Igalia)</td>
+      <td>معيار HTML الحي (WHATWG) = مواصفة واحدة. Interop: مجالات تركيز سنوية عبر المتصفحات. Houdini: Paint API، Layout API، Typed OM — قابلية توسع بدون بادئات.</td>
+    </tr>
+    <tr>
+      <td><strong>2019–2023</strong></td>
+      <td>استعلامات الحاوية، طبقات التدرج، التداخل، <code>:has()</code>، اللون مستوى 4/5</td>
+      <td>Miriam Suzanne (طبقات التدرج، التداخل)، Una Kravets/Adam Argyle (استعلامات الحاوية)، توافق Chrome/FF/Safari</td>
+      <td>استعلامات الحاوية: التخطيط يستجيب للحاوية لا المنفذ. طبقات التدرج (<code>@layer</code>): تحكم صريح في المصدر. التداخل (<code>&</code>): تداخل محددات أصلي. <code>:has()</code>: محدد الأب. فضاءات لون OKLCH/OKLAB. خط أساس Interop 2023/2024.</td>
+    </tr>
+    <tr>
+      <td><strong>2024–الحاضر</strong></td>
+      <td>تموضع المرساة، انتقالات العرض L2، مفاتيح CSS، <code>@scope</code>، خط الأساس "متاح حديثاً"</td>
+      <td>مجموعة عمل CSS، مجموعة Open UI CG، بائعو المتصفحات</td>
+      <td>تموضع المرساة: تلميح/popover بدون رياضيات JS. انتقالات عرض عبر المستندات: تنقل يشبه SPA لـ MPA. <code>@scope</code>: تحديد نطاق مبني على القرب بدون Shadow DOM. مفاتيح: آلات حالة في CSS. خط الأساس "متاح حديثاً" = آمن للاستخدام بدون polyfill.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>٣. تطور — انعكاسات القيود عبر المنصة</h2>
+
+<p>الفكرة الأساسية — <em>مستند تصريحي يعرض في كل مكان</em> — لم تتغير. ما تغير هو القيد السائد، وميزة المنصة التي امتصته:</p>
+
+<table>
+  <thead><tr><th>القيد السائد</th><th>ميزة المنصة الفائزة</th><th>لماذا انطبقت</th></tr></thead>
+  <tbody>
+    <tr><td>لا تخطيط إطلاقاً (1991–1996)</td><td>جداول HTML + سمات تنفيذية</td><td>الجداول كانت الشبكة الوحيدة. <code><font></code>، <code>bgcolor</code>، <code>align</code> = تحكم المؤلف. تلوث دلالي مقبول.</td></tr>
+    <tr><td>فصل الاهتمامات (1996–2003)</td><td>CSS 1/2 + تبديل DOCTYPE</td><td>أوراق أنماط خارجية، التدرج يحل التعارضات. "وضع المعايير" = نموذج صندوق متوقع. تخطيط مبني على الطفو (الكأس المقدسة، clearfix).</td></tr>
+    <tr><td>تخطيطات الطفو الجامدة تكسر عند تغير المحتوى (2003–2012)</td><td>Flexbox ( أحادي البعد)</td><td>Flex يحل "توسيط عمودي"، "أعمدة متساوية الارتفاع"، "دفع التذييل لأسفل". محور واحد، مدفوع بالمحتوى. لا مزيد من clearfix.</td></tr>
+    <tr><td>تخطيط ثنائي البعد لا يزال صعباً (2012–2018)</td><td>CSS Grid (ثنائي البعد)</td><td>Grid يحل "صف + عمود معاً"، "تداخل"، "مناطق مسماة"، "مسارات جوهرية (<code>minmax</code>، <code>auto-fit</code>)." التخطيط كنظام قيود، لا كاختراق.</td></tr>
+    <tr><td>استعلامات المنفذ لا تعبر عن تجاوب مستوى المكون (2018–2022)</td><td>استعلامات الحاوية</td><td>بطاقة في شريط جانبي مقابل عمود رئيسي تحتاج نقاط كسر مختلفة. <code>@container</code> يستعلم <em>حجم الأب</em> لا المنفذ. المكون يملك منطق تجاوبه.</td></tr>
+    <tr><td>حروب تحديدية + تصادمات CSS طرف ثالث (2019–2023)</td><td>طبقات التدرج (<code>@layer</code>)</td><td>طبقات = ترتيب مصدر صريح: <code>@layer reset, base, components, utilities</code>. CSS طرف ثالث في طبقه الخاصة. لا مزيد من تصعيد <code>!important</code>.</td></tr>
+    <tr><td>إرغونوميات التأليف مقابل طول المنصة (2020–2024)</td><td>التداخل، <code>:has()</code>، خصائص مخصصة، <code>@property</code></td>
+      <td>التداخل = تكرار أقل للمحددات. <code>:has()</code> = محدد الأب (أخيراً). <code>@property</code> = خصائص مخصصة مُنوعة (تحريك، تحقق). المنصة تمتص ميزات المعالجات الأولية.</td>
+    </tr>
+    <tr><td>تفاعلات ثقيلة JS (تلميحات، popovers، انتقالات) (2023+)</td><td>تموضع المرساة، انتقالات العرض، Popover API، <code>@starting-style</code></td>
+      <td>تموضع التلميح بدون رياضيات JS. انتقالات عبر المستندات بدون SPA. popovers تصريحية. المنصة تمتص أنماط JS الشائعة.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>النمط يتكرر: عندما يتغير القيد السائد (لا تخطيط → فصل → 1D مرن → 2D مرن → تجاوب مستوى المكون → تدرج بلا تصادم → تأليف إرغونومي → تفاعل تصريحي)، إرغونوميات الميزة القديمة تصبح احتكاكاً وتمتص ميزة منصة جديدة القيد.</p>
+
+---
+
+<h2>٤. تقاطع مع الجيران — حيث تحد ممارسات أخرى</h2>
+
+<table>
+  <thead><tr><th>الممارسة</th><th>DNA مشترك</th><th>أين تختلف</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>تصميم UI/UX والويب</strong></td>
+      <td>رؤية الحالة، إمكانيات الفعل، إمكانية الوصول، التسلسل الهرمي البصري، الحركة، الرموز</td>
+      <td>UI/UX <em>يقرر ما يختبره الإنسان</em>؛ HTML و CSS <em>هي الركيزة التي تجعله ممكناً</em>. UI/UX تصمم مصفوفة الحالة؛ HTML/CSS تنفذ خطافات <code>aria-busy</code>/<code>[data-state]</code> والفئات المزيفة التي تكشفها.</td>
+    </tr>
+    <tr>
+      <td><strong>حلقة المطور (الواجهة الأمامية)</strong></td>
+      <td>شكل المكون، الخصائص، الحالة، العرض، الأداء، الترطيب</td>
+      <td>الحلقة <em>تكتب مكونات تصدر HTML و CSS</em>؛ المنصة <em>تحلل، تتدرج، تخطّط، ترسم</em>. قرارات الحلقة "الشكل" (ما الخصائص، ما الحالات) مقيدة بما توجد عناصر HTML وما يمكن CSS اختياره.</td>
+    </tr>
+    <tr>
+      <td><strong>JavaScript: اللغة</strong></td>
+      <td>DOM API، CSSOM، حلقة الأحداث، microtaps، مراقبات التحور</td>
+      <td>JS <em>تتلاعب بالأشجار</em> (DOM، CSSOM، AOM)؛ HTML و CSS <em>تعرف البنية الأولية للأشجار وخوارزمية التدرج</em>. JS لا تستطيع إصلاح تدرج مكسور؛ فقط تتحور بعد الحقيقة.</td>
+    </tr>
+    <tr>
+      <td><strong>التصميم المعماري</strong></td>
+      <td>استراتيجية العرض (SSR/RSC/Islands)، CSS الحرج، تحميل الخطوط، الترطيب، التدفق</td>
+      <td>التصميم المعماري <em>يقرر متى وأين يصدر HTML/CSS</em>؛ المنصة <em>تعرف ما يعني "إصدار"</em> (حظر المحلل، حظر العرض، تنازل المحلل). <code><link rel="preload" as="style"></code> أولية منصة؛ التصميم المعماري يقرر أي أوراق تحصل عليها.</td>
+    </tr>
+    <tr>
+      <td><strong>مسح معسكرات الواجهات الأمامية</strong></td>
+      <td>React (JSX → HTML)، Vue (SFC → HTML)، Svelte (تجميع → HTML+CSS)، Astro (jزر → HTML)</td>
+      <td>كل معسكر <em>استخلاص فوق الركيزة</em>. React<em> الركيزة</em>. الركيزة (تحليل HTML، تدرج CSS، تخطيط) متطابقة؛ تسرب الاستخلاص (الترطيب، تحديد نطاق الأنماط، التسلسل) يختلف.</td>
+    </tr>
+    <tr>
+      <td><strong>إمكانية الوصول (WCAG / ARIA)</strong></td>
+      <td>HTML دلالي، <code>aria-*</code>، إدارة التركيز، التباين، حركة مخفضة</td>
+      <td>WCAG هو <em>خط أساس الامتثال</em>؛ HTML و CSS <em>هي المنصة التي تجعل الامتثال افتراضياً</em>. <code><button></code> = لوحة مفاتيح + دور + تركيز مجاناً. ARIA هروب عند فجوة دلالية.</td>
+    </tr>
+    <tr>
+      <td><strong>أنظمة التصميم / رموز التصميم</strong></td>
+      <td>لون، مسافات، طباعة، حركة، حد، ظل كبيانات منظمة</td>
+      <td>الرموز (صيغة W3C DTCG) تترجم إلى <em>خصائص CSS المخصصة</em>. المنصة <em>هي</em> وقت تشغيل الرموز: التوريث، البديل، كتابة <code>@property</code>، <code>calc()</code> مع متغيرات. أنظمة التصميم تؤلف الرموز؛ المنصة تحلها.</td>
+    </tr>
+    <tr>
+      <td><strong>الأداء / Core Web Vitals</strong></td>
+      <td>CLS، LCP، INP، TTFB، حظر العرض، تحميل الخطوط</td>
+      <td>الأداء <em>يقيس سلوك المنصة</em>؛ HTML و CSS <em>هو السلوك المقاس</em>. <code><link rel="preload"></code>، <code>font-display</code>، <code>content-visibility</code>، <code>will-change</code> أزرار منصة. المنصة لا تحسّن؛ أنت تفعل.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>٥. النظرية الأساسية — الخوارزميات التي تشغلها المنصة</h2>
+
+<table>
+  <thead><tr><th>النظرية / الخوارزمية</th><th>المواصفة / المنشأ</th><th>ما تفعله المنصة بها</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>خوارزمية تحليل HTML</strong></td>
+      <td>معيار HTML الحي لـ WHATWG — "محلل HTML"</td>
+      <td>ترميز → بناء شجرة. يتعامل مع ترميز معيب حتمياً (خوارزمية وكالة التبني، الوالدية الحاضنة). DOM الذي تحصل عليه محدد، لا يعتمد على المتصفح.</td>
+    </tr>
+    <tr>
+      <td><strong>خوارزمية تدرج CSS</strong></td>
+      <td>تدرج CSS والتوريث مستوى 5</td>
+      <td>المصدر (UA/المستخدم/المؤلف) → الأهمية (<code>!important</code>) → التحديدية (ID/فئة/نوع) → ترتيب المصدر → قرب النطاق → ترتيب الطبقات. حتمي، قابل للفحص في تبويب DevTools "Computed".</td>
+    </tr>
+    <tr>
+      <td><strong>حساب تحديدية CSS</strong></td>
+      <td>محددات CSS مستوى 3/4</td>
+      <td><code>(a,b,c)</code> = (عدد ID، عدد فئة/سمة/فئة مزيفة، عدد نوع/عنصر مزيف). <code>#id .class:hover</code> = (1,2,0). الأعلى يفوز. ليس قاعدة 10؛ <code>(0,11,0)</code> < <code>(1,0,0)</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>نموذج الصندوق وبناء شجرة الصندوق</strong></td>
+      <td>نموذج صندوق CSS مستوى 3/4، عرض CSS مستوى 3</td>
+      <td>كل عنصر → صندوق رئيسي (محتوى/حشو/حد/هامش). <code>display</code> يحدد النوع الخارجي (block/inline/flex/grid) والداخلي (سياق تنسيق). <code>box-sizing: border-box</code> يغير الصندوق الذي يطبق عليه <code>width</code>/<code>height</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>سياقات التنسيق</strong></td>
+      <td>عرض CSS مستوى 3، CSS Flexbox، CSS Grid</td>
+      <td>BFC (سياق تنسيق كتلي): طفو، هوامش، إزالة. Flex: محور رئيسي/متقاطع، محاذاة، توزيع. Grid: مسارات، خطوط، مناطق، وضع تلقائي. كل سياق خوارزمية تخطيط خاصة.</td>
+    </tr>
+    <tr>
+      <td><strong>التحجيم الجوهري و <code>min/max-content</code></strong></td>
+      <td>تحجيم CSS مستوى 3/4</td>
+      <td><code>min-content</code> = الأصغر بلا تجاوز. <code>max-content</code> = الأكبر بلا تفاف. <code>fit-content(limit)</code> = clamp(<code>min-content</code>، <code>limit</code>، <code>max-content</code>). Grid <code>minmax()</code>، <code>auto-fit</code>، <code>auto-fill</code> تستخدم هذه.</td>
+    </tr>
+    <tr>
+      <td><strong>بناء شجرة إمكانية الوصول</strong></td>
+      <td>W3C ARIA في HTML، HTML AAM (ترجمات API إمكانية الوصول)</td>
+      <td>DOM → AOM: دور، اسم، وصف، حالة، علاقات. <code><button></code> → role=button، name=محتوى نصي. <code><label for></code> → name من التسمية. <code>aria-*</code> يتخطى. قارئات الشاشة تستهلك AOM، لا DOM.</td>
+    </tr>
+    <tr>
+      <td><strong>خط أنابيب العرض: تنسيق → تخطيط → رسم → تركيب</strong></td>
+      <td>CSSOM، بلنك/WebKit/Gecko الداخلية</td>
+      <td>تنسيق: تدرج → قيم محسوبة. تخطيط: شجرة صندوق → هندسة (حل قيود). رسم: قوائم عرض (أوامر رسم). تركيب: طبقات → GPU. <code>transform</code>/<code>opacity</code> = تركيب فقط (رخيص). تخطيط = مكلف.</td>
+    </tr>
+    <tr>
+      <td><strong>خصائص CSS المخصصة و <code>@property</code></strong></td>
+      <td>خصائص CSS المخصصة مستوى 1/2، CSS Properties and Values API</td>
+      <td>الخصائص المخصصة تورث، تتدرج، لها بديل (<code>var(--x, fallback)</code>). <code>@property</code> يسجل نوع (<code><color></code>، <code><length></code>)، قيمة أولية، توريث: true/false. يمكّن تحريك، تحقق، OM منوع.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>٥ب. النماذج العقلية — كيف يفكر مهندسو المنصة فعلياً</h2>
+
+<p>الخوارزميات أعلاه هي الحواجز الواقية. النماذج العقلية هي كيف تتنقل بداخلها. كل نموذج يضغط الخوارزميات لسياق قرار محدد:</p>
+
+<table>
+  <thead><tr><th>النموذج</th><th>الفكرة الأساسية</th><th>متى تصل إليه</th><th>ما يستبدل</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>HTML دلالي = عقد AOM</strong></td>
+      <td><code><button></code> ≠ <code><div role="button" tabindex="0"></code>. الأول يحصل على لوحة مفاتيح، تركيز، دور، اسم، حالة مجاناً. الثاني يتطلب ARIA يدوياً. اختر العنصر الذي يعني الشيء.</td>
+      <td>اختيار العناصر؛ تدقيق إمكانية الوصول؛ تعليم المبتدئين.</td>
+      <td>ARIA كملاذ أول؛ حساء <code><div></code> مع <code>onclick</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>التدرج كسياسة عامة</strong></td>
+      <td>أوراق أنماط المستخدم تربح. <code>!important</code> في CSS المؤلف ينتهك وكالة المستخدم (تباين عالي، خطوط مخصصة، تكبير). استخدم الطبقات، التحديدية، ترتيب المصدر بدلاً منها.</td>
+      <td>حروب التحديدية؛ تصادمات CSS الطرف الثالث؛ تجاوزات رموز نظام التصميم.</td>
+      <td>تصعيد <code>!important</code>؛ محددات ID؛ أنماط مضمنة.</td>
+    </tr>
+    <tr>
+      <td><strong>نظام التخطيط = لا رجعة فيه لكل سياق تنسيق</strong></td>
+      <td>أبناء حاوية flex هم عناصر flex. أبناء حاوية grid هم عناصر grid. لا يمكنك خلط سياقات التنسيق على نفس الأبناء. اختر عند الحاوية؛ الأبناء تطيع.</td>
+      <td>اختيار flex مقابل grid مقابل التدفق؛ تصحيح "لماذا لا يتمركز هذا؟"</td>
+      <td>إضافة المزيد من CSS "لإصلاح" تخطيط في سياق تنسيق خاطئ.</td>
+    </tr>
+    <tr>
+      <td><strong>التحسين التدريجي = عقد، لا اقتراح</strong></td>
+      <td>HTML يعمل بدون CSS. CSS يعمل بدون JS. JS يعزز، لا يحجز. المنصة تضمن هذا إذا لم تكسره (<code><noscript></code> تخفي محتوى، توجيه JS فقط بدون <code><a href></code>).</td>
+      <td>مراجعات المعمار؛ تخطيط الميزات؛ قرارات SSR/SSG.</td>
+      <td>توجيه JS فقط؛ <code>display: none</code> على <code><noscript></code>؛ CSS-in-JS بدون SSR.</td>
+    </tr>
+    <tr>
+      <td><strong>رموز على الأرقام السحرية</strong></td>
+      <td><code>padding: var(--space-4)</code> لا <code>padding: 16px</code>. <code>color: var(--color-primary)</code> لا <code>color: #3b82f6</code>. الرموز تمكّن الوضع الداكن، الكثافة، السمات، المزامنة عبر المنصات. الأرقام السحرية تضمن الانحراف.</td>
+      <td>تأليف نظام التصميم؛ تنميط المكونات؛ هجرة من قيم مشفرة.</td>
+      <td>px/rem/hex مشفر؛ "سنستخرج الرموز لاحقاً".</td>
+    </tr>
+    <tr>
+      <td><strong>الأداء = مفاتيح منصة تضبطها</strong></td>
+      <td><code><link rel="preload" as="style"></code>، <code>font-display: swap</code>، <code>content-visibility: auto</code>، <code>will-change</code> (باقتصاد). المنصة لا تحسّن لك؛ تكشف مفاتيح. قس (CLS، LCP، INP)، ثم در المفاتيح.</td>
+      <td>مراجعة Core Web Vitals؛ تصحيح LCP/CLS/INP؛ استراتيجية تحميل الخطوط.</td>
+      <td>التخمين؛ إضافة <code>preload</code> في كل مكان؛ <code>will-change</code> على كل شيء.</td
+    </tr>
+    <tr>
+      <td><strong>الحالة تعيش في السمات، تُختار في CSS</strong></td>
+      <td><code>[aria-busy="true"]</code>، <code>[data-state="loading"]</code>، <code>:disabled</code>، <code>:focus-visible</code>. JS يبدل السمات؛ CSS يختار الحالات. لا JS-in-CSS (لا <code>style="..."</code> من JS)، لا منطق حالة CSS-in-JS.</td>
+      <td>تصميم حالة المكون؛ التسليم بين JS و CSS؛ رموز حالة نظام التصميم.</td>
+      <td><code>style="..."</code> من React؛ CSS-in-JS تحسب أسماء الفئات من الحالة.</td>
+    </tr>
+    <tr>
+      <td><strong>احترم تفضيلات المستخدم افتراضياً</strong></td>
+      <td><code>@media (prefers-reduced-motion: reduce)</code> يعطل الرسوم غير الأساسية. <code>@media (prefers-contrast: more)</code> يعزز التباين. <code>@media (prefers-color-scheme: dark)</code> يبدل الرموز. المنصة تكشف التفضيلات؛ أنت تكرمها.</td>
+      <td>نظام الرسوم؛ نظام الألوان؛ تنفيذ الحركة المخفضة؛ وضع الألوان القسرية.</td>
+      <td>الرسوم كزينة فقط؛ الوضع الداكن كاختراق <code>filter: invert</code>؛ تجاهل الحركة المخفضة.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>نمط مضاد:</strong> كتابة CSS تحارب المنصة. التدرج، التوريث، سياقات التنسيق، والفئات الوهمية ليست أخطاء للعمل حولها — هي بدائيات المنصة. العمل <em>معها</em> (HTML دلالي، خصائص منطقية، استعلامات الحاوية، طبقات التدرج) دائماً أصغر وأكثر متانة من العمل <em>ضدها</em> (أطر أداة تزيل الدلالات، مكتبات تخطيط JS، حروب <code>!important</code>).</p>
+
+---
+
+<h2>٦. الإيقاع، لا الخوارزمية</h2>
+
+<p>مثل <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a>، <a href="./system-design.html">التصميم المعماري</a>، و <a href="./api-design.html">تصميم API</a>، HTML و CSS هو <strong>إيقاع</strong>، لا خوارزمية منظمة. يفشل اختبارات الخوارزمية الثلاثة:</p>
+
+<ul>
+  <li><strong>المدخلات غير معرفة مسبقاً.</strong> لا تعرف كل المحتوى المستقبلي، أحجام المنافذ، تفضيلات المستخدم (وضع داكن، حركة مخفضة، تباين عالي)، أو قدرات المتصفح عند كتابة أول قاعدة. المنصة تكتشفها وقت التشغيل.</li>
+  <li><strong>الخطوات غير حتمية.</strong> لا توجد قاعدة تقول "الآن التقط Grid". تختار Grid عندما يتطلب التصميم محاذاة ثنائية البعد بمسارات جوهرية — قرار حكم. <code>@container</code> مقابل <code>@media</code> قرار سياق، لا حكم.</li>
+  <li><strong>لا إنهاء ثابت.</strong> "منجز" يعني "المكون يعرض بشكل صحيح عبر مصفوفة الدعم (متصفحات، منافذ، أوضاع، شجرة a11y) والتدرج قابل للفحص بلا <code>!important</code>." ذلك قرار، لا حكم. المنصة تتطور؛ المكون يتكرر.</li>
+</ul>
+
+<p>هذا لماذا يقاوم HTML و CSS قوائم تحقق تتظاهر بالكمال. قائمة تحقق تفترض أنك تعرف المحتوى والسياق النهائيان؛ الإيقاع يفترض أنك تعرف <em>ما ينقص للسياق الذي لديك</em> — قرار منصة/هندسة.</p>
+
+<blockquote class="callout">
+  <p><strong>اختراق الإيقاع "رموز التصميم → خصائص CSS المخصصة".</strong> رموز التصميم (صيغة W3C DTCG) تترجم إلى خصائص CSS المخصصة. تدرج المنصة + التوريث + البديل + كتابة <code>@property</code> <em>هو</em> وقت تشغيل الرموز. تغيير رمز = تغيير متغير CSS واحد = انتشار فوري لكل مكون. لا خطوة بناء، لا إعادة نشر. مضاعف سرعة — مفيد حين يكون نظام الرموز حياً، خطير حين تصبح الرموز بيروقراطية تمنع الانحراف لكل مكون.</p>
+</blockquote>
+
+---
+
+<h2>٧. المنهجيات / الأطر المسماة</h2>
+
+<p>توجد مقاربات تأليف مسماة متعددة. لا واحدة قانونية؛ كل تحزم الإيقاع لسياق مختلف.</p>
+
+<table>
+  <thead><tr><th>المنهجية</th><th>الفكرة الأساسية</th><th>المنشأ</th><th>أفضل لـ</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>HTML دلالي أولاً</strong></td>
+      <td>اختر العناصر بالمعنى (<code><article></code>، <code><nav></code>، <code><button></code>)، لا المظهر. CSS ينسق الدلالات.</td>
+      <td>HTML لـ WHATWG، WaSP، Zeldman، Meyer</td>
+      <td>خط أساس إمكانية الوصول، SEO، أوضاع القارئ، تجهيز للمستقبل. كل مشروع يبدأ هنا.</td>
+    </tr>
+    <tr>
+      <td><strong>Mobile-First / تحسين تدريجي CSS</strong></td>
+      <td>أنماط أساسية لأصغر/أكثر قيداً؛ <code>@media (min-width: ...)</code> يعزز للأعلى. لا تجاوزات desktop-first.</td>
+      <td>Luke Wroblewski (2009)، Aaron Gustafson (2011)</td>
+      <td>دعم أجهزة واسع؛ حرج الأداء؛ مواقع غنية بالمحتوى؛ خط أساس مرن.</td>
+    </tr>
+    <tr>
+      <td><strong>BEM (Block Element Modifier)</strong></td>
+      <td>تحديدية مسطحة: <code>.block__element--modifier</code>. لا تداخل، لا محددات ID، لا محددات وسم.</td>
+      <td>Yandex (2010)، Harry Roberts (CSS Wizardry)</td>
+      <td>فرق كبيرة؛ تحديدية متوقعة؛ CSS يتوسع بلا طبقات. مطول لكن صريح.</td>
+    </tr>
+    <tr>
+      <td><strong>ITCSS (Inverted Triangle CSS)</strong></td>
+      <td>تحديدية ذات طبقات: إعدادات → أدوات → عامة → عناصر → كائنات → مكونات → أدوات مساعدة. التحديدية تزداد للأسفل.</td>
+      <td>Harry Roberts (2015)</td>
+      <td>قواعد كود كبيرة تحتاج تنظيم CSS معماري. يرسم 1:1 إلى طبقات التدرج (<code>@layer</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>ذري / أدوات أولاً (Tailwind، UnoCSS، Open Props)</strong></td>
+      <td>فئة واحدة = إعلان واحد. <code>p-4</code> = <code>padding: 1rem</code>. رموز التصميم كأدوات مساعدة. لا CSS مخصص للأنماط الشائعة.</td>
+      <td>Adam Wathan (Tailwind، 2017)، Anthony Fu (UnoCSS)</td>
+      <td>تكرار سريع؛ التزام بنظام تصميم؛ فرق تريد صفر تبديل سياق. تحديدية = مسطحة (فئة واحدة).</td>
+    </tr>
+    <tr>
+      <td><strong>CSS-in-JS (وقت تشغيل → صفر وقت تشغيل)</strong></td>
+      <td>أنماط موضوعة مع المكون. وقت تشغيل: <code>styled-components</code>، <code>emotion</code>. صفر وقت تشغيل: <code>linaria</code>، <code>Panda CSS</code>، <code>StyleX</code> (تجميع لـ .css).</td>
+      <td>Max Stoiber (styled-components)، Sunil Pai (emotion)، SeatGeek (linaria)</td>
+      <td>أنماط محددة للمكون؛ سمات ديناميكية عبر الخصائص؛ تكامل TypeScript. صفر وقت تشغيل = لا تكلفة حزمة.</td>
+    </tr>
+    <tr>
+      <td><strong>استعلامات حاوية + طبقات تدرج (أصلي حديث)</strong></td>
+      <td><code>@container</code> للتجاوب مستوى المكون؛ <code>@layer</code> لتحكم تدرج صريح. أصلي، لا خطوة بناء.</td>
+      <td>Miriam Suzanne (Layers)، Una Kravets (استعلامات حاوية)، مجموعة عمل CSS</td>
+      <td>أنظمة تصميم؛ مكتبات مكونات؛ فرق تريد تحديد نطاق أصلي للمنصة. يعمل في Shadow DOM + Light DOM.</td>
+    </tr>
+    <tr>
+      <td><strong>Shadow DOM / تحديد نطاق مكونات الويب</strong></td>
+      <td><code>this.shadowRoot</code> = تغليف أنماط. <code>::part()</code>، <code>::slotted()</code> لاختراق متحكم. <code>@scope</code> (بديل Light DOM).</td>
+      <td>مجموعة W3C Web Components CG، Google (Polymer → Lit)، Apple (Safari)</td>
+      <td>مكونات مستقلة عن إطار؛ عزلة أنماط صارمة؛ توزيع نظام تصميم. CSS يبقى في المكون.</td>
+    </tr>
+    <tr>
+      <td><strong>أنظمة رموز التصميم (W3C DTCG، Style Dictionary، Token Studio، Specify)</strong></td>
+      <td>رموز (JSON) → خصائص CSS مخصصة / SCSS / JS / iOS / Android. مصدر حقيقة واحد.</td>
+      <td>Jina Anne (2014)، W3C DTCG (2019+)، Amazon (Style Dictionary)</td>
+      <td>متعدد المنصات (ويب، أصلي، بريد)؛ سمات؛ وضع داكن؛ كثافة؛ مزامنة تصميم-تطوير. وقت تشغيل المنصة = خصائص CSS مخصصة.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>كل العشر تشترك في نفس DNA: <em>اكتب HTML دلالي → دع التدرج يحل → حدد نطاق الأنماط للمكونات → شفر القرارات كرموز → تحقق في المتصفح → كرر</em>. الاختلافات إرغونوميات التأليف، آلية تحديد النطاق، وأين يعيش مصدر الرمز.</p>
+
+---
+
+<h2>٨. المبادئ — الثوابت المشتركة</h2>
+
+<p>عبر كل منهجية، ثماني مبادئ تصمد (مستخلصة من مواصفات HTML/CSS، WCAG، وثوابت المنصة):</p>
+
+<ol>
+  <li><strong>HTML الدلالي هو API إمكانية الوصول.</strong> <code><button></code> ≠ <code><div role="button" tabindex="0"></code>. الأول يحصل لوحة مفاتيح، تركيز، دور، اسم، حالة مجاناً. الثاني يتطلب ARIA يدوي. اختر العنصر الذي يعني الشيء.</li>
+  <li><strong>التدرج سياسة عامة، لا ذوق شخصي.</strong> أوراق أنماط المستخدم تفوز. <code>!important</code> في CSS المؤلف انتهاك سياسة — يمنع وكالة المستخدم (تباين عالي، خطوط مخصصة، تكبير). استخدم طبقات التدرج، التحديدية، وترتيب المصدر بدلاً منه.</li>
+  <li><strong>اختيار نظام التخطيط لا رجعة فيه تقريباً لكل جذر سياق تنسيق.</strong> أبناء حاوية flex هم عناصر flex. أبناء حاوية grid هم عناصر grid. لا يمكنك مزج سياقات تنسيق على نفس الأبناء. اختر في الحاوية؛ الأبناء يطيعون.</li>
+  <li><strong>التحسين التدريجي عقد، لا اقتراح.</strong> HTML يعمل بلا CSS. CSS يعمل بلا JS. JS يعزز، لا يحجب. المنصة تضمن هذا إن لم تكسره (مثلاً <code><noscript></code> يخفي محتوى، توجيه JS فقط بلا <code><a href></code>).</li>
+  <li><strong>رموز على أرقام سحرية.</strong> <code>padding: var(--space-4)</code> لا <code>padding: 16px</code>. <code>color: var(--color-primary)</code> لا <code>color: #3b82f6</code>. الرموز تمكّن وضع داكن، كثافة، سمات، ومزامنة عبر منصات. أرقام سحرية تضمن الانحراف.</li>
+  <li><strong>الأداء ميزة منصة تهيئها.</strong> <code><link rel="preload" as="style"></code>، <code>font-display: swap</code>، <code>content-visibility: auto</code>، <code>will-change</code> (باقتراح). المنصة لا تحسّن لك؛ تكشف أزرار. قس (CLS، LCP، INP)، ثم در الأزرار.</li>
+  <li><strong>الحالة تعيش في السمات، تُختار في CSS.</strong> <code>[aria-busy="true"]</code>، <code>[data-state="loading"]</code>، <code>:disabled</code>، <code>:focus-visible</code>. JS تبدل السمات؛ CSS تختار الحالات. لا JS-in-CSS (لا <code>style="..."</code> من JS)، لا CSS-in-JS منطق حالة.</li>
+  <li><strong>احترم تفضيلات المستخدم افتراضياً.</strong> <code>@media (prefers-reduced-motion: reduce)</code> يعطل حركة غير أساسية. <code>@media (prefers-contrast: more)</code> يعزز تباين. <code>@media (prefers-color-scheme: dark)</code> يبدل رموز. المنصة تكشف تفضيلات؛ أنت تحترمها.</li>
+</ol>
+
+---
+
+<h2>٩. مثال مُفصل — "مكوّن بطاقة ينجو من المحتوى، RTL، الوضع الداكن، وقارئ الشاشة"</h2>
+
+<p>مشكلة بطاقة واقعية، مشية من النهاية للنهاية عبر الإيقاع.</p>
+
+<h3>السياق والقيود</h3>
+<ul>
+  <li><strong>محتوى</strong> — عنوان بطول متغير (١–٣ أسطر)، وصف (٠–٥ أسطر)، صورة اختيارية، شارة اختيارية، فعل أساسي (زر)، فعل ثانوي (رابط). المحتوى يأتي من CMS — غير متوقع.</li>
+  <li><strong>بيئات</strong> — LTR (en)، RTL (ar/he)، وضع فاتح/داكن، تباين عالي (forced colors)، حركة مخفضة، تكبير ٢٠٠٪، قارئ شاشة (VoiceOver/NVDA).</li>
+  <li><strong>عرض</strong> — Next.js App Router (RSC للمحتوى، Client Component للتفاعل). CSS عبر CSS Modules + خصائص CSS المخصصة (رموز التصميم).</li>
+  <li><strong>رموز التصميم</strong> — مقياس مسافات ٨pt، نظام لون OKLCH، تخفيف قياسي ٢٠٠ms، رمز حركة مخفضة.</li>
+</ul>
+
+<h3>خطوة ١ — بنية HTML دلالية (عقد AOM)</h3>
+<pre><code><article class="card">
+  <header class="card__header">
+    <!-- شارة: اختيارية، زخرفية أو دلالية -->
+    <span class="card__badge" aria-label="وصول جديد">جديد</span>
+    <h2 class="card__title">{title}</h2>
+  </header>
+  <div class="card__media">
+    <img src="{image}" alt="" loading="lazy" />
+  </div>
+  <div class="card__body">
+    <p class="card__description">{description}</p>
+  </div>
+  <footer class="card__footer">
+    <button class="card__primary" type="button">فعل أساسي</button>
+    <a class="card__secondary" href="{url}">ثانوي</a>
+  </footer>
+</article>
+</code></pre>
+
+<p>لماذا هذه العناصر:</p>
+<ul>
+  <li><code><article></code> — تكوين مستقل (قارئ الشاشة: "مقالة").</li>
+  <li><code><header></code> + <code><h2></code> — بنية عناوين لهيكل المستند.</li>
+  <li><code><img alt=""></code> — صورة زخرفية (alt="" يزيل من AOM). إذا معلوماتية، alt يصف المحتوى.</li>
+  <li><code><button type="button"></code> — قابل للتشغيل بلوحة مفاتيح، لا يرسل شيئاً (لا نموذج).</li>
+  <li><code><a href></code> — رابط حقيقي، يعمل بلا JS، يظهر في دوّار الروابط.</li>
+</ul>
+
+<h3>خطوة ٢ — CSS: تخطيط بـ Grid (جوهري، واعٍ للمحتوى)</h3>
+<pre><code>/* tokens.css (مستورد عالمياً) */
+:root {
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+  --color-bg: oklch(1 0 0); --color-surface: oklch(0.98 0 0);
+  --color-text: oklch(0.15 0 0); --color-text-muted: oklch(0.45 0 0);
+  --color-primary: oklch(0.55 0.22 260); --color-primary-hover: oklch(0.5 0.25 260);
+  --color-border: oklch(0.9 0 0);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1);
+  --motion-fast: 100ms; --motion-standard: 200ms; --motion-slow: 300ms;
+  --easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: oklch(0.08 0 0); --color-surface: oklch(0.1 0 0);
+    --color-text: oklch(0.95 0 0); --color-text-muted: oklch(0.65 0 0);
+    --color-primary: oklch(0.65 0.22 260); --color-primary-hover: oklch(0.7 0.25 260);
+    --color-border: oklch(0.2 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-standard: 0ms; --motion-slow: 0ms; }
+}
+</code></pre>
+
+<pre><code>/* card.css (CSS Module) */
+.card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto; /* header، media، body، footer */
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--motion-standard) var(--easing),
+              border-color var(--motion-fast) var(--easing);
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card:focus-within { border-color: var(--color-primary); outline: none; }
+
+.card__header { display: flex; align-items: flex-start; gap: var(--space-2); }
+.card__badge {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  font-size: 0.75rem; font-weight: 600;
+  background: var(--color-primary); color: white;
+  border-radius: var(--radius-full);
+}
+.card__title {
+  margin: 0; font-size: 1.125rem; font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.3;
+  /* line-clamp لعناوين طويلة */
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card__media {
+  border-radius: var(--radius-sm); overflow: hidden;
+  aspect-ratio: 16 / 9; background: var(--color-bg);
+}
+.card__media img { width: 100%; height: 100%; object-fit: cover; }
+.card__body { color: var(--color-text-muted); line-height: 1.6; margin: 0; }
+.card__description {
+  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card__footer {
+  display: flex; gap: var(--space-2); justify-content: flex-end;
+  padding-top: var(--space-2); border-top: 1px solid var(--color-border);
+}
+.card__primary {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary); color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-weight: 500; cursor: pointer;
+  transition: background-color var(--motion-fast) var(--easing);
+}
+.card__primary:hover { background: var(--color-primary-hover); }
+.card__primary:focus-visible {
+  outline: 2px solid var(--color-primary); outline-offset: 2px;
+}
+.card__secondary {
+  color: var(--color-text-muted); text-decoration: none; font-weight: 500;
+  padding: var(--space-2) 0; /* منطقة قابلة للنقر */
+  transition: color var(--motion-fast) var(--easing);
+}
+.card__secondary:hover { color: var(--color-primary); }
+.card__secondary:focus-visible {
+  outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm);
+}
+
+/* RTL: الخصائص المنطقية تتعامل مع الانعكاس تلقائياً */
+/* لا CSS إضافي مطلوب — margin-inline، padding-inline، border-inline تعمل */
+</code></pre>
+
+<h3>خطوة ٣ — استعلامات حاوية (المكون يملك منطق تجاوبه)</h3>
+<pre><code>.card {
+  /* ...القائمة... */
+  container-type: inline-size; /* يمكّن @container على هذا العنصر */
+  container-name: card;
+}
+@container card (max-width: 320px) {
+  .card { grid-template-rows: auto 1fr auto auto; } /* media قبل header في الضيق */
+  .card__header { flex-direction: column; align-items: stretch; }
+  .card__footer { flex-direction: column; }
+  .card__primary, .card__secondary { width: 100%; text-align: center; }
+}
+</code></pre>
+
+<p>البطاقة تتكيف مع <em>عرضها الخاص</em> لا المنفذ. في شريط جانبي (ضيق) تتراص؛ في الرئيسي (واسع) أفقية. لا استعلام وسائط مطلوب.</p>
+
+<h3>خطوة ٤ — وضع داكن، RTL، حركة مخفضة: صفر CSS إضافي</h3>
+<ul>
+  <li><strong>وضع داكن</strong> — الرموز تتبدل عبر <code>@media (prefers-color-scheme: dark)</code>. OKLCH تحفظ الإضاءة الإدراكية؛ لا ألوان علامة تجارية "مهتزة".</li>
+  <li><strong>RTL</strong> — الخصائص المنطقية (<code>margin-inline-start</code>، <code>padding-inline-end</code>، <code>border-inline-start</code>) تنعكس تلقائياً. Flex/Grid تحترم <code>dir="rtl"</code> على <code><html></code>. الشارة تبقى في المقدمة؛ أفعال التذييل تنعكس.</li>
+  <li><strong>حركة مخفضة</strong> — <code>@media (prefers-reduced-motion: reduce)</code> تصفر رموز الحركة. الانتقالات تصبح فورية. لا محفزات دهليزية.</li>
+  <li><strong>تباين عالي / forced colors</strong> — <code>@media (forced-colors: active)</code> يعطل خلفيات/ظلال؛ ألوان النظام تتولى. <code>border: 1px solid CanvasText</code> يضمن رؤية.</li>
+</ul>
+
+<h3>خطوة ٥ — تحقق قارئ الشاشة (تفاوت AOM)</h3>
+<pre><code>/* ما يعلنه قارئ الشاشة: */
+"مقالة، وصول جديد، عنوان مستوى ٢، {title}"
+"{description}"
+"زر، فعل أساسي"
+"رابط، ثانوي"
+</code></pre>
+<ul>
+  <li>شارة: <code>aria-label</code> يعطيها اسماً (إلا "جديد" غامض).</li>
+  <li>عنوان: <code><h2></code> في <code><article></code> = تسلسل عناوين سليم.</li>
+  <li>صورة: <code>alt=""</code> = مخفية من AOM (زخرفية). إذا معلوماتية، <code>alt="صورة لـ..."</code>.</li>
+  <li>زر: <code><button></code> أصلي = لوحة مفاتيح + دور + تركيز + اسم من نص.</li>
+  <li>رابط: <code><a href></code> أصلي = يظهر في دوّار الروابط، يعمل بلا JS.</li>
+</ul>
+
+<h3>خطوة ٦ — مقارنة ساذجة مقابل مصممة</h3>
+
+<table>
+  <thead><tr><th>الجانب</th><th>ساذجة (div soup + فئات أدوات)</th><th>مصممة (HTML دلالي + رموز + ميزات منصة)</th></tr></thead>
+  <tbody>
+    <tr><td>HTML</td><td><code><div class="card"><div class="title">...<div onclick>...</td><td><code><article><header><h2>...<button>...</td></tr>
+    <tr><td>شجرة AOM</td><td>divs عامة، لا أدوار، لا عناوين، onclick ليس لوحة مفاتيح</td><td>مقالة → عنوان → زر/رابط. قابل للتشغيل بالكامل.</td></tr>
+    <tr><td>وضع داكن</td><td>ألوان مبرمجة؛ اختراق <code>filter: invert</code> يكسر صور</td><td>تبديل رموز؛ OKLCH تحفظ العلامة التجارية؛ صور سليمة</td></tr>
+    <tr><td>RTL</td><td><code>direction: rtl</code> يدوي + تجاوزات هامش</td><td>خصائص منطقية + انعكاس flex/grid أصلي</td></tr>
+    <tr><td>تجاوب</td><td>استعلامات وسائط المنفذ؛ تكسر في شريط جانبي</td><td>استعلام حاوية؛ يتكيف مع عرض الأب</td></tr>
+    <tr><td>حركة مخفضة</td><td>الحركات لا تزال تشغل؛ محفز دهليزي</td><td>رموز حركة مصفرة؛ انتقالات فورية</td></tr>
+    <tr><td>تباين عالي</td><td>خلفيات/ظلال غير مرئية؛ حد ذهب</td><td>استعلام <code>forced-colors</code> يحفظ حدود</td></tr>
+    <tr><td>صيانة</td><td>أرقام سحرية في كل مكان؛ انحراف مضمون</td><td>ملف رمز واحد؛ تغيير ينتشر في كل مكان</td></tr>
+  </tbody>
+</table>
+
+<h3>المخرجات المنتجة</h3>
+<ul>
+  <li>قالب HTML دلالي (عقد AOM).</li>
+  <li>CSS Module مع تخطيط Grid، استعلام حاوية، خصائص منطقية.</li>
+  <li>ملف رموز (خصائص CSS مخصصة، OKLCH، فاتح/داكن/حركة مخفضة/forced-colors).</li>
+  <li>مواصفات حلقة focus-visible (متسقة عبر كل العناصر التفاعلية).</li>
+  <li>خريطة نقاط كسر استعلام حاوية (لكل مكون، لا عالمية).</li>
+  <li>قائمة تحقق تحقق AOM (تشغيل في VoiceOver/NVDA + axe).</li>
+</ul>
+
+---
+
+<h2>١٠. أكثر أوضاع الفشل شيوعاً</h2>
+
+<table>
+  <thead><tr><th>وضع الفشل</th><th>ما يبدو عليه</th><th>لماذا يحدث</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>حروب تصعيد !important</strong></td>
+      <td><code>.btn { color: red !important }</code> → <code>.btn-primary { color: blue !important }</code> → <code>.btn-primary.urgent { color: orange !important }</code></td>
+      <td>معاملة التحديدية كنتيجة للتغلب عليها. حل: طبقات تدرج (<code>@layer base, components, utilities</code>)، تحديدية مسطحة (BEM/أدوات)، <code>!important</code> فقط في أوراق أنماط المستخدم.</td>
+    </tr>
+    <tr>
+      <td><strong>z-index = 999999999</strong></td>
+      <td>مودال: 9999، تلميح: 99999، توست: 999999، قائمة منسدلة: 9999999</td>
+      <td>لا استراتيجية سياق تجميع. حل: سياقات تجميع صريحة (<code>isolation: isolate</code>)، رموز طبقة (<code>--z-modal: 100</code>)، بوابات للتراكبات.</td>
+    </tr>
+    <tr>
+      <td><strong>position: absolute "لإصلاح" مشاكل التدفق</strong></td>
+      <td>قائمة منسدلة مطلقة على body؛ تكسر عند تمرير، تغيير حجم، تكبير، RTL</td>
+      <td>سوء فهم كتلة المحتوية. حل: <code>position: relative</code> على الأب، أو Popover API / تموضع مرساة (تصريحي).</td>
+    </tr>
+    <tr>
+      <td><strong>إعادة تعيين box-sizing شاملة تكسر عناصر النموذج</strong></td>
+      <td><code>*, *::before, *::after { box-sizing: border-box }</code> → <code><input></code> العرض يتضمن حد، إزاحة تخطيط</td>
+      <td>عناصر النموذج لها أنماط UA تفترض content-box. حل: <code>box-sizing: border-box</code> على عناصر تخطيط فقط؛ <code>input, textarea, select { box-sizing: content-box }</code> أو استخدم <code>appearance: none</code> + إعادة تنسيق كاملة.</td>
+    </tr>
+    <tr>
+      <td><strong>التباس انهيار الهوامش</strong></td>
+      <td>هوامش أشقاء تنهار؛ هامش أب ينهار مع أول/آخر ابن؛ "لماذا فجوتي ٠؟"</td>
+      <td>عدم معرفة قواعد BFC. حل: <code>gap</code> في flex/grid (لا انهيار)، <code>overflow: hidden</code> / <code>flow-root</code> على الأب، أو استخدم حشو بدلاً من هامش للمسافات.</td>
+    </tr>
+    <tr>
+      <td><strong>سوء استخدام استعلام حاوية: استعلام حاوية خاطئة</strong></td>
+      <td><code>@container (min-width: 400px)</code> على بطاقة داخل عنصر flex لا يصل 400px أبداً</td>
+      <td>الحاوية يجب أن يكون لها <code>container-type: inline-size</code> وتنمو فعلاً. حل: سمّ الحاويات (<code>container-name: card</code>)، استعلم بالاسم.</td>
+    </tr>
+    <tr>
+      <td><strong>وضع داكن كاختراق filter: invert</strong></td>
+      <td><code>@media (prefers-color-scheme: dark) { html { filter: invert(1) hue-rotate(180deg) } }</code></td>
+      <td>صور تنعكس، فيديوهات تنعكس، ظلال تنعكس، ألوان علامة تجارية تهتز. حل: رموز تصميم + OKLCH + خصائص CSS مخصصة. المنصة تقوم بالعمل.</td>
+    </tr>
+    <tr>
+      <td><strong>outline: none بلا حلقة تركيز بديلة</strong></td>
+      <td>مستخدم لوحة مفاتيح ينتقل بالتبويب؛ لا شيء مرئي؛ "أين أنا؟"</td>
+      <td>مصمم يكره outline الافتراضي. حل: <code>:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px }</code>. مرئي فقط للوحة مفاتيح.</td>
+    </tr>
+    <tr>
+      <td><strong>div-as-button (لا لوحة مفاتيح، لا دور، لا اسم)</strong></td>
+      <td><code><div class="btn" onclick="...">اضغط</div></code></td>
+      <td>تفكير "معالج نقر = زر". حل: <code><button type="button"></code>. أصلي = لوحة مفاتيح مجانية، تركيز، دور، اسم، ارتباط نموذج.</td>
+    </tr>
+    <tr>
+      <td><strong>عودة table-for-layout</strong></td>
+      <td><code><table><tr><td>الشريط الجانبي</td><td>الرئيسي</td></tr></table></code> لتخطيط الصفحة</td>
+      <td>Flexbox/Grid "صعب جداً" أو "غير مدعوم" (أسطورة). حل: <code>display: grid</code> على الصفحة، <code>grid-template-areas</code>. جداول = بيانات دلالية فقط.</td>
+    </tr>
+    <tr>
+      <td><strong>نوادي تحديدية: #id #id #id</strong></td>
+      <td><code>#main #content #article .title { ... }</code></td>
+      <td>محددات ID لا تتوالف. حل: محددات فئة فقط (BEM، أدوات)، طبقات تدرج، <code>:where()</code> لصفر تحديدية.</td>
+    </tr>
+    <tr>
+      <td><strong>التباس 1px مقابل 1dp على شاشات عالية DPR</strong></td>
+      <td>حدود خط شعر تختفي على شاشات 3x؛ <code>border: 1px</code> = 3 بكسل جهاز</td>
+      <td>CSS px ≠ بكسل جهاز. حل: <code>border: 1px</code> صحيح (1 CSS px = 1/96in). لخطوط شعر: <code>border: 0.5px</code> (ينقر لبكسل جهاز 1 على 2x+) أو <code>outline</code> (أبداً سابكسل).</td>
+    </tr>
+    <tr>
+      <td><strong>تكبير موبايل معطل عبر viewport</strong></td>
+      <td><code><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"></code></td>
+      <td>انتهاك إمكانية الوصول (WCAG 1.4.4). حل: لا تعطل تكبير أبداً. <code>maximum-scale=1</code> و <code>user-scalable=no</code> أنماط مضادة.</td>
+    </tr>
+    <tr>
+      <td><strong>CSS-in-JS وقت تشغيل في الإنتاج</strong></td>
+      <td><code>styled-components</code> يحقن <code><style></code> كل عرض؛ 50ms إعادة حساب أنماط عند تفاعل</td>
+      <td>صفر وقت تشغيل غير معتمد. حل: Linaria، Panda CSS، StyleX، vanilla-extract — تجميع لـ .css ساكنة عند البناء.</td>
+    </tr>
+    <tr>
+      <td><strong>تجربة UX تحقق نموذج: حد أحمر عند ضغط مفتاح</strong></td>
+      <td>المستخدم يكتب أول حرف؛ الحقل يتحول لأحمر؛ "غير صالح" قبل أن ينتهي</td>
+      <td>تحقق على <code>onChange</code> / <code>input</code>. حل: تحقق على <code>blur</code> أو <code>submit</code>؛ أظهر خطأ مضمن <em>بعد</em> تفاعل؛ استخدم <code>:user-invalid</code> (أصلي، بعد تفاعل).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>نقد الممارسين (1998–الحاضر)</h3>
+
+<p>HTML و CSS واجه نقداً جاداً من مجتمع المنصة:</p>
+
+<ul>
+  <li><strong>Jeffrey Zeldman / Eric Meyer (مشروع معايير الويب، 1998–2008)</strong> — "Designing with Web Standards": HTML تنفيذي (<code><font></code>، جداول للتخطيط) دين تقني. فصل الاهتمامات ليس اختيارياً. التدرج ميزة، لا عيب.</li>
+  <li><strong>Jeremy Keith (<em>Resilient Web Design</em>، 2016)</strong> — التحسين التدريجي قوة الويب الخارقة. كل طبقة (HTML، CSS، JS) يجب أن تعمل بدون التالية. المنصة مرنة افتراضياً؛ نحن نكسرها.</li>
+  <li><strong>Harry Roberts (CSS Wizardry، 2010–الحاضر)</strong> — التحديدية عدو التوسع. تحديدية مسطحة (BEM، أدوات) تهزم CSS معماري. <code>!important</code> رائحة كود. ITCSS / طبقات تدرج ترسم هذا رسمياً.</li>
+  <li><strong>Una Kravets / Adam Argyle / Bramus (Chrome DevRel، 2020–الحاضر)</strong> — المنصة امتصت الأنماط التي تُضلّع لها. استعلامات حاوية، طبقات تدرج، تداخل، <code>:has()</code>، تموضع مرساة — توقف عن شحن JS لما CSS الآن يفعله.</li>
+  <li><strong>Rachel Andrew / Jen Simmons (مجموعة عمل CSS، 2015–الحاضر)</strong> — تصميم ويب جوهري: تخطيط من المحتوى للخارج، لا من المنفذ للداخل. <code>minmax()</code>، <code>auto-fit</code>، <code>fit-content</code> أوليات جديدة. Grid + Flexbox + تدفق = نظام كامل.</li>
+  <li><strong>Miriam Suzanne (OddBird، مجموعة عمل CSS، 2020–الحاضر)</strong> — طبقات تدرج تحل مشكلة "تصادم CSS طرف ثالث" أصلياً. <code>@scope</code> يحل "تحديد نطاق مكون بلا Shadow DOM." التدرج نظام مصمم، لا ساحة معركة.</li>
+</ul>
+
+<p><strong>الخيط المشترك:</strong> النقد ليس أن <em>المنصة</em> خاطئة — بل أن <em>عادات التأليف</em> تتخلف عن المنصة بـ ٥–١٠ سنوات. الإيقاع ينجو؛ الحلول البديلة تصبح أنماطاً مضادة.</p>
+
+---
+
+<h2>١١. النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+
+<p>المنصة جيدة فقط بقدر الأدوات التي تجعل أولياتها مرئية، قابلة للاختبار، وقابلة للمشاركة. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
+
+<table>
+  <thead><tr><th>الفئة</th><th>الأدوات / المنصات</th><th>المُحفّز → الهدف</th><th>معايير القرار</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>التأليف والعمارة</strong></td>
+      <td>CSS Modules، PostCSS، Lightning CSS، Stylelint، Style Query، CSS Stats، Project Wallace</td>
+      <td>CSS خام → أوراق أنماط محللة، مدققة، محسنة، قابلة للتدقيق</td>
+      <td>حجم الحزمة؛ رسم بياني للتحديدية؛ % CSS غير مستخدم؛ امتثال طبقات التدرج؛ معدل نجاح التدقيق</td>
+    </tr>
+    <tr>
+      <td><strong>خط إنتاج رموز التصميم</strong></td>
+      <td>Figma Tokens، Style Dictionary، Specify، Token Studio، Theo، Amazon Style Dictionary، Knapsack</td>
+      <td>قرارات التصميم → رموز مستقلة عن المنصة → خصائص CSS المخصصة</td>
+      <td>تغطية الرموز؛ انحراف التصميم↔الكود؛ زمن مزامنة عبر المنصات؛ معدل الاعتماد</td>
+    </tr>
+    <tr>
+      <td><strong>CSS-in-JS / صفر وقت تشغيل</strong></td>
+      <td>Panda CSS، Linaria، StyleX، vanilla-extract، Compiled، Goober، Stitches</td>
+      <td>أنماط مشتركة في الموقع → .css ساكنة عند البناء</td>
+      <td>حجم الحزمة؛ أمان الأنواع؛ تكلفة وقت التشغيل؛ مسار الهجرة؛ درجة DX</td>
+    </tr>
+    <tr>
+      <td><strong>إطارات أدوات / ذرية</strong></td>
+      <td>Tailwind CSS، UnoCSS، Open Props، Master Styles، Windi CSS</td>
+      <td>نظام تصميم → فئات أدوات → CSS أدنى</td>
+      <td>حجم الحزمة؛ اضطراب التكوين؛ سقف التخصيص؛ اعتماد الفريق؛ تكلفة الهجرة</td>
+    </tr>
+    <tr>
+      <td><strong>تحديد نطاق المكون والتغليف</strong></td>
+      <td>CSS Modules، Shadow DOM، @scope (CSS)، CSS-in-JS، Styled Components، Emotion</td>
+      <td>CSS عام → أنماط بمحدد نطاق للمكون</td>
+      <td>معدل التسرب؛ نفقات الحزمة العامة؛ توافق SSR؛ راحة DevTools</td>
+    </tr>
+    <tr>
+      <td><strong>التراجع البصري والاختبار</strong></td>
+      <td>Chromatic، Percy، Happo، BackstopJS، Playwright visual، Cypress visual، Storybook</td>
+      <td>تغيير CSS → فرق بصري → موافقة/رفض</td>
+      <td>معدل الاهتزاز؛ وقت المراجعة؛ % التغطية؛ معدل الإيجابيات الكاذبة؛ وقت CI</td>
+    </tr>
+    <tr>
+      <td><strong>تدقيق وإمكانية الوصول واختبارها</strong></td>
+      <td>axe-core، eslint-plugin-jsx-a11y، Storybook a11y، Lighthouse CI، pa11y، WAVE</td>
+      <td>HTML/CSS → تدقيق آلي لإمكانية الوصول</td>
+      <td>معدل اجتياز WCAG؛ نجاح مهمة قارئ الشاشة؛ تغطية تباين الألوان؛ عدد فخاخ لوحة المفاتيح</td>
+    </tr>
+    <tr>
+      <td><strong>ملف أداء</strong></td>
+      <td>Lighthouse CI، WebPageTest، Chrome DevTools Performance، SpeedCurve، Calibre، DebugBear</td>
+      <td>CSS → مقاييس CLS، LCP، INP، TTFB</td>
+      <td>درجة CLS/LCP/INP؛ CSS حاصر للعرض؛ تحميل الخطوط؛ مصادر تحويل التخطيط</td>
+    </tr>
+    <tr>
+      <td><strong>أدوات مطور المتصفح والفحص</strong></td>
+      <td>Chrome DevTools (Styles، Computed، Layout، Animations)، Firefox DevTools، Polypane، Sizzy</td>
+      <td>CSS حي → مفحوص، مصحح، مرئي</td>
+      <td>زمن حل التدرج؛ تصور تحويل التخطيط؛ استخدام تراكب Grid/Flex؛ خط زمني للرسوم المتحركة</td>
+    </tr>
+    <tr>
+      <td><strong>تتبع المواصفات والمعايير</strong></td>
+      <td>MDN Web Docs، caniuse.com، Baseline (web.dev)، مسودات CSSWG، مواصفات W3C، اختبارات منصة الويب</td>
+      <td>فكرة ميزة → حالة المواصفة → دعم المتصفح → آمن للاستخدام</td>
+      <td>حالة Baseline؛ نضج المواصفة؛ تغطية التنفيذ؛ حاجة polyfill</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>طريقة اختيار:</strong> ابدأ بالتأليف (Stylelint + CSS Modules) + خط إنتاج الرموز (Style Dictionary) + التراجع البصري (Chromatic/Playwright). أضف CSS-in-JS إذا كان تحديد الموقع المشترك للمكون مهمًا. أضف إطار الأدوات إذا كان الالتزام بنظام التصميم هو الأولوية. أضف تدقيق إمكانية الوصول إذا كان القطاع منظماً أو عام. أضف ملف الأداء إذا كانت Core Web Vitals هي مؤشرات الأداء الرئيسية. المنصة توفر الأوليات؛ الأدوات تجعلها قابلة للحوكمة.</p>
+
+---
+
+<h2>١٢. المستقبل — أين يتجه HTML و CSS</h2>
+
+<table>
+  <thead><tr><th>إشارة (2024–2026)</th><th>ما يعنيه للمنصة</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>خط أساس Interop 2024/2025 + "متاح حديثاً"</td>
+      <td>محاذاة سنوية عبر المتصفحات (Apple، Google، Microsoft، Mozilla، Igalia). "خط أساس" = آمن في كل المحركات. "متاح حديثاً" = صدر للتو، بلا polyfill. مصفوفة الدعم تضغط سنوياً.</td>
+    </tr>
+    <tr>
+      <td>تداخل CSS (أصلي <code>&</code>) خط أساس</td>
+      <td>تداخل محددات أصلي بلا معالج أولي. <code>.card { &__title { } }</code>. يقلل احتكاك التأليف؛ يعمل في DevTools.</td>
+    </tr>
+    <tr>
+      <td>طبقات تدرج (<code>@layer</code>) خط أساس</td>
+      <td>تحكم مصدر صريح. <code>@layer reset, base, components, utilities</code>. CSS طرف ثالث في طبقه الخاصة. لا مزيد من حروب تحديدية.</td>
+    </tr>
+    <tr>
+      <td>استعلامات حاوية خط أساس</td>
+      <td>تصميم تجاوب مستوى مكون. <code>@container card (min-width: 400px)</code>. المكون يملك نقاط كسره. يعمل في Shadow DOM.</td>
+    </tr>
+    <tr>
+      <td>انتقالات العرض API مستوى ٢ (عبر المستندات)</td>
+      <td><code>@view-transition { navigation: auto }</code>. انتقالات تشبه SPA لـ MPA. لا موجّه JS مطلوب. انتقالات عناصر مشتركة تصريحية.</td>
+    </tr>
+    <tr>
+      <td>تموضع مرساة (تلميحات، popovers، قوائم)</td>
+      <td><code>position-anchor: --my-anchor; position-area: bottom span-left</code>. تموضع تلميح بلا رياضيات JS. تكامل Popover API.</td>
+    </tr>
+    <tr>
+      <td><code>@scope</code> (تحديد نطاق Light DOM)</td>
+      <td>تحديد نطاق مبني على القرب: <code>@scope (.card) to (.card__footer) { .title { } }</code>. أنماط لا تتسرب للخارج؛ لا تحتاج Shadow DOM.</td>
+    </tr>
+    <tr>
+      <td>CSS Houdini Paint API / Typed OM</td>
+      <td>وحدات طلاء مخصصة (تدرجات، أنماط، ضجيج) على GPU. Typed OM: <code>element.attributeStyleMap.set('width', CSS.px(100))</code>. قابلية توسع بلا بادئات.</td>
+    </tr>
+    <tr>
+      <td>مفاتيح CSS (آلات حالة في CSS)</td>
+      <td><code>toggle-root: --open; toggle-trigger: .trigger { toggle(--open) }</code>. كشف، تبويبات، أكورديون بلا JS. حالة تصريحية.</td>
+    </tr>
+    <tr>
+      <td>وحدة تنسيق رموز التصميم W3C DTCG → مرشح توصية</td>
+      <td>رموز (JSON) → خصائص CSS مخصصة موحدة. متغيرات Figma، Style Dictionary، Token Studio، Specify تتقارب. مصدر حقيقة واحد، لا طبقة ترجمة.</td>
+    </tr>
+    <tr>
+      <td>التنسيق كهدف بناء (Lightning CSS، OxCSS، cssnano)</td>
+      <td>محولات CSS مبنية على Rust/Go: تصغير، بادئات، طبقة، تداخل، polyfill <code>@property</code>، وسائط مخصصة. ١٠x أسرع من PostCSS. polyfill ميزات منصة وقت بناء.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>١٣. ملخص — قائمة تحقق المنصة</h2>
+
+<p>قبل شحن أي HTML/CSS، تحقق:</p>
+
+<table>
+  <thead><tr><th>السؤال</th><th>إذا لا…</th></tr></thead>
+  <tbody>
+    <tr><td>هل كل عنصر تفاعلي عنصر HTML دلالي (<code><button></code>، <code><a href></code>، <code><input></code>، <code><select></code>) لا <code><div></code> مع معالجات؟</td><td>توقف. لوحة مفاتيح، تركيز، دور، اسم، ارتباط نموذج كلها مفقودة. عنصر أصلي = إمكانية وصول مجانية.</td></tr>
+    <tr><td>هل المكون يعمل بلا CSS (HTML فقط يعرض بمعنى؟)</td><td>توقف. تحسين تدريجي مكسور. ترتيب محتوى، هيكل عناوين، دلالات رابط/زر يجب أن تنجو.</td></tr>
+    <tr><td>هل المكون يعمل بلا JS (نماذج ترسل، روابط تتنقل، details/summary تبدل؟)</td><td>توقف. JS كتعزيز، لا بوابة. <code><form></code> + <code><button type="submit"></code>، <code><a href></code>، <code><details></code>/<code><summary></code>.</td></tr>
+    <tr><td>هل كل ألوان، مسافات، طباعة، حركة، ظلال معرفة كخصائص CSS مخصصة (رموز) — لا أرقام سحرية؟</td><td>توقف. وضع داكن يكسر، كثافة تكسر، سمات تكسر، انحراف مضمون. ملف رمز واحد = مصدر حقيقة واحد.</td></tr>
+    <tr><td>هل الوضع الداكن يعمل عبر <code>@media (prefers-color-scheme: dark)</code> تبديل رموز — لا اختراق <code>filter: invert</code>؟</td><td>توقف. صور تنعكس، علامة تهتز، ظلال تختفي. رموز OKLCH تحفظ الإضاءة الإدراكية.</td></tr>
+    <tr><td>هل RTL يعمل عبر خصائص منطقية (<code>margin-inline</code>، <code>padding-inline</code>، <code>border-inline</code>) وانعكاس flex/grid أصلي — لا تجاوزات يدوية؟</td><td>توقف. RTL CSS يدوي دين تقني. خصائص منطقية + <code>dir="rtl"</code> على <code><html></code> = المنصة تقوم به.</td></tr>
+    <tr><td>هل المكون يحترم <code>prefers-reduced-motion</code> (حركة غير أساسية معطلة عبر رموز حركة؟)</td><td>توقف. محفزات دهليزية تُشحن افتراضياً. رموز حركة مصفرة في <code>@media (prefers-reduced-motion: reduce)</code>.</td></tr>
+    <tr><td>هل هناك حلقة <code>:focus-visible</code> مرئية على كل عنصر تفاعلي (outline، لا box-shadow؟)</td><td>توقف. مستخدمو لوحة مفاتيح يفقدون موضع. <code>outline: 2px solid var(--color-primary); outline-offset: 2px</code>.</td></tr>
+    <tr><td>هل المكون بلا إزاحة تخطيط فوق الطي (CLS = ٠) — أحجام صريحة، <code>aspect-ratio</code>، font-display: swap؟</td><td>توقف. CLS = إحباط مستخدم. احجز مساحة لصور، إعلانات، خطوط. <code>aspect-ratio</code> على وسائط، <code>font-display: swap</code> على خطوط.</td></tr>
+    <tr><td>هل المكون يجتاز اختبار قارئ شاشة يدوي (VoiceOver/NVDA) — يعلن دور صحيح، اسم، حالة؟</td><td>توقف. تفاوت AOM يمسك ما يفوت axe. اختبر: تبويب خلال، اسمع هيكل عناوين، أدوار زر/رابط، تسميات نموذج.</td></tr>
+  </tbody>
+</table>
+
+<p>اطبع هذا. ضعه على جدار مراجعة المكونات. إذا لم يجتز PR هذه القائمة، فهو غير جاهز للمنصة.</p>
+
+---
+
+<section class="cite">
+  <strong>مصادر أولية →</strong>
+  <a href="https://html.spec.whatwg.org/">WHATWG (2024). <em>معيار HTML الحي</em>.</a> ·
+  <a href="https://www.w3.org/Style/CSS/current-work">مجموعة عمل CSS لـ W3C (2024). <em>عمل CSS الحالي</em> (كل مواصفات الوحدات).</a> ·
+  <a href="https://www.w3.org/TR/css-cascade-5/">W3C (2024). <em>تدرج CSS والتوريث مستوى ٥</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-box-3/">W3C (2024). <em>نموذج صندوق CSS مستوى ٣</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-display-3/">W3C (2024). <em>عرض CSS مستوى ٣</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-sizing-3/">W3C (2024). <em>تحجيم CSS جوهري وخارجي مستوى ٣</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-contain-3/">W3C (2024). <em>استعلامات حاوية CSS مستوى ٣</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-cascade-5/#layering">W3C (2024). <em>طبقات تدرج CSS</em>.</a> ·
+  <a href="https://www.w3.org/TR/selectors-4/">W3C (2024). <em>محددات مستوى ٤</em> (<code>:has()</code>، <code>:focus-visible</code>، <code>:user-invalid</code>).</a> ·
+  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAIC (2023). <em>مرجع WCAG 2.2 السريع</em>.</a> ·
+  <a href="https://www.w3.org/TR/html-aam-1.0/">W3C (2023). <em>ترجمات HTML API إمكانية الوصول 1.0</em>.</a> ·
+  <a href="https://tokens.dtcg.io/">مجتمع رموز التصميم W3C DTCG (2024). <em>وحدة تنسيق رموز التصميم</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-color-4/">W3C (2024). <em>لون CSS مستوى ٤</em> (OKLCH، OKLAB).</a> ·
+  <a href="https://alistapart.com/article/dao/">Zeldman, J. (2001). <em>Designing with Web Standards</em>.</a> ·
+  <a href="https://resilientwebdesign.com/">Keith, J. (2016). <em>Resilient Web Design</em>.</a> ·
+  <a href="https://csswizardry.com/">Roberts, H. (ongoing). <em>CSS Wizardry — Scalable CSS Architecture</em>.</a> ·
+  <a href="https://developer.chrome.com/blog">Kravets, U. / Argyle, A. / Bramus (ongoing). <em>Chrome DevRel — Modern CSS Platform</em>.</a> ·
+  <a href="https://www.smashingmagazine.com/author/rachelandrew/">Andrew, R. (ongoing). <em>Intrinsic Web Design</em>.</a> ·
+  <a href="https://www.oddbird.net/">Suzanne, M. (ongoing). <em>Cascade Layers، @scope، Container Queries</em>.</a>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>"امشني خلال مكون حقيقي حيث الفريق <em>لم</em> يستخدم HTML دلالي، وما اختبره مستخدم قارئ الشاشة فعلاً. أرني تذكرة الدعم التي قالت 'لا أستطيع العثور على الزر.'"</li>
+    <li>"عندما ترث قاعدة كود بأرقام سحرية في كل مكان (ألوان، مسافات، حركة)، لا وضع داكن، حروب <code>!important</code>، و <code>outline: none</code> — ما أول ملف رموز تكتب، وما أول مكون تهجر؟"</li>
+    <li>"كيف تعلم فريقاً التمييز بين <em>CSS التي تشغلها المنصة</em> و <em>CSS التي يضلّع لها أداة بناء</em>؟ ما لوحة DevTools الوحيدة التي تفصل بينهما؟"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>مرجع · HTML و CSS — طبقة المنصة</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work</span>
+  <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

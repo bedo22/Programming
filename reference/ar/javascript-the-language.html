@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جافاسكريبت: اللغة — التاريخ، التصميم، ونموذج التشغيل</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · اللغة، لا الأطر</p>
+  <h1>جافاسكريبت: اللغة — التاريخ، التصميم، ونموذج التشغيل</h1>
+  <p class="meta">كيف أصبحت JS هي JS: صفقة نتسكيب/صن 1995، سباق برندان إيك في 10 أيام، موكا → لايف سكريبت → جافاسكريبت → إيكماسكربت، نموذج البروتوتايب، حلقة الأحداث، التزامن أحادي المسار، ولماذا أصبحت لغة برمجية نصية لتحقق النماذج هي اللغة الوحيدة التي تعمل أصلياً في كل متصفح. وثيقة تأسيسية لباقي رف المراجع.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا توجد هذه الوثيقة</h3>
+  <p>وثائق المراجع الأخرى (<a href="./class-to-hooks-paradigm-shift.html">نموذج رياكت</a>، <a href="./angular-evolution.html">تطور Angular</a>، <a href="./nextjs-deep-dive.html">Next.js العميق</a>، <a href="./frontend-camps-survey.html">مسح المعسكرات</a>) تعامل JS كمسلمة. هذه الوثيقة تتراجع وتسأل: ما هي JS، ولماذا تبدو هكذا، وما الرهانات التصميمية التي جعلتها اللغة التي تعمل في كل مكان؟ شقيقة لـ <a href="./what-is-state-prequel.html">ما هي الحالة</a> (التي تغطي نظرية البرمجة عموماً) وسياق أب لـ <a href="./class-to-hooks-paradigm-shift.html">الانتقال من الكلاسات إلى الخطافات</a>. وثيقتها الشقيقة عبر المنصات (<a href="./javascript-across-stacks.html">جافاسكريبت عبر المنصات</a>) تغطي أين تعمل JS ومن يحاربها في كل مسار.</p>
+</section>
+
+<h2>٠. كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: مستقلة. جلسة واحدة. هذه الوثيقة <em>ليست</em> درس JS — <a href="../lessons/0001-scope-and-hoisting.html">الـ ١٢ درس</a> بالفعل هم (النطاق، الإغلاقات، البروتوتايبات، المصفوفات، <code>this</code>، الكائنات، الكيري، السلاسل، الأخطاء، الوحدات، اختبار الشهادة الذاتي). هذه الوثيقة <em>ليست</em> وثيقة رياكت — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> بالفعل هي. هذه الوثيقة <em>هي</em> القطعة المفقودة: تاريخ اللغة، منطق التصميم، ونموذج التشغيل، مكتوبة لتستطيع قراءة أي قاعدة كود JS دون أن تسأل "لماذا فعلوها هكذا؟" على مستوى اللغة. المرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع وثائق المراجع.</p>
+
+<h2>١. العشرة أيام في مايو ١٩٩٥</h2>
+
+<p>مايو ١٩٩٥. نتسكيب نافيجيتور ١.١ يُشحن. الويب مجرد HTML ساكن. مارك آندريسن يريد المتصفح قابلاً للبرمجة — ليس فقط لعرض المستندات، بل للتفاعل مع المستخدم. يكلف برندان إيك، مبرمج أنظمة عمره ٣٤ سنة انضم لنتسكيب في أبريل، ببناء لغة برمجية نصية للمتصفح. القيود: يجب أن تعمل في المتصفح، يجب أن تكون سهلة لغير المبرمجين (مصممون، مؤلفو HTML)، يجب أن تُشحن في نتسكيب ٢.٠ بحلول سبتمبر.</p>
+
+<p>لدى إيك ١٠ أيام لإنتاج نموذج أولي عامل. يستلهم من خطين:</p>
+
+<ul>
+  <li><strong>Scheme (Lisp)</strong> — دوال من الدرجة الأولى، إغلاقات لفظية، نواة صغيرة. إيك أراد هذا.</li>
+  <li><strong>Java</strong> — تحالف نتسكيب/صن يعني "بنية جملة شبيهة بـ Java" كان مطلب إدارة. الأقواس <code>{ }</code>، الفواصل المنقوطة <code>;</code>، <code>new</code>، <code>typeof</code> — كلها على شكل Java.</li>
+</ul>
+
+<p>سُمِّي النموذج الأولي <strong>Mocha</strong>. شُحن في نسخة بيتا من نتسكيب نافيجيتور ٢.٠ كـ <strong>LiveScript</strong>. أُعيدت تسميته <strong>JavaScript</strong> في ديسمبر ١٩٩٥ — مصافحة تسويقية بين صن/نتسكيب: "Java للمؤسسات، JavaScript للمتصفح". الاسم تسبب في ٣٠ سنة من الالتباس. Java و JavaScript تتشاركان البنية (الأقواس المعقوفة) ولا شيء تقريباً غير ذلك.</p>
+
+<blockquote class="callout">
+  <p><strong>مصدر أولي → </strong>برندان إيك، <cite>FAQ: Why is JS designed the way it is?</cite> (٢٠١١): "أردت لغة شبيهة بـ Lisp لكن اضطررت لاستخدام بنية جملة شبيهة بـ Java لتمرير موافقة الإدارة. تحت أقواس <code>{ }</code> ينبض قلب حساب لامدا في جسد على شكل C."</p>
+</blockquote>
+
+<h2>٢. لماذا لغة جديدة، لا ابليت Java ولا امتداد C++</h2>
+
+<p>النظرية التي سألت عنها: لماذا إنشاء لغة جديدة بدلاً من تمديد Java أو C++؟ الجواب هو <em>قيود المنصة</em>.</p>
+
+<ul>
+  <li><strong>Java applets</strong> كانت قادمة بالفعل (١٩٩٥). كانت لديها JVM ثقيلة، خطوة تجميع، كتابة ساكنة، صندوق حماية. كانت لـ <em>تطبيقات</em> داخل المتصفح — ثقيلة، بطيئة البداية، مبالغة لـ "تحقق من هذا النموذج قبل الإرسال".</li>
+  <li><strong>C++</strong> — لا أحد يشحن مترجم C++ لمتصفح. لا تجميع قمامة، إدارة يدوية للذاكرة، لا صندوق حماية آمن. المتصفح يحتاج لغة لا تُسقط العملية.</li>
+  <li><strong>المنصة تحتاج غراء.</strong> قشرة برمجية نصية: تحوّر DOM، تتعامل مع أحداث، تحقق نماذج، تتحدث للخادم (لاحقاً: <code>XMLHttpRequest</code>). لغات الغراء مكتوبة ديناميكياً، ذات تجميع قمامة، مفسرة، متسامحة. Java و C++ لا شيء من هذه.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>النمط الذي يتكرر:</strong> المنصة تستحق لغة مصممة لقيودها، لا ورثة من منصة مختلفة. هذه نفس النظرية التي تبرر لاحقاً TypeScript (ترقية JS لصيانة الفرق الكبيرة، لا بديل)، Go (بديل C++ مصمم للخوادم الشبكية، لا لغة أنظمة عامة)، Rust (بديل C++ يحل أمان الذاكرة بدون GC). القيود تغيرت — اللغة تغيرت.</p>
+</blockquote>
+
+<h2>٣. التصميم: نموذج البروتوتايب، لا الكلاسات</h2>
+
+<p>اختار إيك البروتوتايبات لا الكلاسات. التأثير: <strong>Self</strong> (حفيد Smalltalk، مبني على البروتوتايب، من مختبرات صن). في نظام البروتوتايب، الكائنات تورث مباشرة من كائنات أخرى — لا كلاس ككيان منفصل. تنشئ كائناً، يصبح بروتوتايب لآخرين. <code>Object.create(proto)</code> هو البدائي.</p>
+
+<p><code>new</code> في جافاسكريبت + دالة منشئة + <code>.prototype</code> طبقة نحوية رقيقة فوق هذا:</p>
+
+<pre><code><span class="comment-line">// سلسلة البروتوتايب في العمل</span>
+function Animal(name) { this.name = name; }
+Animal.prototype.speak = function() { console.log(this.name + ' makes a sound'); };
+
+const dog = new Animal('Dog');
+dog.speak(); <span class="output">// Dog makes a sound</span>
+
+<span class="comment-line">// dog.__proto__ === Animal.prototype</span>
+<span class="comment-line">// Animal.prototype.__proto__ === Object.prototype</span>
+<span class="comment-line">// Object.prototype.__proto__ === null</span>
+</code></pre>
+
+<p>كلمة <code>class</code> في ES6 (٢٠١٥) <strong>سكر نحوي فوق البروتوتايبات</strong> — لا نظام كلاسات كامل. لا تُدخل حقولاً خاصة (جاءت لاحقاً، ٢٠٢٢)، لا تغير التوريث الأحادي، لا تضيف إرسال متعدد. تخفي التفويض. عندما تقرأ <code>class Dog extends Animal</code>، سلسلة البروتوتايب لا تزال هناك تحته. فهم نموذج البروتوتايب مهم لأن السكر يتسرب: ربط <code>this</code>، استخراج الدوال، <code>Object.getPrototypeOf</code>، <code>__proto__</code> كلها تكشف الآلية.</p>
+
+<h2>٤. التصميم: دوال من الدرجة الأولى، إغلاقات، قلب حساب اللامدا</h2>
+
+<p>سلالة Scheme/Lisp. دوال جافاسكريبت قيم — يمكن إسنادها، تمريرها، إرجاعها، إنشاؤها أثناء التشغيل. هذا يمكّن:</p>
+
+<ul>
+  <li><strong>دوال رتبة أعلى</strong> — <code>map</code>/<code>filter</code>/<code>reduce</code> تأخذ دوالاً كمعاملات.</li>
+  <li><strong>إغلاقات لفظية</strong> — دالة "تلتقط" نطاقها المحيط. <code>function outer() { let x = 1; return function inner() { return x++; }; }</code> — <code>inner</code> تتذكر <code>x</code> بعد عودة <code>outer</code>.</li>
+  <li><strong>كيري (Currying)</strong> — تطبيق جزئي بإرجاع دوال تأخذ المعامل التالي.</li>
+</ul>
+
+<p>هذه ليست "ميزات أضيفت لاحقاً". كانت هناك في النموذج الأولي ذي الـ ١٠ أيام لأن إيك نفذ حساب اللامدا مباشرة. كلمة <code>function</code> <em>هي</em> لامدا. <a href="../lessons/0002-closures.html">درس الإغلاقات</a> و <a href="../lessons/0007-currying.html">درس الكيري</a> يغطيان الآليات؛ هذه الوثيقة تغطي <em>لماذا</em>.</p>
+
+<blockquote class="callout">
+  <p><strong>مصدر أولي → </strong>برندان إيك، <cite>JavaScript at 20</cite> (٢٠١٥): "قلب حساب اللامدا كان هناك منذ اليوم الأول. الجسد على شكل C كان التنازل."</p>
+</blockquote>
+
+<h2>٥. التصميم: أحادي المسار + حلقة الأحداث</h2>
+
+<p>جافاسكريبت أحادية المسار بالتصميم. مكدس استدعاء واحد. خيط تنفيذ واحد. DOM المتصفح أحادي المسار — خيطان يعيدان رسم نفس DOM سيتسابقان. حلقة الأحداث هي نموذج التزامن:</p>
+
+<pre><code><span class="comment-line">// حلقة أحداث مبسطة (المتصفح)</span>
+<span class="comment-line">// while (queue.length) {</span>
+<span class="comment-line">//   const task = queue.shift();</span>
+<span class="comment-line">//   task();  // تعمل حتى النهاية</span>
+<span class="comment-line">//   while (microtaskQueue.length) { microtaskQueue.shift()(); }</span>
+<span class="comment-line">//   render();</span>
+<span class="comment-line">// }</span>
+</code></pre>
+
+<p>ما يعين على الحلقة:</p>
+
+<table>
+  <thead><tr><th>API</th><th>طابور</th><th>ملاحظات</th></tr></thead>
+  <tbody>
+    <tr><td><code>setTimeout</code> / <code>setInterval</code></td><td>مهمة كبرى (Macrotask)</td><td>تعمل بعد المهمة الحالية + كل المهام الدقيقة + الرسم</td></tr>
+    <tr><td><code>Promise.then</code> / <code>await</code></td><td>مهمة دقيقة (Microtask)</td><td>تعمل قبل المهمة الكبرى التالية، بعد الكود المتزامن الحالي</td></tr>
+    <tr><td><code>queueMicrotask</code></td><td>مهمة دقيقة</td><td>جدولة صريحة للمهام الدقيقة</td></tr>
+    <tr><td><code>requestAnimationFrame</code></td><td>إطار رسم</td><td>تعمل قبل الرسم التالي، بعد المهام الدقيقة</td></tr>
+  </tbody>
+</table>
+
+<p>رهان Node.js (٢٠٠٩): <em>نفس الحلقة</em> تعمل جانب الخادم. لا خيوط لكل طلب — حلقة واحدة، عمليات I/O متزامنة كثيرة. لهذا Node تتعامل مع ١٠ آلاف اتصال على خيط واحد بينما خادم خيوط يحتاج ١٠ آلاف خيط. المقايضة: العمل المكثف CPU يسد الحلقة. الحل: خيوط عاملة (٢٠١٨) أو نقل لعملية أخرى.</p>
+
+<h2>٦. بيئة المضيف، لا اللغة</h2>
+
+<p>أكبر بصيرة في JS: JS <strong>ضيف</strong> في مضيف. مواصفة اللغة (إيكماسكربت) تعرف النواة — البنية، الأنواع، الكائنات، الدوال، حلقة الأحداث. المضيف يوفر <em>كل شيء آخر</em>:</p>
+
+<table>
+  <thead><tr><th>المضيف</th><th>العموميات التي يوفرها</th></tr></thead>
+  <tbody>
+    <tr><td>المتصفح</td><td><code>window</code>، <code>document</code>، <code>fetch</code>، <code>localStorage</code>، <code>WebGL</code>، <code>WebAssembly</code></td></tr>
+    <tr><td>Node.js</td><td><code>global</code>، <code>require</code>/<code>import</code>، <code>fs</code>، <code>net</code>، <code>process</code>، <code>Buffer</code></td></tr>
+    <tr><td>Deno</td><td><code>Deno</code>، <code>Deno.serve</code>، <code>Deno.readFile</code>، APIs قياسية للويب</td></tr>
+    <tr><td>Bun</td><td><code>Bun</code>، <code>Bun.serve</code>، <code>Bun.file</code>، متوافق مع Node + APIs الويب</td></tr>
+    <tr><td>Cloudflare Workers</td><td><code>fetch</code>، <code>caches</code>، <code>KV</code>، <code>Durable Objects</code> — لا <code>fs</code>، لا <code>net</code></td></tr>
+  </tbody>
+</table>
+
+<p>لهذا <code>window</code> غير موجودة في Node، <code>fs</code> غير موجودة في المتصفح، والكود "الموحد" (isomorphic) ينكسر عندما يفترض عامومية مضيف. اللغة واحدة؛ المضيف يتغير. الدرس: عند قراءة JS غير مألوف، <strong>حدد المضيف أولاً</strong>. <code>require</code> → Node/CommonJS. <code>import</code> + <code>Deno</code> → Deno. <code>window</code> → متصفح.</p>
+
+<h2>٧. التقييس: إيكماسكربت، TC39، نقطة التحول ES6/2015</h2>
+
+<p>١٩٩٦: نتسكيب تسلم JS لـ Ecma International → <strong>إيكماسكربت</strong> (اسم المواصفة؛ "جافاسكريبت" علامة تجارية).</p>
+
+<table>
+  <thead><tr><th>الإصدار</th><th>السنة</th><th>المرحلة</th></tr></thead>
+  <tbody>
+    <tr><td>ES1</td><td>1997</td><td>أول معيار. خط أساس.</td></tr>
+    <tr><td>ES2</td><td>1998</td><td>إصلاحات تحريرية.</td></tr>
+    <tr><td>ES3</td><td>1999</td><td>خط أساس IE6. <code>try/catch</code>، <code>instanceof</code>، Regex. <strong>لا تحديثات لـ ١٠ سنوات.</strong></td></tr>
+    <tr><td>ES4</td><td>مهمل</td><td>طموح زائد (كلاسات، حزم، مساحات أسماء، نظام أنواع). موت سياسي.</td></tr>
+    <tr><td>ES5</td><td>2009</td><td>الإنقاذ. وضع صارم، <code>JSON</code>، خصائص وصول (<code>get</code>/<code>set</code>)، <code>Object.create</code>، <code>Array.isArray</code>، <code>Function.prototype.bind</code>.</td></tr>
+    <tr><td>ES6 / ES2015</td><td>2015</td><td><strong>إعادة الكتابة.</strong> <code>let</code>/<code>const</code>، دوال سهمية، <code>class</code>، وحدات (<code>import</code>/<code>export</code>)، Promises، <code>Map</code>/<code>Set</code>، تفكيك، معاملات افتراضية، rest/spread، <code>Symbol</code>، <code>Proxy</code>، <code>Reflect</code>. JS الحديثة تولد.</td></tr>
+    <tr><td>ES2016+</td><td>سنوي</td><td>إيقاع سنوي. <code>async/await</code> (٢٠١٧)، تسلسل اختياري <code>?.</code> (٢٠٢٠)، دمج معدوم <code>??</code> (٢٠٢٠)، await أعلى مستوى (٢٠٢٢)، حقول خاصة <code>#x</code> (٢٠٢٢)، <code>Array.groupBy</code> (٢٠٢٤)، إلخ.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>عملية TC39</strong>: المقترحات تمر بمرحلة 0 (فكرة) → مرحلة 1 (مقترح) → مرحلة 2 (مسودة) → مرحلة 3 (مرشح) → مرحلة 4 (مكتمل). تطبيقان مستقلان مطلوبان للمرحلة 4. لهذا الميزات تستغرق سنوات — الويب لا يمكن أن ينكسر.</p>
+
+<h2>٨. المحركات: V8، SpiderMonkey، JavaScriptCore</h2>
+
+<p>ثلاث محركات، ثلاث سلالات:</p>
+
+<ul>
+  <li><strong>V8</strong> (Google، ٢٠٠٨) — فئات خفية + تجميع JIT. أيضاً وقت تشغيل Node.js. المحرك الذي جعل JS سريعاً.</li>
+  <li><strong>SpiderMonkey</strong> (Mozilla، ١٩٩٥) — أصل إيك. أول محرك JS. لا يزال يشغل Firefox.</li>
+  <li><strong>JavaScriptCore</strong> (Apple/Safari، متفرع من KJS) — يشغل Safari، WebKit، و Bun.</li>
+</ul>
+
+<p>لماذا المحركات مهمة للقارئ: JIT يعني خصائص الأداء تعتمد على وقت التشغيل. المقاييس الدقيقة تكذب. "JS بطيئة" قديمة بـ ٢٠ سنة — V8 يجمع المسارات الساخنة لشفرة آلة. لكن: تسخين JIT موجود، وإلغاء تحسين يحدث، و <code>eval</code>/<code>with</code> تعطل التحسين. المحرك جزء من المنصة؛ مواصفة اللغة لا تضمن الأداء.</p>
+
+<h2>٩. تقاطع WASM</h2>
+
+<p>WebAssembly (٢٠١٧، ١.٠ عبر المتصفحات) <strong>شريك</strong>، لا منافس. WASM هدف تجميع لـ C++/Rust/Go في المتصفح. JS لا يزال الغراء — WASM لا تلمس DOM مباشرة (مقترح <code>anyref</code> قيد التقدم). نموذج مكونات WASM ٢٠٢٣ ومقترح GC يتجهان لوصول مباشر للمضيف، لكن حتى ٢٠٢٦، JS تظل طبقة DOM الإلزامية لأي تفاعل DOM.</p>
+
+<blockquote class="callout">
+  <p><strong>قراءة كود في ٢٠٢٦:</strong> إذا رأيت <code>import { something } from 'wasm-module'</code> — الرفع الثقيل في Rust/C++، JS طبقة تنسيق. هذا التقسيم المقصود.</p>
+</blockquote>
+
+<h2>١٠. ما JS ليست</h2>
+
+<ul>
+  <li>ليست رياكت → <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a></li>
+  <li>ليست Angular → <a href="./angular-evolution.html">angular-evolution</a></li>
+  <li>ليست TypeScript → <a href="./javascript-across-stacks.html">javascript-across-stacks</a> (تحول TS قصة منافس، لا قصة لغة)</li>
+  <li>ليست الـ ١٢ درس → <a href="../lessons/0001-scope-and-hoisting.html">lessons/</a> (تلك الآليات؛ هذه الـ لماذا)</li>
+</ul>
+
+---
+
+<h2>١١. النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+
+<p>اللغة جيدة فقط بقدر الأدوات التي تجعل دلالاتها مرئية، قابلة للاختبار، وقابلة للترحيل. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
+
+<table>
+  <thead><tr><th>الفئة</th><th>الأدوات / المنصات</th><th>المُحفّز → الهدف</th><th>مقاييس القرار</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>التدقيق والتنسيق</strong></td>
+      <td>ESLint، Biome، Prettier، dprint، Rome، Oxlint، Quick-lint-js</td>
+      <td>أسلوب غير متناسق / أخطاء كامنة ← مفروض، مصحح تلقائياً، محكوم بـ CI</td>
+      <td>تغطية القاعدة؛ معدل الإيجابيات الكاذبة؛ زمن الإصلاح؛ انحراف التكوين؛ وقت CI</td>
+    </tr>
+    <tr>
+      <td><strong>فحص الأنواع</strong></td>
+      <td>TypeScript (tsc)، JSDoc + TS Check، Flow، Hegelia</td>
+      <td>أنواع ديناميكية ← عقود ثابتة، पकड़ التراجعات عند البناء</td>
+      <td>تغطية الأنواع؛ % any؛ كثافة الأخطاء؛ وقت الترجمة؛ سرعة الهجرة</td>
+    </tr>
+    <tr>
+      <td><strong>الاختبار (وحدوي، تكامل، E2E)</strong></td>
+      <td>Vitest، Jest، uvu، Playwright، Cypress، WebdriverIO، TestCafe، Nightwatch</td>
+      <td>سلوك غير مختبر ← سلوك موثق، محكوم بالتراجع</td>
+      <td>التغطية (سطر/فرع/دالة)؛ معدل الاهتزاز؛ وقت التنفيذ؛ عبء الصيانة</td>
+    </tr>
+    <tr>
+      <td><strong>التجميع والترجمة</strong></td>
+      <td>Vite، Rspack، Turbopack، esbuild، swc، Rollup، Webpack، Parcel</td>
+      <td>مصدر ← حزم إنتاج محسنة، مهزوزة، مقسمة بالكود</td>
+      <td>وقت البناء؛ حجم الحزمة؛ استراتيجية التقسيم؛ زمن HMR؛ نظام الإضافات</td>
+    </tr>
+    <tr>
+      <td><strong>وقت التشغيل والمحرك</strong></td>
+      <td>Node.js، Deno، Bun، Cloudflare Workers، Vercel Edge، QuickJS، Hermes، V8 Isolates</td>
+      <td>كود ← يتم تنفيذه في البيئة المستهدفة مع APIs صحيحة</td>
+      <td>زمن بدء التشغيل؛ بصمة الذاكرة؛ توافق API؛ بدء بارد؛ معدل الإنتاج</td>
+    </tr>
+    <tr>
+      <td><strong>التحليل الثابت والأمان</strong></td>
+      <td>SonarQube، CodeQL، Semgrep، Snyk، Dependabot، Renovate، Socket، Trivy</td>
+      <td>ثغرات/أنماط غير معروفة ← مكشفة، أولوية، مصلحة</td>
+      <td>معدل كشف الثغرات؛ معدل الإيجابيات الكاذبة؛ وقت الإصلاح؛ التغطية</td>
+    </tr>
+    <tr>
+      <td><strong>ملف الأداء</strong></td>
+      <td>Chrome DevTools، Node --inspect، 0x، Clinic.js، PySpy، Speedscope، Perfetto</td>
+      <td>كود بطيء ← عقدة اختبار محددة ← مسار ساخن محسن</td>
+      <td>وقت الوصول للعقدة؛ وضوح رسم اللهب؛ كشف التراجع؛ النفقات العامة</td>
+    </tr>
+    <tr>
+      <td><strong>الهجرة وكودمودز</strong></td>
+      <td>jscodeshift، TS Morph، إضافات Babel، Putout، Recast، Codemod.com، بمساعدة الذكاء الاصطناعي</td>
+      <td>أنماط قديمة ← معادلات حديثة على نطاق واسع</td>
+      <td>دقة التحويل؛ % الإصلاح اليدوي؛ معدل اجتياز الاختبارات بعد الهجرة؛ وقت المراجعة</td>
+    </tr>
+    <tr>
+      <td><strong>التوثيق ومرجع API</strong></td>
+      <td>TypeDoc، JSDoc، TSDoc، API Extractor، DocFX، Docusaurus، Nextra، VitePress</td>
+      <td>كود مصدر ← وثائق حية، قابلة للبحث، مصداردة</td>
+      <td>التغطية؛ الانحراف (الكود مقابل الوثائق)؛ تجربة البحث؛ الإصدار؛ وقت النشر</td>
+    </tr>
+    <tr>
+      <td><strong>التطوير المعزز بالذكاء الاصطناعي</strong></td>
+      <td>GitHub Copilot، Cursor، Sourcegraph Cody، Tabnine، Continue، Codeium، Windsurf</td>
+      <td>نية ← كود / اختبار / إعادة هيكلة / شرح / هجرة</td>
+      <td>معدل القبول؛ معدل اكتشاف الهلوسة؛ زمن المراجعة؛ نقل المهارة</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>طريقة اختيار:</strong> ابدأ بالتدقيق + فحص الأنواع + الاختبار ("مجموعة أدوات JS الدنيا القابلة للحياة"). أضف التجميع عندما وقت البناء >٣٠ث أو حجم الحزمة مهم. أضف التحليل الثابت عند عدد التبعيات >١٠٠. أضف ملف الأداء عندما p99 زمن الوصول > الميزانية. أضف أدوات الهجرة عند عدد أنماط >٥ عبر قاعدة الكود. الأداة تخدم اللغة — لا العكس.</p>
+
+---
+
+<section class="win">
+  <h3>ما تغطيه هذه الوثيقة</h3>
+  <p>اللغة: التاريخ، رهانات التصميم، نموذج التشغيل، التقييس. لا أطر (<a href="./class-to-hooks-paradigm-shift.html">paradigm-shift</a>، <a href="./angular-evolution.html">angular-evolution</a>). لا آليات بنية جملة JS (<a href="../lessons/0001-scope-and-hoisting.html">الـ ١٢ درس</a>). لا الانقسام بين JS و TypeScript/Java/.NET/Spring Boot — ذلك في <a href="./javascript-across-stacks.html">الوثيقة الشقيقة عبر المنصات</a>.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>مرجع · جافاسكريبت: اللغة</span>
+  <span>المهمة: قراءة JS/React في العمل</span>
+  <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

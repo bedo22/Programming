@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0001 — The Accidental Lingua Franca · How JavaScript Became the Web's Language</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 1 · The Exploration Journey · Episode 1 of 14</p>
+  <h1>The Accidental Lingua Franca — How JavaScript Became the Web's Language</h1>
+  <p class="meta">The founding story of the ecosystem you're about to explore: a ten-day scripting language for form validation, named by marketers, that became the only language every browser ships — by structural accident, not by being the best language. This is the lens for the entire journey. Anchored to <a href="../reference/javascript-the-language.html">JavaScript: The Language</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>You're starting an <em>exploration journey</em> through programming, the web, and the frontend ecosystem (see <a href="../MISSION.md">MISSION.md</a>). Before any framework — React, Angular, Next.js — there is one language they all run on. Knowing <em>why</em> that language exists, and <em>why it became unavoidable</em>, reframes everything you'll meet later. This lesson is the first step on the <a href="../MISSION.md#the-journey-map-curriculum-backbone--each-episode-anchors-to-a-reference-doc">journey map</a>; the next is <a href="./0002-the-platform-layer.html">Lesson 2 — The Platform Layer</a>.</p>
+</section>
+
+<h2>1. A web that couldn't react</h2>
+<p>May 1995. The web is <strong>static documents</strong>. A page is HTML, served by a server, rendered by a browser. It cannot respond to a click without a round-trip to the server. It cannot validate a form before you submit it. It cannot update a number when you press a button.</p>
+<p>Marc Andreessen, founder of Netscape, wants the browser to be <strong>programmable</strong> — not a document viewer, but a surface that reacts to the user. He tasks a new hire, <strong>Brendan Eich</strong>, with building a scripting language that runs <em>inside</em> the browser. The deadline is brutal: ship in Netscape Navigator 2.0 by September. Eich gets roughly <strong>ten days</strong> to produce a working prototype.<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">MDN</a> calls the result "a lightweight interpreted (or just-in-time compiled) programming language with first-class functions… prototype-based, garbage-collected, dynamic."</p>
+
+<h2>2. The ten-day sprint</h2>
+<p>Eich pulls from two very different lineages, and the tension between them defines the language forever:</p>
+<ul>
+  <li><strong>Scheme</strong> (a Lisp dialect) — first-class functions, lexical closures, a tiny core. This is the language Eich <em>wanted</em> to build.</li>
+  <li><strong>Java</strong> — the Netscape/Sun alliance made "Java-like syntax" a management requirement. The curly braces <code>{ }</code>, the semicolons, the <code>new</code> keyword, <code>typeof</code> — all Java-shaped.</li>
+</ul>
+<blockquote class="callout">
+  <p><strong>The defining quote.</strong> Brendan Eich, <cite>FAQ: Why is JS designed the way it is?</cite> (2011): "I wanted a Lisp-like language but had to use Java-like syntax to pass management approval. Under the <code>{ }</code> braces is a lambda-calculus heart beating in a C-shaped body."</p>
+  <p><a href="https://en.wikipedia.org/wiki/JavaScript">Wikipedia's history section</a> traces the creation and the Netscape/Sun deal; the reference doc <a href="../reference/javascript-the-language.html">JavaScript: The Language §1</a> covers the sprint in depth.</p>
+</blockquote>
+<p>That single sentence is the whole lesson in miniature: <strong>Java on the outside, Lisp on the inside.</strong> When a piece of JS ever feels weird to you, ask which of the two parents is showing.</p>
+
+<h2>3. The naming accident</h2>
+<p>The prototype was code-named <strong>Mocha</strong>. It shipped in the Navigator 2.0 beta as <strong>LiveScript</strong>. Then, in December 1995, it was renamed <strong>JavaScript</strong> — the marketing handshake of the Netscape/Sun alliance: <em>"Java is to the enterprise as JavaScript is to the browser."</em> The rename was announced in a joint press release on 4 December 1995.</p>
+<p>The name has caused roughly thirty years of confusion. <strong>Java and JavaScript share some syntax and almost nothing else.</strong> Java is statically typed and class-based; JavaScript is dynamically typed and prototype-based. Java compiles to bytecode; JavaScript ships as human-readable source. They are as related as <em>car</em> and <em>carpet</em>. MDN states it bluntly: "Do not confuse JavaScript with the Java programming language — JavaScript is not 'Interpreted Java'."</p>
+<p><a href="../reference/glossary.html">Glossary</a> — the shared vocabulary every reference doc uses.</p>
+
+<h2>4. Why it became unavoidable</h2>
+<p>Here is the one fact that matters most. <strong>A browser ships exactly one programming language natively: JavaScript.</strong> Not Python, not Ruby, not Java (applets died), not C++. Whatever JavaScript's flaws, it is the only language <em>guaranteed</em> to run in every browser on every device.</p>
+<p>So JavaScript didn't conquer the web by being the best-designed language. It conquered the web by being the <strong>only</strong> language the platform shipped — and then, over three decades, by everyone building on top of that one fact: the engines (V8, SpiderMonkey, JavaScriptCore), the runtimes (Node.js, Deno, Bun), the frameworks (React, Angular, Vue), the meta-frameworks (Next.js, Nuxt). All of it is a tower built on a ten-day prototype that happened to be the only thing the browser would run.</p>
+<blockquote class="callout">
+  <p><strong>The pattern that repeats.</strong> A platform deserves a language designed for its constraints, not a hand-me-down. The browser needed <em>glue</em> — dynamically typed, garbage-collected, forgiving — to mutate the page and handle events. Java and C++ were none of those things. JavaScript was. The constraint chose the language.</p>
+</blockquote>
+
+
+<h2>5. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (All options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="marketing" data-explain="The Sun/Netscape deal marketed it as 'Java is to the enterprise as JavaScript is to the browser.' It was branding, not technology — the two languages share little but curly braces. The name has misled learners for 30 years. (Netscape/Sun press release, 4 Dec 1995.)">
+  <summary>Why was LiveScript renamed "JavaScript" in December 1995?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="marketing"> To borrow Java's marketing hype</label>
+      <label><input type="radio" name="q1" value="replace"> To supersede Java in browsers</label>
+      <label><input type="radio" name="q1" value="classes"> To copy Java's class-based model</label>
+      <label><input type="radio" name="q1" value="microsoft"> To match Microsoft's JScript name</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="scheme" data-explain="Eich wanted a Lisp-like language: first-class functions and lexical closures — the Scheme heritage — forced into Java-shaped syntax to pass management. 'A lambda-calculus heart beating in a C-shaped body.' (Eich, 2011.)">
+  <summary>Beneath its Java-shaped curly-brace syntax, JavaScript's core ideas descend from which language?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="scheme"> Scheme, a Lisp dialect</label>
+      <label><input type="radio" name="q2" value="java"> Java, an enterprise language</label>
+      <label><input type="radio" name="q2" value="c"> C, a systems language</label>
+      <label><input type="radio" name="q2" value="python"> Python, a scripting language</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="native" data-explain="Browsers ship exactly one programming language natively. However JS was designed, it is the only language guaranteed to run in every browser — so it became the web's lingua franca by structural accident, not by being the best-designed language.">
+  <summary>What single structural fact made JavaScript unavoidable on the web?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="native"> Every browser ships it natively</label>
+      <label><input type="radio" name="q3" value="fast"> Every browser compiles it fastest</label>
+      <label><input type="radio" name="q3" value="classes"> Every browser supports its classes</label>
+      <label><input type="radio" name="q3" value="standard"> Every browser mandates its modules</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the founding story of the ecosystem: JavaScript was a <strong>ten-day scripting language for form validation</strong>, <strong>named by marketers</strong>, that became the web's <strong>only native language</strong> — by structural accident, not by merit. Every framework you'll meet runs on top of this accident. That reframing — <em>lingua franca by constraint, not by design</em> — is the lens for the rest of the journey. When a piece of JS feels strange, you now know to ask: <em>is it the Lisp heart, the Java skin, or the thirty years of people building on an accident?</em></p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/javascript-the-language.html">JavaScript: The Language</a> — the full history, the prototype model, the event loop, and the engine lineage (V8, SpiderMonkey, JavaScriptCore). This lesson was the story; that doc is the substance.</li>
+    <li><strong>Next lesson:</strong> <a href="./0002-the-platform-layer.html">Lesson 2 — The Platform Layer</a> — what the browser <em>actually is</em> (HTML &amp; CSS), the substrate that JavaScript manipulates. The accident needed a stage; this is the stage.</li>
+    <li><strong>Reinforce later:</strong> come back to these three questions tomorrow, from memory, without the options. That spaced, effortful recall is what turns the story into permanent knowledge.</li>
+  </ul>
+  <span class="cite"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">MDN, JavaScript</a> (the canonical web-platform reference). For the definitive academic history, see Wirfs-Brock &amp; Eich, <em>JavaScript: The First 20 Years</em> (HOPL IV, 2020, DOI 10.1145/3386327).</span>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? I'm your teacher for this journey — follow-up questions are exactly how we find the gaps and decide what comes next. For example:</p>
+  <ul>
+    <li>"What did Eich actually build in those ten days — how much of modern JS was already there?"</li>
+    <li>"If JS is an accident, why didn't anyone replace it once browsers got powerful?"</li>
+    <li>"What's a <em>prototype</em>, and why does it matter that JS chose prototypes over classes?"</li>
+  </ul>
+  <p>Just ask. No question is too basic — this is an exploration, not an exam.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 1 · <a href="../reference/javascript-the-language.html">Reference: JavaScript: The Language</a></span>
+  <span>Next → <a href="./0002-the-platform-layer.html">Lesson 2 · The Platform Layer</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

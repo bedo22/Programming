@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript Across Stacks — Where JS Runs, and Who Fights It</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">REFERENCE · JS ACROSS STACKS</p>
+  <h1>JavaScript Across Stacks — Where JS Runs, and Who Fights It</h1>
+  <p class="meta">How JS looks from the frontend, backend, mobile, embedded, and AI perspectives — what each one uses of JS, what about JS doesn't fit, and the languages written to fill that gap (TypeScript, .NET/C#, Java/Spring Boot, Kotlin, Dart, Rust, Python). For each competitor: one positioning table on what justifies creating a new language instead of extending an existing one. Companion to <a href="./javascript-the-language.html">javascript-the-language</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>JS-the-language is one thing (<a href="./javascript-the-language.html">javascript-the-language</a>). JS-as-deployed is five different stories. Where JS runs changes what you use of it, what you wish were different, and who was built to replace it. This doc answers: "if JS is everywhere, why are there still five other major languages in the industry?" Sibling to <a href="./javascript-the-language.html">javascript-the-language</a> and <a href="./frontend-camps-survey.html">frontend-camps-survey</a> — the camps survey covers the frontend-only framework camps; this one covers language-level competition across every stack.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. What "perspective" means here: same language, different host + different constraints = different competitor set. Each section follows the same template: what this perspective uses of JS → what doesn't fit → the competitors → one positioning table per competitor (what each optimizes for) → one paragraph on the theory that justifies creating it instead of extending Java/C++. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+
+<blockquote class="callout">
+  <p><strong>The pattern.</strong> Across all perspectives, one rule emerges from the data: a new language wins when the dominant constraint changes and the old language's design bet conflicts with the new constraint. JS won the browser because the constraint was 1995 download size + scripting glue. TypeScript won JS tooling because the constraint changed to large-team maintainability. Go won networked services because the constraint changed to concurrency-first. Rust won systems because the constraint changed to memory safety without GC. Java extended C++ syntax but won on the JVM bet (write once, ship anywhere). The rule: extend when the constraint is unchanged, invent when it inverts.</p>
+</blockquote>
+
+<h2>1. The Frontend Perspective</h2>
+
+<p><strong>What the frontend uses of JS:</strong> the language + DOM + fetch + Canvas/WebGL + WASM interop. The browser only runs JS (and WASM). There is no language-level competitor on the frontend — the browser chooses for you.</p>
+
+<p><strong>What doesn't fit:</strong> heavy numerics (WASM handles this), real threads (Workers are separate memory, not shared), type-safe large codebases (TypeScript is the answer, not a new language).</p>
+
+<p><strong>Compile-to-JS languages that tried:</strong> CoffeeScript (syntax sugar, died when ES6 arrived), PureScript/Elm/ReasonML (typed functional, niche), Dart (compiled to JS, pivoted to Flutter). None survived as a mainstream alternative because the browser's JS monopoly is absolute — you compile <em>to</em> JS, you don't replace it.</p>
+
+<p><strong>Positioning table — TypeScript vs JavaScript (the one competitor that survived):</strong></p>
+
+<table>
+  <thead><tr><th>Dimension</th><th>JavaScript</th><th>TypeScript</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>Fast iteration, zero build step, dynamic flexibility</td><td>Large-team maintainability, refactor safety, self-documenting APIs</td></tr>
+    <tr><td>Runtime</td><td>JS (it <em>is</em> JS)</td><td>Compiles away → plain JS at runtime</td></tr>
+    <tr><td>Adoption model</td><td>Default, everywhere</td><td>Opt-in, gradual (any .js file is valid .ts)</td></tr>
+    <tr><td>When it wins</td><td>Small teams, prototypes, scripts, library internals</td><td>Apps >10 devs, long-lived codebases, public APIs, library authors</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Extending JS with gradual typing, not replacing it. The "compile away" design means no runtime cost, no separate ecosystem, no migration cliff. This is why TS won where Dart/CoffeeScript failed — they required a runtime or a clean break.</td></tr>
+  </tbody>
+</table>
+
+<h2>2. The TypeScript Shift (the JS competitor that survived)</h2>
+
+<p>TS is not a separate perspective — it's the frontend perspective's internal evolution. But it deserves its own section because it's the only "competitor" that didn't fight JS from outside; it replaced JS from inside.</p>
+
+<p><strong>Timeline:</strong> 2012 release (Anders Hejlsberg, creator of C# and Turbo Pascal). 2014 Angular 2 bets on TS — the first major framework to require it. 2018 Babel 7 adds TS support — no separate compiler needed. 2020 "TS as default" inflection: Create React App, Next.js, Vue CLI all default to TS. 2024 Stack Overflow survey: TS is #2 most-loved language (after Rust), JS is #14.</p>
+
+<p><strong>The theory — why extend, not replace:</strong> The constraint didn't invert. The codebase grew, the team grew, the maintainability burden grew — but the target (the browser) and the runtime (JS) stayed the same. Adding types on top preserves 100% of the JS ecosystem, 100% of the runtime, 100% of the developer's mental model. The "compile away" property is the key: at runtime, there is no TS. This is the general rule — if the constraint is "the same platform, more safety," you extend. If the constraint is "a different platform," you invent.</p>
+
+<h2>3. The Backend Perspective</h2>
+
+<p><strong>What backend uses of JS:</strong> Node.js — the event loop + npm + <code>fs</code>/<code>net</code>/<code>http</code> modules. Single-threaded, non-blocking I/O, one process handles thousands of connections. The same loop from the browser, transplanted to the server.</p>
+
+<p><strong>What doesn't fit:</strong> CPU-bound work (blocks the loop), real threads (Worker threads exist but are heavy), sandboxed memory (V8 isolates are not JVM-grade), the decades of enterprise backend tooling (JMX, JPA, Spring, .NET diagnostics), the talent pool that knows Java/C# from university.</p>
+
+<p><strong>Competitors — one positioning table per lane:</strong></p>
+
+<h3>3.1 Java / Spring Boot</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Node.js</th><th>Java / Spring Boot</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>I/O-bound microservices, fast startup, JS-stack unity</td><td>Enterprise correctness, transaction boundaries, decade-long maintenance, team scaling</td></tr>
+    <tr><td>Concurrency model</td><td>Single-threaded event loop + async I/O</td><td>Thread-per-request (virtual threads in JDK 21+), managed thread pools</td></tr>
+    <tr><td>Type system</td><td>Optional (TS), dynamic at runtime</td><td>Static, nominative, heavy generics, reflection</td></tr>
+    <tr><td>Ecosystem depth</td><td>npm (volume), fragmented quality</td><td>Maven Central (curated), Spring portfolio (boot, data, security, cloud, batch)</td></tr>
+    <tr><td>When it wins</td><td>API gateways, BFF layers, real-time, frontend-heavy teams</td><td>Core banking, insurance, logistics, regulated domains, 50+ dev teams</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Java didn't extend C++ — it kept C++ syntax but bet on the JVM (write once, run anywhere) and garbage collection. The constraint inverted: C++ targeted bare metal; Java targeted <em>portable enterprise servers</em>. Spring Boot (2014) added convention-over-configuration on top — extending Java, not replacing it. The JVM bet is why Java still dominates enterprise backend 30 years later.</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 C# / .NET</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Node.js</th><th>C# / .NET (ASP.NET Core)</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>I/O-bound, JS-stack unity</td><td>Microsoft-stack unity, BCL depth, Windows/Linux parity, tooling (Rider/VS)</td></tr>
+    <tr><td>Concurrency model</td><td>Event loop</td><td>Thread pool + async/await (Task-based), high-throughput Kestrel server</td></tr>
+    <tr><td>Type system</td><td>Optional (TS)</td><td>Static, rich generics, pattern matching, records, nullable refs</td></tr>
+    <tr><td>Ecosystem depth</td><td>npm</td><td>NuGet, ASP.NET Core, EF Core, MAUI, SignalR, Orleans</td></tr>
+    <tr><td>When it wins</td><td>JS/TS teams, serverless, edge</td><td>Azure shops, Windows legacy, game backends, high-throughput APIs</td></tr>
+    <tr><td>The theory</td><td>—</td><td>C# didn't extend Java — it replaced Java on the CLR with better generics, LINQ, async, pattern matching. Anders Hejlsberg again. The constraint was "Windows enterprise developers need a managed language." .NET Core (2016) inverted the platform constraint: now Linux/macOS too. The language didn't change; the platform bet did.</td></tr>
+  </tbody>
+</table>
+
+<h3>3.3 Go</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Node.js</th><th>Go</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>I/O-bound, JS-stack unity</td><td>Networked services, concurrency at scale, simple deployment (static binary)</td></tr>
+    <tr><td>Concurrency model</td><td>Event loop (single thread)</td><td>Goroutines (green threads, millions), channels, select</td></tr>
+    <tr><td>Type system</td><td>Optional (TS)</td><td>Static, structural interfaces, no generics until 1.18 (2022)</td></tr>
+    <tr><td>Deployment</td><td>Node runtime + npm deps</td><td>Single static binary, no runtime</td></tr>
+    <tr><td>When it wins</td><td>JS teams, edge, serverless</td><td>Kubernetes infra, cloud-native services, CLI tools, high-throughput proxies</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Go didn't extend C++ — it replaced C++ for <em>networked servers</em>. The constraint inverted: C++ targeted maximum control; Go targeted "Google-scale services written by average engineers." Goroutines vs threads, fast compile vs slow compile, opinionated tooling vs infinite choice. Go is the C++ updater for the cloud era.</td></tr>
+  </tbody>
+</table>
+
+<h3>3.4 Rust</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Node.js</th><th>Rust</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>I/O-bound, JS-stack unity</td><td>Memory safety without GC, zero-cost abstractions, systems programming</td></tr>
+    <tr><td>Concurrency model</td><td>Event loop</td><td>Async/await + tokio, fearless concurrency (ownership prevents data races)</td></tr>
+    <tr><td>Type system</td><td>Optional (TS)</td><td>Static, affine types, lifetimes, traits, algebraic data types</td></tr>
+    <tr><td>Learning curve</td><td>Low (JS), Medium (TS)</td><td>High (ownership, borrowing, lifetimes)</td></tr>
+    <tr><td>When it wins</td><td>JS teams, fast iteration</td><td>High-perf services, WASM modules, embedded, crypto, databases, browsers (Firefox, Chrome components)</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Rust didn't extend C++ — it solved C++'s unsolved problem: memory safety without GC. The constraint inverted: C++ chose "no GC allowed" (performance); Rust made it "no GC <em>and</em> no memory bugs." The borrow checker is the new design bet. This is the systems-language inversion: safety as a compile-time guarantee, not a runtime cost.</td></tr>
+  </tbody>
+</table>
+
+<h3>3.5 Python</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Node.js</th><th>Python</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>I/O-bound, JS-stack unity</td><td>Data science, ML/AI, scripting, glue code, exploratory programming</td></tr>
+    <tr><td>Concurrency model</td><td>Event loop</td><td>GIL (single-threaded CPU), multiprocessing, asyncio (recent)</td></tr>
+    <tr><td>Type system</td><td>Optional (TS)</td><td>Optional (type hints, mypy), dynamic at runtime</td></tr>
+    <tr><td>Ecosystem depth</td><td>npm</td><td>PyPI — NumPy, Pandas, PyTorch, TensorFlow, JAX, scikit-learn</td></tr>
+    <tr><td>When it wins</td><td>API layers, web servers</td><td>Model training, data pipelines, research, scientific computing</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Python didn't extend anything — it was a scripting language (1991) that <em>accidentally</em> became the AI language because NumPy existed in 2006, before "AI" meant LLMs. The lock-in is library lock-in, not language lock-in. Mojo (2023, Chris Lattner) tries to invert it: Python syntax + compiler + no GIL. Too early to call.</td></tr>
+  </tbody>
+</table>
+
+<h2>4. The Mobile Perspective</h2>
+
+<p><strong>What mobile uses of JS:</strong> React Native (Expo, bare), Capacitor/Ionic (WebView + native plugins), NativeScript. JS runs on a JS engine (Hermes on Android, JavaScriptCore on iOS) bridged to native modules. UI is native (React Native) or WebView (Capacitor).</p>
+
+<p><strong>What doesn't fit:</strong> native performance (bridge overhead, JSI helps but doesn't eliminate), native UI primitives (you're reimplementing platform conventions), App Store review (WebView apps face scrutiny), the talent pool that knows Swift/Kotlin from university.</p>
+
+<h3>4.1 Kotlin / Jetpack Compose (Android native)</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>React Native / JS</th><th>Kotlin + Compose</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>Code sharing with web, JS team reuse</td><td>Android-native performance, platform fidelity, Google's blessed path</td></tr>
+    <tr><td>UI model</td><td>React (declarative, bridge/JSI)</td><td>Compose (declarative, direct, Kotlin compiler plugin)</td></tr>
+    <tr><td>Language</td><td>TS/JS</td><td>Kotlin (static, null-safe, coroutines)</td></tr>
+    <tr><td>When it wins</td><td>Web-first teams, cross-platform > native polish</td><td>Android-first, performance-critical, Google ecosystem</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Kotlin didn't extend Java — it replaced Java on Android by being <em>better Java</em> (null safety, data classes, coroutines, less boilerplate). Google blessed it (2017), then made it first-class (2019). The constraint: Java 6 on Android was frozen; the platform needed a modern language without breaking the JVM. Kotlin extended the JVM bytecode target, not the Java language.</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Swift / SwiftUI (iOS native)</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>React Native / JS</th><th>Swift + SwiftUI</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>Code sharing with web</td><td>iOS-native performance, platform fidelity, Apple's blessed path</td></tr>
+    <tr><td>UI model</td><td>React (bridge/JSI)</td><td>SwiftUI (declarative, state-driven, compiler-verified)</td></tr>
+    <tr><td>Language</td><td>TS/JS</td><td>Swift (static, value types, protocol-oriented, async/await)</td></tr>
+    <tr><td>When it wins</td><td>Web-first, cross-platform > polish</td><td>iOS-first, Apple ecosystem, performance, privacy features</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Swift didn't extend Objective-C — it replaced it. The constraint: Obj-C was a C superset with a fragile runtime; Apple wanted memory safety, value semantics, and a modern compiler. Swift owns the toolchain (LLVM), the runtime, the stdlib. It's a platform language, not a portable one.</td></tr>
+  </tbody>
+</table>
+
+<h3>4.3 Dart / Flutter (Google's "JS but with a real VM and type system")</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>React Native / JS</th><th>Dart + Flutter</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>Web code sharing</td><td>Single codebase, pixel-perfect UI on all platforms, no bridge</td></tr>
+    <tr><td>UI model</td><td>Native components via bridge</td><td>Own rendering engine (Skia/Impeller), draws every pixel</td></tr>
+    <tr><td>Language</td><td>TS/JS</td><td>Dart (static, sound null safety, JIT dev / AOT prod)</td></tr>
+    <tr><td>When it wins</td><td>Web team going mobile</td><td>Brand-first apps, custom designs, embedded, desktop, web (same code)</td></tr>
+    <tr><td>The theory</td><td>—</td><td>Dart <em>tried</em> to replace JS in the browser (2011, Dart VM in Chrome). Failed — no other vendor adopted it. Pivoted to Flutter (2017): own the rendering, own the language, target everything. The constraint inverted: browser JS is a monopoly you can't break; so build a <em>parallel stack</em> that doesn't need the browser's JS engine. Dart is "what JS would be if it had a sound type system and an AOT compiler."</td></tr>
+  </tbody>
+</table>
+
+<h2>5. The Embedded / IoT Perspective</h2>
+
+<p><strong>What IoT uses of JS:</strong> Espruino (JS on microcontrollers), Johnny-Five (Node on host + Firmata on device), Tessel, low.js. JS runs on devices with ≥100KB RAM (ESP32, STM32). The event loop model actually fits IoT well — sensors are async events.</p>
+
+<p><strong>What doesn't fit:</strong> RAM pressure (V8 needs ~MB), hard real-time (GC pauses), battery life (interpreted > compiled), no stdlib for bare metal.</p>
+
+<h3>Competitors:</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>JS (Espruino/low.js)</th><th>C / C++</th><th>Rust</th><th>MicroPython</th></tr></thead>
+  <tbody>
+    <tr><td>RAM floor</td><td>~100KB</td><td>~2KB</td><td>~16KB (no std)</td><td>~64KB</td></tr>
+    <tr><td>Real-time</td><td>No (GC)</td><td>Yes</td><td>Yes (no GC)</td><td>No (GC)</td></tr>
+    <tr><td>Dev speed</td><td>High</td><td>Low</td><td>Medium</td><td>High</td></tr>
+    <tr><td>The theory</td><td>JS event loop fits async sensors</td><td>Only thing that fits 32KB MCU</td><td>Memory safety for firmware without GC</td><td>Python syntax on microcontroller</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>One-paragraph theory:</strong> JS's event loop is actually well-suited to IoT (sensors = async events). The wall is RAM, not the language model. C/C++ win because they compile to 2KB binaries with zero runtime. Rust is the newer entrant: memory safety for firmware without GC. The constraint didn't invert — it just <em>got harder</em> (smaller chips, more safety regulation). The languages that win embedded are the ones that can shed their runtime.</p>
+</blockquote>
+
+---
+
+<h2>5b. Mental models — how cross-stack reasoning actually works</h2>
+
+<p>When developers move between stacks (frontend, backend, mobile, embedded, AI), they don't just learn new syntax — they <em>swap mental models</em>. Each stack has a primary abstraction that determines what "easy" and "hard" mean. The same code pattern that is idiomatic in one stack is an anti-pattern in another.</p>
+
+<table>
+  <thead><tr><th>Stack</th><th>Primary abstraction</th><th>What "state" means</th><th>What "performance" means</th><th>What "correct" means</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Frontend (browser)</strong></td>
+      <td>DOM tree + event loop</td>
+      <td>Live in the document; mutations trigger repaint</td>
+      <td>Render time, jank, bundle size, perceived latency</td>
+      <td>Same result across browsers; correct accessibility semantics</td>
+    </tr>
+    <tr>
+      <td><strong>Backend (Node)</strong></td>
+      <td>Request/response + async I/O</td>
+      <td>Per-request or shared via DB/cache; mutations go through explicit boundaries</td>
+      <td>Throughput, p99 latency, memory under load</td>
+      <td>Idempotency, correct error propagation, no resource leaks</td>
+    </tr>
+    <tr>
+      <td><strong>Mobile (RN/Native)</strong></td>
+      <td>Native UI bridge + constrained device</td>
+      <td>Hybrid: JS-side store + native UI mirror</td>
+      <td>Frame budget (16ms), memory pressure, cold start</td>
+      <td>Same UX offline, gestures don't feel broken, no jank</td>
+    </tr>
+    <tr>
+      <td><strong>Embedded (MCU)</strong></td>
+      <td>Hardware registers + interrupt loop</td>
+      <td>Global state, often no heap; everything is a static buffer</td>
+      <td>Bytes, cycles, watts; no GC pauses allowed</td>
+      <td>Deterministic timing; never miss an interrupt; never crash</td>
+    </tr>
+    <tr>
+      <td><strong>AI / Data</strong></td>
+      <td>Tensors + computational graph</td>
+      <td>Model weights; "state" of a running process is the computation history</td>
+      <td>FLOPs, memory bandwidth, GPU utilization</td>
+      <td>Numerical reproducibility; the answer is approximately right, with bounded error</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The shift:</strong> The hardest part of polyglot work is not the syntax — it is noticing <em>which mental model is in play</em>. A backend developer reading frontend code will treat the DOM as state; a frontend developer reading backend code will treat requests as instantaneous; an embedded developer will be terrified by garbage collection. None of them are wrong — they are <em>carrying the right model for a different stack</em>. The skill is the meta-skill of <em>switching models</em> on entry.</p>
+
+<p><strong>JS's specific edge:</strong> Because JS lives in so many stacks, the same syntax (<code>await</code>, <code>Promise.all</code>, an event handler) has to work in all of them. This is why the language has stayed small but flexible — every stack reuses the same primitives. The cost is that JS code in the wild often <em>looks</em> the same across stacks but <em>means</em> different things depending on the model in the developer's head.</p>
+
+---
+
+<h2>6. The AI / Data-Science Perspective</h2>
+
+<p><strong>What AI uses of JS:</strong> almost nothing in the model layer (PyTorch/JAX/CUDA are Python/C++). Everything in the application layer: Next.js + Vercel AI SDK + fetch to model APIs, LangChain.js, Transformers.js (WASM), TensorFlow.js (WebGL/WASM). JS is the <em>delivery vehicle</em> for models trained elsewhere.</p>
+
+<p><strong>What doesn't fit:</strong> training (no CUDA, no autograd ecosystem, no distributed training), massive tensors (WASM memory limits), the talent pool (every PhD learns Python).</p>
+
+<h3>Competitor: Python (the model layer) / Mojo (the challenger)</h3>
+
+<table>
+  <thead><tr><th>Dimension</th><th>JS (app layer)</th><th>Python (model layer)</th><th>Mojo (emerging)</th></tr></thead>
+  <tbody>
+    <tr><td>What it optimizes for</td><td>Productizing models, web UIs, edge inference</td><td>Research, training, data pipelines, model authoring</td><td>Python syntax + systems perf, no GIL, compile to GPU</td></tr>
+    <tr><td>Ecosystem</td><td>Vercel AI SDK, LangChain.js, TF.js</td><td>PyTorch, JAX, HuggingFace, NumPy, Pandas</td><td>MAX platform (Modular), early stage</td></tr>
+    <tr><td>The theory</td><td>JS won the app layer by default</td><td>Library lock-in (NumPy 2006 → PyTorch 2016)</td><td>Constraint inversion: Python's perf wall is the GIL + interpreter; Mojo keeps syntax, adds compiler</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>One-paragraph theory:</strong> AI picked Python because NumPy existed in 2006, before "AI" meant LLMs. The lock-in is library lock-in, not language lock-in. JS owns the application layer because the web is the delivery target. Mojo (Chris Lattner, 2023) is the first serious attempt to invert the constraint: keep Python syntax, add a compiler, remove the GIL, target accelerators directly. If it works, it's the first language that extends Python's syntax but replaces its runtime — the inverse of TypeScript's "compile away" strategy.</p>
+</blockquote>
+
+<h2>7. The "Other" Perspective: Edge, Serverless, Build Tools</h2>
+
+<p><strong>Where JS is the default entirely due to the host being JS:</strong> Cloudflare Workers, Vercel Edge Functions, Deno Deploy, Bun, esbuild/rolldown/Vite (written in Go/Rust but drive the JS ecosystem). The edge runtime picked JS because V8 is already there, the security sandbox already exists, and cold-start matters more than steady-state perf.</p>
+
+<p><strong>Competitor: WASM on the edge.</strong> Cloudflare supports WASM components; Fastly Compute@Edge is WASM-first. But WASM still needs JS glue for DOM/HTTP in the browser, and the edge is converging on the same APIs (WinterCG). Here JS has no real language competitor — WASM is a partner, not a replacement, same as in the browser.</p>
+
+<h2>8. The Pattern: When Does a New Language Beat Extending an Old One?</h2>
+
+<p>Across all seven perspectives, one rule emerges from the data:</p>
+
+<blockquote class="callout">
+  <p><strong>A new language wins when the dominant constraint changes and the old language's design bet conflicts with the new constraint.</strong></p>
+</blockquote>
+
+<table>
+  <thead><tr><th>Old Language</th><th>Old Constraint</th><th>Old Design Bet</th><th>New Constraint</th><th>New Language</th><th>New Design Bet</th></tr></thead>
+  <tbody>
+    <tr><td>C++</td><td>Bare metal control</td><td>Manual memory, zero overhead</td><td>Networked services at Google scale</td><td>Go</td><td>Goroutines, fast compile, opinionated tooling</td></tr>
+    <tr><td>C++</td><td>Bare metal control</td><td>Manual memory</td><td>Memory safety without GC</td><td>Rust</td><td>Borrow checker, affine types, fearless concurrency</td></tr>
+    <tr><td>Java</td><td>Portable enterprise servers</td><td>JVM + GC</td><td>Android needed modern language, frozen Java 6</td><td>Kotlin</td><td>JVM bytecode target, null safety, coroutines, less boilerplate</td></tr>
+    <tr><td>Objective-C</td><td>C superset + dynamic runtime</td><td>Message passing, fragile binary interface</td><td>Memory safety, value semantics, modern compiler</td><td>Swift</td><td>LLVM ownership, value types, protocol-oriented</td></tr>
+    <tr><td>JavaScript</td><td>1995 browser scripting</td><td>Dynamic, prototype, single-threaded</td><td>Large-team maintainability</td><td>TypeScript</td><td>Gradual typing, compiles away, zero runtime cost</td></tr>
+    <tr><td>JavaScript</td><td>Browser monopoly</td><td>Only language the browser runs</td><td>Native mobile performance without bridge</td><td>Dart/Flutter</td><td>Own rendering engine, AOT, sound types, multi-platform</td></tr>
+    <tr><td>Python</td><td>Scripting / scientific glue</td><td>Dynamic, GIL, interpreter</td><td>AI training at scale</td><td>Mojo (attempt)</td><td>Python syntax + compiler + no GIL + GPU native</td></tr>
+  </tbody>
+</table>
+
+<p>The inverse also holds: when the constraint doesn't invert, extension wins. Java extended C++ syntax but bet on the JVM. C# extended Java syntax but bet on the CLR. TypeScript extends JS syntax but compiles away. Kotlin extends the JVM bytecode target but replaces the language. The platform bet is what changes; the syntax is negotiable.</p>
+
+<p>JS's original constraint: <em>a scripting language for Netscape Navigator 2.0, downloaded over 28k modem, written in 10 days.</em> That constraint is gone. The new constraints (large teams, mobile, edge, AI delivery) each spawned their own response — TS, RN/Flutter, Workers, Vercel AI SDK. None replaced JS because none inverted the <em>browser</em> constraint. The browser still only runs JS (and WASM). As long as that's true, JS survives at the center and the competitors orbit around it.</p>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+  <p>Where JS runs, what each host uses of it, and the languages built to fight it in each lane. Not the JS language itself (<a href="./javascript-the-language.html">javascript-the-language</a>). Not the frontend framework landscape (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>). Not React internals (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a>).</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · JS across stacks</span>
+  <span>Mission: read JS/React at work</span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

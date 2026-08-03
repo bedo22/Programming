@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جافاسكريبت عبر المنصات: أين تعمل JS، ومن يحاربها</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · JS عبر المنصات</p>
+  <h1>جافاسكريبت عبر المنصات: أين تعمل JS، ومن يحاربها</h1>
+  <p class="meta">كيف تبدو JS من منظور الواجهة الأمامية، الخلفية، الجوّال، المدمج، والذكاء الاصطناعي — ما يستخدمه كل واحد من JS، ما لا يناسب JS، واللغات التي كتبت لملء تلك الفجوة (TypeScript، .NET/C#، Java/Spring Boot، Kotlin، Dart، Rust، Python). لكل منافس: جدول تموضع بفقرة واحدة عن النظرية التي تبرر إنشاء لغة جديدة بدلاً من تمديد لغة موجودة. وثيقة شقيقة لـ <a href="./javascript-the-language.html">javascript-the-language</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا توجد هذه الوثيقة</h3>
+  <p>JS-اللغة شيء. JS-كما-تُنشر خمسة قصص مختلفة. حيث تعمل JS يغير ما تستخدمه منها، ما تتمنى لو اختلف، ومن بُني ليحل محلها. هذه الوثيقة تجيب: "إذا كانت JS في كل مكان، لماذا لا تزال هناك خمس لغات رئيسية أخرى في الصناعة؟" شقيقة لـ <a href="./javascript-the-language.html">javascript-the-language</a> و <a href="./frontend-camps-survey.html">frontend-camps-survey</a> — مسح المعسكرات يغطي معسكرات الواجهة الأمامية فقط؛ هذه تغطي منافسة مستوى اللغة عبر كل المنصات.</p>
+</section>
+
+<h2>٠. كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة. ما يعنيه "منظور" هنا: نفس اللغة، مضيف مختلف + قيود مختلفة = مجموعة منافسين مختلفة.</p>
+
+<p>مرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع وثائق المراجع.</p>
+
+<blockquote class="callout">
+  <p><strong>النمط.</strong> عبر كل المنظورات، تظهر قاعدة واحدة من البيانات: لغة جديدة تربح عندما يتغير القيد المهيمن ويراهن تصميم اللغة القديمة ضد القيد الجديد. JS ربحت المتصفح لأن القيد كان حجم التحميل 1995 + غراء برمجة نصية. TypeScript ربحت أدوات JS لأن القيد تغير لصيانة الفرق الكبيرة. Go ربحت الخدمات الشبكية لأن القيد تغير للتزامن أولاً. Rust ربحت الأنظمة لأن القيد تغير لأمان الذاكرة بدون GC. Java مدت بناء جملة C++ لكن ربحت على رهان JVM (اكتب مرة، شغّل في أي مكان). القاعدة: مدد عندما القيد غير متغير، اخترع عندما ينقلب.</p>
+</blockquote>
+
+<h2>١. منظور الواجهة الأمامية</h2>
+
+<p><strong>ما تستخدمه الواجهة الأمامية من JS:</strong> اللغة + DOM + fetch + Canvas/WebGL + تفاعل WASM. <strong>ما JS-اللغة <em>لا تستطيع</em> فعله على الواجهة الأمامية:</strong> الحساب الثقيل، الخيوط، قواعد كود كبيرة آمنة النوعياً. Recap الـ ٥ معسكرات أمامية (رابط لـ <a href="./frontend-camps-survey.html">camps-survey</a>). لا منافس حقيقي على مستوى اللغة في الواجهة الأمامية (المتصفح يشغل JS + WASM فقط)؛ المنافسون هم أوقات تشغيل بديلة (WASM) ولغات تُترجم لـ JS (TS، PureScript، Elm، ReasonML).</p>
+
+<h2>٢. تحول TypeScript (المنافس الذي نجا)</h2>
+
+<p>TS ليس منظوراً منفصلاً — هو التطور الداخلي للمنظور الأمامي. لكنه يستحق قسمه الخاص لأنه المنافس الوحيد الذي لم يحارب JS من الخارج؛ بل <em>استبدلها من الداخل</em>. النظرية: تمديد JS بالأنواع التدريجية، لا كتابة لغة جديدة. لماذا فاز TS حيث خسر Dart و CoffeeScript (لا خطوة تجميع منفصلة وقت التشغيل، لا بناء جملة منفصل للكود القيمي، فقط أنواع). إصدار ٢٠١٢، رهان Angular 2 (٢٠١٤)، دعم Babel 7 + TS (٢٠١٨)، نقطة تحول ٢٠٢٠ "TS كافتراضي". جدول تموضع: TS مقابل JS — ما يحسّن كل منهما. قاعدة "TS تتبخر عند التجميع" — وقت التشغيل، JS هو ما يعمل.</p>
+
+<h2>٣. منظور الخلفية</h2>
+
+<p><strong>ما تستخدمه الخلفية من JS:</strong> Node.js — حلقة الأحداث + npm + <code>fs</code>/<code>net</code>/<code>http</code> الوحدات. أحادية المسار، I/O غير حاصر، عملية واحدة تتعامل مع آلاف الاتصالات. نفس الحلقة من المتصفح، مزروعة في الخادم.</p>
+
+<p><strong>ما لا يناسب:</strong> العمل المكثف CPU (يسد الحلقة)، خيوط حقيقية (خيوط عاملة موجودة لكن ثقيلة)، صندوق حماية ذاكرة (عزلات V8 ليست JVM-grade)، عقود من أدوات الخلفية المؤسسية (JMX، JPA، Spring، تشخيصات .NET)، تجمع المواهب الذي يعرف Java/C# من الجامعة.</p>
+
+<p><strong>منافسون — جدول تموضع واحد لكل مسار:</strong></p>
+
+<h3>٣.١ Java / Spring Boot</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>Node.js</th><th>Java + Spring Boot</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>I/O-bound microservices، بدء سريع، وحدة مكدس JS</td><td>نضج JVM، أدوات المؤسسات، "أعد كتابة الشركة في ٦ أشهر"</td></tr>
+    <tr><td>نموذج التزامن</td><td>حلقة أحداث</td><td>خيوط (Virtual threads في Java 21+)</td></tr>
+    <tr><td>نظام الأنواع</td><td>اختياري (TS)</td><td>ساكب، استنتاج محلي، nullable annotations</td></tr>
+    <tr><td>متى تفوز</td><td>طبقة API، خوادم ويب</td><td>أنظمة أساسية، بنوك، حوكمة، فرق كبيرة</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>لم تمدد Java لغة C++ — بل راهنت على JVM (اكتب مرة، شغّل في أي مكان). القيود: تطبيقات المؤسسات تحتاج وقت تشغيل مُدار، أمان، نظام بيئي. JVM قدم ذلك؛ اللغة تتبع المنصة.</td></tr>
+  </tbody>
+</table>
+
+<h3>٣.٢ C# / .NET</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>Node.js</th><th>C# + .NET</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>فرق JS، نظام بيئي واحد</td><td>الافتراضي لمتاجر Microsoft، عمق BCL، أداء .NET 8+</td></tr>
+    <tr><td>التزامن</td><td>حلقة أحداث</td><td>async/await + خيوط، Task Parallel Library</td></tr>
+    <tr><td>متى تفوز</td><td>فرق JS، شركات ناشئة، Edge</td><td>فرق .NET، Azure، أداء عالي، نقل إرث</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>C# لم تمدد Java — بل استبدلتها على CLR برهان أفضل على الأنواع، LINQ، async، pattern matching. Anders Hejlsberg مجدداً. القيد كان "مطورو المؤسسات على Windows يحتاجون لغة مُدارة". .NET Core (٢٠١٦) قلب قيد المنصة: الآن Linux/macOS أيضاً. اللغة لم تتغير؛ رهان المنصة فعل.</td></tr>
+  </tbody>
+</table>
+
+<h3>٣.٣ Go</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>Node.js</th><th>Go</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>فرق JS، نظام بيئي واحد</td><td>التزامن أولاً، ثنائي ملف واحد، نشر بسيط</td></tr>
+    <tr><td>التزامن</td><td>حلقة أحداث (خيط واحد)</td><td>Goroutines + قنوات (CSP)</td></tr>
+    <tr><td>متى تفوز</td><td>طبقة API، واجهات BFF</td><td>خدمات ميكرو، CLI، Kubernetes، أدوات سحابية أصلية</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>Go لم تمدد C++ — بل استبدلتها للخدمات الشبكية. القيود تغيرت: من "تحكم عاري" إلى "التزامن على نطاق Google". Goroutines تحل مشكلة C10k التي حلقة الأحداث تحلها بشكل مختلف. رأي في الأدوات (go fmt، go test، go mod) يمنع جدل التنسيق.</td></tr>
+  </tbody>
+</table>
+
+<h3>٣.٤ Rust</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>Node.js</th><th>Rust</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>سرعة التطوير، npm</td><td>أمان ذاكرة بدون GC، طبقة أنظمة، أداء قابل للتنبؤ</td></tr>
+    <tr><td>التزامن</td><td>حلقة أحداث</td><td>async/.await + tokio، تزامن بلا خوف (ملكية)</td></tr>
+    <tr><td>متى تفوز</td><td>معظم خدمات الويب</td><td>محركات، قواعد بيانات، WASM، بنية تحتية، حيث يهم كل ns/byte</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>Rust لم تمدد C++ — بل قلبت رهانها: C++ قالت "لا GC للأداء"؛ Rust قالت "لا GC <em>و</em> لا أخطاء ذاكرة". مدقق الاستعارة (borrow checker) هو الرهان التصميمي الجديد. هذا انعكاس لغة الأنظمة: الأمان كضمان وقت تجميع، لا تكلفة وقت تشغيل.</td></tr>
+  </tbody>
+</table>
+
+<h3>٣.٥ Python</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>Node.js</th><th>Python</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>I/O-bound، وحدة مكدس JS</td><td>علم البيانات، ML/AI، خطوط أنابيب البيانات، البرمجة الاستكشافية</td></tr>
+    <tr><td>نموذج التزامن</td><td>حلقة أحداث</td><td>GIL (CPU أحادي المسار)، multiprocessing، asyncio (حديث)</td></tr>
+    <tr><td>نظام الأنواع</td><td>اختياري (TS)</td><td>اختياري (type hints، mypy)، ديناميكي وقت التشغيل</td></tr>
+    <tr><td>عمق النظام البيئي</td><td>npm</td><td>PyPI — NumPy، Pandas، PyTorch، TensorFlow، JAX، scikit-learn</td></tr>
+    <tr><td>متى تفوز</td><td>طبقات API، خوادم ويب</td><td>تدريب النماذج، خطوط أنابيب البيانات، البحث، الحوسبة العلمية</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>Python لم تمدد شيئاً — كانت لغة برمجية نصية (1991) <em>أصبحت بالصدفة</em> لغة AI لأن NumPy وجدت في 2006، قبل أن تعني "AI" نماذج LLM. القفل لغة هو قفل مكتبة. Mojo (2023، Chris Lattner) يحاول قلبها: بناء جملة Python + مترجم + لا GIL. مبكر جداً للحكم.</td></tr>
+  </tbody>
+</table>
+
+<h2>٤. منظور الجوّال</h2>
+
+<p><strong>ما يستخدمه الجوّال من JS:</strong> React Native (Expo، bare)، Capacitor/Ionic (WebView + إضافات أصلية)، NativeScript. JS يعمل على محرك JS (Hermes على Android، JavaScriptCore على iOS) مع جسر للوحدات الأصلية. UI أصلي (React Native) أو WebView (Capacitor).</p>
+
+<p><strong>ما لا يناسب:</strong> الأداء الأصلي (عبء الجسر، JSI يساعد لكن لا يلغي)، بدائيات UI الأصلية (أنت تعيد تنفيذ اتفاقيات المنصة)، مراجعة App Store (تطبيقات WebView تواجه تدقيقاً)، تجمع المواهب الذي يعرف Swift/Kotlin من الجامعة.</p>
+
+<h3>٤.١ Kotlin / Jetpack Compose (Android الأصلي)</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>React Native / JS</th><th>Kotlin + Compose</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>مشاركة الكود مع الويب، إعادة استخدام فريق JS</td><td>أداء Android أصلي، وفاء المنصة، المسار المبارك من Google</td></tr>
+    <tr><td>نموذج UI</td><td>React (إعلاني، جسر/JSI)</td><td>Compose (إعلاني، مباشر، إضافة مترجم Kotlin)</td></tr>
+    <tr><td>اللغة</td><td>TS/JS</td><td>Kotlin (ثابتة، null-safe، coroutines)</td></tr>
+    <tr><td>متى تفوز</td><td>فرق الويب أولاً، عبر المنصات > صقل أصلي</td><td>Android أولاً، حرج الأداء، نظام Google البيئي</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>Kotlin لم تمدد Java — بل استبدلت Java على Android بكونها <em>Java أفضل</em> (أمان المعدوم، data classes، coroutines، بويلربليت أقل). باركها Google (٢٠١٧)، جعلها أولوية (٢٠١٩). القيد: Java 6 على Android كانت مجمدة؛ المنصة احتاجت لغة حديثة دون كسر JVM. Kotlin مدت هدف بايت كود JVM، لا لغة Java.</td></tr>
+  </tbody>
+</table>
+
+<h3>٤.٢ Swift / SwiftUI (iOS الأصلي)</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>React Native / JS</th><th>Swift + SwiftUI</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>مشاركة الكود مع الويب</td><td>أداء iOS أصلي، وفاء المنصة، المسار المبارك من Apple</td></tr>
+    <tr><td>نموذج UI</td><td>React (جسر/JSI)</td><td>SwiftUI (إعلاني، مدفوع بالحالة، مُحقق بالمترجم)</td></tr>
+    <tr><td>اللغة</td><td>TS/JS</td><td>Swift (ثابتة، أنواع قيمة، موجهة بالبروتوكولات، async/await)</td></tr>
+    <tr><td>متى تفوز</td><td>الويب أولاً، عبر المنصات > صقل</td><td>iOS أولاً، نظام Apple البيئي، الأداء، ميزات الخصوصية</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>Swift لم تمدد Objective-C — بل استبدلته. القيد: Obj-C كانت فوقية C مع وقت تشغيل هش؛ Apple أرادت أمان ذاكرة، دلالات قيمة، مترجم حديث. Swift تملك سلسلة الأدوات (LLVM)، وقت التشغيل، المكتبة القياسية. إنها لغة منصة، لا لغة محمولة.</td></tr>
+  </tbody>
+</table>
+
+<h3>٤.٣ Dart / Flutter (Google "JS لكن مع VM حقيقي ونظام أنواع حقيقي")</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>React Native / JS</th><th>Dart + Flutter</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>مشاركة كود الويب</td><td>قاعدة كود واحدة، UI مثالي البكسل على كل المنصات، لا جسر</td></tr>
+    <tr><td>نموذج UI</td><td>مكونات أصلية عبر جسر</td><td>محرك رسم خاص (Skia/Impeller)، يرسم كل بكسل</td></tr>
+    <tr><td>اللغة</td><td>TS/JS</td><td>Dart (ثابتة، null safety سليم، JIT تطوير / AOT إنتاج)</td></tr>
+    <tr><td>متى تفوز</td><td>فريق ويب يذهب للجوّال</td><td>تطبيقات علامة تجارية أولاً، تصاميم مخصصة، مدمج، سطح مكتب، ويب (نفس الكود)</td></tr>
+    <tr><td>النظرية</td><td>—</td><td>Dart <em>حاولت</em> استبدال JS في المتصفح (٢٠١١، Dart VM في Chrome). فشلت — لا بائع آخر تبناها. تحولت لـ Flutter (٢٠١٧): املك الرسم، املك اللغة، استهدف كل شيء. القيد انعكس: احتكار JS المتصفح كسر لا تكسر؛ لذا ابني <em>مكدس متوازي</em> لا يحتاج محرك JS المتصفح. Dart هي "ما كانت JS لو كان لها نظام أنواع سليم ومترجم AOT".</td></tr>
+  </tbody>
+</table>
+
+<h2>٥. منظور المدمج / إنترنت الأشياء</h2>
+
+<p><strong>ما يستخدمه IoT من JS:</strong> Espruino (JS على المتحكمات الدقيقة)، Johnny-Five (Node على المضيف + Firmata على الجهاز)، Tessel، low.js. JS يعمل على أجهزة ≥ 100KB RAM (ESP32، STM32). نموذج حلقة الأحداث يناسب IoT حقاً — المستشعرات أحداث async.</p>
+
+<p><strong>ما لا يناسب:</strong> ضغط RAM (V8 تحتاج ~MB)، وقت حقيقي صلب (توقفات GC)، عمر البطارية (مفسر > مُجمّع)، لا مكتبة قياسية للمعدن العاري.</p>
+
+<h3>المنافسون:</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>JS (Espruino/low.js)</th><th>C / C++</th><th>Rust</th><th>MicroPython</th></tr></thead>
+  <tbody>
+    <tr><td>أرضية RAM</td><td>~100KB</td><td>~2KB</td><td>~16KB (بدون std)</td><td>~64KB</td></tr>
+    <tr><td>وقت حقيقي</td><td>لا (GC)</td><td>نعم</td><td>نعم (لا GC)</td><td>لا (GC)</td></tr>
+    <tr><td>سرعة التطوير</td><td>عالية</td><td>منخفضة</td><td>متوسطة</td><td>عالية</td></tr>
+    <tr><td>النظرية</td><td>حلقة أحداث JS تناسب مستشعرات async</td><td>الوحيد الذي يناسب متحكم 32KB</td><td>أمان ذاكرة للفييرموير بدون GC</td><td>بنية جملة Python على متحكم دقيق</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>فقرة نظرية واحدة:</strong> حلقة أحداث JS في الواقع مناسبة لـ IoT (المستشعرات = أحداث async). الجدار هو RAM، لا نموذج اللغة. C/C++ تفوز لأنها تُجمّع لثنائيات 2KB بوقت تشغيل صفر. Rust الوافد الأحدث: أمان ذاكرة للفييرموير بدون GC. القيد لم ينعكس — فقط <em>اشتد</em> (رقائق أصغر، تنظيم سلامة أكثر). اللغات التي تربح المدمج هي التي تستطيع إسقاط وقت تشغيلها.</p>
+</blockquote>
+
+<h2>٦. منظور الذكاء الاصطناعي / علم البيانات</h2>
+
+<p><strong>ما يستخدمه AI من JS:</strong> تقريباً لا شيء في طبقة النموذج (PyTorch/JAX/CUDA ليست في JS). كل شيء في طبقة التطبيق: Next.js + Vercel AI SDK + fetch لـ APIs النماذج، LangChain.js، Transformers.js (WASM)، TensorFlow.js (WebGL/WASM). JS <em>مركبة توصيل</em> للنماذج المدربة في مكان آخر.</p>
+
+<p><strong>ما لا يناسب:</strong> التدريب (لا CUDA، لا نظام autograd البيئي، لا تدريب موزع)، تينزورات ضخمة (حدود ذاكرة WASM)، تجمع المواهب (كل دكتوراه تتعلم Python).</p>
+
+<h3>منافس: Python (طبقة النموذج) / Mojo (المتحدي)</h3>
+
+<table>
+  <thead><tr><th>البعد</th><th>JS (طبقة التطبيق)</th><th>Python (طبقة النموذج)</th><th>Mojo (ناشئ)</th></tr></thead>
+  <tbody>
+    <tr><td>ما تحسّنه</td><td>إنتاج النماذج، واجهات ويب، استنتاج Edge</td><td>البحث، التدريب، خطوط أنابيب البيانات، تأليف النماذج</td><td>بنية جملة Python + أداء أنظمة، لا GIL، تجميع لـ GPU</td></tr>
+    <tr><td>النظام البيئي</td><td>Vercel AI SDK، LangChain.js، TF.js</td><td>PyTorch، JAX، HuggingFace، NumPy، Pandas</td><td>منصة MAX (Modular)، مرحلة مبكرة</td></tr>
+    <tr><td>النظرية</td><td>JS فازت بطبقة التطبيق بالافتراض</td><td>قفل مكتبة (NumPy 2006 → PyTorch 2016)</td><td>انعكاس قيد: جدار أداء Python هو GIL + مفسر؛ Mojo تحافظ على البناء، تضيف مترجم</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>فقرة نظرية واحدة:</strong> AI اختارت Python لأن NumPy وجدت في 2006، قبل أن تعني "AI" نماذج LLM. القفل لغة هو قفل مكتبة، لا قفل لغة. JS تملك طبقة التطبيق لأن الويب هدف التوصيل. Mojo (Chris Lattner، 2023) أول محاولة جادة لقلب القيد: احتفظ ببنية جملة Python، أضف مترجم، أزِل GIL، استهدف المسرعات مباشرة. إن نجحت، هي أول لغة تمد بنية جملة Python لكن تستبدل وقت تشغيلها — عكس استراتيجية TypeScript "تتبخر عند التجميع".</p>
+</blockquote>
+
+<h2>٧. منظور "الآخر": Edge، Serverless، أدوات البناء</h2>
+
+<p><strong>حيث JS الافتراضي بالكامل لأن المضيف JS:</strong> Cloudflare Workers، Vercel Edge Functions، Deno Deploy، Bun، esbuild/rolldown/Vite (مكتوبة Go/Rust لكن تدفع نظام JS البيئي). وقت تشغيل Edge اختار JS لأن V8 موجود بالفعل، صندوق حماية الأمان موجود بالفعل، والبدء البارد أهم من الأداء المستقر.</p>
+
+<p><strong>منافس: WASM على الحافة.</strong> Cloudflare تدعم مكونات WASM؛ Fastly Compute@Edge واصف WASM أولاً. لكن WASM ما زال يحتاج غراء JS لـ DOM/HTTP في المتصفح، والحافة تتقارب على نفس APIs (WinterCG). هنا JS لا منافس حقيقي للغة — WASM شريك، كما في المتصفح.</p>
+
+<h2>٨. النمط: متى تهزم لغة جديدة تمديد لغة قديمة؟</h2>
+
+<p>عبر كل السبعة منظورات، تظهر قاعدة واحدة من البيانات:</p>
+
+<blockquote class="callout">
+  <p><strong>لغة جديدة تربح عندما يتغير القيد المهيمن ويراهن تصميم اللغة القديمة ضد القيد الجديد.</strong></p>
+</blockquote>
+
+<table>
+  <thead><tr><th>اللغة القديمة</th><th>القيد القديم</th><th>رهان التصميم القديم</th><th>القيد الجديد</th><th>اللغة الجديدة</th><th>رهان التصميم الجديد</th></tr></thead>
+  <tbody>
+    <tr><td>C++</td><td>تحكم عاري</td><td>ذاكرة يدوية، صفر تكلفة</td><td>خدمات شبكية بمقياس Google</td><td>Go</td><td>Goroutines، تجميع سريع، أدوات ذات رأي</td></tr>
+    <tr><td>C++</td><td>تحكم عاري</td><td>ذاكرة يدوية</td><td>أمان ذاكرة بدون GC</td><td>Rust</td><td>مدقق استعارة، أنواع أفينية، تزامن بلا خوف</td></tr>
+    <tr><td>Java</td><td>خوادم مؤسسات قابلة للنقل</td><td>JVM + GC</td><td>Android احتاج لغة حديثة، Java 6 مجمدة</td><td>Kotlin</td><td>هدف بايت كود JVM، أمان معدوم، coroutines، بويلربليت أقل</td></tr>
+    <tr><td>Objective-C</td><td>فوقية C + وقت تشغيل ديناميكي</td><td>تمرير رسائل، واجهة ثنائية هشة</td><td>أمان ذاكرة، دلالات قيمة، مترجم حديث</td><td>Swift</td><td>ملكية LLVM، أنواع قيمة، موجهة بالبروتوكولات</td></tr>
+    <tr><td>JavaScript</td><td>برمجة نصية للمتصفح 1995</td><td>ديناميكية، بروتوتايب، أحادية المسار</td><td>صيانة فرق كبيرة</td><td>TypeScript</td><td>أنواع تدريجية، تتبخر، صفر تكلفة وقت تشغيل</td></tr>
+    <tr><td>JavaScript</td><td>احتكام المتصفح</td><td>اللغة الوحيدة التي يشغلها المتصفح</td><td>أداء جوّال أصلي بدون جسر</td><td>Dart/Flutter</td><td>محرك رسم خاص، AOT، أنواع سليمة، متعدد المنصات</td></tr>
+    <tr><td>Python</td><td>برمجة نصية / غراء علمي</td><td>ديناميكية، GIL، مفسر</td><td>تدريب AI بمقياس واسع</td><td>Mojo (محاولة)</td><td>بنية جملة Python + مترجم + لا GIL + GPU أصلي</td></tr>
+  </tbody>
+</table>
+
+<p>العكس صحيح أيضاً: عندما لا ينعكس القيد، التمديد يربح. Java مدت بناء جملة C++ لكن راهنت على JVM. C# مدت بناء جملة Java لكن راهنت على CLR. TypeScript تمد بناء جملة JS لكن تتبخر. Kotlin تمد هدف بايت كود JVM لكن تستبدل اللغة. رهان المنصة هو ما يتغير؛ البناء جملة قابلة للتفاوض.</p>
+
+<p>قيد JS الأصلي: <em>لغة برمجية نصية لـ Netscape Navigator 2.0، محمّلة عبر مودم 28k، مكتوبة في 10 أيام.</em> ذلك القيد ذهب. القيود الجديدة (فرق كبيرة، جوّال، حافة، توصيل AI) كل منها ولّد استجابته — TS، RN/Flutter، Workers، Vercel AI SDK. لا أحد استبدل JS لأن لا أحد قلب <em>قيد المتصفح</em>. المتصفح لا يزال يشغل JS فقط (و WASM). ما دام هذا صحيحاً، JS تبقى في المركز والمنافسون يديرون حولها.</p>
+
+<section class="win">
+  <h3>ما تغطيه هذه الوثيقة</h3>
+  <p>أين تعمل JS، ما يستخدمه كل مضيف منها، واللغات المبنية لمحاربتها في كل مسار. لا اللغة نفسها (<a href="./javascript-the-language.html">javascript-the-language</a>). لا مشهد أطر الواجهة الأمامية (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>). لا دواخل رياكت (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a>).</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>مرجع · JS عبر المنصات</span>
+  <span>المهمة: قراءة JS/React في العمل</span>
+  <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

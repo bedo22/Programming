@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Is "State"? — A Prequel to Programming in React</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · JavaScript fundamentals — the ideas under the code</p>
+  <h1>What Is "State"? — A Prequel to Programming in React</h1>
+  <p class="meta">Programming primitives, the four theories of computation, how data becomes values becomes variables becomes state, and why "state" is the same word across Turing machines and React hooks. Read this before the main paradigm-shift doc if terms like "variable ≠ state" or "lifetime" aren't second nature.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>The <a href="./class-to-hooks-paradigm-shift.html">main paradigm-shift reference</a> covers React's journey from classes to hooks to the compiler. One section — "Before React, before OOP" — grew into a complete prequel about what programming <em>is</em>, what state <em>is</em>, and the four theories of computation that underpin every language. That prequel lives here now. The main doc picks the story up at OOP and assumes you've absorbed this foundation.</p>
+</section>
+
+<p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+
+<h2>1. When did "programming" appear?</h2>
+
+<p>Two words people use loosely that we have to separate first: <strong>algorithm</strong> and <strong>program</strong>.</p>
+
+<ul>
+  <li>An <strong>algorithm</strong> is an <em>abstract procedure</em> — a finite, step-by-step recipe for solving a problem (e.g. "to compute GCD of two numbers, repeatedly subtract the smaller from the larger until they equal"). It can be written on paper, described in words, or even executed by a human with paper, with no machine in sight. Algorithms have existed as long as mathematics has: the Euclidean algorithm for GCD is from ~300 BCE.</li>
+  <li>A <strong>program</strong> is a <em>concrete implementation</em> of one or more algorithms in a specific language, runnable on a specific machine. The Euclidean algorithm is ~2300 years old; the oldest computer <em>program</em> implementing it ran decades ago. Same algorithm, different programs, millennia apart.</li>
+</ul>
+
+<p>The word <strong>"algorithm" itself</strong> is a 1,200-year-old loan from <strong>Al-Khwarizmi</strong> (Muḥammad ibn Mūsā al-Khwārizmī, c. 780–850 CE, the Persian polymath at the House of Wisdom in Baghdad). His name was Latinized in medieval Europe as <em>Algoritmi</em>, and "algorithm" literally means "of Khwarizmi." The same scholar's book <em>al-Jabr</em> gave us the word "algebra." So the word for "a step-by-step procedure" is older than the computer by about a millennium — the concept existed long before any machine could run it.</p>
+
+<p>The idea of giving a <em>machine</em> a sequence of instructions to carry out is much newer than algorithms themselves:</p>
+
+<ul>
+  <li><strong>1843 — Ada Lovelace</strong> wrote the first <em>algorithm intended for a machine</em> (Babbage's Analytical Engine, a mechanical, theoretical machine never completed in her lifetime). She wrote a plan for computing Bernoulli numbers. Crucially: she wrote an <em>algorithm for a machine that did not yet exist</em> — a program with no computer to run on. She is called the first programmer because she was the first to think through what a machine — once built — would have to be told step by step. Programming as an <em>idea</em> tied to a machine starts here, even though no machine ran it.</li>
+  <li><strong>1936 — Alan Turing</strong> published "On Computable Numbers," defining the Turing machine — the mathematical model of "anything that can compute." This proved which problems are solvable by any machine at all. It is the theory under programming, not programming itself.</li>
+  <li><strong>1941 — Konrad Zuse's Z3</strong> was the first working programmable computer (electromechanical, in Germany) — the first time an algorithm became a program that actually <em>ran</em>. Limited, but real.</li>
+  <li><strong>1945-46 — ENIAC</strong> in the US was the first general-purpose electronic programmable computer. It was programmed by women rewiring cables between panels — "soft" instructions didn't exist yet; the program was a physical configuration. The first <em>programmers</em> in the modern sense were the "ENIAC girls."</li>
+  <li><strong>1957 — Fortran</strong> was the first widely-used high-level programming language. For the first time you wrote <code>X = Y + Z</code> on punch cards and a compiler turned it into machine code. This is when "programming" starts to mean what you do today: typing text that becomes instructions.</li>
+</ul>
+
+<p>So: the <em>algorithm</em> as a concept is older than mathematics itself; the <em>word</em> "algorithm" is ~1,200 years old (from Al-Khwarizmi); the <em>idea of programming a machine</em> is from the 1840s (Lovelace); the <em>practice</em> of running programs on real machines from the 1940s (Zuse, then ENIAC); and what you'd recognize as programming today from the 1950s (Fortran). The 70 years since Fortran are variations on one theme: tell a machine how to transform inputs into outputs.</p>
+
+<h2>2. The four theories underneath — what makes programming possible at all</h2>
+
+<p>The last section told you <em>when</em> things happened. This section tells you <em>what</em> the ideas are that make programming work. Four theories, all worked out between 1936 and 1948 — and they are not historical footnotes. The code you write today directly radiates from them. If you skip this section, "variable," "function," "type," and "state" will feel like arbitrary labels from a language spec. They aren't. Every strange term in the subsections below will be defined on first use — but be patient: the first two subsections are the most abstract, and they pay off in the last two, which connect directly to the hardware and to JS.</p>
+
+<h3>2.1 The Turing machine (Alan Turing, 1936) — what is "computable"?</h3>
+
+<p><strong>The problem Turing was solving.</strong> In 1928, the German mathematician David Hilbert asked the <em>Entscheidungsproblem</em> (German for "decision problem"): given a fixed set of axioms (like the rules of arithmetic) and a mathematical statement (like "there are infinitely many prime numbers"), is there a general, mechanical procedure that can decide, for any statement, whether it is provable or not? In 1936, Alan Turing and Alonzo Church working independently proved the answer is <strong>no</strong> — no such general procedure can exist. But to prove that, Turing first had to define what "general procedure" meant in a mathematically precise way. He did it by inventing a machine that is so simple you can understand every part of it in a few minutes — and 90 years later, it remains the foundation of everything we call "computing."</p>
+
+<p><strong>The machine.</strong> Imagine an infinitely long paper tape divided into squares (cells). Each square has a symbol (say, 0, 1, or blank). A read/write head sits over one square at a time. There is a control box that is <em>in exactly one state</em> at any moment, from a finite set of possible states (say: "start," "seek 1," "found 1," "halt"). The machine follows a table of rules. Each rule says:</p>
+
+<blockquote>IF the control box is in state X AND the square under the head contains symbol Y, THEN: write symbol Z over the current square, move the head left (L) or right (R) by one square, and switch the control box to state W.</blockquote>
+
+<p>A <strong>state</strong> is the current configuration of the control box (one value from a finite set). A <strong>transition</strong> is a rule that defines what happens in one step. The <strong>tape</strong> is the unlimited memory. <strong>Halting</strong> is when no rule applies — either the machine stops, or it runs forever. That is the entire machine — tape, head, state, rules — and Turing proved that this absurdly simple thing can compute <em>anything any real computer can compute</em>, given enough tape and enough time. Every modern CPU, every programming language, every AI model is the Turing machine with more moving parts and infinite tape replaced by finite RAM.</p>
+
+<p><strong>What Turing proved — the Halting Problem and the boundary of the possible.</strong> The most important single result in computing: there exists <em>no</em> Turing machine that can take the description of any other Turing machine plus its input, and decide whether that machine will halt or run forever. This is not a "we haven't figured it out yet" — it is a proven logical impossibility, like asking someone to draw a square circle. The practical consequence: every compiler, every linter, every type checker, every static analysis tool has <strong>false negatives</strong> (it misses some real bugs) and <strong>false positives</strong> (it flags correct code as wrong), and this is <em>mathematically unavoidable</em>. No improvement in AI, no new type system, no magic tool can ever cross this boundary. It's the bedrock limit of computation.</p>
+
+<p>Three things every programmer inherits from Turing:</p>
+<ul>
+  <li><strong>"Turing-complete" is the minimum bar.</strong> A language is Turing-complete if it can simulate any Turing machine. C is. JS is. Python is. Lisp is. Haskell is. Excel formulas are. Minecraft redstone is. Any Turing-complete language can compute <em>anything any other Turing-complete language can compute</em>, given infinite time and memory. This means: the difference between OOP, FP, and procedural is about <em>convenience, readability, and safety</em> — NOT about what the language can <em>do</em>. Everything React hooks do could be done in class components with more ceremony. The paradigm shift is an ergonomic improvement, not a capability upgrade.</li>
+  <li><strong>The re-render loop is a Turing cycle.</strong> React calls your component → component reads state and returns JSX → event handler calls setState → React re-calls the component. This is the Turing cycle: read the current state, execute the transition (your function), write new state, repeat. Every <code>useReducer</code> you write is a Turing machine minus the tape — a pure finite state machine where the reducer is the transition table.</li>
+  <li><strong>"State" is the Turing word.</strong> When we say "the button is in the <em>loading</em> state," we are using the exact word Turing chose for his control-box register — a finite set of configurations, one active at a time, with defined transitions between them. The React mental model (UI = f(state)) is Turing's architecture with a rendering system attached.</li>
+</ul>
+
+<h3>2.2 The lambda calculus (Alonzo Church, 1936) — the other way to compute</h3>
+
+<p><strong>The same problem, a different direction.</strong> Church was working on the same <em>Entscheidungsproblem</em> at the same time as Turing, but his background was logic and mathematics, not physics and mechanics. He invented the <strong>lambda calculus</strong> — a formal system where everything is a function, there are no machines, no tapes, no memory, no state. Only pure functions that take arguments and return results. Zero side effects, zero mutation, zero "write to memory." Just transformation.</p>
+
+<p><strong>What it looks like.</strong> The lambda calculus has exactly three things:</p>
+<ul>
+  <li><strong>A variable</strong> — a name like <code>x</code> or <code>y</code>.</li>
+  <li><strong>An abstraction</strong> — a function definition: <code>λx.&lt;body&gt;</code> means "a function that takes argument <code>x</code> and produces body." <code>λx.x</code> is "a function that takes x and returns x" (the identity function).</li>
+  <li><strong>An application</strong> — calling a function with an argument: <code>(λx.x) 5</code> means "call the identity function with argument 5" → returns 5.</li>
+</ul>
+
+<p>That is the entire system. From these three things (variables, function definitions, function calls), Church built the entire machinery of arithmetic: numbers (the Church numeral for 0 is <code>λf.λx.x</code> — "a function that takes f and x and applies f zero times to x"), addition, multiplication, conditionals (true is <code>λx.λy.x</code>, false is <code>λx.λy.y</code>), loops (recursion), and data structures (pairs are <code>λx.λy.λf.f x y</code>). All from nothing but functions. You cannot mutate any variable; you can only create a new value. This is the mathematical origin of "pure function," "immutability," and "no side effects" in the FP tradition.</p>
+
+<p>Key terms, each defined:</p>
+<ul>
+  <li><strong>Pure function</strong>: a function that always returns the same output for the same inputs and has no side effects (does not modify anything outside itself). <code>add(2, 3)</code> always returns 5, no matter when or how many times you call it. The lambda calculus only has pure functions because there's no memory to mutate — every call returns a fresh result.</li>
+  <li><strong>First-class function</strong>: a function can be treated like any other value — assigned to a variable, passed as an argument, returned as a result. In lambda calculus, functions ARE the only values, so "first-class" is not a feature — it's the whole system.</li>
+  <li><strong>Higher-order function</strong>: a function that takes another function as input or returns one as output. <code>λf.λx.f(f(x))</code> is "a function that takes callback f and returns a function that applies f twice." <code>array.map(fn)</code> is a higher-order function: it takes fn as input and applies it to every element.</li>
+  <li><strong>Lexical closure</strong>: when a function "captures" variables from the scope where it was defined. In lambda calculus, a function body can reference variables that were bound in its enclosing abstraction — <code>λx.λy.x</code> creates a function that "remembers" x even after the outer function has returned. JS closures are this exact mechanism.</li>
+  <li><strong>Currying</strong>: converting a function that takes multiple arguments into a chain of functions each taking one argument. <code>add(x, y)</code> becomes <code>add(x)(y)</code>. The example <code>λx.λy.x</code> is the curried version of "take x and y, return x" — it takes x, returns a function that takes y, and returns x.</li>
+</ul>
+
+<p><strong>The Church-Turing thesis — the equivalence that underlies all of computing.</strong> When Turing published "On Computable Numbers" in 1936, Church was already known for the lambda calculus. Church recognized that Turing's machine model and his own function model were aiming at the same target. He invited Turing to Princeton University for a Ph.D. under his supervision — Turing arrived in 1936 and they worked together to prove the <strong>Church-Turing thesis</strong>:</p>
+
+<blockquote class="callout">
+  <p><strong>The Church-Turing thesis:</strong> Every function that is "intuitively calculable" by any finite, mechanical procedure can be computed by a Turing machine, AND equivalently by a lambda-calculus expression. Two models built on completely different intuitions — one mechanical (tape, states, mutation), one mathematical (functions, purity, no state) — turn out to compute <em>exactly the same class of functions</em>.</p>
+  <p>This is called a "thesis" rather than a "theorem" because you cannot mathematically prove something about "intuitively calculable" — that would require a mathematical definition of intuition, which is a philosophical problem, not a mathematical one. But the thesis has been tested for 80+ years: every new model of computation proposed (recursive functions, cellular automata, quantum computers, DNA computing, typed lambda calculi) has turned out to compute exactly the same class. If we ever meet aliens, the working assumption is that their computation is equivalent to ours.</p>
+</blockquote>
+
+<p><strong>The relation between Turing and Church — a summary for the reader.</strong> The Turing machine is the computer-as-mechanic: there is a physical-looking machine with moving parts, it holds state over time, it mutates memory. The lambda calculus is computer-as-mathematician: pure transformations, no time, no memory, no mutation, just functions producing values from values. The thesis says both are the same. This is NOT obvious: the Turing machine is procedural with mutation; the lambda calculus is functional without mutation. They LOOK like opposites. The thesis says they compute the same things. This is why React could move from classes (Turing-machine paradigm: state inside objects, mutation via methods) to hooks (lambda-calculus paradigm: pure functions, immutable state, composition — see the later sections). Both are mathematically equivalent; moving between them is choosing a different organizing metaphor, not adding new power.</p>
+
+<p>Why this matters for the code you write:</p>
+<ul>
+  <li><strong>JavaScript functions are lambda calculus descendants.</strong> Lisp (1958), the second-oldest language still in wide use, was built explicitly on the lambda calculus. JavaScript's first-class functions, lexical closures (a closure "captures" its surrounding variables just like lambda calculus binds them), higher-order functions (<code>map</code> / <code>filter</code> / <code>reduce</code>), and the ability to pass functions as arguments are all inheritance from the Lisp/lambda-calculus tradition. <a href="./javascript-the-language.html">Brendan Eich, who created JS in 10 days in 1995</a>, has said he wanted a Lisp-like language but had to use Java-like syntax to pass management approval. Under the <code>{ }</code> braces is a lambda-calculus heart beating in a C-shaped body.</li>
+  <li><strong>The lambda calculus gives you currying and partial application.</strong> That pattern <code>const add = x => y => x + y; add(2)(3)</code> is Church's currying directly. The lesson on currying in this workspace (lesson 0007) is actually teaching 1936 mathematics that became practical through Lisp.</li>
+  <li><strong>FP is not a fashion.</strong> When people dismiss FP as "academic" or "impractical," they are dismissing a model of computation that Church proved equivalent to the one behind every real machine. The difference is organization, not capacity. React adopting hooks was not "trendy" — it was choosing one of the two equivalent models over the other, for concrete engineering reasons (the three problems from the main doc's intro: reuse, lifecycles, and <code>bind</code>).</li>
+</ul>
+
+<h3>2.3 The Halting Problem (Turing, 1936) — the boundary of what machines can know</h3>
+
+<p><strong>The question.</strong> Can you write a program that reads <em>any other program</em> + its input, and correctly answers "does this program halt or run forever?"</p>
+
+<p><strong>The proof (by contradiction).</strong> Suppose such a program <code>H</code> exists. <code>H</code> takes two inputs: a program <code>P</code> and an input <code>x</code>. It outputs <code>true</code> if <code>P(x)</code> halts, <code>false</code> if it loops forever.</p>
+
+<p>Now build a new program <code>D</code> ("the diagonalizer"):</p>
+
+<pre><code><span class="comment-line">// D takes a program P as input</span>
+function D(P) {
+  <span class="comment-line">// Run H on P with P itself as input</span>
+  if (H(P, P) === true) {
+    <span class="comment-line">// H says P(P) halts — so we loop forever</span>
+    while (true) { }  <span class="comment-line">// infinite loop</span>
+  } else {
+    <span class="comment-line">// H says P(P) loops — so we halt immediately</span>
+    return "done";
+  }
+}
+</code></pre>
+
+<p>What happens when we run <code>D(D)</code> — feeding <code>D</code> to itself?</p>
+
+<ul>
+  <li>If <code>H(D, D)</code> says "halts" → <code>D(D)</code> enters the infinite loop → <strong>does NOT halt</strong></li>
+  <li>If <code>H(D, D)</code> says "loops" → <code>D(D)</code> returns immediately → <strong>halts</strong></li>
+</ul>
+
+<p>Both cases contradict <code>H</code>'s prediction. Therefore <code>H</code> cannot exist. No program can solve the halting problem for all programs.</p>
+
+<blockquote class="callout">
+  <p><strong>What this means for you.</strong> There is no tool, no static analyzer, no AI, no "sufficiently smart compiler" that can catch <em>all</em> infinite loops, all deadlocks, all "will this function terminate?" questions. The boundary is mathematically proven, not engineering-limited. Every linter, type checker, and IDE warning is a <em>sound but incomplete</em> approximation — it catches some bugs, misses others, and sometimes flags correct code. You will always need human judgment at the edge.</p>
+</blockquote>
+
+<h3>2.4 The von Neumann architecture (John von Neumann, 1945) — the hardware that made computation real</h3>
+
+<p><strong>From mathematical model to physical machine.</strong> The Turing machine is an abstraction with an infinite tape that doesn't exist in the physical world. To actually build a working computer, someone had to design the engineering layout. That design was described in 1945 in "First Draft of a Report on the EDVAC," written by John von Neumann, a mathematician and physicist working as a consultant on the EDVAC project at the University of Pennsylvania. The architecture it described is so universal that we barely notice it as an invention — but every CPU in every laptop, phone, server, and embedded device today is still a "von Neumann machine."</p>
+
+<p>Three core ideas, each with its own name and consequence:</p>
+
+<ol>
+  <li><strong>Stored program (the program is data).</strong> Before 1945, "the program" was how the machine was physically wired. ENIAC — the giant electronic computer completed in 1945 — had to be rewired for every new program, a process that took days. Von Neumann's insight: represent the program's instructions as <em>data</em> in the same memory where the data lives. The CPU reads an instruction from memory, decodes it (what does this bit pattern mean?), executes it (load, add, jump, compare), and moves to the next instruction. The instruction <em>is</em> a number — the bit pattern for "ADD" is just another number, no different from the bit pattern for 42. This is why today you can <code>eval("let x = 5")</code> in JS — the engine reads a string (data) and compiles it into instructions (code). It's why functions can be passed as values (a function is data that the engine can execute). The boundary between "code" and "data" is a choice, not a physical reality.</li>
+  <li><strong>Separate CPU and memory, connected by a bus.</strong> The CPU (Central Processing Unit — the "brain") does the actual work: arithmetic, comparisons, logic. Memory (RAM — Random Access Memory) stores the instructions and data. A "bus" — just wires — connects them. The CPU places a memory address on the address bus, reads or writes data on the data bus. Each cycle: fetch an instruction from memory at the current "program counter" address, execute it, increment the program counter. <strong>A variable is a memory address with a human-readable name attached. Assignment is a bus write: the CPU places the address on the bus, places the value on the data bus, and the memory chip at that address stores the new bits. That is literally what <code>x = 5</code> means at the hardware level.</strong></li>
+  <li><strong>Sequential execution (one instruction at a time).</strong> The CPU executes instructions one at a time, top to bottom, with "jumps" for loops (<code>while</code>), branches (<code>if</code>), and function calls (<code>call</code> / <code>ret</code>). This is the origin of the "procedural" or "imperative" paradigm — "do this, then do that, then if X do Y" — because that is literally how the CPU works. Every sequential imperative language (C, Pascal, Fortran, and the shape of JS inside function bodies despite its FP heart) radiates from this.</li>
+</ol>
+
+<p><strong>A footnote on credit.</strong> Eckert and Mauchly, who actually built ENIAC, argued after von Neumann's draft that the stored-program idea was theirs before von Neumann wrote about it. The term "von Neumann architecture" stuck because his draft was the first written description that circulated and became standard. Some people use "stored-program architecture" to avoid taking sides on the credit dispute. The idea itself is what matters — whichever direction it came from, it is the design of every modern computer.</p>
+
+<p>Connection to your C/C++ background and to the rest of this doc:</p>
+<ul>
+  <li><strong>Your C/C++ background: memory is real.</strong> In C, a variable IS a memory address. <code>int count = 5</code> in C allocates 4 bytes at a specific address — the compiler knows the address at compile time (for globals / stack locals) or at link time (for heap allocations). The <code>&amp;</code> (address-of) operator gives you the actual address. In JS, a variable is a name binding managed by the engine — you cannot take its address; the engine moves values around in memory freely. But underneath both, the von Neumann machine hums: eventually the value ends up in a RAM chip at some address connected by a bus to a CPU.</li>
+  <li><strong>Why OOP felt natural in 2013.</strong> <code>this.state.count++</code> in a class component means: "go to the memory address assigned to this instance, find the <code>state</code> field offset, find the <code>count</code> field offset at that address, read the integer at that address, increment it by 1, write the new integer back." The class instance IS a block of memory; its methods are subroutines that know the memory layout of their object. This maps directly to how the von Neumann machine works: a chunk of memory with operations that mutate it.</li>
+  <li><strong>Why functional code feels inefficient (and why the React Compiler existed).</strong> When React moved from classes (mutate the instance field) to hooks (call <code>setCount(count + 1)</code> which returns a new value and asks the component to re-run from scratch), it moved away from the von Neumann mutation model and toward the lambda-calculus purity model. But the hardware underneath is STILL von Neumann: the CPU is sequential, mutable, address-based. The functional layer sits on top of this with an efficiency tax — React has to call the entire component again, diff the output, and only apply the minimal DOM changes. This is why manual optimization (<code>useMemo</code>, <code>useCallback</code>, <code>React.memo</code>) was necessary: the functional pattern is mathematically clean but doesn't map naturally to the sequential mutation machine. The React Compiler (see the main paradigm-shift doc) is the automatic version of these optimizations — it lets you write functional code and have the compiler translate it efficiently to von Neumann execution. <strong>The compiler exists because the lambda calculus and the von Neumann machine are equivalent but not identical.</strong></li>
+</ul>
+
+<h3>2.4 Information theory (Claude Shannon, 1948) — why "bits" and "types" exist</h3>
+
+<p><strong>The fourth question: what IS information?</strong> Turing asked "what can be computed?" Von Neumann asked "how do we build the machine?" In 1948, Claude Shannon, an American mathematician and electrical engineer, asked a different question: "what is information itself, and how can we measure it?" Before his paper "A Mathematical Theory of Communication" (1948), "information" was an informal, everyday word — "this letter contains information." After it, information was a <em>quantifiable quantity</em>, measured in bits. This is the theory that made the internet, digital media, compression, and modern communication possible.</p>
+
+<p>Two proofs that changed engineering forever:</p>
+
+<ol>
+  <li><strong>Any information can be encoded in bits.</strong> A black-and-white photo (1000×1000 pixels, each pixel's brightness 0–255) → 1,000,000 numbers × 8 bits each → 8,000,000 bits. A text file → each character is 8 bits (ASCII) or 16-32 bits (Unicode) → the total in bits. A song → 44,100 samples per second × 16 bits × 2 stereo channels = 1,411,200 bits per second. Shannon proved that if you can describe the information, you can encode it in binary — 0s and 1s — with a known maximum number of bits needed. There is a <em>finite</em>, <em>computable</em> number that is "how much information this source produces."</li>
+  <li><strong>Information can be quantified — entropy.</strong> Shannon defined <strong>entropy</strong> — a measure of how much information a source produces, based on the probability of each symbol it emits. If a source emits every symbol equally often (all letters of the alphabet with equal probability), its entropy is high — each symbol carries a lot of information because it's surprising. If a source emits 'e' 50% of the time and 'q' 0.01% of the time, its entropy is low — the symbols are predictable, and a message of the same length carries less actual information. This difference is the mathematical basis of <strong>compression</strong>: a low-entropy source like English text can be compressed to ~50% of its size (common letters get short codes, rare letters get long codes — the principle behind zip, gzip, DEFLATE). A high-entropy source like random noise or already-encrypted data cannot be compressed at all — it already has maximum information per bit.</li>
+</ol>
+
+<p><strong>The word "bit."</strong> The term "bit" — short for "binary digit" — was coined by John Tukey in 1947, the same time Shannon was developing his theory. It is perhaps the most consequential single word of engineering jargon ever created — simple enough for anyone to say, precise enough for every communication protocol to depend on.</p>
+
+<p>Why this matters for every line of JS you write, and for this doc:</p>
+<ul>
+  <li><strong>Types exist because Shannon proved bits cannot interpret themselves.</strong> The von Neumann machine stores the byte <code>00110101</code> at address 0x1000. That byte is simultaneously: the integer 53, the ASCII character '5' (since '5' = 0x35 = 53), the boolean true (any non-zero value), a shade of gray at 20.7% brightness, a small fraction of a larger number if this byte is part of a 32-bit integer, and eight individual flags. The <em>type</em> is what disambiguates: "read these bits as a number. Read those bits as a character." Without a type, the byte is just bits — 00110101 with no meaning. <strong>Before Shannon, this problem wasn't even recognized as a problem</strong> — you had bits and you assumed everybody agreed on what they meant. Shannon proved that encoding and interpretation are <em>separate concerns</em>. The storage medium (von Neumann memory) handles the bits; the programming language (types) handles the interpretation. This is why in JS, <code>typeof 5</code> = "number" and <code>typeof "5"</code> = "string" — same visual character, completely different bits, completely different interpretations.</li>
+  <li><strong>The variable/value/type stack.</strong> The von Neumann machine gives you memory addresses. Shannon's encoding proves those addresses hold bits that need a type interpretation. A variable (like <code>let count = 5</code>) is the three layers together: a name (variable) pointing at bits in memory (von Neumann) that are to be interpreted as a number (Shannon type). If you change what <code>count</code> points to (<code>count = "5"</code>), the bits at that address change (from the IEEE 754 floating-point representation of the integer 5 to the UTF-8 byte 0x35 for the character '5') and the type changes (from number to string). The name <code>count</code> is still the same variable — but the value it points to has changed both bits and type. This is the full picture: data is the abstract idea, a value is the bits+type in memory, a variable is a handle pointing to a value.</li>
+  <li><strong>Serialization is Shannon's theorem applied.</strong> When you write <code>JSON.stringify(obj)</code>, you are doing exactly what Shannon described: take the information in memory (a JS object with all its fields and values), decide an encoding convention (JSON: ASCII text with curly braces and commas), produce a sequence of bits (the resulting string as bytes), transmit or store it, then decode by <code>JSON.parse</code> to recover a JS object. This is why you cannot "just save" a JS object to a file — the file system is a different kind of storage (von Neumann talks to von Neumann, but the bits need to be the right bits) — and Shannon's theorem tells you that any encoding works as long as both sides agree on the convention.</li>
+  <li><strong>Why entropy matters for optimization.</strong> When React talks about "performance" and "re-renders," the underlying information theory says: a component that produces the same output for the same input is like a low-entropy source — predictable, compressible, optimizable. Memoization (<code>useMemo</code>, <code>React.memo</code>) is compression for computation: skip the work when the input hasn't changed, because the output would be the same. The React Compiler automates this by analyzing which computations produce pure output — which is Shannon's information measure applied to function calls.</li>
+</ul>
+
+<h3>2.5 The four theories — recap table</h3>
+
+<table>
+  <thead><tr><th>Theory</th><th>Year</th><th>The core idea</th><th>What it proves</th><th>Where you feel it in this doc</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Turing machine</strong></td>
+      <td>1936</td>
+      <td>A simple machine (tape, head, state table) can compute anything any computer can. Some problems are provably uncomputable.</td>
+      <td>The boundary of the possible. Halting Problem. Turing-complete is the goal line for languages.</td>
+      <td>The word "state" from Turing. <code>useReducer</code> is a Turing machine minus the tape. Why no paradigm can add computing power.</td>
+    </tr>
+    <tr>
+      <td><strong>Lambda calculus</strong></td>
+      <td>1936</td>
+      <td>Pure functions with no mutation, no memory, and no state form an equivalent model of computation. Church-Turing thesis.</td>
+      <td>FP is not a fad — it's a model proven equivalent to Turing's mechanical one. Two equivalent paradigms.</td>
+      <td>JS closures, higher-order functions, currying all descend from this. Why React could move from classes to functions — same capability, different metaphor.</td>
+    </tr>
+    <tr>
+      <td><strong>Von Neumann architecture</strong></td>
+      <td>1945</td>
+      <td>Stored program (instructions = data). CPU + memory + bus. Sequential execution.</td>
+      <td>The actual hardware model. Variables are addresses, assignment is a bus write.</td>
+      <td>Why OOP's <code>this.state.count</code> felt natural (mirrors CPU mutating RAM). Why the React Compiler exists (closes the gap between functional code and von-Neumann-shaped performance).</td>
+    </tr>
+    <tr>
+      <td><strong>Information theory</strong></td>
+      <td>1948</td>
+      <td>All information can be encoded in bits. Bits need a type to be interpreted. Entropy measures predictability.</td>
+      <td>Types exist. Serialization is possible. Compression is Shannon's theorem applied.</td>
+      <td>Why §3 (types) exists. Why serialization is a fundamental activity. Why variables ≠ values. Memoization is information compression for computation.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The rest of this doc (primitives, types, state, lifetime) and the main paradigm-shift doc (OOP, hooks, compiler, RSC) are elaborations on these four foundations. When you read "state" in the main doc, mentally replace it with "Turing's state register." When you read "function" in the hooks sections, think "lambda calculus pure function (Church, 1936)." When you read "variable" anywhere, think "von Neumann memory address with a name." When you read "type" in the next section, think "Shannon's proof that bits cannot interpret themselves."</p>
+
+<h2>3. The two primitives — data and operations</h2>
+
+<p>Strip away all the paradigms (OOP, FP, procedural, declarative) and programming has just two building blocks:</p>
+
+<ol>
+  <li><strong>Data</strong> — abstract information. The number 5. The text "hello." A color value. Independent of any machine, any language. Purely conceptual.</li>
+  <li><strong>Operations</strong> — abstract transformations on data. "Add two numbers." "Compare two values." "Find the larger of two numbers." Also conceptual, machine-independent.</li>
+</ol>
+
+<p><strong>Data and operations are in the model layer — they exist as ideas, independent of any programming language or hardware.</strong> A recipe on paper has data (flour, eggs) and operations (mix, bake). An algorithm on a chalkboard has data (the two numbers to compare) and operations (subtract, compare). No variables, no functions, no machine. Just information and what you can do with it.</p>
+
+<p>To run on a machine, you need a <em>language layer</em> — a specific programming language that represents data and operations with names you can write and read. <strong>Variables</strong> and <strong>functions</strong> are the language layer's handles for data and operations:</p>
+<ul>
+  <li>A <strong>variable</strong> is a name that points to a value in memory. You read the value by writing the variable's name; you store a new value by assigning to it. <code>count = 5</code> in JS means: "find the memory location that the engine has associated with the name <code>count</code>, and write the bits for the number 5 there."</li>
+  <li>A <strong>function</strong> is a named reusable block of operations. You call it by writing its name followed by arguments. <code>add(2, 3)</code> means: "go to the memory location that stores the instruction block for <code>add</code>, pass it the values 2 and 3, execute, and return the result."</li>
+</ul>
+
+<p>A <strong>handle</strong> is a general term for "a name that gets you to a thing without knowing where that thing actually lives." A variable handle gets you to a value. A function handle gets you to a block of operations. A <strong>ref</strong> (<code>useRef</code> in React) is a handle for a mutable box that persists across renders. A file descriptor in operating systems is a handle for an open file — you don't know the file's disk sector; you just hold the number the kernel gave you. A URL is a handle for a web resource. A memory address in C/++ is a handle for a location in RAM. In every case, the same idea: a stable, unnamed name that lets you <em>reach</em> something without knowing its internals. When you read "variable" in later sections, know that it is one kind of handle among many — and React's design is largely about giving you the right handles at the right level (hooks for state, refs for mutable boxes, props for passed-in values).</p>
+
+<p><strong>The full chain from abstract to concrete — data, value, variable, state.</strong> These four words are often used interchangeably, but the doc now has the vocabulary to separate them:</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>What it is</th><th>Connected theory</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Data</strong></td>
+      <td>Abstract information, independent of machine or language</td>
+      <td>Mathematics — pre-computer</td>
+      <td>"The number 5" — the concept of five-ness, exists whether in memory, on paper, or in your head</td>
+    </tr>
+    <tr>
+      <td><strong>Value</strong></td>
+      <td>Data as encoded in memory, with a type interpretation</td>
+      <td>Shannon (bits + type = a value). Bits encode anything; types interpret them.</td>
+      <td><code>5</code> in JS memory: the IEEE 754 floating-point bit pattern for 5, with <code>typeof</code> = "number". <code>"5"</code> in JS: the UTF-16 bytes for '5', with <code>typeof</code> = "string".</td>
+    </tr>
+    <tr>
+      <td><strong>Variable</strong></td>
+      <td>A named handle pointing at a value</td>
+      <td>Von Neumann (memory address with a name). Handle concept (stable generic name).</td>
+      <td><code>let count = 5</code>: the variable named <code>count</code> is a handle pointing to the memory location holding the value-5 (bits + number type)</td>
+    </tr>
+    <tr>
+      <td><strong>State</strong></td>
+      <td>A role a variable plays — its value persists across events, and the next event depends on the previous one</td>
+      <td>Turing (state register: finite set, one active at a time, transitions between configurations)</td>
+      <td><code>let count = 0; ... count++;</code> on every click: the same variable persists across clicks, each click reads the previous value and writes a new one</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The key relationship: <strong>data</strong> (abstract) → <strong>value</strong> (= bits + type per Shannon) → <strong>variable</strong> (= handle per von Neumann) → <strong>state</strong> (= role when lifetime is long per Turing). State is NOT a new kind of thing added at the end — it is the same variable-value-bits-data from earlier layers, playing the role of "persistence across events." The "state" label only appears at the top because it is a property of <em>how the variable is used</em>, not a property of the variable itself.</p>
+
+<blockquote class="callout">
+  <p><strong>Does "handle" make things clearer or messier?</strong> Clearer, because a single idea ("a name that gets you to something without knowing its address") unifies variables, functions, refs, file descriptors, DOM refs, and URLs into one concept. This reduces the number of distinct mental objects you need to track. Messier? Only if you try to use "handle" everywhere the doc says "variable" — but the doc uses "variable" when pointing at values, "function" when pointing at operations, and will introduce "ref" when pointing at React's mutable boxes. The word "handle" sits above all three in the abstraction hierarchy, not replacing them.</p>
+</blockquote>
+
+<p>Everything else — types, classes, modules, hooks, components — is a way of <em>organizing</em> variables and functions. Classes bundle variables with the functions that operate on them. Modules group related functions and variables under a namespace. Hooks are functions backed by hidden storage (React's state-slot array). The two atoms (data via variables, operations via functions) never go away.</p>
+
+<h2 id="sec-types">4. Types — the contract on a value</h2>
+
+<p>Every value has a <strong>type</strong> — number, string, boolean, object, function, etc. The type tells the machine how to interpret the bits at that memory location, and which operations are valid: <code>+</code> works on numbers; <code>.length</code> works on strings and arrays; <code>()</code> calls a function. Attempting the wrong operation on the wrong type is a type error.</p>
+
+<p>You came from C/C++, where types are enforced at compile time — the compiler refuses to compile if a variable declared <code>int</code> is read as <code>char*</code>. JavaScript is <strong>dynamically typed</strong>: a variable can hold a number now and a string later, and type errors surface only at runtime. The trade-off: faster to write, easier to refactor, harder to catch a whole class of bugs before the code runs. TypeScript (a typed superset of JS) was invented to give back what dynamic typing gave up — compiler-checked types — without losing JS itself. Most production React apps today are written in TypeScript, not plain JS.</p>
+
+<p>In dynamically-typed JS, variables don't have types; <em>values</em> do — a variable is just a name binding to whatever value you assigned it last. <code>let x = 5;</code> — x is bound to a number value. <code>x = "hello";</code> — x is re-bound to a string value. In statically-typed C, a variable's type is fixed at compile time by the declaration: <code>int x; x = "hello";</code> won't compile. JS swapped compile-time type safety for run-time flexibility — a trade-off that made rapid iteration easier and a whole class of bugs harder to catch.</p>
+
+<h2>5. The key distinction — variables ≠ state</h2>
+
+<p>Here is the distinction this whole doc leans on. People say "state is data in memory," and that is true but it is not the part that matters. <strong>State IS normal variables.</strong> There is no special "state" cell type in memory. What we call "state" is a <em>role</em> a variable plays, not a different kind of thing. The label just says <em>this particular normal variable matters across events</em>.</p>
+
+<p>The real distinction is not "variable vs state" — it is three properties that any variable has:</p>
+
+<table>
+  <thead><tr><th>Property</th><th>The question it answers</th><th>Values</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lifetime</strong></td><td>How long does the value have to live?</td><td>One function call · block · module · program runtime</td></tr>
+    <tr><td><strong>Scope</strong></td><td>Who can <em>see</em> the variable by name?</td><td>Function · block · module · global</td></tr>
+    <tr><td><strong>Reachability</strong></td><td>Who can <em>reach</em> the variable to modify it?</td><td>Just one code path · several · everything</td></tr>
+  </tbody>
+</table>
+
+<p>"State" is the label we give a variable when its <strong>lifetime</strong> is long enough that next events depend on the values previous events wrote into it, AND its <strong>reachability</strong> is wide enough that more than one call site can modify it. That is it. Closure counters are state. Module-level counters are state. Class instance fields are state. Globals are the most extreme kind of state (max lifetime, max scope, max reachability).</p>
+
+<blockquote class="callout">
+  <p><strong>State vs global — the question you're about to ask.</strong> A <em>global</em> is a maximum-scope variable (everyone can see it). <em>State</em> is a variable whose lifetime/reachability is high enough that it matters across events. These are two different axes, not competing categories. A closure counter is state but NOT global. A global <code>const PI</code> is global but NOT state (it never changes, so calling it state adds nothing).</p>
+</blockquote>
+
+<h3>How does state get modified — and isn't that just what normal variables do?</h3>
+
+<p>Yes — by the same mechanism as any variable: <strong>assignment</strong>. There is no special state-modification opcode. What changes across patterns is not the operation (it's always "write a new value into a binding") but <em>who performs the write</em> and <em>who owns the binding</em>:</p>
+
+<ul>
+  <li><strong>You own the binding, you write directly:</strong> <code>let count = 0; ...; count++;</code> — direct assignment. The "role" of state emerges because <code>count</code> lives across calls. No framework involved.</li>
+  <li><strong>A closure owns the binding, you write via a setter it hands you:</strong> <code>function makeCounter() { let n = 0; return [() => n, (v) => { n = v }]; }</code> — the caller can't write <code>n</code> by name (it's not in their scope), but they can call the setter, which walks back into the closure and assigns on their behalf. Same assignment operation; you just handed off the right to do it.</li>
+  <li><strong>React owns the binding, you write via a setter that also schedules a re-render:</strong> <code>const [count, setCount] = useState(0); ...; setCount(count + 1)</code> — you never see the actual variable. React holds it in an internal slot indexed by the order you called <code>useState</code>. <code>setCount</code> is the only authorized path: it assigns into React's slot AND tells React "this changed, re-render me." Direct assignment like <code>count++</code> wouldn't work because the <code>count</code> you destructured is a <em>snapshot</em> for this render — React's real storage lives elsewhere, and mutating the snapshot does nothing to it.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>"But useState's variable can't be assigned directly — doesn't that contradict 'state is normal variables'?"</strong> No — it confirms it. The reason you can't assign directly is exactly the reason state has to live in a *normal variable* somewhere: <em>someone has to be the storage</em>. With <code>useState</code>, that someone is React. The <code>count</code> you destructured is a read-only <em>copy</em> React handed you *for this render*; React keeps the mutable original in its own slot. If you wrote <code>count++</code> you'd be mutating a local snapshot that disappears when the function returns — which would silently lose state, the bug that hooks were designed to prevent. So the API forces you to go through <code>setCount</code>, which performs the assignment into React's real storage and triggers a re-render. The mechanism is still ordinary assignment. What changed: you no longer own the variable, so you no longer have the right to write it directly — you have to ask the owner.</p>
+  <p>This is the same design as the closure-setter pattern above, with one extra rule: the setter also schedules a re-render. So <em>"you can't write directly"</em> isn't evidence that state is a special kind of object — it's evidence that <em>the owner</em> controls writes, and the owner here is a framework that needs to know when state changes.</p>
+</blockquote>
+
+<p>So "if state can be modified, isn't it just a normal variable?" — yes, that is the whole point. State is a normal variable stored in an ordinary binding. The label exists because <em>some</em> normal variables matter across events and have to be treated with care (re-render me when this one changes; do not reset this one on every call; do not let two callers race on this one). The "rules" around state — go through the setter, don't mutate the snapshot — are about *coordinating* the writes, not about state being a different kind of object. The rest of the main paradigm-shift doc is the story of <em>where</em> that normal-but-persistent variable lives: closure, class field, hook slot, server. Same variable, different owner.</p>
+
+<p>A few examples to make the gap sharp:</p>
+
+<ul>
+  <li><strong>A function-local variable — not state.</strong> <code>function add(a, b) { let result = a + b; return result; }</code> — <code>result</code> lives for the duration of one call. When <code>add</code> returns, <code>result</code> is gone. The next call to <code>add</code> starts fresh with no memory of the previous call. <code>result</code> is a variable, not state — its value doesn't need to survive the function returning.</li>
+  <li><strong>A counter — state.</strong> <code>let count = 0; function increment() { count++; }</code> — here <code>count</code> must survive across calls to <code>increment</code>. The 5th click needs to know the 4th click happened (otherwise it would say "1" every time). <code>count</code> is state: its value persists across events, and the next event's behavior depends on the value produced by the previous one.</li>
+  <li><strong>A <code>const</code> used as a label — not state.</strong> <code>const GREETING = "Hi";</code> — never changes, so calling it state adds nothing. It is data, but it has no temporal dependency. Constants are the opposite of state: they are values that <em>don't</em> change across the lifetime of the program.</li>
+  <li><strong>A global counter outside any function — state.</strong> Same as the counter above, but now visible everywhere. Still state, because the value must persist across whatever events read or write it.</li>
+</ul>
+
+<p>So the test for "is this variable state?" is not "does it live in memory?" (everything does) — it is <em>"does the next event / call / render depend on the value this variable had after the previous one?"</em> If yes, it's state. If no, it's just a temporary scratch variable.</p>
+
+<h2 id="sec-lifetime">6. Lifetime — the property that makes a variable into state</h2>
+
+<p>The single word that distinguishes state from a regular variable is <strong>lifetime</strong>: how long does the value have to live, and across what?</p>
+
+<table>
+  <thead><tr><th>Variable kind</th><th>Lifetime</th><th>Is it state?</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Function-local</td><td>Until the function returns</td><td>No — next call starts fresh</td><td><code>let sum = a + b;</code> inside a function</td></tr>
+    <tr><td>Block-local</td><td>Until the enclosing block exits</td><td>No — gone when the block ends</td><td><code>{ let temp = compute(); use(temp); }</code></td></tr>
+    <tr><td>Module-scoped</td><td>For the lifetime of the program/module</td><td>Yes — survives across function calls in that module</td><td>A module-level <code>let nextId = 1;</code> counter</td></tr>
+    <tr><td>Closed-over (closure)</td><td>As long as something still holds a reference to the closure</td><td>Yes — survives across calls of the closure</td><td>The <code>count</code> in a <code>function makeCounter() { let n = 0; return () => ++n; }</code></td></tr>
+    <tr><td>On an object instance</td><td>As long as the instance is alive</td><td>Yes — instance fields are state; they outlive each method call on the object</td><td><code>this.count</code> on a class instance</td></tr>
+    <tr><td>Global</td><td>For the whole program's run</td><td>Yes (the most extreme kind)</td><td><code>window.foo = 5;</code></td></tr>
+  </tbody>
+</table>
+
+<p>The longer a value has to live, the more "state" it is. The shorter, the more it is just a scratch variable. This is why functions are stateless by default — their locals die when they return — and why React's class components (each instance holding <code>this.state</code> for the lifetime of the instance) were naturally stateful: the <em>instance</em> was the persistence mechanism.</p>
+
+---
+
+<h2>5b. Mental models — how developers actually reason about state</h2>
+
+<p>Before any framework is involved, the developer's mental model of state determines how they design code. The same runtime program is "obviously correct" or "obviously broken" depending on which of three mental models the developer carries.</p>
+
+<table>
+  <thead><tr><th>Era / Model</th><th>Core abstraction</th><th>Where state lives</th><th>What "stale" means</th><th>Debugging reflex</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Imperative (C/Pascal)</strong></td>
+      <td>Memory addresses, manual allocation</td>
+      <td>A variable is a named cell; the program mutates it in place</td>
+      <td>Whatever the address says <em>now</em></td>
+      <td>Print the address; single-step; look at <code>&x</code></td>
+    </tr>
+    <tr>
+      <td><strong>OO (Java/Smalltalk)</strong></td>
+      <td>Object as identity + lifetime</td>
+      <td>An object's <em>instance fields</em>; lifetime equals object lifetime</td>
+      <td>"Is the field set on <em>this</em> instance?"</td>
+      <td>Inspect the instance in the debugger; check who owns the reference</td>
+    </tr>
+    <tr>
+      <td><strong>Functional (Haskell/ML)</strong></td>
+      <td>Value as immutable snapshot; state is a stream of values</td>
+      <td>There is no mutable cell; state is <em>the function from time to value</em></td>
+      <td>"What value did this expression evaluate to at step <em>n</em>?"</td>
+      <td>Trace the function; replay with fixed inputs; the value <em>at</em> a moment is the state</td>
+    </tr>
+    <tr>
+      <td><strong>Reactive (React/Signals)</strong></td>
+      <td>Computation that re-runs when its inputs change</td>
+      <td>State is in a slot; reading is subscription; writing triggers re-evaluation</td>
+      <td>"What were the inputs at the time this computation ran?"</td>
+      <td>Inspect the dependency array; trace the data flow; the closure captured the wrong inputs</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The shift:</strong> React's hooks (and Signals) did not invent a new kind of state — they re-framed the developer's mental model. Under the hood, state is still a mutable cell somewhere. What changed is the <em>contract</em> the developer reads: "this effect re-runs when its inputs change." The mental model of "state = cell" still works for understanding <em>storage</em>, but the mental model of "state = stream of values" is what makes hooks feel natural.</p>
+
+<p><strong>Stale-closure is a mental-model bug, not a runtime bug.</strong> When a closure captures a value and the developer thinks "this is current," they are mentally treating a snapshot as live. The runtime is correct — it stored what it was told to store — but the developer's model assumed freshness. Closing this gap is what the class-to-hooks paradigm shift <em>is</em>.</p>
+
+---
+
+<h2>7. The whole rest of the class-to-hooks doc, in one sentence</h2>
+
+<p>State is a thing that <em>persists</em> and that <em>the next event depends on</em>. The history of UI programming is the history of <em>where that state lives</em>: in a global variable, in a closure, in a class instance field, in a framework store, in a hook slot, in a server database. Each migration was a different answer to one question: <em>where does the state live, and who is responsible for keeping it alive across events?</em> React itself moved state roughly every 3-5 years — class instance (2013) → hook slot (2018) → client/server split (2022) → compiler-memoized hooks (2024) — and the <a href="./class-to-hooks-paradigm-shift.html">main paradigm-shift doc</a> is the inside of that story.</p>
+
+<p>Continue reading at the main doc: <a href="./class-to-hooks-paradigm-shift.html">Class-to-Function Paradigm Shift in React</a>, which starts with "OOP — the paradigm classes came from" and assumes you have internalized the foundation in this prequel: what <em>state</em> is (Turing), what <em>functions</em> are (Church), what <em>variables</em> are (von Neumann), what <em>types</em> are (Shannon), and the chain they form: data → value → variable → state.</p>
+
+<footer class="lesson-foot">
+  <span>Reference · What Is "State"? — foundations</span>
+  <span>← <a href="./class-to-hooks-paradigm-shift.html">back to the paradigm-shift doc</a></span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

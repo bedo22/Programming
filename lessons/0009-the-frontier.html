@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0009 — The Frontier · React 2024+ &amp; Next.js</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 9 · The Exploration Journey · Episode 9 of 14 · Practice (3/3, finale)</p>
+  <h1>The Frontier — React 2024+ &amp; Next.js</h1>
+  <p class="meta">The class→hooks story (Lesson 6) settled the component model. What happened next: a compiler that auto-memoizes, Server Components that split rendering across two computers, and a framework layer that's now the default. Anchored to <a href="../reference/react-2024-and-beyond.html">React 2024+</a> and <a href="../reference/nextjs-deep-dive.html">Next.js Deep Dive</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>This is the Practice finale, and it completes the React story begun in <a href="./0006-the-class-to-hooks-revolution.html">Lesson 6</a>. The mental model from Lesson 6 still holds — the compiler and Server Components are <em>layers on top</em>, not replacements. Next, the journey enters the <a href="../PLAN.md">System</a> movement: API design (Lesson 10).</p>
+</section>
+
+<h2>1. What happened after hooks settled</h2>
+<p>By 2024, the function+hooks model from Lesson 6 was settled — <code>useState</code>, <code>useEffect</code>, closures capturing values per render. The React team's attention moved <em>up-stack</em>: two big additions and one big recommendation.</p>
+<p>The two additions: a <strong>compiler</strong> that removes the last hooks-era friction (manual memoization), and <strong>Server Components</strong> that split rendering across two computers. The one recommendation: <strong>Create React App was sunset in February 2025</strong> — new apps should use a framework, not bare React. Together these define the frontier you'll read at work.</p>
+
+<h2>2. The compiler finishes what hooks started</h2>
+<p>Recall Lesson 6: hooks gave functions state and effects, but left one tax — <strong>manual memoization</strong>. To keep a value or function stable across renders you reached for <code>useMemo</code>, <code>useCallback</code>, or <code>React.memo</code>, and got the deps arrays right by hand. The <strong>React Compiler v1.0</strong> (stable, October 2025) removes that tax. It's a Babel plugin that analyzes your code's data flow and mutability, then inserts memoization <em>automatically</em> — even in places <code>useMemo</code> can't legally go, like after an early return.</p>
+<p>For you, reading code at work: <code>useMemo</code>, <code>useCallback</code>, and <code>React.memo</code> become <strong>escape hatches, not the default.</strong> New code written under the compiler can be the simple version — a plain function with hooks, no manual memoization, no wrapper components — because the compiler puts the optimization back. Existing code keeps working; you don't have to rip out old memoization to adopt it. The Lesson 6 mental model is untouched; the compiler just lifts the chores off it.</p>
+
+<h2>3. Server Components split the process across two computers</h2>
+<p>The second addition is bigger in shape. <strong>React Server Components (RSC)</strong> split rendering across two computers:</p>
+<ul>
+  <li><strong>Server components</strong> run once on the server. They fetch data, talk to the database, and send HTML to the client. They have <em>no hooks, no events, no interactivity</em> — they're pure data-to-markup.</li>
+  <li><strong>Client components</strong> run in the browser with the full hooks model you learned in Lesson 6 — <code>useState</code>, <code>useEffect</code>, closures capturing values per render. The directive <code>"use client"</code> at the top of a file marks the boundary.</li>
+</ul>
+<p>This is why <strong>Next.js</strong> is now the framework you're most likely to meet on a React job. Next.js is React plus routing, the server/client split, caching, and tooling. Its <strong>App Router</strong> defaults to Server Components; you opt into the client model with <code>"use client"</code> where you need interactivity. And in February 2025, React's team <strong>sunset Create React App</strong> and made it official: new apps should use a framework — Next.js, React Router (in framework mode), or Expo — not bare React. The component model is settled; the next layer is the framework.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="memo" data-explain="The React Compiler (v1.0, Oct 2025) analyzes your code and inserts memoization automatically — even where useMemo can't legally go. So useMemo/useCallback/React.memo become escape hatches, not the default. You write the simple version; the compiler puts the optimization back.">
+  <summary>What does the React Compiler (stable, Oct 2025) do for you?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="memo"> It auto-memoizes, so you don't</label>
+      <label><input type="radio" name="q1" value="types"> It adds static type checking</label>
+      <label><input type="radio" name="q1" value="router"> It fully replaces the router</label>
+      <label><input type="radio" name="q1" value="server"> It moves code to servers</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="process" data-explain="RSC split rendering across two computers: server components run once on the server (data, no hooks, no events), client components run in the browser with the full hooks model. 'use client' marks the boundary.">
+  <summary>What do React Server Components split?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="process"> Rendering across two computers</label>
+      <label><input type="radio" name="q2" value="state"> State across two databases</label>
+      <label><input type="radio" name="q2" value="css"> CSS across two stylesheets</label>
+      <label><input type="radio" name="q2" value="types"> Types across two compilers</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="framework" data-explain="React's team sunset Create React App in Feb 2025 and now recommends a framework for new apps — Next.js, React Router (framework mode), or Expo. The component model is settled; the next layer is routing, data, and server rendering. React is moving up-stack.">
+  <summary>After Create React App was sunset (Feb 2025), what do React's docs recommend for new apps?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="framework"> Use a framework, not bare React</label>
+      <label><input type="radio" name="q3" value="vanilla"> Use vanilla JS, with no React</label>
+      <label><input type="radio" name="q3" value="classes"> Go back to old class components</label>
+      <label><input type="radio" name="q3" value="angular"> Switch over to Angular instead now</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold React's frontier: the <strong>compiler</strong> (stable, Oct 2025) auto-memoizes, so <code>useMemo</code>/<code>useCallback</code> become escape hatches — you write the simple version and it puts the optimization back. <strong>Server Components</strong> split rendering across two computers — server components are data-only (no hooks, no events), client components get the full Lesson 6 model, and <code>"use client"</code> marks the boundary. And <strong>Create React App was sunset</strong> (Feb 2025) — new apps use a framework, with <strong>Next.js</strong> the most likely on a React job (App Router defaults to Server Components). The big reassurance: the Lesson 6 model still holds — the compiler and RSC are layers on top, not replacements.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/react-2024-and-beyond.html">React 2024+</a> (compiler, RSC, the foundation, 19.2) and <a href="../reference/nextjs-deep-dive.html">Next.js Deep Dive</a> (App vs Pages Router, caching, the "what am I reading at work" checklist).</li>
+    <li><strong>Next lesson:</strong> <a href="./0010-the-contract.html">Lesson 10 — The Contract</a> — the System movement begins: API design, how the split computers actually speak to each other.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="https://react.dev/blog/2025/10/07/react-compiler-1">React — React Compiler v1.0 (Oct 2025)</a> and <a href="https://react.dev/blog/2025/02/14/sunsetting-create-react-app">React — Sunsetting Create React App (Feb 2025)</a>.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"If a server component has no hooks, how do I make it interactive?"</li>
+    <li>"Does the compiler mean I never write useMemo again?"</li>
+    <li>"Is Next.js the only choice, or when would I pick React Router or Expo?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 9 · <a href="../reference/react-2024-and-beyond.html">React 2024+</a> · <a href="../reference/nextjs-deep-dive.html">Next.js</a></span>
+  <span>Next → <a href="./0010-the-contract.html">Lesson 10 · The Contract</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

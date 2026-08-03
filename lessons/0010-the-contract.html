@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0010 — The Contract · How Systems Speak Without Speaking</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 10 · The Exploration Journey · Episode 10 of 14 · System (1/2)</p>
+  <h1>The Contract — How Systems Speak Without Speaking</h1>
+  <p class="meta">An API is a contract — a promise that lets services and clients evolve independently. Its defining trait is high reversal cost: these decisions are expensive to change later. The styles (REST, GraphQL, gRPC) are tools, not religions. Anchored to <a href="../reference/api-design.html">API Design</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>The <a href="../PLAN.md">Practice</a> movement is done — you know how developers think, the contrasting paths, and React's frontier. The <strong>System</strong> movement begins: the contract between systems (this lesson) and the architecture that holds it all together (<a href="./0011-the-architecture.html">L11</a>). Lesson 9 split rendering across two computers — this is how those computers actually talk.</p>
+</section>
+
+<h2>1. What an API actually is</h2>
+<p>Most tutorials teach "how to call an API." API <em>design</em> starts somewhere else: <strong>what contract lets both sides move without breaking each other?</strong> An API is a <strong>contract</strong> — a stable, evolvable boundary between independent deployables (a server and a browser, two services, a mobile app and a backend). It produces <em>decisions, not code</em>: what are the resources? What does each call promise? How does the API say "no" in a way the client can act on? How do we add, change, and remove things without breaking existing clients?</p>
+<p>Here is the defining characteristic: <strong>these decisions are expensive to change later.</strong> Wire-format changes need coordinated deployments. Interface changes need consumer migrations. Both are multi-week efforts in any real system. That high reversal cost is what makes API design a distinct discipline — not just "writing an endpoint," but deciding the promises that endpoint makes.</p>
+
+<h2>2. Two layers of the same contract</h2>
+<p>The reference doc splits an API contract into two layers — both are API design, and neither is complete without the other:</p>
+<ul>
+  <li><strong>Interface contract (macro)</strong> — what the <em>consumer</em> sees: resources, operations, versioning, authentication, rate limits, error envelope, pagination strategy, idempotency semantics. The <em>promises</em>.</li>
+  <li><strong>Wire contract (micro)</strong> — what the <em>bytes</em> say: serialization format, schema evolution rules, field-level nullability, enum extensibility, timestamp formats, transport (HTTP/1.1, HTTP/2, gRPC, WebSocket). What makes the promises <em>verifiable</em>.</li>
+</ul>
+<p>Both matter. A beautiful interface contract with a broken wire contract is unverifiable; a perfect wire contract with an incoherent interface is unusable. The interface sets the promises; the wire makes them real.</p>
+
+<h2>3. Styles are tools, not religions — and bad contracts leak downstream</h2>
+<p>"REST vs GraphQL vs gRPC" is not a religion. Each won a different era by fitting a different constraint:</p>
+<ul>
+  <li><strong>REST</strong> (Roy Fielding's dissertation, 2000) — resources + HTTP verbs + stateless. Won the public-API era because it's simple, cacheable, and works with a <code>curl</code> command.</li>
+  <li><strong>GraphQL</strong> (Facebook, 2015) — client-specified queries, one endpoint. Won the mobile era because it solved over-fetching and under-fetching on slow connections.</li>
+  <li><strong>gRPC</strong> (Google, 2015) — HTTP/2 + Protocol Buffers, contract-first codegen. Won the internal-microservices era because it's fast, typed, and streaming-built-in.</li>
+</ul>
+<p>The core idea — <em>a stable boundary between independent deployables</em> — never changed. What changed was the dominant constraint, and the style that fit it. That's the same "extend vs invent" pattern from <a href="./0004-js-across-stacks.html">Lesson 4</a>, applied to contracts.</p>
+<p>And here's the cost of getting it wrong: a bad contract doesn't stay at the boundary. It forces <strong>"paper-over code"</strong> downstream — loading states that shouldn't exist, retries that patch over flaky semantics, type assertions that paper over schema drift, toast storms for errors the client can't programmatically handle. That friction is exactly what <a href="./0007-the-rhythm.html">Lesson 7's</a> developer loop absorbs. The contract is upstream of the UI; design it there.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="cost" data-explain="API design decisions have high reversal cost — they're expensive to change later. Wire-format changes need coordinated deployments; interface changes need consumer migrations. That's what makes it a distinct discipline, not just 'writing an endpoint.'">
+  <summary>What is the defining characteristic of an API design decision?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="cost"> It's expensive to change later</label>
+      <label><input type="radio" name="q1" value="speed"> It's fast to change later</label>
+      <label><input type="radio" name="q1" value="syntax"> It's about the syntax only</label>
+      <label><input type="radio" name="q1" value="tooling"> It's about the tooling used</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="tools" data-explain="REST, GraphQL, and gRPC are architectural styles / constraints you choose. API design is the discipline of choosing and applying them to a specific problem — the decision process, not the style itself.">
+  <summary>Is "REST vs GraphQL vs gRPC" the same thing as API design?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="tools"> No — those are styles you choose</label>
+      <label><input type="radio" name="q2" value="same"> Yes — they are the API design</label>
+      <label><input type="radio" name="q2" value="better"> Yes — one is always much better</label>
+      <label><input type="radio" name="q2" value="syntax"> Yes — it's all about the syntax</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="paper" data-explain="A bad contract doesn't stay at the boundary — it forces 'paper-over code' downstream: loading states, retries, type assertions, toast storms, invisible failures. The frontend loop (Lesson 7) absorbs the friction the contract should have prevented.">
+  <summary>What does a bad API contract force downstream in the frontend?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="paper"> Paper-over code: retries and loading states</label>
+      <label><input type="radio" name="q3" value="nothing"> Nothing — the frontend handles it fine</label>
+      <label><input type="radio" name="q3" value="faster"> The frontend code gets oddly faster</label>
+      <label><input type="radio" name="q3" value="simpler"> The frontend code gets simpler actually</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the contract layer: an API is a <strong>contract</strong> — a promise that lets both sides move independently — and its defining trait is <strong>high reversal cost</strong> (these decisions are expensive to change later). It has two layers: <strong>interface</strong> (the promises the consumer sees) and <strong>wire</strong> (the bytes that make them verifiable). The styles — REST, GraphQL, gRPC — are <strong>tools for different constraints</strong>, not a religion; the stable-boundary idea never changed while the winning style did. And the cost of a bad contract doesn't stay at the boundary — it forces <strong>paper-over code</strong> downstream in the UI, which is exactly what the developer loop (Lesson 7) then has to absorb.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/api-design.html">API Design</a> — the full two-layer model, the history from RPC to GraphQL to events, the failure-mode catalog (errors that lie, offset pagination, enum extensibility), and the tooling ecosystem.</li>
+    <li><strong>Next lesson:</strong> <a href="./0011-the-architecture.html">Lesson 11 — The Architecture</a> — system design: the layer that decides the boundaries the contract materializes.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm">Roy Fielding — Architectural Styles and the Design of Network-based Software Architectures (2000)</a> (REST) and <a href="https://12factor.net/">The Twelve-Factor App</a> — the lineage behind the contract layer.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"What does 'idempotency' mean, and why does it matter for a contract?"</li>
+    <li>"When would I actually pick GraphQL over REST?"</li>
+    <li>"How do you version an API without breaking existing clients?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 10 · <a href="../reference/api-design.html">Reference: API Design</a></span>
+  <span>Next → <a href="./0011-the-architecture.html">Lesson 11 · The Architecture</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problem-Solving — How to Think Before You Code</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · The connective layer — between finding the problem and building the feature</p>
+  <h1>Problem-Solving — How to Think Before You Code</h1>
+  <p class="meta">The disciplined activity of understanding a problem, devising a plan, carrying it out, and looking back. Built on Pólya's four phases (1945), extended by Schoenfeld's metacognition (1985), connected to programming by Dromey (1982) and Wing's computational thinking (2006). Sibling docs: <a href="./design-thinking.html">Design Thinking</a> (upstream — what problem to solve), <a href="./how-developers-think-frontend.html">How Developers Think</a> (downstream — how to build the feature), <a href="./glossary.html">Glossary</a> (shared vocabulary).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>Most resources teach either <em>syntax</em> (how to write a loop) or <em>the development loop</em> (how to cycle Model → View → Flow when building a UI feature). Almost none teach the layer in between: <strong>how to think about a problem before you write any code.</strong> If you've ever written an algorithm, gotten it mostly working, then realized you misunderstood the problem — or if you've stared at a HackerRank challenge wondering "where do I even start?" — this is the missing layer. It is not new: Pólya published it in 1945 for mathematics, Dromey adapted it for programming in 1982, and Wing named its computational thinking lens in 2006. This doc captures the full stack of that lineage, positioned between finding the problem (Design Thinking) and building the feature (The Rhythm).</p>
+</section>
+
+<blockquote class="callout">
+  <p><strong>The three nested layers of thinking in software</strong></p>
+  <pre style="margin:0; font-size:.85rem; line-height:1.5; overflow-x:auto;">
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 1: DESIGN THINKING                                       │
+│  "What problem should I solve?"                                 │
+│  Desirability · Feasibility · Viability                         │
+│  → owner: design-thinking.html                                  │
+│              ↓ produces a validated problem                     │
+│  LAYER 2: PROBLEM-SOLVING  ← YOU ARE HERE                       │
+│  "How do I solve this problem?"                                 │
+│  Understand → Plan → Execute → Review                           │
+│  → owner: this doc                                              │
+│              ↓ produces a verified solution (an algorithm)      │
+│  LAYER 3: THE RHYTHM                                            │
+│  "How do I build this as a feature?"                            │
+│  Model → View → Flow (cycled in rounds)                         │
+│  → owner: how-developers-think-frontend.html                    │
+└─────────────────────────────────────────────────────────────────┘
+  </pre>
+  <p>Each layer assumes the one above it has done its work. Design Thinking finds the <em>right problem</em>. Problem-Solving finds the <em>right solution</em>. The Rhythm builds the <em>right feature</em>. Skip a layer and you'll build the wrong thing, or build the right thing badly.</p>
+</blockquote>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone, but most useful <em>between</em> the Design Thinking and How Developers Think docs. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./design-thinking.html">Design Thinking</a> — discovers <em>what problem</em> to solve; this doc assumes the problem is given.</li>
+  <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think</a> — the development loop; this doc feeds it a verified solution to implement.</li>
+  <li>Sibling to <a href="./system-design.html">System Design</a> — system design structures a solution <em>across services and boundaries</em>; problem-solving structures a solution <em>within a single algorithm or component</em>.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+</ul>
+
+<h2>1. Definition — what problem-solving <em>is</em> and what it is <em>not</em></h2>
+
+<h3>What it is</h3>
+<p>Problem-solving is the disciplined activity of <strong>understanding a problem, devising a plan to solve it, carrying out that plan, and reviewing the result.</strong> It produces <em>decisions and algorithms, not just code</em> — the plan is the artifact; the code is the implementation. The discipline is universal: the same four-phase rhythm applies to mathematics (Pólya's original domain), to algorithmic challenges (HackerRank, LeetCode, ICPC), to debugging ("why doesn't this work?"), and to designing a component's internal logic before you reach for React.</p>
+
+<h3>What it is not</h3>
+<ul>
+  <li><strong>Not just "writing code."</strong> Writing code is Phase 3 (Carry out the plan). If you skip Phases 1 and 2, you're improvising — which works for trivial problems and fails for non-trivial ones.</li>
+  <li><strong>Not the same as the development loop</strong> (Model → View → Flow). The loop is how you <em>build a UI feature</em>; problem-solving is how you <em>solve the underlying problem</em> the feature addresses. A HackerRank challenge has no UI — it's pure problem-solving. A React feature uses both: problem-solving first, then the loop.</li>
+  <li><strong>Not a fixed algorithm.</strong> The four phases are a <em>rhythm</em> — you cycle through them, return to "understand" when your plan reveals a gap, revise your plan when execution fails. Pólya himself emphasized: "the divisions between phases are not rigid... we have to shift our position again and again" (<a href="https://en.wikipedia.org/wiki/How_to_Solve_It">Wikipedia</a>).</li>
+  <li><strong>Not just for hard problems.</strong> The discipline scales: for a trivial problem, all four phases flash by in seconds. For a complex one, each phase is a multi-hour effort. The <em>process</em> is the same; the <em>depth</em> varies.</li>
+</ul>
+
+<h3>Well-defined vs wicked problems — why HackerRank gets an algorithm but features get a rhythm</h3>
+
+<table>
+  <thead><tr><th>Property</th><th>Well-defined problem</th><th>Wicked problem</th></tr></thead>
+  <tbody>
+    <tr><td>Examples</td><td>HackerRank challenges, LeetCode, math proofs, algorithm puzzles</td><td>UI features, product decisions, system architecture</td></tr>
+    <tr><td>Input</td><td>Clearly specified</td><td>Evolving, ambiguous</td></tr>
+    <tr><td>Output</td><td>Clearly specified</td><td>Subjective, contested</td></tr>
+    <tr><td>Success criteria</td><td>Objective (passes test cases)</td><td>Subjective (users like it? business improves?)</td></tr>
+    <tr><td>Stopping rule</td><td>Clear (all tests pass)</td><td>No true stopping rule — only better or worse</td></tr>
+    <tr><td>Solution type</td><td>An <strong>algorithm</strong> (a fixed, finite sequence of steps)</td><td>A <strong>rhythm</strong> (an iterative loop you cycle through)</td></tr>
+    <tr><td>Method</td><td>Pólya's four phases → produces a verifiable algorithm</td><td>The Rhythm (Model → View → Flow) → produces a working feature</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The key insight:</strong> both use Pólya's four phases at the meta-level, but well-defined problems converge to a fixed algorithm (you can write down the exact steps), while wicked problems require a rhythm (the steps change as you learn). This is why the existing glossary says "Rhythm, Not Algorithm" for the frontend loop — but for a HackerRank challenge, an algorithm <em>is</em> the right output. The difference is the problem type, not the thinker.</p>
+
+<h2>1b. History — from mathematics to programming (1945–present)</h2>
+
+<p>The problem-solving methodology in this doc is not new — it has an 80-year lineage, branching from mathematics into artificial intelligence, programming, and education.</p>
+
+<table>
+  <thead><tr><th>Year</th><th>Contribution</th><th>Who</th><th>What it added</th></tr></thead>
+  <tbody>
+    <tr><td>1945</td><td><em>How to Solve It</em></td><td>George Pólya</td><td>The four-phase framework (Understand → Plan → Execute → Look back) + heuristic dictionary. Originally for mathematics. Over 1 million copies, 15+ translations.</td></tr>
+    <tr><td>1960s</td><td>AI adopts Pólya</td><td>Newell, Simon, Minsky</td><td>AI pioneers adopted Pólya's heuristics for problem-solving in artificial intelligence. Newell's 1980 paper: "The Heuristic of George Pólya and Its Relation to Artificial Intelligence."</td></tr>
+    <tr><td>1971</td><td>Stepwise refinement</td><td>Niklaus Wirth</td><td>"Program Development by Stepwise Refinement" — top-down decomposition adapted for programming. The creator of Pascal made Pólya's "decompose" heuristic into a disciplined coding practice.</td></tr>
+    <tr><td>1980</td><td>"Computational thinking" coined</td><td>Seymour Papert</td><td><em>Mindstorms</em> — the creator of Logo introduced the term, though it wouldn't be widely adopted for 26 more years.</td></tr>
+    <tr><td>1982</td><td><em>How to Solve It by Computer</em></td><td>R.G. Dromey</td><td>Direct adaptation of Pólya's framework for computer programming. Bridged the math-to-code gap.</td></tr>
+    <tr><td>1985</td><td>Metacognition extension</td><td>Alan Schoenfeld</td><td><em>Mathematical Problem Solving</em> — empirically tested Pólya's strategies and found them weak without metacognition. Added the fifth element.</td></tr>
+    <tr><td>1999</td><td>Rubber duck debugging</td><td>Hunt &amp; Thomas</td><td><em>The Pragmatic Programmer</em> — explaining code line-by-line to an inanimate object. Phase 1 applied to your own code.</td></tr>
+    <tr><td>2002</td><td>Systematic debugging rules</td><td>David Agans</td><td><em>Debugging: The Nine Indispensable Rules</em> — codified debugging as disciplined problem-solving, not guessing.</td></tr>
+    <tr><td>2006</td><td>Computational thinking popularized</td><td>Jeannette Wing</td><td>"Computational Thinking" essay in <em>Communications of the ACM</em> — argued CT is a fundamental skill for everyone. Brought Papert's term to prominence.</td></tr>
+    <tr><td>2000s–present</td><td>Deliberate practice at scale</td><td>Online platforms</td><td>HackerRank (2009), LeetCode (2015), CodeWars, CSES, USACO Guide — platform-enabled practice with tight feedback loops.</td></tr>
+    <tr><td>2020s</td><td>AI-assisted problem-solving</td><td>Copilot, ChatGPT</td><td>AI can generate solutions — but raises the fluency-vs-storage question. The skill shifts from "can you write it" to "can you recognize and verify the right approach."</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The pattern:</strong> Pólya's four phases have survived 80 years unchanged. What evolved around them is: the domain (math → programming → universal), the extensions (metacognition, computational thinking), the tools (pen and paper → platforms → AI), and the understanding of <em>why</em> the method works (cognitive science — see §1e).</p>
+
+<h2>1c. Evolution — constraint inversions across the same idea</h2>
+
+<p>Like every discipline on this shelf, problem-solving evolved through constraint inversions — moments when a constraint changed and the old approach stopped being sufficient.</p>
+
+<table>
+  <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Math → programming</strong></td><td>Pólya's framework for math proofs (1945)</td><td>Dromey's adaptation for code (1982), Wirth's stepwise refinement (1971)</td><td>Programming added a new constraint: the solution must be executable by a machine. This required more precise decomposition and the concept of "black boxes" that refine to implementable operations.</td></tr>
+    <tr><td><strong>Strategies → + metacognition</strong></td><td>Pólya assumed strategies alone were sufficient</td><td>Schoenfeld proved empirically they're weak without metacognition (1985)</td><td>Students who learned Pólya's strategies still failed on non-routine problems. The inversion: you need a <em>monitoring loop on top of</em> the strategy loop — the same "rhythm, not algorithm" pattern.</td></tr>
+    <tr><td><strong>Specialist → universal literacy</strong></td><td>Problem-solving seen as a specialist skill</td><td>Wing argued CT is for everyone (2006)</td><td>Computing became ubiquitous. The inversion: computational thinking isn't just for computer scientists — it's a fundamental skill like reading.</td></tr>
+    <tr><td><strong>Manual → platform-enabled</strong></td><td>Practice was self-directed: books, homework</td><td>Online platforms with instant feedback, difficulty progression</td><td>Tight feedback loops are essential for deliberate practice but were hard to get outside a classroom. Platforms like HackerRank made them instant and accessible.</td></tr>
+    <tr><td><strong>Unaided → AI-assisted</strong></td><td>You solved problems alone or with human help</td><td>AI generates solutions, explains approaches, debugs</td><td>Implementation is no longer the bottleneck. The skill shifts from "can you write the code" to "can you recognize the right approach, decompose, and verify." But the fluency trap (§11) intensifies — AI makes it easy to feel you understand without building storage strength.</td></tr>
+  </tbody>
+</table>
+
+<h2>1d. Intersection with neighbors — where it borders other practices</h2>
+
+<p>Problem-solving sits between the layer that finds the problem and the layer that builds the feature. Every neighbor is a sibling, not a substitute.</p>
+
+<table>
+  <thead><tr><th>Neighbor</th><th>Relationship</th><th>What each layer owns</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./design-thinking.html">Design Thinking</a> <em>(upstream)</em></td><td>Design Thinking produces the problem; problem-solving produces the solution.</td><td>Design Thinking: "What problem should I solve?" (desirability, feasibility, viability). Problem-solving: "How do I solve this problem?" (understand, plan, execute, review).</td></tr>
+    <tr><td><a href="./how-developers-think-frontend.html">How Developers Think</a> <em>(downstream)</em></td><td>Problem-solving produces the verified solution; the dev loop implements it as a feature.</td><td>Problem-solving: the algorithm, the plan, the verified logic. The dev loop: Model → View → Flow, the cycle that turns the solution into a working UI feature.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a> <em>(sibling)</em></td><td>System design structures across boundaries; problem-solving structures within a boundary.</td><td>System design: services, data ownership, consistency, failure domains — the macro structure. Problem-solving: the algorithm within one service or component — the micro logic.</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a> <em>(sibling)</em></td><td>API design is problem-solving applied to the interface between systems.</td><td>API design: what contract lets both sides move independently? Problem-solving: how do you decompose the interface into resources, operations, and error contracts?</td></tr>
+    <tr><td>Debugging <em>(application)</em></td><td>Debugging is problem-solving applied to "why doesn't this work?"</td><td>Same four phases, inverted direction: you start from the symptom and work backwards to the cause. See §9.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The boundary rule:</strong> if you're deciding <em>what</em> to build, that's Design Thinking. If you're deciding <em>how the solution fits together at scale</em>, that's System Design. If you're deciding <em>how to solve one specific problem</em>, that's problem-solving. If you're <em>building the UI feature</em>, that's the dev loop. Each layer feeds the next.</p>
+
+<h2>1e. Underlying theory — the cognitive science behind why the method works</h2>
+
+<p>Pólya's framework was derived from introspection — a mathematician reflecting on how he solved problems. In the decades since, cognitive science has confirmed <em>why</em> it works, providing the theoretical foundation that Pólya lacked.</p>
+
+<h3>Working memory limitations — why you must plan before coding</h3>
+<p>Working memory is the mental workspace where you hold information while reasoning. It is <strong>severely limited</strong>: Miller (1956) estimated ~7±2 items; Cowan (2001) revised this to ~4. This is why you can't hold a complex problem's data, conditions, AND write code simultaneously — you overflow working memory. Pólya's Phase 2 (Plan) is the workaround: by writing the plan down (on paper, in a comment), you <strong>offload working memory to an external representation</strong>, freeing your mind for reasoning.</p>
+
+<h3>Cognitive load theory — three types of mental effort</h3>
+<p>John Sweller's cognitive load theory (1980s, <a href="https://en.wikipedia.org/wiki/Cognitive_load">Wikipedia</a>) identifies three types of load on working memory:</p>
+<ul>
+  <li><strong>Intrinsic load</strong> — the inherent difficulty of the topic. You can't reduce it; you can only break it into smaller pieces (decomposition).</li>
+  <li><strong>Extraneous load</strong> — load caused by <em>how</em> information is presented. Bad problem statements, messy code, unclear variable names all add extraneous load. Planning and clear notation reduce it.</li>
+  <li><strong>Germane load</strong> — the productive effort of building mental schemas (pattern libraries). This is the load you <em>want</em> — it's what deliberate practice increases.</li>
+</ul>
+<p><strong>The implication:</strong> Pólya's method reduces extraneous load (by clarifying the problem and externalizing the plan), allowing more working memory for germane load (building the schema that makes future problems easier). Skipping the plan doesn't save time — it overloads working memory and impairs learning.</p>
+
+<h3>Schema theory — why experts solve faster (and it's not intelligence)</h3>
+<p>Research by Simon and Chase (1973) showed that chess experts don't have better raw memory — they have <strong>richer schemas</strong> (mental pattern libraries) that allow <em>chunking</em>: seeing a complex position as one meaningful unit rather than many individual pieces (<a href="https://en.wikipedia.org/wiki/Expertise">Wikipedia</a>). The same applies to problem-solving: an expert sees "hash-map frequency counting" as one chunk; a novice sees "create object, iterate, check key, increment" as four separate items. This is why pattern filing (§10) matters — each filed pattern adds a chunk to your schema, freeing working memory for reasoning.</p>
+
+<h3>The Einstellung effect — why metacognition matters</h3>
+<p>Abraham Luchins (1942) discovered the <strong>Einstellung effect</strong>: a predisposition to solve a problem in a specific manner even when better methods exist (<a href="https://en.wikipedia.org/wiki/Einstellung_effect">Wikipedia</a>). In the water-jar experiment, subjects who learned one solution method kept applying it to later problems even when a simpler solution was available. This is why Schoenfeld's metacognition (§5) is essential — without monitoring your approach, you fall into the Einstellung trap: applying the first method that comes to mind, not the best one. The metacognitive check "is this approach worth continuing?" is the antidote to Einstellung.</p>
+
+<h3>Dual process theory — System 1 and System 2</h3>
+<p>The brain has two thinking modes: <strong>System 1</strong> (fast, intuitive, pattern-matching — the "blink") and <strong>System 2</strong> (slow, analytical, deliberate — the "think"). Problem-solving uses both: System 1 for pattern recognition (§3 — "I've seen this before, it's a hash-map problem") and System 2 for verification and when patterns don't match. The danger: System 1 is fast but error-prone — it can match a surface similarity that doesn't reflect deep structure (§1f). Phase 4 (Look back) is the System 2 check on System 1's intuition.</p>
+
+<h2>1f. Mental models — how expert problem-solvers actually reason</h2>
+
+<p>Research on expertise (Simon &amp; Chase 1973, Schoenfeld 1985, Ericsson) reveals that experts and novices don't just differ in knowledge — they differ in <em>how they reason</em>. Understanding these differences shows you what to practice.</p>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Novice</th><th>Expert</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Direction of reasoning</strong></td><td>Work <em>forward</em> from the given data: "I have a string, so I'll split it, then..."</td><td>Work <em>backward</em> from the goal: "I need a frequency map, so I need to count, so I need to iterate, so I need to split." Then verify forward.</td></tr>
+    <tr><td><strong>Problem classification</strong></td><td>Classify by <em>surface features</em>: "This is a string problem" (because the input is a string).</td><td>Classify by <em>deep structure</em>: "This is a hash-map frequency-counting problem" (because the operation is counting, regardless of input type).</td></tr>
+    <tr><td><strong>Approach generation</strong></td><td>Try one approach and stick with it (Einstellung effect). If it fails, panic.</td><td>Generate multiple candidate approaches, then select. If one fails, switch to another — the metacognitive loop (§5) is running.</td></tr>
+    <tr><td><strong>Working memory usage</strong></td><td>Hold each piece separately: "create object, split, loop, lowercase, strip, check key, increment" = 7 items.</td><td>Chunk using schemas: "normalize-and-count" = 1 item. Frees working memory for reasoning about edge cases.</td></tr>
+    <tr><td><strong>Self-monitoring</strong></td><td>Rarely check progress. Keep going on the same path until it works or they give up.</td><td>Regularly check: "Am I progressing? Is this the right paradigm? Should I re-read the problem?" — Schoenfeld's metacognition.</td></tr>
+    <tr><td><strong>Phase 4 (Look back)</strong></td><td>Skips it. Moves on as soon as it passes the example.</td><td>Always does it. Edge cases, alternative approaches, pattern filing, generalization. This is where the schema grows.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The expert's advantage is NOT raw intelligence.</strong> It's the size and organization of their pattern library (schemas), built through deliberate practice and pattern filing. Simon and Chase (1973) showed that chess experts' advantage disappeared when positions were random — they weren't memorizing more squares, they were recognizing meaningful patterns. The same is true in programming: experts recognize problem patterns, not memorize more syntax.</p>
+</blockquote>
+
+<p><strong>What this means for your practice:</strong> the goal is not to solve more problems faster — it's to <em>build richer schemas</em>. Every problem you solve and file (Phase 4) adds a pattern to your library. Every problem you attempt before reading the solution (§11) strengthens the retrieval pathway. The expert advantage compounds: each filed pattern makes the next problem faster to recognize, which frees more working memory for reasoning, which lets you solve harder problems, which adds more patterns. This is the positive feedback loop of expertise.</p>
+
+
+<h2>2. The universal meta-rhythm — Pólya's four phases</h2>
+
+<p>George Pólya, a Hungarian mathematician, published <em>How to Solve It</em> in 1945. It has sold over a million copies, been translated into 15+ languages, and is described by Alan Schoenfeld as "the mathematician best known for his conceptualization of mathematics as problem solving." The book's core is a four-phase checklist — a <strong>rhythm</strong> you cycle through for every problem, from a homework exercise to a competitive programming challenge.</p>
+
+<div class="callout">
+  <pre style="margin:0; font-size:.85rem; line-height:1.5; overflow-x:auto;">
+  ┌──────────────────────────────────────────────────────┐
+  │  PHASE 1: UNDERSTAND    →  "What am I given?          │
+  │                             What am I asked for?"     │
+  │  PHASE 2: PLAN          →  "Have I seen this before?  │
+  │                             Can I break it apart?"     │
+  │  PHASE 3: EXECUTE       →  "Carry out each step,      │
+  │                             checking as you go."       │
+  │  PHASE 4: LOOK BACK     →  "Can I check the result?   │
+  │                             Can I do it differently?"  │
+  └──────────────────────────────────────────────────────┘
+  </pre>
+</div>
+
+<h3>Phase 1 — Understand the problem</h3>
+<p>Pólya's key questions (the ones to ask yourself or write down):</p>
+<ul>
+  <li><strong>What is the unknown?</strong> What are you asked to find, produce, or prove?</li>
+  <li><strong>What are the data?</strong> What is given? What do you have to work with?</li>
+  <li><strong>What is the condition?</strong> What constraints link the data to the unknown?</li>
+  <li><strong>Can you restate the problem in your own words?</strong> If you can't, you don't understand it yet.</li>
+  <li><strong>Is the condition sufficient? redundant? contradictory?</strong> Can you satisfy it at all?</li>
+</ul>
+<p><strong>The practical form for programmers</strong> — and the one you already intuited in your HackerRank comment — is to write down <em>Input, Operation, Output</em>: what comes in, what transformation is needed, what comes out. This is Phase 1 made concrete. If you can write Input/Operation/Output clearly, you've understood the problem. If you can't, go back and read it again.</p>
+
+<h3>Phase 2 — Devise a plan</h3>
+<p>This is where heuristics live (see §4 for the full dictionary). Pólya's key questions:</p>
+<ul>
+  <li><strong>Have you seen this problem before?</strong> Do you know a related problem with the same unknown?</li>
+  <li><strong>Can you restate the problem?</strong> A different framing might reveal a known approach.</li>
+  <li><strong>Can you solve a part of it?</strong> If you can't solve the whole, solve a piece.</li>
+  <li><strong>Can you work backwards?</strong> What would the answer look like? What produces that?</li>
+  <li><strong>Can you use a concrete example?</strong> Work through a specific case, then generalize.</li>
+  <li><strong>Can you decompose it?</strong> Break it into sub-problems you can solve independently.</li>
+</ul>
+<p><strong>The practical form for programmers</strong> — write a numbered algorithm in plain language before touching code. Your HackerRank comment did exactly this: "1. create an empty object, 2. split the string, 3. iterate, 3a. lowercase and strip, 3b/3c. count, 4. return." That's Phase 2 output. The numbered steps <em>are</em> the plan.</p>
+
+<h3>Phase 3 — Carry out the plan</h3>
+<p>Execute each step of the plan, <strong>checking each step as you go</strong>. Pólya says: "check each step — can you see clearly that the step is correct?" In programming, this means: write the code, but also verify each piece as you write it — test with a simple input, check the intermediate values, don't wait until the end to discover a flaw in step 2.</p>
+
+<h3>Phase 4 — Look back</h3>
+<p><strong>This is the phase everyone skips</strong> — and it's the one that builds the most long-term skill. Pólya's key questions:</p>
+<ul>
+  <li><strong>Can you check the result?</strong> Test with the example. Test with edge cases (empty input, single element, maximum size, negative values, Unicode).</li>
+  <li><strong>Can you derive the result differently?</strong> Is there a simpler approach you missed? A more efficient one?</li>
+  <li><strong>Can you use the result, or the method, for another problem?</strong> This is <em>pattern filing</em> — the act that builds pattern recognition over time (see §3).</li>
+  <li><strong>What did you learn?</strong> What pattern did this problem teach you? What trap did you fall into?</li>
+</ul>
+<p><strong>The practical form for programmers</strong> — after your solution passes, don't immediately move on. Ask: what are the edge cases? Is there a faster approach? What category does this problem belong to? Could I recognize it next time? This is where you convert a one-off solution into reusable pattern knowledge.</p>
+
+
+<h2>3. The lens — Computational thinking's four pillars</h2>
+
+<p>If Pólya's four phases are the <em>rhythm</em> (the process you cycle through), computational thinking is the <em>lens</em> — the way you see and structure the problem <em>during</em> Phases 1 and 2. The term was first used by Seymour Papert in 1980 (the creator of Logo, the first programming language for children) and was brought to prominence by Jeannette Wing's 2006 <em>Communications of the ACM</em> essay, which argued that "thinking computationally is a fundamental skill for everyone, not just computer scientists" (<a href="https://en.wikipedia.org/wiki/Computational_thinking">Wikipedia</a>).</p>
+
+<p>Wing defined computational thinking as "the thought processes involved in formulating problems so their solutions can be represented as computational steps and algorithms." It has four pillars — the moves you make while understanding and planning:</p>
+
+<table>
+  <thead><tr><th>Pillar</th><th>What it means</th><th>Concrete example</th><th>Maps to Pólya</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Decomposition</dfn></td>
+      <td>Break the problem into smaller, manageable parts that can be solved independently.</td>
+      <td>"Count word frequencies" → (a) split text into words, (b) normalize each word, (c) count occurrences in a map.</td>
+      <td>Phase 2: "Can you decompose it?"</td>
+    </tr>
+    <tr>
+      <td><dfn>Pattern recognition</dfn></td>
+      <td>Identify patterns in the problem, or similarities to problems you've solved before.</td>
+      <td>"I need to count things → a hash map (object) is the right structure. I've seen this pattern in frequency-counting problems."</td>
+      <td>Phase 2: "Have you seen this before?"</td>
+    </tr>
+    <tr>
+      <td><dfn>Abstraction</dfn></td>
+      <td>Focus on essential features, ignore irrelevant detail. Generalize from the specific.</td>
+      <td>"A word is a lowercased, punctuation-stripped token split by whitespace." — you abstracted away the messy definition of "word" into a precise rule.</td>
+      <td>Phase 1: "Can you restate it?"</td>
+    </tr>
+    <tr>
+      <td><dfn>Algorithm design</dfn></td>
+      <td>Develop the step-by-step solution — the finite sequence of operations.</td>
+      <td>The numbered steps: create empty object → split → iterate → normalize → count → return.</td>
+      <td>Phase 2 → Phase 3: the plan itself</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>How the pillars relate to the phases:</strong> decomposition and abstraction happen mostly in Phase 1 (Understand) and the beginning of Phase 2 (Plan). Pattern recognition is the bridge — it's what tells you <em>which</em> decomposition and <em>which</em> abstraction to use. Algorithm design is the output of Phase 2 — the plan you carry out in Phase 3. The pillars are not separate from Pólya; they're the <em>moves within his phases</em>, given modern names by the computer science education community.</p>
+
+<blockquote class="callout">
+  <p><strong>The relationship in one sentence:</strong> Pólya gives you the <em>when</em> (the four-phase rhythm); computational thinking gives you the <em>what</em> (the four moves you make within those phases). Together they form a complete problem-solving method.</p>
+</blockquote>
+
+
+<h2>4. Pólya's heuristic dictionary — the moves</h2>
+
+<p>Heuristics are <strong>rules of thumb that usually help but don't guarantee</strong> a solution. An algorithm <em>guarantees</em> a result; a heuristic <em>usually</em> finds one faster. Pólya's book contains a "short dictionary of heuristics" — the strategies you try during Phase 2 (Devise a plan). You won't use all of them on every problem; you try the ones that seem to fit, and cycle until one works.</p>
+
+<table>
+  <thead><tr><th>Heuristic</th><th>The question it answers</th><th>Example in programming</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Analogy</dfn></td>
+      <td>"Have I seen a similar problem? Can I use its method?"</td>
+      <td>"This counting problem is like the character-frequency problem I solved last week — same structure, different tokens."</td>
+    </tr>
+    <tr>
+      <td><dfn>Specialization</dfn></td>
+      <td>"Can I solve a specific case first, then generalize?"</td>
+      <td>"Let me trace through the algorithm with input 'hello world hello' and see what happens, step by step."</td>
+    </tr>
+    <tr>
+      <td><dfn>Working backwards</dfn></td>
+      <td>"What would the answer look like? What produces that?"</td>
+      <td>"I need an object like { hello: 2, world: 1 }. What produces that? Iterating and counting. What do I iterate over? An array of words. What produces that? Splitting the string."</td>
+    </tr>
+    <tr>
+      <td><dfn>Decomposition &amp; recombining</dfn></td>
+      <td>"Can I break it into parts, solve each, then combine?"</td>
+      <td>"Part 1: split the string. Part 2: normalize each word. Part 3: count in a map. Combine: pipe part 1's output into part 2, then part 2's into part 3."</td>
+    </tr>
+    <tr>
+      <td><dfn>Variation</dfn></td>
+      <td>"Can I restate or vary the problem to make it easier?"</td>
+      <td>"Instead of 'count word frequencies,' restate as 'for each word, increment its counter in a dictionary' — the restatement makes the algorithm obvious."</td>
+    </tr>
+    <tr>
+      <td><dfn>Auxiliary elements</dfn></td>
+      <td>"Can I introduce something extra that helps?"</td>
+      <td>"Introduce an intermediate variable: a 'normalized word' that's the lowercased, stripped version. This extra element simplifies the counting logic."</td>
+    </tr>
+    <tr>
+      <td><dfn>Generalization</dfn></td>
+      <td>"Can I solve a more general problem that includes this one?"</td>
+      <td>"Instead of solving for words specifically, solve for 'count occurrences of any token in a list' — then words are a special case. This builds a reusable function."</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The meta-heuristic:</strong> when stuck, cycle through these. Try analogy first (is this like something I know?). Then specialization (let me try a concrete example). Then working backwards (what does the answer look like?). Then decomposition (can I break it apart?). Most problems yield to one of these within a few minutes of cycling. If none work, the problem may need a technique you haven't learned yet — which is itself useful information (see §7).</p>
+
+
+<h2>5. Schoenfeld's extension — metacognition (the missing fifth element)</h2>
+
+<p>Alan Schoenfeld, a mathematics education researcher at UC Berkeley, did something important in the 1980s: he <strong>tested</strong> Pólya's strategies empirically. His finding, published in <em>Mathematical Problem Solving</em> (1985), was a landmark (<a href="https://en.wikipedia.org/wiki/Alan_Schoenfeld">Wikipedia</a>):</p>
+
+<blockquote class="callout">
+  <p><strong>Schoenfeld's finding:</strong> Pólya's heuristics <em>alone are weak</em>. Students who learned the strategies still failed on non-routine problems. The strategies need two things Pólya didn't emphasize enough: <strong>domain-specific tactics</strong> (you need to know the techniques, not just the meta-strategy) and <strong>metacognition</strong> — the act of monitoring your own thinking and adjusting your approach as you work.</p>
+</blockquote>
+
+<h3>What metacognition means in practice</h3>
+<p>Metacognition is <strong>thinking about your own thinking while you're thinking</strong>. In problem-solving, it means regularly asking yourself:</p>
+<ul>
+  <li><strong>"Am I making progress, or am I spinning?"</strong> — If you've been stuck for 10 minutes on the same approach, stop. Try a different heuristic. Or re-read the problem — maybe you misunderstood it.</li>
+  <li><strong>"Is this approach worth continuing?"</strong> — Sunk cost is a trap. If brute force works but is too slow, don't keep optimizing it — step back and consider a different paradigm (§7).</li>
+  <li><strong>"Should I go back to Phase 1?"</strong> — Sometimes your plan fails because your understanding was wrong. Don't keep executing a flawed plan; return to understanding.</li>
+  <li><strong>"What am I actually trying to do right now?"</strong> — It's easy to drift into solving a different problem than the one asked. Re-anchor yourself on the actual goal.</li>
+</ul>
+
+<h3>The complete model: five resources</h3>
+<p>Schoenfeld's framework identifies five resources a problem-solver needs. Pólya addressed the first two; Schoenfeld added the third. The last two are from his later work on teaching and beliefs:</p>
+<table>
+  <thead><tr><th>Resource</th><th>What it is</th><th>Pólya / Schoenfeld</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Knowledge</strong></td><td>Domain facts, techniques, definitions. You can't solve a graph problem if you don't know what a graph is.</td><td>Assumed by Pólya; Schoenfeld proved it's essential.</td></tr>
+    <tr><td><strong>Strategies</strong></td><td>Pólya's heuristics (analogy, specialization, working backwards, etc.).</td><td>Pólya's contribution.</td></tr>
+    <tr><td><strong>Control / Metacognition</strong></td><td>Monitoring your progress, deciding when to abandon an approach, allocating time.</td><td><strong>Schoenfeld's key addition.</strong></td></tr>
+    <tr><td><strong>Beliefs</strong></td><td>What you believe about problem-solving. "I'm bad at math" is a self-fulfilling belief. "Problems have solutions if I approach them systematically" is productive.</td><td>Schoenfeld's later work.</td></tr>
+    <tr><td><strong>Practices</strong></td><td>The habits and routines you've built through deliberate practice.</td><td>Schoenfeld's teaching work.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The practical takeaway:</strong> Don't just learn the four phases and the heuristics. Also build the habit of <em>checking in with yourself</em> every few minutes: "Am I progressing? Is this the right approach? Should I try something different?" That monitoring — the metacognitive loop <em>on top of</em> the Pólya loop — is what separates problem-solvers who get unstuck from those who spiral.</p>
+
+
+<h2>6. Stepwise refinement — top-down decomposition for programming</h2>
+
+<p>While Pólya's framework is domain-general, Niklaus Wirth (creator of Pascal) published a programming-specific decomposition method in 1971: <strong>"Program Development by Stepwise Refinement"</strong> (<a href="https://en.wikipedia.org/wiki/Stepwise_refinement">Wikipedia</a>). It's Pólya's "decompose and recombine" heuristic made into a disciplined practice for code.</p>
+
+<h3>How it works</h3>
+<ol>
+  <li><strong>Start with the problem statement</strong> — the whole task, in one sentence: "Count the frequency of each word in a string."</li>
+  <li><strong>Express the solution at the highest level of abstraction</strong>, using "black boxes" for parts you haven't detailed yet: <code>function wordFreq(text) → splitIntoWords(text) → normalizeWords(words) → countOccurrences(words) → return counts</code></li>
+  <li><strong>Refine each black box</strong> one level deeper, still using black boxes for sub-parts: <code>normalizeWords(words) → for each word: lowercase(word) → stripPunctuation(word)</code></li>
+  <li><strong>Continue refining</strong> until every black box is a concrete, implementable operation — a built-in method, a simple loop, a one-liner.</li>
+</ol>
+
+<h3>Top-down vs bottom-up</h3>
+<table>
+  <thead><tr><th>Approach</th><th>How it works</th><th>When it fits</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Top-down (stepwise refinement)</strong></td>
+      <td>Start with the whole problem, decompose into black boxes, refine each downward until you reach implementable operations.</td>
+      <td>When you understand the problem well. When the structure is clear but the details need working out. Best for well-defined problems.</td>
+    </tr>
+    <tr>
+      <td><strong>Bottom-up</strong></td>
+      <td>Start with the smallest operations you know you need, compose them into larger functions, build upward to the full solution.</td>
+      <td>When the building blocks are clear but the overall structure isn't yet. When you're exploring a new domain. Common in prototyping.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The practical guidance:</strong> most problems benefit from starting top-down (it keeps you focused on the goal) and switching to bottom-up when you hit a sub-problem you don't know how to solve. The switch is natural — when a black box won't refine because you don't know the technique, you drop into bottom-up exploration, build the pieces, then come back up. This is exactly the Pólya rhythm: you cycle, you don't waterfall.</p>
+
+<blockquote class="callout">
+  <p><strong>Connection to the Rhythm (Lesson 7):</strong> stepwise refinement is the problem-solving equivalent of "sketch the data shape first" — the frontend loop's one upfront decision. Both say the same thing: <em>structure before code.</em> In the frontend, you sketch the data shape; in algorithmic problem-solving, you sketch the refinement tree. Both catch traps while they cost minutes, not hours.</p>
+</blockquote>
+
+
+<h2>7. Algorithm design paradigms — the technique catalog</h2>
+
+<p>During Phase 2 (Devise a plan), after you've decomposed and recognized patterns, you need to choose a <strong>paradigm</strong> — a fundamental approach to designing the algorithm. There is no single optimal algorithm for all problems; there are paradigms, each fitting a different class of problem. Recognizing which paradigm a problem calls for is itself a pattern-recognition skill built through practice (<a href="https://en.wikipedia.org/wiki/Competitive_programming">Wikipedia</a>).</p>
+
+<table>
+  <thead><tr><th>Paradigm</th><th>What it is</th><th>When to use it</th><th>Example problems</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Brute force</dfn></td>
+      <td>Try all possibilities. Simple, often slow, but correct.</td>
+      <td><strong>Always start here</strong> if the input is small. Get it correct first, optimize later. The first solution is often brute force; the skill is knowing when to upgrade.</td>
+      <td>Find all pairs that sum to N (nested loop); check if a number is prime (test all divisors).</td>
+    </tr>
+    <tr>
+      <td><dfn>Greedy</dfn></td>
+      <td>Make the locally optimal choice at each step, hoping for a global optimum.</td>
+      <td>When the problem has <em>optimal substructure</em> AND a <em>greedy choice property</em> (local optimum = global optimum). Not always applicable — prove it works before trusting it.</td>
+      <td>Minimum coin change (certain coin systems); activity selection; Huffman coding.</td>
+    </tr>
+    <tr>
+      <td><dfn>Divide &amp; conquer</dfn></td>
+      <td>Divide the problem into <strong>independent</strong> sub-problems, solve each, merge results.</td>
+      <td>When sub-problems are <strong>independent</strong> (solving one doesn't depend on another). Three steps: Divide, Conquer, Merge (<a href="https://www.geeksforgeeks.org/introduction-to-divide-and-conquer-algorithm-data-structure-and-algorithm-tutorials/">GeeksForGeeks</a>).</td>
+      <td>Merge sort, quick sort, binary search, FFT, Tower of Hanoi.</td>
+    </tr>
+    <tr>
+      <td><dfn>Dynamic programming</dfn></td>
+      <td>Solve each sub-problem once, store the result, reuse it when the same sub-problem recurs.</td>
+      <td>When sub-problems <strong>overlap</strong> (the same sub-problem appears multiple times). The key distinction from D&amp;C: overlapping vs independent sub-problems.</td>
+      <td>Fibonacci, knapsack, edit distance, longest common subsequence, coin change (general).</td>
+    </tr>
+    <tr>
+      <td><dfn>Backtracking</dfn></td>
+      <td>Systematically try all possibilities, abandoning a path as soon as it's shown to be invalid ("backtrack").</td>
+      <td>When you need to explore all possibilities but can prune early. Constraint satisfaction, combinatorial search.</td>
+      <td>N-Queens, Sudoku solver, generating all permutations, maze solving.</td>
+    </tr>
+    <tr>
+      <td><dfn>Hash table</dfn></td>
+      <td>Use a hash map (object/Map) for O(1) lookup, turning nested-loop searches into single passes.</td>
+      <td>When you need fast lookup, counting, or deduplication. Often the upgrade from brute force that takes O(n²) → O(n).</td>
+      <td><strong>Word frequency counting (your HackerRank problem)</strong>, two-sum, finding duplicates, first non-repeating character.</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The critical distinction — D&amp;C vs DP:</strong> Divide &amp; Conquer is for <em>independent</em> sub-problems (merge sort: each half is sorted independently). Dynamic Programming is for <em>overlapping</em> sub-problems (Fibonacci: fib(5) needs fib(4) and fib(3), but fib(4) also needs fib(3) — so you store fib(3) rather than recomputing). If the sub-problems don't overlap, use D&amp;C. If they do, use DP. This single distinction is one of the most tested in interviews and competitions.</p>
+</blockquote>
+
+<p><strong>Your HackerRank word-frequency counter uses the hash table paradigm</strong> — you intuitively recognized that counting occurrences is a hash-map problem, not a brute-force "search the array each time" problem. That recognition is exactly the pattern-recognition pillar of computational thinking (§3). The skill to build: solve enough problems that you start recognizing the paradigm from the problem statement, before you even plan the steps.</p>
+
+
+<h2>8. The role of examples — concrete before abstract</h2>
+
+<p>One of Pólya's most practical heuristics is <strong>specialization</strong> — "can you solve a specific case first?" In programming, this means: <strong>before you write the algorithm, work through a concrete example by hand.</strong> Trace the input through the steps you're planning, on paper or in your head, and see if the output is what you expect.</p>
+
+<h3>Why examples matter</h3>
+<ul>
+  <li><strong>They reveal hidden requirements.</strong> Your word-frequency algorithm: trace "Hello, world! Hello." → split → ["Hello,", "world!", "Hello."] → lowercase/strip → ["hello", "world", "hello"] → count → { hello: 2, world: 1 }. The trace reveals that punctuation stripping must happen <em>after</em> splitting, not before — a detail you might miss without the example.</li>
+  <li><strong>They catch misunderstandings early.</strong> If your hand-traced output doesn't match the expected output, you've found a flaw in your <em>plan</em> — not in your code. Fixing a plan costs seconds; fixing code costs minutes.</li>
+  <li><strong>They build the mental model.</strong> Abstract algorithm descriptions are hard to hold in working memory. A concrete trace is easy — you see the data transforming.</li>
+  <li><strong>They become your test cases.</strong> The example you traced by hand becomes the first test case you run against your code. If the code produces what you traced, you have a baseline.</li>
+</ul>
+
+<h3>How to use examples effectively</h3>
+<ol>
+  <li><strong>Choose a representative example</strong> — not the simplest possible (that may hide edge cases), not the most complex (that's hard to trace). A medium example with a few interesting features.</li>
+  <li><strong>Trace step by step</strong> — write out the state after each step of your planned algorithm. Don't skip steps; the skipping is where errors hide.</li>
+  <li><strong>Check the output against the expected result</strong> — if it matches, your plan is sound. If not, find where the trace diverged.</li>
+  <li><strong>Then trace an edge case</strong> — empty input, single element, all-same-elements. Edge cases are where Phase 4 (Look back) and Phase 1 (Understand) overlap: the edge case reveals whether you truly understood the problem's boundary conditions.</li>
+</ol>
+
+<p><strong>This is not optional.</strong> Senior competitive programmers always trace examples before coding. The two-step process from competitive programming is: (1) construct an efficient algorithm — which includes tracing examples — and (2) implement the algorithm (<a href="https://en.wikipedia.org/wiki/Competitive_programming">Wikipedia</a>). Skipping the trace to "save time" is the most common way to waste time.</p>
+
+
+<h2>9. Debugging as problem-solving — the same four phases, inverted</h2>
+
+<p>Debugging <em>is</em> problem-solving. The problem is simply: "Why doesn't this code do what I expect?" It follows Pólya's four phases, but the direction is inverted — you start from the symptom (the wrong output) and work backwards to the cause. Recognizing debugging as problem-solving (not a separate ad-hoc activity) is what separates systematic debuggers from people who randomly change things and hope.</p>
+
+<h3>Rubber duck debugging — forced Phase 1 (Understand)</h3>
+<p>From <em>The Pragmatic Programmer</em> by Andy Hunt and Dave Thomas (1999): explain your code, line by line, to an inanimate object (a rubber duck, a teddy bear, a colleague who doesn't need to speak). The act of explaining <strong>forces you to articulate your assumptions</strong> — and the bug is almost always in an assumption you didn't realize you were making (<a href="https://en.wikipedia.org/wiki/Rubber_duck_debugging">Wikipedia</a>).</p>
+<blockquote class="callout">
+  <p>"The simple act of explaining, step by step, what the code is supposed to do often causes the problem to leap off the screen and announce itself." — Hunt &amp; Thomas, <em>The Pragmatic Programmer</em></p>
+</blockquote>
+<p><strong>Why it works:</strong> explaining forces you to look at the code from a new perspective. Describing what the code <em>should</em> do, then comparing to what it <em>actually</em> does, exposes the inconsistency. You don't need the duck to respond — the act of verbalizing is the mechanism. This is Phase 1 (Understand) applied to your own code: "What is the unknown? What is the condition? Can I restate what this code is supposed to do?"</p>
+
+<h3>Hypothesis-driven debugging — the scientific method</h3>
+<p>Systematic debugging applies the scientific method (<a href="https://en.wikipedia.org/wiki/Debugging">Wikipedia</a>):</p>
+<ol>
+  <li><strong>Observe</strong> — what's the actual (wrong) behavior? Reproduce it reliably.</li>
+  <li><strong>Hypothesize</strong> — form a theory about what's causing it. "I think the split is including the punctuation because I strip after counting, not before."</li>
+  <li><strong>Predict</strong> — "If my hypothesis is correct, adding a console.log before the count step will show 'Hello,' not 'hello'."</li>
+  <li><strong>Test</strong> — add the log, run the code, check the prediction.</li>
+  <li><strong>Conclude</strong> — if the prediction holds, you've found the cause. If not, revise the hypothesis. Don't change code until you've confirmed the cause.</li>
+</ol>
+<p><strong>The anti-pattern:</strong> changing code without a hypothesis — "let me try removing this line, maybe that fixes it." This is <em>not</em> debugging; it's guessing. It sometimes works by luck, but it doesn't build understanding, and it often introduces new bugs. David Agans' <em>Debugging: The Nine Indispensable Rules</em> (2002) codifies this: understand the system before changing anything, make it fail reliably, and change one thing at a time.</p>
+
+<h3>Binary search debugging — divide &amp; conquer applied</h3>
+<p>When a bug is somewhere in a large codebase or a long process, apply divide &amp; conquer (§7): put a checkpoint in the <em>middle</em>. Is the state correct there? If yes, the bug is in the second half. If no, it's in the first half. Repeat. This turns a linear search into a logarithmic one — the same algorithm design paradigm applied to the debugging process itself.</p>
+
+
+<h2>10. The "Look back" phase in depth — what everyone skips</h2>
+
+<p>Phase 4 (Look back) is the phase that builds the most long-term skill and is the most consistently skipped. After a solution passes, the temptation is to move on immediately. Resist it. The minutes you spend here compound into the pattern recognition that makes future problems faster.</p>
+
+<h3>Edge case catalog — the systematic check</h3>
+<p>After your solution works on the example, run through this checklist of edge cases. These are the cases that fail in production and in competitive programming's hidden test suites:</p>
+<table>
+  <thead><tr><th>Edge case</th><th>Why it matters</th><th>For your word-frequency counter</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Empty input</strong></td><td>Does the code crash or return a sensible default?</td><td>Empty string <code>""</code> → should return <code>{}</code>, not crash on split.</td></tr>
+    <tr><td><strong>Single element</strong></td><td>Does the off-by-one logic work with n=1?</td><td>Single word <code>"hello"</code> → <code>{ hello: 1 }</code>.</td></tr>
+    <tr><td><strong>All same elements</strong></td><td>Does counting work when everything is identical?</td><td><code>"hello hello hello"</code> → <code>{ hello: 3 }</code>.</td></tr>
+    <tr><td><strong>Maximum size</strong></td><td>Does it perform within time limits at scale?</td><td>A string with 100,000 words — does the O(n) approach hold, or does something accidentally make it O(n²)?</td></tr>
+    <tr><td><strong>Negative / boundary values</strong></td><td>What happens at the boundaries of the input domain?</td><td>Unicode characters, emojis, numbers mixed with words: <code>"hello 123 world"</code> — is "123" a word?</td></tr>
+    <tr><td><strong>Already sorted / reverse sorted</strong></td><td>Does the algorithm degrade on specific orderings?</td><td>(More relevant for sorting/searching problems, but always consider.)</td></tr>
+    <tr><td><strong>Null / undefined / type mismatch</strong></td><td>What if the input isn't the type you expect?</td><td>What if <code>text</code> is <code>null</code>? What if it's a number?</td></tr>
+  </tbody>
+</table>
+
+<h3>Can you derive the result differently?</h3>
+<p>After a working solution, ask: is there a simpler approach? A more efficient one? For the word-frequency counter:</p>
+<ul>
+  <li><strong>Simpler?</strong> Your current approach (split → normalize → count) is already simple. But could you use a <code>reduce</code> instead of a <code>for</code> loop? Both work; the choice is a style preference, not a correctness issue.</li>
+  <li><strong>More efficient?</strong> Your approach is O(n) — one pass through the words. You can't do better than O(n) because you must read every word. But could you avoid creating the intermediate array? You could normalize and count in a single pass, but the readability cost may not be worth it. <em>Optimization is a trade-off, not a virtue.</em></li>
+  <li><strong>More general?</strong> Could you make this a reusable <code>countOccurrences(tokens)</code> function that works for any array of tokens, not just words? This is Pólya's "generalization" heuristic (§4) — and it's how you build a personal utility library.</li>
+</ul>
+
+<h3>Pattern filing — the act that builds pattern recognition</h3>
+<p>The most important Look-Back action: <strong>file the pattern.</strong> Ask yourself: "What category does this problem belong to? What signal in the problem statement told me to use this approach?" For the word-frequency counter:</p>
+<ul>
+  <li><strong>Pattern:</strong> frequency counting → hash map paradigm.</li>
+  <li><strong>Signal:</strong> "count the number of times each X appears" → always a hash map. Any problem that says "count occurrences" or "how many times" is a hash map problem.</li>
+  <li><strong>Filed under:</strong> hash-map / frequency-counting. Next time you see "count how many times each character appears," you'll recognize it instantly.</li>
+</ul>
+<p>This is how pattern recognition (§3) is built — not by reading about patterns, but by <em>filing</em> them after solving. Each filed pattern is one more entry in your mental lookup table. After 50 problems, you'll recognize categories from the problem statement. After 200, you'll recognize them from the first sentence.</p>
+
+
+<h2>11. Fluency vs storage strength in problem-solving</h2>
+
+<p>Reading someone else's solution and understanding it gives you <strong>fluency</strong> — the in-the-moment sense of "I get it." But it does not build <strong>storage strength</strong> — the long-term ability to retrieve and apply the method when you face a similar problem cold. This is the most common trap in problem-solving practice: you read the editorial, nod along, feel you've learned it, then face a similar problem next week and can't solve it. The fluency was real; the storage was not.</p>
+
+<h3>How to build storage strength in problem-solving</h3>
+<table>
+  <thead><tr><th>Practice mode</th><th>Builds</th><th>When to use</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Read the solution</strong></td><td>Fluency only (illusory mastery)</td><td>Only after you've attempted the problem yourself and exhausted your current ability. Never as the first step.</td></tr>
+    <tr><td><strong>Solve, then compare</strong></td><td>Storage strength + pattern filing</td><td>The default mode. Solve first (even if you fail), then read the editorial and compare approaches. The effort of trying — even failing — is what builds the retrieval pathway.</td></tr>
+    <tr><td><strong>Re-solve from memory</strong></td><td>Deep storage strength</td><td>The next day, re-solve the same problem from memory without looking at your previous solution or the editorial. If you can't, you didn't really learn it — re-solve until you can.</td></tr>
+    <tr><td><strong>Variation practice</strong></td><td>Transfer (flexibility, not just retention)</td><td>Solve a <em>different</em> problem that uses the same paradigm. If you learned hash-map counting with words, try it with characters, then with array elements. This tests whether you learned the <em>pattern</em> or just memorized the <em>solution</em>.</td></tr>
+    <tr><td><strong>Interleaving</strong></td><td>Discrimination (knowing <em>which</em> paradigm to use)</td><td>Mix problem types in your practice session. Don't do 10 hash-map problems in a row — mix hash-map with DP with greedy. This builds the skill of <em>recognizing</em> which paradigm a problem calls for, not just executing one you already know is right.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The rule:</strong> <em>effortful retrieval builds storage strength; passive reading builds only fluency.</em> If it feels easy, you're probably not building long-term skill. The struggle is the signal that learning is happening. This is the same principle behind the retrieval-practice quizzes in every lesson in this workspace — effortful recall, not passive review.</p>
+</blockquote>
+
+<h3>HackerRank and LeetCode as practice environments</h3>
+<p>Competitive programming platforms are, at their core, <strong>deliberate practice environments with tight feedback loops</strong> — the exact conditions that build skill. You get a problem, you attempt it, you get immediate feedback (pass/fail + test cases), and you can compare your solution to others. The key is to use them correctly:</p>
+<ul>
+  <li><strong>Attempt before reading editorials.</strong> The struggle is the learning. Even 15 minutes of failed attempt builds more than 15 minutes of reading a solution.</li>
+  <li><strong>Use the difficulty progression.</strong> Start at your current level (zone of proximal development — challenging but not impossible). Too easy = no growth. Too hard = no learning, just frustration.</li>
+  <li><strong>Don't grind one type.</strong> Interleave. The skill that matters most is <em>recognition</em> — knowing which paradigm to use — and that only comes from mixed practice.</li>
+  <li><strong>Review your solved problems.</strong> Once a week, revisit 3-5 problems you solved before and re-solve from memory. Spaced retrieval is what converts short-term familiarity into long-term mastery.</li>
+</ul>
+
+
+<h2>12. The right questions — a catalog</h2>
+
+<p>You said it's not just about answering your questions, but about finding the <em>right</em> questions. Here is the catalog — the questions a systematic problem-solver asks, organized by phase. Print this. Run through it on every problem until it becomes automatic.</p>
+
+<h3>Phase 1 — Understanding (ask these first)</h3>
+<ul>
+  <li>What is the unknown? What am I asked to produce?</li>
+  <li>What are the data? What am I given to work with?</li>
+  <li>What is the condition? What constraints link input to output?</li>
+  <li>Can I restate the problem in my own words? (Write Input / Operation / Output)</li>
+  <li>Can I work through a concrete example by hand?</li>
+  <li>What are the edge cases? (Empty, single, max, negative, type mismatch)</li>
+  <li>Is this a well-defined problem (clear I/O) or a wicked one (evolving)?</li>
+</ul>
+
+<h3>Phase 2 — Planning (ask these when stuck)</h3>
+<ul>
+  <li>Have I seen this problem before? Do I know a related problem?</li>
+  <li>Can I restate the problem to make it easier?</li>
+  <li>Can I decompose it into sub-problems? (Stepwise refinement)</li>
+  <li>Can I solve a part of it first?</li>
+  <li>Can I work backwards from the expected output?</li>
+  <li>What paradigm does this fit? (Brute force, greedy, D&amp;C, DP, hash map, backtracking)</li>
+  <li>What data structure makes the operations natural? (Array, Map, Set, stack, queue)</li>
+  <li>Can I introduce an auxiliary element that simplifies the logic?</li>
+</ul>
+
+<h3>Phase 3 — Executing (ask these while coding)</h3>
+<ul>
+  <li>Can I check each step as I write it? (Don't wait until the end to discover a flaw)</li>
+  <li>Does the code match the plan? (If you're improvising, go back to Phase 2)</li>
+  <li>Am I handling the edge cases I identified in Phase 1?</li>
+</ul>
+
+<h3>Phase 4 — Looking back (ask these after it works)</h3>
+<ul>
+  <li>Can I check the result with the example? With edge cases?</li>
+  <li>Can I derive the result differently? Is there a simpler approach?</li>
+  <li>What is the time and space complexity? Is it good enough for the input size?</li>
+  <li>What pattern does this problem belong to? What signal in the statement tells me to use this approach?</li>
+  <li>Can I generalize this into a reusable function?</li>
+  <li>What did I learn? What trap did I fall into? How will I recognize this pattern next time?</li>
+</ul>
+
+<h3>Metacognitive questions (ask these every few minutes)</h3>
+<ul>
+  <li>Am I making progress, or am I spinning on the same approach?</li>
+  <li>Is this approach worth continuing, or should I try a different paradigm?</li>
+  <li>Should I go back to Phase 1? Did I misunderstand the problem?</li>
+  <li>What am I actually trying to do right now? Have I drifted from the goal?</li>
+  <li>Have I been stuck for more than 10 minutes? If so, stop and try a different heuristic.</li>
+</ul>
+
+<h3>The deepest questions (ask these to build wisdom, not just skill)</h3>
+<ul>
+  <li>How do I know when I've understood a problem well enough to start coding? (Answer: when you can write Input/Operation/Output AND trace an example by hand)</li>
+  <li>How do I recognize which technique a problem needs? (Answer: pattern recognition, built through deliberate practice and pattern filing)</li>
+  <li>What's the difference between solving a HackerRank challenge and solving a real-world feature? (Answer: well-defined vs wicked — algorithm vs rhythm)</li>
+  <li>How do I avoid the fluency trap? (Answer: solve before reading; re-solve from memory; interleave problem types)</li>
+  <li>Is there a difference between a heuristic and an algorithm? (Answer: an algorithm guarantees a result; a heuristic usually helps but doesn't guarantee)</li>
+</ul>
+
+
+<h2>12b. Principles — the shared constants</h2>
+
+<p>Across every paradigm, every era, and every extension, certain principles don't change. These are the constants that survive framework shifts, language changes, and even AI assistance.</p>
+
+<table>
+  <thead><tr><th>Principle</th><th>Why it's constant</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Understand before planning</strong></td><td>You can't plan what you don't understand. This is Phase 1 before Phase 2 — it has been true since Pólya (1945) and is confirmed by cognitive load theory: misunderstanding the problem adds extraneous load that corrupts the entire plan.</td></tr>
+    <tr><td><strong>Concrete before abstract</strong></td><td>Working memory can hold a concrete trace (7 items) but struggles with abstract descriptions. Pólya's specialization heuristic and the practice of tracing examples by hand have always been the entry point to understanding.</td></tr>
+    <tr><td><strong>Decompose before solving</strong></td><td>From Pólya's "decompose and recombine" to Wirth's stepwise refinement to computational thinking's decomposition pillar — every framework agrees: break the problem into parts before attempting the whole.</td></tr>
+    <tr><td><strong>Check each step</strong></td><td>Phase 3 says "check each step as you go." Debugging says "test one hypothesis at a time." Agans says "change one thing at a time." The principle: verify incrementally, not at the end. Finding a flaw in step 2 costs seconds; finding it after step 10 costs hours.</td></tr>
+    <tr><td><strong>Look back after solving</strong></td><td>Phase 4. The phase that builds the schema. Without it, you solve problems but don't grow your pattern library. Every expertise researcher agrees: review is where learning consolidates.</td></tr>
+    <tr><td><strong>Effortful retrieval builds skill</strong></td><td>The fluency-vs-storage distinction (§11). Passive reading builds fluency; effortful retrieval builds storage strength. This is Ericsson's deliberate practice principle: the effort is the signal that learning is happening.</td></tr>
+    <tr><td><strong>Monitor your thinking</strong></td><td>Schoenfeld's metacognition. Without it, you fall into the Einstellung trap. With it, you catch yourself spiraling and switch approaches. The meta-loop on top of the Pólya loop.</td></tr>
+    <tr><td><strong>The plan is the contract; the code is the implementation</strong></td><td>If the code diverges from the plan, the plan was incomplete — fix the plan first. This is the stepwise refinement principle: the black boxes are the contract; the code fills them. Improvising in the code is a sign you skipped Phase 2.</td></tr>
+  </tbody>
+</table>
+
+
+<h2>13. Worked example — your HackerRank word-frequency counter, traced through Pólya</h2>
+
+<p>Your original comment, annotated with the framework you were already (intuitively) using:</p>
+
+<pre style="font-size:.82rem; line-height:1.5; overflow-x:auto;"><code>/*
+  Input: a string of text to analyze                    ← PHASE 1: What are the data?
+  Operation: count the number of times each word        ← PHASE 1: What is the condition?
+    appears in the string, lowercase all the words
+    and strip them of punctuation, the words
+    would be splitted by whitespace
+  Output: an object with each word (lowercased)         ← PHASE 1: What is the unknown?
+    as a key and the number of times it appears
+    in the string as the value
+
+  Algorithm:                                            ← PHASE 2: Devise a plan
+  1- create an empty object to hold the word freqs       ← DECOMPOSITION: sub-problem 1
+  2- split the input string into an array of words      ← DECOMPOSITION: sub-problem 2
+     using whitespace as the delimiter
+  3- iterate through the array of words                 ← DECOMPOSITION: sub-problem 3
+    a- for each word, convert it to lowercase           ← ABSTRACTION: "normalize"
+       and remove any punctuation
+    b- if the word is not already a key,                ← ALGORITHM DESIGN: the counting
+       add it with a value of 1                            logic (hash map paradigm)
+    c- if the word is already a key, increment by 1
+  4- return the object containing the word freqs        ← The output
+*/</code></pre>
+
+<h3>What you did right (and didn't know you were doing)</h3>
+<ul>
+  <li><strong>Phase 1 (Understand):</strong> You wrote Input / Operation / Output — the programmer's form of Pólya's "What is the unknown? What are the data? What is the condition?" You <em>did</em> Phase 1 correctly.</li>
+  <li><strong>Phase 2 (Plan):</strong> You wrote a numbered algorithm in plain language before coding — the programmer's form of "Devise a plan." You used <strong>decomposition</strong> (breaking into sub-problems), <strong>abstraction</strong> (defining "normalize" as lowercase + strip), and <strong>algorithm design</strong> (the hash-map counting logic). You chose the <strong>hash table paradigm</strong> (§7) — correctly recognizing that counting is a hash-map problem.</li>
+  <li><strong>Computational thinking pillars:</strong> You used all four — decomposition (the numbered steps), pattern recognition (object-as-counter, a known pattern), abstraction (normalize = lowercase + strip), algorithm design (the steps themselves).</li>
+</ul>
+
+<h3>What you skipped (Phase 4 — Look back)</h3>
+<p>After your solution passes, you should ask:</p>
+<ul>
+  <li><strong>Edge cases:</strong> What if the string is empty <code>""</code>? → <code>"".split(" ")</code> gives <code>[""]</code>, not <code>[]</code> — so your code would produce <code>{ "": 1 }</code> instead of <code>{}</code>. This is a bug you'd catch in Phase 4. Fix: filter out empty strings after splitting.</li>
+  <li><strong>Edge cases:</strong> What about numbers? Is <code>"123"</code> a word? The problem says "words" — does that include numbers? You'd need to clarify or decide.</li>
+  <li><strong>Edge cases:</strong> What about contractions? <code>"don't"</code> → after stripping punctuation → <code>"dont"</code>. Is that correct? Or should <code>"don't"</code> stay as <code>"don't"</code>? The punctuation-stripping rule needs to be precise.</li>
+  <li><strong>Pattern filing:</strong> "This is a hash-map frequency-counting problem. Signal: 'count the number of times each X appears.' Filed under: hash-map / frequency-counting."</li>
+  <li><strong>Generalization:</strong> Can I make this a reusable <code>countOccurrences(array)</code> function?</li>
+</ul>
+
+<h3>The metacognitive check (Schoenfeld's addition)</h3>
+<p>While solving, you should periodically ask: "Am I making progress? Is the plan working, or am I improvising?" If your code starts diverging from your numbered plan — you're adding cases you didn't plan for — that's a signal to stop, go back to Phase 2, and revise the plan. The plan is the contract; the code is the implementation. If they diverge, the plan was incomplete — fix it first.</p>
+
+
+<h2>13b. The most common failure modes</h2>
+
+<p>Every discipline has its characteristic ways of going wrong. These are the failure modes specific to problem-solving — the traps that catch practitioners at every level.</p>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Premature coding</strong></td><td>You start writing code before understanding the problem or planning. Works for trivial problems; fails for anything non-trivial. You end up refactoring code that was built on a misunderstanding.</td><td>Force yourself through Phase 1 (write Input/Operation/Output) and Phase 2 (numbered algorithm) before opening the editor. If you can't write the plan, you don't understand the problem.</td></tr>
+    <tr><td><strong>The fluency trap</strong></td><td>You read someone else's solution, understand it, and feel you've learned it. Next week, faced with a similar problem, you can't solve it. The fluency was real; the storage wasn't.</td><td>Attempt before reading. Solve, then compare. Re-solve from memory the next day (§11). If it feels easy, you're not building storage strength.</td></tr>
+    <tr><td><strong>The Einstellung effect</strong></td><td>You fixate on the first approach that comes to mind and keep pushing it even when it's not working. "If I just tweak this one more thing..." — but the approach itself is wrong.</td><td>The metacognitive check (§5): "Am I progressing or spinning? Is this the right paradigm?" If you've been stuck 10 minutes on the same approach, stop. Try a different heuristic. Re-read the problem.</td></tr>
+    <tr><td><strong>Not reading the problem</strong></td><td>You skim the problem statement, miss a constraint, and solve a different problem than the one asked. Common in HackerRank: "I didn't see the constraint about negative numbers."</td><td>Phase 1: restate the problem in your own words. Write Input/Operation/Output. List the constraints explicitly. If you can't restate it, you haven't read it carefully enough.</td></tr>
+    <tr><td><strong>Skipping Phase 4</strong></td><td>Your solution passes the example, so you move on. The hidden test cases fail on an edge case you didn't consider. Or: you solve 100 problems but never file the patterns, so your pattern library doesn't grow.</td><td>Always spend 5 minutes in Phase 4: edge cases, alternative approaches, pattern filing. This is the phase that builds the most long-term skill — skipping it is the most expensive shortcut.</td></tr>
+    <tr><td><strong>Guessing at bugs</strong></td><td>Your code doesn't work, so you start changing things randomly: "Let me try removing this line. Let me try swapping these." This is not debugging — it's gambling.</td><td>Hypothesis-driven debugging (§9): observe → hypothesize → predict → test → conclude. Never change code without a hypothesis. Change one thing at a time.</td></tr>
+    <tr><td><strong>Grinding one type</strong></td><td>You solve 50 hash-map problems in a row. You're great at hash-maps but can't recognize when a problem needs dynamic programming. You built execution skill but not recognition skill.</td><td>Interleave problem types (§11). Mix hash-map with DP with greedy with graph. The skill that matters most is <em>recognition</em> — knowing which paradigm to use — and that only comes from mixed practice.</td></tr>
+    <tr><td><strong>Sunk cost fallacy</strong></td><td>You've spent 30 minutes on an approach that isn't working, but you don't want to "waste" the investment, so you keep going. The 30 minutes are already spent; the question is whether the next 30 minutes are better spent on this approach or a different one.</td><td>The metacognitive check: "Is this approach worth continuing?" The sunk cost is irrelevant. Only the expected future value of each option matters. Switch approaches when the current one has diminishing returns.</td></tr>
+  </tbody>
+</table>
+
+<h2>13c. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>Problem-solving is only as good as the practice environment that builds the skill. Here's the catalog of tools, platforms, and resources, with decision metrics for choosing the right ones.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tool</th><th>Best for</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="3"><strong>Practice platforms</strong></td><td><a href="https://hackerrank.com">HackerRank</a></td><td>Beginner to intermediate. Certifications. Language fundamentals.</td><td>Start here if you're preparing for certifications. Good difficulty progression. Has the JS Basic cert you're working toward.</td></tr>
+    <tr><td><a href="https://leetcode.com">LeetCode</a></td><td>Intermediate to advanced. Interview preparation. Paradigm recognition.</td><td>Use when you can solve HackerRank mediums consistently. Better for paradigm variety (DP, graphs, backtracking). Has discussion/editorials for pattern filing.</td></tr>
+    <tr><td><a href="https://codewars.com">CodeWars</a></td><td>Kata-style practice. Community solutions for comparison.</td><td>Good for variation practice (§11) — seeing multiple approaches to the same problem. Gamified, lower pressure.</td></tr>
+    <tr><td rowspan="3"><strong>Books</strong></td><td>Pólya, <em>How to Solve It</em> (1945)</td><td>The foundational framework. Read once, refer forever.</td><td>The primary source for this entire reference. Not a programming book — a thinking book.</td></tr>
+    <tr><td>Dromey, <em>How to Solve It by Computer</em> (1982)</td><td>The programming-specific adaptation of Pólya.</td><td>Read if you want Pólya's framework with code examples. Out of print but findable.</td></tr>
+    <tr><td>Cormen et al., <em>Introduction to Algorithms</em> (CLRS)</td><td>The technique catalog (§7) in depth — DP, D&amp;C, greedy, graphs.</td><td>The reference for <em>when</em> to use each paradigm. Heavy; use as a lookup, not a cover-to-cover read.</td></tr>
+    <tr><td rowspan="2"><strong>Communities</strong></td><td><a href="https://reddit.com/r/learnprogramming">r/learnprogramming</a></td><td>Beginner questions, moral support, practice advice.</td><td>For wisdom (§teaching philosophy): test your understanding by explaining to others. Community guidelines are strict — read before posting.</td></tr>
+    <tr><td><a href="https://reddit.com/r/competitiveprogramming">r/competitiveprogramming</a></td><td>Advanced practice, contest discussion, paradigm recognition.</td><td>For when you're past HackerRank and want to see how experts approach problems. Higher barrier to entry.</td></tr>
+    <tr><td rowspan="2"><strong>Tools</strong></td><td><strong>Pen and paper</strong></td><td>Phase 1 (understand), Phase 2 (plan), Phase 4 (trace examples, list edge cases).</td><td>The single most important tool. Offloads working memory to an external representation (§1e). No setup, no distraction, no AI doing the thinking for you.</td></tr>
+    <tr><td>Debugger (browser DevTools, Node debugger)</td><td>Phase 3 (execute + check), Phase 9 (debugging).</td><td>For hypothesis-driven debugging (§9): set breakpoints, inspect state, verify predictions. Not a substitute for understanding — a tool for testing hypotheses.</td></tr>
+    <tr><td><strong>AI tools</strong></td><td>Copilot, ChatGPT</td><td>Exploring approaches, understanding editorials, debugging hints.</td><td><strong>Use with caution.</strong> AI is a fluency trap amplifier (§11): it makes understanding feel easy without building storage strength. Use AI to <em>check</em> your plan, not to <em>replace</em> Phase 2. Never let AI generate the plan you should have devised yourself.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The one tool that matters most: pen and paper.</strong> Every expert problem-solver traces examples by hand before coding. Every platform, book, and AI tool is secondary to this one habit. If you only adopt one thing from this entire reference, make it: <em>write Input/Operation/Output and trace a concrete example on paper before you touch the keyboard.</em></p>
+</blockquote>
+
+<h2>13d. The future — where problem-solving methodology is heading</h2>
+
+<h3>AI-assisted problem-solving: the constraint is inverting again</h3>
+<p>The latest constraint inversion (§1c) is AI. Copilot can write the algorithm. ChatGPT can explain the approach. Claude can debug your code. This doesn't make problem-solving methodology obsolete — it <em>reshapes</em> which parts matter most:</p>
+<table>
+  <thead><tr><th>Pólya's phase</th><th>Before AI</th><th>With AI</th><th>What this means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Phase 1: Understand</strong></td><td>Essential — you must understand to plan</td><td><em>More</em> essential — you must understand to verify what AI produces</td><td>If you can't restate the problem, you can't tell if the AI's solution solves the right problem. Understanding becomes the gatekeeper.</td></tr>
+    <tr><td><strong>Phase 2: Plan</strong></td><td>Essential — you devise the algorithm</td><td>Partially automated — AI can propose approaches</td><td>The skill shifts from "can you devise the plan" to "can you <em>evaluate</em> the plan." You need to recognize whether AI's suggestion is the right paradigm, not just accept it.</td></tr>
+    <tr><td><strong>Phase 3: Execute</strong></td><td>Essential — you write the code</td><td>Largely automated — AI writes the implementation</td><td>Execution skill becomes less valuable. But you still need to read and verify code — which requires the same understanding as writing it.</td></tr>
+    <tr><td><strong>Phase 4: Look back</strong></td><td>Essential but skipped</td><td><em>More</em> essential — you must verify AI's output</td><td>AI can produce plausible but subtly wrong solutions. Phase 4 (edge cases, verification) becomes the human's primary value — the skill that AI can't do for you.</td></tr>
+  </tbody>
+</table>
+
+<h3>The recognition premium</h3>
+<p>As AI handles implementation, the human value moves to the skills AI can't replicate: <strong>problem recognition</strong> (which paradigm does this need?), <strong>decomposition</strong> (how do I break this into parts AI can handle?), and <strong>verification</strong> (is this solution actually correct?). These are exactly Phases 1, 2, and 4 — the phases that require judgment, not execution. The premium on recognition skill (§1f — classifying by deep structure, not surface features) increases as execution becomes commoditized.</p>
+
+<h3>The fluency trap intensifies</h3>
+<p>AI makes the fluency trap (§11) <em>worse</em>. When ChatGPT can explain any solution in clear prose, the gap between "I understand this" and "I can produce this from memory" grows wider. The solution is the same: attempt before asking AI, solve before reading the editorial, re-solve from memory. The discipline of effortful retrieval becomes <em>more</em> important, not less, because the barrier to passive understanding has dropped to near zero.</p>
+
+<h3>The enduring meta-skill</h3>
+<p>Frameworks change. Languages change. React becomes Next.js becomes whatever comes next. But Pólya's four phases have survived 80 years — from mathematics (1945) to programming (1971–1982) to competitive programming (2000s) to AI-assisted problem-solving (2020s). The methodology is the <strong>meta-skill that survives paradigm shifts</strong>. Learn the rhythm once, and it serves you across every domain, every language, every era. That's why this reference exists: not to teach you a specific algorithm, but to teach you the thinking process that generates algorithms — the one skill that compounds across your entire career.</p>
+
+
+<h2>14. Summary — the complete mental checklist</h2>
+
+<p>Print this table. Run it on every problem — from a HackerRank challenge to a non-trivial function you need to design. The first four rows are Pólya's phases. The fifth is Schoenfeld's metacognitive loop. The sixth is the practice method that builds long-term skill.</p>
+
+<table>
+  <thead><tr><th>Step</th><th>What to do</th><th>If you can't…</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Understand</strong></td><td>Write Input / Operation / Output. Trace a concrete example by hand. List edge cases.</td><td>Re-read the problem. You don't understand it yet.</td></tr>
+    <tr><td><strong>2. Plan</strong></td><td>Write a numbered algorithm in plain language. Choose a paradigm (brute force, hash map, D&amp;C, DP, greedy, backtracking). Choose a data structure.</td><td>Try a heuristic: analogy, specialization, working backwards, decomposition. If none work, you may need to learn a new technique.</td></tr>
+    <tr><td><strong>3. Execute</strong></td><td>Write the code. Check each step as you go. Don't improvise — if the code diverges from the plan, go back to Step 2.</td><td>Debug using hypothesis-driven method: observe, hypothesize, predict, test. Don't guess.</td></tr>
+    <tr><td><strong>4. Look back</strong></td><td>Test edge cases. Check complexity. Ask: simpler approach? Different approach? File the pattern. Generalize?</td><td>You're skipping the phase that builds the most long-term skill. Force yourself to spend 5 minutes here even if it feels unnecessary.</td></tr>
+    <tr><td><strong>5. Monitor</strong></td><td>Every few minutes: "Am I progressing? Should I change approach? Did I misunderstand the problem?"</td><td>You're spiraling. Stop. Re-anchor on the goal. Try a different heuristic.</td></tr>
+    <tr><td><strong>6. Practice</strong></td><td>Attempt before reading. Solve, then compare. Re-solve from memory the next day. Interleave problem types.</td><td>You're building fluency, not storage strength. The solution feels easy but won't stick. Make it harder: re-solve from memory, try variations.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The one-line version:</strong> Understand → Plan → Execute → Review, with a metacognitive check every few minutes, and deliberate practice (attempt first, re-solve from memory, interleave) to build long-term skill. That's the entire method, from Pólya (1945) to Schoenfeld (1985) to Wing (2006) to your HackerRank comment — which was already two-thirds of the way there.</p>
+
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://en.wikipedia.org/wiki/How_to_Solve_It">Pólya, G. (1945). <em>How to Solve It</em>. Princeton University Press.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Alan_Schoenfeld">Schoenfeld, A. (1985). <em>Mathematical Problem Solving</em>. Elsevier.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Computational_thinking">Wing, J. (2006). "Computational Thinking." <em>Communications of the ACM</em>.</a> ·
+  Dromey, R.G. (1982). <em>How to Solve It by Computer</em>. Prentice-Hall. ·
+  <a href="https://en.wikipedia.org/wiki/Stepwise_refinement">Wirth, N. (1971). "Program Development by Stepwise Refinement." <em>Communications of the ACM</em>.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Rubber_duck_debugging">Hunt, A. &amp; Thomas, D. (1999). <em>The Pragmatic Programmer</em>.</a> ·
+  Agans, D. (2002). <em>Debugging: The Nine Indispensable Rules</em>. AMACOM. ·
+  <a href="https://en.wikipedia.org/wiki/Competitive_programming">Competitive programming — problem-solving methodology</a> ·
+  <a href="https://en.wikipedia.org/wiki/Einstellung_effect">Luchins, A. (1942). "Mechanization in problem solving: The effect of Einstellung."</a> ·
+  <a href="https://en.wikipedia.org/wiki/Cognitive_load">Sweller, J. (1988). Cognitive load theory.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Expertise">Simon &amp; Chase (1973). "Skill in chess." <em>American Scientist</em>.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Practice_(learning_method)">Ericsson, A. — Deliberate practice theory.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>This doc is the compressed essence. The lessons will teach it interactively. Meanwhile, follow-up questions:</p>
+  <ul>
+    <li>"Can you trace Pólya's four phases through a second problem — one I haven't seen yet?"</li>
+    <li>"How do I know when to use dynamic programming vs divide and conquer — what's the signal?"</li>
+    <li>"What's the difference between a heuristic and an algorithm, in practice?"</li>
+    <li>"How do I build the pattern-recognition skill faster — is there a shortcut, or is it pure volume?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Problem-Solving — How to Think Before You Code</span>
+  <span>Upstream: <a href="./design-thinking.html">Design Thinking</a> · Downstream: <a href="./how-developers-think-frontend.html">How Developers Think</a> · Sibling: <a href="./system-design.html">System Design</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

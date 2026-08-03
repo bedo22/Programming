@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0007 — The Rhythm · How Developers Think When Building a Feature</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 7 · The Exploration Journey · Episode 7 of 14 · Practice (1/3)</p>
+  <h1>The Rhythm — How Developers Think When Building a Feature</h1>
+  <p class="meta">Tutorials teach syntax. Almost none teach the <em>thinking process</em> that precedes the code. Here it is: three threads — Model, View, Flow — cycled as a loop, and the one upfront decision that catches traps while they cost minutes, not days. Anchored to <a href="../reference/how-developers-think-frontend.html">How Developers Think</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>The <a href="../PLAN.md">Ecosystem</a> is done — you know the language, the platform, state, the camps, and React's revolution. The <strong>Practice</strong> movement begins: how developers <em>actually think</em> when building a feature (this lesson), a contrasting path in Angular (<a href="./0008-the-other-path.html">L8</a>), and where React is heading (<a href="./0009-the-frontier.html">L9</a>).</p>
+</section>
+
+<h2>1. Three threads, not a sequence</h2>
+<p>When a senior developer sits down to build a feature, they do <strong>not</strong> follow a waterfall — "first the HTML, then the CSS, then the JavaScript." Instead they hold three intertwined threads and cycle through them, each pass deeper than the last:</p>
+<ul>
+  <li><strong>Model</strong> — the data structures and state shape. What the app <em>knows</em>.</li>
+  <li><strong>View</strong> — the structure and layout, the visual hierarchy. What the user <em>sees</em>.</li>
+  <li><strong>Flow</strong> — the events, the data movement, the logic. What <em>happens</em>.</li>
+</ul>
+<p>The crucial word is <em>cycle</em>. You don't finish the Model and never return. You sketch a little data, build a little view, wire a little flow, then go back to the Model with what you learned. Each round is deeper. This is a <strong>rhythm</strong>, not an algorithm.</p>
+
+<h2>2. The loop, not the waterfall</h2>
+<p>You cycle through the threads in <strong>rounds</strong>, each one a deeper pass. A common shape: <strong>Round 1 — Skeleton</strong> (the thinnest end-to-end slice that works at all: one piece of data, one element, one event). <strong>Round 2 — Make it real</strong> (real data, real layout, real interactions). <strong>Round 3 — Polish</strong> (edge cases, accessibility, performance). You don't move to the next round by a rule — you move when you <em>feel the friction</em>: when the current round starts to creak, that's the signal to deepen.</p>
+<p>This is not a new idea. The reference doc traces it back through decades of the same insight: Boehm's <strong>spiral model</strong> (1986), iterative and incremental development, Kent Beck's <strong>Extreme Programming</strong> (1999), the <strong>Agile Manifesto</strong> (2001), and Eric Ries's <strong>Lean Startup</strong> MVP (2011). All of them say the same thing in different words: build in narrowing spirals, let feedback tell you when to go deeper. The frontend loop is that idea applied to a single feature.</p>
+
+<h2>3. The one upfront decision: sketch the data shape</h2>
+<p>Before any of the cycling, there is one decision that catches more bugs than any other: <strong>sketch the data shape first.</strong> The reference doc gives a concrete sequence:</p>
+<ul>
+  <li><strong>Nouns</strong> — what are the things in this feature? (a todo, a cart, a product, a user…)</li>
+  <li><strong>Fields</strong> — what fields does each noun have, and what are their types?</li>
+  <li><strong>Collection</strong> — what holds the nouns? (an array, a Map, a Set…)</li>
+  <li><strong>Operations</strong> — what does the user do to the data? (add, remove, filter, toggle…)</li>
+  <li><strong>Where state lives</strong> — which component holds which piece?</li>
+  <li><strong>What's derived</strong> — what can be computed from the rest, and therefore should <em>not</em> be stored as state?</li>
+</ul>
+<p>Here's the payoff. If your data shape distinguishes "loading" from "loaded but the results are empty," you avoid the classic trap of flashing "no results found" while the fetch is still in flight. You saw the trap <em>before writing a line of code</em> — while it cost minutes, not days. That is what sketching the data shape buys you.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="loop" data-explain="Experienced developers hold three threads — Model (data), View (structure), Flow (events) — and cycle through them, each pass deeper. It's a loop, not a waterfall. The reference doc traces this back to Boehm's spiral model (1986).">
+  <summary>When a senior developer builds a frontend feature, what mental model do they use?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="loop"> A loop: Model, View, then Flow</label>
+      <label><input type="radio" name="q1" value="waterfall"> A waterfall: structure, then the styling</label>
+      <label><input type="radio" name="q1" value="guess"> A guess-and-check right at the console</label>
+      <label><input type="radio" name="q1" value="recipe"> A fixed recipe from one book</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="data" data-explain="Sketch the data shape first — the nouns, their fields, the collection type, the operations. Get that right and the traps (loading vs empty, derived vs stored) show up while they cost minutes, not days.">
+  <summary>What's the single most important upfront decision when starting a feature?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="data"> The shape of the data</label>
+      <label><input type="radio" name="q2" value="css"> The CSS framework to use</label>
+      <label><input type="radio" name="q2" value="tools"> The build tools to install</label>
+      <label><input type="radio" name="q2" value="colors"> The color palette to pick</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="loading" data-explain="If your data shape distinguishes 'loading' from 'loaded but empty,' you avoid the classic trap of showing 'no results' while the fetch is still in flight. You saw it before writing a line of code — that's what sketching the data shape buys you.">
+  <summary>Sketching the data shape first lets you catch which trap before writing code?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="loading"> Loading state versus empty results</label>
+      <label><input type="radio" name="q3" value="syntax"> A syntax error in JSX</label>
+      <label><input type="radio" name="q3" value="import"> A missing import in code</label>
+      <label><input type="radio" name="q3" value="indent"> A single wrong indentation level</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the thinking process that precedes the code: <strong>three threads — Model, View, Flow — cycled as a loop</strong>, each round deeper, moving on when you feel the friction. And the one upfront decision that pays off most: <strong>sketch the data shape first</strong> — nouns, fields, collection, operations, where state lives, what's derived. That habit catches traps like "loading vs empty" while they cost minutes, not days. The loop has a lineage — spiral model, Agile, Lean Startup — but on a single feature it's simply how seniors avoid staring at a blank file.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/how-developers-think-frontend.html">How Developers Think</a> — the full loop, the wireframe/prototype/MVP vocabulary, a worked data-shape example, and the printable checklist table (§14).</li>
+    <li><strong>Next lesson:</strong> <a href="./0008-the-other-path.html">Lesson 8 — The Other Path</a> — Angular's evolution, a contrasting route to the same destination.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory — then run the checklist on a real feature.</li>
+  </ul>
+  <p class="cite"><a href="https://theleanstartup.com/">Eric Ries — The Lean Startup (2011)</a> (the MVP / build-measure-learn spiral) and <a href="https://agilemanifesto.org/">The Agile Manifesto (2001)</a> — the lineage behind the loop.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I 'feel the friction' between rounds — what am I actually noticing?"</li>
+    <li>"Can you walk me through sketching the data shape for a real feature?"</li>
+    <li>"What counts as 'derived' state, and why shouldn't I store it?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 7 · <a href="../reference/how-developers-think-frontend.html">Reference: How Developers Think</a></span>
+  <span>Next → <a href="./0008-the-other-path.html">Lesson 8 · The Other Path</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

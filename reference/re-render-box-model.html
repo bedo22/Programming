@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Re-render Box Model — Quick Reference</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Mental Models</p>
+  <h1>Re-render Box Model — Quick Reference</h1>
+  <p class="meta">The mental model that makes <code>useState</code>, <code>useEffect</code>, stale-closure bugs, and <code>useRef</code> cohere. Not React-specific — this is just JS scope + closures applied to a function that gets called many times.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>React components are functions that re-run. Each run creates fresh variable boxes. Closures capture the boxes from their birth render. <code>useState</code> and <code>useRef</code> are just two ways to survive the re-render — one with fresh boxes, one with a stable box. This doc gives you the vocabulary to read any React code and explain its bugs without guessing. Prerequisites: <a href="../lessons/0002-closures.html">closures lesson</a>, <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm shift</a> (§6, §9, §16).</p>
+</section>
+
+<h2>0. How to use this reference</h2>
+
+<p>Reading order: standalone. When you hit a React bug involving stale values, intervals, or subscriptions, map it to one of the <strong>four bug shapes</strong> in §3, apply the fix, and move on. The table in §2 is your cheat sheet for "what survives a re-render?"</p>
+
+<h2>1. The rule</h2>
+
+<ul>
+  <li>Every function call creates a <strong>fresh scope</strong> with fresh <strong>boxes</strong> for its <code>let</code>/<code>const</code>/parameter names.</li>
+  <li>Reassigning a variable changes the <em>contents</em> of one box. Calling the function again creates a <em>new</em> box with the same name, in a different scope.</li>
+  <li>A <strong>closure</strong> is born in one specific scope. It holds a pointer to that scope's boxes. It cannot see boxes from later calls of the same function — those boxes live in different scopes the closure has no pointer to.</li>
+  <li>React <em>never</em> rewrites old scopes. It updates its internal store and re-runs your component → new boxes.</li>
+</ul>
+
+<h2>2. Plain JS minimal example</h2>
+
+<pre><code><span class="comment-line">// Two renders, two different boxes</span>
+let renderNumber = 0;
+function Profile() {
+  const count = renderNumber;          <span class="comment-line">// fresh box each call</span>
+  function readLater() { return count; }
+  return readLater;
+}
+const a = Profile(); renderNumber = 1;
+const b = Profile();
+console.log(a());  <span class="output">// 0  ← born in call 1, sees call 1's count box</span>
+console.log(b());  <span class="output">// 1  ← born in call 2, sees call 2's count box</span>
+<span class="comment-line">// Profile was called twice → two count boxes → two different captured values.</span>
+<span class="comment-line">// Same name, different boxes. Pointer to one doesn't reach the other.</span>
+</code></pre>
+
+<h2>3. Three storage models in React</h2>
+
+<table>
+  <thead><tr><th>Storage</th><th>New box per render?</th><th>Lifetime</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>let</code> / <code>const</code> in render</td><td>Yes</td><td>one render</td><td>render-local scratch values</td></tr>
+    <tr><td><code>useState</code></td><td>Yes</td><td>until next render</td><td>values that drive what renders</td></tr>
+    <tr><td><code>useRef</code> <code>.current</code></td><td><strong>No</strong></td><td>for the component's life</td><td>values that must be read async, outside the render call</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>Key insight.</strong> <code>useState</code> gives you a <em>new box each render</em> (React swaps the pointer). <code>useRef</code> gives you the <em>same box forever</em> (you mutate <code>.current</code> yourself). Both survive the re-run; they differ in <em>which</em> box the callback sees.</p>
+</blockquote>
+
+<h2>4. The four classic bug shapes (and their fix vocabulary)</h2>
+
+<h3>4.1 Stale value inside a long-lived callback / interval / subscription</h3>
+<p><strong>Bug:</strong> tick function born in render N reads N's <code>count</code> forever.</p>
+<p><strong>Fix:</strong> <code>useRef</code> — one stable box across all renders; on each render, write latest value into <code>ref.current</code>; the tick function reads through <code>ref.current</code> and always sees the latest. (Do <strong>not</strong> put the ever-changing value in the deps array if the effect itself drives the change — that creates a teardown/re-run feedback loop.)</p>
+
+<h3>4.2 Writing throughput is fine, but reading is stale</h3>
+<p><strong>Bug:</strong> <code>setCount(count + 1)</code> reads the captured <code>count</code>, not the latest.</p>
+<p><strong>Fix:</strong> functional updater <code>setCount(c => c + 1)</code> — React hands the updater the freshest internal value.</p>
+
+<h3>4.3 Need to read the latest value in a callback without re-subscribing each render</h3>
+<p><strong>Bug:</strong> deps array would tear down the subscription too aggressively.</p>
+<p><strong>Fix:</strong> store the value in a <code>ref</code> and read <code>ref.current</code> — one stable box across all renders.</p>
+
+<h3>4.4 First-render-only setup (subscribe once, read latest later)</h3>
+<p><strong>Bug:</strong> empty deps <code>[]</code> makes the setup die after render 1, captured values frozen.</p>
+<p><strong>Fix:</strong> deps array with <code>[]</code> for setup, but read latest values via refs or use a recent React API (<code>useSyncExternalStore</code>, etc.) — context-specific.</p>
+
+<h2>5. Heuristic</h2>
+
+<p>Reading code with a callback inside a React component? Ask three questions:</p>
+<ol>
+  <li><em>In which render was this callback born?</em> (one specific call of the component)</li>
+  <li><em>Which boxes did that render create?</em> (every <code>let</code>/<code>const</code>/<code>useState</code> in the component body)</li>
+  <li><em>Are the boxes the callback reads still the ones holding the values I want?</em> (often no — re-renders made new boxes)</li>
+</ol>
+
+<h2>6. Why this matches Lesson 2</h2>
+
+<p>This is exactly the closure rule, nothing more. A function's birth scope is fixed at birth. Per-render boxes are just per-call boxes. The only thing React adds is that <em>your function gets called many times automatically</em>, so the "new box per call" fact keeps mattering.</p>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+  <p>The re-render mental model: per-render boxes, three storage models, four bug shapes with fixes. Not a tutorial — the <a href="../lessons/0002-closures.html">closures lesson</a> teaches the mechanism; <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm shift</a> places it in React's history; <a href="./nextjs-deep-dive.html">Next.js deep dive</a> shows where it applies (client components) vs doesn't (server components); <a href="./frontend-camps-survey.html">frontend camps survey</a> contrasts with other reactivity models.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Re-render box model</span>
+  <span>Mission: read JS/React at work</span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

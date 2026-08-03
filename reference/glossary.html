@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary — Shared Vocabulary Across the Reference Shelf</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Shared vocabulary — the terms that travel across disciplines</p>
+  <h1>Glossary — Shared Vocabulary Across the Reference Shelf</h1>
+  <p class="meta">Every reference doc on this shelf uses these terms. This glossary defines them once, with links back to the doc that owns each term. If a term means something slightly different in two docs, both senses are noted.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">How to use this glossary</h3>
+  <p>Terms are grouped by the discipline that <em>owns</em> them (the doc where they're defined in depth). Click a term to jump to its owning section. Terms that appear in multiple disciplines have multiple entries.</p>
+</section>
+
+<h2>Design Thinking (owner: <a href="./design-thinking.html">design-thinking.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Wicked Problem</dfn></td>
+      <td>A problem with no stopping rule, no true/false test, no ultimate solution — only better or worse. The problem definition <em>is</em> the design act (Rittel & Webber, 1973).</td>
+      <td>Design Thinking §2, §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Abductive Reasoning</dfn></td>
+      <td>Inference to the best explanation. Observe behavior → hypothesize cause ("they struggle because the form is confusing") → test with a prototype.</td>
+      <td>Design Thinking §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Double-Loop Learning</dfn></td>
+      <td>Single-loop: "fix the action." Double-loop: "question the governing variable." Reframing the problem = double-loop learning (Argyris & Schön, 1978).</td>
+      <td>Design Thinking §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Desirability / Feasibility / Viability</dfn></td>
+      <td>The IDEO three-lens framework (1998): Do people want it? Can we build it? Does it make business sense? Design Thinking lives in the intersection.</td>
+      <td>Design Thinking §0, §7</td>
+    </tr>
+    <tr>
+      <td><dfn>Design Sprint</dfn></td>
+      <td>A 5-day timeboxed execution of Design Thinking: Understand → Sketch → Decide → Prototype → Test (Google Ventures, 2016). A rhythm hack, not the whole discipline.</td>
+      <td>Design Thinking §6, §7</td>
+    </tr>
+    <tr>
+      <td><dfn>Double Diamond</dfn></td>
+      <td>Discover (diverge) → Define (converge) → Develop (diverge) → Deliver (converge). Visual meta-model from Design Council UK (2005).</td>
+      <td>Design Thinking §2, §7</td>
+    </tr>
+    <tr>
+      <td><dfn>Insight Statement</dfn></td>
+      <td>A reframed problem: "Users don't forget because of memory — they forget because the trigger is hidden by their environment." Output of the Define stage.</td>
+      <td>Design Thinking §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Design Theater</dfn></td>
+      <td>Performing the method (sticky notes, workshops) without real empathy. The output validates the team's bias, not the user's need. (Natasha Jen, 2017).</td>
+      <td>Design Thinking §10</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>System Design (owner: <a href="./system-design.html">system-design.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Bounded Context</dfn></td>
+      <td>A semantic boundary within which a domain model applies. "Order" means different things in Sales (quote, negotiation) vs Fulfillment (pick, pack, ship). One bounded context = one service (DDD strategic design).</td>
+      <td>System Design §7</td>
+    </tr>
+    <tr>
+      <td><dfn>CAP Theorem</dfn></td>
+      <td>In a network partition, you must choose Consistency or Availability. You cannot have both. Every distributed data system makes this choice explicitly or implicitly.</td>
+      <td>System Design §5</td>
+    </tr>
+    <tr>
+      <td><dfn>PACELC</dfn></td>
+      <td>Refines CAP: even without partitions, there's a Latency/Consistency tradeoff (ELC). "If partitioned → A or C; Else → L or C" (Abadi, 2010).</td>
+      <td>System Design §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Conway's Law</dfn></td>
+      <td>"Organizations which design systems are constrained to produce designs which are copies of the communication structures of these organizations." Service boundaries must align with team boundaries.</td>
+      <td>System Design §5, §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Information Hiding</dfn></td>
+      <td>Module boundaries should hide <em>design decisions likely to change</em>, not just data. The "reason for the data structure" is what's hidden (Parnas, 1972).</td>
+      <td>System Design §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Consistency Model</dfn></td>
+      <td>The guarantee an API makes about reads/writes: Strong (linearizable), Sequential, Causal, Eventual, Read-your-writes, Monotonic reads. Every API contract implicitly or explicitly promises one.</td>
+      <td>System Design §5, §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Failure Domain</dfn></td>
+      <td>A box drawn around a component: if this box loses power, what else stops? If deployed with a bug, what's the blast radius? If its DB corrupts, what data is lost? Good design minimizes blast radius.</td>
+      <td>System Design §7, §10</td>
+    </tr>
+    <tr>
+      <td><dfn>Idempotency Key</dfn></td>
+      <td>A client-generated key carried on every mutating request. Server stores key → response mapping for 24h. Duplicate key returns original response. Enables safe retries.</td>
+      <td>System Design §6, §7; API Design §8, §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Circuit Breaker</dfn></td>
+      <td>Stop calling a failing dependency, fail fast, retry after timeout. Prevents cascade failures. (Hystrix, Resilience4j, Go-breaker).</td>
+      <td>System Design §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Saga</dfn></td>
+      <td>Distributed transaction via compensating actions: OrderPlaced → ReserveInventory → ChargePayment → if any fails, run compensations in reverse (ReleaseInventory, RefundPayment).</td>
+      <td>System Design §6, §10</td>
+    </tr>
+    <tr>
+      <td><dfn>ADR (Architecture Decision Record)</dfn></td>
+      <td>Lightweight markdown: Title, Status, Context, Decision, Consequences. Git-tracked. Captures <em>why</em>, not just <em>what</em> (Nygard, 2011).</td>
+      <td>System Design §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Modular Monolith</dfn></td>
+      <td>Single deployable, strict internal module boundaries (enforced by linting, separate packages, explicit contracts). Most microservice benefits without distributed-system tax.</td>
+      <td>System Design §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Durable Objects</dfn></td>
+      <td>Stateful serverless: compute + storage co-located at the edge. The "service" boundary becomes function + attached storage (Cloudflare, 2021+).</td>
+      <td>System Design §8, §11</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>API Design (owner: <a href="./api-design.html">api-design.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Interface Contract (Macro)</dfn></td>
+      <td>Resources, operations, versioning, auth, rate limits, deprecation policy, error envelope, pagination strategy, idempotency semantics. What the <em>consumer</em> sees.</td>
+      <td>API Design §0</td>
+    </tr>
+    <tr>
+      <td><dfn>Wire Contract (Micro)</dfn></td>
+      <td>Serialization format, schema evolution rules, field-level nullability, enum extensibility, timestamp formats, cursor encoding, compression, transport (HTTP/1.1, HTTP/2, HTTP/3, gRPC, WebSocket). What the <em>bytes</em> say.</td>
+      <td>API Design §0</td>
+    </tr>
+    <tr>
+      <td><dfn>Idempotency</dfn></td>
+      <td>An operation that can be applied multiple times with the same effect as once. Every mutating endpoint must accept an <code>Idempotency-Key</code> header.</td>
+      <td>API Design §8, §9; System Design §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Problem Details (RFC 9457)</dfn></td>
+      <td>Standard error envelope: <code>type</code> (URI), <code>title</code>, <code>status</code>, <code>detail</code>, <code>instance</code>, <code>retry_after</code>. Clients switch on <code>type</code>, not string matching.</td>
+      <td>API Design §8, §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Schema Evolution Rules</dfn></td>
+      <td>Formal backward/forward compatibility: add optional fields, never remove required, never change type, enum extensions safe if consumers ignore unknown (Avro/Protobuf/JSON Schema).</td>
+      <td>API Design §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Cursor Pagination (Keyset)</dfn></td>
+      <td>Pagination using a stable sort key (<code>after: "cursor"</code>) instead of offset. O(1) vs O(n) for skipped rows. Default for growing collections.</td>
+      <td>API Design §9, §10</td>
+    </tr>
+    <tr>
+      <td><dfn>Sunset Header</dfn></td>
+      <td><code>Sunset: Sat, 01 Jan 2027 00:00:00 GMT</code> + <code>Link: </v2/...>; rel="successor-version"</code>. Machine-readable deprecation notice.</td>
+      <td>API Design §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Contract Testing</dfn></td>
+      <td>CI gate: implementation must match schema. Pact (consumer-driven), Dredd, Schemathesis. Prevents schema drift.</td>
+      <td>API Design §10</td>
+    </tr>
+    <tr>
+      <td><dfn>API as Product</dfn></td>
+      <td>Treat the contract as a product with a PM, metrics (adoption, p99 latency, breaking-change frequency), and lifecycle. Not a technical artifact (Kin Lane).</td>
+      <td>API Design §10, §11</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>UI/UX & Web Design (owner: <a href="./ui-ux-web-design.html">ui-ux-web-design.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Affordance</dfn></td>
+      <td>Action possibility perceived by the user. Perceived affordance ≠ real affordance. Buttons look pressable; links look clickable. Signifiers communicate affordance (Gibson 1977, Norman 1988).</td>
+      <td>UI/UX §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Fitts's Law</dfn></td>
+      <td>Time to acquire target = f(distance, size). Bigger, closer targets = faster. Corners/edges = infinite size (Mac menu bar, Windows Start).</td>
+      <td>UI/UX §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Hick's Law</dfn></td>
+      <td>Decision time = log₂(n+1) choices. Reduce choices → faster decisions. Progressive disclosure, smart defaults, chunking.</td>
+      <td>UI/UX §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Gulf of Execution / Evaluation</dfn></td>
+      <td>Gulf of execution: user intent → system action. Gulf of evaluation: system state → user understanding. Good UI narrows both (Norman, 1988).</td>
+      <td>UI/UX §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Design Tokens</dfn></td>
+      <td>Platform-agnostic design decisions (color, space, type, motion, border, shadow) as structured data. Compile to CSS custom properties, iOS, Android, etc. (W3C DTCG).</td>
+      <td>UI/UX §7; HTML & CSS §7, §8</td>
+    </tr>
+    <tr>
+      <td><dfn>State Visibility Matrix</dfn></td>
+      <td>Every screen × every state (idle, loading, partial success, error, empty, offline). Maps directly to HTML states (<code>aria-busy</code>) and CSS states (<code>:hover</code>, <code>[data-loading]</code>).</td>
+      <td>UI/UX §9; HTML & CSS §0, §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Headless UI Primitives</dfn></td>
+      <td>Behavior + accessibility + state management, zero styling opinions (Radix, Headless UI, ARIA Kit). Design systems provide visual layer only.</td>
+      <td>UI/UX §7, §11</td>
+    </tr>
+    <tr>
+      <td><dfn>WCAG / POUR</dfn></td>
+      <td>Perceivable, Operable, Understandable, Robust. Testable success criteria (A/AA/AAA). Accessibility as civil right, not feature.</td>
+      <td>UI/UX §5, §8</td>
+    </tr>
+    <tr>
+      <td><dfn>Motion as Meaning</dfn></td>
+      <td>Motion explains spatial relationships (where did this come from?) not "delight." FLIP animations, shared element transitions, View Transitions API.</td>
+      <td>UI/UX §11</td>
+    </tr>
+    <tr>
+      <td><dfn>Dark Patterns</dfn></td>
+      <td>Deceptive patterns (roach motel, hidden costs, forced continuity). Now regulated: EU DSA (2022), California Delete Act (2023), FTC negative option rule.</td>
+      <td>UI/UX §11</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>HTML & CSS (owner: <a href="./html-and-css.html">html-and-css.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>DOM (Document Object Model)</dfn></td>
+      <td>The parsed HTML tree — elements, attributes, text nodes. What the browser exposes to JavaScript. <code>document.querySelector('article')</code> returns a DOM node.</td>
+      <td>HTML & CSS §0</td>
+    </tr>
+    <tr>
+      <td><dfn>AOM (Accessibility Object Model) / Accessibility Tree</dfn></td>
+      <td>A parallel tree derived from the DOM, filtered for semantics. <code><button></code> → <code>role="button"</code> node; <code><div onclick></code> → generic node with no role. Screen readers traverse <em>this</em> tree.</td>
+      <td>HTML & CSS §0</td>
+    </tr>
+    <tr>
+      <td><dfn>Render Tree</dfn></td>
+      <td>DOM + computed styles → boxes. Cascade, layout, paint, composite happen here. Three trees, one source: the HTML you write.</td>
+      <td>HTML & CSS §0</td>
+    </tr>
+    <tr>
+      <td><dfn>Cascade Algorithm</dfn></td>
+      <td>Origin (UA/user/author) → Importance (<code>!important</code>) → Specificity (ID/Class/Type) → Source Order → Scope Proximity → Layer Order. Deterministic, inspectable in DevTools "Computed" tab.</td>
+      <td>HTML & CSS §1, §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Specificity</dfn></td>
+      <td><code>(a,b,c)</code> = (ID count, Class/Attr/Pseudo-class count, Type/Pseudo-element count). <code>#id .class:hover</code> = (1,2,0). Higher wins. Not base-10: <code>(0,11,0)</code> < <code>(1,0,0)</code>.</td>
+      <td>HTML & CSS §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Formatting Context</dfn></td>
+      <td>BFC (Block Formatting Context): floats, margins, clears. Flex: main/cross axis, alignment, distribution. Grid: tracks, lines, areas, auto-placement. Each context has its own layout algorithm.</td>
+      <td>HTML & CSS §1, §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Intrinsic Sizing</dfn></td>
+      <td><code>min-content</code> = smallest without overflow. <code>max-content</code> = largest without wrapping. <code>fit-content(limit)</code> = clamp(<code>min-content</code>, <code>limit</code>, <code>max-content</code>). Grid <code>minmax()</code>, <code>auto-fit</code>, <code>auto-fill</code> use these.</td>
+      <td>HTML & CSS §1, §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Container Queries</dfn></td>
+      <td><code>@container</code> queries the <em>parent's size</em>, not viewport. A card in a sidebar vs main column needs different breakpoints. Component owns its responsive logic.</td>
+      <td>HTML & CSS §1, §3, §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Cascade Layers (<code>@layer</code>)</dfn></td>
+      <td>Explicit origin ordering: <code>@layer reset, base, components, utilities</code>. Third-party CSS in its own layer. No more <code>!important</code> escalation.</td>
+      <td>HTML & CSS §1, §3, §7</td>
+    </tr>
+    <tr>
+      <td><dfn>Logical Properties</dfn></td>
+      <td><code>margin-inline-start</code>, <code>padding-inline-end</code>, <code>border-inline-start</code> mirror automatically. Flex/Grid honor <code>dir="rtl"</code> on <code><html></code>. No extra CSS for RTL.</td>
+      <td>HTML & CSS §1, §9</td>
+    </tr>
+    <tr>
+      <td><dfn>OKLCH / OKLAB</dfn></td>
+      <td>Perceptual color spaces. Lightness preserved across hue shifts; no "vibrating" brand colors in dark mode. Replaces HSL for token systems.</td>
+      <td>HTML & CSS §1, §9</td>
+    </tr>
+    <tr>
+      <dfn>Forced Colors</dfn>
+      <td><code>@media (forced-colors: active)</code> disables backgrounds/shadows; system colors take over. <code>border: 1px solid CanvasText</code> ensures visibility.</td>
+      <td>HTML & CSS §9</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>JavaScript: The Language (owner: <a href="./javascript-the-language.html">javascript-the-language.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Prototype Chain</dfn></td>
+      <td>Objects inherit directly from other objects — no class as separate entity. <code>Object.create(proto)</code> is the primitive. <code>dog.__proto__ === Animal.prototype</code>.</td>
+      <td>JS Language §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Lexical Closure</dfn></td>
+      <td>A function "captures" its surrounding scope. <code>function outer() { let x = 1; return function inner() { return x++; }; }</code> — <code>inner</code> remembers <code>x</code> after <code>outer</code> returns.</td>
+      <td>JS Language §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Event Loop</dfn></td>
+      <td>Single call stack, single thread. Macrotasks (<code>setTimeout</code>) run after current task + all microtasks + render. Microtasks (<code>Promise.then</code>, <code>await</code>) run before next macrotask.</td>
+      <td>JS Language §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Host Environment</dfn></td>
+      <td>JS is a guest. The spec (ECMAScript) defines core; the host provides everything else: <code>window</code>/<code>document</code>/<code>fetch</code> (browser), <code>global</code>/<code>fs</code>/<code>process</code> (Node), <code>Deno</code>, <code>Bun</code>, <code>fetch</code>/<code>KV</code>/<code>Durable Objects</code> (Cloudflare Workers).</td>
+      <td>JS Language §6</td>
+    </tr>
+    <tr>
+      <td><dfn>TC39 Process</dfn></td>
+      <td>Stage 0 (strawperson) → Stage 1 (proposal) → Stage 2 (draft) → Stage 3 (candidate) → Stage 4 (finished). Two independent implementations required for Stage 4. Features take years — the web cannot break.</td>
+      <td>JS Language §7</td>
+    </tr>
+    <tr>
+      <td><dfn>JIT Compilation</dfn></td>
+      <td>V8 compiles hot paths to machine code. "JS is slow" is 20 years out of date. But: JIT warm-up exists, deoptimization happens, <code>eval</code>/<code>with</code> disable optimization.</td>
+      <td>JS Language §8</td>
+    </tr>
+    <tr>
+      <td><dfn>WebAssembly (WASM)</dfn></td>
+      <td>Compile target for C++/Rust/Go in browser. Partner, not competitor. WASM cannot directly touch DOM (<code>anyref</code> in progress). JS remains mandatory DOM/host glue.</td>
+      <td>JS Language §9</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Frontend Camps Survey (owner: <a href="./frontend-camps-survey.html">frontend-camps-survey.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Camp A: CMS / Classic Server</dfn></td>
+      <td>Server owns document (PHP, Rails, Django). JS optional sugar. Admin UIs often full SPAs.</td>
+      <td>Camps §1</td>
+    </tr>
+    <tr>
+      <td><dfn>Camp B: HTML-First / Islands</dfn></td>
+      <td>Document is product, JS is precision tool. Astro: zero JS default; opt into islands (React, Preact, Svelte, Vue, Solid) only where needed. HTMX/Alpine: server-driven UI.</td>
+      <td>Camps §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Camp C: Client SPA</dfn></td>
+      <td>Browser downloads app shell; client-side routing; server mostly API. Vite bundler. State libraries (Redux, Zustand, Pinia). CRA sunset Feb 2025.</td>
+      <td>Camps §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Camp D: Meta-Framework</dfn></td>
+      <td>Framework around UI library: routing, data loading, rendering strategy, bundling, deployment. Next.js, Remix, React Router FW, Expo, Nuxt, SvelteKit, Angular, SolidStart, Qwik City.</td>
+      <td>Camps §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Camp E: Signals World (non-React)</dfn></td>
+      <td>Angular (signals+zone.js), Vue 3 (<code>ref</code>/<code>reactive</code>), Svelte 5 (runes), Solid (<code>createSignal</code>), Preact (<code>@preact/signals</code>). Fine-grained updates; component function often doesn't re-run top-to-bottom.</td>
+      <td>Camps §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Camp F: WASM / Non-JS UI</dfn></td>
+      <td>Rust/C++/C#/Zig in browser via WASM. Heavy compute (codecs, CAD, games, crypto). JS usually owns DOM glue. Yew/Leptos (Rust), Blazor (C#).</td>
+      <td>Camps §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Re-render Box Model</dfn></td>
+      <td>React's mental model: component function = pure function of props+state → UI. Re-run on state change → diff → commit. Closures capture render-scoped values. <em>Does not apply</em> to signals frameworks or server components.</td>
+      <td>Camps §10</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Developer Loop / How Developers Think (owner: <a href="./how-developers-think-frontend.html">how-developers-think-frontend.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Model / View / Flow (Three Threads)</dfn></td>
+      <td>The mental loop: Thread 1 = Data structures & state shape. Thread 2 = Structure + layout (HTML). Thread 3 = Events, data movement, logic. Intertwined, not sequential.</td>
+      <td>Dev Loop §1</td>
+    </tr>
+    <tr>
+      <td><dfn>Skeleton → Deepen → Polish</dfn></td>
+      <td>Round 0: Clarify. Round 1: Simplest structures, semantic HTML, stub handlers. Round 2: Upgrade where pain appears, full styling, real logic. Round 3: Perf, edge cases, a11y.</td>
+      <td>Dev Loop §1, §3–5</td>
+    </tr>
+    <tr>
+      <td><dfn>Data Shape First</dfn></td>
+      <td>Sketch the nouns, fields, collection types, operations, component state ownership <em>before</em> writing HTML. The shape determines the UI structure; changing it late is expensive.</td>
+      <td>Dev Loop §2, §13</td>
+    </tr>
+    <tr>
+      <td><dfn>Derived State</dfn></td>
+      <td>Values computed from other state at render time (filtered list, active count). <strong>Never store derived values in state</strong> — it's the most common frontend bug.</td>
+      <td>Dev Loop §13</td>
+    </tr>
+    <tr>
+      <td><dfn>Spiral Development / IID</dfn></td>
+      <td>Iterative & Incremental Development (Larman & Basili, 2003) — older than Waterfall. Boehm named it "Spiral" (1986): Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper.</td>
+      <td>Dev Loop §11</td>
+    </tr>
+    <tr>
+      <td><dfn>Wireframe / Mockup / Prototype / MVP</dfn></td>
+      <td>Three axes: Fidelity (how real), Disposability (throw away?), Behavior (static vs clickable). Wireframe = high disposability + low fidelity + no behavior. MVP = low disposability + production fidelity + fully working.</td>
+      <td>Dev Loop §12</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Problem-Solving (owner: <a href="./problem-solving.html">problem-solving.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Well-Defined Problem</dfn></td>
+      <td>A problem with clear input, clear output, and objective success criteria. Gets an <em>algorithm</em> (a fixed, finite sequence of steps). Examples: HackerRank challenges, math proofs.</td>
+      <td>Problem-Solving §1</td>
+    </tr>
+    <tr>
+      <td><dfn>Wicked Problem</dfn></td>
+      <td>A problem with evolving input, subjective output, and no true stopping rule. Gets a <em>rhythm</em> (an iterative loop). Examples: UI features, product decisions. Contrast with well-defined.</td>
+      <td>Problem-Solving §1; Design Thinking §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Pólya's Four Phases</dfn></td>
+      <td>The universal problem-solving rhythm (1945): Understand → Plan → Execute → Look back. A rhythm, not a waterfall — you cycle, returning to earlier phases when later ones reveal gaps.</td>
+      <td>Problem-Solving §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Heuristic</dfn></td>
+      <td>A rule of thumb that usually helps but doesn't guarantee a solution. Contrast with <em>algorithm</em>, which guarantees a result. Pólya's heuristics: analogy, specialization, working backwards, decomposition, variation, auxiliary elements, generalization.</td>
+      <td>Problem-Solving §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Computational Thinking</dfn></td>
+      <td>The lens for structuring problems computationally (Papert 1980, Wing 2006). Four pillars: decomposition, pattern recognition, abstraction, algorithm design. These are the moves <em>within</em> Pólya's phases.</td>
+      <td>Problem-Solving §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Metacognition</dfn></td>
+      <td>Thinking about your own thinking while problem-solving — monitoring progress, deciding when to abandon an approach, re-anchoring on the goal. Schoenfeld's (1985) key addition to Pólya: strategies alone are weak without metacognitive control.</td>
+      <td>Problem-Solving §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Stepwise Refinement</dfn></td>
+      <td>Top-down decomposition for programming (Wirth, 1971): start with the whole problem, express the solution using "black boxes," refine each downward until every box is a concrete operation. The problem-solving equivalent of "sketch the data shape first."</td>
+      <td>Problem-Solving §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Algorithm Design Paradigm</dfn></td>
+      <td>A fundamental approach to designing algorithms. Categories: brute force (try all), greedy (local optimum), divide &amp; conquer (independent sub-problems), dynamic programming (overlapping sub-problems), backtracking (try &amp; prune), hash table (O(1) lookup).</td>
+      <td>Problem-Solving §7</td>
+    </tr>
+    <tr>
+      <td><dfn>Pattern Filing</dfn></td>
+      <td>The Phase 4 (Look back) act of categorizing a solved problem by its pattern and the signal that identified it. Builds pattern recognition over time. "Count occurrences → hash map. Signal: 'how many times each X appears.'"</td>
+      <td>Problem-Solving §10</td>
+    </tr>
+    <tr>
+      <td><dfn>Rubber Duck Debugging</dfn></td>
+      <td>Explaining code line by line to an inanimate object (Hunt &amp; Thomas, <em>The Pragmatic Programmer</em>, 1999). Forces articulation of assumptions; the bug is usually in an unstated assumption. Phase 1 (Understand) applied to your own code.</td>
+      <td>Problem-Solving §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Hypothesis-Driven Debugging</dfn></td>
+      <td>Applying the scientific method to debugging: observe → hypothesize → predict → test → conclude. Never change code without a confirmed hypothesis; guessing is not debugging.</td>
+      <td>Problem-Solving §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Fluency vs Storage Strength (Problem-Solving)</dfn></td>
+      <td>Reading a solution builds fluency (in-the-moment "I get it") but not storage strength (long-term retrieval). Storage strength comes from effortful retrieval: attempt first, solve then compare, re-solve from memory, interleave problem types.</td>
+      <td>Problem-Solving §11</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2>Cross-Cutting Terms (appear in multiple disciplines)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Primary Owner</th><th>Also Appears In</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Progressive Enhancement</dfn></td>
+      <td>HTML & CSS</td>
+      <td>HTML & CSS §1, §5; UI/UX §2; Camps §2; System Design §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Design System</dfn></td>
+      <td>UI/UX</td>
+      <td>UI/UX §1, §7; HTML & CSS §1, §7; Camps §4; Dev Loop §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Type-Safe Contract</dfn></td>
+      <td>API Design</td>
+      <td>API Design §7, §8, §11; System Design §11; Camps §4; JS Language §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Observability</dfn></td>
+      <td>System Design</td>
+      <td>System Design §5, §6, §8; API Design §8; Dev Loop §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Trust Boundary</dfn></td>
+      <td>System Design</td>
+      <td>System Design §7; API Design §4; HTML & CSS §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Constraint Inversion</dfn></td>
+      <td>All (pattern)</td>
+      <td>JS Across Stacks §3; System Design §3; API Design §3; UI/UX §3; HTML & CSS §3; Design Thinking §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Rhythm, Not Algorithm</dfn></td>
+      <td>All (meta-pattern)</td>
+      <td>Every doc §6</td>
+    </tr>
+  </tbody>
+</table>
+
+<footer class="lesson-foot">
+  <span>Reference · Glossary — shared vocabulary</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work</span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

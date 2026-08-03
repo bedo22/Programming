@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript: The Language — History, Design, and the Runtime Model</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">REFERENCE · THE LANGUAGE, NOT THE FRAMEWORKS</p>
+  <h1>JavaScript: The Language — History, Design, and the Runtime Model</h1>
+  <p class="meta">How JS became JS: the 1995 Netscape/Sun deal, the Brendan Eich 10-day sprint, Mocha → LiveScript → JavaScript → ECMAScript, the prototype model, the event loop, single-threaded concurrency, and why a scripting language for form validation became the only language that runs natively in every browser. A foundation doc for the rest of the reference shelf. Sibling to <a href="./html-and-css.html">HTML & CSS</a> (the platform substrate JS manipulates).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>The other reference docs (<a href="./class-to-hooks-paradigm-shift.html">React paradigm</a>, <a href="./angular-evolution.html">Angular evolution</a>, <a href="./nextjs-deep-dive.html">Next.js deep dive</a>, <a href="./frontend-camps-survey.html">camps survey</a>) treat JS as a given. This doc steps back and asks: what is JS, why does it look the way it does, and what design bets made it the language that runs everywhere? Sibling to <a href="./what-is-state-prequel.html">what-is-state-prequel</a> (which covers programming theory broadly) and parent-context for <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a>. Its companion across-stacks doc (<a href="./javascript-across-stacks.html">javascript-across-stacks</a>) covers where JS runs and who fights it in each lane.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. One sitting. This doc is <em>not</em> a JS tutorial — the <a href="../lessons/0001-scope-and-hoisting.html">12 lessons</a> already are (scope, closures, prototypes, arrays, <code>this</code>, objects, currying, strings, errors, modules, cert self-test). This doc is not a React doc — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> already is. This doc <em>is</em> the missing piece: the language's history, design rationale, and runtime model, written so you can read any JS codebase without asking "why did they do it this way?" at the language level. Cross-cutting to <a href="./html-and-css.html">HTML & CSS</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+
+<h2>1. The 10 days in May 1995</h2>
+
+<p>May 1995. Netscape Navigator 1.1 ships. The web is static HTML. Marc Andreessen wants the browser to be programmable — not just display documents, but react to the user. He tasks Brendan Eich, a 34-year-old systems programmer who joined Netscape that April, with building a scripting language for the browser. Constraints: must run in the browser, must be easy for non-programmers (designers, HTML authors), must ship in Netscape 2.0 by September.</p>
+
+<p>Eich has 10 days to produce a working prototype. He draws on two lineages:</p>
+
+<ul>
+  <li><strong>Scheme (Lisp)</strong> — first-class functions, lexical closures, a tiny core. Eich wanted this.</li>
+  <li><strong>Java</strong> — the Netscape/Sun alliance meant "Java-like syntax" was a management requirement. The <code>{ }</code> braces, <code>;</code> terminators, <code>new</code>, <code>typeof</code> — all Java-shaped.</li>
+</ul>
+
+<p>The prototype was called <strong>Mocha</strong>. Shipped in Netscape Navigator 2.0 beta as <strong>LiveScript</strong>. Renamed <strong>JavaScript</strong> in December 1995 — the Sun/Netscape marketing handshake: "Java is to the enterprise as JavaScript is to the browser." The name has caused 30 years of confusion. Java and JavaScript share syntax (curly braces) and almost nothing else.</p>
+
+<blockquote class="callout">
+  <p><strong>Primary source → </strong>Brendan Eich, <cite>FAQ: Why is JS designed the way it is?</cite> (2011): "I wanted a Lisp-like language but had to use Java-like syntax to pass management approval. Under the <code>{ }</code> braces is a lambda-calculus heart beating in a C-shaped body."</p>
+</blockquote>
+
+<h2>2. Why a new language, not a Java applet or C++ extension</h2>
+
+<p>The theory you asked for: why create a new language instead of extending Java or C++? The answer is <em>platform constraints</em>.</p>
+
+<ul>
+  <li><strong>Java applets</strong> were already coming (1995). They had a heavyweight JVM, a compile step, static typing, a sandbox. They were for <em>applications</em> inside the browser — heavy, slow to start, overkill for "validate this form before submit."</li>
+  <li><strong>C++</strong> — no one ships a C++ compiler to a browser. No garbage collection, manual memory management, no safe sandbox. The browser needed a language that could not crash the process.</li>
+  <li><strong>The platform needed glue.</strong> A scripting shell: mutate the DOM, handle events, validate forms, talk to the server (later: <code>XMLHttpRequest</code>). Glue languages are dynamically typed, garbage-collected, interpreted, and forgiving. Java and C++ are none of these.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>The pattern that repeats:</strong> A platform deserves a language designed for its constraints, not a hand-me-down from a different platform. This is the same theory that later justifies TypeScript (a JS uplift for large-team maintainability, not a replacement), Go (a C++ replacement designed for networked servers, not a general-purpose systems language), Rust (a C++ replacement that solves memory safety without GC). The constraint changed — the language changed.</p>
+</blockquote>
+
+<h2>3. The design: prototype model, not classes</h2>
+
+<p>Eich chose prototypes over classes. The influence: <strong>Self</strong> (a Smalltalk descendant, prototype-based, from Sun Microsystems labs). In a prototype system, objects inherit directly from other objects — no class as a separate entity. You create an object, it becomes the prototype for others. <code>Object.create(proto)</code> is the primitive.</p>
+
+<p>JavaScript's <code>new</code> + constructor function + <code>.prototype</code> is a thin syntactic layer over this:</p>
+
+<pre><code><span class="comment-line">// The prototype chain in action</span>
+function Animal(name) { this.name = name; }
+Animal.prototype.speak = function() { console.log(this.name + ' makes a sound'); };
+
+const dog = new Animal('Dog');
+dog.speak(); <span class="output">// Dog makes a sound</span>
+
+<span class="comment-line">// dog.__proto__ === Animal.prototype</span>
+<span class="comment-line">// Animal.prototype.__proto__ === Object.prototype</span>
+<span class="comment-line">// Object.prototype.__proto__ === null</span>
+</code></pre>
+
+<p>ES6 <code>class</code> (2015) is <strong>syntax sugar over prototypes</strong> — not a full class system. It does not introduce private fields (those came later, 2022), does not change single inheritance, does not add multiple dispatch. It hides the delegation. When you read <code>class Dog extends Animal</code>, the prototype chain is still there underneath. Understanding the prototype model matters because the sugar leaks: <code>this</code> binding, method extraction, <code>Object.getPrototypeOf</code>, <code>__proto__</code> all expose the mechanism.</p>
+
+<h2>4. The design: first-class functions, closures, the lambda-calculus heart</h2>
+
+<p>The Scheme/Lisp lineage. JavaScript functions are values — they can be assigned, passed, returned, created at runtime. This enables:</p>
+
+<ul>
+  <li><strong>Higher-order functions</strong> — <code>map</code>/<code>filter</code>/<code>reduce</code> take functions as arguments.</li>
+  <li><strong>Lexical closures</strong> — a function "captures" its surrounding scope. <code>function outer() { let x = 1; return function inner() { return x++; }; }</code> — <code>inner</code> remembers <code>x</code> after <code>outer</code> returns.</li>
+  <li><strong>Currying</strong> — partial application by returning functions that take the next argument.</li>
+</ul>
+
+<p>These are not "features added later." They were there in the 10-day prototype because Eich implemented the lambda calculus directly. The <code>function</code> keyword <em>is</em> a lambda. The <a href="../lessons/0002-closures.html">closures lesson</a> and <a href="../lessons/0007-currying.html">currying lesson</a> cover the mechanics; this doc covers the <em>why</em>.</p>
+
+<blockquote class="callout">
+  <p><strong>Primary source → </strong>Brendan Eich, <cite>JavaScript at 20</cite> (2015): "The lambda-calculus heart was there from day one. The C-shaped body was the compromise."</p>
+</blockquote>
+
+<h2>5. The design: single-threaded + event loop</h2>
+
+<p>JavaScript is single-threaded by design. One call stack. One thread of execution. The browser's DOM is single-threaded — two threads repainting the same DOM would race. The event loop is the concurrency model:</p>
+
+<pre><code><span class="comment-line">// Simplified event loop (browser)</span>
+<span class="comment-line">// while (queue.length) {</span>
+<span class="comment-line">//   const task = queue.shift();</span>
+<span class="comment-line">//   task();  // run to completion</span>
+<span class="comment-line">//   while (microtaskQueue.length) { microtaskQueue.shift()(); }</span>
+<span class="comment-line">//   render();</span>
+<span class="comment-line">// }</span>
+</code></pre>
+
+<p>What maps onto the loop:</p>
+
+<table>
+  <thead><tr><th>API</th><th>Queue</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>setTimeout</code> / <code>setInterval</code></td><td>Macrotask</td><td>Runs after current task + all microtasks + render</td></tr>
+    <tr><td><code>Promise.then</code> / <code>await</code></td><td>Microtask</td><td>Runs before next macrotask, after current sync code</td></tr>
+    <tr><td><code>queueMicrotask</code></td><td>Microtask</td><td>Explicit microtask scheduling</td></tr>
+    <tr><td><code>requestAnimationFrame</code></td><td>Animation frame</td><td>Runs before next render, after microtasks</td></tr>
+  </tbody>
+</table>
+
+<p>The Node.js bet (2009): the <em>same loop</em> works server-side. No threads per request — one loop, many concurrent I/O operations. This is why Node handles 10k connections on one thread while a threaded server needs 10k threads. The trade-off: CPU-bound work blocks the loop. The solution: worker threads (2018) or offload to another process.</p>
+
+---
+
+<h2>5b. Mental models — how developers actually reason about the event loop</h2>
+
+<p>Most JS bugs are not syntax bugs — they are <strong>mental-model bugs</strong> about when code runs. The same loop is the answer, but how a developer <em>imagines</em> the loop determines whether they predict correctly. The four most common mental models in practice:</p>
+
+<table>
+  <thead><tr><th>Mental model</th><th>What the developer believes</th><th>Where it breaks</th><th>Debugging clue</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>"Synchronous until proven otherwise"</strong></td>
+      <td>JS runs top-to-bottom; <code>async</code>/<code>await</code> just "waits" inline</td>
+      <td>Mutations after <code>await</code> look like they happen "before" the awaited promise resolves — the developer forgets the continuation is scheduled</td>
+      <td>"Why is <code>x</code> still the old value after I <code>await</code>ed the assignment?" → the assignment is in a microtask after the awaiter already resumed</td>
+    </tr>
+    <tr>
+      <td><strong>"<code>setTimeout(fn, 0)</code> means 'immediately'"</strong></td>
+      <td>0ms = now</td>
+      <td>The callback runs <em>after</em> the current task <em>and</em> all microtasks <em>and</em> render; for heavy pages this can be hundreds of ms</td>
+      <td>"Why didn't my callback fire?" → check the queue; render and microtasks drain first</td>
+    </tr>
+    <tr>
+      <td><strong>"<code>await</code> unwraps the value"</strong></td>
+      <td><code>await p</code> gives you <code>p</code>'s value, like sync assignment</td>
+      <td><code>await</code> yields the current task to the microtask queue; control returns to the event loop first. Anything that ran <em>between</em> the await and the resumption will observe a partial state</td>
+      <td>"Why did my competitor callback see the old state?" → it ran in the microtask gap</td>
+    </tr>
+    <tr>
+      <td><strong>"All callbacks are async"</strong></td>
+      <td>Everything JS does is "callback-based", so order doesn't matter</td>
+      <td>Sync code runs to completion first; only when the stack is empty do queued tasks run. Order matters <em>within</em> a task</td>
+      <td>"Why is my callback reading state from a task I thought ran later?" → it ran <em>inside</em> an earlier task, not after</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The discipline.</strong> The "correct" model is: <em>a single stack runs to completion; tasks queued during the run are processed in queue order after the stack is empty; microtasks drain before the next macrotask.</em> Once this is internalized, the four models above collapse into one. The hard part is that the language <em>lets you write</em> each of the four wrong models and produces <em>sensible-looking</em> output until the bug surfaces in production. This is why "mental model" sections exist in every serious JS doc — not because the loop is complex, but because the developer is often <em>thinking</em> in one of the four shortcuts.</p>
+
+---
+
+<h2>6. The host environment, not the language</h2>
+
+<p>The biggest JS insight: JS is a <strong>guest</strong> in a host. The language spec (ECMAScript) defines the core — syntax, types, objects, functions, the event loop. The host provides <em>everything else</em>:</p>
+
+<table>
+  <thead><tr><th>Host</th><th>Globals it provides</th></tr></thead>
+  <tbody>
+    <tr><td>Browser</td><td><code>window</code>, <code>document</code>, <code>fetch</code>, <code>localStorage</code>, <code>WebGL</code>, <code>WebAssembly</code></td></tr>
+    <tr><td>Node.js</td><td><code>global</code>, <code>require</code>/<code>import</code>, <code>fs</code>, <code>net</code>, <code>process</code>, <code>Buffer</code></td></tr>
+    <tr><td>Deno</td><td><code>Deno</code>, <code>Deno.serve</code>, <code>Deno.readFile</code>, web-standard APIs</td></tr>
+    <tr><td>Bun</td><td><code>Bun</code>, <code>Bun.serve</code>, <code>Bun.file</code>, Node-compatible + web APIs</td></tr>
+    <tr><td>Cloudflare Workers</td><td><code>fetch</code>, <code>caches</code>, <code>KV</code>, <code>Durable Objects</code> — no <code>fs</code>, no <code>net</code></td></tr>
+  </tbody>
+</table>
+
+<p>This is why <code>window</code> doesn't exist in Node, <code>fs</code> doesn't exist in the browser, and "isomorphic" code breaks when it assumes a host global. The language is the same; the host changes. The lesson: when reading unfamiliar JS, <strong>identify the host first</strong>. <code>require</code> → Node/CommonJS. <code>import</code> + <code>Deno</code> → Deno. <code>window</code> → browser.</p>
+
+<h2>7. Standardization: ECMAScript, TC39, the ES6/2015 tipping point</h2>
+
+<p>1996: Netscape hands JS to Ecma International → <strong>ECMAScript</strong> (the spec name; "JavaScript" is the trademark).</p>
+
+<table>
+  <thead><tr><th>Edition</th><th>Year</th><th>Milestone</th></tr></thead>
+  <tbody>
+    <tr><td>ES1</td><td>1997</td><td>First standard. Baseline.</td></tr>
+    <tr><td>ES2</td><td>1998</td><td>Editorial fixes.</td></tr>
+    <tr><td>ES3</td><td>1999</td><td>The IE6 era baseline. <code>try/catch</code>, <code>instanceof</code>, regex. <strong>No updates for 10 years.</strong></td></tr>
+    <tr><td>ES4</td><td>Abandoned</td><td>Over-ambitious (classes, packages, namespaces, type system). Political death.</td></tr>
+    <tr><td>ES5</td><td>2009</td><td>The rescue. Strict mode, <code>JSON</code>, accessor properties (<code>get</code>/<code>set</code>), <code>Object.create</code>, <code>Array.isArray</code>, <code>Function.prototype.bind</code>.</td></tr>
+    <tr><td>ES6 / ES2015</td><td>2015</td><td><strong>The rewrite.</strong> <code>let</code>/<code>const</code>, arrow functions, <code>class</code>, modules (<code>import</code>/<code>export</code>), Promises, <code>Map</code>/<code>Set</code>, destructuring, default params, rest/spread, <code>Symbol</code>, <code>Proxy</code>, <code>Reflect</code>. Modern JS is born.</td></tr>
+    <tr><td>ES2016+</td><td>Annual</td><td>Yearly cadence. <code>async/await</code> (2017), optional chaining <code>?.</code> (2020), nullish coalescing <code>??</code> (2020), top-level await (2022), private fields <code>#x</code> (2022), <code>Array.groupBy</code> (2024), etc.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>TC39 process</strong>: proposals go through Stage 0 (strawperson) → Stage 1 (proposal) → Stage 2 (draft) → Stage 3 (candidate) → Stage 4 (finished). Two independent implementations required for Stage 4. This is why features take years — the web cannot break.</p>
+
+<h2>8. The engines: V8, SpiderMonkey, JavaScriptCore</h2>
+
+<p>Three engines, three lineages:</p>
+
+<ul>
+  <li><strong>V8</strong> (Google, 2008) — hidden classes + JIT compilation. Also the Node.js runtime. The engine that made JS fast.</li>
+  <li><strong>SpiderMonkey</strong> (Mozilla, 1995) — the Eich original. First JS engine. Still powers Firefox.</li>
+  <li><strong>JavaScriptCore</strong> (Apple/Safari, forked from KJS) — powers Safari, WebKit, and Bun.</li>
+</ul>
+
+<p>Why engines matter for readers: JIT means performance characteristics are runtime-dependent. Micro-benchmarks lie. "JS is slow" is 20 years out of date — V8 compiles hot paths to machine code. But: JIT warm-up exists, deoptimization happens, and <code>eval</code>/<code>with</code> disable optimization. The engine is part of the platform; the language spec does not guarantee performance.</p>
+
+<h2>9. The WASM junction</h2>
+
+<p>WebAssembly (2017, cross-browser 1.0) is the <strong>partner</strong>, not a competitor. WASM is the compile target for C++/Rust/Go in the browser. JS is still the glue — WASM cannot directly touch the DOM (the <code>anyref</code> proposal is in progress). The 2023 WASM Component Model and GC proposal move toward direct host access, but as of 2026, JS remains the mandatory DOM/has mandatory for any DOM interaction.</p>
+
+<blockquote class="callout">
+  <p><strong>Reading code in 2026:</strong> if you see <code>import { something } from 'wasm-module'</code> — the heavy lifting is in Rust/C++, JS is the orchestration layer. This is the intended division.</p>
+</blockquote>
+
+<h2>10. What JS is not</h2>
+
+<ul>
+  <li>Not React → <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a></li>
+  <li>Not Angular → <a href="./angular-evolution.html">angular-evolution</a></li>
+  <li>Not TypeScript → <a href="./javascript-across-stacks.html">javascript-across-stacks</a> (the TS shift is a competitor story, not a language story)</li>
+  <li>Not the 12 lessons → <a href="../lessons/0001-scope-and-hoisting.html">lessons/</a> (those are the mechanics; this is the why)</li>
+</ul>
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>The language is only as useful as the tooling that makes its semantics visible, testable, and migratable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Linting & Formatting</strong></td>
+      <td>ESLint, Biome, Prettier, dprint, Rome, Oxlint, Quick-lint-js</td>
+      <td>Inconsistent style / latent bugs → enforced, auto-fixed, CI-gated</td>
+      <td>Rule coverage; False positive rate; Fix latency; Config drift; CI time</td>
+    </tr>
+    <tr>
+      <td><strong>Type Checking</strong></td>
+      <td>TypeScript (tsc), JSDoc + TS Check, Flow, Hegelia</td>
+      <td>Dynamic types → static contracts, catch regressions at build</td>
+      <td>Type coverage; Any %; Error density; Compile time; Migration velocity</td>
+    </tr>
+    <tr>
+      <td><strong>Testing (Unit, Integration, E2E)</strong></td>
+      <td>Vitest, Jest, uvu, Playwright, Cypress, WebdriverIO, TestCafe, Nightwatch</td>
+      <td>Untested behavior → verified, regression-gated behavior</td>
+      <td>Coverage (line/branch/function); Flake rate; Execution time; Maintenance burden</td>
+    </tr>
+    <tr>
+      <td><strong>Bundling & Compilation</strong></td>
+      <td>Vite, Rspack, Turbopack, esbuild, swc, Rollup, Webpack, Parcel</td>
+      <td>Source → optimized, tree-shaken, code-split production bundles</td>
+      <td>Build time; Bundle size; Chunk strategy; HMR latency; Plugin ecosystem</td>
+    </tr>
+    <tr>
+      <td><strong>Runtime & Engine</strong></td>
+      <td>Node.js, Deno, Bun, Cloudflare Workers, Vercel Edge, QuickJS, Hermes, V8 Isolates</td>
+      <td>Code → executed in target environment with correct APIs</td>
+      <td>Startup latency; Memory footprint; API compatibility; Cold start; Throughput</td>
+    </tr>
+    <tr>
+      <td><strong>Static Analysis & Security</strong></td>
+      <td>SonarQube, CodeQL, Semgrep, Snyk, Dependabot, Renovate, Socket, Trivy</td>
+      <td>Unknown vulnerabilities / patterns → surfaced, prioritized, fixed</td>
+      <td>Vulnerability detection rate; False positive rate; Time to remediate; Coverage</td>
+    </tr>
+    <tr>
+      <td><strong>Performance Profiling</strong></td>
+      <td>Chrome DevTools, Node --inspect, 0x, Clinic.js, PySpy, Speedscope, Perfetto</td>
+      <td>Slow code → identified bottleneck → optimized hot path</td>
+      <td>Time to bottleneck; Flame graph clarity; Regression detection; Overhead</td>
+    </tr>
+    <tr>
+      <td><strong>Migration & Codemods</strong></td>
+      <td>jscodeshift, TS Morph, Babel plugins, Putout, Recast, Codemod.com, AI-assisted</td>
+      <td>Legacy patterns → modern equivalents at scale</td>
+      <td>Transformation accuracy; Manual fix %; Test pass rate post-migration; Review time</td>
+    </tr>
+    <tr>
+      <td><strong>Documentation & API Reference</strong></td>
+      <td>TypeDoc, JSDoc, TSDoc, API Extractor, DocFX, Docusaurus, Nextra, VitePress</td>
+      <td>Source code → living, searchable, versioned docs</td>
+      <td>Coverage; Drift (code vs docs); Search UX; Versioning; Time to publish</td>
+    </tr>
+    <tr>
+      <td><strong>AI-Assisted Development</strong></td>
+      <td>GitHub Copilot, Cursor, Sourcegraph Cody, Tabnine, Continue, Cody, Codeium, Windsurf</td>
+      <td>Intent → code / test / refactor / explain / migrate</td>
+      <td>Acceptance rate; Hallucination catch rate; Review latency; Skill transfer</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with Linting + Type Checking + Testing (the "minimum viable JS toolkit"). Add Bundling when build time >30s or bundle size matters. Add Static Analysis when dependency count >100. Add Profiling when p99 latency > budget. Add Migration tooling when pattern count >5 across codebase. The tool serves the language — not the reverse.</p>
+
+---
+
+<ul>
+  <li>Not React → <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a></li>
+</ul>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

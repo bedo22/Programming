@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0011 — The Architecture · What Code Alone Can't Handle</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 11 · The Exploration Journey · Episode 11 of 14 · System (2/2)</p>
+  <h1>The Architecture — What Code Alone Can't Handle</h1>
+  <p class="meta">"The real programming is in system design." It's the architectural layer that structures a solution across trust, consistency, and scaling boundaries — decomposition, data ownership, failure domains. Like API design, its decisions are expensive to reverse. Anchored to <a href="../reference/system-design.html">System Design</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0010-the-contract.html">Lesson 10</a> showed how systems <em>speak</em> (the API contract). This is what holds the conversation together: the <strong>architecture</strong> — services, data ownership, consistency, failure. Next, the journey enters the <a href="../PLAN.md">Human/product</a> movement: UI/UX (Lesson 12). See the <a href="../PLAN.md">plan</a>.</p>
+</section>
+
+<h2>1. "The real programming is in system design"</h2>
+<p>System design is the disciplined activity of <strong>structuring a software solution across trust, consistency, and scaling boundaries.</strong> It translates a validated problem ("what to build") into a structural answer ("how it fits together"). It produces <em>decisions, not code</em> — and those decisions determine:</p>
+<ul>
+  <li><strong>Decomposition</strong> — what are the independently deployable, failure-isolated units? (services, functions, modules)</li>
+  <li><strong>Data ownership</strong> — which unit is the source of truth for each piece of state?</li>
+  <li><strong>Consistency models</strong> — what guarantees does the system make about reads and writes?</li>
+  <li><strong>Failure domains</strong> — what fails independently, and how does the system degrade?</li>
+  <li><strong>Capacity &amp; scaling</strong> — where are the bottlenecks, and how do we add capacity?</li>
+</ul>
+<p>And just like API design (Lesson 10), the defining trait is <strong>high reversal cost</strong>: service boundaries and data ownership are expensive to change later. Variable names and function extraction are cheap; moving a service boundary is not. That cost difference is what makes this a distinct discipline from the component loop of Lesson 7.</p>
+
+<h2>2. Two scales, one discipline</h2>
+<p>System design operates at two scales simultaneously — both are system design, and neither is complete alone:</p>
+<ul>
+  <li><strong>Architectural (macro)</strong> — how many services? What communicates with what? Where does data live? How do we scale? What fails and how do we survive it? Artifacts: service topology, data-flow diagrams, capacity estimates.</li>
+  <li><strong>Component (micro)</strong> — who owns this data? What is the API contract? Where is the trust boundary? What consistency model? Artifacts: OpenAPI specs, bounded context maps, data ownership matrices.</li>
+</ul>
+<p>The architectural layer sets the <em>constraints</em>; the component layer makes them <em>executable</em>. Notice the connection to <a href="./0010-the-contract.html">Lesson 10</a>: system design decides the boundaries and data ownership; API design materializes those boundaries as callable contracts. One decides where the seams are; the other defines how they speak.</p>
+
+<h2>3. Monolith vs services — a trade-off, not a religion</h2>
+<p>Here is the reframe that saves you from cargo-culting. "Microservices vs monolith" is not a question with one right answer. It's a trade-off driven by <strong>team boundaries, domain complexity, and scale</strong>:</p>
+<ul>
+  <li>A <strong>URL shortener</strong> — one team, one simple domain (shorten, resolve, count clicks), 10B reads/day. A <strong>CRUD monolith</strong> with a Redis cache is the right answer. Splitting it into services would add operational complexity for no benefit.</li>
+  <li>A <strong>multi-team order system</strong> — place order → reserve inventory → charge payment → confirm shipping, each owned by a different team, any step can fail and must compensate. Here an <strong>event-driven saga</strong> across services is right: each team owns its service, failures are isolated, and compensation (refund, cancel reservation) is explicit.</li>
+</ul>
+<p>The reference doc has both worked examples with capacity estimates and architecture diagrams. The lesson: don't pick a style because it's trending. Pick it because the problem's <em>team boundaries, domain complexity, and scale</em> demand it. A monolith isn't a failure; it's the right answer when the domain is simple and the team is small.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="structure" data-explain="System design decides decomposition (what are the independent units?), data ownership (who's the source of truth?), consistency models, failure domains, and scaling. These are structural decisions — not code, not UI, not syntax.">
+  <summary>System design produces decisions about what?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="structure"> Decomposition, data ownership, and failure</label>
+      <label><input type="radio" name="q1" value="code"> Variable names and function extraction</label>
+      <label><input type="radio" name="q1" value="ui"> Button colors and layout grids</label>
+      <label><input type="radio" name="q1" value="syntax"> Syntax and the language features</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="cost" data-explain="System design decisions (service boundaries, data ownership) have high reversal cost — they're expensive to change later. Component-loop decisions (variable names, function extraction) are cheap to change. That cost difference is what makes system design a distinct discipline.">
+  <summary>Why are system design decisions distinct from component-loop decisions?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="cost"> They're expensive to reverse later</label>
+      <label><input type="radio" name="q2" value="fast"> They're fast to reverse later</label>
+      <label><input type="radio" name="q2" value="code"> They're really just code decisions</label>
+      <label><input type="radio" name="q2" value="ui"> They're really just UI decisions</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="depends" data-explain="It depends on the problem. A URL shortener is fine as a CRUD monolith (one team, simple domain). A multi-team order system needs event-driven services with compensation (saga). Monolith vs microservices is a trade-off, not a religion — driven by team boundaries, domain complexity, and scale.">
+  <summary>Is choosing a monolith over microservices always wrong?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="depends"> No — it depends on the problem</label>
+      <label><input type="radio" name="q3" value="always"> Yes — microservices are always the right</label>
+      <label><input type="radio" name="q3" value="never"> Yes — a monolith is always right</label>
+      <label><input type="radio" name="q3" value="trend"> Yes — just follow whatever is trending</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the architecture layer: system design is <strong>structuring a solution across trust, consistency, and scaling boundaries</strong> — decomposition, data ownership, consistency, failure domains, capacity. Its defining trait (like API design) is <strong>high reversal cost</strong>: service boundaries are expensive to change. It operates at two scales — <strong>architectural</strong> (services, events, scaling) and <strong>component</strong> (bounded contexts, contracts, trust boundaries). And the big reframe: <strong>monolith vs microservices is a trade-off, not a religion</strong> — a URL shortener is a CRUD monolith; a multi-team order system is an event-driven saga. Pick the style the problem's team boundaries, domain complexity, and scale demand. System design decides where the seams are; API design (Lesson 10) defines how they speak.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/system-design.html">System Design</a> — the two-scale model in full, the history from Parnas to microservices to event-driven, and two worked examples (URL shortener, event-driven orders) with capacity estimates.</li>
+    <li><strong>Next lesson:</strong> <a href="./0012-the-human-layer.html">Lesson 12 — The Human Layer</a> — the Human/product movement begins: UI/UX &amp; web design, where the system meets the person.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="https://martinfowler.com/articles/microservices.html">Fowler &amp; Lewis — Microservices (2014)</a> and <a href="https://12factor.net/">The Twelve-Factor App (Wiggins, 2011)</a> — the lineage behind the architecture layer.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"What's a 'bounded context,' and how do I find one?"</li>
+    <li>"When a service fails, what does 'compensation' actually look like?"</li>
+    <li>"How do I know if my problem needs event-driven vs simple CRUD?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 11 · <a href="../reference/system-design.html">Reference: System Design</a></span>
+  <span>Next → <a href="./0012-the-human-layer.html">Lesson 12 · The Human Layer</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

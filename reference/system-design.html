@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System Design — How Architecture Handles What Code Alone Cannot</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Software architecture — the layer between product and code</p>
+  <h1>System Design — How Architecture Handles What Code Alone Cannot</h1>
+  <p class="meta">The discipline of deciding <em>how the solution fits together at scale</em> — from services and data flows down to component boundaries and API contracts. Sibling docs: <a href="./design-thinking.html">Design Thinking</a> (the product layer upstream), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop downstream), <a href="./api-design.html">API Design</a> (the contract layer that makes boundaries callable), <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering layer that makes state legible), <a href="./html-and-css.html">HTML & CSS</a> (the platform substrate the rendering strategy runs on), <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (language-level consequences).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>"The real programming is in system design." This doc captures what that means. System Design is neither the product discovery of Design Thinking nor the component loop of the developer. It is the <strong>architectural layer</strong> that translates a validated problem into a structured solution — defining services, data ownership, consistency boundaries, failure modes, and the seams where components meet. It operates at two scales simultaneously: <em>architectural</em> (macro: services, events, scaling) and <em>component</em> (micro: bounded contexts, API contracts, trust boundaries). Both are system design; neither is complete without the other.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./design-thinking.html">Design Thinking</a> — system design receives a validated problem ("what to build") and decides the structural approach ("how it fits").</li>
+  <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — system design defines the component boundaries and data contracts that the developer loop executes within.</li>
+  <li>Sibling to <a href="./api-design.html">API Design</a> — system design decides service boundaries and data ownership; API design materializes those boundaries as callable contracts.</li>
+  <li>Sibling to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — system design constrains rendering strategy and latency budgets; UI/UX decides how wire states map to human states.</li>
+  <li>Cross-cutting to <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — language and runtime choices are downstream of architectural constraints (e.g., Go for concurrency, Rust for memory safety, TypeScript for large-team maintainability).</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+</ul>
+
+<h3>Two layers, one discipline</h3>
+
+<table>
+  <thead><tr><th>Layer</th><th>Questions it answers</th><th>Artifacts</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Architectural (macro)</strong></td>
+      <td>How many services? What communicates with what? Where does data live? How do we scale? What fails and how do we survive it?</td>
+      <td>Service topology diagram, data flow diagram, capacity model, failure mode analysis, API gateway config, event schema registry</td>
+    </tr>
+    <tr>
+      <td><strong>Component (micro)</strong></td>
+      <td>Who owns this data? What is the API contract? Where is the trust boundary? What consistency model? How does this component fail?</td>
+      <td>OpenAPI spec, ADR (Architecture Decision Record), bounded context map, data ownership matrix, circuit breaker config</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The architectural layer sets the <em>constraints</em>; the component layer makes them <em>executable</em>. A system design is incomplete if it only does one.</p>
+
+---
+
+<h2>1. Definition — what system design <em>is</em> and what it is <em>not</em></h3>
+
+<h3>What it is</h3>
+
+<p>System Design is the disciplined activity of <strong>structuring a software solution across trust, consistency, and scaling boundaries</strong>. It produces decisions — not code — that determine:</p>
+
+<ul>
+  <li><strong>Decomposition</strong> — what are the independently deployable, scalable, failure-isolated units? (services, functions, modules)</li>
+  <li><strong>Data ownership</strong> — which unit is the source of truth for each piece of state?</li>
+  <li><strong>Communication contracts</strong> — how do units exchange information? (sync RPC, async events, message schemas)</li>
+  <li><strong>Consistency models</strong> — what guarantees does the system make about reads and writes? (strong, eventual, causal, read-your-writes)</li>
+  <li><strong>Failure domains</strong> — what fails independently? How does the system degrade? (circuit breakers, retries, fallbacks, sagas)</li>
+  <li><strong>Capacity & scaling</strong> — what are the load shapes? Where are the bottlenecks? How do we add capacity?</li>
+</ul>
+
+<p>These decisions are <strong>expensive to change later</strong>. That is the defining characteristic: system design decisions have high reversal cost. Component-loop decisions (variable names, function extraction) are cheap to change. System design decisions (service boundaries, data ownership) are not.</p>
+
+<h3>What it is not</h3>
+
+<table>
+  <thead><tr><th>Confused with</th><th>What that is</th><th>Difference</th></tr></thead>
+  <tbody>
+    <tr><td>Enterprise Architecture</td><td>Portfolio-level: standards, governance, roadmap alignment across org</td><td>EA sets <em>policy</em>; System Design makes <em>technical decisions</em> within (or against) policy.</td></tr>
+    <tr><td>Solution Architecture</td><td>A specific engagement: "design this integration for this client"</td><td>Solution Architecture is a <em>role/deliverable</em>; System Design is the <em>discipline</em> behind it.</td></tr>
+    <tr><td>Cloud Architecture</td><td>Cloud-provider-specific: VPC, IAM, managed services selection</td><td>Cloud Architecture is a <em>specialization</em> of System Design for one platform.</td></tr>
+    <tr><td>SRE / DevOps</td><td>Operations, reliability, deployment pipelines, observability</td><td>SRE <em>operates</em> what System Design <em>structures</em>. The boundary is porous (SLOs inform design).</td></tr>
+    <tr><td>Database Administration</td><td>Index tuning, vacuum, replication lag, backup windows</td><td>DBA tunes <em>within</em> a chosen data model; System Design <em>chooses</em> the data model and ownership.</td></tr>
+    <tr><td>System Design Interview</td><td>A 45-minute whiteboard exercise (URL shortener, rate limiter, etc.)</td><td>The interview <em>samples</em> the discipline; it is not the discipline. Real system design takes weeks.</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>2. History — from flowcharts to distributed systems</h2>
+
+<table>
+  <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1960s–70s</strong></td>
+      <td>Structured design, flowchart-driven</td>
+      <td>Yourdon & Constantine (<em>Structured Design</em>, 1979), DeMarco (<em>Structured Analysis</em>, 1978)</td>
+      <td>Decomposition by function (top-down), data flow diagrams. Coupling/cohesion as first formal metrics.</td>
+    </tr>
+    <tr>
+      <td><strong>1972</strong></td>
+      <td>Information hiding / module boundaries</td>
+      <td>David Parnas ("On the Criteria To Be Used in Decomposing Systems into Modules")</td>
+      <td>Modules should hide <em>design decisions likely to change</em>. The origin of "encapsulation" as architectural principle.</td>
+    </tr>
+    <tr>
+      <td><strong>1980s–90s</strong></td>
+      <td>Client/server, 3-tier, OO design patterns</td>
+      <td>GoF (<em>Design Patterns</em>, 1994), Martin Fowler (<em>Patterns of Enterprise Application Architecture</em>, 2002)</td>
+      <td>Patterns as reusable architectural solutions. Separation of presentation / domain / data layers.</td>
+    </tr>
+    <tr>
+      <td><strong>1995</strong></td>
+      <td>Distributed systems as a discipline</td>
+      <td>Tanenbaum & Van Steen (<em>Distributed Systems</em>), Leslie Lamport (Paxos, 1998)</td>
+      <td>Consensus, replication, partial failure, clocks — the hard problems get formalized.</td>
+    </tr>
+    <tr>
+      <td><strong>2000s</strong></td>
+      <td>SOA (Service-Oriented Architecture)</td>
+      <td>Erl (<em>SOA Principles</em>, 2005), WS-* stack, ESBs</td>
+      <td>Services as coarse-grained business capabilities. Heavy contracts (WSDL), central orchestration.</td>
+    </tr>
+    <tr>
+      <td><strong>2006</strong></td>
+      <td>Amazon two-pizza team memo</td>
+      <td>Werner Vogels, Amazon</td>
+      <td>Teams own services end-to-end. "You build it, you run it." The org/architecture coupling made explicit.</td>
+    </tr>
+    <tr>
+      <td><strong>2011</strong></td>
+      <td>12-Factor App</td>
+      <td>Adam Wiggins, Heroku</td>
+      <td>Contract for cloud-native apps: config in env, backing services as attached resources, stateless processes.</td>
+    </tr>
+    <tr>
+      <td><strong>2014</strong></td>
+      <td>Reactive Manifesto</td>
+      <td>Jonas Bonér et al. (Typesafe/Lightbend)</td>
+      <td>Responsive, Resilient, Elastic, Message-Driven. Event-driven as default, not exception.</td>
+    </tr>
+    <tr>
+      <td><strong>2015</strong></td>
+      <td>Microservices mainstream</td>
+      <td>Sam Newman (<em>Building Microservices</em>, 2015), Martin Fowler + James Lewis (2014 article)</td>
+      <td>Small, independently deployable services. Decentralized data management. Infrastructure automation required.</td>
+    </tr>
+    <tr>
+      <td><strong>2017</strong></td>
+      <td>Domain-Driven Design strategic patterns adopted</td>
+      <td>Vaughn Vernon (<em>Implementing DDD</em>, 2013), bounded contexts, context maps</td>
+      <td>DDD moves from tactical (aggregates) to strategic (bounded contexts = service boundaries).</td>
+    </tr>
+    <tr>
+      <td><strong>2018–2020</strong></td>
+      <td>Event-driven + CQRS + Event Sourcing mainstream</td>
+      <td>Greg Young (Event Sourcing), Martin Fowler (CQRS), Confluent/Kafka ecosystem</td>
+      <td>Separate read/write models. Event log as source of truth. Async by default.</td>
+    </tr>
+    <tr>
+      <td><strong>2020+</strong></td>
+      <td>Serverless, edge, stateful platforms</td>
+      <td>Cloudflare Workers, AWS Lambda, Durable Objects, Vercel Edge, PlanetScale, Neon</td>
+      <td>Functions as units. State attached to compute. The "service" boundary dissolves into function + storage.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>3. Evolution — paradigms through one lens</h2>
+
+<p>Each era's primary constraint produced its system design. When the constraint inverted, the design bets inverted with it — the same pattern documented in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>.</p>
+
+<table>
+  <thead><tr><th>Era</th><th>Primary constraint</th><th>System design it produced</th><th>Why it was challenged</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Monolith (1970s–90s)</td>
+      <td>Hardware cost, deployment simplicity</td>
+      <td>Single process, shared DB, modular code</td>
+      <td>Team scaling: merge conflicts, deploy coordination, single failure domain</td>
+    </tr>
+    <tr>
+      <td>Layered / N-tier (1990s–2000s)</td>
+      <td>Separation of concerns, reuse</td>
+      <td>Presentation / Business / Data layers</td>
+      <td>Layers became leaky; changes crossed all tiers; DB became the bottleneck</td>
+    </tr>
+    <tr>
+      <td>Client/Server (1990s)</td>
+      <td>Fat client vs thin client tradeoff</td>
+      <td>Smart client (VB, PowerBuilder) or smart server (web 1.0)</td>
+      <td>Web won: zero-install, universal delivery. Client became the browser.</td>
+    </tr>
+    <tr>
+      <td>SOA (2000s)</td>
+      <td>Enterprise integration, reuse</td>
+      <td>Coarse services, ESB, WS-*, canonical data model</td>
+      <td>ESB became a bottleneck; contracts too heavy; central governance slowed teams</td>
+    </tr>
+    <tr>
+      <td>Microservices (2010s–)</td>
+      <td>Team autonomy, independent deploy, scaling granularity</td>
+      <td>Fine-grained services, decentralized data, API gateway, observability</td>
+      <td>Distributed system complexity: debugging, consistency, operational burden</td>
+    </tr>
+    <tr>
+      <td>Serverless / Functions (2015–)</td>
+      <td>Operational overhead, cold start latency, cost at idle</td>
+      <td>Function = unit, managed runtime, pay-per-invocation</td>
+      <td>Vendor lock-in, debugging distributed traces, stateful workloads awkward</td>
+    </tr>
+    <tr>
+      <td>Event-driven / CQRS (2017–)</td>
+      <td>Write/read scaling asymmetry, auditability, temporal queries</td>
+      <td>Event log = source of truth, projections = read models</td>
+      <td>Eventual consistency mental model; event schema evolution; replay complexity</td>
+    </tr>
+    <tr>
+      <td>Edge / Stateful Functions (2022–)</td>
+      <td>Latency, data gravity, personalization at scale</td>
+      <td>Compute moves to data (Durable Objects, Cloudflare KV, Vercel KV)</td>
+      <td>Consistency across edges; new mental model (not region, not origin)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The arc: <strong>constraint changes → old design bet conflicts → new design bet inverts</strong>. Monolith inverted to microservices (deployment autonomy > hardware cost). SOA inverted to microservices (team autonomy > reuse). Microservices are inverting to edge/stateful-functions (latency > operational simplicity). Each inversion leaves a legacy layer that still works for its constraint.</p>
+
+<h2>3b. Migration paths between architectures</h2>
+
+<p>Architecture migrations are rarely greenfield. They are incremental extractions, strangler figs, and parallel runs:</p>
+
+<table>
+  <thead><tr><th>From → To</th><th>Trigger</th><th>Target state</th><th>Steps</th><th>Risks</th><th>Success signals</th><th>Timeline</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Monolith → Microservices</td>
+      <td>Team count >15; deploy coordination blocks features; single failure domain</td>
+      <td>Bounded contexts as services; API gateway; observability</td>
+      <td>1) Identify bounded contexts (DDD). 2) Extract highest-churn module as service. 3) Shared DB → separate DBs per context. 4) API gateway for routing. 5) Observability (traces, logs, metrics).</td>
+      <td>Distributed transactions; data consistency; testing complexity; ops burden</td>
+      <td>Lead time ↓; deploy frequency ↑; blast radius contained</td>
+      <td>6–24 months</td>
+    </tr>
+    <tr>
+      <td>Microservices → Modular Monolith</td>
+      <td>Ops overhead > team autonomy; latency budget tight; small team</td>
+      <td>Single deploy; module boundaries enforced by tooling</td>
+      <td>1) Merge repos. 2) Replace HTTP calls with in-process calls. 3) Shared DB with schema-per-module. 4) ArchUnit/module tests for boundaries.</td>
+      <td>Coupling creep; shared DB becomes contention hotspot</td>
+      <td>Deploy <10 min; no distributed traces needed; test suite <5 min</td>
+      <td>3–6 months</td>
+    </tr>
+    <tr>
+      <td>Monolith / Microservices → Serverless Functions</td>
+      <td>Spiky traffic; idle cost; event-driven workloads</td>
+      <td>Functions + managed state (DynamoDB, Fauna, Cloudflare D1)</td>
+      <td>1) Identify stateless handlers. 2) Extract to functions. 3) Move state to managed stores. 4) API Gateway / EventBridge routing.</td>
+      <td>Cold starts; vendor lock-in; debugging traces; stateful workloads</td>
+      <td>Cost ∝ invocations; p99 latency <200ms; zero idle cost</td>
+      <td>2–6 months</td>
+    </tr>
+    <tr>
+      <td>Centralized API → Edge / Stateful Functions</td>
+      <td>Global latency; personalization; data gravity</td>
+      <td>Compute at edge (Durable Objects, Cloudflare Workers, Vercel Edge)</td>
+      <td>1) Move read-heavy endpoints to edge. 2) Use edge KV for session/feature flags. 3) Durable Objects for per-user/room state. 4) Origin for writes.</td>
+      <td>Consistency across edges; schema migration; local dev parity</td>
+      <td>p50 <50ms globally; origin traffic ↓; personalization works</td>
+      <td>3–9 months</td>
+    </tr>
+    <tr>
+      <td>REST → GraphQL Federation</td>
+      <td>Over/under-fetching; many clients; team autonomy in schema</td>
+      <td>Federated graph; subgraph per team; gateway</td>
+      <td>1) Schema design workshop. 2) Build subgraphs incrementally. 3) Gateway composition. 4) Client migration (codegen).</td>
+      <td>N+1 in resolvers; gateway as SPOF; over-federation</td>
+      <td>Client bundle ↓; schema changes independent; no waterfall</td>
+      <td>4–12 months</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Big-bang cutover. Every row above uses strangler fig, parallel run, or incremental extraction. The architecture table in §3 shows <em>centers of gravity</em> — not mutually exclusive states.</p>
+
+---
+
+<h2>4. Intersection with neighbors</h2>
+
+<table>
+  <thead><tr><th>Discipline</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Enterprise Architecture</strong></td>
+      <td>Governance, standards, technology radar</td>
+      <td>EA = policy/portfolio. System Design = technical decision within a bounded scope.</td>
+    </tr>
+    <tr>
+      <td><strong>Solution Architecture</strong></td>
+      <td>Stakeholder mapping, non-functional requirements</td>
+      <td>Solution Arch = engagement deliverable. System Design = the thinking discipline.</td>
+    </tr>
+    <tr>
+      <td><strong>Cloud Architecture</strong></td>
+      <td>Managed services, VPC, IAM, serverless</td>
+      <td>Cloud Arch = platform specialization. System Design = platform-agnostic first.</td>
+    </tr>
+    <tr>
+      <td><strong>SRE / DevOps</strong></td>
+      <td>SLOs, error budgets, observability, deployment</td>
+      <td>SRE operates the system. System Design structures it. SLOs <em>feed back</em> into design.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Thinking</strong></td>
+      <td>Problem framing, user needs, constraints</td>
+      <td>Design Thinking outputs <em>what problem</em>. System Design inputs <em>what problem</em> and outputs <em>structure</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>Developer Loop</strong> (<a href="./how-developers-think-frontend.html">Model/View/Flow</a>)</td>
+      <td>Component boundaries, data shape, API contracts</td>
+      <td>System Design <em>defines</em> the component boundary and contract. Developer Loop <em>implements</em> inside it.</td>
+    </tr>
+    <tr>
+      <td><strong>API Design</strong> (<a href="./api-design.html">Contracts</a>)</td>
+      <td>Service boundaries, data ownership, consistency, failure domains</td>
+      <td>System Design <em>decides the decomposition</em>; API Design <em>materializes the boundaries</em> as contracts. A system design without contracts is a diagram; contracts without system design are leaky.</td>
+    </tr>
+    <tr>
+      <td><strong>UI/UX & Web Design</strong> (<a href="./ui-ux-web-design.html">Habitable interfaces</a>)</td>
+      <td>Latency budgets, rendering strategy (SSR/RSC/Islands), data ownership, API contracts</td>
+      <td>System Design <em>constrains what's possible</em> (can we stream this list?); UI/UX <em>decides what's desirable</em> within constraints. Co-design at the seam.</td>
+    </tr>
+    <tr>
+      <td><strong>HTML & CSS</strong> (<a href="./html-and-css.html">Platform substrate</a>)</td>
+      <td>Rendering strategy (SSR/RSC/Islands/SPA), Critical CSS, font loading, hydration, streaming, parser blocking</td>
+      <td>System Design <em>decides when and where HTML/CSS is emitted</em>; the platform <em>defines what "emitted" means</em> (parser blocking, render blocking, parser-yielding). <code><link rel="preload" as="style"></code>, <code>font-display</code>, <code>content-visibility</code> are platform knobs; system design decides which sheets get them.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>5. Underlying theory — what makes a system designed not assembled</h2>
+
+<p>System Design rests on a handful of proven results. Each one <em>forces</em> a decision; you cannot "work around" them.</p>
+
+<table>
+  <thead><tr><th>Theory / Result</th><th>Origin</th><th>What it forces in system design</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>CAP Theorem</strong></td>
+      <td>Brewer (2000 conjecture), Gilbert & Lynch (2002 proof)</td>
+      <td>In a network partition, you <em>must</em> choose Consistency or Availability. You cannot have both. Every distributed data system makes this choice explicitly or implicitly.</td>
+    </tr>
+    <tr>
+      <td><strong>PACELC</strong></td>
+      <td>Abadi (2010)</td>
+      <td>Refines CAP: even without partitions, there's a Latency/Consistency tradeoff (ELC). "If partitioned → A or C; Else → L or C."</td>
+    </tr>
+    <tr>
+      <td><strong>Little's Law</strong></td>
+      <td>Little (1961)</td>
+      <td>L = λW (avg items in system = arrival rate × avg time in system). Forces capacity planning: if λ doubles, either W halves (impossible) or L doubles (queue grows).</td>
+    </tr>
+    <tr>
+      <td><strong>Amdahl's Law</strong></td>
+      <td>Amdahl (1967)</td>
+      <td>Speedup ≤ 1 / (serial fraction + parallel fraction / N). Forces parallelization strategy: the serial part <em>always</em> bounds scaling.</td>
+    </tr>
+    <tr>
+      <td><strong>Consistency models</strong></td>
+      <td>Lamport (1979), Adya (1999), Bailis et al. (2013)</td>
+      <td>Strong / Sequential / Causal / Eventual / Read-your-writes / Monotonic reads. Every API contract implicitly or explicitly promises one.</td>
+    </tr>
+    <tr>
+      <td><strong>Information Hiding</strong></td>
+      <td>Parnas (1972)</td>
+      <td>Module boundaries should hide <em>design decisions likely to change</em>. Not "hide data" — hide the <em>reason for the data structure</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>Conway's Law</strong></td>
+      <td>Melvin Conway (1968)</td>
+      <td>"Organizations which design systems are constrained to produce designs which are copies of the communication structures of these organizations." Service boundaries <em>must</em> align with team boundaries, or the org will fight the architecture.</td>
+    </tr>
+    <tr>
+      <td><strong>Erasure Coding / Reed-Solomon</strong></td>
+      <td>Reed & Solomon (1960)</td>
+      <td>Durable storage = k data + m parity shards, survive any m failures. The math behind every cloud storage tier (S3, GCS, Azure Blob).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5b. Mental models — how architects actually reason</h2>
+
+<p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model is a compression of the theories for a specific decision context:</p>
+
+<table>
+  <thead><tr><th>Mental model</th><th>When you use it</th><th>What it compresses</th><th>Failure mode if misapplied</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Bounded Context Map</strong> (DDD)</td>
+      <td>Drawing service boundaries; deciding what lives together</td>
+      <td>Conway's Law + Information Hiding. "Team = context" is the heuristic; explicit context map (shared kernel, customer-supplier, anticorruption layer) is the artifact.</td>
+      <td>Contexts too small (chatty services) or too large (modulith with hidden coupling)</td>
+    </tr>
+    <tr>
+      <td><strong>Consistency Budget</strong></td>
+      <td>Choosing data model per feature; explaining tradeoffs to product</td>
+      <td>PACELC + CAP. Every feature "spends" consistency budget. Strong = low latency budget; Eventual = high latency budget but high availability.</td>
+      <td>Defaulting to strong everywhere (latency spikes) or eventual everywhere (user-visible anomalies)</td>
+    </tr>
+    <tr>
+      <td><strong>Failure Domain Isolation</strong></td>
+      <td>Sizing blast radius; deciding redundancy</td>
+      <td>Little's Law + Erasure Coding. If one thing fails, what else goes down? Zone, region, dependency, deployment unit.</td>
+      <td>Shared fate: single DB for all services; single queue; single deploy pipeline</td>
+    </tr>
+    <tr>
+      <td><strong>Latency-Throughput Curve</strong></td>
+      <td>Capacity planning; SLO setting; autoscaling thresholds</td>
+      <td>Little's Law + Amdahl's Law. Latency grows non-linearly past ~70% utilization. The knee is where queueing starts.</td>
+      <td>Scaling at 90% utilization (too late); over-provisioning at 30% (waste)</td>
+    </tr>
+    <tr>
+      <td><strong>Decision Reversibility</strong></td>
+      <td>Choosing between options; documenting architecture decisions (ADRs)</td>
+      <td>Information Hiding + Conway's Law. One-way doors (data model, service boundary) vs two-way doors (library, config). Only one-way doors need ADRs.</td>
+      <td>Treating two-way doors as one-way (analysis paralysis); treating one-way doors as two-way (painful migration)</td>
+    </tr>
+    <tr>
+      <td><strong>Trust Boundary Map</strong></td>
+      <td>Security review; compliance; multi-tenant design</td>
+      <td>Conway's Law applied to trust. Where does data cross a trust boundary? (User→App, App→DB, Service→Service, Tenant→Tenant). Each crossing needs validation, encryption, audit.</td>
+      <td>Missing boundaries (internal service trusts all callers); over-boundarying (mTLS everywhere with no key rotation)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>These models are not checklists — they are <em>lenses</em>. An architect switches lenses per decision: Context Map for boundaries, Consistency Budget for data, Failure Domain for resilience, Latency Curve for capacity, Reversibility for commitments, Trust Boundary for security.</p>
+
+---
+
+<h2>6. Architectural layer (macro) — patterns with consequences</h2>
+
+<h3>Microservices vs Monolith — the decision matrix</h3>
+
+<table>
+  <thead><tr><th>Factor</th><th>Favors Monolith</th><th>Favors Microservices</th></tr></thead>
+  <tbody>
+    <tr><td>Team size</td><td>< 10 engineers</td><td>> 30 engineers, multiple teams</td></tr>
+    <tr><td>Deploy frequency</td><td>Weekly or slower</td><td>Daily+ per team</td></tr>
+    <tr><td>Scaling profile</td><td>Uniform</td><td>Highly non-uniform (one service 100×)</td></tr>
+    <tr><td>Failure isolation need</td><td>Low</td><td>High (one domain failure ≠ total outage)</td></tr>
+    <tr><td>Data consistency need</td><td>Strong (ACID)</td><td>Can tolerate eventual</td></tr>
+    <tr><td>Operational maturity</td><td>Low (no K8s, no observability)</td><td>High (service mesh, distributed tracing)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Third option:</strong> Modular Monolith — single deployable, but strict internal module boundaries (enforced by linting, separate packages, explicit contracts). Gives most microservice benefits (team autonomy, clear ownership) without distributed system tax. See Shopify, GitHub, Basecamp architectures.</p>
+
+<h3>Communication patterns</h3>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Sync / Async</th><th>Coupling</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td>REST / gRPC</td><td>Sync</td><td>Temporal (caller waits)</td><td>Query, command with immediate result, low latency required</td></tr>
+    <tr><td>Message queue (Rabbit, SQS)</td><td>Async</td><td>Temporal decoupled</td><td>Fire-and-forget, retryable work, backpressure</td></tr>
+    <tr><td>Event streaming (Kafka, Pulsar)</td><td>Async</td><td>Temporal + schema decoupled</td><td>Audit log, multiple consumers, replay, event sourcing</td></tr>
+    <tr><td>Pub/Sub (Cloud Pub/Sub, SNS)</td><td>Async</td><td>Loose</td><td>Fan-out, notifications, decoupled domains</td></tr>
+  </tbody>
+</table>
+
+<h3>Consistency models — pick one per data domain</h3>
+
+<table>
+  <thead><tr><th>Model</th><th>Guarantee</th><th>Latency</th><th>Typical use</th></tr></thead>
+  <tbody>
+    <tr><td>Strong (linearizable)</td><td>Read sees latest write</td><td>High (quorum)</td><td>Financial balances, inventory reservation</td></tr>
+    <tr><td>Read-your-writes</td><td>Your writes visible to you</td><td>Medium</td><td>User profile, shopping cart</td></tr>
+    <tr><td>Causal</td><td>Cause precedes effect globally</td><td>Medium</td><td>Collaborative editing, comments</td></tr>
+    <tr><td>Eventual</td><td>Converges eventually</td><td>Low</td><td>Analytics, search index, feeds, likes</td></tr>
+  </tbody>
+</table>
+
+<h3>Failure patterns — design for degradation</h3>
+
+<ul>
+  <li><strong>Circuit Breaker</strong> — stop calling a failing dependency, fail fast, retry after timeout (Hystrix, Resilience4j, Go-breaker).</li>
+  <li><strong>Bulkhead</strong> — isolate resources (thread pools, connections) per dependency so one saturated downstream doesn't starve others.</li>
+  <li><strong>Timeout + Retry + Backoff</strong> — every external call has a budget. Exponential backoff with jitter prevents thundering herd.</li>
+  <li><strong>Fallback / Degraded Mode</strong> — return stale cache, empty list, static default instead of error.</li>
+  <li><strong>Saga</strong> — distributed transaction via compensating actions (order placed → reserve inventory → charge payment → if any fails, run compensations in reverse).</li>
+  <li><strong>Idempotency Keys</strong> — every mutating request carries a client-generated key; server deduplicates. Enables safe retries.</li>
+</ul>
+
+<h3>Scaling levers</h3>
+
+<table>
+  <thead><tr><th>Lever</th><th>What it scales</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td>Horizontal (add replicas)</td><td>Stateless compute</td><td>Linear cost, needs load balancer</td></tr>
+    <tr><td>Vertical (bigger instance)</td><td>Stateful, single-threaded bottlenecks</td><td>Step cost, hard ceiling</td></tr>
+    <tr><td>Caching (CDN, Redis, local)</td><td>Read-heavy, repeatable queries</td><td>Invalidation complexity</td></tr>
+    <tr><td>Sharding (partition by key)</td><td>Write-heavy, large datasets</td><td>Rebalancing, cross-shard queries hard</td></tr>
+    <tr><td>Read replicas</td><td>Read scaling for primary DB</td><td>Replication lag = eventual consistency</td></tr>
+    <tr><td>Async processing (queue)</td><td>Spiky write bursts</td><td>Latency, ordering guarantees</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>7. Component layer (micro) — where system design meets code</h2>
+
+<p>This layer is the direct upstream of the <a href="./how-developers-think-frontend.html">developer loop</a>. Every component the developer builds lives inside a boundary defined here.</p>
+
+<h3>Bounded contexts (DDD strategic design)</h3>
+
+<p>From Eric Evans (<em>Domain-Driven Design</em>, 2003) and Vaughn Vernon (<em>Implementing DDD</em>, 2013):</p>
+
+<ul>
+  <li>A <strong>bounded context</strong> is a semantic boundary within which a domain model applies. "Order" means different things in Sales (quote, negotiation) vs Fulfillment (pick, pack, ship) vs Billing (invoice, revenue recognition).</li>
+  <li><strong>Context Map</strong> — explicit relationships between contexts: Partnership, Shared Kernel, Customer/Supplier, Conformist, Anticorruption Layer, Open Host Service, Published Language.</li>
+  <li><strong>Rule:</strong> One bounded context = one service (or one deployable module in a modular monolith). Do not share a database across contexts.</li>
+</ul>
+
+<h3>API contracts — the seam between components</h3>
+
+<table>
+  <thead><tr><th>Aspect</th><th>Decision</th><th>Enforcement</th></tr></thead>
+  <tbody>
+    <tr><td>Schema</td><td>OpenAPI 3.x (REST), Protobuf (gRPC), AsyncAPI (events)</td><td>CI gate: schema lint, breaking change detection</td></tr>
+    <tr><td>Versioning</td><td>URL version (/v1/), header version, or semantic version in schema</td><td>Deprecation policy: 6-month notice, parallel run</td></tr>
+    <tr><td>Validation</td><td>Gateway validates request/response against schema</td><td>400 on invalid request; 500 on invalid response (bug)</td></tr>
+    <tr><td>Contract testing</td><td>Pact (consumer-driven), or provider schema verification</td><td>CI gate on both producer and consumer repos</td></tr>
+  </tbody>
+</table>
+
+<h3>Data ownership — "who mutates what?"</h3>
+
+<p>Every piece of mutable state has <strong>exactly one owner</strong>. The owner is the only component that writes it. All other components read via API or subscribe to events.</p>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Owner</th><th>Readers</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Single-writer DB</td><td>Service A (owns <code>orders</code> table)</td><td>Service B reads via Service A's API</td><td>Order service owns orders; Payment service calls Order API</td></tr>
+    <tr><td>Event-sourced</td><td>Service A emits <code>OrderCreated</code></td><td>Service B projects into its own read model</td><td>Order service emits; Inventory service builds local stock view</td></tr>
+    <tr><td>Reference data</td><td>Service A owns <code>countries</code></td><td>Everyone reads local cached copy</td><td>Country codes change once/year; cache with TTL</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The cardinal sin:</strong> two services writing to the same table. This couples their deployment, their schema migrations, their failure domains, and their scaling. It turns two services into a distributed monolith.</p>
+</blockquote>
+
+<h3>Trust boundaries — where to validate</h3>
+
+<ul>
+  <li><strong>External boundary (API Gateway / WAF)</strong> — validate auth, rate limit, schema, size, known attack patterns. Reject early.</li>
+  <li><strong>Service boundary (each service)</strong> — validate business rules, authorization, data integrity. Do not trust the gateway to have caught everything.</li>
+  <li><strong>Internal boundary (module/function)</strong> — validate preconditions (Design by Contract). Fail fast inside the trust zone.</li>
+</ul>
+
+<p>The rule: <strong>validate at every boundary</strong>. The cost of a validation check is negligible; the cost of corrupted state propagating is not.</p>
+
+<h3>Failure surface — what fails independently?</h3>
+
+<p>Draw a box around each component. Ask:</p>
+<ul>
+  <li>If this box loses power, what else stops working?</li>
+  <li>If this box is deployed with a bug, what is the blast radius?</li>
+  <li>If this box's database is corrupted, what data is lost?</li>
+</ul>
+
+<p>The answers define your <strong>failure domains</strong>. Good system design minimizes blast radius: a failure in the Recommendations service should not take down Checkout.</p>
+
+---
+
+<h2>8. Why it is a method, not an algorithm</h2>
+
+<p>Like the developer loop and Design Thinking, System Design is not an algorithm. But the <em>reason</em> is different:</p>
+
+<ul>
+  <li>The developer loop lacks deterministic steps because <em>the problem is discovered while building</em>.</li>
+  <li>Design Thinking lacks deterministic steps because <em>the problem is unknown until framed</em>.</li>
+  <li>System Design <em>has named constraints</em> (CAP, Little's Law, Amdahl, Conway) that <em>bound the option space</em>. You cannot choose "strong consistency + high availability during partition" — CAP forbids it.</li>
+</ul>
+
+<p>However, <strong>the decision between valid options is judgment, not derivation</strong>.</p>
+
+<table>
+  <thead><tr><th>Constrained by theory</th><th>Still a judgment call</th></tr></thead>
+  <tbody>
+    <tr><td>You cannot have CP + AP during partition</td><td>Do you choose CP (banking) or AP (shopping cart)?</td></tr>
+    <tr><td>Little's Law bounds queue size</td><td>Do you add replicas, increase timeout, or shed load?</td></tr>
+    <tr><td>Conway's Law couples org and architecture</td><td>Do you restructure teams, or accept the architecture the org produces?</td></tr>
+    <tr><td>Amdahl bounds parallel speedup</td><td>Do you invest in parallelizing the serial 10%, or accept the limit?</td></tr>
+  </tbody>
+</table>
+
+<p>The theories <em>eliminate impossible options</em>. They do not <em>select the right option</em>. That selection is where experience, context, and taste live — the same "rhythm" as the developer loop, but with harder guardrails.</p>
+
+---
+
+<h2>9. Worked example — "Design a URL Shortener"</h2>
+
+<p>The canonical system-design interview question, walked through both layers.</p>
+
+<h3>Requirements (from Design Thinking output)</h3>
+
+<ul>
+  <li>Shorten long URLs → short codes (e.g., <code>bit.ly/abc123</code>)</li>
+  <li>Redirect short → long in < 50ms p99</li>
+  <li>100M URLs created / day, 10B redirects / day (100:1 read:write)</li>
+  <li>Custom aliases supported (user-chosen slug)</li>
+  <li>Analytics: clicks per link, referrer, geo</li>
+  <li>99.99% availability</li>
+</ul>
+
+<h3>Architectural layer decisions</h3>
+
+<table>
+  <thead><tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Service topology</td><td>Two services: <strong>Shorten</strong> (write), <strong>Resolve</strong> (read)</td><td>Read/write scaling asymmetry (100:1). Separate failure domains.</td></tr>
+    <tr><td>Storage — Shorten</td><td>PostgreSQL (strong consistency for alias uniqueness)</td><td>Custom aliases need ACID uniqueness check. Write volume low (100M/day = ~1150/s).</td></tr>
+    <tr><td>Storage — Resolve</td><td>Redis Cluster (in-memory, read-optimized) + PostgreSQL async replication</td><td>10B redirects = ~115k/s reads. Redis serves hot keys; PostgreSQL is source of truth.</td></tr>
+    <tr><td>Cache invalidation</td><td>Write-through on create; TTL 24h; background sync job</td><td>New links must resolve immediately. Stale TTL acceptable for analytics.</td></tr>
+    <tr><td>Short code generation</td><td>Base62 (a-zA-Z0-9), 7 chars = 3.5T space. Counter + Base62 encoding.</td><td>No collision check needed (counter is monotonic). 7 chars = readable.</td></tr>
+    <tr><td>Custom alias</td><td>Unique index on <code>alias</code> column in PostgreSQL</td><td>ACID guarantee. Reject on conflict. Low contention.</td></tr>
+    <tr><td>Analytics</td><td>Async event: <code>RedirectOccurred</code> → Kafka → ClickHouse / BigQuery</td><td>Write path stays fast. Analytics is eventual.</td></tr>
+    <tr><td>API Gateway</td><td>Rate limit (1000/min per IP), schema validation, auth for custom alias</td><td>Protect Resolve from abuse. Auth only for write path.</td></tr>
+    <tr><td>Availability</td><td>Multi-AZ PostgreSQL (sync replica), Redis Cluster (3 masters), Resolve stateless (K8s HPA)</td><td>99.99% = 52 min/yr downtime. Budget: 2 min/month for deployments.</td></tr>
+  </tbody>
+</table>
+
+<h3>Component layer decisions</h3>
+
+<table>
+  <thead><tr><th>Component</th><th>Bounded context</th><th>Owns</th><th>API Contract (excerpt)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Shorten Service</td>
+      <td>Link Management</td>
+      <td><code>links</code> table (id, long_url, short_code, alias?, owner_id, created_at)</td>
+      <td><code>POST /v1/links { long_url, alias? } → { short_code, short_url }</code></td>
+    </tr>
+    <tr>
+      <td>Resolve Service</td>
+      <td>Link Resolution</td>
+      <td>Redis cache (short_code → long_url). Reads from PostgreSQL on miss.</td>
+      <td><code>GET /{short_code} → 302 Location: {long_url}</code></td>
+    </tr>
+    <tr>
+      <td>Analytics Worker</td>
+      <td>Link Analytics</td>
+      <td>ClickHouse table (short_code, ts, referrer, country, device)</td>
+      <td>Consumes <code>RedirectOccurred</code> from Kafka. No external API.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Sequence diagram (text)</h3>
+
+<pre><code>User → API Gateway → Shorten Service → PostgreSQL (INSERT)
+                              ↓
+                         Redis (SET short_code → long_url)
+                              ↓
+                         Return { short_code }
+
+User → API Gateway → Resolve Service → Redis (GET short_code)
+                              ↓ (miss)
+                         PostgreSQL (SELECT long_url)
+                              ↓
+                         Redis (SET short_code → long_url)
+                              ↓
+                         302 Redirect
+
+Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
+</code></pre>
+
+<h3>Capacity estimate (back of envelope)</h3>
+
+<table>
+  <thead><tr><th>Metric</th><th>Value</th><th>Calculation</th></tr></thead>
+  <tbody>
+    <tr><td>Writes/day</td><td>100M</td><td>~1,150/s average, ~5,000/s peak</td></tr>
+    <tr><td>Reads/day</td><td>10B</td><td>~115k/s average, ~500k/s peak</td></tr>
+    <tr><td>Redis memory (hot 20%)</td><td>~20M keys × 200B = 4 GB</td><td>Fits in single r6g.xlarge</td></tr>
+    <tr><td>PostgreSQL size</td><td>100M rows × 500B = 50 GB</td><td>Single primary + 1 sync replica</td></tr>
+    <tr><td>Kafka throughput</td><td>115k events/s × 500B = 57 MB/s</td><td>3 broker cluster, 100 GB SSD each</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>10. Worked example — "Design an Event-Driven Order System"</h2>
+
+<p>Shows when you <em>don't</em> pick a CRUD monolith.</p>
+
+<h3>Requirements</h3>
+
+<ul>
+  <li>Place order → reserve inventory → charge payment → confirm shipping</li>
+  <li>Each step owned by different team (Order, Inventory, Payment, Shipping)</li>
+  <li>Any step can fail; must support compensation (cancel reservation, refund payment)</li>
+  <li>Eventual consistency acceptable; audit trail required</li>
+  <li>10k orders/min peak</li>
+</ul>
+
+<h3>Architecture</h3>
+
+<pre><code>┌─────────────┐     OrderPlaced      ┌──────────────┐
+│   Order     │ ──────────────────►  │  Inventory   │
+│  Service    │                      │  Service     │
+└─────────────┘                      └──────┬───────┘
+       │                                     │
+       │ InventoryReserved / InventoryFailed │
+       ▼                                     ▼
+┌─────────────┐     PaymentCharged    ┌──────────────┐
+│  Payment    │ ◄──────────────────►  │  Shipping    │
+│  Service    │                       │  Service     │
+└─────────────┘                       └──────────────┘
+       │                                     │
+       ▼                                     ▼
+   OrderConfirmed / OrderFailed (compensating events flow back)
+</code></pre>
+
+<h3>Key design decisions</h3>
+
+<table>
+  <thead><tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Communication</td><td>Async events (Kafka), not sync RPC</td><td>Teams deploy independently. Sync RPC couples availability.</td></tr>
+    <tr><td>Saga pattern</td><td>Choreography (events) not orchestration (central coordinator)</td><td>No single point of failure. Each service owns its compensation.</td></tr>
+    <tr><td>Idempotency</td><td>Every event carries <code>event_id</code>; consumers deduplicate</td><td>At-least-once delivery is the Kafka guarantee. Idempotency = exactly-once effect.</td></tr>
+    <tr><td>Out-of-order handling</td><td>Event version + <code>causation_id</code>; consumers buffer or reject stale</td><td>Network partitions reorder. Consumers must handle.</td></tr>
+    <tr><td>Compensation</td><td><code>InventoryReleased</code>, <code>PaymentRefunded</code> events flow back</td><td>Saga rolls back by forward actions. No distributed transaction.</td></tr>
+    <tr><td>Observability</td><td>Correlation ID (order_id) propagated through all events</td><td>Distributed trace = filter by correlation_id in log aggregator.</td></tr>
+  </tbody>
+</table>
+
+<h3>Failure modes this design handles</h3>
+
+<ul>
+  <li>Inventory service down → Order service emits <code>OrderPlaced</code>; Inventory processes when up. No blocking.</li>
+  <li>Payment fails → emits <code>PaymentFailed</code>; Order service emits <code>InventoryRelease</code>; Inventory compensates.</li>
+  <li>Network partition between Payment and Shipping → both continue processing local events; reconciliation job runs hourly.</li>
+  <li>Duplicate <code>PaymentCharged</code> → consumer sees same <code>event_id</code>, ignores second. Exactly-once effect.</li>
+</ul>
+
+---
+
+<h2>11. Methodologies / heuristics</h2>
+
+<table>
+  <thead><tr><th>Approach</th><th>What it gives you</th><th>Origin</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>12-Factor App</strong></td>
+      <td>Contract for cloud-native deployability (config, backing services, stateless, logs, admin processes)</td>
+      <td>Adam Wiggins, Heroku (2011)</td>
+    </tr>
+    <tr>
+      <td><strong>Reactive Manifesto</strong></td>
+      <td>Four pillars: Responsive, Resilient, Elastic, Message-Driven. Architecture style, not a checklist.</td>
+      <td>Jonas Bonér et al. (2014)</td>
+    </tr>
+    <tr>
+      <td><strong>C4 Model</strong></td>
+      <td>Diagramming hierarchy: Context → Container → Component → Code. Shared visual language.</td>
+      <td>Simon Brown (2016)</td>
+    </tr>
+    <tr>
+      <td><strong>Architecture Decision Records (ADR)</strong></td>
+      <td>Lightweight markdown: Title, Status, Context, Decision, Consequences. Git-tracked.</td>
+      <td>Michael Nygard (2011)</td>
+    </tr>
+    <tr>
+      <td><strong>Team Topologies</strong></td>
+      <td>Four team types (Stream-aligned, Platform, Enabling, Complicated-subsystem) + three interaction modes. Conway's Law operationalized.</td>
+      <td>Matthew Skelton & Manuel Pais (2019)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>These are not mutually exclusive. A mature org uses ADRs to record decisions, C4 to diagram them, Team Topologies to assign ownership, 12-Factor to constrain runtimes, and Reactive principles to guide async boundaries.</p>
+
+---
+
+<h2>12. Common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Root cause</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Distributed Monolith</strong></td>
+      <td>10 services, shared database, synchronous call chains, single deployment pipeline, one team owns all</td>
+      <td>Did not enforce data ownership. Chose microservices for resume, not for autonomy.</td>
+    </tr>
+    <tr>
+      <td><strong>Resume-Driven Architecture</strong></td>
+      <td>Kafka + Kubernetes + Istio + gRPC + Event Sourcing for a 3-person team building a CRUD app</td>
+      <td>Optimized for hiring/ego, not for the problem's constraints.</td>
+    </tr>
+    <tr>
+      <td><strong>Premature Sharding</strong></td>
+      <td>Sharded PostgreSQL at 50 GB because "we'll need it"</td>
+      <td>Did not measure. Sharding adds cross-shard query pain, rebalancing ops, client complexity.</td>
+    </tr>
+    <tr>
+      <td><strong>Ignoring Idempotency</strong></td>
+      <td>Retries cause double charges, duplicate orders, double emails</td>
+      <td>Assumed exactly-once delivery. Network doesn't provide it.</td>
+    </tr>
+    <tr>
+      <td><strong>Treating Eventual as Strong</strong></td>
+      <td>Read-after-write fails: user creates order, immediately queries "my orders," gets empty list</td>
+      <td>Did not pick a consistency model per domain. Assumed "database = strong."</td>
+    </tr>
+    <tr>
+      <td><strong>Leaky Trust Boundaries</strong></td>
+      <td>Internal service accepts raw user input because "gateway validates"</td>
+      <td>Gateway misses a case; internal service trusts. Corrupted state propagates.</td>
+    </tr>
+    <tr>
+      <td><strong>No Failure Domain Design</strong></td>
+      <td>Recommendations service outage takes down Checkout (shared thread pool / circuit breaker config)</td>
+      <td>Did not draw failure domain boxes. Shared resources created hidden coupling.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>The system design discipline is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, with decision metrics for each.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Architecture Decision Records (ADRs)</strong></td>
+      <td>adr-tools, MADR, Architect, Structurizr, Markdown in repo</td>
+      <td>New significant decision → documented, reviewable, immutable record</td>
+      <td>Coverage: % of decisions with ADR; Latency: time from decision to record; Review: % ADRs reviewed by team</td>
+    </tr>
+    <tr>
+      <td><strong>Diagramming / Modeling (C4, UML, ArchiMate)</strong></td>
+      <td>Structurizr, PlantUML, Mermaid, Draw.io, Miro, IcePanel</td>
+      <td>Need shared mental model → living diagram in docs/CI</td>
+      <td>Drift: diagram vs code sync lag; Coverage: % services modeled; Onboarding: time to understand topology</td>
+    </tr>
+    <tr>
+      <td><strong>Service Catalog / Ownership</strong></td>
+      <td>Backstage, OpsLevel, Cortex, Port, ServiceNow</td>
+      <td>Service sprawl → discoverable, owned, measurable services</td>
+      <td>Registration: % services cataloged; Ownership: % with clear owner; Metadata freshness</td>
+    </tr>
+    <tr>
+      <td><strong>API Contract Management</strong></td>
+      <td>OpenAPI/Swagger, GraphQL Federation, tRPC, Protobuf/gRPC, Pact, Spring Cloud Contract</td>
+      <td>Implicit contracts → schema-defined, versioned, CI-gated contracts</td>
+      <td>Breaking change detection: false positive/negative rate; Consumer coverage; Time to deploy contract change</td>
+    </tr>
+    <tr>
+      <td><strong>Observability (Metrics, Logs, Traces)</strong></td>
+      <td>Prometheus/Grafana, Datadog, Honeycomb, Lightstep, Jaeger, Zipkin, OpenTelemetry</td>
+      <td>Unknown failure → observable, debuggable, SLO-backed system</td>
+      <td>Coverage: % requests traced; SLO burn rate alerting; MTTD/MTTR; Cardinality cost</td>
+    </tr>
+    <tr>
+      <td><strong>Chaos Engineering / Reliability Testing</strong></td>
+      <td>Chaos Mesh, Litmus, Gremlin, Steadybit, AWS Fault Injection Simulator</td>
+      <td>Assumed resilience → verified failure domain isolation</td>
+      <td>Experiment frequency; Blast radius control; MTTR improvement; False confidence rate</td>
+    </tr>
+    <tr>
+      <td><strong>Infrastructure as Code / GitOps</strong></td>
+      <td>Terraform, Pulumi, Crossplane, Flux, ArgoCD, Spacelift, env0</td>
+      <td>Manual infra → versioned, reviewable, auditable infrastructure</td>
+      <td>Drift detection time; Change lead time; Rollback time; Plan/apply success rate</td>
+    </tr>
+    <tr>
+      <td><strong>Service Mesh / Traffic Management</strong></td>
+      <td>Istio, Linkerd, Consul Connect, AWS App Mesh, Cilium</td>
+      <td>Network blind spot → mTLS, retries, timeouts, traffic shifting, observability</td>
+      <td>Mesh coverage; Config complexity; Latency overhead; MTLS adoption %</td>
+    </tr>
+    <tr>
+      <td><strong>Formal Specification / Verification</strong></td>
+      <td>TLA+, Alloy, P, AWS P, Quint, FizzBee</td>
+      <td>Critical protocol → spec-checked, model-verified design</td>
+      <td>Spec coverage: % critical paths specified; Bug prevention: caught vs production; Learning curve</td>
+    </tr>
+    <tr>
+      <td><strong>Team Topology / Org Design Tools</strong></td>
+      <td>Team Topologies canvas, OrgWeaver, Functionly, Miro templates</td>
+      <td>Conway mismatch → intentional team topology aligned to architecture</td>
+      <td>Interaction mode clarity; Cognitive load per team; Handoff frequency; Dependency cycle count</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with ADRs + Diagrams + Observability (the "minimum viable architecture toolkit"). Add Contract Management when API count >5. Add Chaos Engineering when SLOs exist but are untested. Add IaC/GitOps when infra changes >1/week. Add Formal Spec only for protocols with catastrophic failure cost (payments, consensus, auth). The tool serves the decision — not the reverse.</p>
+
+---
+
+<h2>13. The future — where system design is going</h2>
+
+<table>
+  <thead><tr><th>Signal (2024–2026)</th><th>What it means for system design</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Edge computing / stateful functions</td>
+      <td>Cloudflare Workers, Vercel Edge, Fastly Compute, AWS Lambda@Edge. Compute moves to data. The "service" boundary becomes function + attached storage (Durable Objects, KV, D1). System design must now place <em>state geographically</em>.</td>
+    </tr>
+    <tr>
+      <td>WebAssembly as component model</td>
+      <td>WASM Components (wasmCloud, Spin, Fermyon). Language-agnostic, capability-based security, instant cold start. Service boundaries become WASM component boundaries.</td>
+    </tr>
+    <tr>
+      <td>Stateful platforms</td>
+      <td>Cloudflare Durable Objects, D1, KV; PlanetScale, Neon, Turso. The database is no longer a separate tier — it's embedded in the compute platform. System design shifts from "service + DB" to "stateful function."</td>
+    </tr>
+    <tr>
+      <td>API layer consolidation</td>
+      <td>React Server Components, tRPC, GraphQL Federation, gRPC-Web. The API contract is generated from the type system, not hand-written. System design must enforce <em>type-safe contracts</em> as the primary boundary.</td>
+    </tr>
+    <tr>
+      <td>AI as a system component</td>
+      <td>Vector store choice (pgvector, Pinecone, Weaviate, Milvus), orchestration (LangChain, LlamaIndex, custom), eval pipelines, guardrails. The ML model is now a <em>system dependency</em> with its own scaling, versioning, and failure modes.</td>
+    </tr>
+    <tr>
+      <td>Formal verification at the boundary</td>
+      <td>TLA+ for critical protocols (AWS uses it for S3, DynamoDB). Spec the protocol, model-check it, generate code. System design for high-stakes paths becomes <em>specification-driven</em>.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>14. Summary — the architectural checklist</h2>
+
+<p>Before any code is written for a new domain, verify:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>If no…</th></tr></thead>
+  <tbody>
+    <tr><td>Have we estimated capacity (peak QPS, data volume, growth rate)?</td><td>Stop. No capacity model = no scaling plan.</td></tr>
+    <tr><td>Have we drawn the failure domain boxes and verified blast radius?</td><td>Stop. A single failure must not cascade.</td></tr>
+    <tr><td>Have we picked a consistency model per data domain?</td><td>Stop. "Default" consistency is a bug.</td></tr>
+    <tr><td>Does every mutable state have exactly one owner?</td><td>Stop. Shared-write = distributed monolith.</td></tr>
+    <tr><td>Are all trust boundaries validated (gateway, service, module)?</td><td>Stop. Unvalidated boundary = future corruption.</td></tr>
+    <tr><td>Are API contracts schema-defined, versioned, and CI-gated?</td><td>Stop. Implicit contracts break silently.</td></tr>
+    <tr><td>Is idempotency designed into every mutating endpoint?</td><td>Stop. Retries will corrupt state.</td></tr>
+    <tr><td>Does the service topology match the team topology (Conway)?</td><td>Stop. Org/arch mismatch = friction forever.</td></tr>
+    <tr><td>Are the architectural decisions recorded as ADRs?</td><td>Stop. Oral tradition loses context in 6 months.</td></tr>
+  </tbody>
+</table>
+
+<p>Print this. Put it on the architecture wall. If the epic can't pass this checklist, it's not ready for the developer loop.</p>
+
+---
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.cs.umd.edu/~pugh/csci741/yourdon.pdf">Yourdon & Constantine (1979). <em>Structured Design</em>.</a> ·
+  <a href="https://www.cs.cmu.edu/~davidp/ParnasCriteria.pdf">Parnas, D. (1972). "On the Criteria To Be Used in Decomposing Systems into Modules."</a> ·
+  <a href="https://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612">GoF (1994). <em>Design Patterns</em>.</a> ·
+  <a href="https://www.amazon.com/Distributed-Systems-Principles-Paradigms-Andrew-Tanenbaum/dp/0132392275">Tanenbaum & Van Steen (1995/2007). <em>Distributed Systems</em>.</a> ·
+  <a href="https://www.microsoft.com/en-us/research/publication/paxos-made-simple/">Lamport, L. (2001). "Paxos Made Simple."</a> ·
+  <a href="https://www.allthingsdistributed.com/2006/06/you_build_it_you_run_it.html">Vogels, W. (2006). "You Build It, You Run It."</a> ·
+  <a href="https://12factor.net/">12-Factor App (2011)</a> ·
+  <a href="https://www.reactivemanifesto.org/">Reactive Manifesto (2014)</a> ·
+  <a href="https://martinfowler.com/articles/microservices.html">Fowler & Lewis (2014). "Microservices."</a> ·
+  <a href="https://www.amazon.com/Building-Microservices-Designing-Fine-Grained-Systems/dp/1491950358">Newman, S. (2015). <em>Building Microservices</em>.</a> ·
+  <a href="https://www.domainlanguage.com/ddd/">Evans, E. (2003). <em>Domain-Driven Design</em>.</a> ·
+  <a href="https://www.amazon.com/Implementing-Domain-Driven-Design-Vaughn-Vernon/dp/0321834577">Vernon, V. (2013). <em>Implementing DDD</em>.</a> ·
+  <a href="https://cognitect.com/blog/2011/8/12/architecture-decision-records">Nygard, M. (2011). "Architecture Decision Records."</a> ·
+  <a href="https://teamtopologies.com/">Skelton & Pais (2019). <em>Team Topologies</em>.</a> ·
+  <a href="https://www.usenix.org/conference/atc16/technical-sessions/presentation/woodward">Woodward, M. et al. (2016). "C4 Model."</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a real system where the team <em>didn't</em> do the consistency-model-per-domain step, and what the production bug was. Show me the incident timeline."</li>
+    <li>"When you inherit a distributed monolith (shared DB, sync calls, no contracts), what's the first ADR you write, and what's the first service boundary you extract?"</li>
+    <li>"How do you teach a team to distinguish <em>resume-driven architecture</em> from legitimate complexity? What's the one question that separates them?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · System Design — the architectural layer</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

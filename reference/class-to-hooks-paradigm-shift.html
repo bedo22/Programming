@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Class-to-Function Paradigm Shift in React — Reference</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · JavaScript, toward reading React at work</p>
+  <h1>The class-to-function paradigm shift in React</h1>
+  <p class="meta">A comprehensive reference. Why React moved from classes to functions+hooks, what changed, what stayed, and why "functional programming" alone wasn't the answer.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>Lesson 5 introduced <code>this</code> and <code>bind</code> because you'll meet them in older React code at work. But you asked the rightMeta question: <em>why did React move away from classes at all? Wasn't the functional style enough?</em> This doc answers both — because the answer is counterintuitive: React already had function components before hooks, and they weren't enough. Hooks were the missing piece that made functions viable for real components. The story has four eras.</p>
+</section>
+
+<h2>0. Before the classes: a word on foundations</h2>
+
+<p>This section used to hold a deep prequel on programming primitives, the four theories of computation (Turing machine, lambda calculus, von Neumann architecture, information theory), the data→value→variable→state chain, types, and lifetime. That prequel now lives in its own reference doc — <a href="./what-is-state-prequel.html">What Is "State"? — A Prequel to Programming in React</a> — and the JavaScript language foundation (history, design, runtime model) lives in <a href="./javascript-the-language.html">JavaScript: The Language</a>. Read both if the phrase "Turing's state register is the same concept as <code>useState</code>" doesn't feel immediately obvious.</p>
+
+<p>What you need from that prequel to follow the rest of this doc: <strong>state is a normal variable whose value persists across events</strong> — nothing more, nothing less. The rest of this doc is the story of <em>where</em> that persistent variable lives: closure, class field, hook slot, server. Same variable, different owner. If that distinction is clear, you have what you need to continue.</p>
+
+<p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+
+<h2>1. OOP — the paradigm classes came from</h2>
+
+<p>Before we can talk about why React moved <em>away</em> from classes, we have to ask: what paradigm do classes belong to, and why did anyone think it was the right fit for UIs in the first place?</p>
+
+<h3>The three major programming paradigms</h3>
+
+<table>
+  <thead><tr><th>Paradigm</th><th>Heart unit</th><th>State lives…</th><th>Computation is…</th><th>Origin</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Procedural / imperative</strong></td><td>functions acting on data</td><td>In shared data structures, mutated by functions</td><td>A sequence of instructions: do this, then that</td><td>C, Fortran, assembly</td></tr>
+    <tr><td><strong>Object-Oriented (OOP)</strong></td><td>objects = data + behavior together</td><td>Inside objects; objects send messages to each other</td><td>Objects collaborate by calling each other's methods</td><td>Smalltalk (1980s), Java, C++</td></tr>
+    <tr><td><strong>Functional (FP)</strong></td><td>pure functions</td><td>Outside functions — passed in, returned out; never mutated in place</td><td>Function composition: input → output, no side effects</td><td>Lisp (1958), Haskell, ML</td></tr>
+  </tbody>
+</table>
+
+<p>The key insight: a "class" in JavaScript is a thin syntax wrapper over the prototype chain (Lesson 3 — <code>new</code> four-step dance). But conceptually, choosing <code>class</code> is choosing the <strong>OOP paradigm</strong>: the idea that the right unit of a program is an object bundle of state plus the methods that operate on that state. You instantiate the class once, you get one persistent instance, the instance holds the state, and the methods mutate it over time. <code>this</code> is how a method refers to its own instance.</p>
+
+<h3>The four pillars of OOP — and how React classes map to each</h3>
+
+<table>
+  <thead><tr><th>Pillar</th><th>What it says</th><th>How React classes embodied it</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Encapsulation</strong></td><td>Objects hide their internal state and expose only methods</td><td><code>this.state</code> is "private" (React's convention — not enforced); <code>render()</code>, <code>setState()</code>, lifecycle methods are the public interface</td></tr>
+    <tr><td><strong>Inheritance</strong></td><td>New classes extend existing ones, reuse and override behavior</td><td><code>class Counter extends React.Component</code> — every class component inherits from React's base class to get <code>setState</code>, lifecycle hooks, props machinery</td></tr>
+    <tr><td><strong>Polymorphism</strong></td><td>Different objects respond to the same message in their own way</td><td>React calls <code>render()</code> on every component regardless of which class it is — same interface, different output. <code>shouldComponentUpdate</code> override is the classic polymorphism hook.</td></tr>
+    <tr><td><strong>Abstraction</strong></td><td>Hide complex reality behind a simpler interface</td><td>A <code><Counter /></code> in JSX is a clean abstraction over "an instance of the Counter class that holds a number, with a button that increments it"</td></tr>
+  </tbody>
+</table>
+
+<p>This is why OOP felt natural for UIs in 2013. A button is naturally <em>something with state</em> (hovered, pressed, disabled), and OOP's pitch was "state belongs inside objects that know how to manage themselves." A class with <code>this.state</code> and <code>this.handleClick</code> reflected that intuition. It's no accident that React, Angular, Ember, Backbone, and Vue all started with class-style components — OOP was the dominant paradigm of the 2000s-2010s.</p>
+
+<h3>Why OOP fell out of fashion for UIs — and three specific signs</h3>
+
+<p>OOP didn't die. It's still alive in systems programming, game engines, and plenty of languages. But for the specific problem of <em>building user interfaces</em>, three signs appeared over a decade of real-world use:</p>
+
+<p><strong>Sign 1 — Inheritance trees get tangled.</strong> Real React codebases rarely extended <code>React.Component</code> more than one level. When they did, it was painful: a <code>BaseModal extends React.Component</code> and <code>ConfirmModal extends BaseModal</code> quickly turned into "which lifecycle hook does this thing use, and has the parent overridden it?" Inheritance invited ceremony; components were better when flat. The class <em>extending</em> the base class was a tedious tax to get <code>setState</code>.</p>
+
+<p><strong>Sign 2 — Mutable state inside objects is hard to reason about.</strong> <code>this.state.count</code> changes over time, and any method anywhere can read it. When something is wrong on screen, you have to trace <em>which code path</em> mutated <code>this.state</code> to <em>which value</em> at <em>what point</em> in the component's lifetime. This is the classic OOP debugging pain — "object identity over time" — concentrated in a system that re-renders constantly.</p>
+
+<p><strong>Sign 3 — Logic reuse wanted functions, not inheritance.</strong> When two components needed the same stateful logic, inheritance wasn't the answer (you can't extend two base classes). The React community invented workarounds: <strong>higher-order components (HOCs)</strong> (a function that takes a component, returns a wrapped component) and <strong>render props</strong> (a component whose child is a function). Both of these are <em>function-composition patterns smuggled back into the class world</em>. They worked, but they made the wrapper-hell problem: real apps in 2017 were wrapped in five layers of HOCs, all so the underlying class could keep its <code>this</code>. The community was reaching for FP-style composition while still paying the OOP tax.</p>
+
+<pre><code><span class="comment-line">// HOCs — function composition pretending to be OOP</span>
+function withAuth(WrappedComponent) {
+  return class extends React.Component {
+    state = { user: null };
+    componentDidMount() { fetchUser().then(u => this.setState({ user: u })); }
+    render() { return this.state.user ? <WrappedComponent user={this.state.user} {...this.props} /> : null; }
+  };
+}
+
+function withTheme(WrappedComponent) {
+  return class extends React.Component { /* ... reads theme context ... */ };
+}
+
+<span class="bad">// wrapper hell — three layers deep, props threading through each</span>
+export default withAuth(withTheme(withRouter(MyComponent)));
+<span class="comment-line">// DevTools: withAuth > withTheme > withRouter > MyComponent</span>
+<span class="comment-line">// None of this is inheritance — it's FP composition routed through classes.</span></code></pre>
+
+<blockquote class="callout">
+  <p><strong>The pattern that became the React team's motivation.</strong> The official Hooks introduction names "hard to reuse stateful logic" as problem #1. The community <em>couldn't</em> solve this naturally with classes because the stateful logic was <em>glued to the class instance</em>: <code>this.state</code>, <code>this.setState</code>, <code>this.componentDidMount</code> are all instance properties. To reuse them, you had to wrap the whole class. Hooks let you write the logic as a function (a custom hook) that any component can call — because the state now lives in React, not in a class instance.</p>
+</blockquote>
+
+<h3>The pivot — what React kept from OOP, what it dropped</h3>
+
+<p>React didn't abandon EVERYTHING from OOP. It kept: encapsulation of UI logic inside a component boundary (today's function component still encapsulates — just with hooks instead of methods), and the abstraction that "a component is a thing you can compose inside other components" (today still true). It dropped: inheritance (the React base class is gone in the function world), mutable <code>this</code> (no <code>this</code> at all in function components), and the "object-as-unit-of-state" idea (state now flows through hooks, not through instance fields).</p>
+
+<p>It also kept OOP's pragmatic sibling: <strong>imperative escape hatches</strong>. <code>useRef</code> gives you a mutable box — exactly what an instance field was — for the cases where you need imperative state that doesn't trigger re-render. React didn't go pure-functional; it kept a small imperative door for the cases where OOP-style "this thing has mutable state" is genuinely the right model (DOM refs, timer IDs, "latest value" caches).</p>
+
+<p>You can read the whole shift as: <strong>React took OOP's encapsulation + FP's composition, and dropped OOP's inheritance + mutable-this</strong>. Hooks are literally functions you compose; <code>useRef</code> is the one place the old OOP instance-field model survives.</p>
+
+<h2>2. What is "state"? A prequel — before we can talk about React's choices</h2>
+
+<p>Section 1 took "state" as a given. That skips the most important part of the story. <em>State</em> is not a React concept, nor a JavaScript concept — it is a stolen idea with a 70-year history, and the way React treats it today is the result of several migrations across paradigms. If you do not know where state lived before React, you cannot tell what is unusual about where React puts it now.</p>
+
+<h3>2.1 The original meaning — automata theory (1936–1960s)</h3>
+
+<p>The word <em>state</em> comes from computer science before computers had screens: <strong>automata theory</strong>. A Turing machine has a <em>state register</em> — a finite set of configurations the machine can be in, with transition rules that say "if you are in state X and read symbol Y, go to state Z." A <strong>finite state machine</strong> (FSM) is the same idea compressed: an engine that is in exactly one state at a time, and events move it from state to state.</p>
+
+<p>This is the deep origin of every UI state conversation. When we say "the button is in the <em>disabled</em> state" or "the form is in the <em>submitting</em> state," we are using the FSM vocabulary — the component is a machine with discrete configurations and defined transitions. Even the React team's mental model ("UI is a function of state") is automata-descended: state is the input, the transition is an event, the new state is the output.</p>
+
+<blockquote class="callout">
+  <p><strong>Two ideas we will reuse.</strong> (1) State is <em>distinct from</em> the data you compute from it — the FSM is in one state, but a log of past states is different data. (2) State persists across events — that is the whole point of having it; without persistence you would just have a stream of inputs.</p>
+</blockquote>
+
+<h3>2.2 MVC (1979) — state leaves the view, moves into a model</h3>
+
+<p>In 1979, Trygve Reenskaug working at Xerox PARC on Smalltalk-80 wrote the original <a href="https://heim.ifi.uio.no/~trygver/themes/mvc/mvc-index.html">Models-Views-Controllers</a> note. The problem he was solving: if a UI element holds its own data and draws itself, every change ripples through the screen and you cannot have two views of the same data (e.g. a list view and a detail view of the same record). His proposal:</p>
+
+<ul>
+  <li><strong>Model</strong> — holds the <em>state</em> and the domain logic. Knows nothing about screens.</li>
+  <li><strong>View</strong> — reads the model and renders. Listens for change notifications.</li>
+  <li><strong>Controller</strong> — takes input, asks the model to update, tells the view to re-render.</li>
+</ul>
+
+<p>State moved <em>out</em> of the view, <em>into</em> a separate object whose only job was to hold and validate state. Views became projections — read-only functions of the model. This was a profound move: it is why today we still say "the component should not own its data; the data should live in a store/model and the component should read it."</p>
+
+<p>MVC's specific bug was two-way binding: controllers updated models and models notified views and views sent events back to controllers, and tracing a single user click through that loop was hard. Every UI architecture since 1979 has been a variation on "split model from view, but fix the feedback loop MVC left behind."</p>
+
+<h3>2.3 The web's stateless origin (1991–2004)</h3>
+
+<p>HTTP was designed stateless — each request is independent, the server forgets you between requests. Browsers rendered HTML, JavaScript was a tiny assistant for form validation, and <em>state lived in three places, none of them "the component"</em>:</p>
+
+<ul>
+  <li><strong>The DOM</strong> — the HTML document was the state. "Is this checkbox checked?" was a property of the DOM node, queried imperatively. The DOM <em>was</em> the database.</li>
+  <li><strong>The URL</strong> — which page you were on was state.Bookmarkable. Refresh-stable.</li>
+  <li><strong>The server's session</strong> — logged-in identity, cart contents. Keyed by a cookie. The browser's "state" was a token, not actual values.</li>
+</ul>
+
+<p>Vanilla JS of the 1995-2005 era had no concept of component state. You wrote <code>document.getElementById('count').innerHTML = newCount</code> — the count lived in a DOM node, your code mutated that node directly, and "state" as a first-class concept did not exist in your codebase. State was a property of the document, not of your program.</p>
+
+<h3>2.4 jQuery (2006) — implicit state via closures and the DOM</h3>
+
+<p>jQuery didn't add a state abstraction either. It made DOM mutation cleaner (<code>$('#count').text(n)</code>), but state still lived in the DOM. The new thing jQuery enabled accidentally: <strong>state in closures</strong>. A click handler closure could capture a <code>let count = 0</code> in its enclosing function, and that count would persist across clicks — state living in JS memory, reachable only via the closure, not in any DOM attribute. Lesson 2 of this workspace covers exactly this pattern:</p>
+
+<pre><code><span class="comment-line">// jQuery-era implicit state — the count lives in the closure, not the DOM</span>
+$(function() {
+  var count = 0;                          <span class="comment-line">// state = a closed-over variable</span>
+  $('#btn').on('click', function() {
+    count++;
+    $('#count').text(count);              <span class="comment-line">// projection of state into the DOM</span>
+  });
+});</code></pre>
+
+<p>This is the first time <em>JavaScript-side state</em> became common — but it was implicit, scattered, and each plugin/widget reinvented its own. There was no shared vocabulary for "this widget has state X." Plugins like jQuery UI had to invent a widget factory with <code>_create</code>, <code>_setOption</code>, <code>option()</code> — a half-hearted OOP state model bolted on top of closures.</p>
+
+<h3>2.5 Backbone, Angular 1, Ember (2010–2013) — explicit model state returns</h3>
+
+<p>As single-page apps grew, the closure-scattered-state pattern collapsed under its own weight. Three frameworks independently reinvented MVC's "put state in a model object" idea for JavaScript:</p>
+
+<ul>
+  <li><strong>Backbone.js</strong> (2010) — <code>Backbone.Model</code> with <code>get</code>/<code>set</code> and a <code>change</code> event. Explicit. Architecturally honest. Verbose.</li>
+  <li><strong>Angular 1</strong> (2010) — <code>$scope</code> as a hierarchical state tree mirrored to templates via dirty-checking. Two-way binding; the famous digest cycle.</li>
+  <li><strong>Ember</strong> (2011) — routes as the unit, controllers and models holding state, computed properties with explicit dependencies.</li>
+  <li><strong>Knockout</strong>, <strong>CanJS</strong>, <strong>Sencha ExtJS</strong> — variations on the same: a model/observable object holds state, the view binds to it.</li>
+</ul>
+
+<p>What every one of these did was bring state <em>back out of the DOM</em> and into a JS object (a model, a scope, a controller). They differed in how changes propagated. State was no longer a property of the document; it was a property of your JS application — but the framework owned it, not the component.</p>
+
+<p>For Angular's full arc — from AngularJS through the 2016 rewrite to modern Signals — see the companion doc: <a href="./angular-evolution.html">Angular's evolution: the class, the rewrite, and the signal</a>.</p>
+
+<h3>2.6 React 2013 — state moves <em>into</em> the component (a contrarian move)</h3>
+
+<p>React's 2013 launch did <em>the opposite</em> of where Backbone and Angular were going. Where they pulled state into framework-wide stores or scopes, React pushed state <em>down</em> into each component, as <code>this.state</code> on the class instance:</p>
+
+<pre><code>class Counter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 0 };       <span class="comment-line">// state lives on the component instance itself</span>
+  }
+}</code></pre>
+
+<p>This was contrarian and controversial at the time. Critics called it a regression — "we just spent five years pulling state out of views, why put it back?" The React team's argument:</p>
+
+<ul>
+  <li>The unit of reuse is the component, not the model.</li>
+  <li>State scoped to a component is easier to reason about than state in a global scope tree (Angular's <code>$scope</code> digests were notorious).</li>
+  <li>"UI = f(state)" replaces "state, view, controller each touch each other bidirectionally."</li>
+</ul>
+
+<p>The big trade: state moved closer to where it was used, at the cost of <em>cross-component state</em> becoming hard again. That cost is what Flux and Redux were about to fix.</p>
+
+<h3>2.7 Flux (2014) and Redux (2015) — state moves partially back out</h3>
+
+<p>By 2014, the React community had rediscovered MVC's original problem: if every component owns its own state, two siblings cannot share it without awkward parent-passing. Facebook's <a href="https://facebook.github.io/flux/">Flux</a> pattern was a counter-reaction: a single <em>store</em> holding application state, dispatched actions mutating it, components subscribing. Redux (Dan Abramov, 2015) generalized Flux with reducers — pure functions of (state, action) → newState, inspired by Elm.</p>
+
+<p>The pendulum swung. State was <em>partly</em> back out of the component, into a single store outside the component tree. React components kept their <code>this.state</code> for <em>local</em> UI state (form inputs, hover, transient toggles), but the domain state — the user, the cart, the orders — moved to Redux.</p>
+
+<p>That split — "domain state in a store, UI state in components" — has held through hooks (2018), the compiler (2025), and into RSC (2024+). It is the dominant shape of React apps in 2026.</p>
+
+<h3>2.8 Hooks (2018) — state moves to React's runtime, locked by call order</h3>
+
+<p>The 2018 hooks launch did not change <em>where</em> state conceptually lived (still per-component), but it changed <em>how</em> it was stored. With classes, state was literally an instance field: <code>this.state</code> was a property of the object <code>this</code>, the object lived as long as the component was mounted, and you accessed it as <code>count = this.state.count</code>. State lived <em>on the instance</em>, OOP-style.</p>
+
+<p>With <code>useState</code>, state lives <em>in React's runtime storage</em>, keyed by <strong>call order</strong> inside the component function:</p>
+
+<pre><code>function Counter() {
+  const [count, setCount] = useState(0);        <span class="comment-line">// first useState call → slot 0</span>
+  const [name, setName] = useState('');         <span class="comment-line">// second call → slot 1</span>
+  <span class="comment-line">// React keeps an array per component instance, indexed by call order</span>
+}</code></pre>
+
+<p>This is the most invisible and important change in the whole arc. State stopped being a property of the component (an OOP instance field) and became a property <em>of React itself</em>, on a per-instance basis. The component function is now just a description of "I want state at slots 0 and 1"; React stores it. This is why the <em>rules of hooks</em> exist (you cannot call <code>useState</code> conditionally — the slot would be out of order next time) — §8 of this doc.</p>
+
+<p>The trade React made: a function that "is stateful" via call order is weirder than a class with fields, but you can now <em>extract stateful logic into a custom hook</em> — because the logic is just function calls, not an instance. That is exactly the wrapper-hell problem from §1 solved at the storage layer.</p>
+
+<h3>2.9 Signals (2022+) — state as a graph node, not a slot</h3>
+
+<p>The most serious alternative to React's hook-call-order model is <strong>signals</strong>, popularized in the JS world by Solid (2018+) and Preact (2022), and earlier in Vue 3's <code>ref</code>/<code>reactive</code> and Svelte's stores. A signal is not a slot keyed by call order — it is a <em>standalone value cell</em> with subscribers:</p>
+
+<pre><code><span class="comment-line">// Preact signals — state is a graph node, lives where you put it</span>
+import { signal } from '@preact/signals';
+
+const count = signal(0);                 <span class="comment-line">// cell in the JS heap; not scoped to a component</span>
+function Counter() {
+  return <button onClick={() => count.value++}>{count.value}</button>;
+}</code></pre>
+
+<p>When <code>count.value</code> changes, only the bindings that read it update — not the whole component function re-running. Conceptually this is closer to MVC's "model with change notifications" than to React's "function of state." React did not adopt signals (see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>), but Angular <em>did</em> — see <a href="./angular-evolution.html">Angular's evolution: the class, the rewrite, and the signal</a> for the framework that adopted signals to replace zone.js. Reading code in the signals world (Preact, Solid, Vue, Svelte runes, Angular 17+) you should recognize: this is a different answer to the same question. State is a <em>graph node</em>, not a slot.</p>
+
+<h3>2.10 React Server Components (2024+) — state splits from data</h3>
+
+<p>The latest migration: state and data stop being one thing. Server Components have no state (no <code>useState</code>, no hooks) — they are pure functions of data fetched on the server: <code>UI = f(data)</code>. Client Components keep state: <code>UI = f(state)</code>. The full app: <code>UI = f(data, state)</code> (see the <a href="./react-2024-and-beyond.html">React 2024 and beyond</a> doc).</p>
+
+<p>In effect RSC splits the question "where does state live?" in two: <em>state</em> (UI state, things the user does) lives in the browser, in client components; <em>data</em> (records pulled from a database) lives on the server, fetched fresh per request. They used to be the same concept — both were "this.state" on a class. Now they have different storage and different lifecycles.</p>
+
+<h3>2.11 The future — what the compiler changes, what it does not</h3>
+
+<p>The React Compiler (see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>) does <em>not</em> move state again. State stays where hooks put it — in React's runtime, locked by call order, per component instance. What the compiler changes is <em>derivation</em>: where you used to manually memoize with <code>useMemo</code> / <code>useCallback</code> to keep derived values stable, the compiler does that automatically. State stays; memoization bookkeeping disappears.</p>
+
+<p>What the next migration might be is genuinely open. Candidates signals-world advocates push: (a) state as graph nodes (signals fully replacing hook slots) — React has said no (see the <a href="./react-2024-and-beyond.html">React 2024 and beyond</a> doc); (b) state pushed back out of components into stores with first-class framework support (Redux/Zustand becoming framework-native instead of community-driven); (c) state on the server, snapshots shipped to the client — the "single-flight mutations" research area. None of these are settled as of 2026. What <em>is</em> settled: state has moved roughly every 5–7 years since 1979 (MVC → web DOM → jQuery closures → Backbone/Angular models → React components → Flux/Redux stores → hooks slots → RSC split). Expect the next move before 2030.</p>
+
+<blockquote class="callout">
+  <p><strong>The one-sentence history.</strong> State started as a separate object (MVC model), got pushed into the document (web), leaked into closures (jQuery), got pulled back into framework models (Backbone/Angular), got pushed into the component (React classes), got pulled halfway out into stores (Flux/Redux), got stored in React itself by call order (hooks), and most recently got split between browser-state and server-data (RSC). Every one of these moves solved a specific bug and introduced a new one. Reading React today means understanding which of these eras the file you are looking at belongs to.</p>
+</blockquote>
+
+<h2>3. The four eras — a timeline</h2>
+
+<table>
+  <thead><tr><th>Era</th><th>Years</th><th>Style</th><th>State?</th><th>Side effects?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Era 1 — Class only</strong></td><td>2013–2015</td><td><code>React.createClass</code> → class components</td><td><code>this.state</code>, <code>setState</code></td><td>Lifecycle methods (<code>componentDidMount</code>, <code>componentWillUnmount</code>, etc.)</td></tr>
+    <tr><td><strong>Era 2 — Functions appear, but stateless only</strong></td><td>2015–2018</td><td>Function components introduced</td><td>No — functions were <em>stateless</em></td><td>No — no lifecycle, no side effects</td></tr>
+    <tr><td><strong>Era 3 — Hooks</strong></td><td>2018–now</td><td>Function components + hooks</td><td><code>useState</code></td><td><code>useEffect</code></td></tr>
+    <tr><td><strong>Era 4 — Compiler</strong></td><td>2024+</td><td>React Compiler auto-optimizes</td><td>Same hooks</td><td>Same hooks</td></tr>
+  </tbody>
+</table>
+
+<p>The key insight: <strong>function components existed since 2015, but they were second-class citizens</strong> — they couldn't hold state or run side effects. You only used them for pure presentational components. Anything stateful required a class. Hooks (2018) closed the gap.</p>
+
+<p>But the timeline above only answers <em>when</em>. The real question is <em>what changed about how you think about state</em>. Each era is a different answer to one question: <strong>where does state live, who owns it, and how do you touch it?</strong></p>
+
+<table>
+  <thead><tr><th>Era</th><th>State lives in…</th><th>You read state by…</th><th>You write state by…</th><th>Mental model</th><th>Limitation inherited</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Class only</strong></td>
+      <td>An instance field on the component object</td>
+      <td><code>this.state.key</code> — always reads the latest value</td>
+      <td><code>this.setState({key: val})</code> — merges into instance, triggers re-render</td>
+      <td>My component <em>is</em> an object; state is its data; lifecycle methods are its biography</td>
+      <td>None (first model). But: logic reuse requires HOCs/render props → wrapper hell</td>
+    </tr>
+    <tr>
+      <td><strong>2. Functions, stateless</strong></td>
+      <td>Nowhere — functions have no persistence</td>
+      <td>N/A (no state)</td>
+      <td>N/A</td>
+      <td>A component is just a function from props to UI; can't remember anything</td>
+      <td>Inherits era 1's wrapper hell AND can't hold state → pure-presentational only</td>
+    </tr>
+    <tr>
+      <td><strong>3. Hooks</strong></td>
+      <td>A numbered slot in React's internal fiber (not in your closure)</td>
+      <td><code>const [x] = useState(…)</code> — reads the snapshot from <em>this render's</em> closure</td>
+      <td><code>setX(newVal)</code> — writes to React's slot, triggers a new render</td>
+      <td>My component is a function that <em>asks React</em> for state each time it runs</td>
+      <td>Inherits era 2's function model. Fixes state+effects for functions. New cost: rules of hooks, stale closures if deps lie</td>
+    </tr>
+    <tr>
+      <td><strong>4. Compiler</strong></td>
+      <td>Same hook slots — but the compiler infers dependencies so you don't have to write them</td>
+      <td>Same as era 3</td>
+      <td>Same as era 3</td>
+      <td>Same as era 3 — but the compiler catches what you'd forget (deps, memoization)</td>
+      <td>Inherits era 3's model. Removes the deps-array tax. Can't fix broken Rules of React — garbage in, garbage out</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The pattern: each era inherits the previous era's limitations and solves one of them, but introduces a new kind of complexity. Era 4 is notable because it <em>removes</em> complexity (deps arrays, manual memoization) without changing the mental model — the first era that simplifies rather than adds.</p>
+
+<h2>4. Era 1 — Class components, the original model</h2>
+
+<p>React shipped in 2013 with one component model: classes. A class component is an object with a <code>render()</code> method, mutable <code>this.state</code>, and lifecycle methods that fire at specific points in the component's existence.</p>
+
+<pre><code>class Counter extends React.Component {
+  constructor(props) {
+    super(props);                       <span class="comment-line">// required when extending — calls the parent constructor</span>
+    this.state = { count: 0 };          <span class="comment-line">// state lives on the instance</span>
+    this.handleClick = this.handleClick.bind(this);  <span class="comment-line">// pre-bake this so the callback keeps it</span>
+  }
+
+  handleClick() {
+    this.setState(prev => ({ count: prev.count + 1 }));
+  }
+
+  componentDidMount() {                 <span class="comment-line">// runs once, after first render</span>
+    document.title = `Count: ${this.state.count}`;
+  }
+
+  componentDidUpdate() {                <span class="comment-line">// runs after every update</span>
+    document.title = `Count: ${this.state.count}`;
+  }
+
+  componentWillUnmount() {              <span class="comment-line">// runs once, before removal</span>
+    console.log("Counter unmounting");
+  }
+
+  render() {
+    return <button onClick={this.handleClick}>{this.state.count}</button>;
+  }
+}</code></pre>
+
+<p>The mental model: a component is an <strong>instance</strong> of a class. The instance lives as long as the component is mounted. <code>this</code> references that instance. React mutates <code>this.state</code> and <code>this.props</code> over time so the latest values are always readable through <code>this</code>. Lifecycle methods are hooks into the instance's biography — birth (<code>componentDidMount</code>), middle (<code>componentDidUpdate</code>), death (<code>componentWillUnmount</code>).</p>
+
+<h3>What was good</h3>
+<ul>
+  <li><strong>Clear instance model.</strong> One object per component, holding state and methods. Familiar to OOP programmers.</li>
+  <li><strong>Lifecycle biography.</strong> Setup in mount, cleanup in unmount — felt natural.</li>
+  <li><strong><code>this</code> as a time-travelling reference.</strong> Read <code>this.state.count</code> anywhere, any time — it always points to the latest.</li>
+</ul>
+
+<h3>What was painful — and why the React team eventually moved away</h3>
+
+<p>The official Hooks introduction (React blog, 2019) names three problems. They are not about performance.</p>
+
+<p><strong>Problem 1 — Hard to reuse stateful logic between components.</strong> If two components both needed "subscribe to a friend's online status" logic, you couldn't just extract a function. You needed a higher-order component (HOC) or a render prop, both of which wrap your component in another layer. Real apps ended up in "wrapper hell" — DevTools showing five layers of <code>withAuth(withTheme(withRouter(withUser(MyComponent))))</code>. Each layer added indirection, naming collisions, and ref-forwarding headaches.</p>
+
+<pre><code><span class="bad">// The HOC pattern — wrapper hell</span>
+const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
+<span class="comment-line">// In DevTools: withAuth > withTheme > withRouter > MyComponent</span>
+<span class="comment-line">// Each layer re-renders MyComponent; props pass through all of them</span></code></pre>
+
+<p><strong>Problem 2 — Complex components become hard to understand.</strong> Lifecycle methods lumped unrelated logic together. A single <code>componentDidMount</code> might set up a subscription, start a timer, AND fetch initial data — three unrelated concerns in one method. <code>componentWillUnmount</code> cleaned up all three. Related code was scattered across methods; unrelated code was crammed into the same method. As components grew, this became a mess.</p>
+
+<pre><code>class ChatRoom extends React.Component {
+  componentDidMount() {
+    this.fetchMessages();        <span class="comment-line">// concern 1: data fetching</span>
+    this.subscribeToSocket();    <span class="comment-line">// concern 2: real-time subscription</span>
+    this.startTypingTimer();     <span class="comment-line">// concern 3: typing indicator</span>
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.roomId !== this.props.roomId) {
+      this.unsubscribe();        <span class="comment-line">// cleanup for concern 2</span>
+      this.fetchMessages();      <span class="comment-line">// concern 1 again</span>
+      this.subscribeToSocket();  <span class="comment-line">// concern 2 again</span>
+    }
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();           <span class="comment-line">// cleanup for concern 2</span>
+    this.stopTypingTimer();      <span class="comment-line">// cleanup for concern 3</span>
+  }
+}</code></pre>
+
+<p>Three concerns, scattered across three methods, interleaved with each other. Reading any single concern required jumping between all three methods.</p>
+
+<p><strong>Problem 3 — Classes confuse both people and machines.</strong> The React team wrote this verbatim in the official motivation. Three sub-issues:</p>
+
+<ul>
+  <li><code>this</code> in JavaScript is unlike <code>this</code> in most other languages. You must remember to <code>bind</code> event handlers. Without class fields (ES2022), constructor boilerplate is verbose. People understand props, state, and top-down data flow perfectly well — yet still struggle with classes.</li>
+  <li>Classes don't minify well — the minifier can't collapse method names because they might be called by React's internals.</li>
+  <li>Classes make hot reloading flaky — the minified class identity changes between edits, breaking state preservation.</li>
+  <li>Ahead-of-time compilation strategies (component folding, Prepack experiments) hit dead ends with class patterns.</li>
+</ul>
+
+<h2>5. Era 2 — Function components appear, but they're second-class (2015)</h2>
+
+<p>In 2015 React added function components — a simpler way to write components that had no state and no side effects:</p>
+
+<pre><code>function Greeting({ name }) {
+  return <h1>Hello, {name}</h1>;
+}</code></pre>
+
+<p>Cleaner than the class version for presentational components. But function components were <strong>limited by design</strong> — they couldn't:</p>
+<ul>
+  <li>Hold state (no <code>setState</code>).</li>
+  <li>Run side effects (no lifecycle methods).</li>
+  <li>Read context (that required a class or a consumer component).</li>
+  <li>Access refs.</li>
+</ul>
+
+<p>If your component needed <em>any</em> of those, you had to rewrite it as a class. Most real components need state or effects — so most components were classes. Function components were for the leaf presentational nodes of your tree.</p>
+
+<p>This is the answer to "wasn't functional enough?" — <strong>no, it wasn't.</strong> Pure functions can render a UI from props, but a real interactive component needs to hold state over time and respond to the outside world (timers, subscriptions, DOM mutations, fetches). Pure functions can't do that. <em>Something</em> had to bridge the gap. In classes, the bridge was the instance and its lifecycle methods. In functions, the bridge didn't exist yet.</p>
+
+<h2>5b. Mental models — how React developers actually reason</h2>
+
+<p>Before hooks, React developers reasoned in <strong>lifecycle phases</strong>: mount → update → unmount. Each phase had a specific method. The mental model was "what do I do when the component mounts? What about when props change? What about cleanup?"</p>
+
+<p>After hooks, the mental model shifted to <strong>effects and dependencies</strong>: "what side effect do I want to run, and when should it re-run?" The dependency array (<code>[deps]</code>) became the central reasoning artifact — it declares the relationship between the effect and the reactive values it depends on.</p>
+
+<table>
+  <thead><tr><th>Era</th><th>Core mental model</th><th>Key reasoning question</th><th>Debugging intuition</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Classes (Era 1)</strong></td>
+      <td>Lifecycle phases (mount/update/unmount)</td>
+      <td>"Which lifecycle method handles this concern?"</td>
+      <td>React DevTools: component tree + "Why did this render?" (post-16.8). Console: look for <code>setState</code> in <code>render</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Functions pre-hooks (Era 2)</strong></td>
+      <td>Pure function of props → UI</td>
+      <td>"What props does this need?"</td>
+      <td>No state debugging — purely presentational.</td>
+    </tr>
+    <tr>
+      <td><strong>Hooks (Era 3+)</strong></td>
+      <td>Reactive closures + dependency arrays</td>
+      <td>"What values does this effect/state depend on?"</td>
+      <td>Rules of Hooks lint; stale closure bugs; missing deps; <code>useEffect</code> firing twice in strict mode.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The closure trap:</strong> Function components capture the values from their render. A <code>useEffect</code> with <code>[]</code> deps sees the values from the <em>first</em> render forever. This is not a bug — it's the model. The fix is the dependency array, which tells React: "re-create this closure when these values change." Understanding <em>when</em> a closure is created is the mental skill hooks demand.</p>
+
+<h2>6. Era 3 — Hooks (2018): making functions first-class</h2>
+
+<p>Hooks shipped in React 16.8 (February 2019). The name is literal: a hook <em>hooks into</em> React's features (state, effects, context, refs) from inside a function. The function is no longer stateless — it just delegates its state to React via a hook call.</p>
+
+<pre><code>function Counter() {
+  const [count, setCount] = useState(0);     <span class="comment-line">// ask React for a state slot</span>
+
+  useEffect(() => {                          <span class="comment-line">// synchronize something with the outside world</span>
+    document.title = `Count: ${count}`;
+    return () => console.log("cleanup");     <span class="comment-line">// optional cleanup
+  }, [count]);                               <span class="comment-line">// only re-run when count changes</span>
+
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
+}</code></pre>
+
+<p>The function is called <em>on every render</em>. Each call creates fresh local variables (fresh boxes — see the <a href="./re-render-box-model.html">re-render box model reference</a>). <code>useState</code> asks React to remember a value across calls. <code>useEffect</code> schedules side-effect work after the DOM has been painted. No <code>this</code>, no <code>bind</code>, no constructor, no <code>super()</code>.</p>
+
+<h3>Why hooks solve the three problems</h3>
+
+<p><strong>Problem 1 fixed — stateful logic reuse via custom hooks.</strong> Instead of HOCs wrapping your component, you write a function that calls hooks. Any component can call it. No wrappers, no nesting.</p>
+
+<pre><code><span class="good">// Custom hook — reuse stateful logic without wrapper hell</span>
+function useFriendStatus(friendID) {
+  const [isOnline, setIsOnline] = useState(null);
+
+  useEffect(() => {
+    const handler = (status) => setIsOnline(status.isOnline);
+    ChatAPI.subscribe(friendID, handler);
+    return () => ChatAPI.unsubscribe(friendID, handler);
+  }, [friendID]);
+
+  return isOnline;
+}
+
+<span class="comment-line">// Two unrelated components can both use it — no nesting</span>
+function FriendListItem({ friend }) {
+  const isOnline = useFriendStatus(friend.id);
+  return <li>{friend.name} {isOnline ? "🟢" : "⚪"}</li>;
+}
+
+function ChatHeader({ friend }) {
+  const isOnline = useFriendStatus(friend.id);
+  return <span>{isOnline ? "online" : "offline"}</span>;
+}</code></pre>
+
+<p>No layers of wrappers. Each component that needs the logic just calls the hook. The state is private to each caller — two components calling <code>useFriendStatus</code> get independent state.</p>
+
+<p><strong>Problem 2 fixed — related logic stays together.</strong> Instead of scattering one concern across three lifecycle methods, you write one <code>useEffect</code> per concern. Related setup and cleanup live in the same function. Unrelated concerns live in separate effects.</p>
+
+<pre><code>function ChatRoom({ roomId }) {
+  const [messages, setMessages] = useState([]);
+
+  <span class="good">// Concern 1: data fetching — setup + cleanup together</span>
+  useEffect(() => {
+    let active = true;
+    fetchMessages(roomId).then(m => { if (active) setMessages(m); });
+    return () => { active = false; };
+  }, [roomId]);
+
+  <span class="good">// Concern 2: real-time subscription — independent effect</span>
+  useEffect(() => {
+    const handler = (msg) => setMessages(prev => [...prev, msg]);
+    ChatAPI.subscribe(roomId, handler);
+    return () => ChatAPI.unsubscribe(roomId, handler);
+  }, [roomId]);
+
+  <span class="good">// Concern 3: typing indicator — separate again</span>
+  useEffect(() => {
+    const id = setInterval(() => {/*...*/}, 5000);
+    return () => clearInterval(id);
+  }, []);
+
+  return <MessageList messages={messages} />;
+}</code></pre>
+
+<p>Three concerns, three effects. Each is self-contained: setup right next to cleanup. To understand "how does this component fetch data?" you read one effect, not three lifecycle methods.</p>
+
+<p><strong>Problem 3 fixed — no <code>this</code>, no <code>bind</code>, no constructor.</strong> Look at the Counter above: no <code>this</code>, no <code>this.handleClick.bind(this)</code>, no <code>super()</code>, no class at all. The function's locals (including the setter from <code>useState</code>) are ordinary variables. Event handlers defined in the body are closures over those locals — no <code>this</code> to lose.</p>
+
+<h3>The deeper reason — functions capture values, classes don't</h3>
+
+<p>Dan Abramov wrote a famous post titled <a href="https://overreacted.io/how-are-function-components-different-from-classes/">"How are function components different from classes?"</a> (2019). The headline: <strong>function components capture the rendered values.</strong> This is a fundamental difference that has nothing to do with hooks — it existed since function components were introduced, but most people didn't notice until hooks made functions mainstream.</p>
+
+<p>The example: a "Follow" button that shows an alert 3 seconds after click.</p>
+
+<pre><code><span class="good">// Function version — captures props at click time</span>
+function ProfilePage({ user }) {
+  const showMessage = () => alert("Followed " + user);
+  const handleClick = () => setTimeout(showMessage, 3000);
+  return <button onClick={handleClick}>Follow</button>;
+}
+
+<span class="bad">// Class version — reads latest this.props, not the clicked props</span>
+class ProfilePage extends React.Component {
+  showMessage = () => alert("Followed " + this.props.user);
+  handleClick = () => setTimeout(this.showMessage, 3000);
+  render() { return <button onClick={this.handleClick}>Follow</button>; }
+}</code></pre>
+
+<p>If you click Follow on Dan's profile, then navigate to Sophie's profile before 3 seconds pass:</p>
+<ul>
+  <li><strong>Function version</strong> alerts "Followed Dan" — the <code>user</code> variable was captured at click time. Each render has its own <code>user</code> box; the click handler closes over that box. The box doesn't change.</li>
+  <li><strong>Class version</strong> alerts "Followed Sophie" — <code>this.props</code> is mutable; React mutates it on every render. <code>this.showMessage</code> reads the <em>current</em> <code>this.props.user</code>, not the one at click time.</li>
+</ul>
+
+<p>The function behavior is correct (you followed Dan, even if you then navigated away). The class behavior is buggy. And you can't fix it by binding — binding pins <code>this</code>, but the bug is that <code>this</code> mutates. The fix is to <em>capture</em> the value at the moment you care about: which is exactly what closures do, and exactly what function components are made of.</p>
+
+<blockquote class="callout">
+  <p><strong>This is the deepest reason for the shift.</strong> Closures over captured values are <em>correct by default</em> in React's model (UI is a function of state — each render is a snapshot). <code>this</code> in classes is a mutable escape hatch from that model. It causes the bugs React spent five years watching users hit. Hooks embrace the closure model instead of fighting it.</p>
+</blockquote>
+
+<h2>7. The stale-closure "problem" — and why it isn't one</h2>
+
+<p>Once people started using hooks, a new complaint appeared: <em>the stale-closure bug</em>. An effect captures a state value at render time; by the time the effect runs, the value might be old. Example:</p>
+
+<pre><code>function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setCount(count + 1), 1000);
+    return () => clearInterval(id);
+  }, []);   <span class="bad">// empty deps — effect runs once, captures count === 0 forever</span>
+
+  return <h1>{count}</h1>;
+}</code></pre>
+
+<p>This counts to 1 and stops. The interval was set up once, with <code>count === 0</code> captured. Every tick calls <code>setCount(0 + 1)</code> — always 1. The closure is "stale" because it keeps reading the render-0 box forever.</p>
+
+<p>The naive read: "closures are the problem — classes were better because <code>this.state.count</code> always reads fresh." The correct read (from Dan Abramov's <a href="https://overreacted.io/a-complete-guide-to-useeffect/">Complete Guide to useEffect</a>): closures aren't the problem. <strong>The deps array lied.</strong> The effect <em>does</em> depend on <code>count</code>; writing <code>[]</code> told React "don't re-run this" — which froze the closure. The fix is to be honest:</p>
+
+<pre><code><span class="good">// Fix: include count in deps — effect re-runs whenever count changes</span>
+useEffect(() => {
+  const id = setInterval(() => setCount(count + 1), 1000);
+  return () => clearInterval(id);
+}, [count]);</code></pre>
+
+<p>Now the effect tears down and re-creates the interval on every count change. The closure is always fresh. This works but causes the interval to reset every second — annoying. The better fix removes the dependency entirely by using the functional updater form:</p>
+
+<pre><code><span class="good">// Better: remove the dependency by using the updater form</span>
+useEffect(() => {
+  const id = setInterval(() => setCount(c => c + 1), 1000);
+  return () => clearInterval(id);
+}, []);   <span class="good">// now truly doesn't depend on count — updater form handles it</span></code></pre>
+
+<p>The lesson: <strong>closures capture values; that's a feature, not a bug.</strong> The stale-closure bugs happen when you lie to React about which values the effect reads. The <code>exhaustive-deps</code> lint rule catches this automatically. Fix the deps (or restructure to avoid them) — don't go back to <code>this</code>.</p>
+
+<h2>8. The rules of hooks — and where the design came from</h2>
+
+<p>Hooks have two rules (enforced by a linter):</p>
+<ol>
+  <li><strong>Only call hooks at the top level</strong> — not inside loops, conditions, or nested functions.</li>
+  <li><strong>Only call hooks from React function components</strong> (or custom hooks).</li>
+</ol>
+
+<p>Why? React identifies hook state by call order — the first <code>useState</code> call in a render is the same slot as the first <code>useState</code> in the next render. If you call a hook conditionally, the slot order shifts between renders and React loses track of which state belongs to which hook. (Dan Abramov wrote a separate post, <a href="https://overreacted.io/why-isnt-x-a-hook/">"Why Isn't X a Hook?"</a>, explaining which React APIs were considered as hooks but rejected — like <code>useBailout</code> — because they'd break composition: one custom hook calling <code>useBailout</code> would interfere with another calling it.)</p>
+
+<p>For <code>useState</code>, both rules are safe — adding a new unconditional call doesn't break other hooks, and you can't break other state slots by updating one. The design chose only the hooks that composed cleanly. That's why there's no <code>useMemo</code>-free <code>useShouldComponentUpdate</code> hook — it would conflict between custom hooks.</p>
+
+<h2>9. The storage models — three places state can live in React</h2>
+
+<blockquote class="callout">
+  <p>For the full treatment with diagrams, see the <a href="./re-render-box-model.html">re-render box model reference</a>. This is a summary.</p>
+</blockquote>
+
+<p>React has three storage models, each answering "where does this value live between renders?":</p>
+
+<table>
+  <thead><tr><th>Storage</th><th>What it holds</th><th>Lifetime</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>State</strong> (<code>useState</code>, <code>useReducer</code>)</td><td>Values that trigger re-render when they change</td><td>Persisted across renders for a mounted component</td><td>UI-relevant values</td></tr>
+    <tr><td><strong>Ref</strong> (<code>useRef</code>)</td><td>Mutable values that DON'T trigger re-render</td><td>Persisted across renders for a mounted component</td><td>DOM nodes, interval IDs, "latest value" escape hatch, things that don't affect the render output</td></tr>
+    <tr><td><strong>Local variables</strong> (plain <code>let</code>/<code>const</code> in the function body)</td><td>Per-render scratch space</td><td>Dies at end of this render</td><td>Derived values, memoized intermediates, anything that's recomputed each render anyway</td></tr>
+  </tbody>
+</table>
+
+<p>In classes there were effectively two places: <code>this.state</code> (state) and instance fields (<code>this.something</code> = refs). Hooks split these cleanly: <code>useState</code> for trigger-render state, <code>useRef</code> for doesn't-trigger mutable boxes, function-body <code>let</code> for throwaway scratch.</p>
+
+<h2>10. The classic bugs — and which storage model fixes each</h2>
+
+<p>Four bug shapes recur at work — each maps to a storage-model mismatch. (Lesson 2 covered the closure mechanics; this is the map.)</p>
+
+<table>
+  <thead><tr><th>Bug</th><th>Symptom</th><th>Root cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Stale closure in event handler / interval</td><td>Old value read inside callback</td><td>Closure captured a per-render value that the effect claimed it didn't depend on</td><td>Fix the deps array, or use the updater form <code>setCount(c => c + 1)</code>, or read from a ref if you really need the latest</td></tr>
+    <tr><td>Feedback loop in effect</td><td>Component re-renders infinitely</td><td>Effect sets state that depends on the effect's own deps, which re-runs the effect, which sets state again</td><td>Move the state update out of the effect, or use the functional updater, or restructure (the count+1 interval example above)</td></tr>
+    <tr><td>Refused cleanup</td><td>Subscription fires after unmount; "set state on unmounted component" warning</td><td>Effect didn't return a cleanup, or the cleanup doesn't undo what setup did</td><td>Return a cleanup function that unsubscribes / clears / aborts what setup did</td></tr>
+     <tr><td>Wrong render identity</td><td>Two renders compare unequal even though they "look" the same</td><td>Passing a fresh inline object/function as a prop — reference inequality on every render</td><td>Hoist the value out of the component, or wrap with <code>useMemo</code> / <code>useCallback</code>, or accept it as the cost of readable code (the React Compiler, see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>, removes this concern)</td></tr>
+  </tbody>
+</table>
+
+<h2>11. Why not just use functional programming without hooks?</h2>
+
+<p>You asked the key question: <em>wasn't functional enough?</em> The honest answer: pure functional programming — functions that take props and return JSX, with no side effects — works perfectly for presentational components. The problem is that <strong>real interactive UIs are not pure functions.</strong> They need:</p>
+<ul>
+  <li>To <strong>remember</strong> values across renders (state).</li>
+  <li>To <strong>react to the outside world</strong> — subscribe, poll, fetch, mutate the DOM (side effects).</li>
+  <li>To <strong>be testable in isolation</strong> by extracting reusable stateful logic.</li>
+</ul>
+
+<p>Pure functions can't do any of those. So a UI framework has two options:</p>
+
+<ol>
+  <li><strong>Wrap the function in an object</strong> that holds state and lifecycle. → class components. This works, but falls into the three class problems (logic reuse, lifecycle scattering, <code>this</code> confusion).</li>
+  <li><strong>Have the function ask the framework</strong> to provide state and effects. → hooks. The function stays a function; it just calls <code>useState</code> and <code>useEffect</code> to ask React for stateful capabilities. The framework wires them up behind the scenes.</li>
+</ol>
+
+<p>Hooks are the second approach. They didn't replace functional programming — they <em>made functional programming viable for real components</em>, by giving functions access to the stateful capabilities that pure functions can't have on their own. Functional programming alone was never enough; what was needed was a way for functions to opt into state and effects without becoming classes.</p>
+
+<p>This is also why the React docs <a href="https://react.dev/blog/2023/03/16/introducing-react-dev">say (2023)</a>: "We've taught React with function components and Hooks from the beginning." Classes are still supported (the legacy API section documents them) but the new docs don't teach them at all — they teach hooks-first because that's the model the React team chose.</p>
+
+<h2>12. Era 4 — the React Compiler and beyond</h2>
+
+<p>The full post-hooks story — the React Compiler (stable Oct 2025, ship-by-default 2026), React Server Components, the React Foundation, the RSC security lesson, why React didn't adopt signals, Preact as the structural branch, and React 19.2's <code>useEffectEvent</code>/<code>Activity</code> — now lives in a companion reference doc: <a href="./react-2024-and-beyond.html">React 2024 and beyond — compiler, RSC, foundation</a>.</p>
+
+<p>What matters for the arc of this doc: the compiler automates memoization without changing the hooks mental model. RSC splits components into client (full hooks model) and server (no hooks, no events, run once). The foundation changes who governs React, not how React works. None of these reverse the shift from classes to functions — they complete it.</p>
+
+<h2>13. Where classes still live — and whether to learn them</h2>
+
+<blockquote class="callout">
+  <h3>Should you learn class components?</h3>
+  <p><strong>Yes — enough to read them.</strong> Most production React codebases still have class components in older files. You won't write new ones, but you'll read and debug them. The minimum you need to recognize:</p>
+  <ul>
+    <li><code>this.state</code> and <code>this.setState</code> (mutable state, the "always latest" model).</li>
+    <li><code>constructor</code>, <code>super(props)</code>, and <code>this.method.bind(this)</code> (the bind dance from Lesson 5).</li>
+    <li><code>componentDidMount</code> / <code>componentDidUpdate</code> / <code>componentWillUnmount</code> (the lifecycle biography — when refactoring to hooks, these map roughly to effects).</li>
+    <li>Class-field arrow methods (<code>handleClick = () => {...}</code>) as the pre-hooks no-bind workaround.</li>
+  </ul>
+  <p><strong>No — don't invest in mastering them.</strong> You won't write new class components in 2025. Spend that time on hooks (useState, useEffect, useRef, useMemo, useCallback, useContext) and on the closure mental model (the re-render box model). That's what you'll write.</p>
+</blockquote>
+
+<h2>14. The lifecycle-to-hooks translation table</h2>
+
+<p>When refactoring a class component to a function component (or reading an old one), here's how the lifecycle biography maps to effects:</p>
+
+<table>
+  <thead><tr><th>Class lifecycle</th><th>Hooks equivalent</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td><code>constructor</code> — initial state</td><td><code>useState(initialValue)</code></td><td>The hook call IS the initial-value declaration</td></tr>
+    <tr><td><code>componentDidMount</code> — run once after mount</td><td><code>useEffect(() => {...}, [])</code></td><td>Empty deps array = run once. But the effect still captures the first-render values, unlike <code>componentDidMount</code> which read fresh <code>this.props</code></td></tr>
+    <tr><td><code>componentDidUpdate</code> — run after every update</td><td><code>useEffect(() => {...})</code> (no deps array)</td><td>Or with a deps array: <code>useEffect(() => {...}, [value])</code> = "run after <code>value</code> changes"</td></tr>
+    <tr><td><code>componentWillUnmount</code> — cleanup before unmount</td><td>Return a cleanup function from <code>useEffect</code></td><td><code>useEffect(() => { return () => cleanup(); }, [])</code></td></tr>
+    <tr><td><code>shouldComponentUpdate</code></td><td>(No equivalent) — wrap the component in <code>memo()</code>, or use the React Compiler</td><td>Intentionally not a hook — see <a href="https://overreacted.io/why-isnt-x-a-hook/">"Why Isn't X a Hook?"</a></td></tr>
+    <tr><td><code>getSnapshotBeforeUpdate</code></td><td><code>useLayoutEffect</code></td><td>Rare. Reads DOM state before the browser paints.</td></tr>
+    <tr><td>Instance field (<code>this.timerID = null</code>)</td><td><code>useRef</code></td><td>Mutable, doesn't trigger re-render, persists across renders</td></tr>
+    <tr><td><code>this.props</code> / <code>this.state</code></td><td>Function arguments (<code>props</code>) / <code>useState</code> values</td><td>Captured per-render, not mutated externally</td></tr>
+  </tbody>
+</table>
+
+<p>The mental shift: lifecycle methods are a <strong>biography</strong> ("what happens at birth / middle / death") while effects are a <strong>synchronization</strong> ("keep this external state in sync with this render's values"). Dan Abramov's <a href="https://overreacted.io/a-complete-guide-to-useeffect/">Complete Guide to useEffect</a> frames this as: stop asking "when does this run?" and start asking "what am I synchronizing, and with which values?"</p>
+
+<h2>15. The current state — and what you'll write</h2>
+
+<p>As of 2025, modern React is function components + hooks + (optionally) the React Compiler. The dominant mental model:</p>
+<ul>
+  <li>Components are functions called once per render; each call has its own local boxes for state and props.</li>
+  <li><code>useState</code> asks React to remember a value across calls; <code>useEffect</code> synchronizes external state with render values.</li>
+  <li>Closures over those values are correct by default; "stale closures" happen only when the deps array lies.</li>
+  <li>Refs give you the mutable-instance-field equivalent without <code>this</code>.</li>
+  <li>The compiler removes the last remaining hooks-era friction (manual memoization).</li>
+</ul>
+
+<p>Classes are still in the spec, still work, and are documented under "Legacy API" at react.dev. They will not be removed — too many production codebases use them. But no one is teaching them as the first model anymore. That signal from the React team is deliberate: classes are the past you'll read; functions+hooks are the present you'll write.</p>
+
+<p>Is there a "next paradigm after functional"? Not in React's component model — but the surrounding stack did not freeze in 2023. The function+hooks model held, and the next shifts happened around it, not against it. The next section covers those shifts.</p>
+
+<h2>16. A recommended reading order, from React's own writing</h2>
+
+<ol>
+  <li><a href="https://react.dev/blog/2023/03/16/introducing-react-dev">Introducing react.dev (2023)</a> — why the new docs teach hooks-first.</li>
+  <li><a href="https://legacy.reactjs.org/docs/hooks-intro.html">Introducing Hooks (legacy React docs)</a> — the official motivation: the three problems with classes.</li>
+  <li><a href="https://overreacted.io/how-are-function-components-different-from-classes/">How are function components different from classes?</a> — the capture-vs-mutate insight.</li>
+  <li><a href="https://overreacted.io/a-complete-guide-to-useeffect/">A Complete Guide to useEffect</a> — the deep dive on effects, deps arrays, stale closures, and the synchronization mental model.</li>
+  <li><a href="https://overreacted.io/why-isnt-x-a-hook/">Why Isn't X a Hook?</a> — what was rejected and why (composition + debugging).</li>
+  <li><a href="./re-render-box-model.html">Re-render Box Model (this workspace)</a> — the per-render box model that hooks rely on.</li>
+</ol>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+   <p>You now have the full arc: why classes existed, why they were painful (three named problems), why function components alone weren't enough (they were stateless and effect-less), what hooks add (state and effects from inside a function, plus logic reuse via custom hooks), why closures aren't a problem (deps arrays are where bugs live), how the lifecycle model maps to the synchronization model, how the React Compiler removes the remaining friction, where classes still live in the modern landscape, and (see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>) what changed in 2025-2026 — the compiler going stable, RSC splitting the process, the React Foundation replacing Meta sole ownership, the RSC security lesson, why React didn't adopt signals, Preact as the structural branch, and React 19.2's <code>useEffectEvent</code> as the official fix for the patterns (stale closures, feedback loops, wrong identity) that the classic-bugs section (§10) described. You can read older React code at work, recognize the patterns, and not fall into the trap of <code>this</code> when there is no <code>this</code>.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Class-to-Function paradigm shift</span>
+  <span>Mission: read JS/React at work</span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

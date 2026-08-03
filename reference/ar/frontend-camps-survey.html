@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مرجع · مسح معسكرات الواجهة الأمامية</title>
+  <link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+  <main class="reference">
+    <header class="reference-header">
+      <h1>مرجع: مسح معسكرات الواجهة الأمامية</h1>
+      <p class="kicker">أي معسكر؟ → ما الذي يحسّن له → كيف يبدو الكود → متى يفوز/يخسر</p>
+    </header>
+
+    <section class="win">
+      <h3>ما يغطيه هذا المستند</h3>
+      <p>المعسكرات: CMS/خادم كلاسيكي، HTML-first مع جزر، SPA، ميتا-إطار عمل، إشارات، WASM/هجين. لا أطر (<a href="./class-to-hooks-paradigm-shift.html">paradigm-shift</a>، <a href="./angular-evolution.html">angular-evolution</a>). لا آليات JS (<a href="../lessons/0001-scope-and-hoisting.html">الـ ١٢ درس</a>). لا انقسام JS/TypeScript — ذلك في <a href="./javascript-across-stacks.html">الوثيقة الشقيقة عبر المنصات</a>. معرفة المعسكرات تنقذك من افتراض أن كل واجهة أمامية نفس النموذج الذهني.</p>
+      <p>عمق المسح، لا دروس. كل قسم: ما يحسّن له المعسكر، ما ستراه في الكود، ومتى يفوز أو يخسر.</p>
+    </section>
+
+    <p>مرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع مستندات المرجع.</p>
+
+    <h2>٠. كيف تستخدم هذه الخريطة</h2>
+
+    <table>
+      <thead><tr><th>المعسكر</th><th>وحدة العمل</th><th>وقت التشغيل الافتراضي</th><th>استراتيجية تحميل JS</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CMS / خادم كلاسيكي</strong></td><td>صفحة / قالب</td><td>خادم (PHP، Rails، Django…)</td><td>تحسين تدريجي اختياري</td></tr>
+        <tr><td><strong>HTML-first</strong></td><td>مستند + جزر صغيرة</td><td>HTML من الخادم، JS عميل متناثر</td><td>يشحن إطارات شبه معدومة</td></tr>
+        <tr><td><strong>SPA</strong></td><td>غلاف تطبيق عميل</td><td>متصفح (بعد التحميل الأول)</td><td>JS أولي كبير؛ العميل يملك الواجهة</td></tr>
+        <tr><td><strong>ميتا-إطار عمل</strong></td><td>مسار + بيانات + واجهة</td><td>تقسيم خادم + متصفح</td><td>الإطار يقرر ماذا يشحن أين</td></tr>
+        <tr><td><strong>WASM / واجهة أنظمة</strong></td><td>وحدة مترجمة</td><td>متصفح (أو حافة) + كود أصلي</td><td>JS كغراء؛ منطق ثقيل في مكان آخر</td></tr>
+      </tbody>
+    </table>
+
+    <p>هذه المعسكرات تتداخل. "تطبيق Next.js" هو ميتا-إطار عمل يمكنه التصرف كـ SPA في بعض المسارات. موقع WordPress يمكنه استضافة SPA إدارة React مخصص. تعامل مع التسميات كـ <em>مراكز ثقل</em>، لا نوادٍ حصرية.</p>
+
+    <blockquote class="callout">
+      <p><strong>ملاءمة المهمة.</strong> مهمتك لا تزال أساسيات JS → قراءة React في العمل. هذا المسح توجيه للنصف الثاني. لا تحتاج لإتقان كل معسكر. تحتاج أن تفتح مستودعاً وتقول: "هذا HTML-first مع جزر Preact" أو "هذا تطبيق App Router RSC" دون ذعر.</p>
+    </blockquote>
+
+    <h2>١. معسكر A — CMS وتطبيقات مُعرضة من الخادم كلاسيكية</h2>
+
+    <p>أقدم نمط صناعي: الخادم يملك المستند. PHP (WordPress، Laravel)، Rails، Django، ASP.NET MVC، وأطر مشابهة تعرض HTML في كل طلب. JavaScript سكر اختياري للنماذج، الشرائح، وأدوات الإدارة.</p>
+
+    <h3>ما ستراه</h3>
+    <ul>
+      <li>ملفات قوالب (<code>.php</code>، <code>.erb</code>، <code>.jinja</code>) مع HTML ومتغيرات خادم مختلطة.</li>
+      <li>jQuery أو سكربتات DOM خام في مجلدات الثيمات — لا تزال شائعة جداً في WordPress.</li>
+      <li>متغير "CMS منفصل الرأس": Contentful، Sanity، Strapi، WordPress REST/GraphQL — API محتوى + واجهة أمامية مبنية في معسكر آخر.</li>
+      <li>واجهات إدارة تكون SPAs كاملة (Gutenberg، لوحات تحكم مخصصة) تجلس فوق خلفية كلاسيكية.</li>
+    </ul>
+
+    <h3>متى يفوز</h3>
+    <ul>
+      <li>مواقع محتوى، تسويق، مدونات، كتالوجات تجارة إلكترونية مع سير تحريري ثقيل.</li>
+      <li>فرق مهارتها الأساسية في الخلفية أو عمليات المحتوى، لا هندسة SPA.</li>
+      <li>صفحات حرجة لـ SEO حيث "HTML في الاستجابة الأولى" غير قابل للتفاوض والفريق يعرف الـ CMS بالفعل.</li>
+    </ul>
+
+    <h3>متى يخسر</h3>
+    <ul>
+      <li>UI منتج تفاعلي للغاية (لوحات زمن حقيقي، أدوات تصميم، حالة عميل معقدة).</li>
+      <li>منتج متعدد المنصات يشارك المنطق مع الموبايل (React Native، إلخ).</li>
+    </ul>
+
+    <p><strong>نصيحة قراءة لمتعلم JS:</strong> لا تخلط بين "هناك وسم <code>script</code>" و "هذا تطبيق React." تتبع من يملك الطلاء الأول: إذا أرسل الخادم HTML كاملاً لمحتوى الصفحة، فأنت في معسكر A (أو B)، حتى لو ثبت ويدجت React لاحقاً.</p>
+
+    <h2>٢. معسكر B — HTML-first والجزر</h2>
+
+    <p>أطر HTML-first تعامل المستند كمنتج و JavaScript كأداة دقيقة. السفينة الرئيسية الحديثة هي <strong>Astro</strong>: تشحن صفر JS افتراضياً؛ تفعيل "جزر" تفاعلية (React، Preact، Svelte، Vue، Solid) فقط حيث يلزم. العائلة ذات الصلة: <strong>HTMX</strong> / Alpine / UI موجه من الخادم — أبقِ المنطق على الخادم، بادل شظايا HTML عبر السلك.</p>
+
+    <h3>ما ستراه</h3>
+    <ul>
+      <li>معظم المسارات HTML ساكنة أو معروضة من الخادم مع حزمة عميل شبه معدومة.</li>
+      <li>توجيهات مثل <code>client:load</code> / <code>client:visible</code> على المكونات (Astro) — حدود ترطيب صريحة.</li>
+      <li>اختيار Preact على React للجزر لأن ~3.5&nbsp;kB مهم عندما باقي الصفحة ساكنة (انظر مستند التحول §18.5b).</li>
+      <li>سمات HTMX مثل <code>hx-get</code>، <code>hx-swap</code> — تحديثات صفحة جزئية بلا موجّه عميل.</li>
+    </ul>
+
+    <h3>متى يفوز</h3>
+    <ul>
+      <li>مواقع تسويق، توثيق، مدونات، تسويق منتج غني بالمحتوى مع بعض الويدجتس التفاعلية.</li>
+      <li>ميزانيات أداء و Core Web Vitals كمؤشرات أداء رئيسية.</li>
+      <li>فرق تعبت من شحن إطار عمل 200&nbsp;kB لنموذج اتصال.</li>
+    </ul>
+
+    <h3>متى يخسر</h3>
+    <ul>
+      <li>منتجات شبيهة بالتطبيق حيث كل بكسل تقريباً حالة تفاعلية (أدوات من فئة Figma، لوحات تحكم بحالة عميل كثيفة).</li>
+      <li>عندما ينمو "رسم الجزر" حتى تعيد اختراع SPA بشكل سيء.</li>
+    </ul>
+
+    <pre><code><span class="comment-line">// نموذج Astro العقلي (شبه) — HTML أولاً، الجزيرة ثانياً</span>
+---
+<span class="comment-line">// الكود الواجهة يعمل على الخادم / عند البناء</span>
+const posts = await getPosts();
+---
+<ul>
+  {posts.map(p => <li>{p.title}</li>)}
+</ul>
+
+<span class="comment-line">// جزيرة تفاعلية — فقط هذا المكون يترطب</span>
+<LikeButton client:visible />
+</code></pre>
+
+    <h2>٣. معسكر C — SPA (React، Vue، Svelte، Solid)</h2>
+
+    <p>العميل يملك الواجهة بالكامل بعد التحميل الأول. الخادم يرسل غلاف HTML فارغ + حزمة JS كبيرة. التوجيه، الحالة، جلب البيانات — كلها في المتصفح.</p>
+
+    <h3>ما ستراه</h3>
+    <ul>
+      <li><code>createRoot</code> / <code>mount</code> على <code>div#root</code> فارغ.</li>
+      <li>موجّه جانب عميل (<code>react-router</code>، <code>vue-router</code>، <code>@solidjs/router</code>).</li>
+      <li>جلب بيانات جانب عميل (<code>useQuery</code>، <code>swr</code>، <code>rtk-query</code>، <code>useEffect</code> + fetch).</li>
+      <li>إدارة حالة عالمية (Redux، Zustand، Jotai، Pinia، إشارات Solid).</li>
+    </ul>
+
+    <h3>متى يفوز</h3>
+    <ul>
+      <li>منتجات عالية التفاعل: لوحات تحكم، أدوات تصميم، تعاون زمن حقيقي، إعدادات معقدة.</li>
+      <li>فرق تستثمر بالفعل في نظام بيئي لـ SPA (مكتبة مكونات، أنماط اختبار، خبرة).</li>
+      <li>عندما SEO ليس المحرك الأساسي (تطبيق خلف تسجيل دخول، لوحة إدارة داخلية).</li>
+    </ul>
+
+    <h3>متى يخسر</h3>
+    <ul>
+      <li>صفحات تسويق عامة حيث LCP/SEO مهمان — تحتاج SSR/SSG.</li>
+      <li>حزم أولية كبيرة تؤذي المستخدمين على موبايل منخفض المواصفات.</li>
+    </ul>
+
+    <pre><code><span class="comment-line">// نموذج SPA React العقلي — العميل يملك الحلقة</span>
+<span class="keyword">function</span> <span class="function-name">App</span>() {
+  <span class="keyword">const</span> [user, <span class="function-name">setUser</span>] = <span class="function-name">useState</span>(<span class="keyword">null</span>);
+  <span class="keyword">return</span> <Router><Dashboard user={user} /></Router>;
+}
+</code></pre>
+
+    <h2>٤. معسكر D — ميتا-أطر العمل (Next.js، Remix، Nuxt، SvelteKit، Astro + SSR)</h2>
+
+    <p>ميتا-إطار العمل يملك التقسيم: يقرر لكل مسار ما يُعرض على الخادم، ما يُبنى عند البناء، وما يترطب على العميل. العلم الرئيسي: <strong>مكونات خادم React (RSC)</strong> في Next.js App Router — الدوال تعمل على الخادم، ترجع UI، لا حافلات (hooks) على الخادم.</p>
+
+    <h3>ما ستراه</h3>
+    <ul>
+      <li>موجه نظام ملفات (<code>app/</code> في Next.js، <code>routes/</code> في Remix).</li>
+      <li><code>"use client"</code> توجيهات ترسم حدود العميل/الخادم.</li>
+      <li>جلب بيانات في مكونات الخادم (<code>async function Page() { const data = await db.query() }</code>).</li>
+      <li>Actions، Mutations، و Form actions للـ POST من دون API صريح.</li>
+      <li>بث (Streaming) و Suspense لتهيئة تدريجية.</li>
+    </ul>
+
+    <h3>متى يفوز</h3>
+    <ul>
+      <li>منتجات تحتاج SEO + تفاعلية (تجارة إلكترونية، SaaS عام، أسواق).</li>
+      <li>فرق تريد قرارات بنية معمارية أقل (الموجه، الجلب، التخزين المؤقت محلولة).</li>
+      <li>نقل تدريجي من SPA: مسار بمسار.</li>
+    </ul>
+
+    <h3>متى يخسر</h3>
+    <ul>
+      <li>فريق صغير، منتج بسيط — الحمل الزائد للإطار يتجاوز الفائدة.</li>
+      <li>حافة متخصصة حيث وقت بدء WASM البارد يهزم SSR.</li>
+    </ul>
+
+    <pre><code><span class="comment-line">// نموذج Next.js App Router العقلي — الخادم يقرر، العميل يتفاعل</span>
+<span class="comment-line">// app/dashboard/page.tsx — مكون خادم افتراضي</span>
+<span class="keyword">export default async function</span> Dashboard() {
+  <span class="keyword">const</span> data = <span class="keyword">await</span> getDashboardData(); <span class="comment-line">// يعمل على الخادم، لا حزمة عميل</span>
+  <span class="keyword">return</span> <DashboardView data={data} />;
+}
+
+<span class="comment-line">// components/DashboardView.tsx — حد عميل صريح</span>
+<span class="string">"use client"</span>;
+<span class="keyword">export function</span> DashboardView({ data }) {
+  <span class="keyword">const</span> [filter, setFilter] = useState(<span class="string">"all"</span>);
+  <span class="keyword">return</span> <InteractiveTable data={data} filter={filter} />;
+}
+</code></pre>
+
+    <h2>٥. معسكر E — مكتبات الإشارات (Preact Signals، Solid، Qwik، Vue، Svelte 5 runes)</h2>
+
+    <p>نموذج تفاعلي مختلف: <strong>الإشارات</strong> (خلايا تفاعلية دقيقة) بدلاً من الدالة التفاعلية ذات المدى العلوي لـ React. التبعيات تتعقب تلقائياً؛ لا إعادة عرض المكون بالكامل عند تغير حالة ورقة.</p>
+
+    <h3>ما ستراه</h3>
+    <ul>
+      <li><code>const count = signal(0)</code>، <code>count.value++</code> — تحديثات دقيقة.</li>
+      <li>لا قواعد حافلات (hooks rules)، لا اعتماديات <code>useEffect</code>، لا <code>useMemo</code>/<code>useCallback</code>.</li>
+      <li>إشارات مشتقة (<code>computed(() => count.value * 2)</code>) — تلقائياً محفوظة.</li>
+      <li>Qwik: <strong>قابلة للاستئناف</strong> — لا ترطيب. HTML مسلسلة مع حالة؛ التفاعل يبدأ فوراً.</li>
+    </ul>
+
+    <table>
+      <thead><tr><th>المكتبة</th><th>نمط API</th><th>ملاحظات</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Preact Signals</strong></td><td>Hooks + إضافة <code>@preact/signals</code></td><td>API بشكل React، ويب-first، صغيرة؛ مستند التحول §18.5b</td></tr>
+        <tr><td><strong>Solid</strong></td><td>إشارات أولية، JSX، لا DOM وهمي</td><td>أداء قريب من DOM خام؛ نموذج ذهني مختلف عن React</td></tr>
+        <tr><td><strong>Qwik</strong></td><td>استئناف، <code>useSignal</code>، <code>useClientEffect</code></td><td>صفر JS في التحميل الأول؛ التفاعل يستأنف من HTML</td></tr>
+        <tr><td><strong>Vue 3 / Svelte 5</strong></td><td>ref()/reactive()، runes</td><td>إشارات مدمجة في DX الإطار</td></tr>
+      </tbody>
+    </table>
+
+    <h3>متى يفوز</h3>
+    <ul>
+      <li>تحديثات تكرارية عالية، لوحات تحكم زمن حقيقي، محركات ألعاب في المتصفح.</li>
+      <li>فرق تفضل "الحالة كقيم" على "الحالة كإغلاقات في حلقة عرض".</li>
+      <li>Qwik: منتجات حيث TTI (وقت التفاعل) هو الـ KPI رقم 1.</li>
+    </ul>
+
+    <h3>متى يخسر</h3>
+      <ul>
+        <li>نظام React البيئي مطلوب (مكتبات مكونات ضخمة، توظيف، معرفة موجودة).</li>
+        <li>الفريق يعرف نموذج React الذهني جيداً؛ تكلفة التحول > الفائدة.</li>
+      </ul>
+
+    <h2>٦. معسكر F — WASM / واجهة أنظمة هجينة</h2>
+
+    <p>منطق ثقيل (فيزياء، تشفير، معالجة صور، محركات ألعاب) مترجم إلى WebAssembly. JS طبقة غراء رفيعة للـ DOM، الشبكة، والتكامل مع المنصة.</p>
+
+    <h3>ما ستراه</h3>
+    <ul>
+      <li>ملفات <code>.wasm</code> محمولة عبر <code>WebAssembly.instantiateStreaming</code> أو وحدات ES.</li>
+      <li>Rust/C++/Go/Zig → wasm-bindgen / wasm-pack / wasi-sdk خطوط إنتاج.</li>
+      <li>واجهة JS: <code>import { processImage } from './pkg'</code> —Typescript definitions مولدة.</li>
+      <li>أحياناً: <strong>Leptos</strong>، <strong>Dioxus</strong>، <strong>Yew</strong> (أطر Rust تعرض DOM من WASM).</li>
+    </ul>
+
+    <h3>متى يفوز</h3>
+    <ul>
+      <li>حوسبة مكثفة يجب أن تعمل في المتصفح (محررات، CAD، ML استدلال، تشفير).</li>
+      <li>مشاركة كود مع خلفية/موبايل (Rust، Go، C++).</li>
+    </ul>
+
+    <h3>متى يخسر</h3>
+    <ul>
+      <li>CRUD، نماذج، تسويق — تكلفة WASM غير مبررة.</li>
+      <li>الفريق يفتقر مهارات لغات الأنظمة.</li>
+    </ul>
+
+    <h2>٧. كيف تختار المعسكرات في الممارسة</h2>
+
+    <table>
+      <thead><tr><th>السياق</th><th>المعسكر الافتراضي</th><th>لماذا</th></tr></thead>
+      <tbody>
+        <tr><td>موقع تسويق، فريق محتوى</td><td>CMS (A) أو HTML-first (B)</td><td>سير عمل المحررين + أداء</td></tr>
+        <tr><td>SaaS عام، SEO مهم</td><td>ميتا-إطار عمل (D)</td><td>SSR/SSG + تفاعلية خارج الصندوق</td></tr>
+        <tr><td>لوحة إدارة داخلية، فريق React</td><td>SPA (C)</td><td>لا ضغط SEO؛ النموذج الذهني موجود</td></tr>
+        <tr><td>منتج زمن حقيقي، تحديثات تكرارية عالية</td><td>إشارات (E) أو SPA + WebSockets</td><td>تفاعلية دقيقة</td></tr>
+        <tr><td>فريق نظام تصميم / منصة</td><td>React (أو Vue) مكتبة مكونات، Storybook</td></tr>
+        <tr><td>ألعاب / أدوات / CAD في المتصفح</td><td>WASM + غلاف JS رفيع</td></tr>
+        <tr><td>ناشرون محتوى</td><td>CMS + HTML-first أو ميتا-إطار SSG</td></tr>
+      </tbody>
+    </table>
+
+    <p>يضع <strong>تقرير مهارات المطورين من HackerRank</strong> والاستطلاعات الصناعية JavaScript باستمرار في مركز فحوصات التوظيف؛ كلمات إطار العمل تدور (React يظل مهيمناً؛ Next.js يظهر أكثر في الإعلانات كل عام؛ Angular يحتفظ بنشآت الشركات). لمسارات الدخل التي تستخدم هذه المهارات، لا فقط موضة الأطر، اقرأ <a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a>.</p>
+
+    <h2>٣ب. مسارات الهجرة بين المعسكرات</h2>
+
+    <p>الفرق نادراً ما تبقى في معسكر واحد للأبد. هجرات شائعة ونقاط احتكاكها:</p>
+
+    <table>
+      <thead><tr><th>من → إلى</th><th>المحفز</th><th>الحالة الهدف</th><th>الخطوات</th><th>المخاطر</th><th>إشارات النجاح</th><th>الجدول الزمني</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>CMS (A) → HTML-first جزر (B)</td>
+          <td>احتياجات تفاعلية تتجاوز jQuery؛ سير العمل التحريري يجب أن يبقى</td>
+          <td>Astro + جزر Preact فوق CMS</td>
+          <td>1) أضف Astro كمعرض صفحات. 2) هاجر القوالب إلى .astro. 3) أضف جزر client:load للويدجتس. 4) أبقِ API محتوى CMS.</td>
+          <td>معاينة CMS تنكسر؛ ميزانية عرض مزدوج</td>
+          <td>صفحات صفر JS تسجل 90+ Lighthouse؛ الجزر تترطب <100ms</td>
+          <td>٢–٤ سباقات</td>
+        </tr>
+        <tr>
+          <td>HTML-first (B) → ميتا-إطار عمل (D)</td>
+          <td>حاجة SSR لـ SEO/مصادقة؛ الجزر تصبح كثيرة جداً</td>
+          <td>Next.js App Router (RSC + حدود عميل)</td>
+          <td>1) أضف Next.js في مجلد فرعي. 2) هاجر صفحات Astro إلى App Router. 3) وسم مكونات تفاعلية بـ "use client". 4) انقل جلب البيانات إلى مكونات الخادم.</td>
+          <td>عدم تطابق الترطيب؛ تحول نموذج ذهني RSC</td>
+          <td>طلاء أول <1.5s؛ زيارات SEO مستقرة؛ المصادقة تعمل</td>
+          <td>٣–٦ سباقات</td>
+        </tr>
+        <tr>
+          <td>SPA React (C) → ميتا-إطار عمل (D)</td>
+          <td>ضغط SEO/LCP؛ حزمة كبيرة جداً؛ الفريق يريد RSC</td>
+          <td>Next.js أو Remix مع اعتماد تدريجي</td>
+          <td>1) أضف الإطار بجانب SPA. 2) هاجر المسارات واحدة واحدة. 3) استخرج UI المشترك إلى مكونات. 4) فعّل RSC للصفحات الثقيلة بيانات.</td>
+          <td>صيانة مزدوجة مستوى المسار؛ أخطاء إبطال ذاكرة التخزين المؤقت</td>
+          <td>الحزمة -٤٠٪؛ LCP <2.5s؛ لا تراجع في Core Web Vitals</td>
+          <td>٤–٨ سباقات</td>
+        </tr>
+        <tr>
+          <td>Angular (C/D) → React/Next.js (C/D)</td>
+          <td>مجموعة التوظيف؛ زخم النظام البيئي؛ تفضيل الفريق</td>
+          <td>Strangler Fig: ميزات جديدة في Next.js، إرث في Angular</td>
+          <td>1) غلاف Micro-frontend أو iframe. 2) رموز تصميم مشتركة. 3) مسارات جديدة في Next.js. 4) إحالة تدريجية لمسارات Angular.</td>
+          <td>بيئتا تشغيل؛ مزامنة حالة مشتركة؛ تعارضات CSS</td>
+          <td>صفر أخطاء Angular في ميزات جديدة؛ سرعة الفريق ↑</td>
+          <td>٦–١٨ شهر</td>
+        </tr>
+        <tr>
+          <td>مكتبة إشارات (E) → React (C/D)</td>
+          <td>توحيد الفريق؛ حاجة نظام React البيئي</td>
+          <td>إعادة كتابة أو طبقة تفاعل</td>
+          <td>1) عيّن الإشارات إلى حافلات. 2) مكتبة مكونات مشتركة. 3) هجرة مسار بمسار.</td>
+          <td>عدم تطابق نموذج التفاعل؛ أخطاء الحالة المشتقة</td>
+          <td>لا أخطاء خاصة بالإشارات في الكود المُهاجر</td>
+          <td>٣–٦ سباقات</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>نمط مضاد:</strong> إعادة كتابة كبيرة. كل هجرة ناجحة في الجدول أعلاه تدريجية، مسار بمسار، أو جزيرة بجزيرة. حدود المعسكر في جدول المسح (§٠) هي مراكز ثقل — لا جدران.</p>
+
+    <h2>١٠. كيف ترتبط المعسكرات بنموذجك الذهني لـ React</h2>
+
+    <table>
+      <thead><tr><th>المعسكر</th><th>هل ينطبق نموذج صندوق إعادة العرض؟</th></tr></thead>
+      <tbody>
+        <tr><td>CMS + jQuery</td><td>معظمها لا — تحديثات DOM أمرية</td></tr>
+        <tr><td>جزر HTML-first (React/Preact)</td><td>نعم، داخل كل جزيرة</td></tr>
+        <tr><td>SPA React</td><td>نعم — النموذج الكامل من مستندات التحول + نموذج الصندوق</td></tr>
+        <tr><td>مكونات عميل Next.js</td><td>نعم — نفس نموذج SPA React</td></tr>
+        <tr><td>مكونات خادم Next.js</td><td>جزئي — دوال تعمل مرة لكل طلب/بناء؛ لا حلقة حافلات</td></tr>
+        <tr><td>Angular / Vue / إشارات Svelte</td><td>تفاعلية مختلفة؛ لا تفرض نموذج React</td></tr>
+        <tr><td>وحدات WASM</td><td>لا — وقت تشغيل لغة مختلف؛ غراء JS قد يستخدم React</td></tr>
+      </tbody>
+    </table>
+
+    <p>مستندات رفيقة:</p>
+    <ul>
+      <li><a href="./class-to-hooks-paradigm-shift.html">تحول النموذج من الكلاس إلى الحافلات</a> — قوس React الخاص عبر 2026.</li>
+      <li><a href="./re-render-box-model.html">نموذج صندوق إعادة العرض</a> — إغلاقات مطبقة على إعادة العرض.</li>
+      <li><a href="./nextjs-deep-dive.html">غوص عميق في Next.js</a> — الميتا-إطار العمل الذي ستقابله غالباً في وظيفة React.</li>
+      <li><a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a> — جانب الطلب: وظائف، فريلانس، شرح AI، سياق مصر عن بعد.</</ul>
+
+    <h2>١١. النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+
+    <p>مسح المعسكرات جيد فقط بقدر الأدوات التي تجعل حدوده مرئية، قابلة للاختبار، وقابلة للهجرة. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
+
+    <table>
+      <thead><tr><th>الفئة</th><th>الأدوات / المنصات</th><th>المُحفّز → الهدف</th><th>مقاييس القرار</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>تحديد المعسكر وكشف الإطار</strong></td>
+          <td>Wappalyzer، BuiltWith، Framework Detector (Astro)، @astrojs/compiler، استدلالات مخصصة</td>
+          <td>قاعدة كود غير معروفة → معسكر معروف + إصدار + تكوين</td>
+          <td>دقة الكشف؛ معدل الإيجابيات الكاذبة؛ وقت التحديد؛ تغطية التكوين</td>
+        </tr>
+        <tr>
+          <td><strong>أدوات الهجرة (معسكر-إلى-معسكر)</strong></td>
+          <td>هجرة جزر Astro، Next.js Codemods، React → Svelte/Vue/Solid codemods، @vue/compiler-sfc، Svelte migrate، Mitosis، Qwik CLI</td>
+          <td>معسكر مصدر → معسكر هدف مع كود عاملي، أصيل</td>
+          <td>درجة الأصالة؛ معدل اجتياز الاختبارات؛ % الإصلاح اليدوي؛ زمن المراجعة</td>
+        </tr>
+        <tr>
+          <td><strong>تحليل الحزمة وفرض الميزانية</strong></td>
+          <td>webpack-bundle-analyzer، Vite Bundle Analyzer، next-bundle-analyzer، @next/bundle-analyzer، bundlesize، ci-size</td>
+          <td>حزمة غير معروفة → مقاسة، محددة الميزانية، مقفلة</td>
+          <td>اجتياز/فشل الميزانية؛ اتجاه حجم الحزمة؛ عدد القطع؛ كشف التكرار</td>
+        </tr>
+        <tr>
+          <td><strong>أدوات الجزر / الترطيب الجزئي</strong></td>
+          <td>Astro (توجيهات client:*)، Qwik (قابلة للاستئناف)، Fresh (Preact)، Marko، Elder.js، 11ty + جزر</td>
+          <td>ترطيب كامل → ترطيب انتقائي قائم على الجزر</td>
+          <td>% بايتات تفاعلية؛ وقت الترطيب؛ TTI؛ عدد الجزر؛ تعقيد التكوين</td>
+        </tr>
+        <tr>
+          <td><strong>هجرة TypeScript وأمان الأنواع</strong></td>
+          <td>ts-migrate، TS Morph، tsc --isolatedModules، type-fest، Zod، Valibot، ArkType</td>
+          <td>JS/TS فضفاض → TS صارم أصيل للمعسكر</td>
+          <td>% any؛ تغطية الأنواع؛ سرعة الهجرة؛ تقليل أخطاء وقت التشغيل</td>
+        </tr>
+        <tr>
+          <td><strong>مقارنة نموذج التفاعل</strong></td>
+          <td>React DevTools، Svelte DevTools، Vue DevTools، Solid DevTools، @preact/signals-devtools، Knip</td>
+          <td>نموذج ذهني خاطئ → فهم تفاعل مناسب للمعسكر</td>
+          <td>عدد إعادة العرض؛ دقة الحالة المشتقة؛ تكافؤ إشارة/حافلة؛ وقت التصحيح</td>
+        </tr>
+        <tr>
+          <td><strong>ترجمة المعسكر بمساعدة الذكاء الاصطناعي</strong></td>
+          <td>GitHub Copilot، Cursor، Sourcegraph Cody، Continue، Cody، Windsurf، Cline</td>
+          <td>"ترجم هذا المكون للمعسكر X" → كود هدف عامل، أصيل</td>
+          <td>درجة الأصالة؛ معدل اجتياز الاختبارات؛ % الإصلاح اليدوي؛ زمن المراجعة</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>طريقة اختيار:</strong> ابدأ بتحديد المعسكر + كشف الإطار ("مجموعة أدوات المسح الدنيا القابلة للحياة"). أضف أدوات الهجرة عند تقرير الانتقال. أضف تحليل الحزمة عند وجود ميزانية أداء. أضف أدوات الجزر عند استهداف HTML-first/ترطيب جزئي. أضف الترجمة بمساعدة الذكاء الاصطناعي عندما يعرف الفريق المعسكر المصدر لكن ليس الهدف. الأداة تخدم الهجرة — لا العكس.</p>
+
+    ---
+
+    <p>مستندات رفيقة:</p>
+    <ul>
+      <li><a href="./class-to-hooks-paradigm-shift.html">تحول النموذج من الكلاس إلى الحافلات</a> — قوس React الخاص عبر 2026.</li>
+      <li><a href="./re-render-box-model.html">نموذج صندوق إعادة العرض</a> — إغلاقات مطبقة على إعادة العرض.</li>
+      <li><a href="./nextjs-deep-dive.html">غوص عميق في Next.js</a> — الميتا-إطار العمل الذي ستقابله غالباً في وظيفة React.</li>
+      <li><a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a> — جانب الطلب: وظائف، فريلانس، شرح AI، سياق مصر عن بعد.</</ul>
+
+    <section class="win">
+      <h3>ما يغطيه هذا المستند</h3>
+      <p>يمكنك وضع قاعدة كود في معسكر (CMS، HTML-first، SPA، ميتا-إطار عمل، مكتبة إشارات، WASM هجين)، تعرف ما يحسّن له كل منها، وتعرف ما إذا كان نموذجك الذهني لإغلاقات React ينطبق كما هو، ينطبق فقط على جزيرة العميل، أو يجب تجاوزه. الهدف هو التعرف في العمل — لا تحويل كل مشروع لمعسكرك المفضل.</p>
+    </section>
+
+    <footer class="lesson-foot">
+      <span>مرجع · مسح معسكرات الواجهة الأمامية</span>
+      <span>المهمة: قراءة JS/React في العمل</span>
+      <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
+    </footer>
+
+  </main>
+  <script src="../../assets/lesson.js"></script>
+</body>
+</html>

@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI/UX & Web Design — How Interfaces Become Habitable Without Becoming Decoration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Interface design — the layer between people and pixels</p>
+  <h1>UI/UX & Web Design — How Interfaces Become Habitable Without Becoming Decoration</h1>
+  <p class="meta">The discipline of designing interfaces that are usable, accessible, and meaningful. Sibling docs: <a href="./design-thinking.html">Design Thinking</a> (the empathy layer upstream), <a href="./system-design.html">System Design</a> (the architectural layer that constrains rendering), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop that renders), <a href="./api-design.html">API Design</a> (the contract layer that feeds state), <a href="./html-and-css.html">HTML & CSS</a> (the platform substrate that the rendering layer runs on).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>Most tutorials teach "how to style a button" or "how to use Figma." UI/UX & Web Design starts at "what makes an interface habitable for the human using it." It is a distinct discipline with its own history, methods, and failure modes — not "visual design" as decoration, not "Figma" as a tool, not "component library" as a system. This doc captures it as a first-class engineering concern: the rendering layer that materializes Design Thinking's empathy and the Developer Loop's components into something people can actually use. If you've ever shipped a feature that works perfectly but nobody can figure out, this is the layer you missed.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./design-thinking.html">Design Thinking</a> — Design Thinking discovers human behavior; UI/UX renders that description into environments people can actually touch. It's the down-flow of empathy into pixels.</li>
+  <li>Cross-cutting to <a href="./system-design.html">System Design</a> — UI choices (streaming lists, optimistic UI, server components) shape and are shaped by API surface → shapes architecture. Latency budgets, rendering strategy, and data ownership are co-decided.</li>
+  <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — the developer loop decides component shape; UI/UX decides the rendered thing's qualities (space, motion, affordance, state visibility). The loop executes inside UI/UX's guardrails.</li>
+  <li>Cross-cutting to <a href="./api-design.html">API Design</a> — every screen is a read and write through the API contract; bad contracts intrude on the UI as dead states, toast storms, and invisible failures.</li>
+  <li>Context from <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — rendering strategy (SPA, SSR, RSC, Islands) constrains what UI patterns are even available.</li>
+  <li>Downstream to <a href="./html-and-css.html">HTML & CSS</a> — UI/UX decides what the rendered thing <em>should be</em>; HTML & CSS is the substrate it renders <em>on</em>. The state visibility matrix (§9) maps directly to HTML states (<code>aria-busy</code>, <code>aria-invalid</code>) and CSS states (<code>:hover</code>, <code>:focus-visible</code>, <code>[data-loading]</code>).</li>
+    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>The four-discipline answer to "what is UI/UX?"</strong></p>
+  <ul>
+    <li><strong>Interaction Design (IxD)</strong> — behavior: what happens when the human acts? (feedback, affordance, mapping, modes, errors).</li>
+    <li><strong>User Experience (UX)</strong> — outcome: does the human achieve their goal without friction? (usability, accessibility, utility, satisfaction).</li>
+    <li><strong>Visual / UI Design</strong> — presentation: space, type, color, motion, hierarchy, brand. The "skin" that carries the behavior.</li>
+    <li><strong>Information Architecture (IA)</strong> — structure: how is content organized, labeled, found? (navigation, taxonomy, search, mental models).</li>
+  </ul>
+  <p>All four are UI/UX; none is complete without the others. A beautiful IA with broken IxD fails. Accessible IxD with invisible Visual Design fails. The discipline is the <em>integration</em>.</p>
+</blockquote>
+
+---
+
+<h2>1. Definition — what UI/UX <em>is</em> and what it is <em>not</em></h2>
+
+<h3>What it is</h3>
+
+<p>UI/UX & Web Design is the disciplined activity of <strong>designing interfaces that are usable, accessible, and meaningful</strong>. It produces decisions — not pixels — that determine:</p>
+
+<ul>
+  <li><strong>Affordance & feedback</strong> — does the interface suggest its own use? Does every action produce perceivable response?</li>
+  <li><strong>Mental model alignment</strong> — does the interface match how the user thinks about the task? (conceptual model ≈ user's mental model)</li>
+  <li><strong>Accessibility as default</strong> — can the interface be used via keyboard, screen reader, voice, switch control, high contrast, reduced motion? (WCAG 2.2 AA baseline)</li>
+  <li><strong>State visibility</strong> — is system status visible at all times? (loading, empty, error, partial success, offline, syncing)</li>
+  <li><strong>Error prevention & recovery</strong> — are destructive actions guarded? Can mistakes be undone? Do errors explain <em>how to fix</em>, not just <em>what broke</em>?</li>
+  <li><strong>Cognitive load management</strong> — is the interface respecting working memory limits? (chunking, progressive disclosure, sensible defaults, recognition over recall)</li>
+  <li><strong>Visual hierarchy & scanning</strong> — can the user find what they need in <em>F-pattern</em> / <em>layer-cake</em> scanning? (type scale, space, color weight, motion as meaning)</li>
+  <li><strong>Consistency & design systems</strong> — do patterns repeat predictably? (tokens, components, spacing scale, motion tokens, naming)</li>
+</ul>
+
+<p>These decisions are <strong>expensive to change later</strong>. Visual redesigns are cheap; IA restructuring, accessibility retrofits, and mental-model realignments are not. The earlier UI/UX decisions enter, the cheaper the system.</p>
+
+<h3>What it is not</h3>
+
+<table>
+  <thead><tr><th>Confused with</th><th>What that is</th><th>Difference</th></tr></thead>
+  <tbody>
+    <tr><td>Visual design / "making it pretty"</td><td>Color palettes, illustrations, marketing aesthetics, brand expression</td><td>Visual design is <em>one layer</em> of UI/UX. UI/UX decides <em>what works</em>; visual design decides <em>how it looks while working</em>.</td></tr>
+    <tr><td>Figma / design tools</td><td>Canvas, components, auto-layout, prototyping, handoff</td><td>Tools are <em>medium</em>; UI/UX is the <em>discipline</em>. A Figma file is not a design; a design is a set of decisions the file captures.</td></tr>
+    <tr><td>Component library / design system</td><td>Reusable coded components (Button, Input, Modal), tokens, documentation</td><td>A design system <em>encodes</em> UI/UX decisions for reuse. UI/UX decides <em>which patterns exist</em> and <em>when to use them</em>.</td></tr>
+    <tr><td>Frontend development</td><td>HTML, CSS, JS, React, Vue, Svelte, build tools, performance</td><td>Frontend dev <em>implements</em> the design. UI/UX decides <em>what to implement</em>. The boundary is porous (devs make micro-decisions daily).</td></tr>
+    <tr><td>UX Research</td><td>Interviews, usability tests, surveys, analytics, card sorting</td><td>Research <em>informs</em> UI/UX; UI/UX <em>synthesizes</em> research into decisions. Research without synthesis = data, not design.</td></tr>
+    <tr><td>Responsive design = media queries</td><td>Breakpoints, fluid grids, container queries</td><td>Responsive is a <em>technique</em>; UI/UX decides <em>what changes at each breakpoint</em> (content priority, navigation pattern, data density).</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>2. History — from print composition to systems-driven UI</h2>
+
+<table>
+  <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1919–1930s</strong></td>
+      <td>Bauhaus, Swiss International Style</td>
+      <td>Walter Gropius, László Moholy-Nagy, Jan Tschichold, Josef Müller-Brockmann</td>
+      <td>Grid systems, asymmetry, typography as communication, "form follows function." Print composition principles.</td>
+    </tr>
+    <tr>
+      <td><strong>1950s–1960s</strong></td>
+      <td>Human factors & ergonomics</td>
+      <td>Alphonse Chapanis, Paul Fitts, William Edmund Hick</td>
+      <td>Fitts's Law (1954), Hick's Law (1952). Measurement of human motor/cognitive limits. Military/aviation origins.</td>
+    </tr>
+    <tr>
+      <td><strong>1963–1968</strong></td>
+      <td>Sketchpad, NLS, The Mother of All Demos</td>
+      <td>Ivan Sutherland (Sketchpad), Douglas Engelbart (NLS, mouse, hypertext, video conferencing)</td>
+      <td>Direct manipulation, graphical interaction, collaborative editing. The GUI is born.</td>
+    </tr>
+    <tr>
+      <td><strong>1973–1981</strong></td>
+      <td>Xerox PARC Alto, Smalltalk, Star</td>
+      <td>Alan Kay, Adele Goldberg, Larry Tesler (modes vs modeless, cut/copy/paste)</td>
+      <td>Desktop metaphor, windows, icons, menus, pointers (WIMP). Modeless interaction. Object-oriented UI.</td>
+    </tr>
+    <tr>
+      <td><strong>1984–1992</strong></td>
+      <td>Macintosh, Windows, Human Interface Guidelines</td>
+      <td>Apple (Macintosh HIG 1987), Microsoft (Windows 3.1)</td>
+      <td>Consumer GUI standardization. Consistent menus, keyboard shortcuts, drag-and-drop. HIG as platform contract.</td>
+    </tr>
+    <tr>
+      <td><strong>1993–1995</strong></td>
+      <td>Web 1.0, Mosaic, Netscape</td>
+      <td>Tim Berners-Lee, Marc Andreessen, Jakob Nielsen (early web usability)</td>
+      <td>Documents → links. Stateless, server-rendered. "Browser as universal client" breaks platform HIG monopoly.</td>
+    </tr>
+    <tr>
+      <td><strong>1994–2000</strong></td>
+      <td>Jakob Nielsen's heuristics, Web usability</td>
+      <td>Jakob Nielsen, Don Norman (joins Apple 1993), Steve Krug (<em>Don't Make Me Think</em>, 2000)</td>
+      <td>10 Usability Heuristics (1994). Discount usability testing (5 users). "Don't make me think" as mantra.</td>
+    </tr>
+    <tr>
+      <td><strong>2003–2010</strong></td>
+      <td>CSS Zen Garden, Web Standards, Ajax</td>
+      <td>Dave Shea (CSS Zen Garden), Jeffrey Zeldman (Web Standards), Jesse James Garrett (Ajax, 2005)</td>
+      <td>Separation of concerns (HTML/CSS/JS). Progressive enhancement. Ajax = partial updates without reload.</td>
+    </tr>
+    <tr>
+      <td><strong>2007–2012</strong></td>
+      <td>iPhone, Mobile-first, Responsive Web Design</td>
+      <td>Steve Jobs (iPhone), Luke Wroblewski (Mobile First, 2009), Ethan Marcotte (RWD, 2010)</td>
+      <td>Touch-first, small screen, no hover. Fluid grids, flexible images, media queries. Content parity across devices.</td>
+    </tr>
+    <tr>
+      <td><strong>2011–2014</strong></td>
+      <td>Bootstrap, Foundation, Flat Design, Material Design</td>
+      <td>Twitter (Bootstrap), ZURB (Foundation), Google (Material Design, 2014), Microsoft (Metro/Fluent)</td>
+      <td>Component frameworks democratize patterns. Flat vs skeuomorphism debate. Motion as meaning (Material).</td>
+    </tr>
+    <tr>
+      <td><strong>2013–2017</strong></td>
+      <td>Atomic Design, Design Tokens, Design Systems</td>
+      <td>Brad Frost (<em>Atomic Design</em>, 2013), Jina Anne (Design Tokens), Salesforce (Lightning), Airbnb (DLS)</td>
+      <td>Atoms → molecules → organisms → templates → pages. Tokens as platform-agnostic design decisions. Systematization.</td>
+    </tr>
+    <tr>
+      <td><strong>2017–2022</strong></td>
+      <td>Component-driven tooling, CSS-in-JS, Dark mode, WCAG 2.1/2.2</td>
+      <td>Storybook, Styled Components, Emotion, Tailwind CSS, W3C DTCG (Design Tokens Community Group)</td>
+      <td>Design-dev handoff tightens. Utility-first CSS. Dark mode as system preference. Accessibility legal baseline.</td>
+    </tr>
+    <tr>
+      <td><strong>2022–present</strong></td>
+      <td>AI-assisted design, Headless UI, Spatial/AR UI</td>
+      <td>v0, Builder.io, Galileo AI, Radix UI, Headless UI, Apple Vision Pro, W3C DTCG spec</td>
+      <td>LLMs generate mockups/code. Headless primitives (behavior without opinion). Spatial computing adds depth, gaze, gesture.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>3. Evolution — constraint inversions across UI history</h2>
+
+<p>The core idea — <em>an interface that serves the human</em> — did not change. What changed is the dominant constraint, and the method that absorbed it:</p>
+
+<table>
+  <thead><tr><th>Dominant constraint</th><th>Winning method</th><th>Why it fit</th></tr></thead>
+  <tbody>
+    <tr><td>Print reproduction + typography (1920s)</td><td>Swiss Grid / International Style</td><td>Grid + sans-serif + asymmetry = reproducible, legible, international. Constraints: metal type, press.</td></tr>
+    <tr><td>Human motor/cognitive limits (1950s)</td><td>Fitts/Hick Laws applied to UI</td><td>Quantified targets: button size, menu depth, decision count. Military avionics → civilian UI.</td></tr>
+    <tr><td>Screen real estate + discoverability (1980s)</td><td>WIMP + Menu bars</td><td>Menus expose all commands; windows manage space. Consistency across apps via platform HIG.</td></tr>
+    <tr><td>Network latency + document model (1990s)</td><td>Progressive enhancement + Web Standards</td><td>HTML works without CSS/JS. Graceful degradation. Semantic markup = accessibility + SEO.</td></tr>
+    <tr><td>Small screen + touch + no hover (2007+)</td><td>Mobile-first + Responsive</td><td>Content priority forces ruthless editing. Fluid grids adapt. Touch targets ≥44pt.</td></tr>
+    <tr><td>Team scale + consistency across products (2013+)</td><td>Design Systems + Tokens</td><td>Tokens = single source of truth (color, space, type, motion). Components = encoded patterns. Cross-platform parity.</td></tr>
+    <tr><td>Performance budget + runtime cost (2017+)</td><td>Utility-first (Tailwind) + CSS-in-JS → Zero-runtime</td><td>Bundle size matters. Utility classes = no unused CSS. Compile-time extraction = no runtime style injection.</td></tr>
+    <tr><td>Accessibility mandate + legal risk (2018+)</td><td>WCAG 2.1/2.2 AA as baseline</td><td>Semantic HTML, ARIA only when needed, focus management, contrast, reduced motion. Shift-left accessibility.</td></tr>
+    <tr><td>Authoring speed + AI augmentation (2023+)</td><td>LLM → mockup → code → component</td><td>Human directs intent; machine produces artifacts. Design tokens + headless primitives = guardrails for generation.</td></tr>
+  </tbody>
+</table>
+
+<p>The pattern repeats: when the dominant constraint changes (reproduction → human limits → screen space → network → touch → team scale → performance → accessibility → AI), the old method's ergonomics become friction and a new method absorbs the constraint.</p>
+
+---
+
+<h2>4. Intersection with neighbors — where it borders other practices</h2>
+
+<table>
+  <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Design Thinking</strong></td>
+      <td>Empathy, user research, prototyping, iteration, problem framing</td>
+      <td>Design Thinking <em>discovers the problem</em>; UI/UX <em>materializes the solution</em> in pixels. DT output = insight; UI/UX output = interface.</td>
+    </tr>
+    <tr>
+      <td><strong>System Design</strong></td>
+      <td>Latency budgets, rendering strategy (SSR/RSC/Islands), data ownership, API contracts</td>
+      <td>System design <em>constrains what's possible</em> (can we stream this list?); UI/UX <em>decides what's desirable</em> within constraints. Co-design at the seam.</td>
+    </tr>
+    <tr>
+      <td><strong>Developer Loop (Frontend)</strong></td>
+      <td>Component shape, state management, data fetching, rendering, performance</td>
+      <td>The loop <em>builds the component</em>; UI/UX <em>defines the component's contract</em> (props, states, behaviors, a11y). Dev makes micro-decisions daily; UI/UX sets macro guardrails.</td>
+    </tr>
+    <tr>
+      <td><strong>API Design</strong></td>
+      <td>Error envelopes, pagination, optimistic mutations, loading states, empty states</td>
+      <td>API design <em>defines the wire contract</em>; UI/UX <em>decides how wire states map to human states</em>. Bad API = UI papered over with toasts/spinners.</td>
+    </tr>
+    <tr>
+      <td><strong>Frontend Camps Survey</strong></td>
+      <td>Rendering model (SPA/SSR/RSC/Islands), framework patterns, ecosystem norms</td>
+      <td>Camps survey <em>describes the landscape</em>; UI/UX <em>chooses patterns</em> within the chosen camp. RSC changes what "optimistic UI" means.</td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility (WCAG)</strong></td>
+      <td>Semantic HTML, focus order, contrast, ARIA, reduced motion, screen reader testing</td>
+      <td>WCAG is the <em>compliance baseline</em>; UI/UX is the <em>design discipline</em> that makes accessibility invisible (it just works). Compliance ≠ usability.</td>
+    </tr>
+    <tr>
+      <td><strong>Motion Design</strong></td>
+      <td>Easing, duration, choreography, reduced motion, vestibular safety</td>
+      <td>Motion design <em>crafts the movement</em>; UI/UX <em>decides when motion carries meaning</em> (state change, spatial relationship, feedback) vs decoration.</td>
+    </tr>
+    <tr>
+      <td><strong>Content Design / UX Writing</strong></td>
+      <td>Microcopy, error messages, empty states, onboarding, tone, localization</td>
+      <td>Content design <em>writes the words</em>; UI/UX <em>designs the container</em>. Words and layout co-evolve; neither leads alone.</td>
+    </tr>
+    <tr>
+      <td><strong>Brand / Visual Identity</strong></td>
+      <td>Color palette, typography, logo, illustration style, tone</td>
+      <td>Brand <em>expresses identity</em>; UI/UX <em>serves function</em>. Tension: brand wants distinction; UI/UX wants familiarity. Design tokens mediate.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>5. Underlying theory — the ideas it borrows from</h2>
+
+<table>
+  <thead><tr><th>Theory</th><th>Origin</th><th>What UI/UX takes from it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Gestalt Principles</strong></td>
+      <td>Max Wertheimer, Kurt Koffka, Wolfgang Köhler (~1912–1920s)</td>
+      <td>Proximity, similarity, closure, continuity, figure/ground, common fate. Visual grouping explains scanning behavior. Layout = applied Gestalt.</td>
+    </tr>
+    <tr>
+      <td><strong>Fitts's Law</strong></td>
+      <td>Paul Fitts, 1954</td>
+      <td>Time to acquire target = f(distance, size). Bigger, closer targets = faster. Corners/edges = infinite size (Mac menu bar, Windows Start).</td>
+    </tr>
+    <tr>
+      <td><strong>Hick's Law</strong></td>
+      <td>William Edmund Hick, 1952</td>
+      <td>Decision time = log₂(n+1) choices. Reduce choices → faster decisions. Progressive disclosure, smart defaults, chunking.</td>
+    </tr>
+    <tr>
+      <td><strong>Miller's 7±2 (and Cowan's 4±1)</strong></td>
+      <td>George Miller (1956), Nelson Cowan (2001)</td>
+      <td>Working memory holds ~4 chunks reliably. UI must chunk information. Navigation ≤7 items; form fields grouped; progressive disclosure.</td>
+    </tr>
+    <tr>
+      <td><strong>Affordance Theory</strong></td>
+      <td>James J. Gibson (1977), Don Norman (1988, <em>The Design of Everyday Things</em>)</td>
+      <td>Affordance = action possibility perceived. Perceived affordance ≠ real affordance. Buttons look pressable; links look clickable. Signifiers communicate affordance.</td>
+    </tr>
+    <tr>
+      <td><strong>Nielsen's 10 Usability Heuristics</strong></td>
+      <td>Jakob Nielsen, 1994 (refined 1995)</td>
+      <td>Visibility of system status, match real world, user control/freedom, consistency, error prevention, recognition over recall, flexibility/efficiency, aesthetic/minimalist, help users recognize/recover, help/documentation.</td>
+    </tr>
+    <tr>
+      <td><strong>Shneiderman's 8 Golden Rules</strong></td>
+      <td>Ben Shneiderman, 1992 (<em>Designing the User Interface</em>)</td>
+      <td>Consistency, shortcuts for experts, informative feedback, closure, error prevention, easy reversal, internal locus of control, reduce memory load.</td>
+    </tr>
+    <tr>
+      <td><strong>Gulf of Execution / Evaluation</strong></td>
+      <td>Don Norman, 1988</td>
+      <td>Gulf of execution: user's intent → system action. Gulf of evaluation: system state → user understanding. Good UI narrows both.</td>
+    </tr>
+    <tr>
+      <td><strong>ISO 9241-11 Usability Definition</strong></td>
+      <td>ISO, 1998/2018</td>
+      <td>Usability = effectiveness, efficiency, satisfaction in a specified context of use. Context matters: same UI, different context = different usability.</td>
+    </tr>
+    <tr>
+      <td><strong>Cognitive Load Theory</strong></td>
+      <td>John Sweller, 1988</td>
+      <td>Intrinsic (task complexity), extraneous (bad UI), germane (learning). UI/UX minimizes extraneous, manages intrinsic, supports germane.</td>
+    </tr>
+    <tr>
+      <td><strong>WCAG / POUR Principles</strong></td>
+      <td>W3C WAIC, WCAG 2.0 (2008), 2.1 (2018), 2.2 (2023)</td>
+      <td>Perceivable, Operable, Understandable, Robust. Testable success criteria (A/AA/AAA). Accessibility as civil right, not feature.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5b. Mental models — how UI/UX designers actually reason</h2>
+
+<p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
+
+<table>
+  <thead><tr><th>Model</th><th>Core idea</th><th>When you reach for it</th><th>What it replaces</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>State visibility matrix</strong></td>
+      <td>Every interactive element has states (idle, hover, focus, active, disabled, loading, error, success). The matrix maps component × state → visual + a11y treatment. Missing states = invisible failures.</td>
+      <td>Component design; design system building; handoff to engineering.</td>
+      <td>Designing only the "happy path" default state.</td>
+    </tr>
+    <tr>
+      <td><strong>Affordance → signifier mapping</strong></td>
+      <td>Affordance = what's possible (clickable). Signifier = what signals it (underline, button shape, cursor). Every affordance needs a signifier; signifiers without affordances are lies.</td>
+      <td>Button vs link decisions; custom component design; accessibility review.</td>
+      <td>Visuals-first design (looks like button, acts like link).</td>
+    </tr>
+    <tr>
+      <td><strong>Motion as meaning vs decoration</strong></td>
+      <td>Meaningful motion: confirms action, shows relationship, guides attention. Decorative motion: delighters, branding. Meaningful gets reduced-motion respect; decorative gets reduced-motion removal.</td>
+      <td>Animation audit; reduced-motion implementation; design system motion tokens.</td>
+      <td>Animating everything; ignoring <code>prefers-reduced-motion</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Error as conversation, not interruption</strong></td>
+      <td>Inline validation on blur/submit (not keystroke). Error message = what went wrong + how to fix + where to go. Toast = system-level, not field-level.</td>
+      <td>Form design; error state components; validation strategy.</td>
+      <td>Red border on keystroke; generic "something went wrong" toasts.</td>
+    </tr>
+    <tr>
+      <td><strong>Progressive disclosure = cognitive load management</strong></td>
+      <td>Show what's needed now; hide what's needed later. Accordions, tabs, "show more," wizard steps. Each disclosure level is a cognitive load decision.</td>
+      <td>Complex forms; settings panels; onboarding flows; mobile navigation.</td>
+      <td>Everything on one page; tabs as content dumping ground.</td>
+    </tr>
+    <tr>
+      <td><strong>Design token = decision record</strong></td>
+      <td>A token (color, spacing, motion, border, shadow) is a named design decision. Changing a token = changing the decision everywhere. Token governance = decision governance.</td>
+      <td>Design system authoring; theming; dark mode; density; cross-platform sync.</td>
+      <td>Hardcoded values in components; "we'll extract tokens later."</td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility as default, not checklist</strong></td>
+      <td>Semantic HTML = free keyboard, focus, role, name. ARIA only when semantics gap exists. WCAG 2.2 AA baseline. Accessibility is not a phase — it's the floor.</td>
+      <td>Every component; every page; design system audit; definition of done.</td>
+      <td>Accessibility sprint at the end; ARIA-first; "we'll fix a11y later."</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> High-fidelity mockups without state matrix. A static Figma frame is a screenshot, not a specification. The spec is the state matrix + interaction model + accessibility annotations. If you can't answer "what does this look like when loading/error/empty/focused?" for every component, you don't have a design — you have a picture.</p>
+
+---
+
+<h2>6. The rhythm, not the algorithm</h2>
+
+<p>Like <a href="./design-thinking.html">Design Thinking</a>, <a href="./system-design.html">System Design</a>, and <a href="./api-design.html">API Design</a>, UI/UX is a <strong>rhythm</strong>, not a structured algorithm. It fails the three algorithm tests:</p>
+
+<ul>
+  <li><strong>Inputs aren't predefined.</strong> You don't know the user's true mental model, context, or constraints when you start. Research discovers them; the design responds.</li>
+  <li><strong>Steps aren't deterministic.</strong> There is no rule that says "now do high-fidelity mockups." You sketch until the team feels the interaction model is sound — a taste judgment.</li>
+  <li><strong>No fixed termination.</strong> "Done" means "the interface passes usability testing with representative users and meets accessibility baseline." That is a judgment call, not a predicate. The product iterates forever; UI is living.</li>
+</ul>
+
+<p>This is why UI/UX resists checklists that pretend to be complete. A checklist assumes you know the user; the rhythm assumes you know <em>what's missing for the user you have</em> — a design/engineering judgment.</p>
+
+<blockquote class="callout">
+  <p><strong>The "Design System" rhythm hack.</strong> A design system (tokens + components + patterns + governance) solves the "no fixed termination" problem by <em>encoding past judgments as reusable defaults</em>. New features start from the system, not from zero. It's a velocity multiplier — useful when the system is alive, dangerous when the system becomes a bureaucracy that forbids deviation.</p>
+</blockquote>
+
+---
+
+<h2>7. Methodologies / named frameworks</h2>
+
+<p>Multiple named processes exist. None is canonical; each packages the rhythm for a different context.</p>
+
+<table>
+  <thead><tr><th>Methodology</th><th>Core idea</th><th>Origin</th><th>Best for</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>User-Centered Design (UCD)</strong></td>
+      <td>ISO 13407 / 9241-210: iterative cycles with user involvement throughout</td>
+      <td>Donald Norman, ISO (1999/2010)</td>
+      <td>Regulated domains (medical, automotive), teams needing process traceability.</td>
+    </tr>
+    <tr>
+      <td><strong>Goal-Directed Design</strong></td>
+      <td>Personas → scenarios → requirements → framework → refinement (Cooper)</td>
+      <td>Alan Cooper, <em>About Face</em> (1995/2003/2014)</td>
+      <td>Complex products with distinct user roles; teams needing rigorous persona→scenario traceability.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Systems (Material, Polaris, Carbon, Fluent)</strong></td>
+      <td>Tokens + components + patterns + governance + tooling as a product</td>
+      <td>Google (Material, 2014), Shopify (Polaris), IBM (Carbon), Microsoft (Fluent)</td>
+      <td>Large orgs with many products/teams; cross-platform consistency; design-dev handoff at scale.</td>
+    </tr>
+    <tr>
+      <td><strong>Atomic Design</strong></td>
+      <td>Atoms → Molecules → Organisms → Templates → Pages (hierarchy of composition)</td>
+      <td>Brad Frost, <em>Atomic Design</em> (2013)</td>
+      <td>Component library architecture; Storybook-driven development; design token migration.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Tokens (W3C DTCG)</strong></td>
+      <td>Platform-agnostic design decisions (color, space, type, motion, border, shadow) as structured data</td>
+      <td>Jina Anne (2014), W3C DTCG (2019–present), <em>Design Tokens Format Module</em></td>
+      <td>Multi-platform (web, iOS, Android, email); theming; dark mode; design-dev sync.</td>
+    </tr>
+    <tr>
+      <td><strong>Mobile-First / Progressive Enhancement</strong></td>
+      <td>Design for smallest/most constrained first; enhance upward</td>
+      <td>Luke Wroblewski (2009), Aaron Gustafson (2011)</td>
+      <td>Content-heavy sites; broad device support; performance-critical; accessibility baseline.</td>
+    </tr>
+    <tr>
+      <td><strong>8pt / 4pt Grid Systems</strong></td>
+      <td>Spacing, sizing, layout on a consistent base unit (4 or 8 pixels)</td>
+      <td>Google Material (8pt), Apple (8pt), Bootstrap (rem-based)</td>
+      <td>Visual rhythm; developer handoff (no magic numbers); responsive scaling.</td>
+    </tr>
+    <tr>
+      <td><strong>Gestalt-Decomposed Layouts</strong></td>
+      <td>Layout derived from proximity/similarity/closure rather than fixed grids</td>
+      <td>Modern CSS (Grid, Flexbox, Container Queries) + design tools</td>
+      <td>Content-aware layouts; intrinsic sizing; "layout as component" rather than page.</td>
+    </tr>
+    <tr>
+      <td><strong>Headless UI Primitives</strong></td>
+      <td>Behavior + accessibility + state management, zero styling opinions (Radix, Headless UI, ARIA Kit)</td>
+      <td>Radix (2020), Headless UI (Tailwind Labs), ARIA Kit</td>
+      <td>Design systems needing custom visual layer; teams owning brand; accessibility as default.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>All ten share the same DNA: <em>understand the human → decide the behavior → encode as reusable patterns → validate with reality → iterate</em>. The differences are scope (product vs system), deliverable (mockup vs code vs tokens), and governance model.</p>
+
+---
+
+<h2>8. Principles — the shared constants</h2>
+
+<p>Across every methodology, eight principles hold (synthesized from Nielsen, Shneiderman, Norman, ISO 9241, WCAG):</p>
+
+<ol>
+  <li><strong>Visibility of system status.</strong> The interface always communicates what's happening (loading, saving, synced, offline, error) — within 100ms for acknowledgment, 1s for progress, 10s for completion.</li>
+  <li><strong>Match between system and real world.</strong> Language, concepts, and mappings follow user's mental model, not implementation model. "Delete" not "Remove from database."</li>
+  <li><strong>User control and freedom.</strong> Emergency exits (undo, cancel, back) are always available. No forced modal traps without escape. "Oops" is a first-class interaction.</li>
+  <li><strong>Consistency and standards.</strong> Same action, same result, same appearance. Platform conventions respected (iOS back swipe, Android back button, web browser chrome). Design tokens enforce this.</li>
+  <li><strong>Error prevention.</strong> Guardrails before guardrails: confirmation for destructive acts, smart defaults, constraints that prevent invalid state, inline validation on blur not keystroke.</li>
+  <li><strong>Recognition rather than recall.</strong> Make options visible. Search > browse > remember. Autocomplete, recent items, breadcrumbs, visible affordances.</li>
+  <li><strong>Flexibility and efficiency of use.</strong> Accelerators for experts (keyboard shortcuts, power commands, bulk actions) hidden from novices. Modes visible, not hidden.</li>
+  <li><strong>Aesthetic and minimalist design.</strong> Every element competes for attention. Remove what doesn't serve the task. Visual hierarchy guides scanning. Motion carries meaning, not decoration.</li>
+</ol>
+
+---
+
+<h2>9. Worked example — "A Checkout Flow That Doesn't Punish Returns"</h2>
+
+<p>A realistic e-commerce checkout problem, walked end-to-end through the rhythm.</p>
+
+<h3>Context & constraints</h3>
+<ul>
+  <li><strong>Users</strong> — mobile majority (65%), desktop (30%), tablet (5%). Includes screen reader users, motor-impaired, reduced-motion.</li>
+  <li><strong>API contract</strong> — <code>POST /orders</code> (idempotent), <code>PATCH /orders/{id}/cancel</code>, <code>GET /orders/{id}</code> (polling), webhook for status. Latency p99: 800ms.</li>
+  <li><strong>Rendering</strong> — Next.js App Router (RSC for product data, Client Components for form).</li>
+  <li><strong>Design system</strong> — Tailwind + Radix UI primitives + custom design tokens (8pt grid, 200ms standard easing, reduced-motion token).</li>
+</ul>
+
+<h3>Step 1 — Map the user's intent (IA + IxD)</h3>
+<p>User wants: "Buy this, know it's coming, change my mind easily." Not "fill a form." The flow:</p>
+<pre><code>Cart → Shipping → Payment → Review → Confirm → Success → Post-purchase (track, cancel, return)
+</code></pre>
+<p>Key insight: <strong>cancellation/return is not an error path — it's a first-class feature.</strong> The "Review" step is the last easy exit.</p>
+
+<h3>Step 2 — Choose optimistic updates for perceived speed</h3>
+<ul>
+  <li>On <code>Confirm</code>: immediately show "Order placed" with spinner, disable form, start polling <code>GET /orders/{id}</code>.</li>
+  <li>If API succeeds (2xx): replace spinner with checkmark, animate to success state, start webhook listener for shipping updates.</li>
+  <li>If API fails (4xx/5xx): show inline error <em>in context</em> (not toast), re-enable form, preserve all input. Error message from RFC 9457 <code>detail</code> + actionable hint ("Your card was declined. Try another card or contact your bank.").</li>
+  <li>If network timeout: show "Still processing…" with subtle pulse, keep polling. Do not show "failed" until explicit 4xx/5xx.</li>
+</ul>
+
+<h3>Step 3 — State visibility matrix (every screen, every state)</h3>
+
+<table>
+  <thead><tr><th>Screen</th><th>Idle</th><th>Loading</th><th>Partial Success</th><th>Error (recoverable)</th><th>Error (terminal)</th><th>Empty</th><th>Offline</th></tr></thead>
+  <tbody>
+    <tr><td>Shipping</td><td>Form ready</td><td>Saving address…</td><td>Address saved ✓</td><td>Inline: "ZIP not found"</td><td>Toast: "Service down"</td><td>N/A</td><td>Banner: "Offline — changes saved locally"</td></tr>
+    <tr><td>Payment</td><td>Form ready</td><td>Processing $42.00…</td><td>Authorized ✓</td><td>Inline: "Card declined"</td><td>Toast: "Payment service error"</td><td>N/A</td><td>Banner + disabled submit</td></tr>
+    <tr><td>Review</td><td>Summary visible</td><td>Placing order…</td><td>N/A</td><td>Inline + "Edit" links</td><td>Full error card</td><td>N/A</td><td>Banner + "Retry when online"</td></tr>
+    <tr><td>Success</td><td>Order #1234 ✓</td><td>Loading tracking…</td><td>Tracking #9876</td><td>Toast: "Tracking delayed"</td><td>Card: "Order placed, tracking unavailable"</td><td>"No recent orders"</td><td>Cached success + "Sync when online"</td></tr>
+    <tr><td>Post-purchase</td><td>Track / Cancel / Return</td><td>Cancelling…</td><td>Cancelled ✓</td><td>Inline: "Too late to cancel"</td><td>Card: "Contact support"</td><td>N/A</td><td>Read-only cached view</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 4 — Accessibility constraints (non-negotiable)</h3>
+<ul>
+  <li><strong>Focus order</strong> — logical tab sequence: form fields → primary action → secondary links. No focus traps except modal (ESC to close, focus return).</li>
+  <li><strong>Keyboard</strong> — every interactive element reachable and operable. Custom select (Radix) = native keyboard behavior.</li>
+  <li><strong>Screen reader</strong> — <code>aria-live="polite"</code> for status updates; <code>aria-invalid</code> + <code>aria-describedby</code> for errors; <code>role="status"</code> for spinner.</li>
+  <li><strong>Reduced motion</strong> — <code>@media (prefers-reduced-motion: reduce)</code> disables all non-essential animation. Success checkmark appears instantly.</li>
+  <li><strong>Contrast</strong> — all text ≥4.5:1 (AA), large text ≥3:1. Error red meets contrast on light/dark.</li>
+  <li><strong>Touch targets</strong> — minimum 44×44pt (iOS) / 48×48dp (Material). Spacing tokens enforce this.</li>
+</ul>
+
+<h3>Step 5 — Design token mapping (light/dark, density)</h3>
+<pre><code>// tokens.json (excerpt)
+{
+  "color": {
+    "background": { "light": "#ffffff", "dark": "#0a0a0a" },
+    "surface": { "light": "#fafafa", "dark": "#171717" },
+    "primary": { "light": "#1d4ed8", "dark": "#60a5fa" },
+    "error": { "light": "#dc2626", "dark": "#f87171" },
+    "success": { "light": "#16a34a", "dark": "#4ade80" },
+    "onPrimary": { "light": "#ffffff", "dark": "#0a0a0a" }
+  },
+  "spacing": { "xs": "4px", "sm": "8px", "md": "16px", "lg": "24px", "xl": "32px" },
+  "radius": { "sm": "4px", "md": "8px", "lg": "12px", "full": "9999px" },
+  "motion": { "fast": "100ms", "standard": "200ms", "slow": "300ms", "easing": "cubic-bezier(0.4, 0, 0.2, 1)" },
+  "motionReduced": { "duration": "0ms", "easing": "linear" }
+}
+</code></pre>
+
+<h3>Step 6 — Naive vs designed comparison</h3>
+
+<table>
+  <thead><tr><th>Aspect</th><th>Naive (dev-only)</th><th>Designed (UI/UX + dev)</th></tr></thead>
+  <tbody>
+    <tr><td>Loading</td><td>Full-page spinner, form disabled</td><td>Inline button spinner, form stays editable until commit</td></tr>
+    <tr><td>Error</td><td>Toast "Something went wrong"</td><td>Inline field error + RFC 9457 detail + actionable hint</td></tr>
+    <tr><td>Success</td><td>Redirect to /success?order=123</td><td>Optimistic success → confirm → animate → track</td></tr>
+    <tr><td>Cancel</td><td>Hidden in account page</td><td>Primary action on success screen: "Cancel order"</td></tr>
+    <tr><td>Return</td><td>Support ticket form</td><td>"Start return" → label prints → QR code → tracking</td></tr>
+    <tr><td>Accessibility</td><td>ARIA added after audit</td><td>Semantic HTML + Radix primitives = accessible by default</td></tr>
+    <tr><td>Dark mode</td><td>Inverted colors via filter</td><td>Token-swapped surfaces, preserved contrast, brand color adapted</td></tr>
+  </tbody>
+</table>
+
+<h3>Artifacts produced</h3>
+<ul>
+  <li>State visibility matrix (living document, shared with dev + QA).</li>
+  <li>Component contracts (Props + States + A11y requirements per component: <code>CheckoutForm</code>, <code>PaymentFields</code>, <code>OrderSummary</code>, <code>StatusBadge</code>).</li>
+  <li>Error-state matrix (every RFC 9457 <code>type</code> → UI pattern + copy).</li>
+  <li>Design token file (JSON, consumed by Tailwind config + Figma variables).</li>
+  <li>Reduced-motion variant spec (which animations disable, which stay).</li>
+  <li>Focus-order diagram (for QA regression).</li>
+</ul>
+
+---
+
+<h2>10. The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Lorem ipsum shipped to prod</strong></td>
+      <td>Placeholder copy in empty states, error messages, onboarding. "Your order #{{id}} is {{status}}."</td>
+      <td>Content design treated as "later." Dev builds with placeholders; nobody replaces them. Fix: content in design system, content review gate in CI.</td>
+    </tr>
+    <tr>
+      <td><strong>Dark mode as an afterthought</strong></td>
+      <td>Inverted colors via CSS filter; brand colors vibrate; shadows disappear; images invert; contrast fails.</td>
+      <td>Dark mode = "add a class" not "design a mode." Fix: design tokens with light/dark pairs, test both in every PR.</td>
+    </tr>
+    <tr>
+      <td><strong>Loading spinner as the only loading state</strong></td>
+      <td>Full-screen spinner on every navigation; no skeleton, no progressive render, no stale-while-revalidate.</td>
+      <td>Loading = "blocking" not "progressive." Fix: loading patterns per content type (skeleton for lists, blur for images, stale data for dashboards).</td>
+    </tr>
+    <tr>
+      <td><strong>Toast notification storms</strong></td>
+      <td>5 toasts stack on save: "Saved!" "Syncing…" "Synced!" "Updated!" "Done!" User can't read any.</td>
+      <td>Toasts used for system status instead of inline status. Fix: status badges in context; toasts only for cross-screen events.</td>
+    </tr>
+    <tr>
+      <td><strong>AI autofill invisible to screen readers</strong></td>
+      <td>Browser autofills card number; screen reader announces nothing; user submits empty field.</td>
+      <td>Autocomplete attributes missing (<code>autocomplete="cc-number"</code>); no <code>aria-live</code> on programmatic fill. Fix: test with VoiceOver/NVDA + autofill.</td>
+    </tr>
+    <tr>
+      <td><strong>Focus traps in modals</strong></td>
+      <td>Modal opens; focus lands on backdrop; Tab cycles whole page; ESC doesn't close; focus not restored on close.</td>
+      <td>Custom modal without focus management. Fix: Radix Dialog / Headless UI Dialog = accessible by default.</td>
+    </tr>
+    <tr>
+      <td><strong>Optimistic updates without rollback</strong></td>
+      <td>User clicks "Like"; heart fills red; API fails; heart stays red; user clicks again; double-like.</td>
+      <td>No compensation action on error. Fix: every optimistic mutation has a rollback animation + error inline.</td>
+    </tr>
+    <tr>
+      <td><strong>Animation that triggers vestibular disorders</strong></td>
+      <td>Parallax scroll, infinite auto-carousel, scale transitions on hover, no <code>prefers-reduced-motion</code> respect.</td>
+      <td>Motion as decoration, not meaning. Fix: motion tokens + reduced-motion CI check (chromatic/playwright).</td>
+    </tr>
+    <tr>
+      <td><strong>One-button saves that no one can undo</strong></td>
+      <td>"Delete account" → immediate, no confirmation, no grace period, no recovery.</td>
+      <td>Destructive actions lack guardrails. Fix: soft delete + 30-day grace + "Undo" toast + admin recovery.</td>
+    </tr>
+    <tr>
+      <td><strong>Dev chose accessibility = correct ARIA but user can't see the result</strong></td>
+      <td>Perfect ARIA tree; contrast 2.1:1; focus outline removed; error text gray on gray.</td>
+      <td>Accessibility = "passes axe" not "usable by humans." Fix: manual testing with zoom 200%, high contrast, screen reader.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The practitioner critique (2013–present)</h3>
+
+<p>UI/UX has faced serious critique from within the design and engineering community:</p>
+
+<ul>
+  <li><strong>Edward Tufte</strong> — "Chartjunk" / "Data-ink ratio": decoration that carries no information reduces comprehension. Applied to UI: every pixel must earn its keep.</li>
+  <li><strong>Golden Krishna</strong> — <em>The Best Interface Is No Interface</em> (2013): screens are a crutch; the best flow eliminates steps, not designs them better. "No UI" as a design goal.</li>
+  <li><strong>Erika Hall</strong> — <em>Just Enough Research</em> (2013/2019): research theater (surveys, personas nobody reads) replaces direct observation. The method becomes the output.</li>
+  <li><strong>Julie Zhuo</strong> — <em>The Making of a Manager</em> / Facebook design culture: design systems can become "consistency police" that stifle product innovation. Governance must serve velocity.</li>
+  <li><strong>WCAG criticism</strong> — Karl Groves, Adrian Roselli: compliance ≠ usability. A site can pass WCAG AA and be unusable by disabled people. The standard is necessary, not sufficient.</li>
+</ul>
+
+<p><strong>The common thread:</strong> the critique is not that the <em>principles</em> are wrong — it's that the <em>institutional adoption</em> hollows them into checkboxes. The rhythm survives; the branded methodologies often don't.</p>
+
+---
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>The discipline is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Design & Prototyping</strong></td>
+      <td>Figma, Framer, Penpot, Sketch, Adobe XD, UXPin, ProtoPie, Principle</td>
+      <td>Idea → interactive prototype → validated learning</td>
+      <td>Fidelity vs learning goal match; Build time; Handoff clarity; Design system sync</td>
+    </tr>
+    <tr>
+      <td><strong>User Research & Testing</strong></td>
+      <td>Maze, UserTesting, Lookback, Dscout, Optimal Workshop, Hotjar, FullStory, Pendo</td>
+      <td>Assumption → observable behavior → insight</td>
+      <td>Participant diversity; Task success rate; Time to insight; Recruitment cost</td>
+    </tr>
+    <tr>
+      <td><strong>Design System & Token Management</strong></td>
+      <td>Figma Tokens, Style Dictionary, Specify, Token Studio, Supernova, Zeroheight, Knapsack, Backlight</td>
+      <td>Design decisions → platform-agnostic tokens → code</td>
+      <td>Token coverage; Design↔Code drift; Cross-platform sync latency; Adoption rate</td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility Testing & Annotation</strong></td>
+      <td>axe-core, Stark, WAVE, Axe DevTools, Storybook a11y, Figma a11y plugins, Silktide</td>
+      <td>Design → automated a11y audit + annotated specs</td>
+      <td>WCAG audit pass rate; Screen reader task success; Color contrast coverage; Annotation completeness</td>
+    </tr>
+    <tr>
+      <td><strong>Collaboration & Handoff</strong></td>
+      <td>Figma DevMode, Zeplin, Avocode, Sympli, Anima, Locofy, Builder.io, Quest AI</td>
+      <td>Design spec → developer-ready assets + code</td>
+      <td>Handoff completeness; Code gen accuracy; Spec drift; Time to first working component</td>
+    </tr>
+    <tr>
+      <td><strong>Analytics & Behavioral Data</strong></td>
+      <td>Amplitude, Mixpanel, PostHog, Heap, FullStory, LogRocket, Hotjar, Microsoft Clarity</td>
+      <td>Live product → quantitative + qualitative behavior evidence</td>
+      <td>Funnel drop-off points; Rage click patterns; Session replay coverage; Feature adoption</td>
+    </tr>
+    <tr>
+      <td><strong>Design Ops & Research Repository</strong></td>
+      <td>Dovetail, EnjoyHQ, Condens, Notion, Coda, Airtable, GitBook, Confluence</td>
+      <td>Scattered insights → searchable, linkable, reusable knowledge</td>
+      <td>Search success rate; Cross-project reuse; Insight half-life; Stakeholder adoption</td>
+    </tr>
+    <tr>
+      <td><strong>AI-Augmented Design</strong></td>
+      <td>Figma AI, v0, Galileo AI, Builder.io, Uizard, Magician, Diagram, Musho, Relume</td>
+      <td>Prompt → mockup / component / copy / audit</td>
+      <td>Human-in-the-loop ratio; Hallucination catch rate; Time savings vs quality tradeoff</td>
+    </tr>
+    <tr>
+      <td><strong>Motion & Interaction Design</strong></td>
+      <td>Framer Motion, Lottie, Rive, Spline, Jitter, Haiku Animator, After Effects + Bodymovin</td>
+      <td>Static → meaningful motion with code export</td>
+      <td>Runtime size; Dev handoff fidelity; Reduced-motion compliance; Iteration speed</td>
+    </tr>
+    <tr>
+      <td><strong>Content Design & Writing</strong></td>
+      <td>Ditto, Frontitude, Writer, Grammarly Business, Contentful, Sanity, Storyblok</td>
+      <td>Copy as component → versioned, localized, tested</td>
+      <td>Copy change deployment time; Localization coverage; A/B test velocity; Tone consistency</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with Prototyping + Research Repository + Accessibility (the "minimum viable design toolkit"). Add Design System when component library exists. Add Handoff when design/dev friction is measurable. Add Analytics when product is live. Add AI when mockup volume >20/week. The tool serves the rhythm — not the reverse.</p>
+
+---
+
+<h2>11. The future — where UI/UX is going</h2>
+
+<table>
+  <thead><tr><th>Signal (2024–2026)</th><th>What it means for UI/UX</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>AI as designer's intern</td>
+      <td>LLMs generate mockups from prompts (v0, Galileo AI, Builder.io), produce component code, suggest copy, audit accessibility. Human directs, reviews, curates. The authoring loop becomes a review loop.</td>
+    </tr>
+    <tr>
+      <td>Component generation from design tokens</td>
+      <td>Figma variables → design tokens → Tailwind config → Radix primitives → component code. Single source of truth; drift is a build error.</td>
+    </tr>
+    <tr>
+      <td>Motion as meaning, not decoration</td>
+      <td>FLIP animations, shared element transitions, View Transitions API. Motion explains spatial relationships (where did this come from?) not "delight."</td>
+    </tr>
+    <tr>
+      <td>AI-driven personalization vs accessibility tension</td>
+      <td>Dynamic UI per user (layout, density, copy) conflicts with stable mental models and testable accessibility. New guardrails: "personalization within a11y envelope."</td>
+    </tr>
+    <tr>
+      <td>Dark patterns regulation</td>
+      <td>EU Digital Services Act (2022), California Delete Act (2023), FTC negative option rule. Deceptive patterns (roach motel, hidden costs, forced continuity) become illegal. Design must document "user benefit" for every pattern.</td>
+    </tr>
+    <tr>
+      <td>Design tokens standardization (W3C DTCG)</td>
+      <td><em>Design Tokens Format Module</em> reaches Candidate Recommendation. Tools (Figma, Storybook, Style Dictionary, Token Studio) converge on one format. No more translation layers.</td>
+    </tr>
+    <tr>
+      <td>Spatial/AR UI layer (visionOS, WebXR)</td>
+      <td>Depth, gaze, gesture, voice as input. 2D patterns (hover, focus) don't map. New primitives: volumes, portals, immersive spaces. Apple Human Interface Guidelines for visionOS as baseline.</td>
+    </tr>
+    <tr>
+      <td>Headless UI primitives as default</td>
+      <td>Radix, Headless UI, ARIA Kit, React Aria become the "standard library" for behavior. Design systems only provide visual layer (tokens + styled components). Accessibility by default.</td>
+    </tr>
+    <tr>
+      <td>WebGL/WASM-based UI performance</td>
+      <td>Canvas/WebGPU rendering for high-frequency UI (charts, maps, games, collaborative canvas). React/HTML for chrome; WebGL for canvas. Hybrid architectures.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>12. Summary — the usability checklist</h2>
+
+<p>Before any interface ships, verify:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>If no…</th></tr></thead>
+  <tbody>
+    <tr><td>Can a keyboard-only user complete the primary flow without traps?</td><td>Stop. Focus order, focus visible, ESC to close, no keyboard traps.</td></tr>
+    <tr><td>Does every interactive state have a visible, announced counterpart (loading, error, success, empty)?</td><td>Stop. State visibility matrix incomplete.</td></tr>
+    <tr><td>Is color contrast ≥4.5:1 (AA) for all text in both light and dark modes?</td><td>Stop. Tokens don't meet baseline; fix tokens, not instances.</td></tr>
+    <tr><td>Are destructive actions guarded (confirmation, undo, grace period)?</td><td>Stop. One-click destroy = future support ticket.</td></tr>
+    <tr><td>Does the interface respect <code>prefers-reduced-motion</code> (non-essential animation disabled)?</td><td>Stop. Vestibular triggers ship by default.</td></tr>
+    <tr><td>Are error messages actionable (what happened + what to do), not technical (stack trace, code)?</td><td>Stop. RFC 9457 <code>detail</code> not mapped to human copy.</td></tr>
+    <tr><td>Is the primary flow testable with a screen reader (VoiceOver/NVDA) without sighted assistance?</td><td>Stop. Semantic HTML + ARIA incomplete; test manually.</td></tr>
+    <tr><td>Are design tokens the single source of truth for color, space, type, motion (no magic numbers in CSS)?</td><td>Stop. Drift guaranteed; dark mode breaks; density breaks.</td></tr>
+    <tr><td>Does the empty state explain <em>why</em> it's empty and <em>how</em> to fill it?</td><td>Stop. "No data" = dead end. "No orders yet — start shopping" = path forward.</td></tr>
+  </tbody>
+</table>
+
+<p>Print this. Put it on the design review wall. If the PR can't pass this checklist, it's not ready for humans.</p>
+
+---
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.nngroup.com/articles/ten-usability-heuristics/">Nielsen, J. (1994/2020). <em>10 Usability Heuristics for User Interface Design</em>.</a> ·
+  <a href="https://www.cs.umd.edu/~ben/shneiderman.golden.rules.html">Shneiderman, B. (1992). <em>Designing the User Interface: 8 Golden Rules</em>.</a> ·
+  <a href="https://jnd.org/the-design-of-everyday-things/">Norman, D. (1988/2013). <em>The Design of Everyday Things</em>.</a> ·
+  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAIC (2023). <em>WCAG 2.2 Quick Reference</em>.</a> ·
+  <a href="https://www.iso.org/standard/63500.html">ISO (2018). <em>ISO 9241-11:2018 Ergonomics of human-system interaction — Usability: Definitions and concepts</em>.</a> ·
+  <a href="https://www.frost.io/atomic-design/">Frost, B. (2013). <em>Atomic Design</em>.</a> ·
+  <a href="https://tokens.dtcg.io/">W3C Design Tokens Community Group (2024). <em>Design Tokens Format Module</em>.</a> ·
+  <a href="https://www.rfc-editor.org/rfc/rfc9457">Nottingham, M. & Wilde, E. (2023). RFC 9457 — Problem Details for HTTP APIs.</a> ·
+  <a href="https://www.interaction-design.org/literature/topics/gestalt-principles">Wertheimer, M. (1923). "Laws of Organization in Perceptual Forms" (Gestalt).</a> ·
+  <a href="https://doi.org/10.1037/h0055392">Fitts, P. (1954). "The information capacity of the human motor system in controlling the amplitude of movement."</a> ·
+  <a href="https://doi.org/10.1037/h0054411">Hick, W.E. (1952). "On the rate of gain of information."</a> ·
+  <ahttps://www.krishna.golden.com/no-interface/>Krishna, G. (2013). <em>The Best Interface Is No Interface</em>.</a> ·
+  <a href="https://developer.apple.com/design/human-interface-guidelines/">Apple (2024). <em>Human Interface Guidelines</em> (incl. visionOS).</a> ·
+  <a href="https://m3.material.io/">Google (2024). <em>Material Design 3</em>.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a real feature where the team <em>didn't</em> do the state visibility matrix, and what the production bug was. Show me the support ticket that said 'I don't know if it worked.'"</li>
+    <li>"When you inherit a codebase with magic numbers everywhere (colors, spacing, motion), no dark mode, and focus outlines removed — what's the first token file you write, and what's the first component you migrate?"</li>
+    <li>"How do you teach a team to distinguish <em>motion as meaning</em> from <em>motion as decoration</em>? What's the one question that separates them?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · UI/UX & Web Design — the habitable layer</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

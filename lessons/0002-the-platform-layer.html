@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0002 — The Platform Layer · What the Browser Actually Is</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 2 · The Exploration Journey · Episode 2 of 14</p>
+  <h1>The Platform Layer — What the Browser Actually Is</h1>
+  <p class="meta">The browser doesn't paint a canvas. It builds in-memory trees from your HTML and CSS, merges them, and runs an algorithm — the cascade — to decide which style wins. This is the substrate every framework runs on. Anchored to <a href="../reference/html-and-css.html">HTML &amp; CSS</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0001-the-accidental-lingua-franca.html">Lesson 1</a> showed why JavaScript exists. But JS doesn't paint pixels — it manipulates <em>something</em>. This lesson is that something: the platform layer (HTML &amp; CSS). Together with the language and the concept of state (<a href="./0003-what-is-state.html">Lesson 3</a>), these are the <a href="../MISSION.md">atoms</a> the whole ecosystem is built from. See the <a href="../PLAN.md">plan</a> for the full arc.</p>
+</section>
+
+<h2>1. A page is a tree, not a canvas</h2>
+<p>The browser receives your HTML as <strong>text</strong>. Its first job is to parse that text into the <strong>DOM</strong> — the Document Object Model, a tree of nodes (elements, attributes, text). When you call <code>document.querySelector('article')</code>, you get back a node in that tree. MDN is blunt that the document is a structured text file and the browser's default look comes from stylesheets the browser ships — separate from the HTML itself.</p>
+<p>The reframing that matters: the page is <em>not a flat canvas you draw on</em>. It is a living tree of nodes the browser holds in memory. That tree is the structure JavaScript sees, mutates, and re-reads. Everything else in frontend is built on top of this tree.</p>
+
+<h2>2. The second tree, and the algorithm that resolves it</h2>
+<p>CSS is separate from HTML. The browser parses your CSS rules into a second in-memory tree: the <strong>CSSOM</strong> (CSS Object Model). Now two trees exist — the DOM (structure) and the CSSOM (styles).</p>
+<p>When two CSS rules target the same element, something must pick the winner. That algorithm is the <strong>cascade</strong>. It resolves, in order: <strong>origin</strong> (user-agent / user / author styles), <strong>importance</strong> (<code>!important</code>), <strong>specificity</strong>, <strong>source order</strong>, scope proximity, and cascade layers. It is deterministic and inspectable in DevTools — not a guess and not a mystery. "Cascading" is literally the C in CSS.</p>
+
+<h2>3. The merge: the render tree</h2>
+<p>The browser now merges the DOM and the CSSOM into a third structure: the <strong>render tree</strong>. Each visible node is paired with its computed style and becomes a <strong>box</strong> (content, padding, border, margin). Layout solves the boxes' geometry; paint fills the pixels; composite assembles the layers. The reference doc sums it up: <em>three trees, one source — the HTML you write.</em></p>
+<p>There is also a parallel tree worth knowing: the <strong>accessibility tree</strong>, derived from the DOM and filtered for semantics. A <code>&lt;button&gt;</code> becomes a <code>role="button"</code> node; a <code>&lt;div onclick&gt;</code> becomes a generic node with no role. Screen readers traverse <em>this</em> tree, not the DOM. Semantic HTML isn't a checklist — it's how the page becomes accessible by default.</p>
+
+<h2>4. Why this is the substrate</h2>
+<p>So what does JavaScript actually do? It manipulates the <strong>DOM</strong> and the <strong>CSSOM</strong> — it never paints pixels directly. You change a node or a style; the browser re-cascades, lays out, and paints for you. Every framework you'll meet — React, Angular, Vue, Astro — is a different abstraction over this same substrate. The substrate doesn't change; only the abstraction's leakiness does.</p>
+<p>This is why a layout shift, a specificity war, or a dark-mode breakage is a <em>platform</em> problem, not a framework problem. You skipped the layer. Knowing the trees and the cascade is what lets you read any frontend, in any camp, without panic.</p>
+
+
+<h2>5. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="dom" data-explain="The DOM (Document Object Model) is the tree of nodes the browser builds by parsing your HTML text. It is the structure JavaScript sees and mutates. The CSSOM is CSS; the render tree is the merge of the two.">
+  <summary>The browser parses your HTML into an in-memory tree of nodes. What is that tree called?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="dom"> The DOM, the parsed structure</label>
+      <label><input type="radio" name="q1" value="cssom"> The CSSOM, the parsed styles</label>
+      <label><input type="radio" name="q1" value="render"> The render tree, the boxes</label>
+      <label><input type="radio" name="q1" value="aom"> The AOM, the semantic tree</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="cascade" data-explain="The cascade resolves competing declarations by origin, importance, specificity, source order, scope, and layers — in that order. It is deterministic and inspectable. 'Cascading' is the C in CSS.">
+  <summary>When two CSS rules target the same element, what decides the winner?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="cascade"> The cascade: origin and specificity</label>
+      <label><input type="radio" name="q2" value="order"> Source order: whichever loads last</label>
+      <label><input type="radio" name="q2" value="inheritance"> Inheritance: parent values flow down</label>
+      <label><input type="radio" name="q2" value="important"> Importance: the !important flag only</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="domcssom" data-explain="JS manipulates the in-memory trees — the DOM (structure) and the CSSOM (styles). The browser then re-cascades, lays out, and paints. JS never paints pixels directly; it mutates trees and lets the platform render.">
+  <summary>JavaScript does not paint pixels directly. What does it actually manipulate?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="domcssom"> The DOM and the CSSOM</label>
+      <label><input type="radio" name="q3" value="canvas"> The canvas pixel buffer only</label>
+      <label><input type="radio" name="q3" value="css"> The raw CSS text files</label>
+      <label><input type="radio" name="q3" value="html"> The raw HTML text files</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the platform model: HTML parses to the <strong>DOM</strong>, CSS to the <strong>CSSOM</strong>, they merge into the <strong>render tree</strong> of boxes, and the <strong>cascade</strong> is the deterministic algorithm that picks the winning style. A parallel <strong>accessibility tree</strong> is what screen readers actually read. JavaScript manipulates the trees; the platform does the rendering. Every framework abstracts this exact substrate — so when a layout breaks, you now know which layer to blame.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/html-and-css.html">HTML &amp; CSS</a> — the box model, formatting contexts, the cascade in full, and the history from tables to Flexbox to Grid to cascade layers.</li>
+    <li><strong>Next lesson:</strong> <a href="./0003-what-is-state.html">Lesson 3 — What Is "State"?</a> — the one concept that ties the language and the platform together, and makes the rest of frontend click.</li>
+    <li><strong>Reinforce later:</strong> re-answer these three questions tomorrow, from memory, without the options.</li>
+  </ul>
+  <p class="cite"><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/First_steps/How_CSS_works">MDN — How CSS works</a> (the canonical walk through the DOM, the CSSOM, the render tree, and the cascade).</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"What's specificity, exactly — how do I compute it?"</li>
+    <li>"If there's an accessibility tree, why do we still write aria-* attributes?"</li>
+    <li>"Where do React components fit — do they replace the DOM or sit on top of it?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 2 · <a href="../reference/html-and-css.html">Reference: HTML &amp; CSS</a></span>
+  <span>Next → <a href="./0003-what-is-state.html">Lesson 3 · What Is "State"?</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

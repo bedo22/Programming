@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0013 — Problem-Solving: Computational Thinking + Heuristics · The Lens and the Moves</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 2 · The Exploration Journey · Bridge (2/4)</p>
+  <h1>Problem-Solving — Computational Thinking + Heuristics</h1>
+  <p class="meta">Pólya's four phases tell you <em>when</em> to think (Understand → Plan → Execute → Look back). This lesson gives you <em>what</em> to do within those phases: the four pillars of computational thinking (the lens), Pólya's seven heuristics (the moves), and Schoenfeld's missing fifth element (metacognition). Anchored to <a href="../reference/problem-solving.html">Problem-Solving</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0012-problem-solving-polyas-four-phases.html">Lesson 12</a> gave you Pólya's four phases — the universal meta-rhythm. But Pólya tells you <em>when</em> to understand, plan, execute, and review. He doesn't tell you <em>how</em> to understand or <em>how</em> to devise a plan when you're stuck. This lesson fills that gap: the lens (computational thinking), the moves (heuristics), and the monitor (metacognition).</p>
+</section>
+
+<blockquote class="callout">
+  <p><strong>The relationship in one sentence:</strong> Pólya gives you the <em>when</em> (the four-phase rhythm); computational thinking gives you the <em>what</em> (the four moves you make within those phases); heuristics give you the <em>how</em> (the specific strategies to try); metacognition gives you the <em>monitor</em> (checking if it's working). Together they form a complete problem-solving method.</p>
+</blockquote>
+
+<h2>1. The lens — computational thinking's four pillars</h2>
+<p>If Pólya's four phases are the <em>rhythm</em>, computational thinking is the <em>lens</em> — the way you see and structure the problem <em>during</em> Phases 1 and 2. The term was coined by Seymour Papert in 1980 (the creator of Logo) and brought to prominence by <strong>Jeannette Wing's 2006 essay</strong> in <em>Communications of the ACM</em>, which argued that "thinking computationally is a fundamental skill for everyone, not just computer scientists."</p>
+<p>Wing defined computational thinking as "the thought processes involved in formulating problems so their solutions can be represented as computational steps and algorithms." It has four pillars — the moves you make while understanding and planning:</p>
+<ul>
+  <li><strong>Decomposition</strong> — break the problem into smaller, manageable parts. ("Count word frequencies" → (a) split text, (b) normalize each word, (c) count in a map.)</li>
+  <li><strong>Pattern recognition</strong> — identify patterns in the problem or similarities to problems you've solved before. ("I need to count things → a hash map is the right structure.")</li>
+  <li><strong>Abstraction</strong> — focus on essential features, ignore irrelevant detail. ("A word is a lowercased, punctuation-stripped token split by whitespace.")</li>
+  <li><strong>Algorithm design</strong> — develop the step-by-step solution. (The numbered steps you write before coding.)</li>
+</ul>
+<p><strong>Your HackerRank comment used all four.</strong> You decomposed (split, normalize, count), recognized the pattern (hash map for counting), abstracted ("word" = lowercased + stripped token), and designed the algorithm (the numbered steps). You were doing computational thinking without knowing its name.</p>
+
+<h2>2. The moves — Pólya's heuristic dictionary</h2>
+<p>Heuristics are <strong>rules of thumb that usually help but don't guarantee</strong> a solution. An algorithm <em>guarantees</em> a result; a heuristic <em>usually</em> finds one faster. Pólya's book contains a "short dictionary of heuristics" — the strategies you try during Phase 2 (Devise a plan) when you're stuck. Here are the seven most useful for programmers:</p>
+<table>
+  <thead><tr><th>Heuristic</th><th>The question it answers</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Analogy</strong></td><td>"Have I seen a similar problem? Can I use its method?"</td></tr>
+    <tr><td><strong>Specialization</strong></td><td>"Can I solve a specific case first, then generalize?"</td></tr>
+    <tr><td><strong>Working backwards</strong></td><td>"What would the answer look like? What produces that?"</td></tr>
+    <tr><td><strong>Decomposition</strong></td><td>"Can I break it into parts, solve each, then combine?"</td></tr>
+    <tr><td><strong>Variation</strong></td><td>"Can I restate the problem to make it easier?"</td></tr>
+    <tr><td><strong>Auxiliary elements</strong></td><td>"Can I introduce something extra that helps?"</td></tr>
+    <tr><td><strong>Generalization</strong></td><td>"Can I solve a more general problem that includes this one?"</td></tr>
+  </tbody>
+</table>
+<p><strong>The meta-heuristic:</strong> when stuck, cycle through these. Try analogy first (is this like something I know?). Then specialization (let me try a concrete example). Then working backwards (what does the answer look like?). Then decomposition (can I break it apart?). Most problems yield to one of these within a few minutes of cycling.</p>
+
+<h2>3. The monitor — Schoenfeld's missing fifth element</h2>
+<p>In the 1980s, <strong>Alan Schoenfeld</strong> (UC Berkeley) did something important: he <em>tested</em> Pólya's strategies empirically. His finding, published in <em>Mathematical Problem Solving</em> (1985), was a landmark:</p>
+<blockquote class="callout">
+  <p><strong>Schoenfeld's finding:</strong> Pólya's heuristics <em>alone are weak</em>. Students who learned the strategies still failed on non-routine problems. The strategies need two things Pólya didn't emphasize enough: <strong>domain-specific tactics</strong> (you need to know the techniques, not just the meta-strategy) and <strong>metacognition</strong> — the act of monitoring your own thinking and adjusting as you work.</p>
+</blockquote>
+<p>Metacognition is <strong>thinking about your own thinking while you're thinking</strong>. In practice, it means asking yourself every few minutes:</p>
+<ul>
+  <li><strong>"Am I making progress, or am I spinning?"</strong> — If you've been stuck for 10 minutes on the same approach, stop. Try a different heuristic. Or re-read the problem.</li>
+  <li><strong>"Is this approach worth continuing?"</strong> — Sunk cost is a trap. If brute force works but is too slow, don't keep optimizing it — step back and consider a different paradigm.</li>
+  <li><strong>"Should I go back to Phase 1?"</strong> — Sometimes your plan fails because your understanding was wrong.</li>
+  <li><strong>"What am I actually trying to do right now?"</strong> — It's easy to drift into solving a different problem than the one asked.</li>
+</ul>
+<p><strong>The practical takeaway:</strong> Pólya's four phases + computational thinking's four pillars + the seven heuristics are the <em>method</em>. Metacognition is the <em>monitor on top of the method</em> — the loop that checks if the method is working. Without it, you can cycle through phases and heuristics mechanically and still fail, because you never stopped to notice you were on the wrong track.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="pattern-recognition" data-explain="Pattern recognition — identifying similarities to problems you've solved before — is the bridge between understanding and planning. It tells you which decomposition and which abstraction to use. When you recognize 'count occurrences → hash map,' you're using pattern recognition to choose the structure.">
+  <summary>Which computational thinking pillar tells you WHICH decomposition and abstraction to use?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="decomposition"> Decomposition</label>
+      <label><input type="radio" name="q1" value="abstraction"> Abstraction</label>
+      <label><input type="radio" name="q1" value="pattern-recognition"> Pattern recognition</label>
+      <label><input type="radio" name="q1" value="algorithm-design"> Algorithm design</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="does-not-guarantee" data-explain="A heuristic is a rule of thumb that usually helps but doesn't guarantee a solution. An algorithm guarantees a result. Pólya's strategies (analogy, specialization, working backwards) are heuristics — they guide your search, they don't ensure success.">
+  <summary>What is the key difference between a heuristic and an algorithm?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="does-not-guarantee"> A heuristic helps but does not guarantee</label>
+      <label><input type="radio" name="q2" value="heuristic-is-faster"> A heuristic is always faster than an algorithm</label>
+      <label><input type="radio" name="q2" value="heuristic-is-newer"> A heuristic is a more modern technique</label>
+      <label><input type="radio" name="q2" value="no-difference"> There is no real difference between them</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="monitor-the-method" data-explain="Metacognition is the monitor on top of the method — checking whether your approach is working, whether you should abandon it, whether you need to go back to understanding. Without it, you can cycle through phases and heuristics mechanically and still fail, because you never noticed you were on the wrong track.">
+  <summary>What does Schoenfeld's metacognition add on top of Pólya's phases and heuristics?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="new-heuristics"> It adds new heuristics to Pólya's list</label>
+      <label><input type="radio" name="q3" value="monitor-the-method"> It monitors whether the method is working</label>
+      <label><input type="radio" name="q3" value="replaces-polya"> It replaces Pólya's framework entirely</label>
+      <label><input type="radio" name="q3" value="faster-coding"> It makes you code faster than before</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the complete problem-solving method: <strong>Pólya's four phases</strong> (the when), <strong>computational thinking's four pillars</strong> (the what), <strong>seven heuristics</strong> (the how), and <strong>metacognition</strong> (the monitor). They nest: Pólya gives the rhythm; CT gives the moves within the rhythm; heuristics give the strategies within the moves; metacognition monitors the whole thing. Your HackerRank comment was already doing the first three. The monitor is what you add next.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/problem-solving.html">Problem-Solving</a> — the full heuristic dictionary with programming examples (§4), Schoenfeld's five-resource model (§5), and stepwise refinement (§6).</li>
+    <li><strong>Next lesson:</strong> <a href="./0014-problem-solving-paradigms-and-debugging.html">Lesson 14 — Paradigms + Debugging</a> — the six algorithm paradigms + hypothesis-driven debugging + the "Look back" phase in depth.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory. Then, on your next challenge, consciously name which pillar and which heuristic you're using.</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/Computational_thinking">Wing, J. (2006). "Computational Thinking."</a> — the essay that popularized the four pillars. And <a href="https://en.wikipedia.org/wiki/Alan_Schoenfeld">Schoenfeld, A. (1985). Mathematical Problem Solving.</a> — the empirical test that found heuristics alone are weak without metacognition.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I build pattern recognition — do I just solve enough problems?"</li>
+    <li>"What's an example of working backwards on a real problem?"</li>
+    <li>"How often should I check in with metacognition — every minute? Every five?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 2 · <a href="../reference/problem-solving.html">Reference: Problem-Solving</a></span>
+  <span>Next → <a href="./0014-problem-solving-paradigms-and-debugging.html">Lesson 14 · Paradigms + Debugging</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

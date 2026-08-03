@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0003 — What Is "State"? · The Concept That Makes Frontend Click</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 3 · The Exploration Journey · Episode 3 of 14 · Atoms (finale)</p>
+  <h1>What Is "State"? — The Concept That Makes the Rest of Frontend Click</h1>
+  <p class="meta">State is not a special kind of memory — it's a role an ordinary variable plays. Grasp that one distinction, and the chain data → value → variable → state, and every framework conversation afterwards makes sense. Anchored to <a href="../reference/what-is-state-prequel.html">What Is "State"?</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0001-the-accidental-lingua-franca.html">Lesson 1</a> gave you the language; <a href="./0002-the-platform-layer.html">Lesson 2</a> the platform. Now the one concept that ties them together: <em>state</em>. This completes the <a href="../MISSION.md">Atoms</a> movement — the irreducible concepts the whole ecosystem is built from. Next, the journey enters the <a href="../PLAN.md">Ecosystem</a>. Anchored to <a href="../reference/what-is-state-prequel.html">What Is "State"?</a>.</p>
+</section>
+
+<h2>1. The problem frontend actually solves</h2>
+<p>A static page is easy: the server sends HTML, the browser renders it, done. But a real interface must reflect data that <strong>changes over time</strong> — a typed input, a selected image, a shopping cart that grows. The page cannot be static; it must re-render as the data does. The central problem of frontend is <em>managing that change</em>.</p>
+<p>The official React docs put the need plainly: a component has to "remember" things between interactions — and that component-specific memory is what they call <strong>state</strong>. Before we touch any framework, we need the concept underneath.</p>
+
+<h2>2. State is a role, not a cell</h2>
+<p>People say "state is data in memory." True — but it's not the part that matters. <strong>State is a role an ordinary variable plays.</strong> There is no special "state" cell type in memory. The real distinction is three properties any variable has:</p>
+<ul>
+  <li><strong>Lifetime</strong> — how long the value has to live.</li>
+  <li><strong>Scope</strong> — who can <em>see</em> the variable by name.</li>
+  <li><strong>Reachability</strong> — who can <em>modify</em> it.</li>
+</ul>
+<p>A variable becomes "state" when its <strong>lifetime</strong> is long enough that later events depend on the values earlier events wrote, <em>and</em> its <strong>reachability</strong> is wide enough that more than one code path can modify it. That's it. A closure counter is state but not global. A global <code>const PI</code> is global but not state — it never changes, so calling it state adds nothing. "State" and "global" are two different axes, not competing categories.</p>
+
+<h2>3. The chain: data → value → variable → state</h2>
+<p>The concept builds in a chain: <strong>data</strong> (raw) → <strong>value</strong> (a typed piece of data) → <strong>variable</strong> (a named binding to a value) → <strong>state</strong> (a variable that persists and matters across events). Everything else — types, classes, modules, hooks, components — is just a way of <em>organizing</em> variables and functions. The two atoms, data via variables and operations via functions, never go away.</p>
+
+<h2>4. Why a plain variable isn't enough — and what frameworks add</h2>
+<p>So if state is just a variable, why is it so famously hard? Because for a UI, a plain <em>local</em> variable fails twice: (1) it doesn't <strong>persist</strong> between renders, and (2) mutating it doesn't <strong>trigger</strong> a re-render. State fixes both — it survives across renders, and its setter tells the framework to re-render. And unlike <strong>props</strong> (data passed <em>in</em> from a parent), state is <em>private</em> to the component that owns it.</p>
+<blockquote class="callout">
+  <p><strong>The bigger story this unlocks.</strong> The whole history of UI programming is the history of <em>where state lives</em>: in a global, in a closure, in a class instance field, in a framework store, in a hook slot, on the server. Each migration answered one question: <em>where does the state live, and who keeps it alive across events?</em> React itself moved it every few years — and that's exactly the story of <a href="../reference/class-to-hooks-paradigm-shift.html">Episode 6</a>.</p>
+</blockquote>
+
+
+<h2>5. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="role" data-explain="State is not a special cell type — it's an ordinary variable that happens to matter across events (long lifetime + wide reachability). Seeing state as a *role* is what makes the rest of frontend make sense.">
+  <summary>In the conceptual sense, what is "state"?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="role"> A role a normal variable plays</label>
+      <label><input type="radio" name="q1" value="cell"> A special kind of memory cell</label>
+      <label><input type="radio" name="q1" value="global"> A variable at the global scope</label>
+      <label><input type="radio" name="q1" value="constant"> A constant value that never changes</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="private" data-explain="Props flow down from the parent and are read-only; state is the component's own private memory it can change. React docs: 'state is fully private to the component declaring it. Unlike props...'">
+  <summary>What distinguishes a component's state from its props?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="private"> State is private; props pass in</label>
+      <label><input type="radio" name="q2" value="global"> State is global; props are local</label>
+      <label><input type="radio" name="q2" value="static"> State is static; props change often</label>
+      <label><input type="radio" name="q2" value="typed"> State is typed; props are untyped</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="persist" data-explain="Two failures: a local variable doesn't persist between renders, and mutating it doesn't tell the framework to re-render. State survives across renders and its setter triggers a re-render. (React docs)">
+  <summary>Why isn't a plain local variable enough to hold UI data across an interaction?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="persist"> It won't persist, nor trigger renders</label>
+      <label><input type="radio" name="q3" value="slow"> It is far too slow to read</label>
+      <label><input type="radio" name="q3" value="typed"> It lacks a static type check</label>
+      <label><input type="radio" name="q3" value="scoped"> It is scoped to the module</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the one concept: <strong>state is an ordinary variable that persists and matters across events</strong> — not a special cell. The chain is data → value → variable → state. Plain variables fail for UI because they don't persist and don't trigger renders; state (private to the component, unlike props) fixes both. With Lessons 1–3 you now have the <strong>atoms</strong> — the language, the platform, and the concept of state — that everything else in the ecosystem is built from.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/what-is-state-prequel.html">What Is "State"?</a> — the four theories of computation, lifetime/scope/reachability in full, and where state lives across paradigms (imperative, OO, functional, reactive).</li>
+    <li><strong>Next lesson:</strong> <a href="./0004-js-across-stacks.html">Lesson 4 — JS Across Stacks</a> — the Ecosystem begins: where JavaScript runs now, and who fights it.</li>
+    <li><strong>Reinforce later:</strong> re-answer these three questions tomorrow, from memory, without the options.</li>
+  </ul>
+  <p class="cite"><a href="https://react.dev/learn/state-a-components-memory">React docs — State: A Component's Memory</a> (the canonical, official explanation of what state is and how it differs from props).</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"So is a CSS custom property state?"</li>
+    <li>"If state is just a variable, why is it so famously buggy in React?"</li>
+    <li>"Where does state live when it's on the server?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 3 · <a href="../reference/what-is-state-prequel.html">Reference: What Is "State"?</a></span>
+  <span>Next → <a href="./0004-js-across-stacks.html">Lesson 4 · JS Across Stacks</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

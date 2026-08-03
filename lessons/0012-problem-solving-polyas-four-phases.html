@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0012 — Problem-Solving: Pólya's Four Phases · The Universal Meta-Rhythm</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 1 · The Exploration Journey · Bridge (1/4)</p>
+  <h1>Problem-Solving — Pólya's Four Phases</h1>
+  <p class="meta">You know the atoms, the ecosystem, the practice, and the system. But there's a layer you've been using without knowing its name — the thinking skill that sits between <em>finding the problem</em> (Design Thinking) and <em>building the feature</em> (The Rhythm). Here it is: a four-phase rhythm from 1945 that you already intuited in your HackerRank comments. Anchored to <a href="../reference/problem-solving.html">Problem-Solving</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>The <a href="../PLAN.md">technical spine</a> is complete — atoms (L1–3), ecosystem (L4–6), practice (L7–9), system (L10–11). Before going upstream to the human layer (L16–17), we pause to name the connective tissue: the thinking skill you use to solve <em>any</em> problem, whether it's a HackerRank challenge or a React feature. This is the <strong>Bridge</strong> movement — 4 lessons that deepen your thinking before you go upstream.</p>
+</section>
+
+<blockquote class="callout">
+  <p><strong>The three layers of thinking.</strong> This is the reframe that makes everything click:</p>
+  <ul>
+    <li><strong>Layer 1 — Design Thinking</strong> (<a href="../reference/design-thinking.html">reference</a>): "What problem should I solve?" — desirability, feasibility, viability. <em>Upstream of code.</em></li>
+    <li><strong>Layer 2 — Problem-Solving</strong> (this lesson): "How do I solve this problem?" — understand, plan, execute, review. <em>The missing middle.</em></li>
+    <li><strong>Layer 3 — The Rhythm</strong> (<a href="../reference/how-developers-think-frontend.html">reference</a>, <a href="./0007-the-rhythm.html">L7</a>): "How do I build this feature?" — Model → View → Flow. <em>The implementation loop.</em></li>
+  </ul>
+  <p>You've had Layer 1 (coming in L17) and Layer 3 (L7). Layer 2 was never named — you intuited it, but didn't have the vocabulary. This lesson names it.</p>
+</blockquote>
+
+<h2>1. The mathematician who mapped thinking (1945)</h2>
+<p>In 1945, a Hungarian mathematician named <strong>George Pólya</strong> published <em>How to Solve It</em> — a book that has sold over a million copies, been translated into 15+ languages, and is still in print 80 years later. Pólya didn't invent problem-solving; he <em>named</em> what good problem-solvers already did. His contribution was a four-phase checklist — a <strong>rhythm</strong> you cycle through for every problem, from a homework exercise to a competitive programming challenge.</p>
+<p>The four phases are deceptively simple:</p>
+<ul>
+  <li><strong>Phase 1 — Understand the problem.</strong> What is the unknown? What are the data? What is the condition? Can you restate it in your own words?</li>
+  <li><strong>Phase 2 — Devise a plan.</strong> Have you seen this before? Can you solve a part? Can you work backwards? Can you use a concrete example?</li>
+  <li><strong>Phase 3 — Carry out the plan.</strong> Execute each step, <em>checking each step as you go</em>.</li>
+  <li><strong>Phase 4 — Look back.</strong> Can you check the result? Can you derive it differently? Can you use the method elsewhere? What did you learn?</li>
+</ul>
+<p>That's it. Four phases. No magic. The power is in the discipline of actually doing all four — especially the last one, which everyone skips.</p>
+
+<h2>2. You already use this — your HackerRank comment proves it</h2>
+<p>Remember this comment you wrote for a word-frequency counter challenge?</p>
+<blockquote class="callout">
+  <pre style="margin:0; font-size:.85rem; line-height:1.5; overflow-x:auto;">
+Input: a string of text to analyze
+Operation: count the number of times each word appears
+Output: an object with each word (lowercased) as a key
+Algorithm:
+  1- create an empty object to hold the word frequencies
+  2- split the input string into an array of words
+  3- iterate through the array of words
+    a- for each word, convert to lowercase and remove punctuation
+    b- if the word is not already a key, add it with a value of 1
+    c- if the word is already a key, increment its value by 1
+  4- return the object containing the word frequencies
+  </pre>
+</blockquote>
+<p>You did <strong>Phase 1</strong> (Input / Operation / Output — that's restating the problem in your own words) and <strong>Phase 2</strong> (the numbered algorithm — that's the plan). You'd do <strong>Phase 3</strong> when you wrote the JavaScript. What you skipped was <strong>Phase 4</strong> — the look-back: what if the string is empty? What about numbers? What about contractions like "don't"? What pattern does this teach you? (Answer: "count occurrences → hash map" — a pattern you'll see again and again.)</p>
+<p><strong>You were two-thirds of Pólya without knowing his name.</strong> That's the value of learning the framework: it names what you already do, and it shows you what you're missing.</p>
+
+<h2>3. A rhythm, not an algorithm — and why that matters</h2>
+<p>Here's the key insight that resolves your original question ("is it a rhythm or an algorithm?"): <strong>it's both, at different levels.</strong></p>
+<ul>
+  <li>At the <strong>meta-level</strong>, Pólya's four phases are a <strong>rhythm</strong> — a repeatable cycle you go through for every problem. You cycle through them, you go back to "understand" when your plan reveals a gap, you revise your plan when execution fails. It's iterative, like The Rhythm (L7).</li>
+  <li>At the <strong>object-level</strong>, each individual problem's solution (your numbered steps for word counting) is an <strong>algorithm</strong> — a specific, finite sequence of steps that solves that problem.</li>
+</ul>
+<p>So: <strong>problem-solving is a rhythm (Pólya's phases) that produces an algorithm (the specific solution).</strong> The rhythm is the process; the algorithm is the product.</p>
+<p>This also explains why the frontend loop (L7) is called "Rhythm, Not Algorithm" — you can't write down a fixed sequence of steps for "build a feature." But for a HackerRank challenge, you <em>can</em> write down a fixed sequence. The difference is the <em>problem type</em>, not the thinker.</p>
+
+<h2>4. Well-defined vs wicked — why HackerRank gets an algorithm but features get a rhythm</h2>
+<table>
+  <thead><tr><th>Property</th><th>Well-defined problem</th><th>Wicked problem</th></tr></thead>
+  <tbody>
+    <tr><td>Examples</td><td>HackerRank, LeetCode, math proofs</td><td>UI features, product decisions, architecture</td></tr>
+    <tr><td>Input</td><td>Clearly specified</td><td>Evolving, ambiguous</td></tr>
+    <tr><td>Output</td><td>Clearly specified</td><td>Subjective, contested</td></tr>
+    <tr><td>Success</td><td>Objective (tests pass)</td><td>Subjective (users like it?)</td></tr>
+    <tr><td>Stopping</td><td>Clear (all tests pass)</td><td>No true stop — only better or worse</td></tr>
+    <tr><td>Output type</td><td>An <strong>algorithm</strong></td><td>A <strong>rhythm</strong></td></tr>
+  </tbody>
+</table>
+<p><strong>Both use Pólya's four phases</strong> at the meta-level. But well-defined problems converge to a fixed algorithm (you can write down the exact steps), while wicked problems require a rhythm (the steps change as you learn). Your HackerRank challenge is well-defined — it gets an algorithm. Your React feature is wicked — it gets the Model→View→Flow rhythm (L7). Same thinker, same four phases, different output type.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="look-back" data-explain="Phase 4 (Look back) is the one everyone skips — checking edge cases, asking if there's a simpler approach, and filing the pattern for next time. It's where you convert a one-off solution into reusable knowledge.">
+  <summary>Which Pólya phase builds the most long-term skill — and is the one everyone skips?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="understand"> Phase 1 — Understand the problem</label>
+      <label><input type="radio" name="q1" value="plan"> Phase 2 — Devise a plan</label>
+      <label><input type="radio" name="q1" value="execute"> Phase 3 — Carry out the plan</label>
+      <label><input type="radio" name="q1" value="look-back"> Phase 4 — Look back</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="rhythm-produces-algorithm" data-explain="Pólya's four phases are a rhythm (a repeatable cycle you go through for every problem); the specific solution you produce (like your numbered word-frequency steps) is an algorithm. The rhythm is the process; the algorithm is the product.">
+  <summary>Is problem-solving a rhythm or an algorithm?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="rhythm-only"> A rhythm — never an algorithm</label>
+      <label><input type="radio" name="q2" value="algorithm-only"> An algorithm — never a rhythm</label>
+      <label><input type="radio" name="q2" value="rhythm-produces-algorithm"> A rhythm that produces an algorithm</label>
+      <label><input type="radio" name="q2" value="neither"> Neither — it is pure intuition</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="well-defined" data-explain="HackerRank challenges are well-defined: clear input, clear output, objective success (tests pass), clear stopping rule. That's why they converge to an algorithm. A React feature is wicked — evolving requirements, subjective success — which is why it gets the Model→View→Flow rhythm instead.">
+  <summary>Why does a HackerRank challenge get an algorithm, but a React feature gets a rhythm?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="well-defined"> The HackerRank problem is well-defined</label>
+      <label><input type="radio" name="q3" value="different-thinker"> The thinker is different in each case</label>
+      <label><input type="radio" name="q3" value="react-is-harder"> React is simply harder than HackerRank</label>
+      <label><input type="radio" name="q3" value="algorithms-rare"> Algorithms only work in math contexts</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>missing middle layer</strong> — the thinking skill that sits between finding the problem (Design Thinking) and building the feature (The Rhythm). It's <strong>Pólya's four phases</strong> (Understand → Plan → Execute → Look back), an 80-year-old rhythm you were already two-thirds of. The key insight: <strong>problem-solving is a rhythm that produces an algorithm</strong> — the rhythm is the process, the algorithm is the product. And the difference between a HackerRank challenge (well-defined → algorithm) and a React feature (wicked → rhythm) is the problem type, not the thinker. Both use the same four phases.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/problem-solving.html">Problem-Solving</a> — the full 80-year history (§1b), the cognitive science behind why it works (§1e), the heuristic dictionary (§4), and the worked example tracing your HackerRank comment through all four phases (§13).</li>
+    <li><strong>Next lesson:</strong> <a href="./0013-problem-solving-computational-thinking.html">Lesson 13 — Computational Thinking + Heuristics</a> — the lens (decomposition, pattern recognition, abstraction) and the moves (analogy, specialization, working backwards) you use during Phase 2.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory — then take your next HackerRank challenge and write Input/Operation/Output + numbered algorithm before coding. Notice which phase you skip.</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/How_to_Solve_It">Pólya, G. (1945). How to Solve It.</a> — the foundational text, still in print 80 years later. Wikipedia summary linked; the book itself is the primary read.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I know when I've understood a problem well enough to start coding?"</li>
+    <li>"What's the difference between a heuristic and an algorithm — and when do I use which?"</li>
+    <li>"Can you trace Pólya's four phases through a real problem I'm working on?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 1 · <a href="../reference/problem-solving.html">Reference: Problem-Solving</a> · <a href="../reference/how-developers-think-frontend.html">Reference: How Developers Think</a></span>
+  <span>Next → <a href="./0013-problem-solving-computational-thinking.html">Lesson 13 · CT + Heuristics</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

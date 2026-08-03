@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML & CSS — The Platform Layer Between the Browser and the Component</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Platform engineering — the layer between the browser and the component</p>
+  <h1>HTML & CSS — The Platform Layer Between the Browser and the Component</h1>
+  <p class="meta">The contract the browser implements: document structure, cascade, layout, theming, and the accessibility tree. Sibling docs: <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering discipline that lives inside this substrate), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop that consumes these primitives), <a href="./javascript-the-language.html">JavaScript: The Language</a> (the language that manipulates this substrate), <a href="./system-design.html">System Design</a> (the architectural layer whose rendering strategy runs on this platform), <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (framework choices abstract this layer differently).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>Most tutorials teach "the flexbox shortcut" or "CSS Grid in 15 minutes." HTML & CSS starts at <em>what is the platform contract that every CSS rule manipulates?</em> It is a distinct discipline with its own history, algorithms, and failure modes — not "styling" as decoration, not "Tailwind vs CSS-in-JS" as a religion, not "semantic HTML" as a checklist. This doc captures it as a first-class engineering concern: the declarative, cascading, accessible-by-default rendering substrate that UI/UX decisions materialize on, the Developer Loop executes against, and JavaScript manipulates. If you've ever debugged a layout shift, a specificity war, a dark-mode breakage, or a screen reader that reads "button" on a <code><div></code> — this is the layer you missed.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — UI/UX decides what the rendered thing <em>should be</em>; HTML & CSS is the substrate it renders <em>on</em>. The state visibility matrix (§9 in UI/UX) maps directly to HTML states (<code>aria-busy</code>, <code>aria-invalid</code>) and CSS states (<code>:hover</code>, <code>:focus-visible</code>, <code>[data-loading]</code>).</li>
+  <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — the developer loop builds components using HTML elements and CSS rules as primitives. The loop's "shape" decisions (component API, state shape) are constrained by what the platform makes expressible.</li>
+  <li>Cross-cutting to <a href="./javascript-the-language.html">JavaScript: The Language</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them.</li>
+  <li>Cross-cutting to <a href="./system-design.html">System Design</a> — rendering strategy (SSR, RSC, Islands, SPA) is a decision about <em>who emits the initial HTML and when CSS arrives</em>. The platform contract (HTML parsing, CSS blocking, font loading) is the ground truth every strategy negotiates with.</li>
+  <li>Context from <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — each camp (React, Vue, Svelte, Solid, Qwik, Astro) is a different abstraction over the same substrate. The substrate doesn't change; the abstraction's leakiness does.</</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>The two-tree answer to "what is the web platform?"</strong></p>
+  <ul>
+    <li><strong>The DOM (Document Object Model)</strong> — the parsed HTML tree. Elements, attributes, text nodes. The structure the browser exposes to JavaScript. <code>document.querySelector('article')</code> returns a DOM node.</li>
+    <li><strong>The AOM (Accessibility Object Model) / Accessibility Tree</strong> — a parallel tree derived from the DOM, filtered for semantics. <code><button></code> becomes a <code>role="button"</code> node; <code><div onclick></code> becomes a generic node with no role. Screen readers traverse <em>this</em> tree, not the DOM.</</li>
+  </ul>
+  <p>CSS operates on a third structure: the <strong>Render Tree</strong> (DOM + computed styles → boxes). The cascade, layout, paint, and composite all happen here. Three trees, one source: the HTML you write.</p>
+</blockquote>
+
+---
+<h2>1. Definition — what HTML & CSS <em>is</em> and what it is <em>not</em></h2>
+
+<h3>What it is</h3>
+
+<p>HTML & CSS is the <strong>declarative, cascading, accessible-by-default rendering contract of the web platform</strong>. It produces decisions — not imperative instructions — that determine:</p>
+
+<ul>
+  <li><strong>Document structure & semantics</strong> — what elements exist, how they nest, what they mean (<code><article></code> vs <code><section></code> vs <code><div></code>). The DOM is the parse result; the AOM is the semantic projection.</li>
+  <li><strong>The cascade algorithm</strong> — how competing declarations resolve: origin (user agent / user / author), importance (<code>!important</code>), specificity, source order, scope proximity, cascade layers. Deterministic, inspectable, non-imperative.</li>
+  <li><strong>Box model & formatting contexts</strong> — every element generates boxes (content, padding, border, margin). Boxes participate in formatting contexts (normal flow, flex, grid, table, ruby). Layout is constraint-solving on boxes.</li>
+  <li><strong>Visual formatting & theming</strong> — color, typography, spacing, motion, shadows, borders, filters, blend modes. Expressed as computed values on boxes.</li>
+  <li><strong>State exposure</strong> — pseudo-classes (<code>:hover</code>, <code>:focus-visible</code>, <code>:disabled</code>, <code>:valid</code>, <code>:placeholder-shown</code>), attribute selectors (<code>[aria-busy="true"]</code>, <code>[data-state="loading"]</code>), container queries (<code>@container</code>). The platform exposes state; CSS selects it.</li>
+  <li><strong>Responsive & intrinsic sizing</strong> — media queries (<code>@media</code>), container queries (<code>@container</code>), <code>min()</code>/<code>max()</code>/<code>clamp()</code>, <code>fit-content</code>, <code>min-content</code>, <code>max-content</code>. Layout adapts to constraints without JS.</li>
+  <li><strong>Accessibility as default</strong> — semantic HTML <em>is</em> the accessibility API. <code><label for></code>, <code><fieldset></code>/<code><legend></code>, <code>aria-*</code> only when semantics gap exists. WCAG 2.2 AA baseline.</li>
+</ul>
+
+<p>These decisions are <strong>expensive to change later</strong>. A CSS refactor touches every component. An HTML semantics audit touches every template. The earlier platform decisions enter, the cheaper the system.</p>
+
+<h3>What it is not</h3>
+
+<table>
+  <thead><tr><th>Confused with</th><th>What that is</th><th>Difference</th></tr></thead>
+  <tbody>
+    <tr><td>CSS as "styling language"</td><td>Colors, fonts, spacing, "making it look good"</td><td>CSS is a <em>constraint-solving language for box layout</em>. Styling is one output; layout, theming, state exposure, and a11y tree integration are others.</td></tr>
+    <tr><td>Tailwind / Bootstrap / CSS-in-JS</td><td>Utility classes, component frameworks, runtime style injection, zero-runtime extraction</td><td>Tools are <em>authoring abstractions</em>; the platform contract (cascade, specificity, inheritance, computed values) is what they all compile <em>to</em>. The contract doesn't change when the tool does.</td></tr>
+    <tr><td>Semantic HTML as "SEO checklist"</td><td><code><h1></code> for ranking, <code><article></code> for crawlers</td><td>Semantic HTML <em>is the accessibility tree</em>. Screen readers, reader modes, RSS, Safari Reader, Windows High Contrast — all consume the AOM. SEO is a side effect.</td></tr>
+    <tr><td>HTML as "template language"</td><td>Interpolation, loops, conditionals, partials (Jinja, Blade, JSX, Vue templates)</td><td>Templates <em>produce</em> HTML. HTML is the <em>output format</em> the browser parses. The platform sees only the serialized result.</td></tr>
+    <tr><td>CSS variables = theming</td><td><code>--color-primary: blue</code> swapped for dark mode</td><td>Custom properties are <em>cascade-participating values</em>. They inherit, they fallback, they can be overridden per subtree. Theming is one use case; algorithmic layout (calc with vars) is another.</td></tr>
+    <tr><td>Layout = Flexbox or Grid</td><td>Choosing <code>display: flex</code> vs <code>display: grid</code></td><td>Layout is the <em>entire formatting context system</em>: normal flow, floats, positioning, flex, grid, table, ruby, multi-column, masonry. The choice is irreversible-ish per formatting context root.</td></tr>
+  </tbody>
+</table>
+
+---
+<h2>2. History — from SGML docs to the living standard</h2>
+
+<table>
+  <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1989–1991</strong></td>
+      <td>HTML at CERN, SGML heritage</td>
+      <td>Tim Berners-Lee, Dan Connolly (SGML), IETF HTML WG</td>
+      <td>HTML as SGML application. <code><a></code>, <code><p></code>, <code><h1-h6></code>, <code><ul></code>/<code><ol></code>, <code><img></code>. No layout, no style. Documents linked by URLs.</td>
+    </tr>
+    <tr>
+      <td><strong>1994–1996</strong></td>
+      <td>CSS 1 proposal, Netscape "extensions"</td>
+      <td>Håkon Wium Lie, Bert Bos (CSS), Netscape (<code><font></code>, <code><center></code>, <code>bgcolor</code>)</td>
+      <td>CSS 1 (1996): cascade, inheritance, box model, pseudo-classes. Netscape shipped presentational HTML — the "browser wars" divergence.</td>
+    </tr>
+    <tr>
+      <td><strong>1997–1999</strong></td>
+      <td>HTML 4, CSS 2, W3C process</td>
+      <td>W3C HTML WG, CSS WG, Dave Raggett (HTML 4)</td>
+      <td>HTML 4: frames, scripts, stylesheets, <code><div></code>/<code><span></code>, accessibility attributes (<code>alt</code>, <code>longdesc</code>). CSS 2: positioning, media types, <code>@media</code>, generated content.</td>
+    </tr>
+    <tr>
+      <td><strong>2000–2006</strong></td>
+      <td>XHTML 1.x, CSS 2.1, the "standards mode" pivot</td>
+      <td>W3C (XHTML), CSS WG (2.1), WaSP (Web Standards Project), Jeffrey Zeldman, Eric Meyer</td>
+      <td>XHTML = XML-syntax HTML (strict, failed adoption). CSS 2.1 = implementable subset (10 years to REC). DOCTYPE switching: "standards mode" vs "quirks mode." Table-less layout via floats + clearing.</td>
+    </tr>
+    <tr>
+      <td><strong>2004–2008</strong></td>
+      <td>WHATWG forms, HTML5, CSS3 modularization</td>
+      <td>Ian Hickson (WHATWG), Apple/Mozilla/Opera, Hixie's "HTML5" spec, CSS WG (modules)</td>
+      <td>WHATWG forms: <code><input type="email/date/range"></code>, <code><canvas></code>, <code><video></code>, <code><section></code>/<code><article></code>. CSS3 splits into modules (Selectors, Box, Text, Color, UI, Flexbox, Grid).</td>
+    </tr>
+    <tr>
+      <td><strong>2009–2014</strong></td>
+      <td>Flexbox, Grid, Custom Properties, the "modern CSS" era</td>
+      <td>Tab Atkins (Flexbox/Grid), Elika Etemad (fantasai), Léonie Watson (a11y), CSS WG</td>
+      <td>Flexbox (2009 draft → 2018 REC). Grid (2011 draft → 2018 REC). Custom Properties (2012 draft → 2018 REC). Feature queries (<code>@supports</code>). Prefixes (-webkit-, -moz-) as migration pain.</td>
+    </tr>
+    <tr>
+      <td><strong>2014–2018</strong></td>
+      <td>HTML 5.1/5.2, Interop baseline, CSS Houdini</td>
+      <td>W3C/WHATWG convergence (2019), Interop 2022+ (Apple, Google, Microsoft, Mozilla, Igalia)</td>
+      <td>HTML Living Standard (WHATWG) = single spec. Interop: annual cross-browser focus areas. Houdini: Paint API, Layout API, Typed OM — extensibility without prefixes.</td>
+    </tr>
+    <tr>
+      <td><strong>2019–2023</strong></td>
+      <td>Container Queries, Cascade Layers, Nesting, <code>:has()</code>, Color Level 4/5</td>
+      <td>Miriam Suzanne (Cascade Layers, Nesting), Una Kravets/Adam Argyle (Container Queries), Chrome/FF/Safari alignment</td>
+      <td>Container queries: layout responds to container, not viewport. Cascade Layers (<code>@layer</code>): explicit origin control. Nesting (<code>&</code>): native selector nesting. <code>:has()</code>: parent selector. OKLCH/OKLAB color spaces. Interop 2023/2024 baseline.</td>
+    </tr>
+    <tr>
+      <td><strong>2024–present</strong></td>
+      <td>Anchor Positioning, View Transitions L2, CSS Toggles, <code>@scope</code>, Baseline "Newly Available"</td>
+      <td>CSS WG, Open UI CG, browser vendors</td>
+      <td>Anchor positioning: tooltip/popover without JS. View Transitions cross-document: SPA-like navigation for MPA. <code>@scope</code>: proximity-based scoping without Shadow DOM. Toggles: state machines in CSS. Baseline "Newly Available" = safe to use without polyfill.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+<h2>3. Evolution — constraint inversions across the platform</h2>
+
+<p>The core idea — <em>a declarative document that renders everywhere</em> — did not change. What changed is the dominant constraint, and the platform feature that absorbed it:</p>
+
+<table>
+  <thead><tr><th>Dominant constraint</th><th>Winning platform feature</th><th>Why it fit</th></tr></thead>
+  <tbody>
+    <tr><td>No layout at all (1991–1996)</td><td>HTML tables + presentational attributes</td><td>Tables were the only grid. <code><font></code>, <code>bgcolor</code>, <code>align</code> = author control. Semantic pollution accepted.</td></tr>
+    <tr><td>Separation of concerns (1996–2003)</td><td>CSS 1/2 + DOCTYPE switching</td><td>Stylesheets external, cascade resolves conflicts. "Standards mode" = predictable box model. Float-based layout (holy grail, clearfix).</td></tr>
+    <tr><td>Rigid float layouts break on content change (2003–2012)</td><td>Flexbox (one-dimensional)</td><td>Flex solves "center vertically," "equal height columns," "push footer down." One axis, content-driven. No more clearfix.</td></tr>
+    <tr><td>Two-dimensional layout still hard (2012–2018)</td><td>CSS Grid (two-dimensional)</td><td>Grid solves "row + column simultaneously," "overlap," "named areas," "intrinsic tracks (<code>minmax</code>, <code>auto-fit</code>)." Layout as constraint system, not hack.</td></tr>
+    <tr><td>Viewport queries can't express component-level responsive (2018–2022)</td><td>Container Queries</td><td>A card in a sidebar vs main column needs different breakpoints. <code>@container</code> queries the <em>parent's size</em>, not viewport. Component owns its responsive logic.</td></tr>
+    <tr><td>Specificity wars + third-party CSS collisions (2019–2023)</td><td>Cascade Layers (<code>@layer</code>)</td><td>Layers = explicit origin ordering: <code>@layer reset, base, components, utilities</code>. Third-party CSS in its own layer. No more <code>!important</code> escalation.</td></tr>
+    <tr><td>Authoring ergonomics vs platform verbosity (2020–2024)</td><td>Nesting, <code>:has()</code>, Custom Properties, <code>@property</code></td><td>Nesting = less selector repetition. <code>:has()</code> = parent selector (finally). <code>@property</code> = typed custom properties (animation, validation). The platform absorbs preprocessor features.</td></tr>
+    <tr><td>JS-heavy interactions (tooltips, popovers, transitions) (2023+)</td><td>Anchor Positioning, View Transitions, Popover API, <code>@starting-style</code></td><td>Tooltip positioning without JS math. Cross-document transitions without SPA. Declarative popovers. The platform absorbs common JS patterns.</td></tr>
+  </tbody>
+</table>
+
+<p>The pattern repeats: when the dominant constraint changes (no layout → separation → flexible 1D → flexible 2D → component-responsive → collision-free cascade → ergonomic authoring → declarative interaction), the old feature's ergonomics become friction and a new platform feature absorbs the constraint.</p>
+
+---
+<h2>4. Intersection with neighbors — where it borders other practices</h2>
+
+<table>
+  <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>UI/UX & Web Design</strong></td>
+      <td>State visibility, affordance, accessibility, visual hierarchy, motion, tokens</td>
+      <td>UI/UX <em>decides what the human experiences</em>; HTML & CSS <em>is the substrate that makes it possible</em>. UI/UX designs the state matrix; HTML/CSS implements the <code>aria-busy</code>/<code>[data-state]</code> hooks and the CSS pseudo-classes that expose it.</td>
+    </tr>
+    <tr>
+      <td><strong>Developer Loop (Frontend)</strong></td>
+      <td>Component shape, props, state, rendering, performance, hydration</td>
+      <td>The loop <em>writes components that emit HTML and CSS</em>; the platform <em>parses, cascades, lays out, paints</em>. The loop's "shape" decisions (what props, what states) are constrained by what HTML elements exist and what CSS can select.</td>
+    </tr>
+    <tr>
+      <td><strong>JavaScript: The Language</strong></td>
+      <td>DOM API, CSSOM, event loop, microtasks, mutation observers</td>
+      <td>JS <em>manipulates the trees</em> (DOM, CSSOM, AOM); HTML & CSS <em>defines the trees' initial structure and the cascade algorithm</em>. JS cannot fix a broken cascade; it can only mutate after the fact.</td>
+    </tr>
+    <tr>
+      <td><strong>System Design</strong></td>
+      <td>Rendering strategy (SSR/RSC/Islands), Critical CSS, font loading, hydration, streaming</td>
+      <td>System design <em>decides when and where HTML/CSS is emitted</em>; the platform <em>defines what "emitted" means</em> (parser blocking, render blocking, parser-yielding). <code><link rel="preload" as="style"></code>, <code>font-display</code>, <code>content-visibility</code> are platform knobs; system design decides which sheets get them.</td>
+    </tr>
+    <tr>
+      <td><strong>Frontend Camps Survey</strong></td>
+      <td>React (JSX → HTML), Vue (SFC → HTML), Svelte (compile → HTML+CSS), Astro (islands → HTML)</td>
+      <td>Each camp is an <em>abstraction over the substrate</em>. React</em> substrate</em>. The substrate (HTML parsing, CSS cascade, layout) is identical; the abstraction's leakiness (hydration, style scoping, serialization) differs.</<td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility (WCAG / ARIA)</strong></td>
+      <td>Semantic HTML, <code>aria-*</code>, focus management, contrast, reduced motion</td>
+      <td>WCAG is the <em>compliance baseline</em>; HTML & CSS is the <em>platform that makes compliance the default</em>. <code><button></code> = keyboard + role + focus for free. ARIA is the escape hatch when semantics gap.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Systems / Design Tokens</strong></td>
+      <td>Color, spacing, type, motion, border, shadow as structured data</td>
+      <td>Tokens (W3C DTCG) compile to <em>CSS Custom Properties</em>. The platform <em>is</em> the runtime for tokens: inheritance, fallback, <code>@property</code> typing, <code>calc()</code> with vars. Design systems author tokens; the platform resolves them.</td>
+    </tr>
+    <tr>
+      <td><strong>Performance / Core Web Vitals</strong></td>
+      <td>CLS, LCP, INP, TTFB, render-blocking, font loading</td>
+      <td>Performance <em>measures platform behavior</em>; HTML & CSS <em>is the behavior being measured</em>. <code><link rel="preload"></code>, <code>font-display</code>, <code>content-visibility</code>, <code>will-change</code> are platform knobs. The platform doesn't optimize; you do.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+<h2>5. Underlying theory — the algorithms the platform runs</h2>
+
+<table>
+  <thead><tr><th>Theory / Algorithm</th><th>Spec / Origin</th><th>What the platform does with it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>HTML Parsing Algorithm</strong></td>
+      <td>WHATWG HTML Living Standard — "The HTML Parser"</td>
+      <td>Tokenization → tree construction. Handles malformed markup deterministically (adoption agency algorithm, foster parenting). The DOM you get is specified, not browser-dependent.</td>
+    </tr>
+    <tr>
+      <td><strong>CSS Cascade Algorithm</strong></td>
+      <td>CSS Cascading and Inheritance Level 5</td>
+      <td>Origin (UA/user/author) → Importance (<code>!important</code>) → Specificity (ID/Class/Type) → Source Order → Scope Proximity → Layer Order. Deterministic, inspectable in DevTools "Computed" tab.</td>
+    </tr>
+    <tr>
+      <td><strong>CSS Specificity Calculation</strong></td>
+      <td>CSS Selectors Level 3/4</td>
+      <td><code>(a,b,c)</code> = (ID count, Class/Attribute/Pseudo-class count, Type/Pseudo-element count). <code>#id .class:hover</code> = (1,2,0). Higher wins. Not base-10; <code>(0,11,0)</code> < <code>(1,0,0)</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Box Model & Box Tree Construction</strong></td>
+      <td>CSS Box Model Level 3/4, CSS Display Level 3</td>
+      <td>Every element → principal box (content/padding/border/margin). <code>display</code> sets outer (block/inline/flex/grid) and inner (formatting context) display types. <code>box-sizing: border-box</code> changes which box <code>width</code>/<code>height</code> applies to.</td>
+    </tr>
+    <tr>
+      <td><strong>Formatting Contexts</strong></td>
+      <td>CSS Display Level 3, CSS Flexbox, CSS Grid</td>
+      <td>BFC (Block Formatting Context): floats, margins, clears. Flex: main/cross axis, alignment, distribution. Grid: tracks, lines, areas, auto-placement. Each context has its own layout algorithm.</td>
+    </tr>
+    <tr>
+      <td><strong>Intrinsic Sizing & <code>min/max-content</code></strong></td>
+      <td>CSS Sizing Level 3/4</td>
+      <td><code>min-content</code> = smallest without overflow. <code>max-content</code> = largest without wrapping. <code>fit-content(limit)</code> = clamp(<code>min-content</code>, <code>limit</code>, <code>max-content</code>). Grid <code>minmax()</code>, <code>auto-fit</code>, <code>auto-fill</code> use these.</td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility Tree Construction</strong></td>
+      <td>W3C ARIA in HTML, HTML AAM (Accessibility API Mappings)</td>
+      <td>DOM → AOM: role, name, description, state, relations. <code><button></code> → role=button, name=text content. <code><label for></code> → name from label. <code>aria-*</code> overrides. Screen readers consume AOM, not DOM.</td>
+    </tr>
+    <tr>
+      <td><strong>Rendering Pipeline: Style → Layout → Paint → Composite</strong></td>
+      <td>CSSOM, Blink/WebKit/Gecko internals</td>
+      <td>Style: cascade → computed values. Layout: box tree → geometry (constraint solving). Paint: display lists (draw commands). Composite: layers → GPU. <code>transform</code>/<code>opacity</code> = composite-only (cheap). Layout = expensive.</td>
+    </tr>
+    <tr>
+      <td><strong>Progressive Enhancement / Principle of Least Power</strong></td>
+      <td>Tim Berners-Lee, Noah Mendelsohn (W3C TAG)</td>
+      <td>Use the least powerful language that solves the problem: HTML (declarative structure) → CSS (declarative style/layout) → JS (imperative behavior). Each layer works without the next. Resilience by design.</td>
+    </tr>
+    <tr>
+      <td><strong>CSS Custom Properties & <code>@property</code></strong></td>
+      <td>CSS Custom Properties Level 1/2, CSS Properties and Values API</td>
+      <td>Custom properties inherit, cascade, fallback (<code>var(--x, fallback)</code>). <code>@property</code> registers type (<code><color></code>, <code><length></code>), initial-value, inherits: true/false. Enables animation, validation, typed OM.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5b. Mental models — how platform engineers actually reason</h2>
+
+<p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
+
+<table>
+  <thead><tr><th>Model</th><th>Core idea</th><th>When you reach for it</th><th>What it replaces</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Semantic HTML is the accessibility API</strong></td>
+      <td><code><button></code> ≠ <code><div role="button" tabindex="0"></code>. The former gets keyboard, focus, role, name, state for free. The latter requires manual ARIA. Choose the element that means the thing.</td>
+      <td>Choosing elements; auditing a11y; teaching juniors.</td>
+      <td>ARIA as first resort; <code><div></code> soup with <code>onclick</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Cascade as public policy</strong></td>
+      <td>User stylesheets win. <code>!important</code> in author CSS violates user agency (high contrast, custom fonts, zoom). Use layers, specificity, source order instead.</td>
+      <td>Specificity wars; third-party CSS collisions; design system token overrides.</td>
+      <td><code>!important</code> escalation; ID selectors; inline styles.</td>
+    </tr>
+    <tr>
+      <td><strong>Layout system = irreversible per formatting context</strong></td>
+      <td>A flex container's children are flex items. A grid container's children are grid items. You cannot mix formatting contexts on the same children. Choose at the container; the children obey.</td>
+      <td>Choosing flex vs grid vs flow; debugging "why is this not centering?"</td>
+      <td>Adding more CSS to "fix" a layout that's in the wrong formatting context.</td>
+    </tr>
+    <tr>
+      <td><strong>Progressive enhancement = contract, not suggestion</strong></td>
+      <td>HTML works without CSS. CSS works without JS. JS enhances, never gates. The platform guarantees this if you don't break it (<code><noscript></code> hiding content, JS-only routing without <code><a href></code>).</td>
+      <td>Architecture reviews; feature planning; SSR/SSG decisions.</td>
+      <td>JS-only routing; <code>display: none</code> on <code><noscript></code>; CSS-in-JS without SSR.</td>
+    </tr>
+    <tr>
+      <td><strong>Tokens over magic numbers</strong></td>
+      <td><code>padding: var(--space-4)</code> not <code>padding: 16px</code>. <code>color: var(--color-primary)</code> not <code>color: #3b82f6</code>. Tokens enable dark mode, density, theming, cross-platform sync. Magic numbers guarantee drift.</td>
+      <td>Design system authoring; component styling; migration from hardcoded values.</td>
+      <td>Hardcoded px/rem/hex; "we'll extract tokens later."</td>
+    </tr>
+    <tr>
+      <td><strong>Performance = platform knobs you configure</strong></td>
+      <td><code><link rel="preload" as="style"></code>, <code>font-display: swap</code>, <code>content-visibility: auto</code>, <code>will-change</code> (sparingly). The platform doesn't optimize for you; it exposes knobs. Measure (CLS, LCP, INP), then turn knobs.</td>
+      <td>Core Web Vitals review; LCP/CLS/INP debugging; font loading strategy.</td>
+      <td>Guessing; adding <code>preload</code> everywhere; <code>will-change</code> on everything.</td>
+    </tr>
+    <tr>
+      <td><strong>State lives in attributes, selects in CSS</strong></td>
+      <td><code>[aria-busy="true"]</code>, <code>[data-state="loading"]</code>, <code>:disabled</code>, <code>:focus-visible</code>. JS toggles attributes; CSS selects states. No JS-in-CSS (no <code>style="..."</code> from JS), no CSS-in-JS state logic.</td>
+      <td>Component state design; handoff between JS and CSS; design system state tokens.</td>
+      <td><code>style="..."</code> from React; CSS-in-JS computing class names from state.</td>
+    </tr>
+    <tr>
+      <td><strong>Respect user preferences by default</strong></td>
+      <td><code>@media (prefers-reduced-motion: reduce)</code> disables non-essential animation. <code>@media (prefers-contrast: more)</code> boosts contrast. <code>@media (prefers-color-scheme: dark)</code> swaps tokens. The platform exposes preferences; you honor them.</td>
+      <td>Animation system; color system; reduced motion implementation; forced colors mode.</td>
+      <td>Animation as decoration only; dark mode as <code>filter: invert</code> hack; ignoring reduced motion.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Writing CSS that fights the platform. The cascade, inheritance, formatting contexts, and pseudo-classes are not bugs to work around — they are the platform's primitives. Working <em>with</em> them (semantic HTML, logical properties, container queries, cascade layers) is always smaller and more robust than working <em>against</em> them (utility frameworks that strip semantics, JS layout libraries, <code>!important</code> wars).</p>
+
+---
+
+<p>Like <a href="./ui-ux-web-design.html">UI/UX & Web Design</a>, <a href="./system-design.html">System Design</a>, and <a href="./api-design.html">API Design</a>, HTML & CSS is a <strong>rhythm</strong>, not a structured algorithm. It fails the three algorithm tests:</p>
+
+<ul>
+  <li><strong>Inputs aren't predefined.</strong> You don't know all future content, viewport sizes, user preferences (dark mode, reduced motion, high contrast), or browser capabilities when you write the first rule. The platform discovers them at runtime.</li>
+  <li><strong>Steps aren't deterministic.</strong> There is no rule that says "now reach for Grid." You choose Grid when the design requires two-dimensional alignment with intrinsic tracks — a judgment call. <code>@container</code> vs <code>@media</code> is a context judgment, not a predicate.</li>
+  <li><strong>No fixed termination.</strong> "Done" means "the component renders correctly across the support matrix (browsers, viewports, modes, a11y tree) and the cascade is inspectable without <code>!important</code>." That is a judgment, not a predicate. The platform evolves; the component iterates.</li>
+</ul>
+
+<p>This is why HTML & CSS resists checklists that pretend to be complete. A checklist assumes you know the final content and context; the rhythm assumes you know <em>what's missing for the context you have</em> — a platform/engineering judgment.</p>
+
+<blockquote class="callout">
+  <p><strong>The "Design Tokens → CSS Custom Properties" rhythm hack.</strong> Design tokens (W3C DTCG format) compile to CSS custom properties. The platform's cascade + inheritance + fallback + <code>@property</code> typing <em>is</em> the runtime for tokens. A token change = one CSS variable change = instant propagation to every component. No build step, no redeploy. It's a velocity multiplier — useful when the token system is alive, dangerous when tokens become a bureaucracy that forbids per-component deviation.</p>
+</blockquote>
+
+---
+<h2>7. Methodologies / named frameworks</h2>
+
+<p>Multiple named authoring approaches exist. None is canonical; each packages the rhythm for a different context.</</p>
+
+<table>
+  <thead><tr><th>Methodology</th><th>Core idea</th><th>Origin</th><th>Best for</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Semantic HTML First</strong></td>
+      <td>Choose elements by meaning (<code><article></code>, <code><nav></code>, <code><button></code>), not appearance. CSS styles the semantics.</td>
+      <td>WHATWG HTML, WaSP, Zeldman, Meyer</td>
+      <td>Accessibility baseline, SEO, reader modes, future-proofing. Every project starts here.</td>
+    </tr>
+    <tr>
+      <td><strong>Mobile-First / Progressive Enhancement CSS</strong></td>
+      <td>Base styles for smallest/constrained; <code>@media (min-width: ...)</code> enhances upward. No desktop-first overrides.</td>
+      <td>Luke Wroblewski (2009), Aaron Gustafson (2011)</td>
+      <td>Broad device support; performance-critical; content-heavy sites; resilient baseline.</td>
+    </tr>
+    <tr>
+      <td><strong>BEM (Block Element Modifier)</strong></td>
+      <td>Flat specificity: <code>.block__element--modifier</code>. No nesting, no ID selectors, no tag selectors.</td>
+      <td>Yandex (2010), Harry Roberts (CSS Wizardry)</td>
+      <td>Large teams; predictable specificity; CSS that scales without layers. Verbose but explicit.</td>
+    </tr>
+    <tr>
+      <td><strong>ITCSS (Inverted Triangle CSS)</strong></td>
+      <td>Layered specificity: Settings → Tools → Generic → Elements → Objects → Components → Utilities. Specificity increases downward.</td>
+      <td>Harry Roberts (2015)</td>
+      <td>Large codebases needing architectural CSS organization. Maps 1:1 to Cascade Layers (<code>@layer</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Atomic / Utility-First (Tailwind, UnoCSS, Open Props)</strong></td>
+      <td>One class = one declaration. <code>p-4</code> = <code>padding: 1rem</code>. Design tokens as utilities. No custom CSS for common patterns.</td>
+      <td>Adam Wathan (Tailwind, 2017), Anthony Fu (UnoCSS)</td>
+      <td>Rapid iteration; design-system adherence; teams wanting zero context-switching. Specificity = flat (single class).</td>
+    </tr>
+    <tr>
+      <td><strong>CSS-in-JS (Runtime → Zero-Runtime)</strong></td>
+      <td>Styles co-located with component. Runtime: <code>styled-components</code>, <code>emotion</code>. Zero-runtime: <code>linaria</code>, <code>Panda CSS</code>, <code>StyleX</code> (compile to .css).</td>
+      <td>Max Stoiber (styled-components), Sunil Pai (emotion), SeatGeek (linaria)</td>
+      <td>Component-scoped styles; dynamic theming via props; TypeScript integration. Zero-runtime = no bundle cost.</td>
+    </tr>
+    <tr>
+      <td><strong>Container Queries + Cascade Layers (Modern Native)</strong></td>
+      <td><code>@container</code> for component-responsive; <code>@layer</code> for explicit cascade control. Native, no build step.</td>
+      <td>Miriam Suzanne (Layers), Una Kravets (Container Queries), CSS WG</td>
+      <td>Design systems; component libraries; teams wanting platform-native scoping. Works in Shadow DOM + Light DOM.</td>
+    </tr>
+    <tr>
+      <td><strong>Shadow DOM / Web Components Scoping</strong></td>
+      <td><code>this.shadowRoot</code> = style encapsulation. <code>::part()</code>, <code>::slotted()</code> for controlled piercing. <code>@scope</code> (Light DOM alternative).</td>
+      <td>W3C Web Components CG, Google (Polymer → Lit), Apple (Safari)</td>
+      <td>Framework-agnostic components; strict style isolation; design system distribution. CSS stays in the component.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Token Systems (W3C DTCG, Style Dictionary, Token Studio, Specify)</strong></td>
+      <td>Tokens (JSON) → CSS Custom Properties / SCSS / JS / iOS / Android. Single source of truth.</td>
+      <td>Jina Anne (2014), W3C DTCG (2019+), Amazon (Style Dictionary)</td>
+      <td>Multi-platform (web, native, email); theming; dark mode; density; design-dev sync. Platform runtime = CSS Custom Properties.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>All ten share the same DNA: <em>write semantic HTML → let the cascade resolve → scope styles to components → encode decisions as tokens → validate in browser → iterate</em>. The differences are authoring ergonomics, scoping mechanism, and where the token source lives.</</p>
+
+---
+<h2>8. Principles — the shared constants</h2>
+
+<p>Across every methodology, eight principles hold (synthesized from the HTML/CSS specs, WCAG, and platform invariants):</p>
+
+<ol>
+  <li><strong>Semantic HTML is the accessibility API.</strong> <code><button></code> ≠ <code><div role="button" tabindex="0"></code>. The former gets keyboard, focus, role, name, state for free. The latter requires manual ARIA. Choose the element that means the thing.</li>
+  <li><strong>The cascade is public policy, not personal taste.</strong> User stylesheets win. <code>!important</code> in author CSS is a policy violation — it blocks user agency (high contrast, custom fonts, zoom). Use cascade layers, specificity, and source order instead.</li>
+  <li><strong>Layout system choice is irreversible-ish per formatting context root.</strong> A flex container's children are flex items. A grid container's children are grid items. You cannot mix formatting contexts on the same children. Choose at the container; the children obey.</li>
+  <li><strong>Progressive enhancement is a contract, not a suggestion.</strong> HTML works without CSS. CSS works without JS. JS enhances, never gates. The platform guarantees this if you don't break it (e.g., <code><noscript></code> hiding content, JS-only routing without <code><a href></code>).</li>
+  <li><strong>Tokens over magic numbers.</strong> <code>padding: var(--space-4)</code> not <code>padding: 16px</code>. <code>color: var(--color-primary)</code> not <code>color: #3b82f6</code>. Tokens enable dark mode, density, theming, and cross-platform sync. Magic numbers guarantee drift.</li>
+  <li><strong>Performance is a platform feature you configure.</strong> <code><link rel="preload" as="style"></code>, <code>font-display: swap</code>, <code>content-visibility: auto</code>, <code>will-change</code> (sparingly). The platform doesn't optimize for you; it exposes knobs. Measure (CLS, LCP, INP), then turn knobs.</li>
+  <li><strong>State lives in attributes, selects in CSS.</strong> <code>[aria-busy="true"]</code>, <code>[data-state="loading"]</code>, <code>:disabled</code>, <code>:focus-visible</code>. JS toggles attributes; CSS selects states. No JS-in-CSS (no <code>style="..."</code> from JS), no CSS-in-JS state logic.</li>
+  <li><strong>Respect user preferences by default.</strong> <code>@media (prefers-reduced-motion: reduce)</code> disables non-essential animation. <code>@media (prefers-contrast: more)</code> boosts contrast. <code>@media (prefers-color-scheme: dark)</code> swaps tokens. The platform exposes preferences; you honor them.</li>
+</ol>
+
+---
+<h2>9. Worked example — "A Card Component That Survives Content, RTL, Dark Mode, and a Screen Reader"</h2>
+
+<p>A realistic card problem, walked end-to-end through the rhythm.</p>
+
+<h3>Context & constraints</h3>
+<ul>
+  <li><strong>Content</strong> — variable-length title (1–3 lines), description (0–5 lines), optional image, optional badge, primary action (button), secondary action (link). Content comes from CMS — unpredictable.</li>
+  <li><strong>Environments</strong> — LTR (en), RTL (ar/he), light/dark mode, high contrast (forced colors), reduced motion, zoom 200%, screen reader (VoiceOver/NVDA).</li>
+  <li><strong>Rendering</strong> — Next.js App Router (RSC for content, Client Component for interaction). CSS via CSS Modules + CSS Custom Properties (design tokens).</li>
+  <li><strong>Design tokens</strong> — 8pt spacing scale, OKLCH color system, 200ms standard easing, reduced-motion token.</li>
+</ul>
+
+<h3>Step 1 — Semantic HTML structure (the AOM contract)</h3>
+<pre><code><article class="card">
+  <header class="card__header">
+    <!-- Badge: optional, decorative or semantic -->
+    <span class="card__badge" aria-label="New arrival">New</span>
+    <h2 class="card__title">{title}</h2>
+  </header>
+  <div class="card__media">
+    <img src="{image}" alt="" loading="lazy" />
+  </div>
+  <div class="card__body">
+    <p class="card__description">{description}</p>
+  </div>
+  <footer class="card__footer">
+    <button class="card__primary" type="button">Primary action</button>
+    <a class="card__secondary" href="{url}">Secondary</a>
+  </footer>
+</article>
+</code></pre>
+
+<p>Why these elements:</p>
+<ul>
+  <li><code><article></code> — self-contained composition (screen reader: "article").</li>
+  <li><code><header></code> + <code><h2></code> — heading structure for document outline.</li>
+  <li><code><img alt=""></code> — decorative image (alt="" removes from AOM). If informative, alt describes content.</li>
+  <li><code><button type="button"></code> — keyboard operable, submits nothing (no form).</li>
+  <li><code><a href></code> — real link, works without JS, appears in link rotor.</li>
+</ul>
+
+<h3>Step 2 — CSS: Layout with Grid (intrinsic, content-aware)</h3>
+<pre><code>/* tokens.css (imported globally) */
+:root {
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+  --color-bg: oklch(1 0 0); --color-surface: oklch(0.98 0 0);
+  --color-text: oklch(0.15 0 0); --color-text-muted: oklch(0.45 0 0);
+  --color-primary: oklch(0.55 0.22 260); --color-primary-hover: oklch(0.5 0.25 260);
+  --color-border: oklch(0.9 0 0);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1);
+  --motion-fast: 100ms; --motion-standard: 200ms; --motion-slow: 300ms;
+  --easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: oklch(0.08 0 0); --color-surface: oklch(0.1 0 0);
+    --color-text: oklch(0.95 0 0); --color-text-muted: oklch(0.65 0 0);
+    --color-primary: oklch(0.65 0.22 260); --color-primary-hover: oklch(0.7 0.25 260);
+    --color-border: oklch(0.2 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-standard: 0ms; --motion-slow: 0ms; }
+}
+</code></pre>
+
+<pre><code>/* card.css (CSS Module) */
+.card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto; /* header, media, body, footer */
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--motion-standard) var(--easing),
+              border-color var(--motion-fast) var(--easing);
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card:focus-within { border-color: var(--color-primary); outline: none; }
+
+.card__header { display: flex; align-items: flex-start; gap: var(--space-2); }
+.card__badge {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  font-size: 0.75rem; font-weight: 600;
+  background: var(--color-primary); color: white;
+  border-radius: var(--radius-full);
+}
+.card__title {
+  margin: 0; font-size: 1.125rem; font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.3;
+  /* line-clamp for long titles */
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card__media {
+  border-radius: var(--radius-sm); overflow: hidden;
+  aspect-ratio: 16 / 9; background: var(--color-bg);
+}
+.card__media img { width: 100%; height: 100%; object-fit: cover; }
+.card__body { color: var(--color-text-muted); line-height: 1.6; margin: 0; }
+.card__description {
+  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card__footer {
+  display: flex; gap: var(--space-2); justify-content: flex-end;
+  padding-top: var(--space-2); border-top: 1px solid var(--color-border);
+}
+.card__primary {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary); color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-weight: 500; cursor: pointer;
+  transition: background-color var(--motion-fast) var(--easing);
+}
+.card__primary:hover { background: var(--color-primary-hover); }
+.card__primary:focus-visible {
+  outline: 2px solid var(--color-primary); outline-offset: 2px;
+}
+.card__secondary {
+  color: var(--color-text-muted); text-decoration: none; font-weight: 500;
+  padding: var(--space-2) 0; /* clickable area */
+  transition: color var(--motion-fast) var(--easing);
+}
+.card__secondary:hover { color: var(--color-primary); }
+.card__secondary:focus-visible {
+  outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm);
+}
+
+/* RTL: logical properties handle mirroring automatically */
+/* No extra CSS needed — margin-inline, padding-inline, border-inline work */
+</code></pre>
+
+<h3>Step 3 — Container Queries (component owns its responsive logic)</h3>
+<pre><code>.card {
+  /* ...existing... */
+  container-type: inline-size; /* enables @container on this element */
+  container-name: card;
+}
+@container card (max-width: 320px) {
+  .card { grid-template-rows: auto 1fr auto auto; } /* media before header on narrow */
+  .card__header { flex-direction: column; align-items: stretch; }
+  .card__footer { flex-direction: column; }
+  .card__primary, .card__secondary { width: 100%; text-align: center; }
+}
+</code></pre>
+
+<p>The card adapts to <em>its own width</em>, not the viewport. In a sidebar (narrow) it stacks; in main (wide) it's horizontal. No media query needed.</p>
+
+<h3>Step 4 — Dark mode, RTL, reduced motion: zero extra CSS</h3>
+<ul>
+  <li><strong>Dark mode</strong> — tokens swap via <code>@media (prefers-color-scheme: dark)</code>. OKLCH preserves perceptual lightness; no "vibrating" brand colors.</li>
+  <li><strong>RTL</strong> — logical properties (<code>margin-inline-start</code>, <code>padding-inline-end</code>, <code>border-inline-start</code>) mirror automatically. Flex/Grid honor <code>dir="rtl"</code> on <code><html></code>. The badge stays leading; footer actions reverse.</li>
+  <li><strong>Reduced motion</strong> — <code>@media (prefers-reduced-motion: reduce)</code> zeros motion tokens. Transitions become instant. No vestibular triggers.</li>
+  <li><strong>High contrast / forced colors</strong> — <code>@media (forced-colors: active)</code> disables backgrounds/shadows; system colors take over. <code>border: 1px solid CanvasText</code> ensures visibility.</</li>
+</ul>
+
+<h3>Step 5 — Screen reader verification (AOM diff)</h3>
+<pre><code>/* What the screen reader announces: */
+"Article, New arrival, heading level 2, {title}"
+"{description}"
+"Button, Primary action"
+"Link, Secondary"
+</code></pre>
+<ul>
+  <li>Badge: <code>aria-label</code> gives it a name (otherwise "New" is ambiguous).</li>
+  <li>Heading: <code><h2></code> in <code><article></code> = proper heading hierarchy.</li>
+  <li>Image: <code>alt=""</code> = hidden from AOM (decorative). If informative, <code>alt="Photo of..."</code>.</li>
+  <li>Button: native <code><button></code> = keyboard + role + focus + name from text.</li>
+  <li>Link: native <code><a href></code> = appears in link rotor, works without JS.</li>
+</ul>
+
+<h3>Step 6 — Naive vs designed comparison</h3>
+
+<table>
+  <thead><tr><th>Aspect</th><th>Naive (div soup + utility classes)</th><th>Designed (semantic HTML + tokens + platform features)</th></tr></thead>
+  <tbody>
+    <tr><td>HTML</td><td><code><div class="card"><div class="title">...<div onclick>...</td><td><code><article><header><h2>...<button>...</td></tr>
+    <tr><td>A11y tree</td><td>Generic divs, no roles, no headings, onclick not keyboard</td><td>Article → heading → button/link. Fully operable.</td></tr>
+    <tr><td>Dark mode</td><td>Hardcoded colors; <code>filter: invert</code> hack breaks images</td><td>Token swap; OKLCH preserves brand; images untouched</td></tr>
+    <tr><td>RTL</td><td>Manual <code>direction: rtl</code> + margin overrides</td><td>Logical properties + native flex/grid mirroring</td></tr>
+    <tr><td>Responsive</td><td>Viewport media queries; breaks in sidebar</td><td>Container query; adapts to parent width</td></tr>
+    <tr><td>Reduced motion</td><td>Animations still run; vestibular trigger</td><td>Motion tokens zeroed; instant transitions</td></tr>
+    <tr><td>High contrast</td><td>Backgrounds/shadows invisible; border gone</td><td><code>forced-colors</code> media query preserves borders</td></tr>
+    <tr><td>Maintenance</td><td>Magic numbers everywhere; drift guaranteed</td><td>Single token file; change propagates everywhere</td></tr>
+  </tbody>
+</table>
+
+<h3>Artifacts produced</h3>
+<ul>
+  <li>Semantic HTML template (the AOM contract).</li>
+  <li>CSS Module with Grid layout, container query, logical properties.</li>
+  <li>Token file (CSS Custom Properties, OKLCH, light/dark/reduced-motion/forced-colors).</li>
+  <li>Focus-visible ring spec (consistent across all interactive elements).</li>
+  <li>Container query breakpoint map (per component, not global).</li>
+  <li>AOM verification checklist (run in VoiceOver/NVDA + axe).</li>
+</ul>
+
+---
+<h2>10. The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>!important escalation wars</strong></td>
+      <td><code>.btn { color: red !important }</code> → <code>.btn-primary { color: blue !important }</code> → <code>.btn-primary.urgent { color: orange !important }</code></td>
+      <td>Treating specificity as a score to beat. Fix: Cascade Layers (<code>@layer base, components, utilities</code>), flat specificity (BEM/utility), <code>!important</code> only in user stylesheets.</td>
+    </tr>
+    <tr>
+      <td><strong>z-index = 999999999</strong></td>
+      <td>Modal: 9999, Tooltip: 99999, Toast: 999999, Dropdown: 9999999</td>
+      <td>No stacking context strategy. Fix: explicit stacking contexts (<code>isolation: isolate</code>), layer tokens (<code>--z-modal: 100</code>), portals for overlays.</td>
+    </tr>
+    <tr>
+      <td><strong>position: absolute to "fix" flow problems</strong></td>
+      <td>Dropdown positioned absolute to body; breaks on scroll, resize, zoom, RTL</td>
+      <td>Misunderstanding containing block. Fix: <code>position: relative</code> on parent, or Popover API / Anchor Positioning (declarative).</td>
+    </tr>
+    <tr>
+      <td><strong>Blanket box-sizing reset breaks form controls</strong></td>
+      <td><code>*, *::before, *::after { box-sizing: border-box }</code> → <code><input></code> width includes border, layout shifts</td>
+      <td>Form controls have UA styles that assume content-box. Fix: <code>box-sizing: border-box</code> on layout elements only; <code>input, textarea, select { box-sizing: content-box }</code> or use <code>appearance: none</code> + full restyle.</td>
+    </tr>
+    <tr>
+      <td><strong>Margin collapse confusion</strong></td>
+      <td>Sibling margins collapse; parent margin collapses with first/last child; "why is my gap 0?"</td>
+      <td>Not knowing BFC rules. Fix: <code>gap</code> in flex/grid (no collapse), <code>overflow: hidden</code> / <code>flow-root</code> on parent, or use padding instead of margin for spacing.</td>
+    </tr>
+    <tr>
+      <td><strong>Container query misuse: querying the wrong container</strong></td>
+      <td><code>@container (min-width: 400px)</code> on a card inside a flex item that never reaches 400px</td>
+      <td>Container must have <code>container-type: inline-size</code> and actually grow. Fix: name containers (<code>container-name: card</code>), query by name.</td>
+    </tr>
+    <tr>
+      <td><strong>Dark mode as filter: invert hack</strong></td>
+      <td><code>@media (prefers-color-scheme: dark) { html { filter: invert(1) hue-rotate(180deg) } }</code></td>
+      <td>Images invert, videos invert, shadows invert, brand colors vibrate. Fix: design tokens + OKLCH + CSS Custom Properties. Platform does the work.</td>
+    </tr>
+    <tr>
+      <td><strong>outline: none with no alternative focus ring</strong></td>
+      <td>Keyboard user tabs; nothing visible; "where am I?"</td>
+      <td>Designer hates default outline. Fix: <code>:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px }</code>. Visible only for keyboard.</td>
+    </tr>
+    <tr>
+      <td><strong>div-as-button (no keyboard, no role, no name)</strong></td>
+      <td><code><div class="btn" onclick="...">Click</div></code></td>
+      <td>Thinking "click handler = button." Fix: <code><button type="button"></code>. Native = free keyboard, focus, role, name, form association.</td>
+    </tr>
+    <tr>
+      <td><strong>Table-for-layout comeback</strong></td>
+      <td><code><table><tr><td>sidebar</td><td>main</td></tr></table></code> for page layout</td>
+      <td>Flexbox/Grid "too hard" or "not supported" (myth). Fix: <code>display: grid</code> on page, <code>grid-template-areas</code>. Tables = semantic data only.</td>
+    </tr>
+    <tr>
+      <td><strong>Specificity clubs: #id #id #id</strong></td>
+      <td><code>#main #content #article .title { ... }</code></td>
+      <td>ID selectors don't compose. Fix: Class-only selectors (BEM, utility), Cascade Layers, <code>:where()</code> to zero specificity.</td>
+    </tr>
+    <tr>
+      <td><strong>1px vs 1dp confusion on high-DPR</strong></td>
+      <td>Hairline borders disappear on 3x screens; <code>border: 1px</code> = 3 device pixels</td>
+      <td>CSS px ≠ device pixel. Fix: <code>border: 1px</code> is correct (1 CSS px = 1/96in). For hairlines: <code>border: 0.5px</code> (snaps to 1 device pixel on 2x+) or <code>outline</code> (never sub-pixel).</td>
+    </tr>
+    <tr>
+      <td><strong>Mobile zoom disabled via viewport</strong></td>
+      <td><code><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"></code></td>
+      <td>Accessibility violation (WCAG 1.4.4). Fix: never disable zoom. <code>maximum-scale=1</code> and <code>user-scalable=no</code> are anti-patterns.</<td>
+    </tr>
+    <tr>
+      <td><strong>CSS-in-JS runtime in production</strong></td>
+      <td><code>styled-components</code> injecting <code><style></code> on every render; 50ms style recalc on interaction</td>
+      <td>Zero-runtime not adopted. Fix: Linaria, Panda CSS, StyleX, vanilla-extract — compile to static .css at build.</td>
+    </tr>
+    <tr>
+      <td><strong>Form validation UX: red border on keystroke</strong></td>
+      <td>User types first character; field turns red; "invalid" before they finish</td>
+      <td>Validating on <code>onChange</code> / <code>input</code>. Fix: validate on <code>blur</code> or <code>submit</code>; show inline error <em>after</em> interaction; use <code>:user-invalid</code> (native, after interaction).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The practitioner critique (1998–present)</h3>
+
+<p>HTML & CSS has faced serious critique from the platform community:</p>
+
+<ul>
+  <li><strong>Jeffrey Zeldman / Eric Meyer (Web Standards Project, 1998–2008)</strong> — "Designing with Web Standards": presentational HTML (<code><font></code>, tables for layout) is technical debt. Separation of concerns is not optional. The cascade is a feature, not a bug.</li>
+  <li><strong>Jeremy Keith (<em>Resilient Web Design</em>, 2016)</strong> — Progressive enhancement is the web's superpower. Every layer (HTML, CSS, JS) must work without the next. The platform is resilient by default; we break it.</li>
+  <li><strong>Harry Roberts (CSS Wizardry, 2010–present)</strong> — Specificity is the enemy of scale. Flat specificity (BEM, utility) beats architectural CSS. <code>!important</code> is a code smell. ITCSS / Cascade Layers formalize this.</li>
+  <li><strong>Una Kravets / Adam Argyle / Bramus (Chrome DevRel, 2020–present)</strong> — The platform has absorbed the patterns you polyfill. Container queries, cascade layers, nesting, <code>:has()</code>, anchor positioning — stop shipping JS for what CSS now does.</li>
+  <li><strong>Rachel Andrew / Jen Simmons (CSS WG, 2015–present)</strong> — Intrinsic web design: layout from content out, not viewport in. <code>minmax()</code>, <code>auto-fit</code>, <code>fit-content</code> are the new primitives. Grid + Flexbox + Flow = complete system.</li>
+  <li><strong>Miriam Suzanne (OddBird, CSS WG, 2020–present)</strong> — Cascade Layers solve the "third-party CSS collision" problem natively. <code>@scope</code> solves "component scoping without Shadow DOM." The cascade is a designed system, not a battlefield.</li>
+</ul>
+
+---
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>The platform is only as good as the tooling that makes its primitives visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Authoring & Architecture</strong></td>
+      <td>CSS Modules, PostCSS, Lightning CSS, Stylelint, Style Query, CSS Stats, Project Wallace</td>
+      <td>Raw CSS → linted, analyzed, optimized, auditable stylesheets</td>
+      <td>Bundle size; Specificity graph; Unused CSS %; Cascade layer compliance; Lint pass rate</td>
+    </tr>
+    <tr>
+      <td><strong>Design Token Pipeline</strong></td>
+      <td>Figma Tokens, Style Dictionary, Specify, Token Studio, Theo, Amazon Style Dictionary, Knapsack</td>
+      <td>Design decisions → platform-agnostic tokens → CSS Custom Properties</td>
+      <td>Token coverage; Design↔Code drift; Cross-platform sync latency; Adoption rate</td>
+    </tr>
+    <tr>
+      <td><strong>CSS-in-JS / Zero-Runtime</strong></td>
+      <td>Panda CSS, Linaria, StyleX, vanilla-extract, Compiled, Goober, Stitches</td>
+      <td>Co-located styles → static .css at build</td>
+      <td>Bundle size; Type safety; Runtime cost; Migration path; DX score</td>
+    </tr>
+    <tr>
+      <td><strong>Utility / Atomic Frameworks</strong></td>
+      <td>Tailwind CSS, UnoCSS, Open Props, Master Styles, Windi CSS</td>
+      <td>Design system → utility classes → minimal CSS</td>
+      <td>Bundle size; Config churn; Customization ceiling; Team adoption; Migration cost</td>
+    </tr>
+    <tr>
+      <td><strong>Component Scoping & Encapsulation</strong></td>
+      <td>CSS Modules, Shadow DOM, @scope (CSS), CSS-in-JS, Styled Components, Emotion</td>
+      <td>Global CSS → component-scoped styles</td>
+      <td>Leakage rate; Bundle overhead; SSR compatibility; DevTools ergonomics</td>
+    </tr>
+    <tr>
+      <td><strong>Visual Regression & Testing</strong></td>
+      <td>Chromatic, Percy, Happo, BackstopJS, Playwright visual, Cypress visual, Storybook</td>
+      <td>CSS change → visual diff → approve/reject</td>
+      <td>Flake rate; Review time; Coverage %; False positive rate; CI time</td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility Linting & Testing</strong></td>
+      <td>axe-core, eslint-plugin-jsx-a11y, Storybook a11y, Lighthouse CI, pa11y, WAVE</td>
+      <td>HTML/CSS → automated a11y audit</td>
+      <td>WCAG pass rate; Screen reader task success; Color contrast coverage; Keyboard trap count</td>
+    </tr>
+    <tr>
+      <td><strong>Performance Profiling</strong></td>
+      <td>Lighthouse CI, WebPageTest, Chrome DevTools Performance, SpeedCurve, Calibre, DebugBear</td>
+      <td>CSS → CLS, LCP, INP, TTFB metrics</td>
+      <td>CLS/LCP/INP score; Render-blocking CSS; Font loading; Layout shift sources</td>
+    </tr>
+    <tr>
+      <td><strong>Browser DevTools & Inspection</strong></td>
+      <td>Chrome DevTools (Styles, Computed, Layout, Animations), Firefox DevTools, Polypane, Sizzy</td>
+      <td>Live CSS → inspected, debugged, visualized</td>
+      <td>Cascade resolution time; Layout shift visualization; Grid/Flex overlay usage; Animation timeline</td>
+    </tr>
+    <tr>
+      <td><strong>Specification & Standards Tracking</strong></td>
+      <td>MDN Web Docs, caniuse.com, Baseline (web.dev), CSSWG drafts, W3C specs, Web Platform Tests</td>
+      <td>Feature idea → spec status → browser support → safe to use</td>
+      <td>Baseline status; Spec maturity; Implementation coverage; Polyfill need</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with Authoring (Stylelint + CSS Modules) + Token Pipeline (Style Dictionary) + Visual Regression (Chromatic/Playwright). Add CSS-in-JS if component co-location matters. Add Utility framework if design system adherence is the priority. Add A11y linting if regulated or public sector. Add Performance profiling if Core Web Vitals are KPIs. The platform provides the primitives; the tooling makes them governable.</p>
+
+---
+
+<table>
+  <thead><tr><th>Signal (2024–2026)</th><th>What it means for the platform</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Interop 2024/2025 Baseline + "Newly Available"</td>
+      <td>Annual cross-browser alignment (Apple, Google, Microsoft, Mozilla, Igalia). "Baseline" = safe in all engines. "Newly Available" = just shipped, polyfill-free. The support matrix compresses early.</td>
+    </tr>
+    <tr>
+      <td>CSS Nesting (native <code>&</code>) baseline</td>
+      <td>Native selector nesting without preprocessor. <code>.card { &__title { } }</code>. Reduces authoring friction; works in DevTools.</td>
+    </tr>
+    <tr>
+      <td>Cascade Layers (<code>@layer</code>) baseline</td>
+      <td>Explicit origin control. <code>@layer reset, base, components, utilities</code>. Third-party CSS in its own layer. No more specificity wars.</td>
+    </tr>
+    <tr>
+      <td>Container Queries baseline</td>
+      <td>Component-responsive design. <code>@container card (min-width: 400px)</code>. The component owns its breakpoints. Works in Shadow DOM.</td>
+    </tr>
+    <tr>
+      <td>View Transitions API Level 2 (cross-document)</td>
+      <td><code>@view-transition { navigation: auto }</code>. SPA-like transitions for MPA. No JS router needed. Shared element transitions declarative.</td>
+    </tr>
+    <tr>
+      <td>Anchor Positioning (tooltips, popovers, menus)</td>
+      <td><code>position-anchor: --my-anchor; position-area: bottom span-left</code>. Tooltip positioning without JS math. Popover API integration.</td>
+    </tr>
+    <tr>
+      <td><code>@scope</code> (Light DOM scoping)</td>
+      <td>Proximity-based scoping: <code>@scope (.card) to (.card__footer) { .title { } }</code>. Styles don't leak out; don't need Shadow DOM.</td>
+    </tr>
+    <tr>
+      <td>CSS Houdini Paint API / Typed OM</td>
+      <td>Custom paint worklets (gradients, patterns, noise) on GPU. Typed OM: <code>element.attributeStyleMap.set('width', CSS.px(100))</code>. Extensibility without prefixes.</td>
+    </tr>
+    <tr>
+      <td>CSS Toggles (state machines in CSS)</td>
+      <td><code>toggle-root: --open; toggle-trigger: .trigger { toggle(--open) }</code>. Disclosure, tabs, accordions without JS. Declarative state.</td>
+    </tr>
+    <tr>
+      <td>W3C Design Tokens Format Module → Candidate Recommendation</td>
+      <td>Tokens (JSON) → CSS Custom Properties standardized. Figma variables, Style Dictionary, Token Studio, Specify converge. Single source of truth, no translation layer.</td>
+    </tr>
+    <tr>
+      <td>Styling as build target (Lightning CSS, OxCSS, cssnano)</td>
+      <td>Rust/Go-based CSS transformers: minify, prefix, layer, nest, <code>@property</code> polyfill, custom media. 10x faster than PostCSS. Build-time platform feature polyfills.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+<h2>12. Summary — the platform checklist</h2>
+
+<p>Before any HTML/CSS ships, verify:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>If no.</th></tr></thead>
+  <tbody>
+    <tr><td>Is every interactive element a semantic HTML element (<code><button></code>, <code><a href></code>, <code><input></code>, <code><select></code>) not a <code><div></code> with handlers?</td><td>Stop. Keyboard, focus, role, name, form association all missing. Native element = free accessibility.</td></tr>
+    <tr><td>Does the component work without CSS (HTML-only renders meaningfully)?</td><td>Stop. Progressive enhancement broken. Content order, heading structure, link/button semantics must survive.</td></tr>
+    <tr><td>Does the component work without JS (forms submit, links navigate, details/summary toggles)?</td><td>Stop. JS as enhancement, not gate. <code><form></code> + <code><button type="submit"></code>, <code><a href></code>, <code><details></code>/<code><summary></code>.</td></tr>
+    <tr><td>Are all colors, spacing, typography, motion, shadows defined as CSS Custom Properties (tokens) — no magic numbers?</td><td>Stop. Dark mode breaks, density breaks, theming breaks, drift guaranteed. One token file = single source of truth.</td></tr>
+    <tr><td>Does dark mode work via <code>@media (prefers-color-scheme: dark)</code> token swap — no <code>filter: invert</code> hack?</td><td>Stop. Images invert, brand vibrates, shadows disappear. OKLCH tokens preserve perceptual lightness.</td></tr>
+    <tr><td>Does RTL work via logical properties (<code>margin-inline</code>, <code>padding-inline</code>, <code>border-inline</code>) and native flex/grid mirroring — no manual overrides?</td><td>Stop. Manual RTL CSS is technical debt. Logical properties + <code>dir="rtl"</code> on <code><html></code> = platform does it.</td></tr>
+    <tr><td>Does the component respect <code>prefers-reduced-motion</code> (non-essential animation disabled via motion tokens)?</td><td>Stop. Vestibular triggers ship by default. Motion tokens zeroed in <code>@media (prefers-reduced-motion: reduce)</code>.</td></tr>
+    <tr><td>Is there a visible <code>:focus-visible</code> ring on every interactive element (outline, not box-shadow)?</td><td>Stop. Keyboard users lose position. <code>outline: 2px solid var(--color-primary); outline-offset: 2px</code>.</td></tr>
+    <tr><td>Does the component have no layout shift above the fold (CLS = 0) — explicit sizes, <code>aspect-ratio</code>, <code>font-display: swap</code>?</td><td>Stop. CLS = user frustration. Reserve space for images, ads, fonts. <code>aspect-ratio</code> on media, <code>font-display: swap</code> on fonts.</td></tr>
+    <tr><td>Does the component pass manual screen reader test (VoiceOver/NVDA) — announces correct role, name, state?</td><td>Stop. AOM diff catches what axe misses. Test: tab through, hear heading structure, button/link roles, form labels.</td></tr>
+  </tbody>
+</table>
+
+<p>Print this. Put it on the component review wall. If the PR can't pass this checklist, it's not ready for the platform.</p>
+
+---
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://html.spec.whatwg.org/">WHATWG (2024). <em>HTML Living Standard</em>.</a> ·
+  <a href="https://www.w3.org/Style/CSS/current-work">W3C CSS Working Group (2024). <em>CSS Current Work</em> (all module specs).</a> ·
+  <a href="https://www.w3.org/TR/css-cascade-5/">W3C (2024). <em>CSS Cascading and Inheritance Level 5</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-box-3/">W3C (2024). <em>CSS Box Model Level 3</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-display-3/">W3C (2024). <em>CSS Display Level 3</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-sizing-3/">W3C (2024). <em>CSS Intrinsic & Extrinsic Sizing Level 3</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-contain-3/">W3C (2024). <em>CSS Container Queries Level 3</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-cascade-5/#layering">W3C (2024). <em>CSS Cascade Layers</em>.</a> ·
+  <a href="https://www.w3.org/TR/selectors-4/">W3C (2024). <em>Selectors Level 4</em> (<code>:has()</code>, <code>:focus-visible</code>, <code>:user-invalid</code>).</a> ·
+  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAIC (2023). <em>WCAG 2.2 Quick Reference</em>.</a> ·
+  <a href="https://www.w3.org/TR/html-aam-1.0/">W3C (2023). <em>HTML Accessibility API Mappings 1.0</em>.</a> ·
+  <a href="https://tokens.dtcg.io/">W3C Design Tokens Community Group (2024). <em>Design Tokens Format Module</em>.</a> ·
+  <a href="https://www.w3.org/TR/css-color-4/">W3C (2024). <em>CSS Color Level 4</em> (OKLCH, OKLAB).</a> ·
+  <a href="https://alistapart.com/article/dao/">Zeldman, J. (2001). <em>Designing with Web Standards</em>.</a> ·
+  <a href="https://resilientwebdesign.com/">Keith, J. (2016). <em>Resilient Web Design</em>.</a> ·
+  <a href="https://csswizardry.com/">Roberts, H. (ongoing). <em>CSS Wizardry - Scalable CSS Architecture</em>.</a> ·
+  <a href="https://developer.chrome.com/blog">Kravets, U. / Argyle, A. / Bramus (ongoing). <em>Chrome DevRel - Modern CSS Platform</em>.</a> ·
+  <a href="https://www.smashingmagazine.com/author/rachelandrew/">Andrew, R. (ongoing). <em>Intrinsic Web Design</em>.</a> ·
+  <a href="https://www.oddbird.net/">Suzanne, M. (ongoing). <em>Cascade Layers, @scope, Container Queries</em>.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a real component where the team <em>didn't</em> do the AOM diff, and what the production bug was. Show me the screen reader transcript that said 'button' on a div."</li>
+    <li>"When you inherit a codebase with magic numbers everywhere (colors, spacing, motion), no dark mode, and focus outlines removed — what's the first token file you write, and what's the first component you migrate?"</li>
+    <li>"How do you teach a team to distinguish <em>motion as meaning</em> from <em>motion as decoration</em>? What's the one question that separates them?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · HTML & CSS — the platform layer</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

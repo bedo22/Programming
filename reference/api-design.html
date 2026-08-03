@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API Design — How Contracts Make Systems Speak Without Speaking</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Interface engineering — the layer between services and clients</p>
+  <h1>API Design — How Contracts Make Systems Speak Without Speaking</h1>
+  <p class="meta">The discipline of defining contracts that services and clients can evolve independently around. Sibling docs: <a href="./system-design.html">System Design</a> (the architectural layer upstream), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop downstream), <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering layer that consumes the contract).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>Most tutorials teach "how to call an API" or "how to write an OpenAPI file." API Design starts at "what contract lets both sides move without breaking each other." It is a distinct discipline with its own history, methods, and failure modes — not "REST vs GraphQL" as a religion, not "Swagger authoring" as a chore, not "SDK generation" as a silver bullet. This doc captures it as a first-class engineering concern: the interface layer that feeds system design and the developer loop. If you've ever shipped a breaking change that took down a mobile app in production, this is the layer you missed.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./system-design.html">System Design</a> — system design decides service boundaries and data ownership; API design materializes those boundaries as callable contracts.</li>
+  <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — the developer loop consumes APIs; bad contracts create friction the loop absorbs (loading states, error handling, retries, optimistic UI).</li>
+  <li>Cross-cutting to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — every screen is a read and write through the API contract; awkward contracts intrude on the UI as dead states, toast storms, and invisible failures.</li>
+  <li>Cross-cutting to <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — language and runtime choices (TypeScript, Rust, Go) are often driven by contract ergonomics (codegen, schema validation, streaming).</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>The two-layer answer to "what is an API contract?"</strong></p>
+  <ul>
+    <li><strong>Interface contract (macro)</strong> — resources, operations, versioning, authentication, rate limits, deprecation policy, error envelope, pagination strategy, idempotency semantics. What the <em>consumer</em> sees.</li>
+    <li><strong>Wire contract (micro)</strong> — serialization format, schema evolution rules, field-level nullability, enum extensibility, timestamp formats, cursor encoding, compression, transport (HTTP/1.1, HTTP/2, HTTP/3, gRPC, WebSocket). What the <em>bytes</em> say.</li>
+  </ul>
+  <p>Both are API design; neither is complete without the other. The interface contract sets the <em>promises</em>; the wire contract makes them <em>verifiable</em>.</p>
+</blockquote>
+
+---
+
+<h2>1. Definition — what API design <em>is</em> and what it is <em>not</em></h2>
+
+<h3>What it is</h3>
+
+<p>API Design is the disciplined activity of <strong>defining stable, evolvable contracts between independent deployables</strong>. It produces decisions — not code — that determine:</p>
+
+<ul>
+  <li><strong>Resource topology</strong> — what are the nouns? How do they relate? (REST) or what is the query/mutation surface? (GraphQL) or what are the service/method signatures? (gRPC).</li>
+  <li><strong>Operation semantics</strong> — what does each call promise? (safety, idempotency, latency budget, consistency model).</li>
+  <li><strong>Error contract</strong> — how does the API say "no" in a way the client can programmatically act on? (error codes, retry-after, problem details).</li>
+  <li><strong>Versioning strategy</strong> — how do we add, change, and remove without breaking existing clients? (URL version, header version, schema evolution).</li>
+  <li><strong>Identity & auth</strong> — who can call what? (OAuth 2.0, OIDC, mTLS, API keys, SPIFFE).</li>
+  <li><strong>Observability hooks</strong> — what does the API emit so both sides can debug? (request-id, trace headers, structured logs, metrics).</li>
+  <li><strong>Evolution guarantees</strong> — what changes are "safe" (add optional field, add enum value) vs "breaking" (remove field, change type, change semantics).</li>
+</ul>
+
+<p>These decisions are <strong>expensive to change later</strong>. That is the defining characteristic: API design decisions have high reversal cost. Wire-format changes require coordinated deployments. Interface-contract changes require consumer migrations. Both are multi-week efforts in any non-trivial system.</p>
+
+<h3>What it is not</h3>
+
+<table>
+  <thead><tr><th>Confused with</th><th>What that is</th><th>Difference</th></tr></thead>
+  <tbody>
+    <tr><td>OpenAPI / Swagger authoring</td><td>Writing a YAML/JSON file that describes an existing API</td><td>OpenAPI is a <em>description format</em>; API design is the <em>decision process</em> that produces something worth describing.</td></tr>
+    <tr><td>REST vs GraphQL vs gRPC</td><td>Architectural styles / protocols / IDLs</td><td>Styles are <em>constraints you choose</em>; API design is the <em>discipline of choosing and applying them</em> to a specific problem.</td></tr>
+    <tr><td>SDK / Client library generation</td><td>Codegen from a schema (OpenAPI, protobuf, GraphQL)</td><td>SDKs are a <em>convenience artifact</em>; the contract must be usable without them (curl, fetch, Postman).</td></tr>
+    <tr><td>API Gateway configuration</td><td>Rate limiting, routing, auth termination, request transformation</td><td>Gateway enforces <em>policy</em>; API design defines the <em>contract</em> the gateway protects.</td></tr>
+    <tr><td>Integration glue code</td><td>Adapters, transformers, BFFs (Backend-for-Frontend)</td><td>Glue code <em>papers over</em> contract mismatches; API design <em>prevents</em> the mismatch.</td></tr>
+    <tr><td>Database schema design</td><td>Tables, indexes, foreign keys, migrations</td><td>Database schema is an <em>implementation detail</em>; API contract is the <em>public boundary</em>. Leaking one into the other is a failure mode (§10).</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>2. History — from RPC to GraphQL to events</h2>
+
+<table>
+  <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1980s–90s</strong></td>
+      <td>Distributed RPC, CORBA, DCOM, Java RMI</td>
+      <td>Sun (ONC RPC), OMG (CORBA), Microsoft (DCOM)</td>
+      <td>Interface = remote procedure call. Tight coupling, binary contracts, language-specific stubs.</td>
+    </tr>
+    <tr>
+      <td><strong>1998–2000</strong></td>
+      <td>SOAP, WSDL, UDDI — the "Web Services" stack</td>
+      <td>Microsoft, IBM, BEA, W3C XML Protocol WG</td>
+      <td>XML over HTTP, schema-first (WSDL), discovery (UDDI). Verbose, tool-dependent, "WS-*" complexity explosion.</td>
+    </tr>
+    <tr>
+      <td><strong>2000</strong></td>
+      <td>Roy Fielding's dissertation — REST</td>
+      <td>Roy Fielding (UC Irvine)</td>
+      <td>Six constraints: client-server, stateless, cacheable, uniform interface, layered system, code-on-demand. Resources + HTTP verbs + hypermedia (HATEOAS).</td>
+    </tr>
+    <tr>
+      <td><strong>2002</strong></td>
+      <td>JSON (RFC 4627 / ECMA-404)</td>
+      <td>Douglas Crockford</td>
+      <td>Lightweight serialization replaces XML for Ajax. "Fat client" browsers (Gmail, 2004) drive adoption.</td>
+    </tr>
+    <tr>
+      <td><strong>2005–2010</strong></td>
+      <td>REST pragmatism — "RESTish" APIs proliferate</td>
+      <td>Twitter, Facebook, GitHub, Stripe, Twilio</td>
+      <td>Most APIs drop HATEOAS, use JSON, version in URL (/v1/). Richardson Maturity Model (2008) grades compliance.</td>
+    </tr>
+    <tr>
+      <td><strong>2015</strong></td>
+      <td>gRPC open-sourced (Google → CNCF)</td>
+      <td>Google (Stubby internal since 2001)</td>
+      <td>HTTP/2 + Protocol Buffers. Contract-first, codegen-first, streaming built-in. Mobile/internal microservices driver.</td>
+    </tr>
+    <tr>
+      <td><strong>2015</strong></td>
+      <td>GraphQL open-sourced (Facebook)</td>
+      <td>Lee Byron, Dan Schafer, Nick Schrock</td>
+      <td>Client-specified queries, single endpoint, schema introspection. Solves over/under-fetching for mobile.</td>
+    </tr>
+    <tr>
+      <td><strong>2016–2020</strong></td>
+      <td>OpenAPI 3.0 → 3.1 (JSON Schema alignment)</td>
+      <td>SmartBear / Linux Foundation (OpenAPI Initiative)</td>
+      <td>Schema object = JSON Schema 2020-12. Webhooks, callback objects, link objects. Tooling ecosystem matures.</td>
+    </tr>
+    <tr>
+      <td><strong>2017–2020</strong></td>
+      <td>AsyncAPI, CloudEvents — event-driven contracts</td>
+      <td>AsyncAPI Initiative, CNCF CloudEvents</td>
+      <td>Async contracts for Kafka, RabbitMQ, MQTT, HTTP webhooks. "Request-response is not the only shape."</td>
+    </tr>
+    <tr>
+      <td><strong>2020–2024</strong></td>
+      <td>Type-safe full-stack (tRPC, Zod, GraphQL Codegen)</td>
+      <td>Alex/KATT (tRPC), Colin McDonnell (Zod), The Guild (GraphQL)</td>
+      <td>End-to-end types from schema to client. API design becomes "write the schema, get the types free."</td>
+    </tr>
+    <tr>
+      <td><strong>2023–present</strong></td>
+      <td>AI-assisted contract design / generation</td>
+      <td>OpenAPI Generator, Speakeasy, Liblab, Mintlify, Scalar</td>
+      <td>LLMs draft OpenAPI from natural language; codegen produces SDKs, docs, mock servers, contract tests.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>3. Evolution — constraint inversions across the same idea</h2>
+
+<p>The core idea — <em>a stable boundary between independent deployables</em> — did not change. What changed is the dominant constraint, and the style that won:</p>
+
+<table>
+  <thead><tr><th>Dominant constraint</th><th>Winning style</th><th>Why it fit</th></tr></thead>
+  <tbody>
+    <tr><td>Language interop + binary efficiency (1990s)</td><td>CORBA / DCOM / RMI</td><td>IDL + stubs gave compile-time safety across C++, Java, VB. Network was LAN; latency negligible.</td></tr>
+    <tr><td>Enterprise integration + tooling (early 2000s)</td><td>SOAP / WSDL</td><td>XML Schema + WSDL gave contract-first tooling for Java/.NET enterprises. Firewalls allowed HTTP 80/443.</td></tr>
+    <tr><td>Web-scale + browser clients (mid 2000s)</td><td>REST + JSON</td><td>HTTP semantics (caching, verbs) + JSON (lightweight, JS-native) + URL versioning = deployable by two-pizza teams.</td></tr>
+    <tr><td>Mobile bandwidth + many clients (2010s)</td><td>GraphQL</td><td>Single request, exact fields, introspection. Mobile teams own the query; backend owns the resolver map.</td></tr>
+    <tr><td>Internal microservices + streaming (2015+)</td><td>gRPC / Protobuf</td><td>HTTP/2 multiplexing, binary encoding, codegen in 10+ languages, streaming RPC. Latency & throughput critical.</td></tr>
+    <tr><td>Event-driven + loose coupling (2017+)</td><td>AsyncAPI / CloudEvents</td><td>Producer doesn't know consumer. Schema registry + consumer-driven contracts. Replay, audit, choreography.</td></tr>
+    <tr><td>Type-safe DX + monorepo (2020+)</td><td>tRPC / Zod / GraphQL Codegen</td><td>Schema = source of truth. Types flow to client without codegen step. Colocation beats contract testing.</td></tr>
+    <tr><td>AI-augmented authoring (2023+)</td><td>LLM → OpenAPI → SDK → Docs</td><td>Human writes intent; machine writes contract + artifacts. Review loop replaces authoring loop.</td></tr>
+  </tbody>
+</table>
+
+<p>The pattern repeats: when the dominant constraint changes (binary efficiency → firewall traversal → browser native → mobile bandwidth → internal throughput → loose coupling → developer experience → AI authoring), the old style's ergonomics become friction and a new style absorbs the constraint.</p>
+
+<h2>3b. Migration paths between API styles</h2>
+
+<p>API migrations are contract migrations. The consumer side usually dictates the pace:</p>
+
+<table>
+  <thead><tr><th>From → To</th><th>Trigger</th><th>Target state</th><th>Steps</th><th>Risks</th><th>Success signals</th><th>Timeline</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>REST → GraphQL</td>
+      <td>Over-fetching on mobile; N+1 in web; many client types</td>
+      <td>GraphQL schema with REST proxies for legacy</td>
+      <td>1) Schema design from existing REST resources. 2) GraphQL gateway with REST resolvers. 3) Migrate clients query-by-query. 4) Deprecate REST endpoints.</td>
+      <td>N+1 in resolvers; gateway SPOF; caching complexity</td>
+      <td>Client bundle ↓; waterfall requests eliminated; REST traffic <10%</td>
+      <td>4–12 months</td>
+    </tr>
+    <tr>
+      <td>REST / GraphQL → tRPC / Type-safe RPC</td>
+      <td>Monorepo; TypeScript everywhere; want zero codegen step</td>
+      <td>Shared types = contract; no schema file</td>
+      <td>1) Define router with Zod schemas. 2) Shared package for types. 3) Migrate endpoints route-by-route. 4) Remove GraphQL/REST layer.</td>
+      <td>Couples client/server language; not for polyglot</td>
+      <td>Type errors catch breaking changes; CI <2 min; no generated files</td>
+      <td>2–6 months</td>
+    </tr>
+    <tr>
+      <td>REST → gRPC (internal)</td>
+      <td>Throughput/latency critical; polyglot services; streaming needs</td>
+      <td>Protobuf contracts; gRPC gateway for HTTP clients</td>
+      <td>1) .proto files from OpenAPI. 2) gRPC services + gateway. 3) Migrate internal callers. 4) Keep REST gateway for external.</td>
+      <td>Browser support (gRPC-Web); debugging; protobuf learning curve</td>
+      <td>p99 latency <50ms; payload ↓ 60%; streaming works</td>
+      <td>3–9 months</td>
+    </tr>
+    <tr>
+      <td>Sync API → Async / Event-driven</td>
+      <td>Write throughput; loose coupling; audit/replay needs</td>
+      <td>Event schema (CloudEvents/AsyncAPI); schema registry</td>
+      <td>1) Identify write paths. 2) Emit events alongside sync API → event emitter. 3) Consumers subscribe. 4) Dual-write period. 5) Retire sync endpoint.</td>
+      <td>Eventual consistency mental model; duplicate events; schema evolution</td>
+      <td>Write latency ↓; consumers independent; replay works</td>
+      <td>4–12 months</td>
+    </tr>
+    <tr>
+      <td>Manual contract → AI-augmented (OpenAPI → SDK → Docs)</td>
+      <td>Authoring bottleneck; drift between code/docs; onboarding time</td>
+      <td>Intent → OpenAPI (LLM) → SDK/Docs (CI) → Human review</td>
+      <td>1) Annotate handlers with metadata. 2) LLM generates OpenAPI. 3) CI generates SDK/docs. 4) Review gate.</td>
+      <td>Hallucinated fields; over-trusting generated output</td>
+      <td>Contract drift = 0; SDK release <1 hr after merge; review <15 min</td>
+      <td>1–3 months</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Versioned URLs (/v1/, /v2/) without a migration strategy. Every row above uses a gateway/proxy layer, dual-write period, or incremental client migration. The style table in §3 shows <em>centers of gravity</em> — not mutually exclusive endpoints.</p>
+
+---
+
+<h2>4. Intersection with neighbors — where it borders other practices</h2>
+
+<table>
+  <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>System Design</strong></td>
+      <td>Service boundaries, data ownership, consistency models, failure domains</td>
+      <td>System design <em>decides the decomposition</em>; API design <em>materializes the boundaries</em> as contracts. A system design without contracts is a diagram; contracts without system design are leaky.</td>
+    </tr>
+    <tr>
+      <td><strong>Developer Loop (Frontend)</strong></td>
+      <td>Data fetching, mutations, error handling, optimistic UI, caching</td>
+      <td>The loop <em>consumes</em> the contract; API design <em>produces</em> it. Bad contracts force the loop to paper over (loading spinners, retry logic, type assertions).</td>
+    </tr>
+    <tr>
+      <td><strong>UI/UX & Web Design</strong></td>
+      <td>State visibility, error affordances, loading skeletons, progressive enhancement</td>
+      <td>UI/UX decides <em>what the human sees</em>; API design decides <em>what the machine exchanges</em>. The best UX is a contract that makes the right UI trivial to build.</td>
+    </tr>
+    <tr>
+      <td><strong>Database Internals</strong></td>
+      <td>Schema evolution, migrations, consistency, indexing</td>
+      <td>Database schema is <em>private</em>; API contract is <em>public</em>. Leaking DB types (ObjectId, timestamp precision, nullable FK) into the API is a failure mode (§10).</td>
+    </tr>
+    <tr>
+      <td><strong>Protocol Design (HTTP/QUIC)</strong></td>
+      <td>Transport semantics, framing, compression, prioritization</td>
+      <td>Protocol is <em>how bytes move</em>; API design is <em>what the bytes mean</em>. HTTP/2/3 multiplexing changes API design (no domain sharding, server push → early hints).</td>
+    </tr>
+    <tr>
+      <td><strong>SDK / Client Library Design</strong></td>
+      <td>Ergonomics, type safety, retry policies, pagination helpers</td>
+      <td>SDK is a <em>convenience layer</em>; the raw contract must be usable without it. SDK design is downstream of API design.</td>
+    </tr>
+    <tr>
+      <td><strong>API Gateway / Service Mesh</strong></td>
+      <td>Rate limiting, auth, routing, observability, resilience</td>
+      <td>Gateway enforces <em>policy at the edge</em>; API design defines the <em>contract inside</em>. Gateway config changes without contract changes; contract changes require gateway updates.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>5. Underlying theory — what makes a contract designed not accidental</h2>
+
+<table>
+  <thead><tr><th>Theory</th><th>Origin</th><th>What API design takes from it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Communicating Sequential Processes (CSP)</strong></td>
+      <td>Tony Hoare, 1978</td>
+      <td>Processes communicate via typed channels. Contracts are channel types; versioning is channel protocol evolution.</td>
+    </tr>
+    <tr>
+      <td><strong>Lamport Clocks & Happened-Before</strong></td>
+      <td>Leslie Lamport, 1978</td>
+      <td>Idempotency keys and request deduplication rely on causal ordering. "At least once" delivery + idempotency = exactly-once semantics.</td>
+    </tr>
+    <tr>
+      <td><strong>CAP Theorem & PACELC</strong></td>
+      <td>Eric Brewer (2000), Gilbert & Lynch (2002), Daniel Abadi (2010)</td>
+      <td>Every API operation implies a consistency choice. The contract must declare it (strong, eventual, read-your-writes, causal).</td>
+    </tr>
+    <tr>
+      <td><strong>HATEOAS / Hypermedia Constraint</strong></td>
+      <td>Roy Fielding, 2000</td>
+      <td>Clients navigate via links, not out-of-band knowledge. The contract includes discoverability. Rarely fully implemented; the <em>idea</em> shapes pagination and versioning.</td>
+    </tr>
+    <tr>
+      <td><strong>Postel's Law (Robustness Principle)</strong></td>
+      <td>Jon Postel, RFC 791 (1981)</td>
+      <td>"Be liberal in what you accept, conservative in what you send." API design applies this to schema evolution: accept extra fields, never send unexpected ones.</td>
+    </tr>
+    <tr>
+      <td><strong>Richardson Maturity Model</strong></td>
+      <td>Leonard Richardson, 2008</td>
+      <td>Four levels: RPC over HTTP → Resources → HTTP Verbs → Hypermedia. A diagnostic, not a prescription. Most production APIs sit at Level 2–3.</td>
+    </tr>
+    <tr>
+      <td><strong>Interface Segregation Principle (SOLID)</strong></td>
+      <td>Robert C. Martin, 2000</td>
+      <td>Clients shouldn't depend on methods they don't use. In APIs: narrow resources, separate read/write models, avoid "god endpoints" that return everything.</td>
+    </tr>
+    <tr>
+      <td><strong>Schema Evolution Rules (Avro / Protobuf / JSON Schema)</strong></td>
+      <td>Apache Avro, Google Protobuf, IETF JSON Schema</td>
+      <td>Formal rules for backward/forward compatibility: add optional fields, never remove required, never change type, enum extensions are safe if consumers ignore unknown.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5b. Mental models — how API designers actually reason</h2>
+
+<p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
+
+<table>
+  <thead><tr><th>Model</th><th>Core idea</th><th>When you reach for it</th><th>What it replaces</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Contract as product</strong></td>
+      <td>The API <em>is</em> the product for the consumer. Versioning, deprecation, migration, and support are product management.</td>
+      <td>Deciding how long to support v1; whether to break a field; writing changelogs.</td>
+      <td>"It's just an interface" (treats contract as implementation detail).</td>
+    </tr>
+    <tr>
+      <td><strong>Schema as source of truth</strong></td>
+      <td>The schema (OpenAPI, Protobuf, Zod) generates types, tests, docs, mocks, SDKs. Code conforms to schema, not vice versa.</td>
+      <td>Starting a new service; enforcing compatibility in CI; generating client SDKs.</td>
+      <td>Writing types by hand; manual docs; ad-hoc validation.</td>
+    </tr>
+    <tr>
+      <td><strong>Consumer-driven contracts</strong></td>
+      <td>Consumers publish expectations (Pact, Spring Cloud Contract). Providers verify against them. Breaking changes fail fast.</td>
+      <td>Polyglot microservices; independent deployments; team autonomy.</td>
+      <td>Provider-driven schema; integration test theater.</td>
+    </tr>
+    <tr>
+      <td><strong>Idempotency keys = exactly-once</strong></td>
+      <td>Network fails; retries happen. Idempotency key (client-generated) + server dedup = exactly-once semantics on "at-least-once" transport.</td>
+      <td>Any mutation endpoint (POST, PATCH, DELETE). Especially payments, orders, provisioning.</td>
+      <td>Hoping retries don't double-charge; distributed transactions.</td>
+    </tr>
+    <tr>
+      <td><strong>Versioning by media type, not URL</strong></td>
+      <td><code>Accept: application/vnd.myapi.v2+json</code> keeps URL stable; clients opt in. URLs identify resources; media types identify representations.</td>
+      <td>Long-lived APIs with many consumers; avoiding /v1/, /v2/ URL sprawl.</td>
+      <td>URL versioning (/api/v1/); header versioning without media type.</td>
+    </tr>
+    <tr>
+      <td><strong>Gateway as translation layer</strong></td>
+      <td>Internal services evolve independently; gateway translates (GraphQL→REST, Protobuf→JSON, v1→v2). Consumers see stable contract.</td>
+      <td>Brownfield migration; polyglot internals; external partner APIs.</td>
+      <td>Changing all services simultaneously; shared library coupling.</td>
+    </tr>
+    <tr>
+      <td><strong>Evolution over revolution</strong></td>
+      <td>Add fields, never remove. Deprecate with headers (<code>Sunset</code>, <code>Deprecation</code>), timelines, migration guides. Break only when cost of carry > cost of break.</td>
+      <td>Every schema change; deprecation planning; stakeholder communication.</td>
+      <td>Big-bang v2 launches; silent breaking changes.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Writing the OpenAPI file after the code ships. The schema is the contract — if it's generated from implementation, the implementation <em>is</em> the contract, and you've lost the ability to design it.</p>
+
+---
+
+<h2>6. The rhythm, not the algorithm</h2>
+
+<p>Like <a href="./design-thinking.html">Design Thinking</a> and <a href="./system-design.html">System Design</a>, API Design is a <strong>rhythm</strong>, not a structured algorithm. It fails the three algorithm tests:</p>
+
+<ul>
+  <li><strong>Inputs aren't predefined.</strong> You don't know all client use cases when you design the first version. The contract discovers them through usage, feedback, and migration pain.</li>
+  <li><strong>Steps aren't deterministic.</strong> There is no rule that says "now add pagination." You add it when the first client hits the 10k-row response and times out — a judgment call.</li>
+  <li><strong>No fixed termination.</strong> "Done" means "the contract serves current clients and has a documented evolution path for the next 12 months." That is a strategic judgment, not a predicate.</li>
+</ul>
+
+<p>This is why API design resists checklists that pretend to be complete. A checklist assumes you know all consumers; the rhythm assumes you know <em>what's missing for the ones you have</em> — a product/engineering judgment.</p>
+
+<blockquote class="callout">
+  <p><strong>The "Schema-First" rhythm hack.</strong> Schema-first (write OpenAPI/proto before code) solves the "no fixed termination" problem by <em>making the contract the artifact of review</em>. The contract becomes the PR description. CI fails if the implementation diverges from the schema. It's a process guardrail — useful when enforced, dangerous when the schema becomes a ceremonial document nobody reads.</p>
+</blockquote>
+
+---
+
+<h2>7. Methodologies / styles — the named approaches</h2>
+
+<p>Multiple named styles exist. None is canonical; each is a different packaging of constraints for a dominant use case.</p>
+
+<table>
+  <thead><tr><th>Style</th><th>Core constraints</th><th>Origin</th><th>Best for</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>REST (Level 2–3)</strong></td>
+      <td>Resources + HTTP verbs + status codes + JSON + URL versioning + HATEOAS (optional)</td>
+      <td>Fielding (2000), Richardson (2008)</td>
+      <td>Public HTTP APIs, many heterogeneous clients, caching critical, team autonomy over client SDKs.</td>
+    </tr>
+    <tr>
+      <td><strong>GraphQL</strong></td>
+      <td>Schema + resolvers + client queries + introspection + single endpoint + mutations</td>
+      <td>Facebook (2015)</td>
+      <td>Mobile-first, many client teams, over/under-fetching pain, product-driven backend.</td>
+    </tr>
+    <tr>
+      <td><strong>gRPC / Protobuf</strong></td>
+      <td>IDL (proto) + HTTP/2 + codegen + streaming + deadline propagation</td>
+      <td>Google Stubby (2001), open-sourced 2015</td>
+      <td>Internal microservices, polyglot, high throughput, streaming, strong typing across languages.</td>
+    </tr>
+    <tr>
+      <td><strong>AsyncAPI / Event-driven</strong></td>
+      <td>Message schemas + channels + bindings (Kafka, AMQP, MQTT, HTTP webhook) + correlation IDs</td>
+      <td>AsyncAPI Initiative (2017), CloudEvents (2019)</td>
+      <td>Loose coupling, event sourcing, choreography, audit/replay, multiple unknown consumers.</td>
+    </tr>
+    <tr>
+      <td><strong>tRPC / Zod / Type-safe full-stack</strong></td>
+      <td>TypeScript-first, inferred types from runtime validators, no codegen step, colocation</td>
+      <td>tRPC (2021), Zod (2020)</td>
+      <td>Monorepo / full-stack TypeScript, end-to-end types without schema files, rapid iteration.</td>
+    </tr>
+    <tr>
+      <td><strong>Webhooks (push contracts)</strong></td>
+      <td>POST to registered URL + signature verification + retry with backoff + idempotency key</td>
+      <td>GitHub, Stripe, Slack (2010s)</td>
+      <td>Server-to-server notifications, async completion, third-party integrations.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>All seven share the same DNA: <em>define the boundary → make it machine-verifiable → evolve it without breaking consumers</em>. The differences are transport, serialization, coupling model, and who owns the query shape.</p>
+
+---
+
+<h2>8. Principles — the shared constants</h2>
+
+<p>Across every style, eight principles hold:</p>
+
+<ol>
+  <li><strong>Contract-first.</strong> The contract (OpenAPI, proto, GraphQL SDL) is the source of truth. Code generates from it; tests verify against it; docs render from it.</li>
+  <li><strong>Idempotency by default on mutations.</strong> Every POST/PATCH/PUT that mutates state accepts an <code>Idempotency-Key</code> header. Retries are safe; clients don't guess.</li>
+  <li><strong>Error as API, not accident.</strong> Every error returns a structured envelope (RFC 9457 Problem Details or equivalent): <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, <code>instance</code>, <code>retry_after</code>. Clients switch on <code>type</code>, not string matching.</li>
+  <li><strong>Versioning as deliberate breaking-cost.</strong> Breaking changes get a new version (URL or header) with a sunset date. Non-breaking changes (add optional field, add enum value) ship in the same version. The cost of a version bump is explicit.</li>
+  <li><strong>Narrow surface, deep capability.</strong> Prefer many small resources/operations over one "god endpoint." Interface Segregation applies: clients depend only on what they use.</li>
+  <li><strong>Predictable failure modes.</strong> Rate limits return <code>429</code> with <code>Retry-After</code>. Timeouts are documented. Partial failures (batch APIs) return per-item status, not a single 500.</li>
+  <li><strong>Observability built-in.</strong> Every response includes <code>X-Request-ID</code>. Traces propagate <code>traceparent</code> (W3C Trace Context). Metrics expose latency percentiles, error rates, saturation.</li>
+  <li><strong>Discoverability ≠ documentation.</strong> The schema <em>is</em> the contract. Docs explain <em>why</em> and <em>how</em>; the schema defines <em>what</em>. Both stay in sync via CI.</li>
+</ol>
+
+---
+
+<h2>9. Worked example — "Design a Public Shipment Tracking API"</h2>
+
+<p>A realistic public API problem, walked end-to-end through the rhythm.</p>
+
+<h3>Context & personas</h3>
+<ul>
+  <li><strong>Carrier operations</strong> — scans packages at hubs (high throughput, batch ingest).</li>
+  <li><strong>E-commerce platform</strong> — polls for status to show buyers (moderate QPS, needs webhook).</li>
+  <li><strong>End customer</strong> — opens tracking page once per order (low QPS, needs real-time feel).</li>
+</ul>
+
+<h3>Step 1 — Resource topology (interface contract)</h3>
+<pre><code>GET   /v1/shipments/{id}              # single shipment detail
+GET   /v1/shipments                   # list with cursor pagination, filter by status/date
+POST  /v1/shipments                   # carrier creates (idempotent)
+PATCH /v1/shipments/{id}              # carrier updates scan events (idempotent)
+POST  /v1/webhooks                    # platform registers callback URL
+GET   /v1/shipments/{id}/events       # event stream (Server-Sent Events)
+</code></pre>
+
+<h3>Step 2 — Choose style: REST + SSE for status stream</h3>
+<p>Rationale: public HTTP, heterogeneous clients (mobile web, native apps, server), caching on <code>GET</code> matters, SSE gives real-time feel without WebSocket complexity. GraphQL rejected — overkill for 3 resources, caching story weaker. gRPC rejected — not browser-native without proxy.</p>
+
+<h3>Step 3 — Wire contract (OpenAPI 3.1 snippet)</h3>
+<pre><code>openapi: 3.1.0
+info:
+  title: Shipment Tracking API
+  version: "1.0"
+servers:
+  - url: https://api.shiptrack.example/v1
+paths:
+  /shipments/{id}:
+    get:
+      operationId: getShipment
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Shipment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+components:
+  parameters:
+    shipmentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^SHP-[A-Z0-9]{12}$'
+        description: "Carrier-assigned tracking number (format: SHP-XXXXXXXXXXXX)"
+  schemas:
+    Shipment:
+      type: object
+      required: [id, status, created_at, updated_at, events]
+      properties:
+        id:
+          type: string
+          pattern: '^SHP-[A-Z0-9]{12}$'
+        status:
+          type: string
+          enum: [CREATED, PICKED_UP, IN_TRANSIT, OUT_FOR_DELIVERY, DELIVERED, EXCEPTION, RETURNED]
+          description: "Terminal states: DELIVERED, EXCEPTION, RETURNED"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShipmentEvent'
+    ShipmentEvent:
+      type: object
+      required: [id, type, location, timestamp]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [SCAN, DEPARTURE, ARRIVAL, DELIVERY_ATTEMPT, EXCEPTION, DELIVERED, RETURNED]
+        location:
+          type: object
+          required: [facility_id, city, country_code]
+          properties:
+            facility_id:
+              type: string
+            city:
+              type: string
+            country_code:
+              type: string
+              pattern: '^[A-Z]{2}$'
+        timestamp:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+          description: "Carrier-specific extra fields (driver_id, vehicle_id, gps). Ignored by clients."
+  responses:
+    NotFound:
+      description: Shipment not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+          description: "Seconds until next allowed request"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+  schemas:
+    ProblemDetails:
+      type: object
+      required: [type, title, status, detail, instance]
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://api.shiptrack.example/errors/not-found"
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        retry_after:
+          type: integer
+          description: "Seconds until retry allowed (for 429)"
+</code></pre>
+
+<h3>Step 4 — Idempotency & mutation safety</h3>
+<ul>
+  <li><code>POST /shipments</code> and <code>PATCH /shipments/{id}</code> require <code>Idempotency-Key: <uuid></code> header. Server stores key → response mapping for 24h. Duplicate key returns original response.</li>
+  <li>Carrier batch ingest uses <code>POST /shipments/batch</code> with array of shipments, each with its own idempotency key. Response includes per-item status.</li>
+</ul>
+
+<h3>Step 5 — Versioning & deprecation policy</h3>
+<ul>
+  <li>Version in URL: <code>/v1/</code>, <code>/v2/</code>. No header versioning (simpler for public API).</li>
+  <li>Sunset header on deprecated version: <code>Sunset: Sat, 01 Jan 2027 00:00:00 GMT</code> + <code>Link: </v2/shipments/{id}>; rel="successor-version"</code>.</li>
+  <li>12-month minimum support after successor releases. Communication: email to registered apps, changelog, developer portal banner.</li>
+</ul>
+
+<h3>Step 6 — Rate limits & quotas</h3>
+<ul>
+  <li>Anonymous: 60 req/min, 1000 req/day.</li>
+  <li>Authenticated (API key): 300 req/min, 100k req/day.</li>
+  <li>Carrier partner: 5000 req/min, negotiated quota.</li>
+  <li>Headers on every response: <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>.</li>
+</ul>
+
+<h3>Step 7 — GraphQL counter-example (why not here)</h3>
+<pre><code>type Query {
+  shipment(id: ID!): Shipment
+  shipments(filter: ShipmentFilter, first: Int, after: String): ShipmentConnection
+}
+
+type Shipment {
+  id: ID!
+  status: ShipmentStatus!
+  events: [ShipmentEvent!]!
+  # Problem: events can be 10,000+. Client must paginate manually.
+  # No native caching — every query is a POST.
+  # Carrier batch mutation = custom input type, no idempotency story.
+}
+</code></pre>
+<p>GraphQL adds resolver complexity for a read-heavy, cache-friendly domain. The carrier's batch mutation (10k scans/min) fits REST + idempotency keys better.</p>
+
+<h3>Artifacts produced</h3>
+<ul>
+  <li>OpenAPI 3.1 document (source of truth, checked into repo, CI-validated).</li>
+  <li>Error matrix (every <code>type</code> URI, HTTP status, retry guidance).</li>
+  <li>SSE event schema (separate OpenAPI <code>webhooks</code> or <code>components/schemas/EventStream</code>).</li>
+  <li>Deprecation calendar (shared spreadsheet + automated Sunset header injection).</li>
+  <li>Postman collection (generated from OpenAPI, published to public workspace).</li>
+  <li>TypeScript types (generated via <code>openapi-typescript</code>, published to npm).</li>
+</ul>
+
+---
+
+<h2>10. The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Verbing nouns (RPC-shaped REST)</strong></td>
+      <td><code>POST /shipments/{id}/cancel</code>, <code>POST /shipments/{id}/retry-delivery</code>, <code>GET /shipments/{id}/get-status</code></td>
+      <td>Thinking in actions not resources. The contract becomes a remote procedure call over HTTP, losing caching, idempotency semantics, and hypermedia.</td>
+    </tr>
+    <tr>
+      <td><strong>Internal models leak through the API</strong></td>
+      <td>Response includes <code>_id: ObjectId("...")</code>, <code>createdAt: { $date: 1234567890 }</code>, <code>user_id</code> (FK), <code>is_deleted: false</code></td>
+      <td>Serializing the ORM entity directly. Couples clients to storage schema. Migration becomes a coordinated deploy.</td>
+    </tr>
+    <tr>
+      <td><strong>No idempotency on writes → retries corrupt</strong></td>
+      <td>Mobile app retries <code>POST /shipments</code> on network timeout; carrier creates duplicate shipment.</td>
+      <td>Treating idempotency as "nice to have." Every mutating endpoint needs an idempotency key; the cost of not having it is data corruption.</td>
+    </tr>
+    <tr>
+      <td><strong>Version-by-URL vs version-by-header religious war</strong></td>
+      <td>Team spends 3 weeks debating; ships neither; clients break on a field rename.</td>
+      <td>Bikeshedding the mechanism instead of the policy. Pick one (URL is simpler for public APIs), document the breaking-change policy, move on.</td>
+    </tr>
+    <tr>
+      <td><strong>Pagination by offset on a hot table</strong></td>
+      <td><code>GET /shipments?offset=10000&limit=50</code> takes 3 seconds; client times out.</td>
+      <td>Offset pagination requires scanning skipped rows. Cursor pagination (keyset) is O(1) but requires stable sort key. Default to cursor.</td>
+    </tr>
+    <tr>
+      <td><strong>Errors that lie: HTTP 200 with body <code>{success: false}</code></strong></td>
+      <td>Client checks <code>response.ok</code>, sees true, tries to parse data, crashes on error object.</td>
+      <td>Fear of "breaking" HTTP semantics. The contract <em>is</em> the HTTP status. Use 4xx/5xx; put machine-readable details in RFC 9457 body.</td>
+    </tr>
+    <tr>
+      <td><strong>Undocumented status codes clients can't switch on</strong></td>
+      <td>API returns 418 (teapot) for "carrier offline"; client has no handling, shows generic error.</td>
+      <td>Inventing custom codes instead of mapping to standard 4xx/5xx + RFC 9457 <code>type</code> URI. Clients can only handle what they know.</td>
+    </tr>
+    <tr>
+      <td><strong>Breaking change shipped without sunset window</strong></td>
+      <td><code>status</code> enum adds <code>LOST</code>; mobile app crashes on unknown enum because it uses exhaustive switch.</td>
+      <td>Treating enum extension as non-breaking. In typed clients (TypeScript, Swift, Kotlin), new enum values <em>are</em> breaking. Document enum extensibility: "clients must handle unknown."</td>
+    </tr>
+    <tr>
+      <td><strong>Schema as ceremony, not guardrail</strong></td>
+      <td>OpenAPI file exists but implementation diverges; CI doesn't validate; generated SDK is wrong.</td>
+      <td>Schema-first adopted as process theater. The fix: CI fails if implementation response doesn't match schema (Pact, Dredd, Schemathesis).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The practitioner critique (2015–present)</h3>
+
+<p>API design has faced serious critique from the platform engineering community:</p>
+
+<ul>
+  <li><strong>Kin Lane (API Evangelist)</strong> — "APIs as Products": most orgs treat APIs as technical artifacts, not products with PMs, metrics, and lifecycle. The contract is the product; everything else is packaging.</li>
+  <li><strong>API Handyman (Arnaud Lauret)</strong> — "The Design of Web APIs": REST is often cargo-culted; hypermedia is abandoned; versioning is inconsistent; error formats are invented per endpoint.</li>
+  <li><strong>Stoplight / SmartBear surveys</strong> — "State of API 2023": 60% of orgs have no API design guidelines; 40% discover breaking changes in production; schema validation in CI is rare.</li>
+  <li><strong>Phil Sturgeon (APIs You Won't Hate)</strong> — "Design First vs Code First": code-first (annotations) produces contracts that mirror implementation accidents; design-first (OpenAPI/proto) produces contracts that serve consumers.</li>
+</ul>
+
+<p><strong>The common thread:</strong> the critique is not that the <em>principles</em> are wrong — it's that the <em>institutional adoption</em> hollows them into checkboxes. The rhythm survives; the branded methodologies often don't.</p>
+
+---
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>API design is only as good as the tooling that makes contracts visible, testable, and evolvable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Contract Definition (OpenAPI, Protobuf, GraphQL, AsyncAPI)</strong></td>
+      <td>Swagger Editor, Stoplight, Optic, Buf, GraphQL Codegen, AsyncAPI Studio</td>
+      <td>Implicit contracts → schema-defined, versioned, reviewable contracts</td>
+      <td>Coverage: % endpoints with schema; Drift: schema vs impl mismatch rate; Review latency</td>
+    </tr>
+    <tr>
+      <td><strong>Contract Testing (Consumer-Driven)</strong></td>
+      <td>Pact, Spring Cloud Contract, Specmatic, GraphQL Voyager</td>
+      <td>Provider/consumer mismatch → verified compatibility in CI</td>
+      <td>False positive/negative rate; Consumer coverage; Verification time</td>
+    </tr>
+    <tr>
+      <td><strong>Schema Registry & Governance</strong></td>
+      <td>Confluent Schema Registry, Apicurio, Buf Schema Registry, Optic, Spectral</td>
+      <td>Schema sprawl → centralized, governed, evolving schemas</td>
+      <td>Compatibility check pass rate; Version count; Migration lead time</td>
+    </tr>
+    <tr>
+      <td><strong>API Gateway / Traffic Management</strong></td>
+      <td>Kong, Envoy, AWS API Gateway, GCP API Gateway, Azure API Management, Traefik</td>
+      <td>Raw endpoints → managed traffic (auth, rate limit, transform, observability)</td>
+      <td>Latency overhead; Policy coverage; Config drift; Cost per million requests</td>
+    </tr>
+    <tr>
+      <td><strong>Client SDK / Code Generation</strong></td>
+      <td>OpenAPI Generator, GraphQL Codegen, tRPC, oRPC, Orval, Fern</td>
+      <td>Manual client code → generated, type-safe, always-in-sync clients</td>
+      <td>Drift: client vs schema; Regeneration frequency; Type coverage</td>
+    </tr>
+    <tr>
+      <td><strong>Documentation & Developer Portal</strong></td>
+      <td>Redoc, Swagger UI, Stoplight Elements, Mintlify, ReadMe, Postman</td>
+      <td>Tribal knowledge → discoverable, interactive, always-current docs</td>
+      <td>Doc freshness: days since last deploy; Search success rate; Time to first call</td>
+    </tr>
+    <tr>
+      <td><strong>Mocking & Contract-First Development</strong></td>
+      <td>Prism, Mockoon, WireMock, MSW, Stoplight Prism, Spectral</td>
+      <td>Waiting for backend → parallel frontend development against mock</td>
+      <td>Mock fidelity; Contract coverage; Feedback loop latency</td>
+    </tr>
+    <tr>
+      <td><strong>Linting / Style Enforcement</strong></td>
+      <td>Spectral, vacuum, Zally, API Linter, Custom rules</td>
+      <td>Inconsistent design → enforced standards, automated review</td>
+      <td>Rule coverage; False positive rate; Time to fix violations</td>
+    </tr>
+    <tr>
+      <td><strong>Type-Safe Full-Stack (End-to-End Types)</strong></td>
+      <td>tRPC, Zod, GraphQL Codegen, oRPC, Orval, Fern, TypeScript</td>
+      <td>Schema ↔ code drift → compile-time contract verification</td>
+      <td>Type coverage; Drift detection latency; Refactor confidence</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with Contract Definition + Linting + Client Generation (the "minimum viable API toolkit"). Add Contract Testing when consumer count >3. Add Schema Registry when team count >5 or polyglot. Add Gateway when traffic management needs exceed library capabilities. Add Type-Safe Full-Stack when TypeScript is the primary language. The tool serves the contract — not the reverse.</p>
+
+---
+
+<h2>11. The future — where API design is going</h2>
+
+<table>
+  <thead><tr><th>Signal (2024–2026)</th><th>What it means for API design</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>AI-generated contracts from intent</td>
+      <td>LLMs draft OpenAPI/proto from "we need a shipment tracking API with carrier ingest and customer polling." Human reviews, not writes. The authoring loop becomes a review loop.</td>
+    </tr>
+    <tr>
+      <td>OpenAPI 3.1 + JSON Schema 2020-12 alignment</td>
+      <td>Schema object = full JSON Schema. Tools (validators, codegen, docs) converge. No more "OpenAPI Schema vs JSON Schema" dialect friction.</td>
+    </tr>
+    <tr>
+      <td>AsyncAPI mainstreaming</td>
+      <td>Event-driven contracts get the same tooling maturity as REST: codegen, docs, mock servers, contract testing. Kafka/Avro schemas migrate to AsyncAPI.</td>
+    </tr>
+    <tr>
+      <td>"API as Product" organizational shift</td>
+      <td>Platform teams hire API Product Managers. Contracts have OKRs (adoption, latency p99, breaking-change frequency). Design reviews include PM + DX + Security.</td>
+    </tr>
+    <tr>
+      <td>Type-safe full-stack by default</td>
+      <td>tRPC / Zod / GraphQL Codegen / oRPC make "schema → types" zero-config. The contract becomes the type definition; drift is a compile error.</td>
+    </tr>
+    <tr>
+      <td>Contract testing doubling down</td>
+      <td>Pact, Specmatic, Schemathesis in CI on every PR. Consumer-driven contracts (Pact) prevent provider breaking consumers. The "integration test" moves left.</td>
+    </tr>
+    <tr>
+      <td>OAuth 2.1 / PASETO / SPIFFE identity</td>
+      <td>OAuth 2.1 finalizes (removing implicit/password grants). PASETO gains traction as "JWT without footguns." SPIFFE/SPIRE for workload identity in service mesh. Auth contracts evolve.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>12. Summary — the contract checklist</h2>
+
+<p>Before any API change merges, verify:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>If no…</th></tr></thead>
+  <tbody>
+    <tr><td>Is the contract (OpenAPI/proto/GraphQL SDL) the source of truth, not the code?</td><td>Stop. Code-first = implementation leaks into contract.</td></tr>
+    <tr><td>Does every mutating endpoint accept an idempotency key?</td><td>Stop. Retries will corrupt state.</td></tr>
+    <tr><td>Are all errors RFC 9457 Problem Details with a stable <code>type</code> URI?</td><td>Stop. Clients can't programmatically handle string matching.</td></tr>
+    <tr><td>Is the versioning strategy documented with a sunset policy?</td><td>Stop. Breaking changes will surprise consumers.</td></tr>
+    <tr><td>Are enums documented as extensible (clients must handle unknown)?</td><td>Stop. Typed clients will crash on new values.</td></tr>
+    <tr><td>Is pagination cursor-based (not offset) for collections that grow?</td><td>Stop. Offset pagination is O(n) and times out at scale.</td></tr>
+    <tr><td>Does the contract pass schema validation in CI (implementation matches schema)?</td><td>Stop. Schema drift = generated SDKs lie.</td></tr>
+    <tr><td>Are rate limits, quotas, and <code>Retry-After</code> headers documented and returned?</td><td>Stop. Clients can't back off; they hammer and get banned.</td></tr>
+    <tr><td>Is there a deprecation calendar communicated to registered consumers?</td><td>Stop. Surprise deprecation = lost trust, churn.</td></tr>
+  </tbody>
+</table>
+
+<p>Print this. Put it on the API review wall. If the PR can't pass this checklist, it's not ready for consumers.</p>
+
+---
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">Fielding, R. (2000). <em>Architectural Styles and the Design of Network-based Software Architectures</em> (PhD dissertation).</a> ·
+  <a href="https://www.rfc-editor.org/rfc/rfc791">Postel, J. (1981). RFC 791 — Internet Protocol (Robustness Principle).</a> ·
+  <a href="https://www.rfc-editor.org/rfc/rfc9457">Nottingham, M. & Wilde, E. (2023). RFC 9457 — Problem Details for HTTP APIs.</a> ·
+  <a href="https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md">OpenAPI Initiative (2021). <em>OpenAPI Specification 3.1</em>.</a> ·
+  <a href="https://www.asyncapi.com/docs/specifications/v2.6.0">AsyncAPI Initiative (2023). <em>AsyncAPI Specification 2.6</em>.</a> ·
+  <a href="https://cloudevents.github.io/spec/v1.0.2/">CNCF CloudEvents (2021). <em>CloudEvents Specification 1.0</em>.</a> ·
+  <a href="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson, L. (2008). <em>Richardson Maturity Model</em>.</a> ·
+  <a href="https://www.cs.umd.edu/~pugh/csci741/yourdon.pdf">Yourdon & Constantine (1979). <em>Structured Design</em> (coupling/cohesion).</a> ·
+  <a href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf">Lamport, L. (1978). "Time, Clocks, and the Ordering of Events in a Distributed System."</a> ·
+  <a href="https://www.allthingsdistributed.com/2012/01/cap-twelve-years-later.html">Brewer, E. (2012). "CAP Twelve Years Later: How the 'Rules' Have Changed."</a> ·
+  <a href="https://apievangelist.com/">Lane, K. (ongoing). <em>API Evangelist — APIs as Products</em>.</a> ·
+  <a href="https://apihandyman.io/">Lauret, A. (ongoing). <em>API Handyman — The Design of Web APIs</em>.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a real API where the team <em>didn't</em> do idempotency keys on mutations, and what the production data corruption incident looked like. Show me the cleanup script."</li>
+    <li>"When you inherit an API that leaks database IDs (ObjectId, auto-increment PK) and internal enums, what's the first contract version you ship, and how do you migrate existing consumers without a flag day?"</li>
+    <li>"How do you teach a team to distinguish <em>schema-first as guardrail</em> from <em>schema-first as ceremony</em>? What's the one CI check that separates them?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · API Design — the contract layer</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

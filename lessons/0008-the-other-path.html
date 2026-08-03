@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0008 — The Other Path · Angular's Evolution, for Contrast</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 8 · The Exploration Journey · Episode 8 of 14 · Practice (2/3)</p>
+  <h1>The Other Path — Angular's Evolution, for Contrast</h1>
+  <p class="meta">React's class→hooks arc (Lesson 6) is one camp's story. Angular took a different path to the same destination — narrower watching. Three eras, one name, each rewriting reactivity from scratch. Anchored to <a href="../reference/angular-evolution.html">Angular's Evolution</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0007-the-rhythm.html">Lesson 7</a> was the universal thinking loop. This is a <em>contrast</em>: the same period (2010–2026), a different framework, a different mechanism for the same goal. It pairs with <a href="./0006-the-class-to-hooks-revolution.html">Lesson 6</a> (React's arc). Next, <a href="./0009-the-frontier.html">Lesson 9</a> returns to React's frontier. See the <a href="../PLAN.md">plan</a>.</p>
+</section>
+
+<h2>1. Three frameworks, one name</h2>
+<p>Angular is not one framework. It is <strong>three frameworks with the same name</strong>, each rewriting the state and reactivity model from scratch. There was no gradual migration between them — AngularJS apps had to be rewritten entirely to become Angular 2 apps. The three eras:</p>
+<ul>
+  <li><strong>AngularJS (2010–2016)</strong> — <code>$scope</code> tree, dirty-checking. A "digest cycle" walked the whole tree comparing old vs new values on every interaction.</li>
+  <li><strong>Angular 2+ (2016–2023)</strong> — class components, TypeScript, dependency injection. <code>zone.js</code> monkey-patched browser APIs and broadcast "something changed" to <em>all</em> components, running change detection.</li>
+  <li><strong>Modern Angular (2023+)</strong> — Signals, standalone components, zoneless. A fine-grained subscription graph triggers <em>only</em> the components that depend on a changed signal.</li>
+</ul>
+<p>Notice the direction: each era <strong>widened the developer experience and narrowed what the framework had to watch</strong> — from the whole <code>$scope</code> tree, to all components on every async event, to just a signal's dependency graph.</p>
+
+<h2>2. Era by era — and why each gave way</h2>
+<p><strong>AngularJS</strong> (2010) solved the same problem as Backbone and Ember: make the page dynamic without hand-writing DOM code. Its <strong>dirty-checking</strong> digest cycle walked the entire <code>$scope</code> tree, comparing old vs new values on every interaction. It worked — until apps grew. Thousands of watched expressions caused visible lag on every keystroke. The architecture couldn't be fixed incrementally.</p>
+<p><strong>Angular 2+</strong> (2016) was a from-scratch rewrite: class components, TypeScript, dependency injection, and <code>zone.js</code> as the change-detection engine. Zone.js monkey-patched browser APIs so that any async event broadcast "something changed" to <em>all</em> components, which then ran change detection. Stable for a decade — but the cost was a <strong>0% migration path</strong>: AngularJS apps had to be rewritten entirely, which created the "Angular 1 → anything else" migration wave of 2016–2019.</p>
+<p><strong>Modern Angular</strong> (2023+) adopted <strong>Signals</strong> (<code>signal()</code>, <code>computed()</code>, <code>effect()</code>), standalone components, and a zoneless mode. A signal builds a fine-grained subscription graph, so a change triggers <em>only</em> the components that depend on that signal — not all of them. The watching got minimal.</p>
+
+<h2>3. The contrast with React — same direction, different mechanism</h2>
+<p>Here's the headline. React and Angular both moved in the <strong>same direction</strong> — narrow what the framework watches — but by a <strong>different mechanism</strong>:</p>
+<ul>
+  <li><strong>React narrowed the <em>component's</em> awareness</strong> of what changed: <code>this.setState</code> (you tell it) → hooks deps arrays (you list what an effect depends on) → the compiler (it infers for you).</li>
+  <li><strong>Angular narrowed the <em>framework's</em> watching</strong>: the whole <code>$scope</code> tree → all components on every async event → a signal's dependency graph.</li>
+</ul>
+<p>That difference also explains the Signals question. Angular adopted Signals; React declined. Not because one is "better," but because they had <strong>different bottlenecks</strong>. Angular's bottleneck was zone.js broadcasting to everything — Signals' fine-grained graph fixed that. React's bottleneck was the manual deps-array tax — and the <a href="./0009-the-frontier.html">compiler</a> fixed that <em>without</em> changing the per-render capture model that Signals would have broken. Same diagnosis (the framework reacts too broadly), different treatment.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="three" data-explain="Angular is three frameworks with one name: AngularJS (dirty-checking + $scope), Angular 2+ (classes + zone.js), and modern Angular (Signals + zoneless). Each rewrote the state and reactivity model from scratch — a 0% migration path between eras.">
+  <summary>How many distinct reactivity models has Angular had under one name?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="three"> Three, each rewritten from scratch</label>
+      <label><input type="radio" name="q1" value="one"> One, steadily extended over years</label>
+      <label><input type="radio" name="q1" value="two"> Two, then later merged back</label>
+      <label><input type="radio" name="q1" value="five"> Five, one per major version</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="component" data-explain="Same direction, different mechanism: React narrowed the *component's* awareness of what changed (setState → deps arrays → compiler inference); Angular narrowed the *framework's* watching ($scope tree → all components → signal dependency graph).">
+  <summary>React and Angular both narrowed what the framework watches. How did their mechanisms differ?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="component"> React narrowed components, Angular the framework</label>
+      <label><input type="radio" name="q2" value="same"> Both used the exact same mechanism</label>
+      <label><input type="radio" name="q2" value="opposite"> They both moved in opposite directions</label>
+      <label><input type="radio" name="q2" value="neither"> Neither one narrowed anything at all</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="bottleneck" data-explain="Different bottlenecks: Angular's was zone.js broadcasting to all components on every async event — Signals' fine-grained graph fixed that. React's was the manual deps-array tax — the compiler fixed that without changing the capture model Signals would break.">
+  <summary>Why did Angular adopt Signals while React declined them?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="bottleneck"> They each solved different bottlenecks</label>
+      <label><input type="radio" name="q3" value="better"> Signals are simply better always</label>
+      <label><input type="radio" name="q3" value="trend"> Angular follows every new trend</label>
+      <label><input type="radio" name="q3" value="license"> React's license forbade using Signals</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold Angular's arc as a <em>contrast</em> to React's: <strong>three eras, one name</strong> — AngularJS (dirty-checking), Angular 2+ (classes + zone.js), Modern Angular (Signals + zoneless) — each rewriting reactivity from scratch, with a 0% migration path between them. The headline: React and Angular moved in the <strong>same direction</strong> (narrow what's watched) by a <strong>different mechanism</strong> — React narrowed the component's awareness, Angular narrowed the framework's watching. And Angular took Signals where React took the compiler, because they had <strong>different bottlenecks</strong>. At work you can place Angular code without forcing React's model onto it.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/angular-evolution.html">Angular's Evolution</a> — each era in depth, the hooks↔Signals contrast, and the "will I write Angular at work?" Q&amp;A.</li>
+    <li><strong>Next lesson:</strong> <a href="./0009-the-frontier.html">Lesson 9 — The Frontier</a> — back to React: the compiler, Server Components, and the framework-default era.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="../reference/angular-evolution.html">Angular's Evolution (this workspace)</a> — the reference this lesson is built on; for the live docs, <a href="https://angular.dev/">angular.dev</a> and <a href="https://overreacted.io/why-isnt-x-a-hook/">Abramov — Why Isn't X a Hook?</a> (React's case against Signals).</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"If Angular rewrote from scratch, what happened to all the AngularJS apps?"</li>
+    <li>"Would Signals ever come to React, or is the compiler the final answer?"</li>
+    <li>"Should I learn Angular at all, or is React enough?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 8 · <a href="../reference/angular-evolution.html">Reference: Angular's Evolution</a></span>
+  <span>Next → <a href="./0009-the-frontier.html">Lesson 9 · The Frontier</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

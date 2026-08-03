@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Income Stream Landscape — Reference</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<style>
+/*==== editable table cells ====*/
+.editable-table td[contenteditable] {
+  cursor: text;
+  min-width: 4em;
+  background: rgba(255,255,255,.55);
+}
+.editable-table td[contenteditable]:hover {
+  background: #fcf9f2;
+}
+.editable-table td[contenteditable]:focus {
+  outline: 1.5px solid var(--accent-soft);
+  background: #fffefb;
+}
+.editable-table td[contenteditable]::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  font-style: italic;
+  display: block;
+}
+.editable-table td[contenteditable]:empty::before {
+  content: attr(data-placeholder);
+}
+.editable-table td[contenteditable]:focus::before,
+.editable-table td[contenteditable]:not(:empty)::before {
+  content: none;
+}
+/*==== action bar ====*/
+.action-bar {
+  display: flex; gap: .6rem; flex-wrap: wrap;
+  margin: 1.2rem 0 1.8rem;
+}
+.action-bar button {
+  padding: .4rem .85rem; border: 1px solid var(--accent-soft);
+  background: var(--paper-warm); border-radius: 4px;
+  font-family: ui-sans-serif,system-ui,sans-serif; font-size: .85rem;
+  cursor: pointer; color: var(--ink);
+}
+.action-bar button:hover { background: #e9e0cc; }
+.action-bar button.danger { border-color: var(--bad); color: var(--bad); }
+.action-bar button.danger:hover { background: #fae6e6; }
+/*==== saved indicator ====*/
+.saved-tag {
+  font-family: ui-sans-serif,system-ui,sans-serif;
+  font-size: .72rem; color: var(--good);
+  margin-left: .6rem; opacity: 0; transition: opacity .3s;
+}
+.saved-tag.show { opacity: 1; }
+/*==== section salvage ====*/
+h2 .section-save-btn {
+  font-size: .72rem; font-weight: 400; margin-left: .5rem;
+  padding: .1rem .5rem; border: 1px solid var(--rule);
+  border-radius: 3px; background: var(--paper); cursor: pointer;
+  font-family: ui-sans-serif,system-ui,sans-serif;
+  color: var(--muted); vertical-align: middle;
+}
+h2 .section-save-btn:hover { background: var(--paper-warm); color: var(--ink); }
+/*==== export textarea ====*/
+.export-area {
+  width:100%; min-height:18rem; margin-top:.8rem;
+  font-family:ui-monospace,monospace; font-size:.78rem; line-height:1.4;
+  border:1px solid var(--rule); border-radius:4px; padding:.6rem .8rem;
+  background:var(--code-bg); color:var(--ink);
+  resize:vertical; white-space:pre; tab-size:2;
+}
+/*==== week-of line ====*/
+.week-of-line { display: flex; gap: .5rem; align-items: center; margin: .8rem 0; }
+.week-of-line input { border: 1px solid var(--rule); border-radius: 3px; padding: .25rem .5rem; background: #fffefb; font-family: ui-sans-serif,system-ui,sans-serif; flex: 0 0 10rem; }
+.week-of-line label { font-family: ui-sans-serif,system-ui,sans-serif; font-size: .88rem; color: var(--ink-soft); }
+
+/* tally inline edit */
+.tally-edit { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin: .6rem 0; }
+.tally-edit input { width: 3rem; border: 1px solid var(--rule); border-radius: 3px; padding: .2rem .4rem; background: #fffefb; text-align: center; font-family: ui-monospace,monospace; }
+
+/* map changes inline edit */
+.map-changes-edit { margin: .6rem 0; }
+.map-changes-edit div { margin: .25rem 0; font-family: ui-sans-serif,system-ui,sans-serif; font-size: .88rem; display: flex; gap: .5rem; align-items: center; }
+.map-changes-edit input { flex: 1; border: 1px solid var(--rule); border-radius: 3px; padding: .2rem .5rem; background: #fffefb; font-family: ui-sans-serif,system-ui,sans-serif; max-width: 20rem; }
+</style>
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Personal filled map</p>
+  <h1>Income&nbsp;stream landscape</h1>
+  <p class="meta">Demand-side opportunity map · JavaScript/React learner, C++ background · Egypt remote + local context. All editable cells auto-save to <code>localStorage</code> — close and come back, your data stays.</p>
+</header>
+
+<div class="action-bar">
+  <button data-action="export">📋 Export to Markdown</button>
+  <button data-action="reset" class="danger">🗑 Clear all my data</button>
+  <span id="save-tag-global" class="saved-tag">✓ saved</span>
+</div>
+
+<!-- ──── §0 Cheat sheet (static) ──── -->
+<h2 id="s0">0. How to research this</h2>
+
+<blockquote class="callout">
+<p><strong>Do not search only</strong> <code>income stream landscape</code> or <code>demand-side opportunity mapping</code> — those are <em>our labels</em>, not how good sources title pages. One stream + geography/skill + metric. Prefer primary sources over influencer listicles.</p>
+</blockquote>
+
+<table>
+  <thead><tr><th>Stream</th><th>Better search queries</th><th>Prefer these source types</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A · Jobs (Egypt)</strong></td><td><code>frontend developer salary Egypt</code>, <code>React developer Wuzzuf</code></td><td>Wuzzuf, LinkedIn, company career pages, peer offer anecdotes</td></tr>
+    <tr><td><strong>B · Remote jobs</strong></td><td><code>React TypeScript salary remote</code>, <code>levels.fyi frontend</code></td><td>YC Work at a Startup (<code>/jobs/role/front-end-engineer</code> — published bands), RemoteOK (<code>/remote-react-jobs</code> + RSS), HN "Who's Hiring" monthly, LinkedIn saved search, levels.fyi (browser visit)</td></tr>
+    <tr><td><strong>C · Freelance</strong></td><td><code>Upwork React hourly rates</code></td><td>Live job postings, fee docs</td></tr>
+    <tr><td><strong>D · Exclusive nets</strong></td><td><code>Toptal screening process</code></td><td>Official platform pages, not Reddit myths</td></tr>
+    <tr><td><strong>E · AI annotation</strong></td><td><code>DataAnnotation rates</code>, <code>Outlier AI expert pay</code></td><td>Application pages, ToS, your paid hours</td></tr>
+    <tr><td><strong>F · Education</strong></td><td><code>teach programming Arabic</code></td><td>Platform mentor rates, your inbound interest</td></tr>
+    <tr><td><strong>G · C++/WASM</strong></td><td><code>WebAssembly job React</code></td><td>Niche JDs, specialized contractors</td></tr>
+    <tr><td><strong>Macro · Egypt</strong></td><td><code>ITIDA digital freelancers</code>, <code>CBE USD EGP</code></td><td>ITIDA/MCIT press, CBE references</td></tr>
+    <tr><td><strong>Macro · demand</strong></td><td><code>Stack Overflow developer survey</code>, <code>HackerRank developer skills report</code></td><td>Official survey pages</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Weekly recipe (~45 min, no scraper):</strong> YC Work at a Startup front-end + remote roles (published bands) · LinkedIn saved-search digest · RemoteOK React feed with country filter · HN "Who's Hiring" monthly (filter <code>remote react</code>) · levels.fyi cross-check. Do not build a scraper — single-platform data misses ATS, government, AI annotation, education streams entirely and breaks on anti-bot updates.</p>
+
+<p>Companion: <a href="./frontend-income-markets.html">Frontend income markets</a> (stream definitions &amp; caveats).</p>
+
+<!-- ──── §1 Positioning (static) ──── -->
+<h2 id="s1">1. Positioning</h2>
+
+<table>
+  <thead><tr><th>Field</th><th>Filled</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Now</strong></td><td>C++ dev building solid JS fundamentals; not yet a production React hire.</td></tr>
+    <tr><td><strong>+cert (~2–6 wk)</strong></td><td>JS-certified; strong core; learning to read real React components.</td></tr>
+    <tr><td><strong>+proof (~3–9 mo)</strong></td><td>Frontend/React dev who can ship UI, debug hooks/closures; C++ edge for WASM.</td></tr>
+    <tr><td><strong>Languages</strong></td><td>Technical English (work/study); Arabic (teaching/local market advantage).</td></tr>
+    <tr><td><strong>Unfair advantages</strong></td><td>C++ systems thinking; bilingual; Egypt's government-promoted digital export climate; deep JS study trail.</td></tr>
+  </tbody>
+</table>
+
+<!-- ──── §2 Live demand sample (editable) ──── -->
+<h2 id="s2">2. Live demand sample <button class="section-save-btn" data-save="s2">save changes</button></h2>
+
+<p><em>Starter prior from typical 2026 frontend demand. After one sampling week, overwrite the cells below.</em></p>
+
+<table class="editable-table" id="table-s2">
+  <thead><tr><th>Skill / signal</th><th>Remote%</th><th>Egypt local%</th><th>Freelance%</th><th>Your gap</th></tr></thead>
+  <tbody>
+    <tr><td>JavaScript core</td><td contenteditable data-placeholder="Very high">Very high</td><td contenteditable data-placeholder="Very high">Very high</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="gap">Low — main study path</td></tr>
+    <tr><td>React hooks</td><td contenteditable data-placeholder="Very high">Very high</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="gap">Medium — theory done, little shipped</td></tr>
+    <tr><td>TypeScript</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="Med-High">Med–High</td><td contenteditable data-placeholder="Medium">Medium</td><td contenteditable data-placeholder="gap">High — deferred until after cert</td></tr>
+    <tr><td>Next.js / App Router</td><td contenteditable data-placeholder="Med-High">Med–High</td><td contenteditable data-placeholder="Medium">Medium</td><td contenteditable data-placeholder="Medium">Medium</td><td contenteditable data-placeholder="gap">High — survey-level only</td></tr>
+    <tr><td>CSS / responsive UI</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="Very high">Very high</td><td contenteditable data-placeholder="gap">Unknown — not drilled in cert path</td></tr>
+    <tr><td>Git + PR workflow</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="Medium">Medium</td><td contenteditable data-placeholder="gap">Assumed basic; verify</td></tr>
+    <tr><td>Written English</td><td contenteditable data-placeholder="Critical">Critical</td><td contenteditable data-placeholder="Medium">Medium</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="gap">Assumed workable; verify in proposals</td></tr>
+    <tr><td>Portfolio / GitHub proof</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="Medium">Medium</td><td contenteditable data-placeholder="High">High</td><td contenteditable data-placeholder="gap">High — missing</td></tr>
+    <tr><td>HackerRank cert</td><td contenteditable data-placeholder="Low-Med">Low–Med</td><td contenteditable data-placeholder="Low-Med">Low–Med</td><td contenteditable data-placeholder="Low">Low</td><td contenteditable data-placeholder="gap">In progress — high ROI for <em>your</em> stage</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Demand takeaway:</strong> The market pays for <strong>JS + React + proof</strong>. Overweight streams that accept JS-strong / React-learning, not only shipped Next + TS.</p>
+
+<!-- ──── §3 Streams with stage lanes (static) ──── -->
+<h2 id="s3">3. Streams with stage lanes <button class="section-save-btn" data-save="s3">save notes</button></h2>
+
+<p>Legend: <strong>Strong / Possible / Weak / Closed</strong></p>
+
+<h3>Stream A — Local employment (Egypt)</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Possible</td><td>Strong</td><td>Strong</td></tr>
+    <tr><td><strong>Gate</strong></td><td>Interview JS + basic React/CSS</td><td>+ cert/portfolio signal</td><td>Production stories</td></tr>
+    <tr><td><strong>Time-to-first$</strong></td><td>4–12 wk <em>est.</em></td><td>3–8 wk <em>est.</em></td><td>Ongoing</td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>Local EGP bands</td><td>Higher local / MNC local</td><td>Lead path slow</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3a" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream A">Best stable lane while global remote is hard. Aligns with mission.</span></p>
+
+<h3>Stream B — Remote employment (global)</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Weak / Closed</td><td>Possible</td><td>Possible → Strong</td></tr>
+    <tr><td><strong>Gate</strong></td><td>"2+ yr React", TS, timezone</td><td>Portfolio + cert help</td><td>Impact stories</td></tr>
+    <tr><td><strong>Time-to-first$</strong></td><td>Long <em>est.</em></td><td>Still long <em>est.</em></td><td>1–4 mo <em>est.</em></td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>High USD</td><td>High</td><td>Highest</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3b" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream B">Keep as destination, not this quarter's primary hunt.</span></p>
+
+<h3>Stream C — Open freelance (Upwork-class)</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Weak–Possible</td><td>Possible</td><td>Strong</td></tr>
+    <tr><td><strong>Gate</strong></td><td>No reviews; proposal volume</td><td>Social proof; niche wording</td><td>Reputation + C++ niche</td></tr>
+    <tr><td><strong>Time-to-first$</strong></td><td>2–8 wk if aggressive</td><td>Faster with reviews</td><td>Steady</td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>Low net early</td><td>Mid</td><td>High if specialized</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3c" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream C">Viable side stream; protect time from race-to-bottom gigs.</span></p>
+
+<h3>Stream D — Exclusive networks (Toptal-class)</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Closed</td><td>Closed / Weak</td><td>Possible</td></tr>
+    <tr><td><strong>Gate</strong></td><td>Multi-stage screening</td><td>Same</td><td>+ live coding + English</td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>Very high hourly</td><td>—</td><td>High</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3d" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream D">Do not structure 2026 H2 around this. Revisit after proof.</span></p>
+
+<h3>Stream E — AI annotation / expert evaluation</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Possible</td><td>Stronger</td><td>Strong</td></tr>
+    <tr><td><strong>Gate</strong></td><td>App tests; volume variance</td><td>Higher rubric scores</td><td>Domain specialization</td></tr>
+    <tr><td><strong>Time-to-first$</strong></td><td>1–4 wk <em>est.</em></td><td>Ongoing</td><td>Ongoing</td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>~$25–30+/hr gen; domain higher</td><td>Higher on code tasks</td><td>Good side income</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3e" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream E">Best near-term USD side lane — rewards exactly what you're studying. Feast/famine risk.</span></p>
+
+<h3>Stream F — Education / content (Arabic + English)</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Possible</td><td>Stronger</td><td>Strong</td></tr>
+    <tr><td><strong>Gate</strong></td><td>Audience / trust</td><td>Proof + lesson quality</td><td>Distribution</td></tr>
+    <tr><td><strong>Time-to-first$</strong></td><td>Weeks–months</td><td>Medium</td><td>Compounds</td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>Low early</td><td>Medium</td><td>High if distribution works</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3f" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream F">Already have teaching artifacts (EN + AR). Career capital + optional cash.</span></p>
+
+<h3>Stream G — C++ × web niche (WASM, tools, perf)</h3>
+<table>
+  <thead><tr><th></th><th>Now</th><th>After cert + portfolio</th><th>After 6–12 mo proof</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Lane fit</strong></td><td>Weak</td><td>Possible</td><td>Strong</td></tr>
+    <tr><td><strong>Gate</strong></td><td>Browser + build tooling</td><td>One WASM demo</td><td>Client problems</td></tr>
+    <tr><td><strong>Ceiling</strong></td><td>High per project</td><td>High</td><td>High</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3g" style="font-style:italic;color:var(--ink-soft)" data-placeholder="Your notes on Stream G">Long-range unfair advantage. Park behind cert.</span></p>
+
+<!-- ──── §4 Economics scorecard (static) ──── -->
+<h2 id="s4">4. Economics scorecard</h2>
+
+<p>Scale 1–5. <strong>EV rank</strong> = priority for <em>your next 90 days</em>.</p>
+
+<table>
+  <thead><tr><th>Stream</th><th>Reachability</th><th>Pay ceiling</th><th>Time tax</th><th>Learning value</th><th>Downside</th><th>90-day EV</th></tr></thead>
+  <tbody>
+    <tr><td>A Local</td><td>3</td><td>3</td><td>4</td><td>5</td><td>Lower USD</td><td><strong>2</strong></td></tr>
+    <tr><td>B Remote</td><td>1</td><td>5</td><td>5</td><td>4</td><td>Rejection fatigue</td><td><strong>5</strong> (awareness)</td></tr>
+    <tr><td>C Freelance</td><td>2</td><td>3</td><td>5</td><td>3</td><td>Low-ball</td><td><strong>3</strong></td></tr>
+    <tr><td>D Exclusive</td><td>1</td><td>5</td><td>4</td><td>2</td><td>Opportunity cost</td><td><strong>7</strong> (ignore)</td></tr>
+    <tr><td>E Annotation</td><td>3</td><td>3</td><td>2–3</td><td>4</td><td>Volume dries up</td><td><strong>1</strong></td></tr>
+    <tr><td>F Education</td><td>2</td><td>2</td><td>4</td><td>5</td><td>Slow cash</td><td><strong>4</strong></td></tr>
+    <tr><td>G C++/WASM</td><td>1</td><td>4</td><td>3</td><td>3</td><td>Distracts from cert</td><td><strong>6</strong></td></tr>
+  </tbody>
+</table>
+
+<h3>90-day primary strategy</h3>
+<table>
+  <thead><tr><th>Priority</th><th>Stream</th><th>Time budget</th><th>Success metric</th></tr></thead>
+  <tbody>
+    <tr><td><strong>P0</strong></td><td>Mission: cert + L12</td><td>50–60% of binge</td><td>Cert booked/passed</td></tr>
+    <tr><td><strong>P1</strong></td><td>E — AI annotation</td><td>10–20%</td><td>Accepted + first paid hours</td></tr>
+    <tr><td><strong>P2</strong></td><td>A — Local job readiness</td><td>15–25%</td><td>1 React UI + 5 apps after cert</td></tr>
+    <tr><td><strong>P3</strong></td><td>C — Freelance</td><td>0–10%</td><td>Max 5 proposals/week niche</td></tr>
+    <tr><td><strong>Park</strong></td><td>B, D, G</td><td>Watchlist</td><td>Revisit after proof lane</td></tr>
+  </tbody>
+</table>
+
+<!-- ──── §5 Skill → gap (editable) ──── -->
+<h2 id="s5">5. Skill → stream gap <button class="section-save-btn" data-save="s5">save changes</button></h2>
+
+<table class="editable-table" id="table-s5">
+  <thead><tr><th>Skill</th><th>Needed by</th><th>Status</th><th>Action</th></tr></thead>
+  <tbody>
+    <tr><td>Closures / scope / <code>this</code> / modules</td><td contenteditable data-placeholder="needed by">Cert, annotation, all jobs</td><td contenteditable data-placeholder="status">Strong study trail</td><td contenteditable data-placeholder="action">Cold L12 → cert</td></tr>
+    <tr><td>Array/object/string fluency</td><td contenteditable data-placeholder="needed by">Cert, annotation</td><td contenteditable data-placeholder="status">Covered in lessons</td><td contenteditable data-placeholder="action">Timed drills</td></tr>
+    <tr><td>React hooks literacy</td><td contenteditable data-placeholder="needed by">Local/remote/freelance</td><td contenteditable data-placeholder="status">Reading-level building</td><td contenteditable data-placeholder="action">Read one real component/week after cert</td></tr>
+    <tr><td>One shipped UI</td><td contenteditable data-placeholder="needed by">Freelance, jobs</td><td contenteditable data-placeholder="status">Missing</td><td contenteditable data-placeholder="action">Build one small app (not twenty tutorials)</td></tr>
+    <tr><td>TypeScript</td><td contenteditable data-placeholder="needed by">Remote, many local mid</td><td contenteditable data-placeholder="status">Deferred</td><td contenteditable data-placeholder="action">After cert</td></tr>
+    <tr><td>Next.js literacy</td><td contenteditable data-placeholder="needed by">Many product jobs</td><td contenteditable data-placeholder="status">Reference only</td><td contenteditable data-placeholder="action">Skim deep-dive when reading work code</td></tr>
+    <tr><td>CSS/layout</td><td contenteditable data-placeholder="needed by">Almost all UI gigs</td><td contenteditable data-placeholder="status">Unknown</td><td contenteditable data-placeholder="action">Audit with one landing-page rebuild</td></tr>
+    <tr><td>Proposal/interview English</td><td contenteditable data-placeholder="needed by">Remote, freelance</td><td contenteditable data-placeholder="status">Unknown</td><td contenteditable data-placeholder="action">Write 3 templates; do 2 mock interviews</td></tr>
+    <tr><td>Portfolio presence</td><td contenteditable data-placeholder="needed by">Remote, freelance</td><td contenteditable data-placeholder="status">Weak</td><td contenteditable data-placeholder="action">GitHub: cert prep + 1 React app</td></tr>
+  </tbody>
+</table>
+
+<!-- ──── §6 Conversion log (editable) ──── -->
+<h2 id="s6">6. Conversion log <button class="section-save-btn" data-save="s6">save changes</button></h2>
+
+<h3>Applications / proposals</h3>
+<table class="editable-table" id="table-s6a">
+  <thead><tr><th>Date</th><th>Stream</th><th>Target</th><th>Outcome</th><th>Learning</th></tr></thead>
+  <tbody>
+    <tr><td contenteditable data-placeholder="2026-07-28">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="company / gig">—</td><td contenteditable data-placeholder="rejected/accepted/pending">—</td><td contenteditable data-placeholder="what you learned">—</td></tr>
+    <tr><td contenteditable data-placeholder="2026-08-04">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="company / gig">—</td><td contenteditable data-placeholder="rejected/accepted/pending">—</td><td contenteditable data-placeholder="what you learned">—</td></tr>
+    <tr><td contenteditable data-placeholder="2026-08-11">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="company / gig">—</td><td contenteditable data-placeholder="rejected/accepted/pending">—</td><td contenteditable data-placeholder="what you learned">—</td></tr>
+  </tbody>
+</table>
+
+<h3>Measured rates</h3>
+<table class="editable-table" id="table-s6b">
+  <thead><tr><th>Stream</th><th>Attempts</th><th>Wins</th><th>Win rate</th><th>Hours paid</th><th>Gross USD</th><th>Fees/tax/FX</th><th>Net $/hr</th></tr></thead>
+  <tbody>
+    <tr><td>Annotation</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td></tr>
+    <tr><td>Freelance</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td></tr>
+    <tr><td>Jobs</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td></tr>
+  </tbody>
+</table>
+
+<!-- ──── §7 Weekly sample (editable) ──── -->
+<h2 id="s7">7. Weekly demand sample <button class="section-save-btn" data-save="s7">save changes</button></h2>
+
+<div class="week-of-line">
+  <label for="week-of">Week of:</label>
+  <input type="text" id="week-of" placeholder="2026-08-04" data-local="week-of-input">
+</div>
+
+<p>Sources: <span contenteditable id="sources-note" data-placeholder="10 local · 10 remote · 5 freelance">10 local · 10 remote · 5 freelance</span></p>
+
+<table class="editable-table" id="table-s7">
+  <thead><tr><th>#</th><th>Role / gig</th><th>Stream</th><th>Must-haves</th><th>Pay shown?</th><th>Apply in 90 days?</th></tr></thead>
+  <tbody>
+    <tr><td contenteditable data-placeholder="1">1</td><td contenteditable data-placeholder="role title">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React, TS...">—</td><td contenteditable data-placeholder="yes/no/unknown">—</td><td contenteditable data-placeholder="yes/no/maybe">—</td></tr>
+    <tr><td contenteditable data-placeholder="2">2</td><td contenteditable data-placeholder="role title">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React, TS...">—</td><td contenteditable data-placeholder="yes/no/unknown">—</td><td contenteditable data-placeholder="yes/no/maybe">—</td></tr>
+    <tr><td contenteditable data-placeholder="3">3</td><td contenteditable data-placeholder="role title">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React, TS...">—</td><td contenteditable data-placeholder="yes/no/unknown">—</td><td contenteditable data-placeholder="yes/no/maybe">—</td></tr>
+    <tr><td contenteditable data-placeholder="4">4</td><td contenteditable data-placeholder="role title">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React, TS...">—</td><td contenteditable data-placeholder="yes/no/unknown">—</td><td contenteditable data-placeholder="yes/no/maybe">—</td></tr>
+    <tr><td contenteditable data-placeholder="5">5</td><td contenteditable data-placeholder="role title">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React, TS...">—</td><td contenteditable data-placeholder="yes/no/unknown">—</td><td contenteditable data-placeholder="yes/no/maybe">—</td></tr>
+  </tbody>
+</table>
+
+<h4>Skill frequency this week (tally)</h4>
+<div class="tally-edit">
+  <label>JS <input type="text" id="tally-js" data-local="tally-js" size="2" placeholder="0"></label>
+  <label>React <input type="text" id="tally-react" data-local="tally-react" size="2" placeholder="0"></label>
+  <label>TS <input type="text" id="tally-ts" data-local="tally-ts" size="2" placeholder="0"></label>
+  <label>Next <input type="text" id="tally-next" data-local="tally-next" size="2" placeholder="0"></label>
+  <label>CSS <input type="text" id="tally-css" data-local="tally-css" size="2" placeholder="0"></label>
+  <label>Other <input type="text" id="tally-other" data-local="tally-other" size="2" placeholder="0"></label>
+</div>
+
+<h4>Map changes this week</h4>
+<div class="map-changes-edit">
+  <div><label>Promote stream:</label> <input type="text" id="map-promote" data-local="map-promote" placeholder="—"></div>
+  <div><label>Demote stream:</label> <input type="text" id="map-demote" data-local="map-demote" placeholder="—"></div>
+  <div><label>New gate discovered:</label> <input type="text" id="map-gate" data-local="map-gate" placeholder="—"></div>
+</div>
+
+<!-- ──── §8 Verdict (static) ──── -->
+<h2 id="s8">8. One-page verdict</h2>
+
+<blockquote class="callout">
+  <p><strong>You are selling (now):</strong> JS fundamental competence in progress → cert signal next.</p>
+  <p><strong>Best near-term paid demand:</strong> AI code evaluation / annotation <em>if</em> volume exists + contract allows; else tiny freelance fixes.</p>
+  <p><strong>Best near-term career demand:</strong> Local frontend junior roles after cert + one React project.</p>
+  <p><strong>Best long-term upside:</strong> Remote product React (possibly Next) employment; optional C++/WASM niche.</p>
+  <p><strong>Do not chase this quarter:</strong> Toptal-class networks, spray-and-pray global senior remote.</p>
+  <p><strong>Mission lock:</strong> Do not let income optimization delay the cert — the map's "After cert" column is where most lanes jump from Weak → Possible/Strong.</p>
+</blockquote>
+
+<!-- ──── Related ──── -->
+<h2>Related docs</h2>
+<ul>
+  <li><a href="./frontend-income-markets.html">Frontend income markets</a> — stream definitions &amp; macro sources</li>
+  <li><a href="./frontend-camps-survey.html">Frontend camps survey</a> — what stacks demand is asking for</li>
+  <li><a href="./nextjs-deep-dive.html">Next.js deep dive</a> — later-stage product-job literacy</li>
+  <li><a href="./class-to-hooks-paradigm-shift.html">Class-to-hooks paradigm shift</a> — React reading model for work</li>
+</ul>
+
+<footer class="lesson-foot">
+  <span>Reference · Income stream landscape</span>
+  <span>Editable cells auto-save to localStorage</span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  // ──── localStorage helpers ────
+  var STORAGE_PREFIX = 'income_landscape_';
+
+  function saveToStorage(key, value) {
+    try { localStorage.setItem(STORAGE_PREFIX + key, String(value)); } catch(e) {}
+  }
+
+  function loadFromStorage(key, fallback) {
+    try {
+      var v = localStorage.getItem(STORAGE_PREFIX + key);
+      return v !== null ? v : fallback;
+    } catch(e) { return fallback; }
+  }
+
+  // ──── Cell autosave ────
+  function setupEditableAutosave(tableId) {
+    var table = document.getElementById(tableId);
+    if (!table) return;
+    var cells = table.querySelectorAll('td[contenteditable]');
+    cells.forEach(function(td) {
+      var rowIdx = td.closest('tr').rowIndex;
+      var colIdx = td.cellIndex;
+      var storageKey = tableId + '_' + rowIdx + '_' + colIdx;
+
+      // restore
+      var saved = loadFromStorage(storageKey, null);
+      if (saved !== null) {
+        td.textContent = saved;
+      }
+
+      // save on input
+      td.addEventListener('blur', function() {
+        saveToStorage(storageKey, td.textContent.trim());
+      });
+    });
+  }
+
+  // ──── Inline contenteditable autosave ────
+  function setupInlineAutosave(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var saved = loadFromStorage(id, null);
+    if (saved !== null) el.textContent = saved;
+    el.addEventListener('blur', function() {
+      saveToStorage(id, el.textContent.trim());
+    });
+  }
+
+  // ──── Input field autosave ────
+  function setupInputAutosave(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var saved = loadFromStorage(id, null);
+    if (saved !== null) el.value = saved;
+    el.addEventListener('blur', function() {
+      saveToStorage(id, el.value.trim());
+    });
+    // also listen for other inputs
+    el.addEventListener('input', function() {
+      saveToStorage(id, el.value.trim());
+    });
+  }
+
+  // setup all input[data-local] for autosave
+  document.querySelectorAll('input[data-local]').forEach(function(el) {
+    var key = el.getAttribute('data-local');
+    var saved = loadFromStorage(key, null);
+    if (saved !== null) el.value = saved;
+    el.addEventListener('blur', function() {
+      saveToStorage(key, el.value.trim());
+    });
+    el.addEventListener('input', function() {
+      saveToStorage(key, el.value.trim());
+    });
+  });
+
+  // ──── Save indicator ────
+  var globalTag = document.getElementById('save-tag-global');
+  function flashSaved() {
+    globalTag.classList.add('show');
+    clearTimeout(globalTag._timer);
+    globalTag._timer = setTimeout(function() {
+      globalTag.classList.remove('show');
+    }, 1500);
+  }
+
+  // ──── Section save buttons ────
+  document.querySelectorAll('[data-save]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var sectionId = btn.getAttribute('data-save');
+      // For the main tables, they autosave on blur already.
+      // But the button ensures a manual save of the "notes" inline fields too.
+      // Just flash the indicator.
+      flashSaved();
+    });
+  });
+
+  // ──── Setup tables ────
+  ['table-s2', 'table-s5', 'table-s6a', 'table-s6b', 'table-s7'].forEach(setupEditableAutosave);
+
+  // ──── Setup inline notes ────
+  ['note-s3a','note-s3b','note-s3c','note-s3d','note-s3e','note-s3f','note-s3g','sources-note'].forEach(setupInlineAutosave);
+
+  // ──── Reset all data ────
+  document.querySelector('[data-action="reset"]').addEventListener('click', function() {
+    if (!confirm('Clear ALL saved data from this page? This cannot be undone.')) return;
+    var keysToRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key.indexOf(STORAGE_PREFIX) === 0) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
+    location.reload();
+  });
+
+  // ──── Export to Markdown ────
+  document.querySelector('[data-action="export"]').addEventListener('click', function() {
+    function cellText(td) {
+      return (td.textContent || '').trim();
+    }
+
+    var md = '# Income Stream Landscape (filled)\n\n';
+    md += 'Auto-exported from [income-stream-landscape.html](./income-stream-landscape.html) — interactive version.\n\n';
+
+    // §2
+    md += '## 2. Live demand sample\n\n';
+    md += '| Skill / signal | Remote% | Egypt local% | Freelance% | Your gap |\n';
+    md += '|---|---|---|---|---|\n';
+    var t2 = document.getElementById('table-s2');
+    if (t2) {
+      t2.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 5) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // §5
+    md += '## 5. Skill → stream gap\n\n';
+    md += '| Skill | Needed by | Status | Action |\n';
+    md += '|---|---|---|---|\n';
+    var t5 = document.getElementById('table-s5');
+    if (t5) {
+      t5.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 4) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // §6a
+    md += '## 6. Conversion log\n\n### Applications / proposals\n\n';
+    md += '| Date | Stream | Target | Outcome | Learning |\n';
+    md += '|---|---|---|---|---|\n';
+    var t6a = document.getElementById('table-s6a');
+    if (t6a) {
+      t6a.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 5) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // §6b
+    md += '### Measured rates\n\n';
+    md += '| Stream | Attempts | Wins | Win rate | Hours paid | Gross USD | Fees/tax/FX | Net $/hr |\n';
+    md += '|---|---|---|---|---|---|---|---|\n';
+    var t6b = document.getElementById('table-s6b');
+    if (t6b) {
+      t6b.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 8) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' | ' + cellText(tds[5]) + ' | ' + cellText(tds[6]) + ' | ' + cellText(tds[7]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // §7
+    md += '## 7. Weekly demand sample\n\n';
+    var weekOf = (document.getElementById('week-of') || {}).value || '________';
+    md += '**Week of:** ' + weekOf + '\n\n';
+    var sources = (document.getElementById('sources-note') || {}).textContent || '10 local · 10 remote · 5 freelance';
+    md += '**Sources:** ' + sources.trim() + '\n\n';
+    md += '| # | Role / gig | Stream | Must-haves | Pay shown? | Apply in 90 days? |\n';
+    md += '|---|---|---|---|---|---|\n';
+    var t7 = document.getElementById('table-s7');
+    if (t7) {
+      t7.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 6) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' | ' + cellText(tds[5]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // Tallies
+    md += '**Skill frequency this week:**  ';
+    md += 'JS: ' + ((document.getElementById('tally-js') || {}).value || '__') + ' · ';
+    md += 'React: ' + ((document.getElementById('tally-react') || {}).value || '__') + ' · ';
+    md += 'TS: ' + ((document.getElementById('tally-ts') || {}).value || '__') + ' · ';
+    md += 'Next: ' + ((document.getElementById('tally-next') || {}).value || '__') + ' · ';
+    md += 'CSS: ' + ((document.getElementById('tally-css') || {}).value || '__') + ' · ';
+    md += 'Other: ' + ((document.getElementById('tally-other') || {}).value || '__') + '\n\n';
+
+    md += '**Map changes this week:**  \n';
+    md += '- Promote: ' + ((document.getElementById('map-promote') || {}).value || '__') + '\n';
+    md += '- Demote: ' + ((document.getElementById('map-demote') || {}).value || '__') + '\n';
+    md += '- New gate: ' + ((document.getElementById('map-gate') || {}).value || '__') + '\n\n';
+
+    // Stream notes
+    md += '**Stream notes (from §3):**  \n';
+    ['A','B','C','D','E','F','G'].forEach(function(s) {
+      var el = document.getElementById('note-s3' + s.toLowerCase());
+      if (el && el.textContent.trim()) {
+        md += '- Stream ' + s + ': ' + el.textContent.trim() + '\n';
+      }
+    });
+    md += '\n';
+
+    // Display in textarea
+    var existing = document.querySelector('.export-area');
+    if (existing) existing.remove();
+
+    var ta = document.createElement('textarea');
+    ta.className = 'export-area';
+    ta.value = md;
+    ta.readOnly = true;
+    var btn = document.querySelector('[data-action="export"]');
+    btn.parentNode.insertBefore(ta, btn.nextSibling);
+    ta.focus();
+    ta.select();
+    // copy to clipboard
+    try {
+      document.execCommand('copy');
+      flashSaved();
+    } catch(e) {}
+
+    // close button
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close export';
+    closeBtn.style.cssText = 'padding:.3rem .7rem;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;margin-top:.4rem;';
+    closeBtn.addEventListener('click', function() {
+      ta.remove(); this.remove();
+    });
+    ta.parentNode.insertBefore(closeBtn, ta.nextSibling);
+  });
+
+})();
+</script>
+</body>
+</html>

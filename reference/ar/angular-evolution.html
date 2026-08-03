@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تطور Angular — الكلاس، إعادة الكتابة، والإشارة (Signal)</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · مكمل لمستند الكلاسات-إلى-الخطافات</p>
+  <h1>تطور Angular — الكلاس، إعادة الكتابة، والإشارة (Signal)</h1>
+  <p class="meta">كيف تطور النموذج الذهني للحالة والمكونات في Angular عبر ثلاثة عصور: AngularJS (التحقق المتسخ + $scope)، Angular 2+ (الكلاسات + zone.js)، و Angular الحديثة (الإشارات، المكونات المستقلة، بدون zone.js). مكمل <a href="./class-to-hooks-paradigm-shift.html">لمستند رياكت</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا هذا المستند</h3>
+  <p><a href="./class-to-hooks-paradigm-shift.html">مستند الإزاحة النموذجية من الكلاسات إلى الخطافات</a> يغطي القوس الداخلي لرياكت. هذا المستند يغطي نفس الفترة (2010-2026) لـ Angular — إجابة إطار عمل مختلف لنفس المشاكل. في العمل قد تواجه مستودعات Angular (في المؤسسات والحكومات حسب <a href="./frontend-camps-survey.html">مسح معسكرات الواجهات الأمامية</a>). فهم قوس Angular يتيح لك تحديد الكود الذي تقرأه دون تحويله إلى نموذج رياكت.</p>
+  <p>التباين الرئيسي: حيث نقلت رياكت التفاعلية من حقول المثيل إلى ترتيب استدعاء الدوال (الخطافات)، نقلتها Angular من دورة البث (zone.js) إلى اشتراكات دقيقة (الإشارات). نفس الاتجاه — مراقبة أضيق — آلية مختلفة.</p>
+</section>
+
+<h2>0. ثلاثة عصور — خط زمني</h2>
+
+<p>Angular ليس إطار عمل واحداً. إنه ثلاثة أطر عمل بنفس الاسم — كل واحد يعيد كتابة نموذج الحالة والتفاعلية من الصفر. العصور:</p>
+
+<table>
+  <thead><tr><th>العصر</th><th>التواريخ</th><th>النموذج</th><th>آلية الحالة</th><th>نموذج التفاعلية</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. AngularJS</strong></td><td>2010–2016</td><td>MVW (Model-View-Whatever)، المتحكمات، $scope</td><td>شجرة <code>$scope</code> — كائنات قابلة للتغيير مربوطة بالقالب</td><td>التحقق المتسخ — دورة الهضم تجول شجرة <code>$scope</code> وتقارن القيم القديمة بالجديدة</td></tr>
+    <tr><td><strong>2. Angular 2+</strong></td><td>2016–2023</td><td>مكونات كلاسية، TypeScript، DI، NgModules</td><td>حقول مثيل كلاس — قابلة للتغيير، مزينة بـ <code>@Input</code> / <code>@Output</code></td><td>Zone.js — يرقّع واجهات المتصفح، ثم يبث "شيء تغير" لكل المكونات، ويشغل كشف التغيير</td></tr>
+    <tr><td><strong>3. Angular الحديثة</strong></td><td>2023+</td><td>مكونات مستقلة، إشارات (Signals)، بدون zone.js</td><td><code>signal()</code> / <code>computed()</code> / <code>effect()</code> — أوليات تفاعلية</td><td>قائم على الإشارات — رسم اشتراكات مدمج يشغل فقط المكونات التي تعتمد على إشارات تغيرت</td></tr>
+  </tbody>
+</table>
+
+<p>النمط: كل عصر وسّع تجربة المطوّر وضيّق ما كان على الإطار مراقبته. AngularJS راقب كل شيء في شجرة $scope (مكلف). Angular 2+ راقب كل المكونات عند كل حدث غير متزامن (أقل كلفة لكن لا يزال واسعاً). الإشارات تراقب فقط رسم تبعيات الإشارة (أقل ما يمكن). لرياكت نفس الاتجاه لكن آلية مختلفة: بدلاً من تضييق المراقب، ضيّقت رياكت وعي المكون بما تغير (من <code>setState</code> إلى مصفوفات التبعيات إلى استنتاج المترجم).</p>
+
+<h2>1. العصر 1 — AngularJS (2010–2016): التحقق المتسخ و $scope</h2>
+
+<p>أُطلق AngularJS في 2010 بواسطة Miško Hevery، حلّاً لنفس مشكلة Backbone و Ember: جعل تطبيقات الويب الديناميكية قابلة للإدارة بهيكل. عرضه كان "Model-View-Whatever" — تضع البيانات في كائن <code>$scope</code>، و Angular يزامنها مع قالب HTML تلقائياً.</p>
+
+<h3>كيف عملت الحالة — $scope والتحقق المتسخ</h3>
+
+<p>دالة المتحكم (controller) تستقبل <code>$scope</code> من حقن التبعيات في Angular. تضع خصائص عليه مباشرة. القالب يشير إليها. دورة هضم Angular تفحص دورياً كل تعبير مراقب بمقارنة القيمة الحالية بالسابقة:</p>
+
+<pre><code>angular.module('app', [])
+  .controller('CounterCtrl', function($scope) {
+    <span class="comment-line">// $scope كائن JS عادي — تحويره هو تغيير الحالة</span>
+    $scope.count = 0;
+
+    $scope.increment = function() {
+      $scope.count++;                    <span class="comment-line">// تحوير — لا واجهة خاصة</span>
+      <span class="comment-line">// Angular لا يعرف بعد. دورة الهضم التالية سترى التغيير.</span>
+    };
+
+    <span class="comment-line">// $watch يسجل تعبيراً للفحص المتسخ كل دورة هضم</span>
+    $scope.$watch('count', function(newVal, oldVal) {
+      console.log('count تغير من', oldVal, 'إلى', newVal);
+    });
+  });</code></pre>
+
+<blockquote class="callout">
+  <p><strong>التحقق المتسخ كان عبقرياً لعام 2010 ومؤلماً بحلول 2015.</strong> عند كل حدث غير متزامن (نقرة، setTimeout، XHR)، Angular يشغّل "دورة هضم" تجول <em>كل</em> تعبير مراقب مسجل (غالباً آلاف)، تقارن القيمة الحالية بالسابقة، وتحدّث DOM حيث اختلفت. إذا أعاد تعبير مراقب كائناً/مصفوفة جديدة كل مرة، Angular يرى "تغيير!" كل دورة — مما يجبر المطور على تعلم <code>$scope.$watchCollection</code>، <code>$watch(…, true)</code> للمساواة العميقة، و "track by" في ng-repeat. الأداء محدود بعدد المراقبين وعمق الشجرة.</p>
+</blockquote>
+
+<h3>الربط ثنائي الاتجاه — الميزة المميزة</h3>
+
+<p>ميزة AngularJS القاتلة كانت <code>ng-model</code>: التغييرات في الحقل ت update <code>$scope</code> تلقائياً، والتغييرات في <code>$scope</code> (من الكود) ت update الحقل تلقائياً. لا مستمعي أحداث، لا setState — الإطار يملك المزامنة:</p>
+
+<pre><code>&lt;input ng-model="user.name" /&gt;        <span class="comment-line">// اكتب هنا → $scope.user.name يتغير</span>
+&lt;p&gt;Hello, {{ user.name }}&lt;/p&gt;          <span class="comment-line">// $scope.user.name يتغير → النص يتغير</span></code></pre>
+
+<p>المشكلة: الربط ثنائي الاتجاه جعل التفكير في تدفق البيانات غير خطي. مكون A مربوط بـ <code>$scope.shared.item</code> ومكون B مربوط به أيضاً — من غيّر ماذا، وبأي ترتيب؟ في التطبيقات الكبيرة، أصبحت دورة الهضم مصدر تصحيح "لماذا حدث هذا التحديث؟"، مع عدد المراقبين كمقياس معياري لـ "ما مدى سرعة تطبيقك."</p>
+
+<h3>لماذا انهار</h3>
+
+<p>بحلول 2014-2015، تطبيقات AngularJS الكبيرة جمعت آلاف المراقبين. دورة الهضم استغرقت 50-200ms — تأخير مرئي عند كل تفاعل. الفريق جرب حلولاً (الربط لمرة واحدة <code>::</code>، تحديد عدد المراقبين، صياغة "controller as" بدلاً من <code>$scope</code> الخام)، لكن العمارة كانت العنق الزجاجة. لا يمكن جعل التحقق المتسخ على شجرة كاملة رخيصاً على نطاق واسع.</p>
+
+<p>قرر فريق Angular: الحل هو إعادة كتابة. ليست ترقية — إعادة كتابة من الصفر، مع TypeScript، نظام وحدات حقيقي، ونموذج تفاعلية مختلف تماماً.</p>
+
+<h2>2. العصر 2 — Angular 2+ (2016–2023): الكلاسات، TypeScript، zone.js</h2>
+
+<p>Angular 2 (2016) كان إعادة كتابة كاملة. نفس الفريق، نفس الشركة، نفس مجال المشكلة — لكن كل شيء جديد: TypeScript أولاً، مكونات كلاسية مع مزينات، حقن تبعيات، نظام وحدات حقيقي (NgModules)، و zone.js كمحرك تفاعلية.</p>
+
+<h3>كيف عملت الحالة — حقول مثيل كلاس + zone.js</h3>
+
+<p>بدلاً من تحوير <code>$scope</code>، تكتب كلاساً مع حقول مزينة. Angular DI يحقن الخدمات عبر المُنشئ. القالب يربط بخصائص الكلاس:</p>
+
+<pre><code>@Component({
+  selector: 'app-counter',
+  template: `
+    &lt;p&gt;Count: {{ count }}&lt;/p&gt;
+    &lt;button (click)="increment()"&gt;+&lt;/button&gt;
+  `
+})
+export class CounterComponent {
+  count = 0;                             <span class="comment-line">// حقل مثيل كلاس = حالة</span>
+
+  constructor(private logger: LoggerService) {}  <span class="comment-line">// حقن التبعيات</span>
+
+  increment() {
+    this.count++;                        <span class="comment-line">// تحوير مباشر — zone.js يلتقطه</span>
+  }
+}</code></pre>
+
+<blockquote class="callout">
+  <p><strong>لا <code>this.setState</code>، لا واجهة حالة خاصة.</strong> تحوّر حقل كلاس مباشرة. Angular وثق أن zone.js سيُخبره أن "شيئاً حدث" — أي عملية غير متزامنة (معالج نقرة، setTimeout، استجابة XHR) تم اعتراضها بواسطة zone.js، الذي أشار إلى Angular لتشغيل كشف التغيير على <em>كل</em> المكونات (مع فتحة هروب OnPush لكل مكون). هذا كان الفرق الرئيسي من رياكت: رياكت حافظت على انضباط "يجب استدعاء setState"؛ Angular أزالته ودفعت الثمن على مستوى الإطار.</p>
+</blockquote>
+
+<h3>تدفق البيانات أحادي الاتجاه — تأثير رياكت</h3>
+
+<p>Angular 2 تخلى عن الربط ثنائي الاتجاه كافتراضي. بدلاً منه: <code>@Input()</code> يمرر البيانات إلى المكون (من القالب الأب)، <code>@Output()</code> يبعث أحداثاً للأعلى (عبر <code>EventEmitter</code>). حالة المكون المحلي هي حقول كلاسه. هذا كان تأثيراً مباشراً لرياكت (2013-2015 أثبتت رياكت أن التدفق أحادي الاتجاه يتفوق على الربط ثنائي الاتجاه للتصحيح).</p>
+
+<pre><code>@Component({
+  selector: 'app-child',
+  template: `&lt;p&gt;{{ data }} &lt;button (click)="onClick()"&gt;أرسل&lt;/button&gt;&lt;/p&gt;`,
+  changeDetection: ChangeDetectionStrategy.OnPush  <span class="comment-line">// الخروج من الفحص المدفوع بـ zone.js</span>
+})
+export class ChildComponent {
+  @Input() data: string;                 <span class="comment-line">// من الأب</span>
+  @Output() notify = new EventEmitter&lt;string&gt;();  <span class="comment-line">// إلى الأب</span>
+
+  onClick() {
+    this.notify.emit('clicked!');
+  }
+}</code></pre>
+
+<h3>Zone.js — محرك البث</h3>
+
+<p>Zone.js يرقّع كل واجهات المتصفح غير المتزامنة (setTimeout، addEventListener، fetch، XHR، requestAnimationFrame). عندما تُشغّل أي واجهة مرقّعة، zone.js يُخطر Angular أن "شيئاً حدث." ثم Angular يشغّل كشف التغيير من المكون الجذر نزولاً في الشجرة — يفحص أي المكونات تغيرت قيم <code>@Input</code> فيها.</p>
+
+<p>نهج "البث للكل" كان منطقة وسطى بين "افحص كل مراقب" لـ AngularJS و "أعد تشغيل الدالة وقارن VDOM" لرياكت. كان أسرع من AngularJS لكن لا يزال له كلفة: نقرة في زر متداخل بعمق تشغّل تجولاً في الشجرة من الجذر، حتى لو تغير مكون ورقة واحد فقط.</p>
+
+<p>استراتيجية <code>OnPush</code> كانت فتحة الهروب لكل مكون: "سأتحدث فقط إذا تغيرت مدخلاتي بالإشارة، أو إذا نشأ حدث من داخلي." كانت طبقة التحسين اليدوي لـ Angular — مماثلة لـ <code>React.memo</code> و <code>shouldComponentUpdate</code> في رياكت.</p>
+
+<h3>لماذا لم ينته هذا العصر بشكل جيد أيضاً</h3>
+
+<p>Zone.js كان مكلفاً. كل حدث غير متزامن شغّل تجولاً كاملاً في الشجرة (حتى مع OnPush، Angular ما زال يجتاز الشجرة ليقرر أي المكونات يجب إعادة الفحص). الفرق التي استخدمت OnPush بقوة غالباً ما أعادت إدخال أخطاء حيث المكونات <em>يجب</em> أن تتحدث لكنها لم تفعل — لأن zone.js أطلق، لكن إشارات المدخلات لم تتغير حسب فحص Angular. التوتر: zone.js كان واسعاً جداً (افحص كل شيء)، لكن تضييقه تطلب انضباط OnPush اليدوي الذي كان من السهل إخطاؤه.</p>
+
+<p>نفس التوتر كان موجوداً في عصر الكلاسات في رياكت: <code>componentDidUpdate</code> + <code>setState</code> عملا، لكن معرفة متى ولماذا أعيد تصيير مكون تطلب تنميطاً يدوياً. حل رياكت كان الخطافات (ضيّق التفاعلية إلى مصفوفات تبعيات صريحة). حل Angular كان الإشارات (ضيّق التفاعلية إلى اشتراكات صريحة).</p>
+
+<h2>3. العصر 3 — Angular الحديثة (2023–حتى الآن): الإشارات، المكونات المستقلة، بدون zone.js</h2>
+
+<p>بدءاً من Angular 16 (2023، معاينة) واستقراراً في 17+ (2024)، قدمت Angular ثلاثة تغييرات تعرف بأثر رجعي "Angular الحديثة": المكونات المستقلة (بدون NgModules)، الإشارات (تفاعلية دقيقة)، وبدون zone.js (V18+).</p>
+
+<h3>المكونات المستقلة — لا NgModules</h3>
+
+<p>في Angular 2-15، كل مكون <em>يجب</em> أن يُصرَّح عنه في <code>NgModule</code> — كلاس منفصل يسرد المكونات، التوجيهات، الأنابيب، والاستيرادات. هذا خلق ملفاً موازياً لكل ميزة. المكونات المستقلة (v14 معاينة، v15 مستقر، v17 افتراضي) تسمح للمكون بتصرح تبعياته مباشرة بدون غلاف NgModule:</p>
+
+<pre><code>@Component({
+  selector: 'app-counter',
+  standalone: true,
+  imports: [CommonModule],              <span class="comment-line">// تبعيات مباشرة، لا ملف NgModule</span>
+  template: `&lt;p&gt;Count: {{ count() }} &lt;button (click)="increment()"&gt;+&lt;/button&gt;&lt;/p&gt;`
+})
+export class CounterComponent {
+  count = signal(0);                     <span class="comment-line">// إشارة تفاعلية، ليس حقلاً عادياً</span>
+
+  increment() {
+    this.count.update(c => c + 1);       <span class="comment-line">// set() أو update() — الإطار يرى التغيير</span>
+  }
+}</code></pre>
+
+<h3>الإشارات — <code>signal()</code>، <code>computed()</code>، <code>effect()</code></h3>
+
+<p>أوليات الإشارات الأساسية:</p>
+
+<ul>
+  <li><strong><code>signal(value)</code></strong> — مرجع تفاعلي قابل للكتابة. استدع <code>.set()</code> للاستبدال، <code>.update(fn)</code> للاشتقاق من القيمة الحالية، <code>.mutate()</code> لتعديل القيمة الداخلية في مكانها.</li>
+  <li><strong><code>computed(fn)</code></strong> — قيمة مشتقة للقراءة فقط. يُعاد تقييمها بتكاسل فقط عندما تتغير تبعياتها. لا "مصفوفة تبعيات" — Angular يتتبع التبعيات وقت التشغيل (مثل <code>computed</code> في Vue أو Preact Signals).</li>
+  <li><strong><code>effect(fn)</code></strong> — مشغل تأثيرات جانبية يُجدول عندما تتغير تبعياته المتتبعة. خليفة <code>ngOnInit</code>/<code>ngOnDestroy</code> والتنظيف اليدوي للاشتراكات. تنظيف التأثير هو قيمة إرجاع الدالة.</li>
+</ul>
+
+<pre><code>export class CartComponent {
+  items = signal&lt;Item[]&gt;([]);            <span class="comment-line">// إشارة قابلة للكتابة</span>
+  total = computed(() =>                 <span class="comment-line">// مشتقة — لا مصفوفة تبعيات</span>
+    this.items().reduce((sum, item) => sum + item.price, 0)
+  );
+
+  constructor() {
+    effect(() => {
+      console.log('إجمالي السلة:', this.total());  <span class="comment-line">// يُعاد فقط عندما تتغير items</span>
+      <span class="comment-line">// تنظيف: return () => unsubscribe()</span>
+    });
+  }
+
+  addItem(item: Item) {
+    this.items.update(list => [...list, item]);
+  }
+}</code></pre>
+
+<blockquote class="callout">
+  <p><strong>الفرق الرئيسي من خطافات رياكت:</strong> إشارات Angular ليس لها "قواعد خطافات." يمكنك استدعاء <code>signal()</code> داخل <code>if</code>، داخل حلقات، داخل معالجات أحداث، أو في منشئ الكلاس — لا قيد على ترتيب الاستدعاء لأن الإشارات كائنات ذات قيمة قابلة للتعيين ورسم اشتراكات، وليس فتحات مرقمة في fiber. هذه بالضبط المرونة التي قالت رياكت لا لها (راجع <a href="./class-to-hooks-paradigm-shift.html">مستند رياكت §2.9</a> — "لماذا ليست X خطافاً؟"). Preact Signals أثبتت أن هذا النهج يعمل؛ إشارات Angular جعلته رسمياً.</p>
+</blockquote>
+
+<h3>بدون zone.js — لماذا يمكن للإشارات استبدال zone.js</h3>
+
+<p>Zone.js يبث "شيء تغير" لكل المكونات. الإشارات تعرف <em>بالضبط أي مكون يعتمد على أي إشارة</em>. بمجرد وجود رسم تبعيات الإشارة، يصبح zone.js زائداً عن الحاجة — يمكن لـ Angular تشغيل كشف التغيير فقط على المكونات التي تشترك في إشارات تغيرت، بالإضافة إلى أسلافها في سلسلة تمرير المدخلات.</p>
+
+<p>Angular 18 (2024) قدم <code>provideZonelessChangeDetection</code> تجريبياً. Angular 20+ (2026) تتجه نحو جعل بدون zone.js الافتراضي للمشاريع الجديدة. هذا هو تعريف هجرة العصر: أزل zone.js، اعتمد كلياً على الإشارات للتفاعلية. الثمن: كل الحالة المشتركة يجب أن تمر عبر <code>signal()</code> أو نماذج مغلفة بـ <code>signal()</code>. المكسب: كشف تغيير بدون هدر — فقط المكونات التي تحتاج التحديث تتحدث.</p>
+
+<h2>4. العصور الثلاثة عبر عدسة واحدة — أين تعيش الحالة ومن يراقبها</h2>
+
+<p>توسعة §3 في مستند رياكت سألت: <em>أين تعيش الحالة، من يملكها، وكيف تلمسها؟</em> نفس العدسة لـ Angular:</p>
+
+<table>
+  <thead><tr><th>العصر</th><th>الحالة تعيش في…</th><th>تقرأ الحالة بـ…</th><th>تكتب الحالة بـ…</th><th>النموذج الذهني</th><th>من يكتشف التغيير؟</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1. AngularJS</strong></td>
+      <td>كائن <code>$scope</code> (قابل للتغيير، مربوط بالقالب)</td>
+      <td><code>$scope.property</code> داخل المتحكم</td>
+      <td><code>$scope.property = newVal</code> — تحوير مباشر</td>
+      <td>الحالة كائن عادي يتزامن مع DOM؛ اكتب إليه والإطار يزامنه</td>
+      <td>دورة الهضم — تجول كل تعبير مراقب عند كل حدث غير متزامن</td>
+    </tr>
+    <tr>
+      <td><strong>2. Angular 2+</strong></td>
+      <td>حقل مثيل كلاس (قابل للتغيير، مزين)</td>
+      <td><code>this.property</code> داخل صنف المكون</td>
+      <td><code>this.property = newVal</code> — تحوير مباشر</td>
+      <td>الحالة عضو في كلاس؛ الإطار يكتشف التحويرات عبر بث zone.js</td>
+      <td>Zone.js — يلتقط كل الأحداث غير المتزامنة ويشير لـ Angular لفحص كل المكونات</td>
+    </tr>
+    <tr>
+      <td><strong>3. Angular الحديثة</strong></td>
+      <td>كائن <code>signal()</code> أو نموذج مدعوم بـ <code>signal()</code></td>
+      <td><code>count()</code> — استدعِ الإشارة كـ getter</td>
+      <td><code>count.set(n)</code> / <code>count.update(fn)</code> — تحوير صريح عبر واجهة الإشارة</td>
+      <td>الحالة عقدة تفاعلية؛ فقط المشتركون في تلك العقدة يتلقون الإشعار</td>
+      <td>رسم تبعيات الإشارة الخاص — يعرف بالضبط أي المكونات تعتمد على أي إشارات</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>النمط: <strong>كشف أوسع → كشف أضيق.</strong> AngularJS كشف بالقوة الغاشمة (تجول كل شيء). Angular 2+ كشف بالبث + تجول الشجرة (أضف OnPush للتضييق). Angular الحديثة تكشف بالاشتراك (المشتركون فقط). اتجاه رياكت هو نفسه لكن يبدأ من مكان مختلف: رياكت كان لديها دائماً كشف ضيق (فقط المكونات التي استدعت <code>setState</code>). تطور رياكت (مصفوفات تبعيات الخطافات → المترجم) هو عن <em>تضييق ما يجب عليك تحديده يدوياً</em>، وليس تضييق مراقب الإطار.</p>
+
+<h2>5. لماذا لم تتبع Angular مسار خطافات رياكت</h2>
+
+<p>خطافات رياكت وإشارات Angular تحلان كلتاهما "كيف يحمل المكون حالة ويتفاعل مع التغييرات؟" — لكن من نقطتي بداية متعارضتين:</p>
+
+<p>رياكت بدأت من <strong>الدوال</strong>. مكون رياكت الدالي ليس له مثيل، لا <code>this</code>، لا منشئ. لإعطائه حالة، كان على رياكت اختراع نظام تخزين خارج الدالة — فتحات خطاف fiber. هذا تطلب قواعد الخطافات (ترتيب الاستدعاء يجب أن يكون مستقراً) لأن فتحة الخطاف تُحدد بموقعها في تسلسل الاستدعاء، وليس باسم.</p>
+
+<p>Angular بدأت من <strong>الكلاسات</strong>. مكون Angular <em>هو</em> مثيل مع منشئ وحقن تبعيات وحقول كلاس. لإعطائه تفاعلية دقيقة، كان على Angular استبدال آلية كشف التحوير (zone.js) بآلية اشتراك صريحة (الإشارات). لكنه استطاع الاحتفاظ بهيكل الكلاس — الإشارات مجرد كائنات مخصصة لحقول، لا قيود على ترتيب الاستدعاء، لا "قواعد إشارات."</p>
+
+<p>عبور الحدود كان سيكلف كل إطار ميزته المميزة:</p>
+
+<ul>
+  <li>لو تبنّت Angular نموذجاً شبيهاً بالخطافات، لخسرت حقن التبعيات (لا يمكنك الحقن في ترتيب استدعاء دالة — حقن التبعيات يتطلب منشئاً). حقن التبعيات هو قوة Angular الخارقة للاختبارية وتنظيم كود الفرق الكبيرة.</li>
+  <li>لو تبنّت رياكت الإشارات كبديل لـ <code>useState</code>، لخسرت نموذج الإغلاق لكل تصيير (الإشارات تعيد أحدث قيمة، وليست لقطة — مشكلة "الإغلاق العالق" هي في الواقع <em>الميزة</em> التي تجعل قيم رياكت لكل تصيير قابلة للتوقع).</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>كلا الإطارين ضيّقا التفاعلية. ضيّقا أشياء مختلفة.</strong> رياكت ضيّقت من "أعد تصيير كل شيء" إلى "أعد تصيير فقط إذا تغيرت التبعيات" إلى "دع المترجم يكتشفها." Angular ضيّقت من "افحص كل شيء عند أي حدث غير متزامن" إلى "افحص فقط المكونات التي تشترك في إشارات تغيرت." الاتجاه هو نفسه؛ الآلية مقيدة بتصميم كل إطار الأصلي — دوال رياكت مقابل كلاسات Angular.</p>
+</blockquote>
+
+<h2>6. ما ستواجهه في كود Angular في العمل</h2>
+
+<p>على عكس انتقال رياكت من الكلاسات إلى الخطافات (حيث كانت المكونات الدالة موجودة طوال الوقت لكنها كانت من الدرجة الثانية)، عصور Angular مرئية فيزيائياً في الكود — هيكل الملف، الاستيرادات، والصياغة تغيرت كلياً بين الإصدارات:</p>
+
+<h3>AngularJS (2010-2016) — ستتعرف عليه</h3>
+
+<ul>
+  <li><code>.controller('Name', function($scope) {...})</code> — لا مزين <code>@Component</code></li>
+  <li><code>.directive</code> للمكونات القابلة لإعادة الاستخدام (مشابهة لمكونات رياكت لكن كدالة مصنع تعيد <code>{ template, scope, link }</code>)</li>
+  <li><code>ng-repeat</code>، <code>ng-click</code>، <code>ng-model</code> كسمات HTML</li>
+  <li><code>$scope.$watch</code>، <code>$scope.$apply</code>، <code>$timeout</code> كمشغلات مزامنة يدوية</li>
+  <li>سلاسل حقن التبعيات: <code>function($http, $scope, myService) { ... }</code></li>
+  <li>إذا رأيت هذا، قاعدة الكود عمرها 8-15 سنة ويتم صيانتها على الأرجح، لا تطوير نشط</li>
+</ul>
+
+<h3>Angular 2-15 (2016-2023) — قاعدة الكود المؤسسية السائدة</h3>
+
+<ul>
+  <li>مزين <code>@Component()</code> مع <code>template</code> أو <code>templateUrl</code></li>
+  <li>مكون كلاسي مع خطافات دورة الحياة (<code>ngOnInit</code>، <code>ngOnDestroy</code>، <code>ngOnChanges</code>)</li>
+  <li>ملفات <code>NgModule</code> بجانب وحدات الميزات (واحد على الأقل لكل ميزة)</li>
+  <li><code>@Input()</code> / <code>@Output()</code> للتواصل بين الأب والابن</li>
+  <li>خدمات محقونة عبر المُنشئ (<code>constructor(private http: HttpClient)</code>)</li>
+  <li><code>RxJS Observables</code> للحالة غير المتزامنة — <code>this.http.get(...).subscribe(...)</code> مع <code>unsubscribe</code> يدوي في <code>ngOnDestroy</code></li>
+  <li>هذا ما تبدو عليه معظم "Angular في العمل" في 2026</li>
+</ul>
+
+<h3>Angular الحديثة (2024+) — ما يبدو عليه الكود الجديد</h3>
+
+<ul>
+  <li><code>standalone: true</code> في مزين المكون — لا ملف NgModule</li>
+  <li><code>signal()</code> للحالة المحلية، <code>computed()</code> للقيم المشتقة، <code>effect()</code> للتأثيرات الجانبية</li>
+  <li><code>@Input()</code> / <code>@Output()</code> ما زالت موجودة لكن يمكن أن تكون <code>input.required()</code> (v17.2+) — بديل قائم على الإشارات</li>
+  <li>لا تنظيف يدوي <code>ngOnDestroy</code> للحالة القائمة على الإشارات — تنظيف <code>effect()</code> تلقائي</li>
+  <li>إعداد بدون zone.js (<code>provideZonelessChangeDetection()</code>) في تهيئة التطبيق</li>
+  <li>هذا ما تنشئه مشاريع Angular الجديدة في 2026</li>
+</ul>
+
+<p>الخبر الجيد: إذا كنت تستطيع قراءة كود Angular 2-15، يمكنك قراءة كود Angular الحديث. هيكل الكلاس، المزينات، حقن التبعيات، و TypeScript هي نفسها. الاختلافات إضافية (إشارات) وليست إبدالية (لا "المكونات أصبحت دوال الآن" صدمة مثل هجرة خطافات رياكت).</p>
+
+<h2>7. ترجمة دورة الحياة: AngularJS ↔ Angular 2+ ↔ رياكت</h2>
+
+<p>جدولان. أولاً: كيف دورة حياة مكون AngularJS ترتبط بـ Angular 2+. ثم: كيف ترتبط دورة حياة Angular 2+ بخطافات رياكت — لتتمكن من قراءة كود في أي من النماذج الثلاثة دون إعادة تعلم النموذج الذهني من الصفر.</p>
+
+<h3>الجدول أ — AngularJS → Angular 2+</h3>
+
+<table>
+  <thead><tr><th>دورة حياة AngularJS</th><th>المكافئ في Angular 2+</th><th>ملاحظات</th></tr></thead>
+  <tbody>
+    <tr><td><code>$onInit()</code> — تُستدعى عندما تكون روابط المتحكم جاهزة</td><td><code>ngOnInit()</code> — تُستدعى بعد أن يهيئ Angular مدخلات المكون</td><td>كلاهما "البيانات جاهزة، هيئ الآن." في Angular الحديثة، <code>ngOnInit</code> غالباً ما يُستبدل بـ <code>effect()</code> أو منشئ مدعوم بـ <code>signal</code> لجلب البيانات.</td></tr>
+    <tr><td><code>$onChanges(changes)</code> — تُستدعى عندما تتغير الروابط (AngularJS 1.5+)</td><td><code>ngOnChanges(changes: SimpleChanges)</code> — تُستدعى عندما تتغير قيم <code>@Input</code></td><td>كلاهما يعطيك القيم السابقة والحالية. في Angular الحديثة، يمكنك أيضاً <code>effect(() => this.input())</code> — مراقبة قائمة على الإشارات لا تتطلب خطاف دورة الحياة.</td></tr>
+    <tr><td><code>$doCheck()</code> — تُستدعى عند كل دورة هضم، لكشف تغيير مخصص</td><td><code>ngDoCheck()</code> — تُستدعى خلال كل تشغيل لكشف التغيير</td><td>كلاهما فتحتا هروب لكشف تغييرات يغفل عنها Angular. نادراً ما تحتاجهما في Angular الحديثة مع الإشارات.</td></tr>
+    <tr><td><code>$onDestroy()</code> — تُستدعى قبل تدمير المتحكم/النطاق</td><td><code>ngOnDestroy()</code> — تُستدعى قبل أن يدمر Angular المكون</td><td>كلاهما ينظف الاشتراكات، المؤقتات، ومستمعي الأحداث. في Angular الحديثة، قيمة إرجاع <code>effect()</code> هي التنظيف — لا حاجة لـ <code>ngOnDestroy</code> يدوي لاشتراكات الإشارات.</td></tr>
+    <tr><td><code>$postLink()</code> — تُستدعى بعد ربط DOM المتحكم</td><td><code>ngAfterViewInit()</code> — تُستدعى بعد تهيئة عرض المكون وعروض الأطفال</td><td>كلاهما "القالب حي." يُستخدمان لدمج مكتبات DOM خارجية.</td></tr>
+  </tbody>
+</table>
+
+<h3>الجدول ب — Angular 2+ → خطافات رياكت</h3>
+
+<table>
+  <thead><tr><th>دورة حياة Angular 2+</th><th>مكافئ خطافات رياكت</th><th>ملاحظات</th></tr></thead>
+  <tbody>
+    <tr><td><code>constructor()</code> — حقن التبعيات، قيم الحقول الأولية</td><td>نص الدالة الرئيسي (خارج <code>useState</code>)، أو <code>useRef</code> للوصول الشبيه بـ DI للـ singleton</td><td>رياكت ليس لها منشئ. هيئ الحالة عبر <code>useState(initialValue)</code>. الخدمات تعيش خارج مكونات رياكت (خطافات مخصصة أو حاوية DI إذا لزم الأمر).</td></tr>
+    <tr><td><code>ngOnInit()</code> — تُستدعى مرة واحدة بعد ربط المدخلات</td><td><code>useEffect(() => {...}, [])</code> مع تبعيات فارغة</td><td>كلاهما يُشغّل مرة واحدة بعد التصيير/التهيئة الأول. تأثير رياكت يلتقط قيم أول تصيير؛ <code>ngOnInit</code> في Angular يقرأ قيم <code>@Input</code> الطازجة (لا خطر إغلاق عالق).</td></tr>
+    <tr><td><code>ngOnChanges(changes)</code> — تُستدعى عندما تتغير قيم <code>@Input</code></td><td><code>useEffect(() => {...}, [prop])</code> — يُعاد تشغيله عندما يتغير <code>prop</code></td><td>مصفوفة تبعيات رياكت تستبدل الفحص اليدوي "أي القيم تغيرت." التأثير يعمل <em>بعد</em> التصيير؛ <code>ngOnChanges</code> يعمل <em>قبل</em> أن يعالج Angular المكون (أثناء كشف التغيير). توقيت مختلف، نفس الغرض.</td></tr>
+    <tr><td><code>ngAfterViewInit()</code> — تُستدعى بعد تصيير عروض الأطفال</td><td><code>useLayoutEffect(() => {...}, [])</code></td><td>كلاهما يُشغّل بعد أن يكون DOM متاحاً لكن قبل أن يرسم المتصفح. يُستخدمان لقياس عناصر DOM أو دمج مكتبات DOM غير تابعة لرياكت.</td></tr>
+    <tr><td><code>ngOnDestroy()</code> — تنظيف قبل التدمير</td><td><code>useEffect(() => { return () => cleanup; }, [])</code> — قيمة إرجاع التأثير</td><td>كلاهما ينظف الاشتراكات، المؤقتات، مستمعي الأحداث. في Angular، تكتب دالة منفصلة؛ في رياكت، التنظيف بجوار الإعداد داخل نفس التأثير.</td></tr>
+    <tr><td><code>ngDoCheck()</code> — كشف تغيير مخصص عند كل تشغيل</td><td>(لا مكافئ مباشر) — استخدم <code>useRef</code> + مقارنة يدوية</td><td>"أحتاج أن أعرف كل مرة يعمل فيها كشف التغيير" ليس له نظير في رياكت لأن رياكت ليس لها مشغل كشف تغيير خارجي. إذا كنت تحتاج القيمة السابقة، استخدم <code>useRef</code> لتخزينها.</td></tr>
+    <tr><td>لا مكافئ مباشر — Angular ليس لديها نموذج "أعد تشغيل الدالة"</td><td><code>useRef</code> — قابل للتغيير، يستمر عبر التصييرات</td><td>حقل كلاس Angular <em>هو</em> مستمر (المثيل يعيش حتى التدمير). نموذج رياكت "استدعاء دالة لكل تصيير" يتطلب <code>useRef</code> لحالة "الحقل المستمر."</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>الفكرة الرئيسية لقراءة كود Angular كمطوّر رياكت:</strong> دوال دورة حياة Angular هي سيرة ذاتية ("عند الولادة، عند التغيير، عند الموت") — مثل مكونات رياكت الكلاسية. خطافات رياكت استبدلت السيرة الذاتية بنموذج مزامنة ("هذا التأثير يزامن هذه القيم مع هذا التأثير الجانبي"). إشارات Angular تدفع في نفس الاتجاه — <code>effect()</code> أقرب إلى <code>useEffect</code> في رياكت من <code>ngOnInit</code> + <code>ngOnDestroy</code>. Angular الحديثة تتقارب مع نفس النمط الذي تبنّته رياكت في 2018 — مزامنة، وليس سيرة ذاتية. الفرق: Angular حافظت على الكلاس وأضافت الإشارات؛ رياكت أزالت الكلاس وأضافت الخطافات.</p>
+</blockquote>
+
+<h2>8. أين يقف Angular الآن (2026)</h2>
+
+<ul>
+  <li><strong>المستقر الحالي:</strong> Angular (v22 أو v23 وقت القراءة — رقم الإصدار يزيد بمقدار 2 سنوياً منذ v17). 19.x LTS ما زال مدعوماً للمؤسسات المتمسكة.</li>
+  <li><strong>الإشارات:</strong> أولية الحالة الموصى بها لكل كود جديد. Zone.js ما زال مدعوماً لكن النظام البيئي يهاجر نحو الافتراضي بدون zone.js.</li>
+  <li><strong>المكونات المستقلة:</strong> الافتراضي للمشاريع الجديدة. NgModules في الكود القديم فقط — لا ميزات جديدة تُضاف لواجهة NgModule منذ v17.</li>
+  <li><strong>RxJS:</strong> ما زال خط أنابيب async المهيمن لـ HTTP وتدفقات الأحداث، لكن واجهات قائمة على الإشارات تحل محل أنماط Observable الثقيلة تدريجياً (<code>httpResource()</code> في v20+ كعميل HTTP قائم على الإشارات).</li>
+  <li><strong>المجال المؤسسي:</strong> Angular يمسك مجال "قواعد كثيرة، مساهمون كثيرون، مشروع طويل العمر." البنوك، التأمين، الحكومة، والأدوات الداخلية الكبيرة. رياكت تقود في المنتجات الموجهة للمستهلك، الشركات الناشئة، ونظام الإطارات الوصفية (Next.js).</li>
+  <li><strong>القراءة مقابل الكتابة:</strong> ستقرأ كود Angular أكثر مما تكتبه (إلا إذا انضممت لفريق يستخدم Angular أولاً). أغلب قواعد كود Angular في الإنتاج هي Angular 2-15 مع NgModules و zone.js — مُهاجَرة تدريجياً، إن تمت أصلاً، إلى الإشارات.</li>
+  <li><strong>مقابلة رياكت (2026):</strong> رياكت تبنّت المترجم لحل مشكلة "ضريبة مصفوفة التبعيات." Angular تبنّت الإشارات لحل مشكلة "ضريبة zone.js." كلاهما أزال عبء الحفظ اليدوي. كلاهما حافظ على نموذج المكون (دوال رياكت، كلاسات Angular). لا أحد "متفوق" — حلا عنق زجاجة مختلفين من نقطتي بداية مختلفتين.</li>
+</ul>
+
+<h2>9. قراءات إضافية</h2>
+
+<ol>
+  <li><a href="https://angular.io/guide/signals">دليل إشارات Angular</a> — الوثائق الرسمية: <code>signal()</code>، <code>computed()</code>، <code>effect()</code>، والنموذج الذهني.</li>
+  <li><a href="https://angular.io/guide/incremental-update">دليل التحديث التدريجي لـ Angular</a> — مسارات الهجرة عبر العصور (AngularJS إلى Angular 2+، Angular 2+ إلى الحديثة).</li>
+  <li><a href="https://blog.angular.dev/angular-18-zoneless-change-detection-8c235775ddec">كشف التغيير بدون Zone.js (مدونة Angular، 2024)</a> — الأساس المنطقي لإزالة zone.js.</li>
+  <li><a href="https://angular.io/guide/standalone-components">دليل المكونات المستقلة</a> — ما يتغير عندما تتخلى عن NgModules.</li>
+  <li><a href="https://overreacted.io/why-isnt-x-a-hook/">Why Isn't X a Hook? (Dan Abramov, 2019)</a> — حالة رياكت ضد الإشارات، التي يعارضها تبني Angular مباشرة.</li>
+  <li><a href="./class-to-hooks-paradigm-shift.html">مستند الإزاحة النموذجية (مساحة العمل هذه)</a> — قوس رياكت الموازي، مع مقابلة الخطافات-الإشارات في §2.9.</li>
+  <li><a href="./frontend-camps-survey.html">مسح معسكرات الواجهات الأمامية (مساحة العمل هذه)</a> — أين يجلس Angular في النظام البيئي الأوسع للواجهات الأمامية.</li>
+</ol>
+
+<section class="win">
+  <h3>ماذا يغطي هذا المستند</h3>
+
+  <p><strong>س: لماذا أعاد Angular كتابة نفسه من الصفر في 2016؟</strong></p>
+  <p><strong>ج:</strong> دورة هضم AngularJS لم تكن قابلة للتوسع — آلاف التعبيرات المراقبة سببت تأخيراً مرئياً عند كل تفاعل مستخدم. قرر الفريق أن العمارة لا يمكن إصلاحها تزايدياً. الرهان على TypeScript + مزينات الكلاس + حقن التبعيات + zone.js كأساس مستقبلي. الرهان نجح (Angular 2+ مستقر لعقد) لكن الثمن كان 0% مسار هجرة — تطبيقات AngularJS كان يجب إعادة كتابتها كلياً، مما خلق موجة هجرة "Angular 1 → أي شيء آخر" في 2016-2019.</p>
+
+  <p><strong>س: هل نسخ Angular تدفق البيانات أحادي الاتجاه من رياكت؟</strong></p>
+  <p><strong>ج:</strong> نعم — Angular 2 تخلى عن الربط ثنائي الاتجاه كافتراضي. بدلاً منه: <code>@Input()</code> يمرر البيانات للأسفل، <code>@Output()</code> يبعث أحداثاً للأعلى. صياغة القالب (ربط الخاصية <code>[value]</code> وربط الحدث <code>(click)</code>) كانت مستوحاة مباشرة من نمط JSX في رياكت، مكيفة لسمات HTML. Angular حافظ على حقول الكلاس كحالة محلية (لا <code>this.setState</code>)، وأضاف zone.js كمحرك بث كشف التغيير — تصميم لم تحتجه رياكت أبداً لأن <code>setState</code> كان بالفعل المشغل الصريح.</p>
+
+  <p><strong>س: لماذا تبنّت Angular الإشارات بينما رفضتها رياكت؟</strong></p>
+  <p><strong>ج:</strong> الإشارات وخطافات رياكت تحل عنق زجاجة مختلفين. رياكت كان لديها بالفعل لقطات لكل تصيير ممسوكة في إغلاقات — الإشارات كانت ستكسر ذلك النموذج لأنها تعيد أحدث قيمة unconditionally. عنق زجاجة رياكت كان ضريبة مصفوفة التبعيات (الحفظ اليدوي لتبعيات التأثير)، حُلّ بالمترجم. عنق زجاجة Angular كان بث zone.js (فحص كل شيء عند كل حدث غير متزامن)، حُلّ برسم اشتراكات الإشارات الدقيقة. نفس التشخيص (الإطار يتفاعل على نطاق واسع جداً)، علاج مختلف (رياكت: المترجم يضيّق العمل اليدوي للمطوّر؛ Angular: الإشارات تضيّق العمل التلقائي للإطار).</p>
+
+  <p><strong>س: هل سأكتب Angular في العمل؟</strong></p>
+  <p><strong>ج:</strong> على الأرجح ستقرأ أكثر مما تكتب — المجال المؤسسي لـ Angular يعني قواعد كود قديمة كبيرة وبطيئة في الهجرة. إذا انضممت لبنك، شركة تأمين، مقاول حكومي، أو فريق أدوات داخلية كبير، قد تواجه مستودعات Angular مع NgModules و zone.js. كتابة Angular من الصفر شائعة في نفس هذه البيئات للمشاريع الجديدة — النظام البيئي نشط (إشارات، مكونات مستقلة، بدون zone.js) لكن التبني يتخلف عن رياكت في عالم الشركات الناشئة/الإطارات الوصفية. مهارات القراءة (مكونات كلاسية، حقن تبعيات، <code>@Input</code>/<code>@Output</code>، خطافات دورة الحياة) تنتقل عبر كل العصور. مهارات الكتابة (إشارات، مكونات مستقلة، بدون zone.js) للكود الجديد فقط.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>مرجع · تطور Angular</span>
+  <span>→ <a href="./class-to-hooks-paradigm-shift.html">العودة إلى مستند التحول النموذجي</a></span>
+  <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

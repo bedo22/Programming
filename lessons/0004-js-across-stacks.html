@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0004 — JS Across Stacks · Where JS Runs, and Who Fights It</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Lesson 4 · The Exploration Journey · Episode 4 of 14 · Ecosystem (1/3)</p>
+  <h1>JS Across Stacks — Where JS Runs, and Who Fights It</h1>
+  <p class="meta">Episode 1 showed JS conquered the browser by accident. In 2009 someone pulled JS's engine <em>out</em> of the browser — and now JS runs on servers, phones, and beyond. So why are there still five other major languages? Because each stack has different constraints. Anchored to <a href="../reference/javascript-across-stacks.html">JS Across Stacks</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>You finished the <a href="../MISSION.md">atoms</a> — the language (<a href="./0001-the-accidental-lingua-franca.html">L1</a>), the platform (<a href="./0002-the-platform-layer.html">L2</a>), state (<a href="./0003-what-is-state.html">L3</a>). The <a href="../PLAN.md">Ecosystem</a> movement begins here: how that language spread across stacks, how products ship UI in different <em>camps</em> (<a href="./0005-the-camps.html">L5</a>), and the biggest shift in React (<a href="./0006-the-class-to-hooks-revolution.html">L6</a>).</p>
+</section>
+
+<h2>1. JavaScript escapes the browser</h2>
+<p>For fourteen years JavaScript lived in one place: the browser. It was a page-scripting language, full stop. Then in <strong>2009</strong>, a developer named <strong>Ryan Dahl</strong> took Google's <strong>V8</strong> JavaScript engine — the same engine Chrome used to run JS in the browser — and ran it <em>outside</em> the browser, as a standalone program. He called it <strong>Node.js</strong>. (Wikipedia: Node.js, original author Ryan Dahl, first released 27 May 2009, built on V8.)</p>
+<p>The significance is easy to miss. Until Node, "JavaScript" meant "the thing in the web page." After Node, JavaScript was a <em>general-purpose</em> language that could read files, talk to databases, run a server — anything a backend language did. The same language you wrote in the browser, you could now write on the server. That single move is why "full-stack JavaScript" exists.</p>
+
+<h2>2. If JS is everywhere, why are there five other languages?</h2>
+<p>Because "everywhere" is not "every stack the same way." Each stack — frontend, backend, mobile, embedded, AI — has a different dominant constraint, and a different thing about JS that doesn't fit. The reference doc lays out the rule that emerges from all of them:</p>
+<blockquote class="callout">
+  <p><strong>Extend when the constraint is unchanged; invent when it inverts.</strong> A new language wins only when the dominant constraint changes so that the old language's design bet conflicts with the new constraint.</p>
+</blockquote>
+<p>On the <strong>frontend</strong>, the browser still ships exactly one language natively — JS (and WebAssembly as a partner, not a replacement). The constraint never inverted, so no language <em>replaces</em> JS here. Languages that tried to (CoffeeScript, Elm, Dart-to-JS) died or pivoted, because the browser's monopoly is absolute: you compile <em>to</em> JS, you don't replace it.</p>
+<p>On the <strong>backend</strong>, the constraint did change — networked services at scale, concurrency-first. JS (via Node) competes, but here it has real rivals: <strong>Go</strong> won the concurrency-first bet (goroutines, fast compile), <strong>Rust</strong> won memory safety without a garbage collector (the borrow checker), Java/Spring and Python hold huge installed bases. Each won because the old constraint (bare-metal control, portable servers) inverted into a new one (concurrency, safety) that the old design bet didn't serve.</p>
+
+<h2>3. The one exception that proves the rule: TypeScript</h2>
+<p>Here's the case that ties the whole rule together. <strong>TypeScript extends JavaScript; it does not replace it.</strong> The new constraint was large-team maintainability — JS's dynamic typing made big codebases fragile. You'd expect a new language. Instead, Microsoft built TS to <em>compile away</em> into plain JS: you get compiler-checked types at authoring time, and zero runtime cost — the browser still receives JS. Why didn't TS invent a new runtime? Because the browser constraint never inverted. TS adds types <em>without</em> fighting the platform.</p>
+<p>So the picture is: <strong>JS sits at the center</strong> — it survived the browser by accident (Lesson 1), escaped the browser by Node (2009), and now runs across stacks. The competitors orbit it: TypeScript extends it; Go, Rust, Kotlin, Swift invent beside it; WebAssembly partners with it. None replaced JS because none inverted the one constraint that made JS unavoidable in the first place — the browser.</p>
+
+
+<h2>4. Retrieve it</h2>
+<p>Reading is acquisition. Recall is retention. Answer from memory — the effort is what makes it stick. (Options are the same length on purpose; no clues in the formatting.)</p>
+
+<details class="quiz" data-answer="node" data-explain="In 2009 Ryan Dahl built Node.js on Google's V8 engine, pulling JS out of the browser and onto the server (Wikipedia). That single move is why JS now runs across stacks, not just pages.">
+  <summary>What, in 2009, let JavaScript run outside the browser?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="node"> Node.js, built on V8</label>
+      <label><input type="radio" name="q1" value="wasm"> WebAssembly, the bytecode</label>
+      <label><input type="radio" name="q1" value="deno"> Deno, the secure runtime</label>
+      <label><input type="radio" name="q1" value="browser"> Nothing; the browser only</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="invent" data-explain="When the constraint inverts the old design bet, a new language tends to win (Go for concurrency, Rust for memory safety, Kotlin for mobile). When it doesn't invert, you extend (TypeScript compiles away into JS).">
+  <summary>When a stack's dominant constraint changes so the old language's bet conflicts, what tends to happen?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="invent"> A new language gets invented</label>
+      <label><input type="radio" name="q2" value="extend"> The old language gets extended</label>
+      <label><input type="radio" name="q2" value="fork"> The old language gets forked</label>
+      <label><input type="radio" name="q2" value="ignore"> The constraint gets ignored</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="browser" data-explain="TypeScript extends JS because the browser constraint never inverted — the browser still only runs JS. TS compiles away to plain JS, adding types without fighting the platform. That's why it extends rather than replaces.">
+  <summary>Why does TypeScript extend JavaScript rather than replace it?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="browser"> The browser only runs JS</label>
+      <label><input type="radio" name="q3" value="fast"> TS compiles to faster code</label>
+      <label><input type="radio" name="q3" value="syntax"> TS just adds nicer syntax</label>
+      <label><input type="radio" name="q3" value="config"> JS needs zero config always</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the ecosystem's shape: JS escaped the browser in <strong>2009</strong> (Node.js on V8), so it runs across stacks — but each stack keeps its own winners, because the rule is <strong>extend when the constraint is unchanged, invent when it inverts.</strong> TypeScript is the telling exception: it extends JS precisely because the browser constraint never inverted. JS sits at the center; the competitors orbit it. None replaced JS because none inverted the one fact that made it unavoidable — the browser.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/javascript-across-stacks.html">JS Across Stacks</a> — every perspective (frontend, backend, mobile, embedded, AI), a positioning table per competitor, and the full extend-vs-invent table.</li>
+    <li><strong>Next lesson:</strong> <a href="./0005-the-camps.html">Lesson 5 — The Camps</a> — zooming into the frontend stack: the different ways real products ship UI.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory.</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/Node.js">Wikipedia — Node.js</a> (origin: Ryan Dahl, 2009, built on V8) and <a href="https://www.typescriptlang.org/">TypeScript</a> (compiles away to JS).</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"If Go and Rust are better for the backend, why do so many companies still use Node?"</li>
+    <li>"Is WebAssembly going to replace JS on the frontend?"</li>
+    <li>"Why didn't TypeScript just become its own language with its own runtime?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Episode 4 · <a href="../reference/javascript-across-stacks.html">Reference: JS Across Stacks</a></span>
+  <span>Next → <a href="./0005-the-camps.html">Lesson 5 · The Camps</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

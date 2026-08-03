@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Thinking — How Products Discover Problems Before Code Can Solve Them</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Product engineering — the layer above architecture</p>
+  <h1>Design Thinking — How Products Discover Problems Before Code Can Solve Them</h1>
+  <p class="meta">The discipline of figuring out <em>what to build</em> before deciding <em>how to build it</em>. Sibling docs: <a href="./system-design.html">System Design</a> (the architectural layer downstream), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop downstream), <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering layer that materializes empathy into pixels).</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p>Most engineering tutorials start at "how to implement." Design Thinking starts at "what problem is worth solving, and for whom." It is a distinct discipline with its own history, methods, and failure modes — not "design" as in visual styling, not "UX research" as a phase, not a design sprint as an event. This doc captures it as a first-class engineering concern: the upstream layer that feeds system design and the developer loop. If you've ever built the wrong thing perfectly, this is the layer you missed.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone. Cross-links:</p>
+<ul>
+  <li>Downstream to <a href="./system-design.html">System Design</a> — once you know <em>what</em> to build, system design answers <em>how it fits together at scale</em>.</li>
+  <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — once architecture is set, the developer loop executes one component at a time.</li>
+  <li>Downstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — once the problem is framed, UI/UX renders the empathy into habitable interfaces.</li>
+  <li>Upstream to <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — language choices are downstream of product constraints.</</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>The three questions.</strong> Every Design Thinking method answers the same Venn (IDEO, ~1998):</p>
+  <ul>
+    <li><strong>Desirability</strong> — Do people actually want this? (Human-centered)</li>
+    <li><strong>Feasibility</strong> — Can we build it with our technology and skills? (Technical)</li>
+    <li><strong>Viability</strong> — Does it make business sense? (Business)</li>
+  </ul>
+  <p>Design Thinking lives in the intersection. If any circle is empty, the product fails.</p>
+</blockquote>
+
+<h2>1. Definition — what Design Thinking <em>is</em> and what it is <em>not</em></h2>
+
+<h3>What it is</h3>
+
+<p>Design Thinking is a disciplined approach to <strong>problem discovery and framing</strong> before solution construction. It treats the problem as unknown and discoverable, not given. Its artifacts are not code or diagrams but <em>insight statements, experience maps, and testable prototypes</em>. Its currency is empathy (direct observation of users), abductive reasoning (inferring the best explanation for observed behavior), and iteration (cycles that refine the problem definition, not just the solution).</p>
+
+<h3>What it is not</h3>
+
+<table>
+  <thead><tr><th>Confused with</th><th>What that is</th><th>Difference</th></tr></thead>
+  <tbody>
+    <tr><td>Visual / UI design</td><td>Typography, color, layout, interaction patterns</td><td>Design Thinking produces <em>problem definitions</em>; UI design produces <em>visual solutions</em>.</td></tr>
+    <tr><td>UX research</td><td>Usability testing, surveys, analytics</td><td>UX research is a toolset <em>inside</em> Design Thinking; Design Thinking is the framing that decides <em>what to research</em>.</td></tr>
+    <tr><td>Design Sprint</td><td>A 5-day time-boxed process (Google Ventures)</td><td>A sprint is <em>one execution</em> of Design Thinking under a deadline; Design Thinking is the broader discipline.</td></tr>
+    <tr><td>Product Management</td><td>Roadmaps, prioritization, metrics, stakeholder management</td><td>PM owns the <em>business outcome</em>; Design Thinking is a <em>method PMs use</em> to de-risk what to build.</td></tr>
+    <tr><td>Agile / Scrum</td><td>Iterative delivery with fixed timeboxes</td><td>Agile assumes the backlog items are <em>already valid</em>. Design Thinking questions the backlog itself.</td></tr>
+  </tbody>
+</table>
+
+<h3>The three-layer answer to "where does it sit?"</h3>
+
+<pre><code>Layer 1: Design Thinking   → "What problem is worth solving, and for whom?"
+Layer 2: System Design     → "How does the solution fit together at scale?"
+Layer 3: Developer Loop    → "How do I build this component well, right now?"
+</code></pre>
+
+<p>Each layer feeds the next. A flaw in Layer 1 cannot be fixed in Layer 3.</p>
+
+---
+
+<h2>2. History — five phases of the idea</h2>
+
+<table>
+  <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures</th><th>What shifted</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1960s</strong></td>
+      <td>Visual/industrial design roots</td>
+      <td>Bruce Archer (Royal College of Art), John Chris Jones</td>
+      <td>Design treated as a systematic, teachable process, not just craft intuition.</td>
+    </tr>
+    <tr>
+      <td><strong>1969</strong></td>
+      <td><em>The Sciences of the Artificial</em> (Herbert Simon)</td>
+      <td>Herbert Simon (Nobel 1978, Economics)</td>
+      <td>Design = "devising courses of action aimed at changing existing situations into preferred ones." Bounded rationality: humans satisfice, don't optimize.</td>
+    </tr>
+    <tr>
+      <td><strong>1973</strong></td>
+      <td>"Wicked Problems" paper</td>
+      <td>Horst Rittel, Melvin Webber</td>
+      <td>Problems in planning have no stopping rule, no true/false test, no ultimate solution — only better/worse. The term "wicked problem" is coined.</td>
+    </tr>
+    <tr>
+      <td><strong>1980s</strong></td>
+      <td>Designerly ways of knowing</td>
+      <td>Nigel Cross</td>
+      <td>Design has its own epistemology: abductive reasoning, modeling, reflective practice.</td>
+    </tr>
+    <tr>
+      <td><strong>1991</strong></td>
+      <td>IDEO founded</td>
+      <td>David Kelley, Bill Moggridge, Mike Nuttall</td>
+      <td>First consultancy to systematize and commercialize the process across industries.</td>
+    </tr>
+    <tr>
+      <td><strong>1998</strong></td>
+      <td>IDEO's three-lens framework published</td>
+      <td>Tim Brown (later CEO), IDEO team</td>
+      <td>Desirability / Feasibility / Viability becomes the public vocabulary.</td>
+    </tr>
+    <tr>
+      <td><strong>2005</strong></td>
+      <td>Stanford d.school launches</td>
+      <td>David Kelley, George Kembel</td>
+      <td>Academic institutionalization; the 5-stage model (Empathize → Define → Ideate → Prototype → Test) becomes the teaching standard.</td>
+    </tr>
+    <tr>
+      <td><strong>2005</strong></td>
+      <td>Double Diamond published</td>
+      <td>Design Council UK (Bela Banathy lineage)</td>
+      <td>Discover → Define (diverge/converge) → Develop → Deliver. A visual meta-model adopted by UK government and EU policy.</td>
+    </tr>
+    <tr>
+      <td><strong>2009</strong></td>
+      <td><em>Change by Design</em> (Tim Brown)</td>
+      <td>Tim Brown</td>
+      <td>First mainstream business book; moves Design Thinking from design press to Harvard Business Review.</td>
+    </tr>
+    <tr>
+      <td><strong>2011</strong></td>
+      <td><em>The Lean Startup</em> (Eric Ries)</td>
+      <td>Eric Ries</td>
+      <td>Build–Measure–Learn applies Design Thinking's iteration to venture-backed startups. "Validated learning" = Design Thinking's "test with users" made metric-driven.</td>
+    </tr>
+    <tr>
+      <td><strong>2013</strong></td>
+      <td>Lean UX (Jeff Gothelf, Josh Seiden)</td>
+      <td>Jeff Gothelf, Josh Seiden</td>
+      <td>Adapts Lean Startup for in-house product teams; replaces heavy deliverables with hypothesis-driven design.</td>
+    </tr>
+    <tr>
+      <td><strong>2016</strong></td>
+      <td>Design Sprint (Google Ventures / Jake Knapp)</td>
+      <td>Jake Knapp, John Zeratsky, Braden Kowitz</td>
+      <td>5-day recipe: Understand → Sketch → Decide → Prototype → Test. The first "run this exact process in one week" product.</td>
+    </tr>
+    <tr>
+      <td><strong>2018–present</strong></td>
+      <td>Critique and backlash</td>
+      <td>Natasha Jen ("Design Thinking is Bullshit"), Don Norman ("Rethinking Design Thinking"), Bruce Nussbaum</td>
+      <td>Design Thinking becomes a corporate ritual ("design theater") — method without empathy. See §10.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>3. Evolution — from industrial design to software and policy</h2>
+
+<p>The core idea — <em>problem framing before solution</em> — did not change. What changed is where it was applied:</p>
+
+<table>
+  <thead><tr><th>Domain</th><th>How the methods adapted</th><th>Key artifact shift</th></tr></thead>
+  <tbody>
+    <tr><td>Industrial products (1960s–90s)</td><td>Physical prototypes, ergonomic studies, manufacturing constraints</td><td>Foam models → CAD</td></tr>
+    <tr><td>Service design (1990s–2000s)</td><td>Front-stage / back-stage mapping, service blueprints (G. Lynn Shostack)</td><td>Service blueprint replaces product spec</td></tr>
+    <tr><td>Digital products (2000s–)</td><td>Wireframes, clickable prototypes, A/B tests, analytics</td><td>Code prototype replaces physical model</td></tr>
+    <tr><td>Policy / government (2010s–)</td><td>Citizen journey mapping, policy labs (UK Policy Lab, 2011), co-design with affected communities</td><td>Policy prototype replaces legislation draft</td></tr>
+    <tr><td>AI / ML products (2020s–)</td><td>Wizard-of-Oz prototypes, data labeling as research, harm mapping, red-teaming</td><td>Model behavior prototype replaces UI prototype</td></tr>
+  </tbody>
+</table>
+
+<p>The methods migrated because the <em>constraint inversion</em> pattern (see <a href="./javascript-across-stacks.html">JS Across Stacks</a>) repeated: when the dominant constraint changes (manufacturing → service delivery → software speed → regulatory accountability → model behavior), the old toolkit no longer fits and the discipline adapts.</p>
+
+<h2>3b. Migration paths — adopting Design Thinking in existing orgs</h2>
+
+<p>Organizations don't "switch to Design Thinking" in one step. Common adoption paths:</p>
+
+<table>
+  <thead><tr><th>From → To</th><th>Trigger</th><th>Target state</th><th>Steps</th><th>Risks</th><th>Success signals</th><th>Timeline</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>No formal discovery → Design Sprint (one team)</td>
+      <td>High-stakes feature; 5 days available; cross-functional team exists</td>
+      <td>Validated prototype + shared vocabulary</td>
+      <td>1) Map the problem. 2) Recruit 5 users. 3) Run Sprint (Mon-Fri). 4) Share learnings widely.</td>
+      <td>Sprint theater (performative); no follow-through; prototype discarded</td>
+      <td>Prototype tested with real users; decision made; team runs another</td>
+      <td>1 week + 2 weeks prep</td>
+    </tr>
+    <tr>
+      <td>Ad-hoc research → Continuous discovery (product trio)</td>
+      <td>Backlog full of unvalidated features; engineering idle on "what to build"</td>
+      <td>Weekly customer interviews; opportunity solution tree; continuous prototypes</td>
+      <td>1) Form trio (PM, Designer, Eng). 2) Schedule 1 user/week. 3) Map opportunities. 4) Small bets (painted door, concierge). 5) Share outcomes in sprint review.</td>
+      <td>Research becomes a phase; trio dissolves under delivery pressure</td>
+      <td>Backlog items have insight traces; % validated ideas ↑; cycle time ↓</td>
+      <td>3–6 months</td>
+    </tr>
+    <tr>
+      <td>Project-based design → Embedded design partnership</td>
+      <td>Designers are "service bureau"; handoffs cause rework; featuritis</td>
+      <td>Designers in squad; discovery runs ahead of delivery; shared ownership</td>
+      <td>1) Move designers into squads. 2) Dual-track: discovery 1 sprint ahead. 3) Shared OKRs (outcome, not output). 4) Designer in sprint planning.</td>
+      <td>Designer capacity split; "sprint ahead" becomes mini-waterfall</td>
+      <td>Handoff tickets → 0; rework % ↓; designer satisfaction ↑</td>
+      <td>6–12 months</td>
+    </tr>
+    <tr>
+      <td>Top-down roadmap → Outcome-driven portfolio</td>
+      <td>Leadership mandates features; teams lack problem ownership; OKR theater</td>
+      <td>Outcome OKRs; discovery budget; portfolio review kills bad bets</td>
+      <td>1) Rewrite OKRs as outcomes. 2) Allocate 20% capacity to discovery. 3) Quarterly portfolio review: kill/pivot/double-down. 4) Leadership models "I was wrong."</td>
+      <td>Leadership reverts to feature list; discovery budget cut first</td>
+      <td>% features killed in discovery >0; outcome metrics move; team autonomy ↑</td>
+      <td>12–24 months</td>
+    </tr>
+    <tr>
+      <td>Design as "UI polish" → Design as strategic partner</td>
+      <td>Design brought in after requirements; pixel-pushing perception</td>
+      <td>Designer in strategy meetings; problem framing; business model design</td>
+      <td>1) Designer presents at roadmap planning. 2) Facilitate problem framing workshop. 3) Co-create success metrics. 4) Track "decisions influenced" not "screens delivered."</td>
+      <td>Token inclusion; no authority; design seen as "soft"</td>
+      <td>Designer in 3+ strategic meetings/qtr; reframed problems ship</td>
+      <td>6–18 months</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Certifying everyone in a 2-day workshop and calling it "transformation." The rhythm (§6) survives; the branded methodologies (§7) often don't. Adoption is a series of small bets (§9), not a rollout.</p>
+
+---
+
+<h2>4. Intersection with neighbors — where it borders other practices</h2>
+
+<table>
+  <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>UX Research</strong></td>
+      <td>Ethnography, usability testing, interviews</td>
+      <td>UX research answers "is this usable?" Design Thinking asks "is this the right problem?"</td>
+    </tr>
+    <tr>
+      <td><strong>Service Design</strong></td>
+      <td>End-to-end journey, front/back stage, co-design</td>
+      <td>Service design assumes a service context; Design Thinking is domain-agnostic.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Sprint</strong></td>
+      <td>5-day timebox, prototype on day 4, test on day 5</td>
+      <td>Sprint = fixed recipe. Design Thinking = toolbox you adapt to the problem.</td>
+    </tr>
+    <tr>
+      <td><strong>Product Management</strong></td>
+      <td>Prioritization, metrics, stakeholder alignment</td>
+      <td>PM decides <em>what ships when</em>; Design Thinking is a method PMs use to <em>de-risk what</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>Engineering (System Design)</strong></td>
+      <td>Feasibility lens, technical constraints</td>
+      <td>Engineering assumes a problem to solve; Design Thinking discovers the problem.</td>
+    </tr>
+    <tr>
+      <td><strong>Developer Loop</strong> (<a href="./how-developers-think-frontend.html">Model/View/Flow</a>)</td>
+      <td>Iteration, feedback, "done" is judgment</td>
+      <td>Developer loop executes a <em>given feature</em>. Design Thinking decides <em>which feature</em>.</td>
+    </tr>
+    <tr>
+      <td><strong>Agile / Scrum</strong></td>
+      <td>Iterative, timeboxed, feedback-driven</td>
+      <td>Agile takes the backlog as input. Design Thinking questions the backlog.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>5. Underlying theory — the ideas it borrows from</h2>
+
+<p>Design Thinking does not have a single unified theory. It borrows from several established fields:</p>
+
+<table>
+  <thead><tr><th>Theory</th><th>Origin</th><th>What Design Thinking takes from it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Wicked Problems</strong></td>
+      <td>Rittel & Webber, 1973</td>
+      <td>Problems with no stopping rule, no true/false test — only better/worse. The problem definition <em>is</em> the design act.</td>
+    </tr>
+    <tr>
+      <td><strong>Bounded Rationality</strong></td>
+      <td>Herbert Simon, 1957</td>
+      <td>Humans satisfice (accept good enough) rather than optimize. Design Thinking uses this: prototypes are "good enough to learn from," not optimal.</td>
+    </tr>
+    <tr>
+      <td><strong>Abductive Reasoning</strong></td>
+      <td>Charles Sanders Peirce, ~1900</td>
+      <td>Inference to the best explanation. Design is "thinking made visible" — you observe behavior, abduct a hypothesis ("they struggle because the form is confusing"), test it.</td>
+    </tr>
+    <tr>
+      <td><strong>Double-Loop Learning</strong></td>
+      <td>Chris Argyris & Donald Schön, 1978</td>
+      <td>Single-loop: "fix the action." Double-loop: "question the governing variable." Design Thinking's "reframe the problem" is double-loop learning.</td>
+    </tr>
+    <tr>
+      <td><strong>Designerly Ways of Knowing</strong></td>
+      <td>Nigel Cross, 1982/2001</td>
+      <td>Design has its own epistemology: modeling (externalizing thought), reflective practice (Schön), and the "generator–evaluator" cycle.</td>
+    </tr>
+    <tr>
+      <td><strong>The Craft vs Science Debate</strong></td>
+      <td>Cross, Schon, Simon</td>
+      <td>Is design a science (discovering laws) or a craft (making things)? Design Thinking says: it's a <em>discipline of synthesis</em> — neither pure science nor pure craft.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5b. Mental models — how designers actually reason</h2>
+
+<p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
+
+<table>
+  <thead><tr><th>Model</th><th>Core idea</th><th>When you reach for it</th><th>What it replaces</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Problem ≠ solution space</strong></td>
+      <td>Problem space is explored broadly (diverge) before solution space is narrowed (converge). Mixing them = premature convergence.</td>
+      <td>Workshop facilitation; sprint planning; stakeholder says "just build X."</td>
+      <td>Jumping to features; backlog as solution list.</td>
+    </tr>
+    <tr>
+      <td><strong>Abductive hypothesis → prototype test</strong></td>
+      <td>Observe behavior → infer best explanation ("they struggle because form is confusing") → build smallest test → learn → refine hypothesis.</td>
+      <td>Every design decision; research synthesis; prioritizing what to prototype.</td>
+      <td>Gut feel; A/B testing without hypothesis; building to validate.</td>
+    </tr>
+    <tr>
+      <td><strong>Diverge–converge as rhythm, not phases</strong></td>
+      <td>Double Diamond is a meta-rhythm: discover (diverge) → define (converge) → develop (diverge) → deliver (converge). Each micro-cycle follows the same shape.</td>
+      <td>Scoping a sprint; planning a workshop; structuring a discovery cadence.</td>
+      <td>Waterfall phases; "design phase" then "dev phase."</td>
+    </tr>
+    <tr>
+      <td><strong>Insight statement as decision anchor</strong></td>
+      <td>"Users don't forget because of memory — they forget because the trigger (pill bottle) is hidden by their environment." Every decision traces back to an insight.</td>
+      <td>Prioritization; design reviews; stakeholder alignment; saying no to feature requests.</td>
+      <td>Feature lists; "the user wants X" without why.</td>
+    </tr>
+    <tr>
+      <td><strong>Prototype fidelity = learning goal</strong></td>
+      <td>Paper = concept validation; clickable = flow validation; coded = interaction/feasibility validation. Never over-build for the question.</td>
+      <td>Deciding what to build for a test; timeboxing prototype effort.</td>
+      <td>High-fidelity everything; coded prototypes for concept tests.</td>
+    </tr>
+    <tr>
+      <td><strong>Radical collaboration = shared mental model</strong></td>
+      <td>Designers, engineers, PMs, support, sales, users in the room. The artifact (map, prototype, tree) is the shared externalized thinking.</td>
+      <td>Kickoff; discovery; synthesis; retrospective. Anywhere handoffs happen.</td>
+      <td>Designer → engineer handoff; PM writes requirements alone.</td>
+    </tr>
+    <tr>
+      <td><strong>Outcome > output</strong></td>
+      <td>Success = user behavior changed / metric moved. Not = screens delivered / sprint points burned.</td>
+      <td>OKR setting; portfolio review; sprint demo; performance reviews.</td>
+      <td>Velocity; feature count; "design delivered."</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> Running a Design Sprint and calling it "doing Design Thinking." The rhythm (§6) survives; the branded methodologies (§7) often don't. Adoption is a series of small bets (§9), not a rollout.</p>
+
+---
+
+<h2>6. The rhythm, not the algorithm</h2>
+
+<p>Like the <a href="./how-developers-think-frontend.html">developer loop</a>, Design Thinking is a <strong>rhythm</strong>, not a structured algorithm. It fails the three algorithm tests:</p>
+
+<ul>
+  <li><strong>Inputs aren't predefined.</strong> You don't know the real problem when you start. The "Empathize" phase discovers it.</li>
+  <li><strong>Steps aren't deterministic.</strong> There is no rule that says "now do Define." You converge when the team feels the insight density is sufficient — a taste judgment.</li>
+  <li><strong>No fixed termination.</strong> "Done" means "we have a testable hypothesis about the problem and a prototype that validates it." That is a judgment call, not a predicate.</li>
+</ul>
+
+<p>This is why Design Thinking resists checklists. A checklist assumes you know what to do next; the rhythm assumes you know <em>what's missing</em> — an aesthetic/strategic judgment.</p>
+
+<blockquote class="callout">
+  <p><strong>The Design Sprint as a rhythm hack.</strong> The Google Ventures Design Sprint (Jake Knapp, 2016) solves the "no fixed termination" problem by <em>imposing a 5-day deadline</em>. Day 1 = Understand, Day 2 = Sketch, Day 3 = Decide, Day 4 = Prototype, Day 5 = Test. The calendar forces convergence. It's a timeboxed execution of the rhythm — useful when you must decide, dangerous when mistaken for the whole discipline.</p>
+</blockquote>
+
+---
+
+<h2>7. Methodologies — the named frameworks</h2>
+
+<p>Multiple named processes exist. None is canonical; each is a different packaging of the same rhythm.</p>
+
+<table>
+  <thead><tr><th>Methodology</th><th>Stages / Lenses</th><th>Origin</th><th>Best for</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>IDEO Three Lenses</strong></td>
+      <td>Desirability → Feasibility → Viability (iterative, not sequential)</td>
+      <td>IDEO, ~1998</td>
+      <td>Cross-functional teams needing a shared vocabulary with business, engineering, design.</td>
+    </tr>
+    <tr>
+      <td><strong>Stanford d.school 5 Stages</strong></td>
+      <td>Empathize → Define → Ideate → Prototype → Test (loops back to Empathize)</td>
+      <td>Stanford d.school, 2005</td>
+      <td>Teaching, workshops, teams learning the rhythm for the first time.</td>
+    </tr>
+    <tr>
+      <td><strong>Double Diamond</strong></td>
+      <td>Discover (diverge) → Define (converge) → Develop (diverge) → Deliver (converge)</td>
+      <td>Design Council UK, 2005</td>
+      <td>Policy, government, large orgs needing a visual meta-process for governance.</td>
+    </tr>
+    <tr>
+      <td><strong>Design Sprint</strong></td>
+      <td>Understand → Sketch → Decide → Prototype → Test (5 days, fixed)</td>
+      <td>Google Ventures / Jake Knapp, 2016</td>
+      <td>Teams that need a decision <em>this week</em>. High urgency, clear enough problem space.</td>
+    </tr>
+    <tr>
+      <td><strong>Lean UX</strong></td>
+      <td>Hypothesis → MVP experiment → Measure → Learn (builds on Lean Startup)</td>
+      <td>Gothelf & Seiden, 2013</td>
+      <td>In-house product teams shipping continuously; replaces heavy deliverables with hypotheses.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>All five share the same DNA: <em>diverge → converge → validate with reality → repeat</em>. The differences are cadence, deliverables, and who participates.</p>
+
+---
+
+<h2>8. Principles — the shared constants</h2>
+
+<p>Across every methodology, seven principles hold:</p>
+
+<ol>
+  <li><strong>Human-centered.</strong> Start with people's actual behavior, not stated preferences or internal assumptions.</li>
+  <li><strong>Abductive.</strong> Infer the best explanation for what you observe; make it visible (sketch, map, prototype).</li>
+  <li><strong>Iterative.</strong> The first problem definition is wrong. Plan to reframe.</li>
+  <li><strong>Tolerant of ambiguity.</strong> The fuzzy front end <em>must</em> be fuzzy. Premature convergence = wrong problem.</li>
+  <li><strong>Radical collaboration.</strong> Cross-functional by default — design, engineering, product, support, sales, users in the room.</li>
+  <li><strong>Show, don't tell.</strong> A prototype (even paper) is worth 100 slides. Tangible artifacts align teams.</li>
+  <li><strong>Fail forward.</strong> A failed prototype is a successful learning event. The goal is to invalidate bad hypotheses cheap.</li>
+</ol>
+
+---
+
+<h2>9. Worked example — "Reduce missed medication doses"</h2>
+
+<p>A classic human-centered design problem, walked through the d.school 5 stages:</p>
+
+<h3>Stage 1 — Empathize (field work)</h3>
+<ul>
+  <li>Team visits 12 patients' homes, observes morning routines.</li>
+  <li>Key observation: patients put pill bottles in the kitchen cabinet <em>behind</em> the coffee mugs. The bottle is invisible at pill time.</li>
+  <li>Quote captured: "I remember when I see the bottle. If I don't see it, I forget."</li>
+</ul>
+
+<h3>Stage 2 — Define (insight statement)</h3>
+<pre><code>Insight: Patients don't forget because of memory — they forget because the trigger (the bottle) is hidden by their own environment.
+Reframed problem: How might we make the medication trigger visible at the right moment without adding cognitive load?
+</code></pre>
+
+<h3>Stage 3 — Ideate (diverge)</h3>
+<ul>
+  <li>Team generates 40+ sketches in 20 minutes (Crazy 8s exercise).</li>
+  <li>Ideas range: smart bottle cap with light → fridge magnet reminder → text message → pill strip redesign → voice assistant integration → wearable vibration.</li>
+</ul>
+
+<h3>Stage 4 — Prototype (converge + build)</h3>
+<ul>
+  <li>Team selects two concepts: (a) a bottle sleeve with a flip-up flag that catches the eye, (b) a simple SMS reminder timed to the patient's stated routine.</li>
+  <li>Day 4: paper sleeve cutouts + Twilio SMS test script. Total build time: 3 hours.</li>
+</ul>
+
+<h3>Stage 5 — Test (validate)</h3>
+<ul>
+  <li>5 patients try the sleeve for 3 days; 5 try SMS for 3 days.</li>
+  <li>Result: sleeve group missed 1 dose / 15 (6.7%); SMS group missed 2 / 15 (13.3%); control (historical) ~30%.</li>
+  <li>Insight: the <em>physical</em> trigger in context beat the <em>digital</em> trigger out of context.</li>
+</ul>
+
+<p><strong>Artifacts produced at each stage:</strong> field notes + photos → insight statement → 40 sketches → two paper prototypes + Twilio script → test protocol + results spreadsheet. None is code. All are <em>decision-support artifacts</em>.</p>
+
+---
+
+<h2>10. The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Design Theater</strong></td>
+      <td>Team runs a "design sprint," makes sticky notes, builds a prototype, tests with 2 coworkers, declares success, ships the original roadmap item unchanged.</td>
+      <td>Method performed as ritual without empathy. The "user test" validates the team's bias, not the user's need.</td>
+    </tr>
+    <tr>
+      <td><strong>The Loudest User Bias</strong></td>
+      <td>Team interviews 3 power users who ask for a dashboard. The silent majority needs a one-tap action. Team builds the dashboard.</td>
+      <td>Convenience sampling instead of representative observation. Power users are easy to reach; they are rarely representative.</td>
+    </tr>
+    <tr>
+      <td><strong>Solution Without a Problem</strong></td>
+      <td>Team falls in love with a technology (blockchain, AR, LLM) and reverse-engineers a problem to justify it.</td>
+      <td>Abduction runs backward: starts with solution, invents problem. Violates the first principle (human-centered).</td>
+    </tr>
+    <tr>
+      <td><strong>Premature Convergence</strong></td>
+      <td>Team picks the first plausible idea and polishes it. Never explores the fringe where the real insight lives.</td>
+      <td>Ambiguity intolerance. Organizations reward "decisiveness" over "exploration."</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The academic critique (2018+)</h3>
+
+<p>Design Thinking has faced serious critique from within design academia:</p>
+
+<ul>
+  <li><strong>Natasha Jen (2017)</strong> — "Design Thinking is Bullshit": argues it reduces design to a linear process, strips away craft and criticism, and serves corporate innovation theater.</li>
+  <li><strong>Don Norman (2019)</strong> — "Rethinking Design Thinking": the original intent (Herbert Simon) was deep problem framing; the popularized version became a shallow workshop format.</li>
+  <li><strong>Bruce Nussbaum (2018)</strong> — "Design Thinking is a Failed Experiment": it promised creativity, delivered compliance.</li>
+</ul>
+
+<p><strong>The common thread:</strong> the critique is not that the <em>principles</em> are wrong — it's that the <em>institutional adoption</em> hollowed them into checkboxes. The rhythm survives; the branded methodologies often don't.</p>
+
+---
+
+<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+
+<p>Design Thinking is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Research & Synthesis</strong></td>
+      <td>Dovetail, EnjoyHQ, Condens, Maze, UserTesting, Lookback, Dscout</td>
+      <td>Raw interviews → tagged, searchable, shareable insights</td>
+      <td>Time to insight; Tagging consistency; Stakeholder access rate; Synthesis bias audit</td>
+    </tr>
+    <tr>
+      <td><strong>Journey Mapping & Service Blueprints</strong></td>
+      <td>Miro, FigJam, Whimsical, Smaply, UXPressia, Custellence</td>
+      <td>Fragmented understanding → shared, visual end-to-end journey</td>
+      <td>Journey coverage: % touchpoints mapped; Update frequency; Cross-team alignment score</td>
+    </tr>
+    <tr>
+      <td><strong>Prototyping & Validation</strong></td>
+      <td>Figma, Framer, ProtoPie, Principle, Webflow, CodeSandbox, Storybook</td>
+      <td>Hypothesis → testable prototype → validated learning</td>
+      <td>Prototype fidelity vs learning goal match; Build time; Test participant diversity; Surprise rate</td>
+    </tr>
+    <tr>
+      <td><strong>Design Sprint / Workshop Facilitation</strong></td>
+      <td>Mural, Miro, FigJam, Butter, SessionLab, Parabol</td>
+      <td>Divergent thinking → convergent decision in timeboxed session</td>
+      <td>Idea count per sprint; Decision clarity; Follow-through rate; Participant energy</td>
+    </tr>
+    <tr>
+      <td><strong>Insight Repository & Knowledge Management</strong></td>
+      <td>Notion, Confluence, GitBook, Dovetail, EnjoyHQ, Airtable</td>
+      <td>Lost insights → searchable, linkable, reusable knowledge base</td>
+      <td>Search success rate; Cross-project reuse; Insight half-life; Stakeholder adoption</td>
+    </tr>
+    <tr>
+      <td><strong>Participatory / Co-Design Platforms</strong></td>
+      <td>Miro, FigJam, Whimsical, Kumospace, Gather, custom community platforms</td>
+      <td>Expert-led → community-owned design process</td>
+      <td>Participant diversity; Power balance score; Decision ownership distribution</td>
+    </tr>
+    <tr>
+      <td><strong>AI-Augmented Research & Synthesis</strong></td>
+      <td>Dovetail AI, Condens AI, ChatGPT/Claude for coding, synthetic users</td>
+      <td>Manual coding → accelerated clustering, theming, persona drafting</td>
+      <td>Human-in-the-loop ratio; Hallucination catch rate; Time savings vs quality tradeoff</td>
+    </tr>
+    <tr>
+      <td><strong>Accessibility & Inclusion Testing</strong></td>
+      <td>axe, WAVE, Stark, Figma plugins, Screen reader testing (NVDA, VoiceOver)</td>
+      <td>Compliance checkbox → inclusive by default</td>
+      <td>WCAG audit pass rate; Screen reader task success; Color contrast coverage</td>
+    </tr>
+    <tr>
+      <td><strong>Design System & Token Management</strong></td>
+      <td>Figma Tokens, Style Dictionary, Specify, Token Studio, Supernova, Zeroheight</td>
+      <td>Design decisions → platform-agnostic tokens → code</td>
+      <td>Token coverage; Drift: design vs code; Cross-platform sync latency; Adoption rate</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection heuristic:</strong> Start with Research Repository + Prototyping + Journey Mapping (the "minimum viable design toolkit"). Add Sprint Facilitation when running regular timeboxed discoveries. Add AI Augmentation when interview volume >10/week. Add Co-Design Platforms when affected communities are identifiable and accessible. Add Token Management when design system exists. The tool serves the rhythm — not the reverse.</p>
+
+---
+
+<h2>11. The future — where Design Thinking is going</h2>
+
+<table>
+  <thead><tr><th>Signal (2024–2026)</th><th>What it means for Design Thinking</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>AI as research synthesizer</td>
+      <td>LLMs transcribing interviews, clustering themes, generating persona drafts, "being your own user" via simulation. Risk: synthetic empathy replaces real observation.</td>
+    </tr>
+    <tr>
+      <td>EU AI Act / regulatory mandates</td>
+      <td>Human-centered risk assessment becomes a compliance requirement (Article 9, Annex III). Design Thinking moves from "nice to have" to "auditable artifact."</td>
+    </tr>
+    <tr>
+      <td>Generative AI products</td>
+      <td>When the product <em>generates</em> its own behavior, pure empathy becomes the only reliable guardrail. You cannot A/B test infinite output spaces.</td>
+    </tr>
+    <tr>
+      <td>Participatory / co-design mainstreaming</td>
+      <td>"Nothing about us without us" — affected communities as co-designers, not subjects. Moves from consultancy-led to community-owned process.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>12. Summary — the mental checklist</h2>
+
+<p>Before any feature enters the backlog, verify:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>If no…</th></tr></thead>
+  <tbody>
+    <tr><td>Have we observed real users in their context (not a conference room)?</td><td>Go to Empathize. Stop writing tickets.</td></tr>
+    <tr><td>Can we state the problem as an insight, not a feature request?</td><td>Go to Define. Reframe until it's an insight.</td></tr>
+    <tr><td>Have we generated at least 20 distinct ideas before converging?</td><td>Go to Ideate. Diverge more.</td></tr>
+    <tr><td>Do we have a testable prototype that costs < 1 day to build?</td><td>Go to Prototype. Lower fidelity.</td></tr>
+    <tr><td>Did we test with 5+ representative users and learn something surprising?</td><td>Go to Test. The surprise is the signal.</td></tr>
+  </tbody>
+</table>
+
+<p>Print this. Put it on the product wall. If the ticket can't pass this checklist, it's not ready for System Design.</p>
+
+---
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.amazon.com/Sciences-Artificial-Herbert-Alexander-Simon/dp/0262691916">Simon, H. (1969). <em>The Sciences of the Artificial</em>.</a> ·
+  <a href="https://www.jstor.org/stable/40222683">Rittel, H. & Webber, M. (1973). "Dilemmas in a General Theory of Planning."</a> ·
+  <a href="https://www.amazon.com/Change-Design-Thinking-Transforms-Organizations/dp/0061766089">Brown, T. (2009). <em>Change by Design</em>.</a> ·
+  <a href="https://www.amazon.com/Lean-UX-Applying-Principles-Innovate/dp/1491953602">Gothelf, J. & Seiden, J. (2013). <em>Lean UX</em>.</a> ·
+  <a href="https://www.amazon.com/Sprint-Solve-Problems-Test-Ideas/dp/150112174X">Knapp, J. et al. (2016). <em>Sprint</em>.</a> ·
+  <a href="https://www.nytimes.com/2017/07/26/technology/design-thinking.html">Jen, N. (2017). "Design Thinking is Bullshit."</a> ·
+  <a href="https://jnd.org/rethinking-design-thinking/">Norman, D. (2019). "Rethinking Design Thinking."</a> ·
+  <a href="https://dschool.stanford.edu/resources/design-thinking-bootleg">Stanford d.school Bootcamp Bootleg (current)</a> ·
+  <a href="https://www.designcouncil.org.uk/our-work/skills/what-is-the-double-diamond">Design Council UK. Double Diamond (2005)</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Show me a real project where the team <em>didn't</em> do Empathize, and what the downstream cost was. Walk me through the bug that shipped because the problem was mis-framed."</li>
+    <li>"When you run a Design Sprint inside a 2-week Scrum sprint — how do you handle the fact that the Sprint output (a validated prototype) still needs to be engineered? Where does the handoff to System Design happen?"</li>
+    <li>"How do you teach a team to distinguish <em>design theater</em> from real Design Thinking? What's the one observable behavior that separates them?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Design Thinking — the upstream layer</span>
+  <span>Mission: HackerRank JS Basic + reading JS/React at work · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

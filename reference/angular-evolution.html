@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Angular's Evolution — The Class, the Rewrite, and the Signal</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Companion to class-to-hooks</p>
+  <h1>Angular's Evolution — The Class, the Rewrite, and the Signal</h1>
+  <p class="meta">How Angular's mental model of state and components evolved across three eras: AngularJS (dirty-checking + $scope), Angular 2+ (classes + zone.js), and modern Angular (Signals, standalone, zoneless). A companion to the <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks React doc</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm doc</a> covers React's internal arc. This doc covers the same period (2010-2026) for Angular — a different framework's answer to the same problems. At work you may encounter Angular monorepos (enterprise/government niches per the <a href="./frontend-camps-survey.html">frontend camps survey</a>). Understanding Angular's arc lets you place the code you're reading without converting it to React's model.</p>
+  <p>The key contrast throughout: where React moved reactivity from instance fields into function call order (hooks), Angular moved it from a broadcast-driven cycle (zone.js) into fine-grained subscriptions (Signals). Same direction — narrower watching — different mechanism.</p>
+</section>
+
+<h2>0. The three eras — a timeline</h2>
+
+<p>Angular is not one framework. It is three frameworks with the same name — each rewriting the state and reactivity model from scratch. The eras:</p>
+
+<table>
+  <thead><tr><th>Era</th><th>Years</th><th>Paradigm</th><th>State mechanism</th><th>Reactivity model</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. AngularJS</strong></td><td>2010–2016</td><td>MVW (Model-View-Whatever), controllers, $scope</td><td><code>$scope</code> tree — mutable objects linked to the template</td><td>Dirty-checking — digest cycle walks the <code>$scope</code> tree comparing old vs new values</td></tr>
+    <tr><td><strong>2. Angular 2+</strong></td><td>2016–2023</td><td>Class components, TypeScript, DI, NgModules</td><td>Class instance fields — mutable, decorated via <code>@Input</code> / <code>@Output</code></td><td>Zone.js — monkey-patches browser APIs, then broadcasts "something changed" to all components, runs change detection</td></tr>
+    <tr><td><strong>3. Modern Angular</strong></td><td>2023+</td><td>Standalone components, Signals, zoneless</td><td><code>signal()</code> / <code>computed()</code> / <code>effect()</code> — reactive primitives</td><td>Signal-based — a built-in subscription graph triggers only the components that depend on changed signals</td></tr>
+  </tbody>
+</table>
+
+<p>The pattern: each era widened the developer experience and narrowed what the framework had to watch. AngularJS watched everything in the $scope tree (expensive). Angular 2+ watched all components on every async event (less expensive but still broad). Signals watch only the signal's dependency graph (minimal). React's evolution (classes → hooks → compiler) has the same direction but a different mechanism: instead of narrowing the watcher, React narrowed the component's own awareness of what changed (from <code>this.setState</code> to deps arrays to compiler inference).</p>
+
+<h2>1. Era 1 — AngularJS (2010–2016): dirty-checking and $scope</h2>
+
+<p>AngularJS was released in 2010 by Miško Hevery, solving the same problem as Backbone and Ember: make dynamic web apps manageable with structure. Its pitch was "Model-View-Whatever" — you put data in a <code>$scope</code> object, and Angular synced it to the HTML template automatically.</p>
+
+<h3>How state worked — $scope and dirty-checking</h3>
+
+<p>A controller function received a <code>$scope</code> from Angular's DI. You set properties on it directly. The template referenced them. Angular's digest cycle periodically "checked" each watched expression by comparing current value to the previous:</p>
+
+<pre><code>angular.module('app', [])
+  .controller('CounterCtrl', function($scope) {
+    <span class="comment-line">// $scope is a regular JS object — mutating it IS the state change</span>
+    $scope.count = 0;
+
+    $scope.increment = function() {
+      $scope.count++;                    <span class="comment-line">// mutate — no special API</span>
+      <span class="comment-line">// Angular doesn't know yet. Next digest will see the change.</span>
+    };
+
+    <span class="comment-line">// $watch registers an expression for dirty-checking each digest cycle</span>
+    $scope.$watch('count', function(newVal, oldVal) {
+      console.log('count changed from', oldVal, 'to', newVal);
+    });
+  });</code></pre>
+
+<blockquote class="callout">
+  <p><strong>Dirty-checking was brilliant for 2010 and painful by 2015.</strong> On every async event (click, setTimeout, XHR), Angular ran a "digest cycle" that walked <em>every</em> registered watch expression (often thousands), compared current vs previous value, and updated the DOM where they differed. If a watched expression returned a new array/object every time, Angular would see "change!" every cycle — forcing the developer to learn <code>$scope.$watchCollection</code>, <code>$watch(…, true)</code> for deep equality, and "track by" in ng-repeat. Performance was bounded by how many watches you had and how deep the tree was.</p>
+</blockquote>
+
+<h3>Two-way binding — the signature feature</h3>
+
+<p>AngularJS's killer feature was <code>ng-model</code>: changes in the input automatically updated <code>$scope</code>, and changes in <code>$scope</code> (from code) automatically updated the input. No event listeners, no setState — the framework owned the sync:</p>
+
+<pre><code>&lt;input ng-model="user.name" /&gt;        <span class="comment-line">// type here → $scope.user.name updates</span>
+&lt;p&gt;Hello, {{ user.name }}&lt;/p&gt;          <span class="comment-line">// $scope.user.name changes → text updates</span></code></pre>
+
+<p>The trouble: two-way binding made reasoning about data flow non-linear. Component A binding to <code>$scope.shared.item</code> and Component B also binding to it — who changed what, and in what order? In large apps, the digest cycle became a source of "Why did this update happen?" debugging, with watch count as the standard metric of "how fast is your app."</p>
+
+<h3>Why it collapsed</h3>
+
+<p>By 2014-2015, large AngularJS apps had accumulated thousands of watches. The digest cycle took 50-200ms — visible lag on every interaction. The team tried solutions (one-time binding <code>::</code>, limiting watcher count, "controller as" syntax instead of raw <code>$scope</code>), but the architecture was the bottleneck. You cannot make dirty-checking over a complete tree cheap at scale.</p>
+
+<p>The Angular team decided: the fix is a rewrite. Not a migration — a rewrite from zero, with TypeScript, a proper module system, and a completely different reactivity model.</p>
+
+<h2>2. Era 2 — Angular 2+ (2016–2023): classes, TypeScript, zone.js</h2>
+
+<p>Angular 2 (2016) was a full rewrite. Same team, same company, same problem domain — but everything else new: TypeScript-first, class components with decorators, dependency injection, a proper module system (NgModules), and zone.js as the reactivity engine.</p>
+
+<h3>How state worked — class instance fields + zone.js</h3>
+
+<p>Instead of mutating <code>$scope</code>, you wrote a class with decorated fields. Angular DI injected services via the constructor. The template bound to class properties:</p>
+
+<pre><code>@Component({
+  selector: 'app-counter',
+  template: `
+    &lt;p&gt;Count: {{ count }}&lt;/p&gt;
+    &lt;button (click)="increment()"&gt;+&lt;/button&gt;
+  `
+})
+export class CounterComponent {
+  count = 0;                             <span class="comment-line">// class instance field = state</span>
+
+  constructor(private logger: LoggerService) {}  <span class="comment-line">// DI injection</span>
+
+  increment() {
+    this.count++;                        <span class="comment-line">// mutate directly — zone.js catches it</span>
+  }
+}</code></pre>
+
+<blockquote class="callout">
+  <p><strong>No <code>this.setState</code>, no special state API.</strong> You mutated a class field directly. Angular trusted zone.js to notify it that "something happened" — any async operation (click handler, setTimeout, XHR response) was intercepted by zone.js, which signaled Angular to run change detection on <em>all</em> components (with the <code>OnPush</code> escape hatch per component). This was the key difference from React: React kept the "you must call setState" discipline; Angular removed it and paid the cost at the framework level.</p>
+</blockquote>
+
+<h3>Unidirectional data flow — the React influence</h3>
+
+<p>Angular 2 abandoned two-way binding as the default. Instead: <code>@Input()</code> passes data into the component (from the parent template), <code>@Output()</code> emits events up (via <code>EventEmitter</code>). The component's own state is its class fields. This was a direct React influence (2013-2015 React had proven that unidirectional flow beats two-way binding for debugging).</p>
+
+<pre><code>@Component({
+  selector: 'app-child',
+  template: `&lt;p&gt;{{ data }} &lt;button (click)="onClick()"&gt;send&lt;/button&gt;&lt;/p&gt;`,
+  changeDetection: ChangeDetectionStrategy.OnPush  <span class="comment-line">// opt out of zone-driven checks</span>
+})
+export class ChildComponent {
+  @Input() data: string;                 <span class="comment-line">// from parent</span>
+  @Output() notify = new EventEmitter&lt;string&gt;();  <span class="comment-line">// to parent</span>
+
+  onClick() {
+    this.notify.emit('clicked!');
+  }
+}</code></pre>
+
+<h3>Zone.js — the broadcast engine</h3>
+
+<p>Zone.js monkey-patches all browser async APIs (setTimeout, addEventListener, fetch, XHR, requestAnimationFrame). When any patched API fires, zone.js notifies Angular that "something happened." Angular then runs change detection from the root component down the tree — checking which components have <code>@Input</code> values that changed.</p>
+
+<p>This "broadcast all" approach was a middle ground between AngularJS's "check every watch" and React's "re-render the function and diff the VDOM." It was faster than AngularJS but still had a cost: a click in a deeply nested button triggered a tree walk from the root, even if only one leaf component changed.</p>
+
+<p>The <code>OnPush</code> strategy was the per-component escape hatch: "I will only update if my inputs change by reference, or if an event originated inside me." This was Angular's manual optimization layer — analogous to React's <code>React.memo</code> and <code>shouldComponentUpdate</code>.</p>
+
+<h3>Why this era didn't end well either</h3>
+
+<p>Zone.js was expensive. Every async event triggered a full tree walk (even with OnPush, Angular still traversed the tree to decide which components should re-check). Teams that aggressively used OnPush often reintroduced bugs where components <em>should</em> update but didn't — because zone.js had fired, but the input references hadn't changed per Angular's check. The tension: zone.js was too broad (check everything), but narrowing it required manual OnPush discipline that was easy to get wrong.</p>
+
+<p>The same tension existed in React's class era: <code>componentDidUpdate</code> + <code>setState</code> worked, but knowing when and why a component re-rendered required manual profiling. React's solution was hooks (narrow the reactivity to explicit deps arrays). Angular's solution was Signals (narrow the reactivity to explicit subscriptions).</p>
+
+<h2>3. Era 3 — Modern Angular (2023–present): Signals, standalone, zoneless</h2>
+
+<p>Starting with Angular 16 (2023, preview) and stabilizing in 17+ (2024), Angular introduced three changes that retroactively define "modern Angular": standalone components (no NgModules), Signals (fine-grained reactivity), and (in v18+) zoneless change detection.</p>
+
+<h3>Standalone components — no NgModules</h3>
+
+<p>In Angular 2-15, every component <em>must</em> be declared in a <code>NgModule</code> — a separate class listing components, directives, pipes, and imports. This created a parallel file for every feature. Standalone components (v14 preview, v15 stable, v17 default) let the component declare its own dependencies without the NgModule wrapper:</p>
+
+<pre><code>@Component({
+  selector: 'app-counter',
+  standalone: true,
+  imports: [CommonModule],              <span class="comment-line">// direct dependencies, no NgModule file</span>
+  template: `&lt;p&gt;Count: {{ count() }} &lt;button (click)="increment()"&gt;+&lt;/button&gt;&lt;/p&gt;`
+})
+export class CounterComponent {
+  count = signal(0);                     <span class="comment-line">// reactive signal, not a plain field</span>
+
+  increment() {
+    this.count.update(c => c + 1);       <span class="comment-line">// set() or update() — framework sees the change</span>
+  }
+}</code></pre>
+
+<h3>Signals — <code>signal()</code>, <code>computed()</code>, <code>effect()</code></h3>
+
+<p>The core Signal primitives:</p>
+
+<ul>
+  <li><strong><code>signal(value)</code></strong> — a writable reactive reference. Call <code>.set()</code> to replace, <code>.update(fn)</code> to derive from current, <code>.mutate()</code> to modify the internal value in-place.</li>
+  <li><strong><code>computed(fn)</code></strong> — a read-only derived value. Re-evaluated lazily only when its dependencies change. No "deps array" — Angular tracks dependencies at runtime (like Vue's <code>computed</code> or Preact Signals).</li>
+  <li><strong><code>effect(fn)</code></strong> — a side-effect runner scheduled when its tracked dependencies change. The successor to <code>ngOnInit</code>/<code>ngOnDestroy</code> and manual subscription cleanup. The effect's cleanup is the return value of the function.</li>
+</ul>
+
+<pre><code>export class CartComponent {
+  items = signal&lt;Item[]&gt;([]);            <span class="comment-line">// writable signal</span>
+  total = computed(() =>                 <span class="comment-line">// derived — no deps array needed</span>
+    this.items().reduce((sum, item) => sum + item.price, 0)
+  );
+
+  constructor() {
+    effect(() => {
+      console.log('Cart total:', this.total());  <span class="comment-line">// re-runs only when items change</span>
+      <span class="comment-line">// cleanup: return () => unsubscribe()</span>
+    });
+  }
+
+  addItem(item: Item) {
+    this.items.update(list => [...list, item]);
+  }
+}</code></pre>
+
+<blockquote class="callout">
+  <p><strong>The key difference from React hooks:</strong> Angular Signals have no "rules of hooks." You can call <code>signal()</code> inside <code>if</code>, inside loops, inside event handlers, or at the class constructor — there's no call-order constraint because Signals are objects with a settable value and a subscription graph, not slot indices in a fiber. This is exactly the flexibility React said no to (see <a href="./class-to-hooks-paradigm-shift.html">React's §2.9</a> — "Why Isn't X a Hook?"). Preact Signals proved this approach works; Angular Signals made it official.</p>
+</blockquote>
+
+<h3>Zoneless — why Signals can replace zone.js</h3>
+
+<p>Zone.js broadcasts "something changed" to all components. Signals know <em>exactly which component depends on which signal</em>. Once a signal's dep graph is in place, zone.js is redundant — Angular can fire change detection only on the components that subscribe to changed signals, plus their ancestors in the input-passing chain.</p>
+
+<p>Angular 18 (2024) introduced experimental <code>provideZonelessChangeDetection</code>. Angular 20+ (2026) is moving toward zoneless as the default for new projects. This is the era's defining migration: remove zone.js, rely entirely on Signals for reactivity. The cost: all shared state must go through <code>signal()</code> or <code>signal()-wrapped</code> models. The payoff: zero-waste change detection — only the components that need to update, update.</p>
+
+<h2>4. The three eras through one lens — where state lives and who watches it</h2>
+
+<p>The React doc's §3 expansion asked: <em>where does state live, who owns it, and how do you touch it?</em> The same lens for Angular:</p>
+
+<table>
+  <thead><tr><th>Era</th><th>State lives in…</th><th>You read state by…</th><th>You write state by…</th><th>Mental model</th><th>Who detects the change?</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1. AngularJS</strong></td>
+      <td>A <code>$scope</code> object (mutable, linked to the template)</td>
+      <td><code>$scope.property</code> inside the controller</td>
+      <td><code>$scope.property = newVal</code> — direct mutation</td>
+      <td>State is a plain object that syncs to the DOM; write to it and the framework syncs it</td>
+      <td>The digest cycle — walks every registered watch expression on every async event</td>
+    </tr>
+    <tr>
+      <td><strong>2. Angular 2+</strong></td>
+      <td>A class instance field (mutable, decorated)</td>
+      <td><code>this.property</code> inside the component class</td>
+      <td><code>this.property = newVal</code> — direct mutation</td>
+      <td>State is a class member; the framework detects mutations via zone.js broadcasting</td>
+      <td>Zone.js — catches all async events and signals Angular to check all components</td>
+    </tr>
+    <tr>
+      <td><strong>3. Modern Angular</strong></td>
+      <td>A <code>signal()</code> or <code>signal()</code>-backed model</td>
+      <td><code>count()</code> — call the signal as a getter</td>
+      <td><code>count.set(n)</code> / <code>count.update(fn)</code> — explicit mutation through the signal API</td>
+      <td>State is a reactive node; only subscribers to that node get notified</td>
+      <td>The signal's own dependency graph — knows exactly which components depend on which signals</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The pattern: <strong>wider detection → narrower detection.</strong> AngularJS detected by brute force (walk everything). Angular 2+ detected by broadcast + tree walk (add <code>OnPush</code> to narrow). Modern Angular detects by subscription (only the subscribers). React's direction is the same but starts from a different place: React always had narrow detection (only components that called <code>setState</code>). React's evolution (hooks deps arrays → compiler) is about <em>narrowing what you have to manually specify</em>, not narrowing the framework's watcher.</p>
+
+<h2>5. Why Angular didn't follow React's hooks path</h2>
+
+<p>React hooks and Angular Signals both solve "how does a component hold state and react to changes?" — but they solve it from opposite starting points:</p>
+
+<p>React started from <strong>functions</strong>. A React function component has no instance, no <code>this</code>, no constructor. To give it state, React had to invent a storage system outside the function — the fiber's hook slots. This required the rules of hooks (call order must be stable) because the hook slot is identified by its position in the call sequence, not by a name.</p>
+
+<p>Angular started from <strong>classes</strong>. An Angular component <em>is</em> an instance with a constructor, DI injection, and class fields. To give it fine-grained reactivity, Angular had to replace the mutation-detection mechanism (zone.js) with an explicit subscription mechanism (Signals). But it could keep the class structure — Signals are just objects assigned to fields, no call order constraints, no "rules of Signals."</p>
+
+<p>Crossing over would have cost each framework its defining feature:</p>
+
+<ul>
+  <li>If Angular adopted a hooks-like model, it would lose DI (you cannot inject into a function's call order — DI requires a constructor). DI is Angular's superpower for testability and large-team code organization.</li>
+  <li>If React adopted Signals as a replacement for <code>useState</code>, it would lose the per-render closure model (Signals return the latest value, not a snapshot — the stale-closure "problem" is actually the <em>feature</em> that makes React's per-render values predictable).</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>Both frameworks narrowed reactivity. They narrowed different things.</strong> React narrowed from "re-render everything" to "only re-render if deps change" to "let the compiler figure it out." Angular narrowed from "check everything on any async event" to "only check components that subscribe to changed signals." The direction is the same; the mechanism is constrained by each framework's original design — React's functions vs Angular's classes.</p>
+</blockquote>
+
+<h2>6. What you'll encounter in Angular code at work</h2>
+
+<p>Unlike React's class-to-hooks transition (where function components existed throughout but were second-class), Angular's eras are physically visible in the code — the file structure, imports, and syntax changed completely between versions:</p>
+
+<h3>AngularJS (2010-2016) — you will recognize it</h3>
+
+<ul>
+  <li><code>.controller('Name', function($scope) {...})</code> — no <code>@Component</code> decorator</li>
+  <li><code>.directive</code> for reusable components (conceptually similar to React components, but written as a factory function returning <code>{ template, scope, link }</code>)</li>
+  <li><code>ng-repeat</code>, <code>ng-click</code>, <code>ng-model</code> as HTML attributes</li>
+  <li><code>$scope.$watch</code>, <code>$scope.$apply</code>, <code>$timeout</code> as manual sync triggers</li>
+  <li>Dependency injection strings: <code>function($http, $scope, myService) { ... }</code></li>
+  <li>If you see this, the codebase is 8-15 years old and likely being maintained, not actively developed</li>
+</ul>
+
+<h3>Angular 2-15 (2016-2023) — the mainstream enterprise codebase</h3>
+
+<ul>
+  <li><code>@Component()</code> decorator with <code>template</code> or <code>templateUrl</code></li>
+  <li>Class component with lifecycle hooks (<code>ngOnInit</code>, <code>ngOnDestroy</code>, <code>ngOnChanges</code>)</li>
+  <li><code>NgModule</code> files alongside feature modules (at least one per feature)</li>
+  <li><code>@Input()</code> / <code>@Output()</code> for parent↔child communication</li>
+  <li>Services injected via constructor (<code>constructor(private http: HttpClient)</code>)</li>
+  <li><code>RxJS Observables</code> for async state — <code>this.http.get(...).subscribe(...)</code> with manual <code>unsubscribe</code> in <code>ngOnDestroy</code></li>
+  <li>This is what most "Angular at work" repos look like in 2026</li>
+</ul>
+
+<h3>Modern Angular (2024+) — what new code looks like</h3>
+
+<ul>
+  <li><code>standalone: true</code> in the component decorator — no NgModule file</li>
+  <li><code>signal()</code> for local state, <code>computed()</code> for derived values, <code>effect()</code> for side effects</li>
+  <li><code>@Input()</code> / <code>@Output()</code> still exist but can also be <code>input.required()</code> (v17.2+) — a signals-based alternative</li>
+  <li>No manual <code>ngOnDestroy</code> cleanup for Signals-based state — <code>effect()</code> cleanup is automatic</li>
+  <li>Zoneless configuration (<code>provideZonelessChangeDetection()</code>) in the app config</li>
+  <li>This is what new Angular projects scaffold in 2026</li>
+</ul>
+
+<p>The good news: if you can read Angular 2-15 code, you can read modern Angular code. The class structure, decorators, DI, and TypeScript are the same. The differences are additive (Signals) not replacive (no "components are functions now" shock like React's hooks migration).</p>
+
+<h2>7. Lifecycle translation: AngularJS ↔ Angular 2+ ↔ React</h2>
+
+<p>Two tables. First: how AngularJS's component lifecycle maps to Angular 2+. Then: how Angular 2+ maps to React hooks — so you can read code in any of the three paradigms without re-learning the mental model from scratch.</p>
+
+<h3>Table A — AngularJS → Angular 2+</h3>
+
+<table>
+  <thead><tr><th>AngularJS lifecycle</th><th>Angular 2+ equivalent</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>$onInit()</code> — called when the controller's bindings are ready</td><td><code>ngOnInit()</code> — called after Angular initializes the component's inputs</td><td>Both are "the data is ready, now set up." In modern Angular, <code>ngOnInit</code> is often replaced by <code>effect()</code> or a <code>signal</code>-backed constructor for data-fetching.</td></tr>
+    <tr><td><code>$onChanges(changes)</code> — called when bindings change (AngularJS 1.5+)</td><td><code>ngOnChanges(changes: SimpleChanges)</code> — called when <code>@Input</code> values change</td><td>Both give you the previous and current values. In modern Angular, you can also <code>effect(() => this.input())</code> — a signals-based watch that doesn't require the lifecycle hook.</td></tr>
+    <tr><td><code>$doCheck()</code> — called on each digest cycle, for custom change detection</td><td><code>ngDoCheck()</code> — called during every change detection run</td><td>Both are escape hatches for detecting changes Angular misses. Rarely needed in modern Angular with Signals.</td></tr>
+    <tr><td><code>$onDestroy()</code> — called before the controller/scope is destroyed</td><td><code>ngOnDestroy()</code> — called before Angular destroys the component</td><td>Both clean up subscriptions, timers, and event listeners. In modern Angular, <code>effect()</code>'s return value IS the cleanup — no manual <code>ngOnDestroy</code> needed for signal subscriptions.</td></tr>
+    <tr><td><code>$postLink()</code> — called after the controller's DOM is linked</td><td><code>ngAfterViewInit()</code> — called after the component's view and child views are initialized</td><td>Both are "the template is live." Used for third-party DOM library integration.</td></tr>
+  </tbody>
+</table>
+
+<h3>Table B — Angular 2+ → React hooks</h3>
+
+<table>
+  <thead><tr><th>Angular 2+ lifecycle</th><th>React hooks equivalent</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>constructor()</code> — DI injection, initial field values</td><td>Top-level function body (outside <code>useState</code>), or <code>useRef</code> for DI-like singleton access</td><td>React has no constructor. Initialize state via <code>useState(initialValue)</code>. Services live outside React components (custom hooks or a DI container, if needed).</td></tr>
+    <tr><td><code>ngOnInit()</code> — called once after inputs are bound</td><td><code>useEffect(() => {...}, [])</code> with empty deps</td><td>Both run once after the first render/initialization. React's effect captures the first render's values; Angular's <code>ngOnInit</code> reads fresh <code>@Input</code> values (no stale closure risk).</td></tr>
+    <tr><td><code>ngOnChanges(changes)</code> — called when <code>@Input</code> values change</td><td><code>useEffect(() => {...}, [prop])</code> — re-run when <code>prop</code> changes</td><td>React's deps array replaces the imperative "which values changed" check. The effect runs <em>after</em> the render; <code>ngOnChanges</code> runs <em>before</em> Angular processes the component (during change detection). Different timing, same purpose.</td></tr>
+    <tr><td><code>ngAfterViewInit()</code> — called after child views render</td><td><code>useLayoutEffect(() => {...}, [])</code></td><td>Both fire after the DOM is available but before the browser paints. Used for measuring DOM elements or integrating non-React DOM libraries.</td></tr>
+    <tr><td><code>ngOnDestroy()</code> — cleanup before destruction</td><td><code>useEffect(() => { return () => cleanup; }, [])</code> — the return value of the effect</td><td>Both clean up subscriptions, timers, event listeners. In Angular, you write a separate method; in React, the cleanup lives next to the setup inside the same effect.</td></tr>
+    <tr><td><code>ngDoCheck()</code> — custom change detection on every run</td><td>(No direct equivalent) — use <code>useRef</code> + manual comparison</td><td>Angular's "I need to know every time change detection runs" has no React parallel because React doesn't have an external change detection runner. If you need to know the previous value, use <code>useRef</code> to store it.</td></tr>
+    <tr><td>No direct equivalent — Angular has no "re-run the function" model</td><td><code>useRef</code> — mutable, persists across renders</td><td>Angular's class field <em>is</em> persistent (the instance lives until destruction). React's function-call-per-render model requires <code>useRef</code> for the "persistent field" use case.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The key insight for reading Angular code as a React developer:</strong> Angular's lifecycle methods are a biography ("at birth, at change, at destruction") — same as React's class components. React hooks replaced the biography with a synchronization model ("this effect syncs these values with this side effect"). Angular's Signals push in the same direction — <code>effect()</code> is closer to React's <code>useEffect</code> than <code>ngOnInit</code> + <code>ngOnDestroy</code> are. Modern Angular is converging on the same pattern React adopted in 2018 — synchronization, not biography. The difference: Angular kept the class and added Signals; React removed the class and added hooks.</p>
+</blockquote>
+
+<h2>8. Where Angular stands now (2026)</h2>
+
+<ul>
+  <li><strong>Current stable:</strong> Angular (v22 or v23 at time of reading — the version number increases by 2 per year since v17). 19.x LTS remains supported for enterprise holdouts.</li>
+  <li><strong>Signals:</strong> The recommended state primitive for all new code. Zone.js still supported but the ecosystem is migrating toward zoneless defaults.</li>
+  <li><strong>Standalone components:</strong> The default for new projects. NgModules in legacy code only — no new features added to the NgModule API since v17.</li>
+  <li><strong>RxJS:</strong> Still the dominant async pipeline for HTTP and event streams, but Signal-based APIs are replacing Observable-heavy patterns incrementally (<code>httpResource()</code> in v20+ as a Signal-based HTTP client).</li>
+  <li><strong>Enterprise niche:</strong> Angular holds the "rules-heavy, many-contributors, long-lived project" niche. Banks, insurance, government, and large internal tools. React leads in consumer-facing products, startups, and the meta-framework ecosystem (Next.js).</li>
+  <li><strong>Reading vs writing:</strong> You will read more Angular code than you write (unless you join an Angular-first shop). The majority of Angular codebases in production are Angular 2-15 with NgModules and zone.js — migrated incrementally, if at all, to Signals.</li>
+  <li><strong>The React contrast (2026):</strong> React adopted the compiler to solve the "deps array tax" problem. Angular adopted Signals to solve the "zone.js tax" problem. Both removed a manual bookkeeping burden. Both kept their component model (React's functions, Angular's classes). Neither is "ahead" — they solved different bottlenecks from different starting points.</li>
+</ul>
+
+<h2>9. Further reading</h2>
+
+<ol>
+  <li><a href="https://angular.io/guide/signals">Angular Signals Guide</a> — the official docs: <code>signal()</code>, <code>computed()</code>, <code>effect()</code>, and the mental model.</li>
+  <li><a href="https://angular.io/guide/incremental-update">Angular Incremental Update Guide</a> — migration paths across eras (AngularJS to Angular 2+, Angular 2+ to modern).</li>
+  <li><a href="https://blog.angular.dev/angular-18-zoneless-change-detection-8c235775ddec">Zoneless Change Detection (Angular blog, 2024)</a> — the rationale for removing zone.js.</li>
+  <li><a href="https://angular.io/guide/standalone-components">Standalone Components Guide</a> — what changes when you drop NgModules.</li>
+  <li><a href="https://overreacted.io/why-isnt-x-a-hook/">Why Isn't X a Hook? (Dan Abramov, 2019)</a> — React's case against Signals, which Angular's adoption directly contradicts.</li>
+  <li><a href="./class-to-hooks-paradigm-shift.html">Class-to-Hooks Paradigm Shift (this workspace)</a> — React's parallel arc, with the hooks-Signals contrast at §2.9.</li>
+  <li><a href="./frontend-camps-survey.html">Frontend Camps Survey (this workspace)</a> — where Angular sits in the wider frontend ecosystem.</li>
+</ol>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+
+  <p><strong>Q: Why did Angular rewrite from scratch in 2016?</strong></p>
+  <p><strong>A:</strong> AngularJS's digest cycle scaled poorly — thousands of watched expressions caused visible lag on every user interaction. The team decided that the architecture could not be fixed incrementally. The rewrite bet on TypeScript + class decorators + DI + zone.js as the future-proof foundation. The bet paid off (Angular 2+ has been stable for a decade) but the cost was a 0% migration path — AngularJS apps had to be rewritten entirely, which created the "Angular 1 → anything else" migration wave in 2016-2019.</p>
+
+  <p><strong>Q: Did Angular copy React's unidirectional data flow?</strong></p>
+  <p><strong>A:</strong> Yes — Angular 2 abandoned AngularJS's two-way binding as the default. Instead: <code>@Input()</code> passes data down, <code>@Output()</code> emits events up. The template syntax (property binding <code>[value]</code> and event binding <code>(click)</code>) was directly inspired by React's JSX pattern, adapted to HTML attributes. Angular kept class fields as local state (no <code>this.setState</code>), and added zone.js as the change-detection broadcast engine — a design React never needed because <code>setState</code> was already the explicit trigger.</p>
+
+  <p><strong>Q: Why did Angular adopt Signals when React declined?</strong></p>
+  <p><strong>A:</strong> Signals and React hooks solve different bottlenecks. React already had per-render snapshots captured in closures — Signals would break that model because they return the latest value unconditionally. React's bottleneck was the deps array tax (manual bookkeeping of effect dependencies), solved by the compiler. Angular's bottleneck was zone.js broadcast (checking everything on every async event), solved by Signals' fine-grained subscription graph. Same diagnosis (the framework reacts too broadly), different treatment (React: compiler narrows the developer's manual work; Angular: Signals narrow the framework's automatic work).</p>
+
+  <p><strong>Q: Will I write Angular at work?</strong></p>
+  <p><strong>A:</strong> More likely read than write — Angular's enterprise niche means legacy codebases are large and slow to migrate. If you join a bank, insurance company, government contractor, or large internal-tools team, you may encounter Angular monorepos with NgModules and zone.js. Writing Angular from scratch is common in those same environments for new projects — the ecosystem is active (Signals, standalone, zoneless) but adoption lags behind React's in the startup/meta-framework world. The reading skills (class components, DI, <code>@Input</code>/<code>@Output</code>, lifecycle hooks) transfer across all eras. The writing skills (Signals, standalone, zoneless) are for new code only.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Angular evolution</span>
+  <span>← <a href="./class-to-hooks-paradigm-shift.html">back to the paradigm-shift doc</a></span>
+  <span>Reference: <a href="./glossary.html">Glossary</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>
