@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0021 — Upstream of Code: Design Thinking</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 10 · The Exploration Journey · Human/product (2/3)</p>
+  <h1>Upstream of Code: How Products Discover Problems</h1>
+  <p class="meta">Design Thinking — the discipline of figuring out <em>what problem</em> is worth solving before deciding <em>how</em> to build it. The desirability/feasibility/viability Venn, the five phases, and why "build the right thing" is the move that prevents building the wrong thing perfectly. Anchored to <a href="../reference/design-thinking.html">Design Thinking</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0020-the-human-layer.html">Lesson 20</a> covered the interface people touch (the human layer's surface). This lesson goes one layer further <em>upstream</em> — before anyone touches code, before the interface exists, before system design (L11). This is the layer that answers "what problem is worth solving, and for whom?" For 20 lessons you've learned how to <em>build well</em>; this is where you learn to <em>build the right thing</em>. The Human/product movement concludes with L22 (Income/Markets).</p>
+</section>
+
+<h2>1. The three circles — the Venn every method serves</h2>
+<p>Every Design Thinking method answers the same question — is this product in the intersection of three circles? (IDEO, ~1998):</p>
+<ul>
+  <li><strong>Desirability</strong> — Do people actually <em>want</em> this? (Human-centered: real needs, observed, not assumed.)</li>
+  <li><strong>Feasibility</strong> — Can we <em>build</em> it with our tech and skills? (Technical.)</li>
+  <li><strong>Viability</strong> — Does it make <em>business</em> sense? (It must be sustainable.)</li>
+</ul>
+<p><strong>Design Thinking lives in the intersection.</strong> If any circle is empty, the product fails — and each failure looks different:</p>
+<ul>
+  <li>Desirable + feasible but <em>not viable</em> → a beloved product that loses money and dies.</li>
+  <li>Desirable + viable but <em>not feasible</em> → vaporware you can't ship.</li>
+  <li>Feasible + viable but <em>not desirable</em> → "a solution in search of a problem" — you built the wrong thing perfectly.</li>
+</ul>
+<p>That last failure mode is exactly what the rest of the journey has been engineering against — and Design Thinking is the layer whose job is to prevent it.</p>
+
+<h2>2. What Design Thinking is — and what it is not</h2>
+<p><strong>It is</strong> a disciplined approach to <em>problem discovery and framing</em> before solution construction. It treats the problem as <em>unknown and discoverable</em>, not given. Its currency is empathy (direct observation of users), abductive reasoning (inferring the best explanation for observed behavior), and iteration (cycles that refine the problem definition, not just the solution). Its artifacts are insight statements, experience maps, and testable prototypes — not code.</p>
+<p><strong>It is not</strong> any of the things it's usually confused with:</p>
+<table>
+  <thead><tr><th>Confused with</th><th>What that really is</th><th>The difference</th></tr></thead>
+  <tbody>
+    <tr><td>Visual / UI design</td><td>Typography, color, layout, interaction</td><td>Design Thinking <em>discovers the problem</em>; UI design <em>renders the solution</em> (L20).</td></tr>
+    <tr><td>UX research</td><td>A research phase/discipline</td><td>Research is Design Thinking's tool, not its whole.</td></tr>
+    <tr><td>A design sprint</td><td>A 5-day event</td><td>The sprint is one <em>recipe</em> within it, not the discipline.</td></tr>
+    <tr><td>Agile</td><td>A delivery process</td><td>Agile (L18) delivers fast; Design Thinking decides <em>what</em> to deliver. They pair end-to-end.</td></tr>
+  </tbody>
+</table>
+<p>This is the same boundary logic as L11 (System Design) and L7 (The Rhythm): each layer owns one question. Design Thinking owns <em>"what problem, for whom?"</em></p>
+<h2>3. The five phases — Stanford d.school, and the design sprint</h2>
+<p>The most widely taught recipe is Stanford's d.school five phases. They're a <em>rhythm</em> (you loop back out of order), not a strict waterfall:</p>
+<table>
+  <thead><tr><th>Phase</th><th>What you do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Empathize</strong></td><td>Observe and interview real users. The goal: understand their needs and context — not your assumptions about them. This is the empathy engine that feeds everything.</td></tr>
+    <tr><td><strong>Define</strong></td><td>Frame the problem as a <em>point-of-view statement</em>: "a user needs X so that Y." The way you frame it determines what solutions are imaginable.</td></tr>
+    <tr><td><strong>Ideate</strong></td><td>Generate many solutions — divergent thinking first, then converge. Quantity over quality at this stage.</td></tr>
+    <tr><td><strong>Prototype</strong></td><td>Build something cheap and testable — a sketch, a clickable mock, a paper cutout. Prototypes make ideas concrete enough to test (L20's interface becomes testable).</td></tr>
+    <tr><td><strong>Test</strong></td><td>Show users the prototype. Watch what they do, not what they say. Feed learnings back into an earlier phase.</td></tr>
+  </tbody>
+</table>
+<p>Google Ventures' <strong>Design Sprint</strong> (Jake Knapp, 2016) compresses these into one 5-day week — Understand → Sketch → Decide → Prototype → Test — with a cross-functional team and real users on Friday. It's the "bake the whole loop in 5 days" recipe, and it's how you'll most likely experience Design Thinking in a real job.</p>
+
+<h2>4. The failure mode — design theater</h2>
+<p>The most important caution in this discipline (also the hardest lesson to remember, because it quietly infects everything):</p>
+<ul>
+  <li><strong>Design theater</strong> — following the <em>method</em> without the <em>empathy</em>. Post-it notes, journey maps, and workshops that produce no insight and no change. It's "a solution in search of a problem" replayed at the process level: <em>the ritual</em> without the goal.</li>
+  <li>Critics (Natasha Jen's "Design Thinking is Bullshit," Don Norman's "Rethinking Design Thinking") attacked exactly this: when it becomes a corporate ritual, empathy drains out and it's theater.</li>
+  <li><strong>The tell:</strong> prototypes get produced but never tested with real users; insight statements never change what gets built; the exercise ends, the backlog doesn't change.</li>
+</ul>
+<p><strong>The guard:</strong> Design Thinking's output is a <em>decision</em>, not a deliverable. If a sprint ends and the team isn't more sure what to build (or sure it shouldn't build it), it was theater. This is the one failure mode that reverses the whole point of being upstream.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+<details class="quiz" data-answer="desirability" data-explain="If it's feasible (we can build it) and viable (business makes sense) but people don't want it, that's a 'solution in search of a problem' — you built the wrong thing perfectly. Desirability is the human-centered circle: do real people actually want this? It's the circle only Design Thinking (empathy/observation) can fill.">
+  <summary>A product is technically buildable and profitable, but nobody wants it. Which circle is empty?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="l21q1" value="desirability"> Desirability — no one wants it</label>
+      <label><input type="radio" name="l21q1" value="feasibility"> Feasibility — can't build it</label>
+      <label><input type="radio" name="l21q1" value="viability"> Viability — no business case</label>
+      <label><input type="radio" name="l21q1" value="accessibility"> Accessibility — not accessible</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="empathize" data-explain="The five phases run Empathize → Define → Ideate → Prototype → Test, and they loop (it's a rhythm, not a waterfall). Empathize comes first because it's the source of all real needs — without direct observation of users, every later phase builds on assumptions, and you end up in a solution-in-search-of-a-problem.">
+  <summary>Which phase comes first in the d.school five-phase model?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="l21q2" value="empathize"> Empathize — observe real users</label>
+      <label><input type="radio" name="l21q2" value="prototype"> Prototype — build a mock</label>
+      <label><input type="radio" name="l21q2" value="ideate"> Ideate — generate ideas</label>
+      <label><input type="radio" name="l21q2" value="test"> Test — try it on users</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="theater" data-explain="Design theater is following the method without the empathy — Post-its, journey maps, and workshops that produce no insight and no change. The tell: prototypes never get tested with real users; the backlog never changes. The guard: Design Thinking's output is a decision, not a deliverable.">
+  <summary>What is "design theater"?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="l21q3" value="theater"> Method without empathy — ritual, no change</label>
+      <label><input type="radio" name="l21q3" value="pitch"> Pitching a product to investors</label>
+      <label><input type="radio" name="l21q3" value="prototype"> Building a high-fidelity prototype</label>
+      <label><input type="radio" name="l21q3" value="research"> Running a user interview</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>upstream layer</strong>: Design Thinking decides <em>what problem is worth solving, for whom</em> — before any code, before UI (L20), before system design (L11). The three circles (desirable, feasible, viable) frame every product decision, and the empty-circle failure modes explain why great software can still fail. The five phases (Empathize → Define → Ideate → Prototype → Test) are a rhythm, and the one guardrail to never forget: <strong>design theater</strong> — method without empathy — is how you quietly build the wrong thing. This completes the stack: Design Thinking (what) → System (how it fits) → Rhythm (how I build it) → UI/UX (how people use it).</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/design-thinking.html">Design Thinking</a> — the full definition (§1), the history and constraint inversions (§2–3), migration paths for adopting it in orgs (§3b), theory and mental models (§5), principles (§8), and the worked example (§9).</li>
+    <li><strong>Next lesson:</strong> <a href="./0022-the-real-world.html">Lesson 22 — The Real World</a> — income streams and markets around the ecosystem. The final lesson of the journey.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow. Then, on your next project, name the three circles and which one is least certain — and run a 15-minute user interview before you plan the build.</li>
+  </ul>
+  <p class="cite"><a href="https://www.interaction-design.org/literature/article/5-stages-in-the-design-thinking-process">Interaction Design Foundation — 5 Stages of the Design Thinking Process</a> — a clear, well-sourced walkthrough of the d.school model. And Jake Knapp's <a href="https://www.thesprintbook.com/"><em>Sprint</em></a> for the 5-day recipe.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I run a 15-minute user interview that actually reveals needs?"</li>
+    <li>"How do I know if my team's design process is theater or real?"</li>
+    <li>"What's the difference between desirability checking and market research?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 10 · <a href="../reference/design-thinking.html">Reference: Design Thinking</a></span>
+  <span>Next → <a href="./0022-the-real-world.html">Lesson 22 · The Real World</a></span>
+</footer>
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

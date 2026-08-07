@@ -20,6 +20,129 @@
   <p><a href="./0007-the-rhythm.html">Lesson 7</a> taught the core: three threads (Model, View, Flow), the rounds (Skeleton → Deepen → Polish), and the data-shape sketch. The three problem-solving lessons (L12–14) gave you the meta-skill. This lesson <em>deepens</em> the rhythm — it doesn't replace L7, it supplements it. The reference doc was expanded with theory, failure modes, and principles; this lesson brings those to the surface.</p>
 </section>
 
+<h2>1. Why it works — the cognitive science</h2>
+<p>The three-thread loop wasn't derived from cognitive science — it was derived from practice, from decades of developers noticing what works. But cognitive science explains <em>why</em> it works:</p>
+<ul>
+  <li><strong>Working memory limits</strong> (Miller 1956: ~7±2; Cowan 2001: ~4). You cannot simultaneously hold the data shape (Model), the component tree (View), <em>and</em> the event flow (Flow) in working memory while also writing code. The loop is the workaround: you focus on one thread at a time, holding the others lightly, and cycle through them. Each pass is shallow enough to fit in working memory.</li>
+  <li><strong>Cognitive load theory</strong> (Sweller 1980s). Building a feature all-at-once maximizes extraneous load — you're juggling data, layout, <em>and</em> logic simultaneously. The rounds reduce extraneous load: in Round 1 (Skeleton) you only deal with the simplest possible data + one element + one event. As you deepen, you add one thread at a time, keeping total load within working memory capacity. <strong>The rounds are a cognitive load management strategy.</strong></li>
+  <li><strong>Feedback loops</strong> — the tighter the loop, the faster you learn. Before hot reload (Vite, Fast Refresh), the feedback loop was: edit → compile → refresh → see result (seconds to minutes). After: edit → see result (milliseconds). This is why the frontend loop works at feature scale — you can cycle through Skeleton → Deepen → Polish in minutes because you see each change instantly.</li>
+  <li><strong>The "feel the friction" signal</strong> — the signal to move from one round to the next is a metacognitive judgment, not a mechanical rule. You monitor your own progress and decide "this round is creaking, it's time to deepen." This is the same metacognition from <a href="./0013-problem-solving-computational-thinking.html">L13</a> — applied to feature building, not algorithmic challenges.</li>
+</ul>
+
+<h2>2. How it fails — the eight traps</h2>
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Premature polishing</strong></td><td>You start styling (Round 3) before the skeleton works (Round 1). Two hours in, you have a beautiful button that does nothing.</td></tr>
+    <tr><td><strong>Over-planning</strong></td><td>You spend an hour designing the perfect data shape. But you can't know until you see it rendered.</td></tr>
+    <tr><td><strong>Skipping the sketch</strong></td><td>You jump straight to code. You build a tree for the wrong data shape — refactoring costs hours.</td></tr>
+    <tr><td><strong>Storing derived state</strong></td><td>You store a filtered list alongside the full list. Two sources of truth drift apart — the most common bug.</td></tr>
+    <tr><td><strong>Waterfall in disguise</strong></td><td>You build all the data, then all the UI, then all the events. Nothing works end-to-end until the end.</td></tr>
+    <tr><td><strong>Copy-paste without understanding</strong></td><td>You copy a pattern. It works, but you don't know why. When it breaks, you can't debug it.</td></tr>
+    <tr><td><strong>Premature optimization</strong></td><td>You reach for useMemo or a state library before the feature works. Complexity you can defer.</td></tr>
+    <tr><td><strong>Not feeling the friction</strong></td><td>You follow the rounds mechanically without noticing what's actually creaking. You deepen the wrong thing.</td></tr>
+  </tbody>
+</table>
+
+<h2>3. What stays constant — the eight principles</h2>
+<table>
+  <thead><tr><th>Principle</th><th>Why it's constant</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Cycle, don't waterfall</strong></td><td>You can't know everything upfront. The spiral (Boehm 1986) and IID proved iterative beats upfront-design for wicked problems.</td></tr>
+    <tr><td><strong>Feel the friction</strong></td><td>The signal to deepen is metacognitive — an aesthetic judgment about what's missing. You build it through practice.</td></tr>
+    <tr><td><strong>Sketch data shape first</strong></td><td>The data shape determines the component tree. Wrong shape caught early = minutes; caught late = hours.</td></tr>
+    <tr><td><strong>Derived state is never stored</strong></td><td>Two sources of truth drift apart. Always compute derived values at render time.</td></tr>
+    <tr><td><strong>Thinnest end-to-end slice first</strong></td><td>Round 1 is the thinnest slice that works — not "finish the data layer." Cycle all three threads shallowly.</td></tr>
+    <tr><td><strong>Structure follows state</strong></td><td>Get the data shape right and the UI structure often falls out naturally.</td></tr>
+    <tr><td><strong>Simplest thing first, then refactor</strong></td><td>Premature optimization is the cardinal sin. Start with an array, change to Map if needed.</td></tr>
+    <tr><td><strong>Defer decisions until needed</strong></td><td>Deciding too early locks you into a structure that may be wrong.</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Where it's heading — the future of the loop</h2>
+<ul>
+  <li><strong>React Compiler</strong> (2024+) — automatically handles memoization. Round 2's "performance optimization" shifts from manual to automatic. The human's Round 2 focuses on "making the data and flow right."</li>
+  <li><strong>Server Components</strong> (2023+) — the Model thread partially runs on the server. The loop is the same, but the boundary shifted. The data-shape sketch now needs to account for server-side vs client-side.</li>
+  <li><strong>AI scaffolding</strong> — AI can generate the skeleton (Round 1) for common patterns. But Deepen and Polish still need human judgment — the "feel the friction" signal is yours, not the AI's.</li>
+</ul>
+<p><strong>The enduring rhythm:</strong> frameworks change, but the three-thread loop has survived from Boehm's spiral model (1986) through XP (1999) through Agile (2001) through React (2013) through Server Components (2023) through the React Compiler (2024). The rhythm survives because it's the shape of iterative work itself. Learn it once, and it serves you across every framework, every era.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="cognitive-load" data-explain="The rounds (Skeleton → Deepen → Polish) are a cognitive load management strategy. Building all-at-once maximizes extraneous load — juggling data, layout, and logic simultaneously. The rounds reduce extraneous load: each round adds one thread at a time, keeping total load within working memory capacity (Miller ~7±2, Cowan ~4).">
+  <summary>Why does the rounds approach (shallow then deepen) beat building everything at once?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="cognitive-load"> It manages cognitive load within working memory</label>
+      <label><input type="radio" name="q1" value="faster-typing"> It lets you type code faster than before</label>
+      <label><input type="radio" name="q1" value="fewer-bugs"> It eliminates all bugs automatically by design</label>
+      <label><input type="radio" name="q1" value="tooling"> It requires fewer build tools to be installed</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="derived-state" data-explain="Storing derived state (a filtered list alongside the full list) creates two sources of truth that drift apart — the most common frontend bug. The fix: compute derived values at render time, never store them. const visible = items.filter(...) — not const [visible, setVisible] = useState(...).">
+  <summary>What creates two sources of truth that drift apart?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="derived-state"> Storing derived state</label>
+      <label><input type="radio" name="q2" value="premature-polish"> Premature polishing</label>
+      <label><input type="radio" name="q2" value="over-planning"> Over-planning the data shape</label>
+      <label><input type="radio" name="q2" value="copy-paste"> Copy-paste without understanding</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="react-compiler" data-explain="The React Compiler (2024+) automatically handles memoization — the manual useMemo, useCallback, and React.memo that developers used in Round 2-3. This doesn't change the loop's shape, but it changes what Round 2 produces: instead of manually optimizing re-renders, the compiler does it. The human's Round 2 shifts to "making the data and flow right.">
+  <summary>What does the React Compiler automate — and what does that change about the loop?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="react-compiler"> Memoization — Round 2 shifts to data and flow</label>
+      <label><input type="radio" name="q3" value="ai-skeleton"> The skeleton — Round 1 is fully automated</label>
+      <label><input type="radio" name="q3" value="data-shape"> The data-shape sketch — Round 0 is automated</label>
+      <label><input type="radio" name="q3" value="replaces-loop"> It replaces the entire loop with one pass</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>deepening</strong> of the rhythm — the theory (why it works: working memory, cognitive load, feedback loops, metacognition), the failure modes (how it fails: 8 traps from premature polishing to not feeling the friction), and the principles (what stays constant: 8 principles from "cycle don't waterfall" to "defer decisions"). Plus where it's heading: the React Compiler automating Round 2's optimization, Server Components splitting the Model thread, AI scaffolding the skeleton. The deepest insight: <strong>the rhythm survives because it's the shape of iterative work itself</strong> — from Boehm's spiral (1986) to the React Compiler (2024), the same pattern at different scales. Learn it once, and it serves you across every framework, every era.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/how-developers-think-frontend.html">How Developers Think</a> — the full cognitive science (§1e), all 8 failure modes with fixes (§13b), the tooling catalog (§13c), and the future section (§13d).</li>
+    <li><strong>Next lesson:</strong> <a href="./0016-the-human-layer.html">Lesson 16 — The Human Layer</a> — UI/UX &amp; web design, where the system meets the person. The Human/product movement begins.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow from memory. Then, on your next feature, notice which failure mode you fall into — and which principle you violated.</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/Spiral_model">Boehm, B. (1986). "A Spiral Model of Software Development and Enhancement."</a> — the named ancestor of the loop. And <a href="https://en.wikipedia.org/wiki/Iterative_and_incremental_development">Larman &amp; Basili (2003). "Iterative and Incremental Development: A Brief History."</a> — the proof that IID is older than waterfall.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I build the 'feel the friction' signal — what exercises develop it?"</li>
+    <li>"Which failure mode do you see most often in junior developers?"</li>
+    <li>"How does the loop change when the Model thread is server-rendered (RSC)?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 4 · <a href="../reference/how-developers-think-frontend.html">Reference: How Developers Think</a> · <a href="./0007-the-rhythm.html">Lesson 7 (the intro)</a></span>
+  <span>Next → <a href="./0016-the-human-layer.html">Lesson 16 · The Human Layer</a></span>
+</footer>
+
 </main>
 <script src="../assets/lesson.js"></script>
 </body>

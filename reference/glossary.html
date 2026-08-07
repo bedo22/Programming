@@ -513,6 +513,114 @@
 </table>
 
 
+<h2>Computer Science &amp; Software Engineering</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Owning section</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Computer Science</dfn></td>
+      <td>The science of computation — what can be computed, how efficiently, and what the fundamental limits are. A <em>science</em>: discovers what is possible, proves theorems. Founded by Turing (1936).</td>
+      <td>CS &amp; SE §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Software Engineering</dfn></td>
+      <td>The engineering discipline of building reliable, maintainable software systems at scale. An <em>engineering</em> discipline: builds under constraints, makes trade-offs, judged by outcomes. Named at the 1968 NATO conference.</td>
+      <td>CS &amp; SE §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Quality Attribute</dfn></td>
+      <td>A parameter along which you evaluate a solution — also called "non-functional requirement" or "the ilities." ISO 25010 defines 8: functional suitability, performance efficiency, compatibility, usability, reliability, security, maintainability, portability.</td>
+      <td>CS &amp; SE §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Time Complexity</dfn></td>
+      <td>How an algorithm's runtime grows as the input size grows. Measured in Big O notation. O(n) = linear (double the input, double the time). O(n²) = quadratic (double the input, quadruple the time).</td>
+      <td>CS &amp; SE §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Space Complexity</dfn></td>
+      <td>How an algorithm's memory usage grows as the input size grows. Measured in Big O notation. An in-place sort uses O(1) extra space; a hash map uses O(n) space.</td>
+      <td>CS &amp; SE §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Big O Notation</dfn></td>
+      <td>The mathematical notation for classifying algorithm efficiency. Describes the upper bound of growth rate as input size approaches infinity. Coined by Bachmann (1894) and Landau in math; adopted for CS by Knuth. Standard classes: O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ), O(n!).</td>
+      <td>CS &amp; SE §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Trade-off</dfn></td>
+      <td>A situational decision where improving one parameter diminishes another. In software: time vs space, readability vs performance, simplicity vs flexibility. The engineering skill is making trade-offs explicit — naming what you're sacrificing and why.</td>
+      <td>CS &amp; SE §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Pareto Front</dfn></td>
+      <td>The set of solutions where you can't improve one parameter without degrading another. A solution is "Pareto-optimal" if no other solution is better on <em>all</em> parameters. Most real-world decisions involve choosing <em>which</em> Pareto-optimal solution fits your context.</td>
+      <td>CS &amp; SE §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Premature Optimization</dfn></td>
+      <td>Optimizing before you know it matters. Knuth (1974): "Premature optimization is the root of all evil." The fix: measure first, optimize only the critical path, leave the rest simple.</td>
+      <td>CS &amp; SE §7, §9b</td>
+    </tr>
+    <tr>
+      <td><dfn>KISS — Keep It Simple, Stupid</dfn></td>
+      <td>Origin: Kelly Johnson, Lockheed Skunk Works (1960s). Principle: simplicity should be a key goal; unnecessary complexity should be avoided. In practice: the simplest solution is usually the most maintainable, testable, and fastest to ship.</td>
+      <td>CS &amp; SE §8</td>
+    </tr>
+    <tr>
+      <td><dfn>YAGNI — You Aren't Gonna Need It</dfn></td>
+      <td>Origin: Kent Beck, Extreme Programming (1999). Principle: "Always implement things when you actually need them, never when you just foresee that you need them." Don't build flexibility you don't need yet.</td>
+      <td>CS &amp; SE §8</td>
+    </tr>
+    <tr>
+      <td><dfn>DRY — Don't Repeat Yourself</dfn></td>
+      <td>Origin: Hunt &amp; Thomas, The Pragmatic Programmer (1999). Principle: "Every piece of knowledge must have a single, unambiguous, authoritative representation." About knowledge duplication, not code duplication — two similar-looking functions with different business rules should NOT be merged.</td>
+      <td>CS &amp; SE §8</td>
+    </tr>
+    <tr>
+      <td><dfn>SOLID</dfn></td>
+      <td>Five object-oriented design principles: Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion. Origin: Robert C. Martin (2000); acronym coined by Michael Feathers (~2004). Make code more understandable, flexible, and maintainable.</td>
+      <td>CS &amp; SE §8</td>
+    </tr>
+    <tr>
+      <td><dfn>ISO/IEC 25010</dfn></td>
+      <td>The international standard for software quality evaluation (2011). Superseded ISO 9126 (1991). Defines 8 quality characteristics. The formal framework for "what makes a solution good."</td>
+      <td>CS &amp; SE §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Separation of Concerns</dfn></td>
+      <td>Origin: Dijkstra (1974). Divide a program into sections that each address a separate concern. In frontend: HTML (structure), CSS (presentation), JS (behavior) — the same separation as The Rhythm's three threads (Model, View, Flow).</td>
+      <td>CS &amp; SE §8</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2>Software Development Process</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Owning section</th></tr></thead>
+  <tbody>
+    <tr><td><dfn>SDLC — Software Development Life Cycle</dfn></td><td>The sequence of phases a software system goes through from birth to retirement: Requirements → Design → Implementation → Testing → Deployment → Maintenance. Describes <em>what happens</em>, not <em>how</em> you navigate it.</td><td>SDP §2</td></tr>
+    <tr><td><dfn>Methodology</dfn></td><td>A blueprint for navigating the SDLC — tells you the order, the cadence, and the roles. Waterfall does the phases sequentially; Agile does them iteratively; Spiral does them in risk-driven cycles.</td><td>SDP §1</td></tr>
+    <tr><td><dfn>Agile</dfn></td><td>An umbrella philosophy (not a single framework) expressed in the Agile Manifesto (2001). Under the umbrella: Scrum, Kanban, XP, Lean, DevOps. 4 values, 12 principles.</td><td>SDP §1, §3</td></tr>
+    <tr><td><dfn>Agile Manifesto</dfn></td><td>The 2001 document by 17 software developers at Snowbird, Utah. 4 values: individuals over processes, working software over documentation, customer collaboration over contracts, responding to change over plans. 12 principles.</td><td>SDP §3</td></tr>
+    <tr><td><dfn>Waterfall</dfn></td><td>The sequential methodology: finish all Requirements, then all Design, then all Implementation, etc. Royce (1970) actually warned against single-pass — people read the diagram, skipped the warning.</td><td>SDP §1b</td></tr>
+    <tr><td><dfn>Scrum</dfn></td><td>The most widely adopted Agile framework. 3 roles (Product Owner, Developers, Scrum Master), 5 events (Sprint, Sprint Planning, Daily Scrum, Sprint Review, Sprint Retrospective), 3 artifacts (Product Backlog, Sprint Backlog, Increment). Based on empirical process control theory.</td><td>SDP §4</td></tr>
+    <tr><td><dfn>Sprint</dfn></td><td>A fixed-length timebox (usually 2 weeks) during which a usable increment is created. The container for all other Scrum events.</td><td>SDP §4</td></tr>
+    <tr><td><dfn>Kanban</dfn></td><td>A flow-based Agile method from the Toyota Production System. 6 practices: visualize workflow, limit WIP, manage flow, make policies explicit, implement feedback loops, improve collaboratively. Pull-based, not timeboxed.</td><td>SDP §5</td></tr>
+    <tr><td><dfn>WIP — Work in Progress</dfn></td><td>The number of items currently being worked on. Kanban limits WIP per column to prevent context switching and expose bottlenecks. The key constraint in Kanban (vs Scrum's timebox).</td><td>SDP §5</td></tr>
+    <tr><td><dfn>XP — Extreme Programming</dfn></td><td>Kent Beck (1999). The engineering practices that make Agile work: TDD, pair programming, continuous integration, refactoring, simple design. "Make it work, make it right, make it fast."</td><td>SDP §6</td></tr>
+    <tr><td><dfn>DevOps</dfn></td><td>The convergence of Development and Operations (2009). Automates Testing → Deployment → Maintenance via CI/CD, infrastructure as code, and monitoring. Makes very frequent, low-risk deployments possible.</td><td>SDP §6</td></tr>
+    <tr><td><dfn>CI/CD — Continuous Integration / Continuous Deployment</dfn></td><td>CI: every code change is integrated and tested automatically. CD: if CI passes, the code deploys to production automatically. The DevOps pipeline.</td><td>SDP §6</td></tr>
+    <tr><td><dfn>Empirical Process Control</dfn></td><td>The theory behind Scrum: when you can't define the process (software is unpredictable), make it visible, inspect frequently, and adapt. "Inspect and adapt." vs defined process (manufacturing — steps are known, repeat them).</td><td>SDP §1e</td></tr>
+    <tr><td><dfn>Agent Development Lifecycle (ADLC)</dfn></td><td>A new lifecycle (2024–present) for building AI agents — autonomous systems that pursue goals, use tools, take actions. 5 phases: Agent Design → Build → Evaluate → Deploy with guardrails → Monitor for drift. The product IS an AI agent, not traditional software.</td><td>SDP §9d</td></tr>
+    <tr><td><dfn>AI-augmented SDLC</dfn></td><td>The traditional SDLC with AI assisting each phase (Copilot writes code, AI generates tests). Not a new lifecycle — the same SDLC with the human shifting from writer to evaluator.</td><td>SDP §9d</td></tr>
+  </tbody>
+</table>
+
+
 <h2>Cross-Cutting Terms (appear in multiple disciplines)</h2>
 
 <table>

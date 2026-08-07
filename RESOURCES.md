@@ -132,5 +132,99 @@ High-trust sources that ground the teaching. **Never trust parametric knowledge*
 
 ## TODO
 - Expand per episode as lessons are written. Each lesson adds the sources it cited.
-- **Problem-solving lessons TBD** — the reference (`reference/problem-solving.html`) is complete; lessons will be built based on its size and the learner's decision on whether it needs a full episode or a bridge lesson.
+- **Problem-solving reference complete** (`reference/problem-solving.html`, 826 lines, 24 sections). Bridge lessons L12–15 written.
+- **CS & SE reference complete** (`reference/cs-and-software-engineering.html`, 550 lines, 20 sections, 18 tables). Lessons L16–17 planned.
 - Verify any URL before first use in a lesson; mark paywalled/inaccessible ones.
+
+## Software Development Process (macro-process — anchors the SDP reference)
+
+### The Agile Manifesto (2001)
+- **Type:** Founding document
+- **URL:** https://agilemanifesto.org/
+- **Trust:** Highest — the foundational statement of Agile philosophy. 17 signatories.
+- **Grounds:** §3 (the 4 values + 12 principles).
+- **Notes:** Verified reachable. The canonical source.
+
+### Scrum Guide — Schwaber & Sutherland
+- **Type:** Reference document (free, maintained)
+- **URL:** https://www.scrumguides.org/scrum-guide.html
+- **Trust:** Highest — the definitive Scrum definition by its co-creators. Updated periodically (latest: 2020).
+- **Grounds:** §4 (3 roles, 5 events, 3 artifacts).
+- **Notes:** Verified reachable. The single source of truth for Scrum.
+
+### Software Development Process (Wikipedia)
+- **Type:** Encyclopedia article
+- **URL:** https://en.wikipedia.org/wiki/Software_development_process
+- **Trust:** High — comprehensive overview of the SDLC and methodologies.
+- **Grounds:** §1–§2 (SDLC phases, methodology definition), §1b (history).
+- **Notes:** Verified reachable.
+
+### Agile Software Development (Wikipedia)
+- **Type:** Encyclopedia article
+- **URL:** https://en.wikipedia.org/wiki/Agile_software_development
+- **Trust:** High — covers the history, values, principles, methods, and common pitfalls (15 listed).
+- **Grounds:** §3, §9b (failure modes).
+- **Notes:** Verified reachable.
+
+### Scrum (Wikipedia)
+- **Type:** Encyclopedia article
+- **URL:** https://en.wikipedia.org/wiki/Scrum_(software_development)
+- **Trust:** High — covers roles, events, artifacts, history, criticism.
+- **Grounds:** §4.
+- **Notes:** Verified reachable.
+
+### Kanban (Wikipedia)
+- **Type:** Encyclopedia article
+- **URL:** https://en.wikipedia.org/wiki/Kanban_(development)
+- **Trust:** High — covers the 6 practices, origin (Toyota Production System), evolution.
+- **Grounds:** §5, §1e (Lean manufacturing).
+- **Notes:** Verified reachable.
+
+### AI Agent (Wikipedia)
+- **Type:** Encyclopedia article
+- **URL:** https://en.wikipedia.org/wiki/AI_agent
+- **Trust:** High — covers the definition, history, architecture, applications, concerns.
+- **Grounds:** §9d (Agent Development Lifecycle).
+- **Notes:** Verified reachable. The ADLC is emerging (2024–present); this article covers the agent concept that the ADLC builds upon.
+
+### Knuth, D. — The Art of Computer Programming (1968)
+- **Type:** Book (foundational, multi-volume)
+- **URL:** https://en.wikipedia.org/wiki/Analysis_of_algorithms
+- **Trust:** Highest — Knuth coined the term "analysis of algorithms." The definitive work on algorithm efficiency.
+- **Grounds:** §5 (Big O, complexity classes), §7 (Knuth's "premature optimization" principle), §1b (history — the birth of solution evaluation).
+- **Notes:** Wikipedia article on analysis of algorithms verified reachable. The books themselves are dense; for the learner, the Wikipedia summary + the reference doc are the accessible entry.
+
+### Turing, A. — "On Computable Numbers" (1936)
+- **Type:** Paper (foundational)
+- **URL:** https://en.wikipedia.org/wiki/Alan_Turing
+- **Trust:** Highest — the founding document of computer science. Defined the Turing machine and computability.
+- **Grounds:** §1b (history — the science thread begins here), §1e (underlying theory — computability, the halting problem).
+- **Notes:** Wikipedia verified reachable. The paper itself is highly technical; the Wikipedia summary is the accessible entry.
+
+### NATO Software Engineering Conference (1968)
+- **Type:** Conference proceedings (historical)
+- **URL:** https://en.wikipedia.org/wiki/Software_engineering
+- **Trust:** High — the event that named software engineering as a discipline, in response to the "software crisis."
+- **Grounds:** §1b (history — the engineering thread begins here), §3 (what SE is).
+- **Notes:** Wikipedia verified reachable. The proceedings are the primary source; Wikipedia is the accessible summary.
+
+### ISO/IEC 25010 — Software Quality Model (2011)
+- **Type:** International standard
+- **URL:** https://en.wikipedia.org/wiki/ISO/IEC_25010
+- **Trust:** Highest — the formal international standard for software quality evaluation. Superseded ISO 9126 (1991).
+- **Grounds:** §4 (the 8 quality attributes/parameters), §1b (history — the formalization of "what makes a solution good").
+- **Notes:** Wikipedia (redirects from ISO 25010 to ISO 9126 article) verified reachable.
+
+### SOLID Principles — Robert C. Martin (2000)
+- **Type:** Design principles
+- **URL:** https://en.wikipedia.org/wiki/SOLID
+- **Trust:** High — Robert C. Martin ("Uncle Bob") introduced the principles in 2000; acronym coined by Michael Feathers (~2004).
+- **Grounds:** §8 (engineering principles — the five SOLID principles).
+- **Notes:** Wikipedia verified reachable. Each principle has its own Wikipedia article for deeper reading.
+
+### Big O Notation
+- **Type:** Mathematical notation
+- **URL:** https://en.wikipedia.org/wiki/Big_O_notation
+- **Trust:** Highest — the standard notation for algorithm complexity classification. Origin: Bachmann (1894), Landau; adopted for CS by Knuth.
+- **Grounds:** §5 (the measures — complexity classes, how to analyze an algorithm).
+- **Notes:** Wikipedia verified reachable. The article is mathematically dense; the reference doc's §5 is the accessible version.

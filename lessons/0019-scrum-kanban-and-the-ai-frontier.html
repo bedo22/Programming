@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0019 — Scrum, Kanban, and the AI/Agent Frontier</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 8 · The Exploration Journey · Bridge (8/8)</p>
+  <h1>Scrum, Kanban, and the AI/Agent Frontier</h1>
+  <p class="meta">How Scrum works in practice (3 roles, 5 events, 3 artifacts), how Kanban differs (flow vs timeboxes, pull vs push), the common failure modes (cargo cult Agile, velocity gaming), and the two AI frontiers: AI-augmented SDLC and the Agent Development Lifecycle. What you'll encounter at work and what's emerging. Anchored to <a href="../reference/software-development-process.html">Software Development Process</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0018-the-software-development-process.html">Lesson 18</a> taught the SDLC, the 55-year history, and the Agile Manifesto. This lesson goes practical: how Scrum actually works day-to-day, how Kanban differs, what goes wrong, and where it's all heading with AI. This is the last Bridge lesson (L12–19); next, we go to the human layer (L20: UI/UX, L21: Design Thinking, L22: Income/Markets).</p>
+</section>
+
+<h2>1. Scrum in practice — 3 roles, 5 events, 3 artifacts</h2>
+<p>Scrum is the most widely adopted Agile framework. Here's what you'll actually encounter at work:</p>
+<ul>
+  <li><strong>3 roles:</strong> Product Owner (owns the backlog, decides priorities), Developers (build the increment, self-managing), Scrum Master (removes impediments, facilitates, serves the team).</li>
+  <li><strong>5 events:</strong> The Sprint (2-week container), Sprint Planning (what + how), Daily Scrum (15-min sync), Sprint Review (demo to stakeholders), Sprint Retrospective (inspect the process itself).</li>
+  <li><strong>3 artifacts:</strong> Product Backlog (everything that could be built, prioritized), Sprint Backlog (what's committed this sprint), the Increment (the usable product at sprint end).</li>
+</ul>
+<p><strong>The sprint retrospective is the most important ceremony</strong> — it's Manifesto principle 12 ("reflect and adjust") in action. It's metacognition (L13) at the team level: inspect your own process, decide what to change. If your team doesn't do retrospectives, or if they produce no changes, you're doing cargo cult Agile (§3 below).</p>
+
+<h2>2. Kanban — flow, not timeboxes</h2>
+<p>Kanban is the alternative to Scrum's sprint model. Where Scrum uses fixed 2-week timeboxes, Kanban uses <strong>continuous flow</strong> — work is pulled as capacity permits. The 6 practices: visualize the workflow (a board), limit WIP (don't start more than N items), manage flow, make policies explicit, implement feedback loops, improve collaboratively.</p>
+<p><strong>The key difference:</strong> Scrum's constraint is the <em>timebox</em> (finish in 2 weeks). Kanban's constraint is the <em>WIP limit</em> (don't start more than 3 items). Scrum is push-based (commit to a batch at planning); Kanban is pull-based (pull work as capacity permits). <strong>Most teams use Scrumban</strong> — loose sprint cadence with Kanban's WIP limits. This is what you'll most likely encounter.</p>
+
+<h2>3. The common failure modes — what goes wrong</h2>
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Cargo cult Agile</strong></td><td>The team does the ceremonies but not the values. Stand-ups are status reports, retrospectives produce no changes, sprints are mini-waterfalls. Form without function.</td></tr>
+    <tr><td><strong>Velocity as a metric</strong></td><td>Management uses story points to measure productivity. Teams inflate estimates to look faster. Velocity becomes a target, not a measure.</td></tr>
+    <tr><td><strong>Technical debt accumulation</strong></td><td>Every sprint is 100% new features, 0% refactoring. Code quality degrades; velocity drops to near zero. The debt crisis.</td></tr>
+    <tr><td><strong>Developer burnout</strong></td><td>Sustainable pace (principle #8) is ignored. The team sprints at 110% every sprint. After 3 months, developers quit.</td></tr>
+  </tbody>
+</table>
+<p><strong>The fix for all of these:</strong> read the Manifesto. Ask "why are we doing this ceremony?" If the answer is "because Scrum says so," you're doing cargo cult. Each ceremony exists for a reason — understand it. And advocate for ~20% refactoring time every sprint. Technical debt is a loan — it compounds.</p>
+
+<h2>4. The two AI frontiers — AI-augmented SDLC vs Agent Development Lifecycle</h2>
+<p>AI is changing the process in two distinct ways. Understanding the difference is critical:</p>
+<ul>
+  <li><strong>AI-augmented SDLC:</strong> AI <em>assists</em> the human in building traditional software. Copilot writes code, AI generates tests, AI drafts requirements. <strong>Not a new lifecycle</strong> — the same SDLC with the human shifting from <em>writer</em> to <em>evaluator</em>. The evaluation skill (L17) becomes the premium skill.</li>
+  <li><strong>Agent Development Lifecycle (ADLC):</strong> A <em>genuinely new lifecycle</em> for building AI agents — autonomous systems that pursue goals, use tools, take actions. The agent IS the product. 5 phases: Agent Design (LLM, tools, memory, orchestration) → Build (prompt engineering, tool definitions) → Evaluate (goal achievement, hallucination, safety) → Deploy with guardrails (action limits, human-in-the-loop) → Monitor for drift (hallucination, behavioral drift, prompt injection).</li>
+</ul>
+<p><strong>The key distinction:</strong> AI-augmented SDLC is <em>AI helping you build traditional software faster</em>. ADLC is <em>building AI agents as a new type of software</em>. The first accelerates the existing process; the second is a new process for a new type of product. The ADLC is too young (2024–present) for a standalone reference — it's a chapter in the bigger story. But it's the chapter you'll be living in.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="retrospective" data-explain="The sprint retrospective is where the team inspects the process itself — what went well, what didn't, what to change. It's Manifesto principle 12 ('reflect and adjust') in action — metacognition at the team level. Without it, the team never improves its process.">
+  <summary>Which Scrum ceremony is the team's metacognitive loop — inspecting the process itself?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="retrospective"> Sprint Retrospective</label>
+      <label><input type="radio" name="q1" value="review"> Sprint Review</label>
+      <label><input type="radio" name="q1" value="planning"> Sprint Planning</label>
+      <label><input type="radio" name="q1" value="daily"> Daily Scrum</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="wip-limit" data-explain="Scrum's constraint is the timebox (finish in 2 weeks). Kanban's constraint is the WIP limit (don't start more than N items in a column). Scrum is push-based (commit to a batch); Kanban is pull-based (pull as capacity permits). Most teams use Scrumban — a hybrid.">
+  <summary>What is the key constraint in Kanban (vs Scrum's timebox)?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="wip-limit"> WIP limit — don't start too many items</label>
+      <label><input type="radio" name="q2" value="story-points"> Story points — estimate everything upfront</label>
+      <label><input type="radio" name="q2" value="sprint-length"> Sprint length — must be 1 week</label>
+      <label><input type="radio" name="q2" value="team-size"> Team size — must be exactly 7 people</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="assists-vs-new-product" data-explain="AI-augmented SDLC = AI assists the human in building traditional software (same SDLC, human shifts from writer to evaluator). ADLC = a new lifecycle for building AI agents as a new type of software (the agent IS the product, with new phases like guardrails and drift monitoring). The first accelerates; the second is genuinely new.">
+  <summary>What is the key difference between AI-augmented SDLC and the Agent Development Lifecycle?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="assists-vs-new-product"> AI assists traditional software vs agents ARE the product</label>
+      <label><input type="radio" name="q3" value="same-thing"> They are the same thing with different names</label>
+      <label><input type="radio" name="q3" value="adlc-older"> ADLC is older than the SDLC</label>
+      <label><input type="radio" name="q3" value="no-difference"> There is no real difference</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>practical process knowledge</strong>: how Scrum works (3 roles, 5 events, 3 artifacts — the retrospective is the metacognitive loop), how Kanban differs (flow vs timeboxes, WIP limits, pull vs push), the common failure modes (cargo cult Agile, velocity gaming, technical debt, burnout), and the two AI frontiers. The deepest insight: <strong>AI-augmented SDLC is AI helping you build traditional software faster (the evaluation skill becomes premium); the ADLC is building AI agents as a new type of software (new phases, new guardrails, new monitoring)</strong>. The first accelerates; the second is genuinely new. Knowing the difference is the key to navigating the next 5 years of your career.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/software-development-process.html">Software Development Process</a> — the full Scrum reference (§4), Kanban's 6 practices (§5), XP/Lean/DevOps (§6), the 9 failure modes with fixes (§9b), the sprint worked example (§9), and the full AI/ADLC section with the ADLC phase table (§9d).</li>
+    <li><strong>Next lesson:</strong> <a href="./0020-the-human-layer.html">Lesson 20 — The Human Layer</a> — UI/UX &amp; web design, where the system meets the person. The Human/product movement begins.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow. Then, at work, check: does your team do retrospectives? Are they producing changes? Is there refactoring time?</li>
+  </ul>
+  <p class="cite"><a href="https://www.scrumguides.org/scrum-guide.html">The Scrum Guide</a> — the definitive reference by Scrum's co-creators. And <a href="https://en.wikipedia.org/wiki/AI_agent">AI Agent (Wikipedia)</a> — the concept behind the Agent Development Lifecycle.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"My team does stand-ups but no retrospectives — is that cargo cult Agile?"</li>
+    <li>"How do I advocate for refactoring time when the Product Owner wants new features?"</li>
+    <li>"If I want to build an AI agent, where do I start — LangChain? Claude? What's the ADLC in practice?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 8 · <a href="../reference/software-development-process.html">Reference: SDP</a></span>
+  <span>Next → <a href="./0020-the-human-layer.html">Lesson 20 · The Human Layer</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

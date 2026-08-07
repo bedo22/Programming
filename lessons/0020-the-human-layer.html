@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0020 — The Human Layer: UI/UX & Web Design</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 9 · The Exploration Journey · Human/product (1/3)</p>
+  <h1>The Human Layer: Where the System Meets the Person</h1>
+  <p class="meta">What UI/UX actually is (four disciplines, not just "making it pretty"), the core principles (affordance, visibility, feedback, constraints, Fitts/Hick), why state visibility is the bridge to frontend, and accessibility as the legal baseline. The layer between people and pixels. Anchored to <a href="../reference/ui-ux-web-design.html">UI/UX & Web Design</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0018-the-software-development-process.html">Lessons 18–19</a> covered the macro-process (how a project runs). This lesson turns one layer outward: the <strong>human layer</strong> — the interface people actually touch. For 19 lessons you've learned how the engine works (language, platform, state, rhythm, system, process). This is where the engine's output becomes <em>habitable</em>. The Human/product movement runs L20 (UI/UX) → L21 (Design Thinking) → L22 (Income/Markets).</p>
+</section>
+
+<h2>1. What UI/UX actually is — four disciplines, not "making it pretty"</h2>
+<p>The single most common mistake is to hear "UI/UX" and think "pretty buttons." It's four distinct disciplines that share the goal of making software <em>usable</em>:</p>
+<ul>
+  <li><strong>Interaction Design (IxD)</strong> — <em>behavior</em>: what happens when the human acts? Feedback and affordance on every action. This is <strong>the most important one for a developer</strong> — it's the logic of the interface.</li>
+  <li><strong>Visual / UI design</strong> — <em>appearance</em>: typography, color, layout, hierarchy. The part everyone pictures when they hear "design."</li>
+  <li><strong>UX research</strong> — <em>discovery</em>: observing and interviewing real users (patterns, needs, mental models). This is the empathy engine (L21).</li>
+  <li><strong>UX / web design</strong> — <em>synthesis</em>: turning research into information architecture, flows, and prototypes.</li>
+</ul>
+<p><strong>The key reframe:</strong> UI/UX targets <em>usability</em> — "can the human accomplish their goal with least friction?" — not decoration. Decoration is the easy part; usability is the discipline. A system that works perfectly but nobody can figure out has failed at this layer. That's why the reference's title calls it "habitable without becoming decoration."</p>
+
+<h2>2. The core principles — affordance, visibility, feedback, constraints, Fitts/Hick</h2>
+<p>UI/UX rests on a small set of principles, several borrowed from human-factors psychology:</p>
+<table>
+  <thead><tr><th>Principle</th><th>Idea in one line</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Affordance</strong></td><td>The object suggests what you can do with it. A button looks pressable; a link looks clickable. (Don Norman's <em>The Design of Everyday Things</em>: make the possible action visible.)</td></tr>
+    <tr><td><strong>Visibility / discoverability</strong></td><td>The available actions and the system's <em>status</em> must be visible. If the user can't see what's happening or what they can do next, the interface fails.</td></tr>
+    <tr><td><strong>Feedback</strong></td><td>Every action gets a response — instantly. No response = the user thinks it's broken (or clicks three more times).</td></tr>
+    <tr><td><strong>Constraints</strong></td><td>Prevent errors by design: disable invalid options, validate inline, guide the user so they can't do it wrong.</td></tr>
+    <tr><td><strong>Fitts's Law</strong></td><td>Time to reach a target = f(distance ÷ size). Make important targets big and close (the big "Submit" button is not accidental).</td></tr>
+    <tr><td><strong>Hick's Law</strong></td><td>Decision time grows with the number of choices. Less clutter → faster, easier decisions.</td></tr>
+  </tbody>
+</table>
+<p>These aren't "nice-to-have aesthetic rules" — they're <em>engineering</em> in the sense that they're measurable inputs to user performance. The "state visibility matrix" (below) is where these principles become code.</p>
+<h2>3. State visibility — the bridge to frontend code</h2>
+<p>Here's where UI/UX plugs directly into everything you've learned — especially <a href="./0003-what-is-state.html">state (L3)</a>. Every screen has a set of <strong>states</strong>, and the user must be able to tell which one they're in. The reference's "state visibility matrix" (<code>ui-ux-web-design.html</code> §9) maps directly onto HTML/CSS:</p>
+<table>
+  <thead><tr><th>UI state</th><th>What the user must see</th><th>The code signal</th></tr></thead>
+  <tbody>
+    <tr><td>Loading</td><td>"It's working, not frozen"</td><td>Skeleton/spinner, <code>aria-busy="true"</code></td></tr>
+    <tr><td>Empty</td><td>"There is genuinely no data"</td><td>Empty-state message (distinct from loading!)</td></tr>
+    <tr><td>Error</td><td>"Something failed, and I can recover"</td><td>Error message + retry, <code>role="alert"</code></td></tr>
+    <tr><td>Success</td><td>"It worked"</td><td>Success feedback, focus moves logically</td></tr>
+    <tr><td>Disabled</td><td>"This isn't available right now"</td><td><code>disabled</code>, reduced opacity</td></tr>
+  </tbody>
+</table>
+<p><strong>This is the single most valuable UI/UX insight for a developer:</strong> the most common, most embarrassing bug in UI is <em>state invisibility</em> — a table that silently shows "empty" while actually still loading. The fix isn't more CSS; it's modeling the state (L3) and rendering it visibly. Read <a href="./0003-what-is-state.html">Lesson 3</a> again with this in mind — "loaded" and "empty" are two different states and need two different renderings.</p>
+
+<h2>4. Accessibility — the legal baseline, not a feature</h2>
+<p>Accessibility (a11y) is the part of UI/UX that's now a <em>requirement</em>: WCAG 2.1/2.2 AA is the legal baseline in many jurisdictions (ADA, EAA). The three pillars align with what you already know:</p>
+<ul>
+  <li><strong>Semantic HTML</strong> (from <a href="./0002-the-platform-layer.html">L2</a>) is the foundation — a real <code>&lt;button&gt;</code>, a proper <code>&lt;nav&gt;</code>, correct heading order. Screen readers read the DOM tree, not the pixels.</li>
+  <li><strong>Keyboard + focus management</strong> — every action must be reachable by keyboard, and focus must move where the action logically goes.</li>
+  <li><strong>Contrast, reduced motion, focus-visible</strong> — visual specifics with CSS states you already use (<code>:focus-visible</code>, <code>@media (prefers-reduced-motion)</code>).</li>
+</ul>
+<p>Accessibility is "shift-left" — designed in, not bolted on. And remarkably, it usually <em>improves</em> usability for everyone (curb-cut effect): captions help in noisy rooms, keyboard support helps power users, clear contrast helps in sunlight. Accessible is not less; it's more usable for all.</p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+<details class="quiz" data-answer="usability" data-explain="UI/UX targets usability — helping the human accomplish their goal with least friction. Decoration is easy; usability is the discipline. The reference's title calls it 'habitable without becoming decoration' — if a system works but nobody can figure it out, this layer failed (and it's not a styling problem, it's a state-visibility problem).">
+  <summary>What is the true target of UI/UX design?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="l20q1" value="usability"> Usability — least friction to the goal</label>
+      <label><input type="radio" name="l20q1" value="decoration"> Decoration — making it look beautiful</label>
+      <label><input type="radio" name="l20q1" value="figma"> Figma skill — mastering the tool</label>
+      <label><input type="radio" name="l20q1" value="component-count"> Having many components</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="interaction" data-explain="Interaction Design (IxD) is the behavior discipline — what happens when the human acts, including feedback and affordance. It's the most important one for a developer because it's the logic of the interface, mapping to rules, events, and state changes you implement.">
+  <summary>Which of the four UI/UX disciplines handles behavior — what happens when the user acts?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="l20q2" value="interaction"> Interaction Design (IxD)</label>
+      <label><input type="radio" name="l20q2" value="visual"> Visual / UI design</label>
+      <label><input type="radio" name="l20q2" value="research"> UX research</label>
+      <label><input type="radio" name="l20q2" value="typography"> Typography</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+<details class="quiz" data-answer="state-invisibility" data-explain="This is UI's most common, most embarrassing bug: a table that shows 'empty' while actually still loading. The fix isn't more CSS — it's modeling the state (L3) and rendering it visibly. 'Loading' and 'empty' are two different states that need two different renderings. State visibility is the bridge between UI/UX and the frontend code you write.">
+  <summary>A table takes 2 seconds to load, then shows nothing. What UI/UX principle is being violated?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="l20q3" value="state-invisibility"> State visibility — user can't tell loading vs empty</label>
+      <label><input type="radio" name="l20q3" value="color"> Color contrast is too low</label>
+      <label><input type="radio" name="l20q3" value="font"> The font is hard to read</label>
+      <label><input type="radio" name="l20q3" value="grid"> The grid is misaligned</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>human layer</strong>: UI/UX is four disciplines targeting <em>usability</em> (not decoration); the core principles (affordance, visibility, feedback, constraints, Fitts, Hick) are measurable inputs to performance; and the most valuable developer insight is <strong>state visibility</strong> — every UI state (loading, empty, error, success, disabled) must be visible, drawn straight from the state modeling of <a href="./0003-what-is-state.html">L3</a>. Accessibility (WCAG AA) is now a legal baseline that improves usability for everyone. The system's engine (L1–L19) now has its human-facing surface.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/ui-ux-web-design.html">UI/UX & Web Design</a> — the four-discipline answer (§1), history and constraint inversions (§2–3), the theory and principles (§5, §8), the state visibility matrix (§9), failure modes (§10), and the future (§11).</li>
+    <li><strong>Next lesson:</strong> <a href="./0021-upstream-of-code.html">Lesson 21 — Upstream of Code</a> — Design Thinking, the layer that discovers <em>what problem</em> to solve before anyone writes code.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow. Then, on your next feature, name its five states (loading, empty, error, success, disabled) before you write the component.</li>
+  </ul>
+  <p class="cite"><a href="https://www.nngroup.com/articles/ten-usability-heuristics/">Nielsen Norman Group — 10 Usability Heuristics</a> — the canonical heuristics. And Don Norman's <a href="https://en.wikipedia.org/wiki/The_Design_of_Everyday_Things"><em>The Design of Everyday Things</em></a> — where affordance and feedback come from.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"Can you show me how to build a loading skeleton that's also accessible?"</li>
+    <li>"How do I test whether my app is accessible without hiring an auditor?"</li>
+    <li>"What's the difference between the Accessibility Tree and the DOM tree I learned in L2?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 9 · <a href="../reference/ui-ux-web-design.html">Reference: UI/UX</a></span>
+  <span>Next → <a href="./0021-upstream-of-code.html">Lesson 21 · Upstream of Code</a></span>
+</footer>
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

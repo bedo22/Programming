@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0018 — The Software Development Process · From Waterfall to Agile</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 7 · The Exploration Journey · Bridge (7/8)</p>
+  <h1>The Software Development Process — From Waterfall to Agile</h1>
+  <p class="meta">You know how to build a feature (The Rhythm, L7) and how to think about problems (Problem-Solving, L12–14). But how does a <em>team</em> decide what to build, when to build it, and how to ship it? That's the macro-process — the SDLC and the methodologies that navigate it. Here's the 55-year history, the Agile Manifesto, and the key insight: a sprint is the project-scale process; The Rhythm is the feature-scale process within it. Anchored to <a href="../reference/software-development-process.html">Software Development Process</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>The <a href="../PLAN.md">Bridge movement</a> has taught you the meta-skills: problem-solving (L12–14), the rhythm deepened (L15), CS &amp; SE (L16), solution evaluation (L17). This lesson adds the <strong>process layer</strong> — the project-scale counterpart to The Rhythm. The next lesson (L19) covers Scrum/Kanban in detail and the AI/Agent frontier.</p>
+</section>
+
+<h2>1. The SDLC — six phases, every methodology</h2>
+<p>Every methodology — Waterfall, Agile, Spiral, DevOps — navigates the same six phases: <strong>Requirements → Design → Implementation → Testing → Deployment → Maintenance</strong>. The SDLC describes <em>what happens</em>; the methodology describes <em>how you navigate</em> those phases. Waterfall does them once, sequentially. Agile does them every sprint, iteratively. <strong>The phases don't change; the navigation does.</strong></p>
+
+<h2>2. The 55-year history — why Agile replaced Waterfall</h2>
+<table>
+  <thead><tr><th>Year</th><th>Event</th><th>What it contributed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1970</strong></td><td>Waterfall (Royce)</td><td>Sequential: finish all requirements, then all design, then all code. Royce actually <em>warned against</em> single-pass — people skipped his warning.</td></tr>
+    <tr><td><strong>1986</strong></td><td>Spiral (Boehm)</td><td>First formal "loop": Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper. The ancestor of iterative development.</td></tr>
+    <tr><td><strong>1999</strong></td><td>XP (Beck)</td><td>"Make it work, make it right, make it fast." TDD, pair programming, CI. The engineering practices.</td></tr>
+    <tr><td><strong>2001</strong></td><td>Agile Manifesto</td><td>17 developers at Snowbird, Utah. 4 values + 12 principles. Not a framework — a philosophy. Scrum, Kanban, XP implement it.</td></tr>
+    <tr><td><strong>2009</strong></td><td>DevOps</td><td>Automated deployment via CI/CD. "Deploy 50 times a day" becomes possible.</td></tr>
+  </tbody>
+</table>
+<p><strong>The pattern:</strong> each methodology was a response to a failure of the previous one. Waterfall failed because requirements change. Spiral made change explicit. Agile embraced it. DevOps automated the deployment bottleneck. <em>The recurring theme: humans are bad at predicting what software should do, so processes that embrace change beat processes that resist it.</em></p>
+
+<h2>3. The Agile Manifesto — 4 values</h2>
+<table>
+  <thead><tr><th>Value (left is valued <em>more</em>)</th><th>Over (right still has value)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Individuals and interactions</strong></td><td>Processes and tools</td></tr>
+    <tr><td><strong>Working software</strong></td><td>Comprehensive documentation</td></tr>
+    <tr><td><strong>Customer collaboration</strong></td><td>Contract negotiation</td></tr>
+    <tr><td><strong>Responding to change</strong></td><td>Following a plan</td></tr>
+  </tbody>
+</table>
+<p><strong>The crucial nuance:</strong> the right side is not <em>wrong</em> — the Manifesto says "while there is value in the items on the right, we value the items on the left <em>more</em>." Plans matter; responding to change matters <em>more</em>. This is a reprioritization, not a rejection.</p>
+<p><strong>Principle 10</strong> — "simplicity, the art of maximizing the amount of work not done" — is YAGNI (L16) in manifesto form. <strong>Principle 12</strong> — "reflect and adjust" — is metacognition (L13) at the team level. The Manifesto's principles connect directly to everything you've already learned.</p>
+
+<h2>4. The macro/micro connection — how this relates to The Rhythm</h2>
+<blockquote class="callout">
+  <p><strong>The key structural insight:</strong> The Rhythm (L7) is the <em>micro-process</em> (one feature, minutes to hours). This doc is the <em>macro-process</em> (one project, weeks to months). A Scrum sprint contains multiple features, each built with the Model→View→Flow rhythm. Sprint planning decides <em>what</em> to build; The Rhythm decides <em>how</em> to build each one. The sprint review inspects the results (Pólya's Phase 4 at the team level). The retrospective inspects the process (metacognition at the team level).</p>
+</blockquote>
+<p>They're the same pattern at different scales: Boehm's spiral (1986) named the iterative pattern; XP (1999) operationalized it in code; Agile (2001) institutionalized it at the sprint scale; The Rhythm (L7) applies it at the feature scale. <strong>Learn the macro once, and it explains the micro; learn the micro once, and it makes the macro concrete.</strong></p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="phases-same-navigation-differs" data-explain="The SDLC phases (Requirements → Design → Implementation → Testing → Deployment → Maintenance) are the same for every methodology. What changes is how you navigate them: Waterfall does them once sequentially; Agile does them every sprint iteratively. The phases don't change; the navigation does.">
+  <summary>What is the relationship between the SDLC and methodologies like Waterfall and Agile?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="phases-same-navigation-differs"> Same phases; different navigation</label>
+      <label><input type="radio" name="q1" value="different-phases"> Different phases for each methodology</label>
+      <label><input type="radio" name="q1" value="no-phases"> Agile has no phases at all</label>
+      <label><input type="radio" name="q1" value="waterfall-more-phases"> Waterfall has more phases than Agile</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="responding-to-change" data-explain="The 4th value: 'Responding to change over following a plan.' But the right side still has value — the Manifesto says 'while there is value in the items on the right, we value the items on the left more.' Plans matter; responding to change matters MORE.">
+  <summary>Which Agile Manifesto value directly addresses why Waterfall failed?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="responding-to-change"> Responding to change over following a plan</label>
+      <label><input type="radio" name="q2" value="working-software"> Working software over documentation</label>
+      <label><input type="radio" name="q2" value="individuals"> Individuals over processes</label>
+      <label><input type="radio" name="q2" value="customer"> Customer collaboration over contracts</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="macro-micro" data-explain="The Rhythm (L7) is the micro-process: how an individual builds one feature (Model→View→Flow, minutes to hours). The SDP is the macro-process: how a team navigates the SDLC (sprints, backlogs, ceremonies, weeks to months). A sprint contains multiple features, each built with The Rhythm. They're the same iterative pattern at different scales.">
+  <summary>How does the Software Development Process (macro) relate to The Rhythm (micro)?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="macro-micro"> Macro contains micro — sprints contain features</label>
+      <label><input type="radio" name="q3" value="same-thing"> They are the same thing at the same scale</label>
+      <label><input type="radio" name="q3" value="replaces"> The SDP replaces The Rhythm entirely</label>
+      <label><input type="radio" name="q3" value="unrelated"> They are unrelated processes</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>process layer</strong> — the project-scale counterpart to The Rhythm. The SDLC is the six phases; the methodology is how you navigate them. The 55-year history: processes that embrace change beat processes that resist it. The Agile Manifesto's 4 values + 12 principles connect to what you already know — principle 10 is YAGNI, principle 12 is metacognition. And the key insight: <strong>The Rhythm is the micro within the macro</strong> — a sprint contains features, each built with Model→View→Flow.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/software-development-process.html">Software Development Process</a> — the full history (§1b), 12 principles (§3), Scrum (§4), Kanban (§5), the macro/micro table (§7), the sprint worked example (§9).</li>
+    <li><strong>Next lesson:</strong> <a href="./0019-scrum-kanban-and-the-ai-frontier.html">Lesson 19 — Scrum, Kanban, and the AI/Agent Frontier</a> — Scrum in practice, Kanban's differences, failure modes, and the two AI frontiers.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow. Then, at work, ask: "What methodology does my team use? Is there a retrospective?"</li>
+  </ul>
+  <p class="cite"><a href="https://agilemanifesto.org/">The Agile Manifesto (2001)</a> — the founding document. And <a href="https://en.wikipedia.org/wiki/Software_development_process">Software Development Process (Wikipedia)</a>.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"At my job, we do sprints — how does the Model→View→Flow rhythm fit in?"</li>
+    <li>"What's the difference between a methodology and a framework?"</li>
+    <li>"Is DevOps a methodology or something else?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 7 · <a href="../reference/software-development-process.html">Reference: SDP</a> · <a href="./0007-the-rhythm.html">The Rhythm (micro)</a></span>
+  <span>Next → <a href="./0019-scrum-kanban-and-the-ai-frontier.html">Lesson 19 · Scrum, Kanban, AI</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0017 — Solution Evaluation · Big O, Quality Attributes, and Trade-offs</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 6 · The Exploration Journey · Bridge (6/6)</p>
+  <h1>Solution Evaluation — Big O, Quality Attributes, and Trade-offs</h1>
+  <p class="meta">You solved the problem. But is the solution <em>good</em>? This lesson teaches the evaluation skill: the parameters (what you measure), the measures (Big O), the trade-offs (when parameters conflict), and the judgment (which parameters matter when). Traced through a real brute-force solution and its upgrade. Anchored to <a href="../reference/cs-and-software-engineering.html">CS &amp; SE</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p><a href="./0016-cs-and-se-the-discipline.html">Lesson 16</a> named the umbrella discipline (CS &amp; SE). This lesson teaches the skill at its core: <strong>solution evaluation</strong> — the deepening of Pólya's Phase 4 (Look back). This is the last Bridge lesson; next, we go upstream to the human layer (L18: UI/UX, L19: Design Thinking, L20: Income/Markets).</p>
+</section>
+
+<h2>1. The four layers of evaluation</h2>
+<p>After you solve a problem (Pólya's Phase 3), you evaluate the solution (Phase 4). That evaluation has four layers:</p>
+<ul>
+  <li><strong>The parameters</strong> — what you measure: time complexity, space complexity, correctness, readability, maintainability. The formal name is <strong>quality attributes</strong> (ISO 25010 defines 8).</li>
+  <li><strong>The measures</strong> — how you quantify: Big O notation for time and space. O(n) means "linear growth." O(n²) means "quadratic growth."</li>
+  <li><strong>The trade-offs</strong> — when parameters conflict: faster often means more memory; more readable often means less optimized. The Pareto front is the set of solutions where you can't improve one without degrading another.</li>
+  <li><strong>The judgment</strong> — which parameters matter for your context, and when to stop optimizing. HackerRank: time/space. Production: maintainability. Interview: clarity + correctness.</li>
+</ul>
+
+<h2>2. Big O — the complexity classes you need to know</h2>
+<table>
+  <thead><tr><th>Big O</th><th>Name</th><th>Example</th><th>At n=1000</th></tr></thead>
+  <tbody>
+    <tr><td><strong>O(1)</strong></td><td>Constant</td><td>Hash map lookup</td><td>1 operation</td></tr>
+    <tr><td><strong>O(log n)</strong></td><td>Logarithmic</td><td>Binary search</td><td>~10 operations</td></tr>
+    <tr><td><strong>O(n)</strong></td><td>Linear</td><td>Single pass; your word counter</td><td>1,000</td></tr>
+    <tr><td><strong>O(n log n)</strong></td><td>Linearithmic</td><td>Merge sort, quick sort</td><td>~10,000</td></tr>
+    <tr><td><strong>O(n²)</strong></td><td>Quadratic</td><td>Nested loops</td><td>1,000,000</td></tr>
+    <tr><td><strong>O(2ⁿ)</strong></td><td>Exponential</td><td>Naive Fibonacci</td><td>Universe ends</td></tr>
+  </tbody>
+</table>
+<p><strong>How to analyze:</strong> count the loops. One loop over n = O(n). Nested loop = O(n²). Halving each iteration = O(log n). The highest-order term dominates — O(n² + n + 5) is just O(n²). <strong>On HackerRank, the time limit is ~10⁸ operations.</strong> If your solution is O(n²) and n = 10⁵, that's 10¹⁰ — too slow. You need O(n log n) or better.</p>
+
+<h2>3. Trade-offs — the engineering reality</h2>
+<p>You cannot maximize all parameters simultaneously. The standard trade-offs:</p>
+<ul>
+  <li><strong>Time vs space</strong> — precompute and cache (faster, more memory) vs compute on the fly (slower, less memory).</li>
+  <li><strong>Readability vs performance</strong> — bit manipulation is fast but unreadable; clear code is readable but potentially slower.</li>
+  <li><strong>Simplicity vs flexibility</strong> — hardcoded is simple but rigid; configurable is flexible but complex. (YAGNI says: start simple.)</li>
+</ul>
+<p><strong>The engineering skill is making trade-offs explicit</strong> — naming what you're sacrificing and why. "I'm trading O(1) space for O(n) time here, because the input can be 10⁵ and the O(n²) approach would time out."</p>
+
+<h2>4. Judgment — which parameters matter when</h2>
+<table>
+  <thead><tr><th>Context</th><th>Primary</th><th>Deprioritize</th></tr></thead>
+  <tbody>
+    <tr><td>HackerRank</td><td>Time, space, correctness</td><td>Readability, maintainability</td></tr>
+    <tr><td>Production frontend</td><td>Maintainability, readability, usability</td><td>Micro-optimization</td></tr>
+    <tr><td>Interview</td><td>Correctness, clarity, communication</td><td>Optimal Big O (working O(n²) &gt; broken O(n))</td></tr>
+  </tbody>
+</table>
+<p><strong>Knuth's principle:</strong> "Premature optimization is the root of all evil" (1974). It doesn't say "don't optimize" — it says <em>don't optimize before you know it matters</em>. Measure first. Is it on the critical path? Have you profiled it? Will optimization hurt maintainability? This is the same judgment as The Rhythm's "feel the friction" (L15) — build simple first, optimize where it creaks.</p>
+
+<h2>5. Worked example — evaluating a brute-force solution</h2>
+<p><strong>Problem:</strong> "Find the first non-repeating character in a string."</p>
+<p><strong>Brute force (O(n²)):</strong> For each character, count its occurrences in the whole string. Correct, readable, but nested loop = O(n²). At n=10⁵, that's 10¹⁰ — too slow for HackerRank.</p>
+<p><strong>Upgrade (O(n)):</strong> Count all characters once in a hash map, then scan once for the first count of 1. Two single passes = O(n). <strong>The trade-off:</strong> we traded O(1) space for O(n) space — the hash map uses extra memory. Time vs space.</p>
+<p><strong>The judgment:</strong> On HackerRank (n up to 10⁵), the upgrade is mandatory — O(n²) will time out. In production (n &lt; 100), the brute force is fine — 10,000 operations is instant, and it uses no extra memory. In an interview, start with brute force, then say: "This is O(n²), which works for small n. For large n, I'd use a hash map for O(n)." <strong>The evaluation skill IS the interview signal.</strong></p>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="nested-loop" data-explain="A nested loop (a loop inside a loop, both iterating over n) is O(n²) — for each of n items, you do n operations, so n × n = n². At n=1000, that's 1,000,000 operations. A single loop is O(n); a loop that halves each iteration is O(log n).">
+  <summary>What is the time complexity of a nested loop over n items?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="nested-loop"> O(n²) — quadratic</label>
+      <label><input type="radio" name="q1" value="linear"> O(n) — linear</label>
+      <label><input type="radio" name="q1" value="logarithmic"> O(log n) — logarithmic</label>
+      <label><input type="radio" name="q1" value="constant"> O(1) — constant</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="measure-first" data-explain="Knuth's principle doesn't say 'don't optimize' — it says 'don't optimize before you know it matters.' Measure first: is it on the critical path? Have you profiled it? Will optimization hurt maintainability? Optimize only where the measurement shows it matters.">
+  <summary>What does Knuth's "premature optimization is the root of all evil" actually mean?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="measure-first"> Measure first, optimize where it matters</label>
+      <label><input type="radio" name="q2" value="never-optimize"> Never optimize any code at all</label>
+      <label><input type="radio" name="q2" value="always-optimize"> Always optimize everything upfront</label>
+      <label><input type="radio" name="q2" value="only-brute-force"> Only use brute force solutions</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="context-dependent" data-explain="The same two solutions (brute force O(n²) and hash map O(n)) get different answers depending on context. HackerRank with large n: the O(n) upgrade is mandatory. Production with small n: the brute force is simpler and uses less memory. The evaluation skill is knowing WHICH parameters matter for WHICH context.">
+  <summary>When is a brute-force O(n²) solution the better engineering choice over an O(n) hash map?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="context-dependent"> When n is small and simplicity matters more</label>
+      <label><input type="radio" name="q3" value="never"> Never — O(n) is always better</label>
+      <label><input type="radio" name="q3" value="always"> Always — brute force is always better</label>
+      <label><input type="radio" name="q3" value="only-interviews"> Only in interview settings</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>evaluation skill</strong> — the judgment that ties together parameters (what you measure), measures (Big O), trade-offs (when they conflict), and context (which parameters matter when). The key insights: <strong>Big O tells you how your solution scales</strong> (O(n²) at n=10⁵ is 10¹⁰ — too slow). <strong>Trade-offs are inevitable</strong> (time vs space, readability vs performance) — the skill is making them explicit. <strong>Knuth's principle</strong> — don't optimize before you know it matters. And the deepest one: <strong>the same two solutions get different answers depending on context</strong> — HackerRank needs the optimal algorithm; production often needs the simplest one. The evaluation skill IS the interview signal, and it's the skill AI can't replace — because AI doesn't know your context.</p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/cs-and-software-engineering.html">CS &amp; SE</a> — the full Big O complexity class table with "at n=1000" column (§5), the ISO 25010 quality attributes in full (§4), the Pareto front concept (§6), the complete worked example with code (§9), and the evaluation checklist (§10).</li>
+    <li><strong>Next lesson:</strong> <a href="./0018-the-human-layer.html">Lesson 18 — The Human Layer</a> — UI/UX &amp; web design, where the system meets the person. The Human/product movement begins.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow. Then, on your next HackerRank challenge, after your solution passes, evaluate it: What's the Big O? What trade-offs am I making? Is there a simpler approach for small n?</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/Big_O_notation">Big O Notation (Wikipedia)</a> — the standard complexity classes. And <a href="https://en.wikipedia.org/wiki/Analysis_of_algorithms">Analysis of Algorithms (Wikipedia)</a> — Knuth's discipline of measuring algorithm efficiency.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"How do I analyze the Big O of a recursive function?"</li>
+    <li>"What's the difference between worst case, average case, and best case — and which should I report?"</li>
+    <li>"How do I know if a trade-off is worth it — is there a framework for deciding?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 6 · <a href="../reference/cs-and-software-engineering.html">Reference: CS &amp; SE</a></span>
+  <span>Next → <a href="./0018-the-human-layer.html">Lesson 18 · The Human Layer</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

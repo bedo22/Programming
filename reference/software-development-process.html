@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software Development Process — From Waterfall to Agile to AI Agents</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · How software gets built — the SDLC, the methodologies, and the AI frontier</p>
+  <h1>Software Development Process</h1>
+  <p class="meta">What the Software Development Life Cycle is (the phases), what a methodology is (how you navigate them), the 55-year history from Waterfall to Agile to DevOps to AI agents, the Agile Manifesto's 4 values and 12 principles, Scrum and Kanban in detail, the common failure modes, and the two AI frontiers: AI-augmented SDLC and the Agent Development Lifecycle. Read this to understand the project-scale process that The Rhythm (feature-scale) operates within.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> This doc is the <em>process layer</em> — the project-scale counterpart to <a href="./how-developers-think-frontend.html">The Rhythm</a> (feature-scale):</p>
+  <ul>
+    <li><a href="./how-developers-think-frontend.html">The Rhythm</a> — the <em>micro-process</em> (minutes to hours): how an individual builds one feature (Model → View → Flow).</li>
+    <li><strong>This doc</strong> — the <em>macro-process</em> (weeks to months): how a team navigates the SDLC (Waterfall, Agile, Scrum, Kanban, DevOps).</li>
+    <li><a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the <em>umbrella discipline</em> that contains both.</li>
+    <li><a href="./problem-solving.html">Problem-Solving</a> — the <em>thinking skill</em> used within both scales.</li>
+    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+  </ul>
+  <p>The Rhythm is how you build a feature; this doc is how the feature gets prioritized, sprinted, shipped, and maintained. They're at different scales, and both are needed.</p>
+</blockquote>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone, but most useful <em>after</em> you understand the feature-scale rhythm (<a href="./how-developers-think-frontend.html">The Rhythm</a>) — that gives you the micro-process; this doc gives you the macro-process it sits within. Cross-links:</p>
+<ul>
+  <li>Micro to: <a href="./how-developers-think-frontend.html">The Rhythm</a> — the feature-scale loop (Model → View → Flow) that operates <em>within</em> a sprint.</li>
+  <li>Umbrella: <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the discipline; this doc is the process layer within it.</li>
+  <li>Thinking: <a href="./problem-solving.html">Problem-Solving</a> — Pólya's four phases, used within both the macro and micro processes.</li>
+  <li>Architecture: <a href="./system-design.html">System Design</a> — methodology informs architecture; architecture constrains methodology.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+</ul>
+<p><strong>If you've ever wondered what a "sprint" or a "stand-up" or a "backlog" actually is — and why your team does them — this doc answers that.</strong> Read §1 (Definition) and §2 (the SDLC phases) first. Then §3–§6 for the Agile frameworks. §9e–§9r for the practical layer: choosing a process, measuring it, security, operations, and more. Then §9d for the AI frontier (AI-augmented SDLC + Agent Development Lifecycle).</p>
+
+<h2>1. Definition — what the SDLC is, what a methodology is, what Agile is</h2>
+
+<h3>The SDLC — the phases</h3>
+<p>The <strong>Software Development Life Cycle (SDLC)</strong> is the sequence of phases a software system goes through from birth to retirement: <strong>Requirements → Design → Implementation → Testing → Deployment → Maintenance</strong> (<a href="https://en.wikipedia.org/wiki/Software_development_process">Wikipedia</a>). The SDLC describes <em>what happens</em> — the phases, the deliverables, the transitions. It doesn't prescribe <em>how</em> you navigate them.</p>
+
+<h3>A methodology — how you navigate the phases</h3>
+<p>A <strong>methodology</strong> prescribes how you move through the SDLC (<a href="https://en.wikipedia.org/wiki/Software_development_process">Wikipedia</a>). Waterfall does the phases sequentially (finish Requirements before starting Design). Agile does them iteratively (a little of each phase, every sprint). Spiral does them in risk-driven cycles. A methodology is a <em>blueprint for navigating the SDLC</em> — it tells you the order, the cadence, and the roles.</p>
+
+<h3>Agile — an umbrella philosophy, not a single framework</h3>
+<p><strong>Agile</strong> is not a single methodology — it's an <em>umbrella philosophy</em> expressed in the Agile Manifesto (2001). Under the umbrella sit specific frameworks: <strong>Scrum</strong> (the most widely adopted), <strong>Kanban</strong> (flow-based), <strong>XP</strong> (engineering practices), <strong>Lean</strong> (waste elimination), and <strong>DevOps</strong> (continuous delivery). They all share the Manifesto's 4 values and 12 principles, but implement them differently (<a href="https://en.wikipedia.org/wiki/Agile_software_development">Wikipedia</a>).</p>
+
+<h3>What this doc is NOT</h3>
+<ul>
+  <li><strong>Not The Rhythm.</strong> The Rhythm (L7) is the <em>micro-process</em> — how an individual builds one feature (Model → View → Flow, minutes to hours). This doc is the <em>macro-process</em> — how a team navigates the SDLC (sprints, backlogs, ceremonies, weeks to months). They're at different scales; §7 explains how they connect.</li>
+  <li><strong>Not just project management.</strong> Agile includes project management practices (sprints, backlogs, stand-ups), but it also encompasses development practices (TDD, pair programming, CI), team organization (self-organizing, cross-functional), and a philosophy (the 4 values + 12 principles). Project management is one slice, not the whole.</li>
+  <li><strong>Not a framework.</strong> Agile is the philosophy; Scrum, Kanban, and XP are the frameworks. Saying "we do Agile" is like saying "we do science" — it tells you the philosophy, not the specific practices.</li>
+</ul>
+
+<h2>1b. History — from Waterfall to Agile to AI agents (1970–present)</h2>
+
+<p>The software development process has a 55-year lineage, driven by a recurring theme: <em>humans are bad at predicting what software should do, so processes that embrace change beat processes that resist it</em>.</p>
+
+<table>
+  <thead><tr><th>Year</th><th>Event</th><th>What it contributed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1970</strong></td><td>Waterfall (Winston Royce)</td><td>Royce's paper is often cited as the origin of Waterfall — a sequential process: Requirements → Design → Implementation → Testing → Deployment. But Royce himself <em>emphasized feedback between phases</em> and warned that large systems should not be built as a single linear pass. The simplified sequential version later became known as "Waterfall." The myth of "design everything upfront, build once" was born from the diagram, not the paper.</td></tr>
+    <tr><td><strong>1986</strong></td><td>Spiral Model (Barry Boehm)</td><td>One of the first formal loop-based process models. Each spiral cycle: Plan → Risk Analysis → Engineering → Evaluation. Risk-driven: the level of detail depends on the risks to resolve. A major formalization of iterative development. (See also <a href="./how-developers-think-frontend.html">The Rhythm §11</a>.)</td></tr>
+    <tr><td><strong>1980s–90s</strong></td><td>IID — Iterative &amp; Incremental Development</td><td>Larman &amp; Basili's 2003 IEEE paper traced this back to the 1950s — older than Waterfall. Project Mercury (NASA) was built iteratively. The spiral didn't invent the loop; it named what good devs already did.</td></tr>
+    <tr><td><strong>1995</strong></td><td>Scrum (Sutherland &amp; Schwaber)</td><td>Formalized the iterative process as a lightweight framework: timeboxed sprints, daily stand-ups, product backlog, sprint review, retrospective. Based on empirical process control theory — inspect and adapt (<a href="https://en.wikipedia.org/wiki/Scrum_(software_development)">Wikipedia</a>).</td></tr>
+    <tr><td><strong>1999</strong></td><td>XP — Extreme Programming (Kent Beck)</td><td>"Make it work, make it right, make it fast." Introduced TDD, pair programming, continuous integration, refactoring. The engineering practices that make Agile <em>work</em> — not just the ceremonies.</td></tr>
+    <tr><td><strong>2001</strong></td><td>Agile Manifesto</td><td>17 software developers met at Snowbird, Utah, and wrote the <strong>4 values + 12 principles</strong> (<a href="https://agilemanifesto.org/">agilemanifesto.org</a>). Not a framework — a philosophy. It declared: individuals over processes, working software over documentation, customer collaboration over contracts, responding to change over following a plan.</td></tr>
+    <tr><td><strong>2000s</strong></td><td>Kanban (David Anderson)</td><td>Adapted the Toyota Production System's just-in-time method for software: visualize the workflow, limit work in progress, pull work as capacity permits. Flow-based, not timeboxed. The alternative to Scrum's sprint model (<a href="https://en.wikipedia.org/wiki/Kanban_(development)">Wikipedia</a>).</td></tr>
+    <tr><td><strong>2009</strong></td><td>DevOps</td><td>The convergence of Development and Operations (first a movement, now a set of practices): continuous integration, continuous deployment, infrastructure as code. The practices that made very frequent, low-risk deployments possible. Automation of the Testing → Deployment → Maintenance phases.</td></tr>
+    <tr><td><strong>2010s</strong></td><td>SAFe, LeSS, Spotify Model</td><td>Scaled Agile frameworks — how to do Agile with 50+ teams. SAFe (Scaled Agile Framework) and LeSS (Large-Scale Scrum) added coordination layers. The Spotify Model (squads, tribes, chapters) popularized team topology — though it's a case study of one company's organization, not a formally prescribed universal framework.</td></tr>
+    <tr><td><strong>2023–2025</strong></td><td>AI-augmented SDLC</td><td>Copilot, ChatGPT, Claude assist each SDLC phase: AI writes code, generates tests, drafts requirements, suggests refactors. The human shifts from <em>writer</em> to <em>evaluator</em>. Not a new lifecycle — the same SDLC with AI accelerating each phase.</td></tr>
+    <tr><td><strong>2024–present</strong></td><td>Agent Development Lifecycle (ADLC)</td><td>A genuinely new lifecycle for building <strong>AI agents</strong> — autonomous systems that pursue goals, use tools, take actions. The agent IS the product. New phases: agent design (LLM, tools, memory, orchestration) → build (prompt engineering, tool definitions) → evaluate (goal achievement, hallucination, safety) → deploy with guardrails → monitor for drift (<a href="https://en.wikipedia.org/wiki/AI_agent">Wikipedia</a>).</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The pattern:</strong> each methodology was a response to a failure of the previous one. Waterfall failed because requirements change. Spiral responded by making change explicit. Agile responded by embracing change. DevOps responded by automating the deployment bottleneck. AI-augmentation responds to the writing bottleneck. The ADLC responds to the emergence of a new type of software entirely. <em>The SDLC phases don't change; how you navigate them does — and what you're building is starting to change too.</em></p>
+
+<h2>1c. Evolution — constraint inversions across the process</h2>
+
+<table>
+  <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Sequential → iterative</strong></td><td>Waterfall: finish all requirements, then all design, then all code</td><td>Spiral/Agile: a little of each phase, every cycle</td><td>The constraint: requirements change. You can't know everything upfront. Iterative processes embrace change; sequential processes resist it. Royce warned against single-pass; Boehm made the loop explicit; Agile popularized and institutionalized it.</td></tr>
+    <tr><td><strong>Defined → empirical</strong></td><td>Waterfall: a defined process — the steps are known, repeat them</td><td>Scrum: an empirical process — the steps are uncertain, inspect and adapt</td><td>The constraint: software development is inherently unpredictable (unlike manufacturing). Empirical process control theory (Scrum's foundation): when you can't define the process, you make it visible, inspect frequently, and adapt. This is the deepest Agile inversion.</td></tr>
+    <tr><td><strong>Timeboxed → flow</strong></td><td>Scrum: fixed-length sprints (2 weeks), commit to a batch</td><td>Kanban: continuous flow, pull work as capacity permits, no required timeboxes</td><td>The constraint: some work doesn't fit in 2-week boxes. Kanban (from Toyota Production System) optimizes for flow, not for cadence (though teams may still use their own cadences for reviews). Limit WIP (work in progress) to reduce context switching and bottlenecks.</td></tr>
+    <tr><td><strong>Manual → automated</strong></td><td>Testing, deployment, and infrastructure are manual — slow, error-prone</td><td>DevOps: CI/CD, infrastructure as code, automated testing</td><td>The constraint: manual deployment is the bottleneck. DevOps automates the Testing → Deployment → Maintenance phases. Very frequent, low-risk deployments become possible. The tighter the feedback loop, the faster you learn.</td></tr>
+    <tr><td><strong>Human-writes → AI-assists → Agent-builds</strong></td><td>Human writes all code (the bottleneck)</td><td>AI assists each phase → AI agents build autonomously</td><td>The constraint: writing is the bottleneck. AI-augmented SDLC: AI assists, human evaluates. ADLC: the product IS an AI agent — new phases, new evaluation criteria, new failure modes. The newest inversion, still unfolding.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The meta-pattern:</strong> each inversion <em>tightens the feedback loop</em>. Waterfall's feedback loop: months (discover the bug after deployment). Spiral's: weeks (discover in the next cycle). Agile's: days (discover in the next stand-up or sprint review). DevOps': minutes (discover in CI). AI-augmented's: seconds (discover from the AI's output). The tighter the loop, the faster you learn — this is the same principle as The Rhythm's hot-reload insight (L15).</p>
+
+<h2>1d. Intersection with neighbors — the macro-process</h2>
+
+<table>
+  <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./how-developers-think-frontend.html">The Rhythm</a> <em>(micro-process)</em></td><td>The Rhythm is the feature-scale loop; this doc is the project-scale process. A sprint (this doc) contains multiple features, each built with the Model→View→Flow rhythm.</td><td>The context: why you're building this feature, who prioritized it, what "done" means at the sprint level. See §7.</td></tr>
+    <tr><td><a href="./cs-and-software-engineering.html">CS &amp; SE</a> <em>(umbrella)</em></td><td>This doc is the process layer within the discipline. SE is the discipline; this is how the discipline organizes its work.</td><td>The process context for the engineering principles (DRY, SOLID, KISS) — they're applied <em>within</em> a sprint, using a methodology.</td></tr>
+    <tr><td><a href="./problem-solving.html">Problem-Solving</a> <em>(thinking skill)</em></td><td>Pólya's four phases are used within both scales: the macro (sprint-level: plan the sprint, execute, review at retrospective) and the micro (feature-level: understand, plan, execute, look back).</td><td>The cadence: sprints and retrospectives are Pólya's Phase 4 (Look back) institutionalized at the team level.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a> <em>(architecture)</em></td><td>Methodology informs architecture; architecture constrains methodology. Agile teams favor evolutionary architecture (design emerges over sprints); Waterfall teams favor upfront architecture.</td><td>The process context: how architecture decisions get made (sprint planning vs upfront design).</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a> <em>(contracts)</em></td><td>API contracts are designed within sprints, reviewed in sprint reviews, versioned through CI/CD (DevOps).</td><td>The cadence: how and when contracts evolve (iteratively, not upfront).</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The boundary rule:</strong> if you're asking "how do I build this feature?", that's The Rhythm. If you're asking "how does the team prioritize, plan, and ship features?", that's this doc. If you're asking "what makes the solution good?", that's CS &amp; SE (evaluation). If you're asking "how do I think about the problem?", that's Problem-Solving. Four scales, one discipline.</p>
+
+<h2>1e. Underlying theory — empirical process control and Lean</h2>
+
+<h3>Empirical process control theory — Scrum's foundation</h3>
+<p>Scrum is based on <strong>empirical process control theory</strong>, which distinguishes two types of process:</p>
+<ul>
+  <li><strong>Defined process:</strong> the steps are known and repeatable (like a manufacturing assembly line). You can specify the process upfront and expect the same result every time.</li>
+  <li><strong>Empirical process:</strong> the steps are uncertain and unpredictable (like software development). You can't define the process upfront; instead, you make it <em>visible</em>, <em>inspect</em> frequently, and <em>adapt</em>. This is the "inspect and adapt" loop at the heart of Scrum.</li>
+</ul>
+<p>The theory says: <strong>when you can't define the process, don't pretend you can — make it visible and adapt</strong>. This is why Scrum has daily stand-ups (inspect), sprint reviews (inspect with stakeholders), and sprint retrospectives (adapt the process itself). Each ceremony is an inspection-and-adaptation point.</p>
+
+<h3>Lean manufacturing — Kanban's foundation</h3>
+<p>Kanban is adapted from the <strong>Toyota Production System</strong> (late 1940s), the origin of Lean manufacturing (<a href="https://en.wikipedia.org/wiki/Kanban_(development)">Wikipedia</a>). The core insight: <strong>limit work in progress (WIP) to expose bottlenecks and improve flow</strong>. When you have too much work in progress, everything is half-done and nothing finishes. When you limit WIP, bottlenecks become visible and you can fix them.</p>
+<p>The 7 wastes of Lean (adapted from Toyota's <em>muda</em>): overproduction, waiting, transportation, over-processing, inventory, motion, defects. In software: building features nobody uses (overproduction), waiting for code review (waiting), unnecessary handoffs (transportation), gold-plating (over-processing), stale branches (inventory), context switching (motion), bugs (defects).</p>
+
+<blockquote class="callout">
+  <p><strong>How the theories connect:</strong> empirical process control says "inspect and adapt" (the loop). Lean says "limit WIP and improve flow" (the constraint). Agile combines both: inspect and adapt <em>at a sustainable pace</em>, with limited WIP so the team isn't overloaded. The Rhythm (L7) inherits both at the feature scale: cycle through threads (inspect and adapt), one feature at a time (limit WIP).</p>
+</blockquote>
+
+<h2>1f. Mental models — adaptive vs predictive, empirical vs defined</h2>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Predictive (Waterfall)</th><th>Adaptive (Agile)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Assumption about requirements</strong></td><td>They're knowable upfront; changes are expensive</td><td>They'll change; the process should absorb change cheaply</td></tr>
+    <tr><td><strong>Planning</strong></td><td>Plan the whole project, then execute the plan</td><td>Plan the next sprint; replan every sprint based on what you learned</td></tr>
+    <tr><td><strong>Process type</strong></td><td>Defined — the steps are known, repeat them</td><td>Empirical — the steps are uncertain, inspect and adapt</td></tr>
+    <tr><td><strong>Feedback loop</strong></td><td>Months (discover the problem after deployment)</td><td>Days (discover in the next stand-up or sprint review)</td></tr>
+    <tr><td><strong>Success metric</strong></td><td>On time, on budget, per spec</td><td>Working software that users value; adaptability</td></tr>
+    <tr><td><strong>Risk management</strong></td><td>Upfront: identify all risks, plan for them</td><td>Ongoing: the sprint is a risk-management cycle — the riskiest work goes first</td></tr>
+    <tr><td><strong>Team organization</strong></td><td>Specialized roles, handoffs between phases</td><td>Cross-functional, self-organizing, co-located</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The shift:</strong> Waterfall assumes predictability; Agile assumes uncertainty. Neither is universally right — Waterfall works for well-understood problems with stable requirements (building a bridge, a tax calculation); Agile works for evolving problems with uncertain requirements (a startup product, a user-facing app). <strong>The mature practitioner knows which to adopt when</strong> — the same judgment as CS &amp; SE's "which parameters matter" (L17).</p>
+
+<h3>Pull vs push — Kanban's mental model</h3>
+<p>A second mental model: <strong>push-based</strong> (Scrum) vs <strong>pull-based</strong> (Kanban). In push, work is assigned at sprint planning (pushed to the team). In pull, the team pulls work as capacity permits (no required timeboxes, continuous flow). Push optimizes for cadence and predictability; pull optimizes for flow and utilization. Most teams use a hybrid — "Scrumban" — pulling work within a loose cadence.</p>
+
+<h2>2. The SDLC — the six phases</h2>
+
+<p>Every methodology — Waterfall, Agile, Spiral, DevOps — navigates the same six phases. The difference is the order, the cadence, and the emphasis. Understanding the phases is the prerequisite for understanding the methodologies.</p>
+
+<table>
+  <thead><tr><th>Phase</th><th>What happens</th><th>What it produces</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Requirements</strong></td><td>What should the software do? Who uses it? What are the constraints? Gathered from stakeholders, users, business needs.</td><td>User stories, acceptance criteria, a product backlog (in Agile) or a requirements spec (in Waterfall).</td></tr>
+    <tr><td><strong>2. Design</strong></td><td>How will the software be structured? Architecture, data models, API design, component structure, UI/UX.</td><td>Architecture diagrams, data models, API contracts, wireframes, component designs.</td></tr>
+    <tr><td><strong>3. Implementation</strong></td><td>Write the code. Build the features. This is where The Rhythm (L7) operates — Model → View → Flow for each feature.</td><td>Working code. The feature itself.</td></tr>
+    <tr><td><strong>4. Testing</strong></td><td>Does it work? Unit tests, integration tests, end-to-end tests, user acceptance testing, edge-case checking (Problem-Solving §10).</td><td>Test results, bug reports, a "definition of done" checklist.</td></tr>
+    <tr><td><strong>5. Deployment</strong></td><td>Ship it to users. In DevOps: automated via CI/CD. In Waterfall: a one-time release event.</td><td>Running software in production. Versioned releases.</td></tr>
+    <tr><td><strong>6. Maintenance</strong></td><td>Fix bugs, add features, refactor, monitor. Often the majority of a system's lifetime — the phase that's most underestimated.</td><td>Patches, updates, new versions, monitoring dashboards, incident reports.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>How Waterfall vs Agile navigates these phases:</strong> Waterfall does them <em>once</em>, sequentially — finish all Requirements, then all Design, then all Implementation, etc. Agile does them <em>every sprint</em> — a little Requirements (backlog refinement), a little Design (sprint planning), Implementation (the sprint), Testing (during the sprint), Deployment (at sprint review/end), Maintenance (ongoing). The phases are the same; the navigation is different. That's the entire Agile/Waterfall distinction in one sentence.</p>
+</blockquote>
+
+<h2>3. The Agile Manifesto — 4 values, 12 principles (2001)</h2>
+
+<p>In February 2001, 17 software developers met at a ski lodge in Snowbird, Utah, and wrote the <strong>Manifesto for Agile Software Development</strong> (<a href="https://agilemanifesto.org/">agilemanifesto.org</a>). It's not a framework or a process — it's a <em>statement of values</em> that the frameworks (Scrum, Kanban, XP) implement.</p>
+
+<h3>The 4 values</h3>
+<table>
+  <thead><tr><th>Value (left is valued <em>more</em>)</th><th>Over (right still has value)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Individuals and interactions</strong></td><td>Processes and tools</td></tr>
+    <tr><td><strong>Working software</strong></td><td>Comprehensive documentation</td></tr>
+    <tr><td><strong>Customer collaboration</strong></td><td>Contract negotiation</td></tr>
+    <tr><td><strong>Responding to change</strong></td><td>Following a plan</td></tr>
+  </tbody>
+</table>
+<p><strong>The crucial nuance:</strong> the right side is not <em>wrong</em> — the Manifesto says "while there is value in the items on the right, we value the items on the left <em>more</em>." Processes and tools matter; working software matters <em>more</em>. Plans matter; responding to change matters <em>more</em>. This is not a rejection of planning or documentation — it's a reprioritization.</p>
+
+<h3>The 12 principles (summarized)</h3>
+<ol>
+  <li>Our highest priority is to satisfy the customer through early and continuous delivery of valuable software.</li>
+  <li>Welcome changing requirements, even late in development. Agile processes harness change for the customer's competitive advantage.</li>
+  <li>Deliver working software frequently (weeks rather than months).</li>
+  <li>Business people and developers must work together daily.</li>
+  <li>Build projects around motivated individuals. Give them the environment and support they need, and trust them to get the job done.</li>
+  <li>The most efficient and effective method of conveying information is face-to-face conversation.</li>
+  <li>Working software is the primary measure of progress.</li>
+  <li>Agile processes promote sustainable development. The sponsors, developers, and users should be able to maintain a constant pace indefinitely.</li>
+  <li>Continuous attention to technical excellence and good design enhances agility.</li>
+  <li>Simplicity — the art of maximizing the amount of work not done — is essential.</li>
+  <li>The best architectures, requirements, and designs emerge from self-organizing teams.</li>
+  <li>At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior accordingly.</li>
+</ol>
+<p><strong>Principle 12 is the metacognition of Agile</strong> — it's Schoenfeld's metacognition (L13) at the team level: inspect your own process, adapt. The sprint retrospective is where principle 12 happens. And principle 10 — "simplicity, the art of maximizing the amount of work not done" — is YAGNI (L16) in manifesto form.</p>
+
+<h2>4. Scrum — the most widely adopted Agile framework</h2>
+
+<p>Scrum is a lightweight framework that implements the Agile philosophy. It was formalized by Ken Schwaber and Jeff Sutherland in 1995, based on empirical process control theory. The <a href="https://www.scrumguides.org/scrum-guide.html">Scrum Guide</a> defines it precisely: 3 accountabilities (roles), 5 events (ceremonies), 3 artifacts (<a href="https://en.wikipedia.org/wiki/Scrum_(software_development)">Wikipedia</a>).</p>
+
+<h3>The 3 accountabilities</h3>
+<table>
+  <thead><tr><th>Accountability</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Product Owner</strong></td><td>Maximizes the value of the product. Owns the product backlog — what gets built, in what order. The bridge between stakeholders and the team. One person, not a committee.</td></tr>
+    <tr><td><strong>Developers</strong></td><td>Create the increment each sprint. Cross-functional (frontend, backend, testing, design). Self-managing — they decide <em>how</em> to do the work, not just <em>what</em>.</td></tr>
+    <tr><td><strong>Scrum Master</strong></td><td>Ensures Scrum is understood and enacted. Removes impediments. Facilitates the ceremonies. A servant-leader, not a project manager — they serve the team, they don't direct it.</td></tr>
+  </tbody>
+</table>
+
+<h3>The 5 events (ceremonies)</h3>
+<table>
+  <thead><tr><th>Event</th><th>What happens</th><th>Duration</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The Sprint</strong></td><td>The container for all other events. A fixed-length timebox during which a usable increment is created. Typical length is 2 weeks; the Scrum Guide's upper limit is one month. Teams are typically small — often 10 or fewer people.</td><td>2 weeks (max 1 month)</td></tr>
+    <tr><td><strong>Sprint Planning</strong></td><td>What can be delivered this sprint? How will it be achieved? The team selects backlog items and creates a sprint plan.</td><td>~4 hours (for a 2-week sprint)</td></tr>
+    <tr><td><strong>Daily Scrum</strong></td><td>A daily 15-minute inspection event for the Developers. The three-question format — yesterday, today, blockers — is common, but the team may use any structure that helps inspect progress toward the Sprint Goal and adapt the plan. <em>Not a status report</em> — a synchronization and inspection.</td><td>15 minutes (max)</td></tr>
+    <tr><td><strong>Sprint Review</strong></td><td>Demonstrate the increment to stakeholders. Get feedback. Inspect the outcome and adapt the backlog. This is Pólya's Phase 4 (Look back) with stakeholders.</td><td>~2 hours</td></tr>
+    <tr><td><strong>Sprint Retrospective</strong></td><td>Inspect <em>the process itself</em>: what went well? What didn't? What will we change next sprint? This is principle 12 — the team's metacognitive loop.</td><td>~1.5 hours</td></tr>
+  </tbody>
+</table>
+<p><em>The durations are common examples, not fixed rules</em> — the Scrum Guide sets only upper bounds (the sprint is one month max; the Daily Scrum is 15 minutes). Sprint Planning, Review, and Retrospective lengths scale with sprint length and are whatever the team's situation justifies.</p>
+
+<h3>The 3 artifacts</h3>
+<table>
+  <thead><tr><th>Artifact</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Product Backlog</strong></td><td>The single source of truth for everything that could be added to the product. Ordered by priority (the Product Owner decides). Each item is a user story or a feature with acceptance criteria. <em>Committed to the <strong>Product Goal</strong>.</em></td></tr>
+    <tr><td><strong>Sprint Backlog</strong></td><td>The subset of the product backlog selected for this sprint, plus a plan for delivering it. <em>Committed to the <strong>Sprint Goal</strong> — the single objective the team works toward this sprint.</em></td></tr>
+    <tr><td><strong>The Increment</strong></td><td>The usable, potentially shippable product at the end of the sprint. Must meet the <strong>Definition of Done</strong> — the agreed standard for "potentially releasable." <em>Committed to the <strong>Definition of Done</strong>.</em></td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>Commitments, not just artifacts.</strong> The modern Scrum Guide gives each artifact an explicit commitment: the Product Backlog is committed to the <strong>Product Goal</strong>, the Sprint Backlog to the <strong>Sprint Goal</strong>, and the Increment to the <strong>Definition of Done</strong>. These give everyone a shared target: not just "what we're building" but "what we're aiming at" and "what 'done' actually means." The Definition of Done, for example, might specify: code merged, tests pass, feature flag configured, documented, accessible, deployed and monitored.</p>
+</blockquote>
+
+<blockquote class="callout">
+  <p><strong>Scrum in one sentence:</strong> every 2 weeks, the team picks the highest-priority work from the backlog, builds it using whatever micro-process they choose (The Rhythm), inspects daily, demonstrates the result, and reflects on how to improve — then repeats. The macro-process (Scrum) provides the cadence; the micro-process (The Rhythm) provides the execution within each unit of work.</p>
+</blockquote>
+
+<h2>5. Kanban — flow, not timeboxes</h2>
+
+<p>Kanban is the alternative to Scrum's sprint model. Where Scrum uses fixed-length timeboxes (sprints), Kanban uses <strong>continuous flow</strong> — work is pulled as capacity permits, with no required fixed iterations. It was adapted from the Toyota Production System by David Anderson in the 2000s (<a href="https://en.wikipedia.org/wiki/Kanban_(development)">Wikipedia</a>).</p>
+
+<h3>The 6 core practices</h3>
+<ol>
+  <li><strong>Visualize the workflow.</strong> A Kanban board with columns (To Do → In Progress → Code Review → Done). Every work item is a card that moves left to right. You can <em>see</em> the state of the work at a glance.</li>
+  <li><strong>Limit work in progress (WIP).</strong> Each column has a maximum number of items. If "In Progress" has a WIP limit of 3 and there are already 3 items, nobody starts a 4th — they help finish what's in progress first. This is the key practice: it prevents context switching and exposes bottlenecks.</li>
+  <li><strong>Manage flow.</strong> Monitor how fast items move through the board. Identify bottlenecks (where items pile up) and fix them. Optimize for <em>throughput</em> (items completed per unit time), not for utilization (keeping everyone busy).</li>
+  <li><strong>Make policies explicit.</strong> Write down the rules: what counts as "done," when can an item move to the next column, who can pull what. Explicit policies make the process inspectable.</li>
+  <li><strong>Implement feedback loops.</strong> Regular reviews (similar to Scrum's sprint review, but not tied to a sprint cadence). The team inspects the board, identifies improvements, and adapts.</li>
+  <li><strong>Improve collaboratively, evolve experimentally.</strong> The team improves the process together, using experiments (try a change, measure the effect, keep or revert). This is empirical process control — inspect and adapt — without the sprint ceremony.</li>
+</ol>
+
+<h3>Scrum vs Kanban — the key differences</h3>
+<table>
+  <thead><tr><th>Dimension</th><th>Scrum</th><th>Kanban</th></tr></thead>
+  <tbody>
+    <tr><td>Cadence</td><td>Fixed sprints (2 weeks)</td><td>Continuous flow (no required timeboxes)</td></tr>
+    <tr><td>Work model</td><td>Push — commit to a batch at sprint planning</td><td>Pull — pull work as capacity permits</td></tr>
+    <tr><td>Roles</td><td>Product Owner, Developers, Scrum Master</td><td>No prescribed roles (use your existing structure)</td></tr>
+    <tr><td>Key constraint</td><td>Sprint timebox (finish in 2 weeks)</td><td>WIP limit (don't start more than N items)</td></tr>
+    <tr><td>Best for</td><td>Product development with evolving features</td><td>Maintenance, support, operations, continuous work</td></tr>
+    <tr><td>Change during work</td><td>Don't add stories mid-sprint (protect the timebox)</td><td>Add or reprioritize anytime (flow is flexible)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Scrumban</strong> — the hybrid most teams use in practice: loose sprint cadence (2-week rhythm) with Kanban's WIP limits and pull-based work. The ceremonies are lighter; the flow is visible. This is what you'll most likely encounter at work.</p>
+
+<h2>6. XP, Lean, DevOps — the rest of the landscape</h2>
+
+<h3>XP — Extreme Programming (Kent Beck, 1999)</h3>
+<p>XP focuses on <strong>engineering practices</strong> — the things that make Agile <em>work</em>, not just the ceremonies. While Scrum tells you <em>how to organize</em> (sprints, roles), XP tells you <em>how to code</em>:</p>
+<ul>
+  <li><strong>Test-Driven Development (TDD)</strong> — write the test first, then the code. Red → Green → Refactor. This is Pólya's Phase 4 (Look back) built into every line of code.</li>
+  <li><strong>Pair programming</strong> — two developers, one keyboard. Continuous code review, knowledge sharing, fewer bugs.</li>
+  <li><strong>Continuous Integration (CI)</strong> — integrate code into the main branch frequently (multiple times per day). Automated tests run on every integration. The tighter the integration loop, the faster you discover problems.</li>
+  <li><strong>Refactoring</strong> — continuously improve the code's structure without changing its behavior. This is the "make it right" in "make it work, make it right, make it fast."</li>
+  <li><strong>Simple design</strong> — the simplest thing that could possibly work. This is KISS (L16) as a coding practice.</li>
+</ul>
+
+<h3>Lean Software Development</h3>
+<p>Adapted from the Toyota Production System (the same origin as Kanban) by Tom and Mary Poppendieck (2003). The 7 principles:</p>
+<ol>
+  <li><strong>Eliminate waste</strong> — anything that doesn't add value to the customer (overproduction, waiting, unnecessary features, rework).</li>
+  <li><strong>Amplify learning</strong> — short iterations, feedback loops, experiments. This is the iterative principle from The Rhythm (L7) at the project scale.</li>
+  <li><strong>Decide as late as possible</strong> — defer decisions until you have the most information. This is YAGNI (L16) at the project level.</li>
+  <li><strong>Deliver as fast as possible</strong> — short cycles from idea to production. The tighter the delivery loop, the faster the feedback.</li>
+  <li><strong>Empower the team</strong> — let the people doing the work decide how to do it. Self-organization, same as Scrum.</li>
+  <li><strong>Build integrity in</strong> — quality is not a phase (testing at the end); it's built into every step. This is XP's TDD + CI.</li>
+  <li><strong>See the whole</strong> — optimize the whole system, not local parts. Don't optimize one team's velocity at the cost of another team's bottleneck.</li>
+</ol>
+
+<h3>DevOps — the automation practices</h3>
+<p>DevOps (2009) is the convergence of <em>Dev</em>elopment and <em>Op</em>erations — better described as a culture, movement, or set of practices than a strict methodology. Its goal: <strong>automate the Testing → Deployment → Maintenance phases</strong> so that very frequent, low-risk deployments become possible. The core practices:</p>
+<ul>
+  <li><strong>Continuous Integration (CI)</strong> — every code change is integrated and tested automatically. If the tests fail, the team fixes it immediately.</li>
+  <li><strong>Continuous Deployment (CD)</strong> — if CI passes, the code deploys to production automatically. No manual release event.</li>
+  <li><strong>Infrastructure as Code (IaC)</strong> — servers, networks, and configuration are defined in code (Terraform, Ansible), not set up manually.</li>
+  <li><strong>Monitoring and observability</strong> — dashboards, alerts, logs. If something breaks in production, you know in seconds, not hours.</li>
+</ul>
+<p><strong>DevOps is the set of practices that made Agile's "working software" promise real</strong> — you can't deliver working software frequently if deployment is a manual, risky, once-a-quarter event. DevOps makes deployment routine.</p>
+
+<h2>7. The macro/micro connection — how this doc relates to The Rhythm</h2>
+
+<p>This is the key structural insight: <strong>The Rhythm (L7) is the micro-process; this doc is the macro-process. They operate at different scales, and both are needed.</strong></p>
+
+<table>
+  <thead><tr><th>Dimension</th><th>The Rhythm (micro)</th><th>This doc (macro)</th></tr></thead>
+  <tbody>
+    <tr><td>Scale</td><td>One feature, minutes to hours</td><td>One project, weeks to months</td></tr>
+    <tr><td>Process</td><td>Model → View → Flow, cycled in rounds</td><td>Requirements → Design → Implementation → Testing → Deployment → Maintenance</td></tr>
+    <tr><td>Who</td><td>An individual developer</td><td>A team (Product Owner, Developers, Scrum Master)</td></tr>
+    <tr><td>Cadence</td><td>When you "feel the friction"</td><td>Sprints (Scrum) or continuous flow (Kanban)</td></tr>
+    <tr><td>Feedback</td><td>Hot reload (milliseconds)</td><td>Daily scrum (days), sprint review (2 weeks)</td></tr>
+    <tr><td>Output</td><td>A working feature</td><td>A working increment (multiple features)</td></tr>
+    <tr><td>Pólya mapping</td><td>Phase 1–4 per feature</td><td>Sprint planning = Phase 2; sprint = Phase 3; review + retrospective = Phase 4</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>How they nest:</strong> a Scrum sprint (macro) contains multiple features, each built with the Model→View→Flow rhythm (micro). Sprint planning decides <em>what</em> to build (the backlog items). The Rhythm decides <em>how</em> to build each one (the data shape, the skeleton, the rounds). The sprint review inspects the <em>results</em> (Pólya's Phase 4 at the team level). The retrospective inspects the <em>process</em> (metacognition at the team level). The macro provides the cadence and the inspection points; the micro provides the execution within each unit.</p>
+</blockquote>
+
+<div class="callout">
+<pre style="margin:0; font-size:.85rem; line-height:1.5; overflow-x:auto;">
+  ┌───────────────────────────────────────────────────────────────────┐
+  │  PRODUCT STRATEGY (why)            — what is worth building?      │
+  └───────────────────────────────────────────────────────────────────┘
+        │  decides
+        ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │  SDLC / METHODOLOGY (how the team organizes work) — macro, §1–§6  │
+  │  Waterfall · Spiral · Scrum · Kanban · XP · Lean · DevOps         │
+  └───────────────────────────────────────────────────────────────────┘
+        │  gives cadence + inspection points
+        ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │  THE RHYTHM (how an individual builds a feature) — micro          │
+  │  Model → View → Flow, cycled in rounds                            │
+  └───────────────────────────────────────────────────────────────────┘
+        │  sits within
+        ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │  SYSTEM DESIGN (how the pieces fit together)                      │
+  └───────────────────────────────────────────────────────────────────┘
+        │  and all of it is judged by
+        ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │  CS &amp; SE (how solutions are evaluated) — the umbrella discipline │
+  └───────────────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<p><strong>The nesting in one reading:</strong> product strategy decides <em>why</em>; the SDLC/methodology decides <em>how the team organizes work</em>; The Rhythm decides <em>how an individual builds a feature</em>; System Design decides <em>how the pieces fit together</em>; CS &amp; SE decides <em>how solutions are evaluated</em>. Each layer constrains the one below it and is judged by the one above.</p>
+
+<p><strong>The lineage is the same:</strong> Boehm's spiral model (1986) named the iterative pattern; XP (1999) operationalized it in code ("make it work, make it right, make it fast"); Agile (2001) popularized it at the sprint scale; The Rhythm (L7) applies it at the feature scale. They're the same pattern at different scales — the spiral made visible at the project level (sprints) and at the feature level (rounds).</p>
+
+<h2>8. Principles — the shared constants</h2>
+
+<p>Across every methodology, certain principles don't change. These are the constants that survive from Waterfall to Agile to DevOps to AI:</p>
+<table>
+  <thead><tr><th>Principle</th><th>Why it's constant</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Iterate, don't waterfall</strong></td><td>You can't know everything upfront. The spiral (1986), Agile (2001), and The Rhythm (L7) all prove this. Even Waterfall's creator warned against single-pass.</td></tr>
+    <tr><td><strong>Inspect and adapt</strong></td><td>Software development is an empirical process, not a defined one. Make it visible (boards, dashboards), inspect frequently (stand-ups, reviews), and adapt (retrospectives). This is the deepest Agile principle — from empirical process control theory.</td></tr>
+    <tr><td><strong>Working software is the primary measure of progress</strong></td><td>Documentation, plans, and designs are useful — but they don't prove the software works. Only running code does. Manifesto principle #7.</td></tr>
+    <tr><td><strong>Responding to change over following a plan</strong></td><td>Plans are valuable; the ability to change them is more valuable. Manifesto value #4. The Lean principle "decide as late as possible" is the same idea: defer commitments until you have the most information.</td></tr>
+    <tr><td><strong>Simplicity — maximize work not done</strong></td><td>Manifesto principle #10. This is YAGNI (L16) at the process level. Don't build features nobody needs; don't add process nobody benefits from.</td></tr>
+    <tr><td><strong>Sustainable pace</strong></td><td>Manifesto principle #8. Overtime produces short-term output but long-term debt (burnout, bugs, turnover). The process should be repeatable indefinitely.</td></tr>
+    <tr><td><strong>Self-organizing teams produce the best results</strong></td><td>Manifesto principle #11. The people doing the work know best how to do it. Command-and-control (assigning tasks) is less effective than autonomy (the team decides).</td></tr>
+    <tr><td><strong>Continuous attention to technical excellence</strong></td><td>Manifesto principle #9. Agile is not an excuse for sloppy code — the opposite. TDD, refactoring, CI (XP's practices) are what make fast iteration possible. Speed comes from quality, not from cutting corners.</td></tr>
+  </tbody>
+</table>
+
+<h2>9. Worked example — a Scrum sprint end-to-end</h2>
+
+<p>Let's trace a single 2-week sprint from start to finish, showing how the SDLC phases and the Agile ceremonies map to each other.</p>
+
+<h3>Before the sprint: Backlog Refinement</h3>
+<p>The Product Owner has a product backlog with ~50 items. The team spends 1 hour refining the top items: writing clear acceptance criteria, estimating complexity (story points), splitting items that are too big. This is the <strong>Requirements phase</strong>, done incrementally.</p>
+
+<h3>Day 1: Sprint Planning (4 hours)</h3>
+<p>The team selects the top 8 items from the product backlog for this sprint. They create a sprint backlog — the 8 items plus a plan for how to deliver them. This is the <strong>Design phase</strong> at the sprint level: deciding what to build and how.</p>
+
+<h3>Days 1–10: The Sprint (2 weeks of building)</h3>
+<p>Each developer picks a backlog item and builds it using the <strong>micro-process</strong> — The Rhythm (L7): sketch the data shape, build the skeleton (Round 1), deepen (Round 2), polish (Round 3). This is the <strong>Implementation phase</strong>.</p>
+<p>Every day at 10am: the <strong>Daily Scrum</strong> (15 minutes). "Yesterday I finished the cart component. Today I'm starting the checkout form. I'm blocked on the API — the endpoint isn't ready." The team syncs, impediments are surfaced. This is the daily inspection point.</p>
+<p>Testing happens <em>during</em> the sprint, not after — unit tests, integration tests, code review. This is the <strong>Testing phase</strong>, integrated into Implementation (XP's principle: "build integrity in," not "test at the end").</p>
+
+<h3>Day 10: Sprint Review (2 hours)</h3>
+<p>The team demonstrates the working increment to stakeholders: "Here's the cart, here's the checkout form, here's the order confirmation page." Stakeholders give feedback: "The cart looks great, but the checkout form needs a guest checkout option." The product backlog is updated. This is <strong>Pólya's Phase 4 (Look back)</strong> at the team level — inspect the result, adapt the plan.</p>
+
+<h3>Day 10: Sprint Retrospective (1.5 hours)</h3>
+<p>The team reflects on the process itself: "What went well? The daily scrums kept us synced. What didn't? The API blocker cost us 2 days — next sprint, we should check API readiness in planning. What will we change? Add a 'dependencies' check to sprint planning." This is <strong>metacognition at the team level</strong> — Manifesto principle #12 in action.</p>
+
+<h3>After the sprint: Deploy and repeat</h3>
+<p>The increment is deployed (in a DevOps setup: automatically via CI/CD). The team starts the next sprint — back to planning, with the updated backlog and the retrospective's improvements. The <strong>Maintenance phase</strong> runs in parallel: bugs from production are added to the backlog, prioritized by the Product Owner, and fixed in future sprints.</p>
+
+<blockquote class="callout">
+  <p><strong>The full cycle in one paragraph:</strong> Plan what to build (Requirements + Design) → build it with The Rhythm (Implementation) → test during, not after (Testing) → demonstrate to stakeholders (Review = Phase 4) → reflect on the process (Retrospective = metacognition) → deploy (Deployment) → fix bugs in the next sprint (Maintenance) → repeat. All six SDLC phases, every 2 weeks. That's Agile.</p>
+</blockquote>
+
+<h2>9b. The most common failure modes</h2>
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Cargo cult Agile</strong></td><td>The team does the ceremonies (stand-ups, sprints, retrospectives) but doesn't understand the <em>values</em>. They have the form without the function — stand-ups are status reports, retrospectives produce no changes, sprints are just mini-waterfalls.</td><td>Read the Manifesto. Ask "why are we doing this ceremony?" If the answer is "because Scrum says so," you're doing cargo cult. Each ceremony exists for a reason — understand it.</td></tr>
+    <tr><td><strong>Velocity as a metric</strong></td><td>Management uses story-point velocity to measure productivity and compare teams. Teams game the system: inflate estimates to look faster. Velocity becomes a target, not a measure.</td><td>Velocity is for the team's internal planning, never for management comparison. Measure outcomes (working software, user value), not output (story points).</td></tr>
+    <tr><td><strong>Stand-ups as status meetings</strong></td><td>The daily scrum becomes a report-to-the-manager: "I did X, I'll do Y." No inspection, no impediments raised, no synchronization. The manager treats it as a tracking tool.</td><td>The daily scrum is for the <em>team</em>, not the manager. It's a synchronization: "are we on track? are there blockers?" If nobody raises impediments, either there are none (rare) or people are afraid to speak up.</td></tr>
+    <tr><td><strong>Story points as deadlines</strong></td><td>Story points (relative complexity estimates) become deadlines: "you estimated 5 points, so this should take 5 days." Points are relative, not temporal — they measure complexity, not time.</td><td>Points are for relative sizing and sprint planning. They're not commitments, not deadlines, not performance metrics. Use velocity (average points per sprint) for forecasting, not for pressure.</td></tr>
+    <tr><td><strong>Adding stories mid-sprint</strong></td><td>Stakeholders add work mid-sprint, breaking the timebox. The team's commitment is undermined; the sprint becomes reactive, not planned.</td><td>Protect the sprint. New work goes to the product backlog, not the sprint backlog. Exceptions only for genuine emergencies — and the team decides, not the stakeholder.</td></tr>
+    <tr><td><strong>Technical debt accumulation</strong></td><td>The team sprints so fast that refactoring is never prioritized. Code quality degrades; each new feature is harder to build. Eventually, velocity drops to near zero — the "technical debt crisis."</td><td>Allocate time for refactoring every sprint. Manifesto principle #9: "continuous attention to technical excellence." Technical debt is a loan — it compounds. Pay it down regularly.</td></tr>
+    <tr><td><strong>Developer burnout</strong></td><td>Sustainable pace (principle #8) is ignored. The team sprints at 110% every sprint. After 3 months, developers quit. The process is not repeatable indefinitely.</td><td>Sustainable pace is not laziness — it's the recognition that software is a marathon, not a sprint (the irony of the term). Pace at 80% so you can surge when needed.</td></tr>
+    <tr><td><strong>Scrum Master as contributor</strong></td><td>The Scrum Master is also a developer, so they can't facilitate objectively. They're too busy coding to remove impediments or coach the team.</td><td>The Scrum Master accountability needs sufficient capacity to remove impediments and coach — in some organizations that's a full-time role, but it may also be shared or serve multiple teams. The key is that the accountability is actually fulfilled: the SM serves the team and isn't so deep in code that coaching falls by the wayside.</td></tr>
+    <tr><td><strong>Product Owner role not filled</strong></td><td>Nobody owns the product backlog. Items are vague, priorities shift daily, the team doesn't know what "done" means. The PO role is the most under-filled role in Scrum.</td><td>The Product Owner is one person, not a committee. They must be available daily, have authority over priorities, and write clear acceptance criteria. A missing PO = a rudderless team.</td></tr>
+  </tbody>
+</table>
+
+<h2>9c. Ecosystem — tools, certifications, and books</h2>
+<table>
+  <thead><tr><th>Category</th><th>Resource</th><th>What it gives you</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2"><strong>Project management tools</strong></td><td><strong>Jira</strong> (Atlassian)</td><td>The dominant tool for Scrum/Kanban. Backlogs, sprint boards, story points, burndown charts. What you'll most likely use at work.</td></tr>
+    <tr><td>GitHub Projects, Azure DevOps, Linear</td><td>Alternatives. GitHub Projects is lightweight and integrated with code; Linear is fast and modern; Azure DevOps is enterprise.</td></tr>
+    <tr><td rowspan="2"><strong>CI/CD tools (DevOps)</strong></td><td>GitHub Actions, GitLab CI</td><td>Automated testing and deployment triggered on every push. The DevOps pipeline: code → test → deploy.</td></tr>
+    <tr><td>Jenkins, CircleCI</td><td>Self-hosted or dedicated CI/CD servers. More configuration, more control.</td></tr>
+    <tr><td rowspan="2"><strong>Certifications</strong></td><td>CSM (Certified ScrumMaster), PSM (Professional Scrum Master)</td><td>The two main Scrum certifications. CSM (Scrum Alliance) requires a course; PSM (scrum.org) is exam-based. They can signal baseline vocabulary for hiring, but practical skill matters more.</td></tr>
+    <tr><td>CSPO (Certified Scrum Product Owner)</td><td>The Product Owner certification. Less common than CSM/PSM, but increasingly valued.</td></tr>
+    <tr><td rowspan="7"><strong>Books</strong></td><td><em>Scrum: The Art of Doing Twice the Work in Half the Time</em> — Jeff Sutherland</td><td>The co-creator of Scrum tells the story. Accessible, practical, motivating.</td></tr>
+    <tr><td><em>Extreme Programming Explained</em> — Kent Beck</td><td>The XP origin. "Make it work, make it right, make it fast." The engineering practices.</td></tr>
+    <tr><td><em>The Phoenix Project</em> / <em>The DevOps Handbook</em></td><td>DevOps in narrative form (Phoenix Project is a novel) and reference form (Handbook). How CI/CD transforms delivery.</td></tr>
+    <tr><td><em>Accelerate</em> — Forsgren, Humble, Kim</td><td>The evidence behind the DORA metrics (§9f): what actually correlates with delivery performance.</td></tr>
+    <tr><td><em>Continuous Delivery</em> — Humble &amp; Farley</td><td>Foundational CI/CD thinking; the mechanics behind the release-strategy ideas in §9i.</td></tr>
+    <tr><td><em>Team Topologies</em> — Skelton &amp; Pais</td><td>Team design and organizational flow; the deep-dive behind §9m.</td></tr>
+    <tr><td><em>Kanban</em> — David Anderson · <em>User Story Mapping</em> — Jeff Patton</td><td>The core Kanban reference, and the discovery/requirements practice from §3.</td></tr>
+    <tr><td rowspan="3"><strong>Metrics &amp; frameworks</strong></td><td>DORA metrics</td><td>The standard delivery-performance metrics (deployment frequency, lead time for changes, change failure rate, MTTR) from §9f.</td></tr>
+    <tr><td>SPACE framework</td><td>Developer productivity and well-being beyond output: satisfaction, performance, activity, communication, efficiency.</td></tr>
+    <tr><td>Cumulative flow diagrams</td><td>The Kanban visual for diagnosing bottlenecks (§9f).</td></tr>
+    <tr><td rowspan="2"><strong>Communities</strong></td><td>Scrum Alliance, Agile Alliance</td><td>The two main Agile organizations. Conferences, resources, certifications.</td></tr>
+    <tr><td>r/agile, r/scrum · DevOps Institute</td><td>Practical questions, war stories, and DevOps/Agile adoption troubleshooting.</td></tr>
+  </tbody>
+</table>
+
+<h2>9d. The future — AI-augmented SDLC and the Agent Development Lifecycle</h2>
+
+<p>AI is changing the software development process in two distinct ways. Understanding the difference is critical — they're often confused but they're fundamentally different.</p>
+
+<h3>Part 1: AI-augmented SDLC — AI assists the human in building traditional software</h3>
+<p>This is not a new lifecycle — it's the same SDLC with AI accelerating each phase:</p>
+<table>
+  <thead><tr><th>SDLC phase</th><th>Before AI</th><th>After AI (Copilot, ChatGPT, Claude)</th></tr></thead>
+  <tbody>
+    <tr><td>Requirements</td><td>Human writes user stories</td><td>AI assists with analysis, generates draft stories</td></tr>
+    <tr><td>Design</td><td>Human designs architecture</td><td>AI suggests patterns, generates boilerplate</td></tr>
+    <tr><td>Implementation</td><td>Human writes code (the bottleneck)</td><td>AI generates code — the bottleneck shifts to evaluation</td></tr>
+    <tr><td>Testing</td><td>Human writes test cases</td><td>AI generates test cases, identifies edge cases</td></tr>
+    <tr><td>Deployment</td><td>Human configures CI/CD</td><td>AI-assisted CI/CD, automated deployment</td></tr>
+    <tr><td>Maintenance</td><td>Human debugs, refactors</td><td>AI assists with debugging, suggests refactors</td></tr>
+  </tbody>
+</table>
+<p><strong>The key shift:</strong> the human's role moves from <em>writer</em> to <em>evaluator</em>. AI can generate code in seconds — but is it correct? Efficient? Maintainable? Did it make the right trade-offs? This is the solution evaluation skill from <a href="./cs-and-software-engineering.html">CS &amp; SE §4–§7</a> (L17). The evaluation skill becomes the <strong>premium skill</strong> — it's what AI can't do, because AI doesn't know your context.</p>
+<p><strong>The fluency trap intensifies:</strong> AI makes it easy to feel you understand a solution without building the mental schema. When AI generates an O(n²) solution and you accept it without analyzing the complexity, you've gained a solution but not the skill. The remedy: always evaluate AI-generated code the same way you'd evaluate your own.</p>
+
+<h3>Part 2: Agent Development Lifecycle (ADLC) — building AI agents as a new type of software</h3>
+<p>This IS a genuinely new lifecycle. The thing being built is different: not a website or an API, but an <strong>AI agent</strong> — an autonomous system that pursues goals, uses tools, and takes actions (<a href="https://en.wikipedia.org/wiki/AI_agent">Wikipedia</a>). An agent has: an LLM (the brain), memory, planning logic, tool interfaces, and orchestration. Building one is fundamentally different from building a website.</p>
+<table>
+  <thead><tr><th>ADLC phase</th><th>What happens</th><th>Differs from SDLC</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Agent Design</strong></td><td>Which LLM? What tools? How does it remember? How is it orchestrated?</td><td>SDLC design = data models + components. ADLC design = <em>capabilities and boundaries</em> — what the agent CAN and MUST NOT do.</td></tr>
+    <tr><td><strong>2. Build</strong></td><td>Prompt engineering, tool definitions, fine-tuning, memory config. The "code" is often natural language + tool schemas.</td><td>SDLC = writing code. ADLC = configuring LLM behavior through prompts and guardrails.</td></tr>
+    <tr><td><strong>3. Evaluate</strong></td><td>Does the agent achieve its goal? Hallucinate? Use tools correctly? Stay within safety boundaries? Output is probabilistic.</td><td>SDLC testing = correct output? ADLC = correct <em>behavior</em> across inputs, including adversarial. Closer to evaluating a person.</td></tr>
+    <tr><td><strong>4. Deploy with guardrails</strong></td><td>Deploy with safety boundaries: action limits, cost limits, rate limits, human-in-the-loop checkpoints.</td><td>SDLC deployment = uptime + performance. ADLC = <em>safety and control</em> — an agent that takes actions needs guardrails.</td></tr>
+    <tr><td><strong>5. Monitor for drift</strong></td><td>Monitor for: hallucination, drift (behavior changes), prompt injection, cost overruns, safety violations.</td><td>SDLC maintenance = fix bugs. ADLC = <em>behavioral integrity</em> — is the agent still doing what it should? A new kind of maintenance.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The key distinction:</strong> AI-augmented SDLC is <em>AI helping you build traditional software faster</em>. ADLC is <em>building AI agents as a new type of software</em>. The first accelerates the existing process; the second is a new process for a new type of product.</p>
+</blockquote>
+
+<h3>The ADLC ecosystem (emerging, 2024–present)</h3>
+<ul>
+  <li><strong>Frameworks:</strong> LangChain (dominant), CrewAI (multi-agent), AutoGPT (autonomous), LlamaIndex.</li>
+  <li><strong>Platforms:</strong> OpenAI Assistants API, Anthropic Claude (tool use), Google Gemini, Microsoft Copilot Studio.</li>
+  <li><strong>Protocols:</strong> MCP (Model Context Protocol), Agent2Agent (inter-agent communication).</li>
+  <li><strong>Agent dev tools:</strong> Claude Code, Devin, Cursor, GitHub Copilot — AI-assisted and agent-like development tools (a recursion: agents helping build agents).</li>
+</ul>
+<p><strong>The ADLC is too young (2024–present) for a standalone reference</strong> — it lacks the 55-year history and stable theory the SDLC has. For now, it's a chapter in the bigger story. In 2–3 years, when patterns consolidate, it may warrant its own reference.</p>
+
+<h2>9e. How to choose a process — the practical question</h2>
+
+<p>Every methodology is a tool, not a religion. The mature question isn't "which Agile framework should we adopt?" — it's <em>"what are our constraints, and which process fits them?"</em> The table is a starting guide, not a rule:</p>
+
+<table>
+  <thead><tr><th>Context</th><th>Good fit</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Stable, well-understood requirements</td><td>Waterfall or plan-driven hybrid</td><td>Low uncertainty; requirements are unlikely to change. Upfront planning buys certainty.</td></tr>
+    <tr><td>Regulated environment with mandatory gates</td><td>Hybrid Waterfall/Agile with compliance gates</td><td>Needs auditability and formal approval points; agile flow still helps within phases.</td></tr>
+    <tr><td>Product development with uncertain requirements</td><td>Scrum</td><td>Frequent inspection, adaptation, and stakeholder feedback — the uncertainty isn't going away.</td></tr>
+    <tr><td>Support, maintenance, or continuous flow</td><td>Kanban</td><td>Work arrives continuously; timeboxes are awkward for interrupt-driven work.</td></tr>
+    <tr><td>Engineering-heavy product with strong testing culture</td><td>XP</td><td>TDD, CI, pair programming, refactoring — practices that keep code quality high while iterating.</td></tr>
+    <tr><td>High deployment frequency</td><td>DevOps / trunk-based development</td><td>Automates testing, deployment, and observability so shipping is routine.</td></tr>
+    <tr><td>Team new to Agile</td><td>Scrum or Scrumban</td><td>Provides structure while still allowing flow improvements.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The decision inputs:</strong> uncertainty level, requirement stability, regulatory constraints, team maturity, release cadence, and how much support/operations work the team carries. There is no universal best — only the best fit for <em>your</em> constraint set.</p>
+
+<h2>9f. Process metrics — how to know the process is working</h2>
+
+<p>A process you can't measure is a process you can't improve. Metrics fall into five buckets:</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Metric</th><th>What it tells you</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="5"><strong>Flow</strong></td><td>Lead time</td><td>Time from request to delivery — total cycle.</td></tr>
+    <tr><td>Cycle time</td><td>Time from work started to work completed — how fast work actually moves.</td></tr>
+    <tr><td>Throughput</td><td>Number of items completed per time period.</td></tr>
+    <tr><td>WIP</td><td>How much work is currently in progress. High WIP = context switching and slower finishes.</td></tr>
+    <tr><td>Cumulative flow</td><td>Whether work is piling up in one stage (a bottleneck revealed over time).</td></tr>
+    <tr><td rowspan="4"><strong>Delivery</strong></td><td>Deployment frequency</td><td>How often you ship — the DevOps metric that separates Agile on paper from Agile in practice.</td></tr>
+    <tr><td>Lead time for changes</td><td>How long a change takes from commit to production.</td></tr>
+    <tr><td>Change failure rate</td><td>How often a release causes a failure or rollback.</td></tr>
+    <tr><td>MTTR</td><td>Mean time to recover from failure — how fast you heal.</td></tr>
+    <tr><td rowspan="2"><strong>Quality</strong></td><td>Escaped defects</td><td>Bugs found after release — the real quality signal, not "we wrote tests."</td></tr>
+    <tr><td>Test coverage / flaky test rate</td><td>Confidence in the suite, and how much of that confidence is fake (flaky tests erode trust).</td></tr>
+    <tr><td><strong>Value</strong></td><td>Feature adoption / outcome metrics</td><td>Whether the shipped work actually produced user value — the thing process exists for.</td></tr>
+    <tr><td><strong>Sustainability</strong></td><td>Overtime, burnout, turnover</td><td>Whether the pace is repeatable indefinitely (Manifesto principle #8).</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The velocity warning:</strong> velocity (story points per sprint) is useful for a team's <em>own</em> planning — forecasting how much it can likely take on next sprint. It is a <em>poor</em> metric for comparing teams or measuring productivity: different teams size differently, and any metric used for evaluation gets gamed.</p>
+</blockquote>
+
+<h2>9g. Quality, security, and compliance — the safety gates</h2>
+
+<p>Speed without safety isn't agility — it's recklessness. Modern SDLCs increasingly include <strong>"shift-left" security</strong>: security checks happen during design and implementation, not only after deployment.</p>
+
+<ul>
+  <li><strong>Threat modeling</strong> — reason about how an attacker could misuse the design, before it's built.</li>
+  <li><strong>Dependency scanning</strong> — check third-party libraries for known vulnerabilities (Log4Shell made this first-class).</li>
+  <li><strong>Secret scanning</strong> — prevent API keys and credentials from reaching the repository.</li>
+  <li><strong>Static analysis (SAST)</strong> and <strong>dynamic analysis (DAST)</strong> — automated code and runtime security checks in CI.</li>
+  <li><strong>Access control review</strong> — who can read, write, and deploy what? Least privilege, reviewed regularly.</li>
+  <li><strong>Audit logging</strong> — record who did what, when, for accountability and incident forensics.</li>
+</ul>
+
+<p>In regulated environments (finance, health, government), the SDLC also includes <strong>compliance gates</strong>: change approval records, evidence collection, privacy review, and sign-off before release. These add ceremony — but they're the constraints the process must serve. <em>Security and compliance belong in the Definition of Done.</em></p>
+
+<h2>9h. Operations and incident management — the SDLC doesn't end at deploy</h2>
+
+<p>Deployment is not the end. Production software needs monitoring, alerting, incident response, rollback plans, and support processes — a whole operational layer the SDLC phases barely hint at.</p>
+
+<ul>
+  <li><strong>Monitoring and observability</strong> — metrics, logs, and traces so you know the system is alive and <em>why</em> it behaves as it does.</li>
+  <li><strong>Alerts and on-call</strong> — the right alerts (not alert fatigue), with a human accountable when things break.</li>
+  <li><strong>Incident triage and severity levels</strong> — classify: is this SEV-1 (down, users blocked) or SEV-4 (cosmetic)? Response escalates with severity.</li>
+  <li><strong>Rollback</strong> — every release should be reversible; a safe rollback is a smaller deployment risk than the original change.</li>
+  <li><strong>Hotfix process</strong> — a fast, still-reviewed path for production-urgent fixes that bypasses the normal queue without bypassing quality.</li>
+  <li><strong>Postmortems</strong> — after an incident, ask "what happened, why, what do we change?" — blameless, focused on the system not the person.</li>
+  <li><strong>Runbooks</strong> — documented procedures for known issues, so on-call engineers don't improvise at 3am.</li>
+  <li><strong>SLOs / SLAs</strong> — the service-level objectives that define what "healthy" means, and the contracts that hold you to it.</li>
+</ul>
+
+<p>The loop closes when operational learnings <em>return to the backlog</em>: bugs get triaged and prioritized, postmortem actions become backlog items, and monitoring improvements are planned like any other work. Operations is not downstream of the SDLC — it feeds it.</p>
+
+<h2>9i. Release strategies and environments</h2>
+
+<p>Deployment is not just "ship it." Teams move work through environments and choose how much risk each release carries:</p>
+
+<table>
+  <thead><tr><th>Strategy</th><th>What it is</th><th>Risk profile</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Environment ladder</strong></td><td>Dev → staging → production; each environment approximates the next one closer.</td><td>Catches issues early, but environments can drift from production.</td></tr>
+    <tr><td><strong>Feature flags</strong></td><td>Ship the code but turn it on/off at runtime — decouple deploy from release.</td><td>Low risk per change; needs flag hygiene (remove flags when the feature ships).</td></tr>
+    <tr><td><strong>Canary releases</strong></td><td>Route a small % of traffic to the new version, watch metrics, then widen.</td><td>Contained blast radius; requires good observability and fast decisions.</td></tr>
+    <tr><td><strong>Blue-green</strong></td><td>Run two environments; swap traffic to the new one, keep the old for instant rollback.</td><td>Very fast rollback; doubles infrastructure cost.</td></tr>
+    <tr><td><strong>Automated rollback</strong></td><td>If health checks fail after deploy, automatically revert.</td><td>Fast recovery; needs reliable health checks or you roll back good changes.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The safer the release mechanism, the more frequently the team can ship.</strong> This is the DevOps insight at the release level: deployment risk is managed by mechanics (canaries, flags, rollback), not by releasing less often.</p>
+
+<h2>9j. Testing strategy — the test pyramid</h2>
+
+<p>Testing is not a single phase; it's a strategy with different speeds and scopes:</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>What it covers</th><th>Speed / cost</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unit tests</strong></td><td>Single functions and modules in isolation.</td><td>Fast, cheap — the base of the pyramid, the most tests.</td></tr>
+    <tr><td><strong>Integration tests</strong></td><td>Boundaries between modules: databases, APIs, services.</td><td>Slower, catches wiring bugs unit tests can't.</td></tr>
+    <tr><td><strong>End-to-end tests</strong></td><td>Critical user journeys through the whole stack.</td><td>Slow, brittle — a few, for the paths that matter most.</td></tr>
+    <tr><td><strong>Exploratory / UAT</strong></td><td>Humans probing the real product for behavior automated tests miss.</td><td>Unpredictable, invaluable.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Watch the flaky test.</strong> A test that fails intermittently gets ignored, and an ignored test is worse than no test — it trains the team to skip the suite. A healthy strategy balances speed, coverage, and realism, and <em>pays down</em> flaky and out-of-date tests rather than accumulating them.</p>
+
+<h2>9k. Branching and integration strategy</h2>
+
+<p>Process and version control are connected. The branching model either supports the delivery cadence or fights it:</p>
+
+<ul>
+  <li><strong>Trunk-based development</strong> — everyone commits to the main line (with short-lived feature branches), integrates multiple times a day. Best fit for CI/CD and frequent release.</li>
+  <li><strong>Git Flow</strong> — a develop branch plus release branches and long-lived feature branches. More ceremony; suits versioned releases with long support windows.</li>
+  <li><strong>Short-lived feature branches</strong> — isolate work for hours to days, merge back fast. Merge conflicts shrink as branch lifetime shrinks.</li>
+</ul>
+
+<p><strong>The rule:</strong> long-lived branches increase merge risk and delay feedback. Choose a branching strategy that supports the team's delivery cadence — don't let the branch model become an unintended waterfall between code and integration.</p>
+
+<h2>9l. Estimation and planning — forecasts, not promises</h2>
+
+<p>Estimates answer "how big is this?" — and they are forecasts, not commitments. Common practices:</p>
+
+<ul>
+  <li><strong>Story points</strong> — relative complexity, not time. Useful for the team's own capacity planning (velocity).</li>
+  <li><strong>Planning poker / t-shirt sizing</strong> — converge the team on a shared estimate by discussion, not by the loudest voice.</li>
+  <li><strong>The uncertainty cone</strong> — early estimates are wildly uncertain; uncertainty shrinks as work is understood. Estimate accordingly.</li>
+  <li><strong>"No estimates"</strong> — some teams skip estimates entirely and rely on cycle-time forecasting from historical data.</li>
+</ul>
+
+<p><strong>The rule:</strong> estimates are for planning and forecasting, not for deadlines or performance metrics. The moment an estimate becomes a target, people pad it — and the estimate stops being useful.</p>
+
+<h2>9m. Team topology and organizational constraints (Conway's Law)</h2>
+
+<p>Process cannot be separated from organization. <strong>Conway's Law</strong>: organizations design systems that mirror their communication structure — team boundaries become system boundaries.</p>
+
+<ul>
+  <li><strong>Platform teams</strong> — build shared infrastructure other teams consume; reduce duplication.</li>
+  <li><strong>Enabling teams</strong> — help other teams build capability in a domain, then move on.</li>
+  <li><strong>Cognitive load</strong> — each team should own work it can actually hold in its head; overloaded teams ship less.</li>
+  <li><strong>Team APIs</strong> — the interfaces between teams (owned services, owned domains) are as important as code APIs.</li>
+</ul>
+
+<p><strong>The operational reading:</strong> when many teams depend on one team or one service, process friction becomes architectural friction. A good process design considers the <em>shape of the organization</em>, not just the shape of the sprints.</p>
+
+<h2>9n. Remote and distributed teams</h2>
+
+<p>Face-to-face conversation (Manifesto principle #6) is valuable — but modern teams often work remotely. Distributed teams compensate deliberately:</p>
+
+<ul>
+  <li><strong>Written documentation</strong> — decisions, designs, and context in writing, because hallway conversations don't happen.</li>
+  <li><strong>Async communication</strong> — default to asynchronous (issue threads, PR reviews, recorded decisions) so time zones don't block progress.</li>
+  <li><strong>Distributed ceremonies</strong> — same meetings, run with the same rigor: cameras on, a written agenda, everyone heard, decisions captured.</li>
+  <li><strong>Intentional collaboration time</strong> — scheduled overlap windows for the synchronous work that still needs it.</li>
+</ul>
+
+<p>The principle survives: Agile values working software <em>over</em> comprehensive documentation — but in a distributed team, documentation is what makes working software possible. The trade-off shifts; the values don't.</p>
+
+<h2>9o. Documentation and knowledge management</h2>
+
+<p>Agile does not mean no documentation. What it means: document what earns its keep.</p>
+
+<ul>
+  <li><strong>Architecture Decision Records (ADRs)</strong> — one page per significant decision: the context, the decision, the alternatives rejected.</li>
+  <li><strong>Runbooks</strong> — operational procedures for known scenarios (see §9h).</li>
+  <li><strong>API docs and onboarding guides</strong> — the surfaces new engineers touch first.</li>
+  <li><strong>Docs as code</strong> — documentation lives in the repository, reviewed like code, kept next to what it describes.</li>
+  <li><strong>Living documentation</strong> — generated or maintained alongside the code so it stays true; dead docs are worse than no docs.</li>
+</ul>
+
+<p>The test for any documentation: <em>would a future engineer (or your future self, in three months) be lost without it?</em> If yes, it earns its place.</p>
+
+<h2>9p. Product outcome orientation — shipping is not success</h2>
+
+<p>A mature process asks not only "did we deliver?" but "did this improve the outcome?"</p>
+
+<ul>
+  <li><strong>Outcomes vs outputs</strong> — an output is a feature shipped; an outcome is a change in user behavior or business results. Process optimizes delivery; product thinking optimizes outcome.</li>
+  <li><strong>OKRs and KPIs</strong> — connect team work to measurable objectives; a backlog item that doesn't move a metric should be questioned.</li>
+  <li><strong>Adoption metrics and A/B testing</strong> — the empirical loop applied to product decisions: ship a variant, measure, keep what wins.</li>
+  <li><strong>Discovery experiments</strong> — validate the problem before building the solution (see The Rhythm's model-first instinct at the product scale).</li>
+</ul>
+
+<p>This is the value bucket from §9f made real: a fast process that ships the wrong thing is still a failure — just a faster one.</p>
+
+<h2>9q. Retirement and decommissioning</h2>
+
+<p>The SDLC runs from birth to retirement, but most phase lists stop at Maintenance. The last phase matters:</p>
+
+<ul>
+  <li><strong>Decommission</strong> — shut the system down deliberately, not by neglect.</li>
+  <li><strong>Archive data</strong> — preserve records that have legal or historical value.</li>
+  <li><strong>Migrate users</strong> — move active users to the replacement before cutting the old system off.</li>
+  <li><strong>Remove access</strong> — revoke credentials; an un-decommissioned system is a security liability.</li>
+  <li><strong>Shutdown notice and migration plan</strong> — tell stakeholders, document the plan, preserve required records.</li>
+</ul>
+
+<p>Retirement is a phase like any other: it deserves planning, a Definition of Done, and the same discipline as building the system did.</p>
+
+<h2>9r. Regulated and safety-critical environments</h2>
+
+<p>The rest of this doc mostly assumes product/startup/web development. In <strong>regulated, safety-critical, or high-compliance environments</strong> (medical devices, aviation, banking, government), the SDLC tightens:</p>
+
+<ul>
+  <li><strong>Formal requirements traceability</strong> — every requirement linked to its test and its release evidence.</li>
+  <li><strong>Change approval and audit trails</strong> — who approved what, when, recorded and reviewable.</li>
+  <li><strong>Validation evidence</strong> — proof the system does what it claims, collected and retained.</li>
+  <li><strong>Controlled releases</strong> — release gates, sign-off, and documented approval before production.</li>
+</ul>
+
+<p>Agile can still be used — but it often becomes <strong>hybrid</strong>: iterative development inside, formal gates at the boundaries. The constraint isn't an excuse to abandon Agile; it's an additional constraint the process must serve.</p>
+
+<h2>9s. Worked example — a Kanban support flow end-to-end</h2>
+
+<p>The Scrum sprint walked through in §9 shows timeboxed, push-based work. Kanban is the other common shape — let's trace a single support ticket through a real Kanban board, to make the flow practices (§5) concrete.</p>
+
+<div class="callout">
+<pre style="margin:0; font-size:.85rem; line-height:1.5; overflow-x:auto;">
+  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌────────┐
+  │  TO DO   │ → │ TRIAGE   │ → │ IN WORK  │ → │ CODE     │ → │ DONE   │
+  │  (WIP∞)  │   │ (WIP:5)  │   │ WIP: 3   │   │ REVIEW   │   │ (WIP∞) │
+  │  ⑦   ⑤   │   │  ③  ① ⑨ │   │ (WIP:1)  │   │ (WIP:2)  │   │  ④ ③ ⑥ │
+  │  ⑪       │   │          │   │  ③       │   │  ②       │   │        │
+  └──────────┘   └──────────┘   └──────────┘   └──────────┘   └────────┘
+</pre>
+</div>
+
+<p><em>(Each numbered card is a ticket; the WIP limit under each column name says how many cards may sit there at once. Three columns have WIP limits — Triage 5, In Work 1, Code Review 2 — which is where the bottleneck will show.)</em></p>
+
+<ol>
+  <li><strong>Ticket arrives</strong> (To Do). A bug report from support, a one-line user email, a Slack ping. Everything lands here regardless of priority.</li>
+  <li><strong>Triage</strong> — the first pull. A maintainer pulls the top card when Triage has room (limit 5). They classify it: is this a genuine bug, a broken edge case, duplicated with another ticket, or a "works as designed"? They add a severity and route it onward.</li>
+  <li><strong>In Work — the WIP limit does the real work.</strong> Because only one card may be "In Work", the developer finishing a fix must either continue or stop — they can't hoard four in-progress tasks. When they finish card ③ and mark done, they pull the next triaged card. That column staying almost empty is itself a signal: the bottleneck is upstream (in Triage) or downstream (Code Review backing up).</li>
+  <li><strong>Done.</strong> The card sits in Done only long enough to be verified — deployed, confirmed by the reporter or the monitoring, closed. Nothing accumulates in Done; that would mean nobody is owning the finished work.</li>
+</ol>
+
+<p>The board is the whole process: it <em>is</em> the state of the work. If the "Code Review" column fills to its limit of 2, a bottleneck is visible before it becomes a crisis — that's the inspection-and-adaptation loop in visual form. The ticket moved <strong>not on a scheduled sprint but as capacity, pull by pull</strong> — which is exactly the difference from Scrum's timeboxed push.</p>
+
+<p>Contrast with the Scrum example in §9: there the batch is chosen in Sprint Planning and locked for two weeks; here the priority can change at any time, work arrives continuously, and there are no sprint reviews because the flow <em>is</em> constantly visible. Same SDLC phases underneath (design the fix, implement, test, deploy, maintain) — different navigation.</p>
+
+<h2>10. Summary — the process checklist</h2>
+
+<p>Next time you join a team or start a project, use this checklist to understand the process you're operating within:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
+  <tbody>
+    <tr><td>What <strong>methodology</strong> does the team use? (Scrum, Kanban, Scrumban, Waterfall?)</td><td>Ask the Scrum Master or tech lead. Most teams are Scrumban (hybrid) without knowing it.</td></tr>
+    <tr><td>What's the <strong>cadence</strong>? (2-week sprints? continuous flow?)</td><td>Check the project management tool (Jira, GitHub Projects). Look for sprint boundaries or a Kanban board.</td></tr>
+    <tr><td>What are the <strong>ceremonies</strong>? (stand-up, planning, review, retrospective?)</td><td>Check the calendar. If there's no retrospective, the team isn't inspecting-and-adapting — that's a red flag.</td></tr>
+    <tr><td>Who's the <strong>Product Owner</strong>? Who prioritizes the backlog?</td><td>If nobody owns the backlog, priorities will shift daily and the team will be reactive. A missing PO = a rudderless team.</td></tr>
+    <tr><td>What's the <strong>definition of done</strong>? When is a feature "done"? Does it include quality and security?</td><td>If there's no shared definition, features will be "mostly done" — which means not done. Include tests, security, and monitoring. Write it down, agree on it.</td></tr>
+    <tr><td>How does <strong>deployment</strong> work? (manual? CI/CD? how often?) How do you <strong>roll back</strong>?</td><td>If deployment is manual and rare, the feedback loop is months. If nothing is reversible, every release is gambling. Advocate for CI/CD and a safe rollback (feature flags, canary, blue-green).</td></tr>
+    <tr><td>Is the team <strong>protecting the sprint</strong>? (no mid-sprint additions?)</td><td>If stakeholders add work mid-sprint, the timebox is broken. Protect it — or switch to Kanban (which is designed for continuous flow).</td></tr>
+    <tr><td>Is there <strong>technical debt</strong>? Is refactoring prioritized?</td><td>If every sprint is 100% new features and 0% refactoring, debt is accumulating. Advocate for ~20% refactoring time.</td></tr>
+    <tr><td><strong>What metrics show the process is healthy?</strong> (lead time, deployment frequency, escaped defects?)</td><td>Without metrics (§9f), problems are invisible until they surface as a crisis. Pick a handful of flow/delivery/quality signals and watch them.</td></tr>
+    <tr><td><strong>How are production incidents handled?</strong> (alerting, on-call, postmortems?)</td><td>If something breaks and nobody notices or debriefs, the SDLC stops at deploy. Operations (§9h) is part of the loop, not downstream of it.</td></tr>
+    <tr><td><strong>How does user feedback return to the backlog?</strong></td><td>If shipped work never informs the plan, you're optimizing delivery toward the wrong target. Outcomes, not just outputs (§9p).</td></tr>
+    <tr><td>How does <strong>AI</strong> fit in? (Copilot for code? AI for testing? Building agents?) What's the <strong>AI usage policy</strong>?</td><td>Understand whether you're in an AI-augmented SDLC (AI assists you) or an ADLC (you're building agents). Set explicit guardrails so AI output is treated as untrusted input (§9d). The evaluation skill matters in both.</td></tr>
+  </tbody>
+</table>
+
+<p>The first rows are about understanding your team's process; the later ones about measuring it, keeping it safe, and connecting it to value — plus the frontier. Together, they tell you: <em>how does software get built here, is it improving, and where is it heading?</em></p>
+
+<h3>The sharper 10-question checklist</h3>
+<ol>
+  <li>What methodology are we using?</li>
+  <li>What is our cadence?</li>
+  <li>What ceremonies do we have — and why?</li>
+  <li>Who owns prioritization?</li>
+  <li>What is our Definition of Done?</li>
+  <li>How do we test and secure the work?</li>
+  <li>How do we deploy and roll back?</li>
+  <li>How do we handle incidents and maintenance?</li>
+  <li>What metrics tell us the process is healthy?</li>
+  <li>How does AI assist or change the process?</li>
+</ol>
+
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://en.wikipedia.org/wiki/Software_development_process">Software Development Process (Wikipedia)</a> ·
+  <a href="https://en.wikipedia.org/wiki/Agile_software_development">Agile Software Development (Wikipedia)</a> ·
+  <a href="https://agilemanifesto.org/">The Agile Manifesto (2001)</a> ·
+  <a href="https://en.wikipedia.org/wiki/Scrum_(software_development)">Scrum (Wikipedia)</a> ·
+  <a href="https://en.wikipedia.org/wiki/Kanban_(development)">Kanban (Wikipedia)</a> ·
+  <a href="https://en.wikipedia.org/wiki/AI_agent">AI Agent (Wikipedia)</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"At my job, we do Scrum sprints — but the Model→View→Flow rhythm is how I build each feature within the sprint. How do the two connect?"</li>
+    <li>"What's cargo cult Agile, and how do I know if my team is doing it?"</li>
+    <li>"If AI agents can write code now, does the SDLC still matter — or are we moving to a different lifecycle entirely?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Software Development Process — From Waterfall to Agile to AI Agents</span>
+  <span>Macro to: <a href="./how-developers-think-frontend.html">The Rhythm (micro)</a> · Umbrella: <a href="./cs-and-software-engineering.html">CS &amp; SE</a> · Thinking: <a href="./problem-solving.html">Problem-Solving</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

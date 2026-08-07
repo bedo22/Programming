@@ -10,11 +10,11 @@ The journey walks **from the atoms outward to the economic reality**, in seven m
 2. **Ecosystem** (Ep 4–6) — the landscape that grew on those atoms: where JS runs, the "camps" that ship UI, and React's class→hooks revolution.
 3. **Practice** (Ep 7–9) — the mental models and rhythms developers use daily: the Model→View→Flow loop, Angular for contrast, and the React/Next frontier.
 4. **System** (Ep 10–11) — how the bigger machine fits: API contracts and system design, crossing from frontend into architecture.
-5. **Bridge** (Lessons 12–15) — the meta-skill layer: problem-solving (Pólya's four phases, computational thinking, algorithm paradigms) and the rhythm deepened (theory, failure modes, principles). This is the connective tissue between the technical spine and the human layer — the "how do I think before I code?" that makes the rest click.
+5. **Bridge** (Lessons 12–17) — the meta-skill layer: problem-solving (Pólya's four phases, computational thinking, algorithm paradigms), the rhythm deepened (theory, failure modes, principles), CS &amp; SE (the umbrella discipline), and solution evaluation (Big O, quality attributes, trade-offs, judgment). This is the connective tissue between the technical spine and the human layer — the "how do I think before I code?" and "how do I know if my solution is good?" that make the rest click.
 6. **Human / product** (Ep 12–13) — upstream of code: UI/UX and design thinking, the layers that decide what code gets written.
 7. **Economic reality** (Ep 14) — income and markets: why any of this exists as a livelihood.
 
-Read in order, each episode gives you the vocabulary the next one assumes. You can't appreciate the camps (Ep 5) without the language (Ep 1) and the platform (Ep 2); you can't read React's revolution (Ep 6) without "state" (Ep 3); the practice layer (Ep 7) presumes you know the ecosystem; the system layer (Ep 10) presumes you know how frontends consume contracts; the bridge (L12–15) presumes you know the technical spine and deepens the thinking skills; the human layer (Ep 12) presumes you know what's being built; the economic layer (Ep 14) presumes the whole stack exists.
+Read in order, each episode gives you the vocabulary the next one assumes. You can't appreciate the camps (Ep 5) without the language (Ep 1) and the platform (Ep 2); you can't read React's revolution (Ep 6) without "state" (Ep 3); the practice layer (Ep 7) presumes you know the ecosystem; the system layer (Ep 10) presumes you know how frontends consume contracts; the bridge (L12–17) presumes you know the technical spine and deepens the thinking and evaluation skills; the human layer (Ep 12) presumes you know what's being built; the economic layer (Ep 14) presumes the whole stack exists.
 
 ## 2. The 14-episode map
 
@@ -47,6 +47,10 @@ Read in order, each episode gives you the vocabulary the next one assumes. You c
 **Bridge Lesson 14 — Problem-Solving: Paradigms + Debugging** — *the tools and the application.* Anchors `reference/problem-solving.html` §7, §9–§10. The six algorithm paradigms (brute force, greedy, D&C, DP, backtracking, hash table) + hypothesis-driven debugging + the "Look back" phase. Unlocks: recognizing which technique a problem needs. *(bridge)*
 
 **Bridge Lesson 15 — The Rhythm Deepened** — *why the loop works, how it fails, what stays constant.* Anchors `reference/how-developers-think-frontend.html` §1e, §12b, §13b, §13d. Working memory and cognitive load (why you can't hold all three threads), the 8 failure modes, the 8 principles, and where the loop is heading (React Compiler, RSC, AI). Unlocks: the deepening you come back to after trying the loop on a real feature. *(bridge — supplements Lesson 7, does not replace it)*
+
+**Bridge Lesson 16 — CS &amp; SE: The Discipline** — *the umbrella behind everything.* Anchors `reference/cs-and-software-engineering.html` §1–§3, §8. What CS is (the science of computation, Turing 1936), what SE is (the engineering of software, NATO 1968), how they differ, the 90-year lineage, and the engineering principles (DRY, SOLID, KISS, YAGNI). Unlocks: why HackerRank (CS) and your React job (SE) feel different. *(bridge)*
+
+**Bridge Lesson 17 — Solution Evaluation** — *Big O, quality attributes, and trade-offs.* Anchors `reference/cs-and-software-engineering.html` §4–§7, §9. The parameters (ISO 25010 quality attributes), the measures (Big O notation, complexity classes), the trade-offs (time vs space, readability vs performance), and the judgment (which parameters matter when, when to stop). Traced through a brute-force firstNonRepeat solution and its upgrade. Unlocks: knowing whether your solution is good enough — and when to optimize. *(bridge)*
 
 **Episode 12 — The Human Layer** — *UI/UX & web design.* Anchors `reference/ui-ux-web-design.html`. Habitability over decoration, a11y, motion. Unlocks: the rendering layer's guardrails.
 
@@ -106,15 +110,23 @@ Each lesson is **one self-contained HTML file** in `./lessons/`, named `NNNN-<da
 - ✅ **References expanded** — two references expanded to follow the standard template:
   - `reference/problem-solving.html` (826 lines, 24 sections, 17 tables) — created and expanded
   - `reference/how-developers-think-frontend.html` (893 lines, 24 sections, 13 tables) — expanded with theory, evolution, intersection, failure modes, ecosystem, future
-- ⏭ **Next:** Bridge movement — 4 lessons planned:
-  - `0012-problem-solving-polyas-four-phases.html` — Pólya's universal meta-rhythm
-  - `0013-problem-solving-computational-thinking.html` — CT four pillars + heuristics + metacognition
-  - `0014-problem-solving-paradigms-and-debugging.html` — algorithm paradigms + hypothesis-driven debugging
-  - `0015-the-rhythm-deepened.html` — theory (why it works) + failure modes (how it fails) + principles (what stays constant)
-- ⏳ **Then:** Human/product movement — Episodes 12–13:
-  - `0016-the-human-layer.html` — UI/UX & web design (anchors `ui-ux-web-design.html`)
-  - `0017-upstream-of-code.html` — design thinking (anchors `design-thinking.html`)
-- ⏳ **Then:** Economic reality — Episode 14:
-  - `0018-the-real-world.html` — income/markets (anchors `income-stream-landscape.html` + `frontend-income-markets.html`)
+- ✅ **Bridge complete** — 8 lessons written (L12–L19):
+  - `lessons/0012-problem-solving-polyas-four-phases.html` (Pólya's four phases, three-layer model, well-defined vs wicked)
+  - `lessons/0013-problem-solving-computational-thinking.html` (CT four pillars, seven heuristics, Schoenfeld's metacognition)
+  - `lessons/0014-problem-solving-paradigms-and-debugging.html` (six paradigms, D&C vs DP, debugging, look-back phase)
+  - `lessons/0015-the-rhythm-deepened.html` (cognitive science, 8 failure modes, 8 principles, the future)
+  - `lessons/0016-cs-and-se-the-discipline.html` (CS vs SE, 90-year history, Turing to Agile, DRY/SOLID/KISS/YAGNI)
+  - `lessons/0017-solution-evaluation.html` (Big O, ISO 25010 quality attributes, trade-offs, judgment, worked example)
+- ✅ **CS & SE reference created** — `reference/cs-and-software-engineering.html` (550 lines, 20 sections, 18 tables) — the umbrella discipline. Glossary updated with 15 new terms. RESOURCES.md updated with 6 new sources.
+- ✅ **Software Development Process (macro) complete** — 1 reference + 2 bridge lessons written (the "Agile is project management?" question answered through a full template doc):
+  - `reference/software-development-process.html` (19 sections, valid close) — the SDLC six phases, Agile Manifesto (4 values/12 principles), Scrum, Kanban, XP/Lean/DevOps, the macro/micro table (SDLC ↔ The Rhythm), failure modes, ecosystem, and the AI-augmented SDLC vs **Agent Development Lifecycle (ADLC)** distinction.
+  - `lessons/0018-the-software-development-process.html` (SDLC phases vs methodology; Agile; The Rhythm is the micro within the macro)
+  - `lessons/0019-scrum-kanban-and-the-ai-frontier.html` (Scrum 3-5-3, Kanban flow/WIP, failure modes, AI-augmented SDLC vs ADLC)
+  - Learning records `0018` and `0019` written.
+- ✅ **Human/product & Economic reality complete** — journey finished (22 lessons):
+  - `lessons/0020-the-human-layer.html` (UI/UX: four disciplines, usability, state visibility, accessibility baseline) — anchors `ui-ux-web-design.html`; learning record `0020`
+  - `lessons/0021-upstream-of-code.html` (Design Thinking: desirability/feasibility/viability Venn, five phases, design theater) — anchors `design-thinking.html`; learning record `0021`
+  - `lessons/0022-the-real-world.html` (seven income streams, USD band reading, AI-field evaluation skill, sequencing) — anchors `frontend-income-markets.html` + `income-stream-landscape.html`; learning record `0022`
+- ✅ **Journey complete** — 22 lessons, six movements (Atoms 1–3, Ecosystem 4–6, Practice 7–9, System 10–11, Bridge 12–19, Human/product & Economic reality 20–22). Mission (exploration, conceptual literacy) fulfilled. Further sessions become depth on any node, not new breadth.
 - 🔧 **Open:** verify `speakingjs.com` reachability before recommending it as a primary read.
 

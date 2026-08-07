@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software Testing — How We Prove Software Works, Fails, and Stays Safe</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Evidence about behavior — from a unit test to production verification</p>
+  <h1>Software Testing</h1>
+  <p class="meta">What testing is (a disciplined way to produce evidence about software behavior), how it differs from verification, validation, and QA, the history from debugging to continuous and AI-era testing, the levels and techniques that build useful confidence, test doubles and TDD, how to choose a test strategy without worshipping the pyramid, how non-functional qualities are tested, and how production observability completes the loop. Read this to understand what evidence your code needs before the delivery pipeline should trust it.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> This doc is the <em>evidence layer</em> — the counterpart to <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a>:</p>
+  <ul>
+    <li><a href="./how-developers-think-frontend.html">The Rhythm</a> — the <em>feature-scale loop</em>: how you build one feature.</li>
+    <li><a href="./software-development-process.html">The Process</a> — the <em>macro-process</em>: how a team organizes the SDLC.</li>
+    <li><strong>This doc</strong> — the <em>evidence layer</em>: how we prove behavior is correct, safe, and worth shipping.</li>
+    <li><a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a> — the <em>delivery layer</em>: how that evidence is automated into gates, artifacts, and releases.</li>
+    <li><a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the <em>umbrella discipline</em> that contains them all.</li>
+    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+  </ul>
+  <p>Testing produces evidence; CI/CD consumes it. A pipeline without meaningful tests automates the wrong question.</p>
+</blockquote>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone, but most useful alongside <a href="./software-development-process.html">The Process</a> and <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a>. Cross-links:</p>
+<ul>
+  <li>Upstream: <a href="./problem-solving.html">Problem-Solving</a> — defining the expected behavior clearly enough to test it.</li>
+  <li>Delivery: <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — how tests become automated gates and production checks.</li>
+  <li>Process: <a href="./software-development-process.html">Software Development Process</a> — where the Testing phase sits in the SDLC.</li>
+  <li>Quality: <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — quality attributes and trade-offs that testing evaluates.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared terms.</li>
+</ul>
+<p><strong>If you've ever wondered why unit tests are not enough, when mocks hurt more than they help, what TDD really buys you, or how a team knows a deployment is healthy after release, this doc answers that.</strong> Read §1–§3 first, then §4–§8 for the practical toolbox, then §9–§12 for strategy, production, and the AI frontier.</p>
+
+<h2>1. Definition — what testing is, and what it is <em>not</em></h2>
+
+<p><strong>Software testing</strong> is the discipline of producing useful evidence about a software system by observing or checking its behavior under selected conditions. A test is not just code that runs — it is a claim about expected behavior paired with an observation that can confirm or refute it (<a href="https://standards.ieee.org/standard/1012-2016.html">IEEE 1012</a>).</p>
+
+<ul>
+  <li><strong>Verification</strong> asks: did we build the system right? It compares the artifact to its specification.</li>
+  <li><strong>Validation</strong> asks: did we build the right system? It compares the artifact to user needs and business intent.</li>
+  <li><strong>Testing</strong> contributes to both, but it is not magic. It samples behavior; it cannot prove the absence of all bugs.</li>
+  <li><strong>Quality assurance (QA)</strong> is broader: the organizational practices that make quality likely — process, standards, reviews, testing, release control. Testing is one tool inside QA, not the whole profession.</li>
+</ul>
+
+<h3>What this doc is NOT</h3>
+<ul>
+  <li><strong>Not a CI/CD manual.</strong> <a href="./version-control-ci-cd-deployment.html">The delivery doc</a> explains how tests run in pipelines. This doc explains what the tests mean.</li>
+  <li><strong>Not a guarantee of correctness.</strong> A passing suite means the selected checks passed, under the selected environment, against the selected assumptions.</li>
+  <li><strong>Not only for QA teams.</strong> Developers, designers, testers, operators, and AI tools all produce and consume testing evidence.</li>
+</ul>
+
+<h2>1b. History — from debugging to continuous and AI-era testing</h2>
+
+<p>Testing evolved from an afterthought into an engineering feedback system:</p>
+
+<table>
+  <thead><tr><th>Year</th><th>Event / era</th><th>What it contributed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1950s–60s</strong></td><td>Debugging as the default</td><td>Testing mostly meant stepping through code until the symptom disappeared. The goal was fault removal, not systematic evidence.</td></tr>
+    <tr><td><strong>1970s</strong></td><td>Foundations of program testing</td><td>Testing began to be framed as execution with expected results, coverage, and test case selection. The question shifted from "can I make it work?" to "can I show it works?"</td></tr>
+    <tr><td><strong>1980s</strong></td><td>Regression and formal methods</td><td>As systems lived longer, preserving existing behavior became central. Regression suites and stronger specification discipline emerged.</td></tr>
+    <tr><td><strong>1990s</strong></td><td>xUnit and developer testing</td><td>JUnit and related frameworks normalized tests as code written by developers, runnable repeatedly and automatically (<a href="https://junit.org/junit5/">JUnit 5</a>).</td></tr>
+    <tr><td><strong>1999</strong></td><td>TDD in Extreme Programming</td><td>Red → Green → Refactor made tests a design tool: write the failing expectation, implement just enough, then clean the design (<a href="https://en.wikipedia.org/wiki/Test-driven_development">Wikipedia</a>).</td></tr>
+    <tr><td><strong>2000s</strong></td><td>Continuous testing and CI</td><td>Tests moved from release-week activity to push-time feedback. Fast suites became gates; slow suites moved later in the pipeline.</td></tr>
+    <tr><td><strong>2010s</strong></td><td>Property-based, contract, and cloud-era testing</td><td>Instead of only examples, teams generated inputs and tested invariants. Contract tests helped distributed systems verify API expectations without full end-to-end brittleness.</td></tr>
+    <tr><td><strong>2020s</strong></td><td>Observability-informed testing</td><td>Production signals — logs, metrics, traces, alerts, SLOs — became part of the evidence loop, especially for systems too large to reproduce locally.</td></tr>
+    <tr><td><strong>2022–present</strong></td><td>AI-era testing</td><td>AI writes more code and more tests, but evaluation becomes harder: generated code must be judged, and AI systems themselves need probabilistic, scenario-based evaluation rather than only exact assertions.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The recurring theme:</strong> testing keeps moving earlier, closer to the change, and later, closer to production reality. Modern testing is not one phase; it is a chain of evidence from design intent to runtime behavior.</p>
+
+<h2>1c. Evolution — the constraint inversions</h2>
+
+<table>
+  <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Manual → automated</strong></td><td>Humans click through scenarios near release</td><td>Executable checks run on every change</td><td>Repetition became cheap, so regression could be continuous instead of occasional.</td></tr>
+    <tr><td><strong>End-of-cycle → continuous</strong></td><td>Testing happens after implementation</td><td>Tests run during development, review, merge, and deployment</td><td>Feedback time collapsed from weeks to minutes. Small defects stopped accumulating into release-day surprises.</td></tr>
+    <tr><td><strong>Example-only → property-based</strong></td><td>A few hand-picked inputs</td><td>Generated inputs against invariants</td><td>The test states what must always be true, then searches for counterexamples beyond the examples the developer imagined.</td></tr>
+    <tr><td><strong>Local-only → production-aware</strong></td><td>If it passes on a laptop, ship it</td><td>Test plus health checks, telemetry, canaries, and SLOs</td><td>Distributed systems, third-party services, and real traffic made local simulation insufficient. Production verification became part of the evidence chain.</td></tr>
+    <tr><td><strong>Human-written → AI-assisted</strong></td><td>Humans write both code and tests</td><td>AI can generate both, but the human judges the evidence</td><td>The bottleneck moves from writing tests to knowing which tests matter and whether generated checks actually encode the intended behavior.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The meta-pattern:</strong> testing keeps shortening the distance between a change and trustworthy feedback. The goal is not more tests; it is better evidence sooner.</p>
+
+<h2>1d. Intersection with neighbors — evidence at every boundary</h2>
+
+<table>
+  <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./problem-solving.html">Problem-Solving</a></td><td>A test encodes the expected result of a well-understood problem. Pólya's "look back" becomes executable evidence.</td><td>The discipline of turning examples, edge cases, and assumptions into checks.</td></tr>
+    <tr><td><a href="./software-development-process.html">Software Development Process</a></td><td>The SDLC names Testing as a phase, but modern methods weave testing through every phase.</td><td>The concrete techniques and levels that make the Testing phase real.</td></tr>
+    <tr><td><a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a></td><td>The pipeline runs the tests and blocks unsafe promotion. Deployment verification extends testing into production.</td><td>The evidence the pipeline should automate and the distinction between checks, gates, and operational signals.</td></tr>
+    <tr><td><a href="./cs-and-software-engineering.html">CS &amp; SE</a></td><td>Testing evaluates correctness and the quality attributes CS &amp; SE defines.</td><td>The practices that make correctness, reliability, security, and maintainability inspectable.</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a></td><td>Contract tests verify that provider and consumer expectations still match.</td><td>The boundary where interface promises become executable compatibility checks.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The boundary rule:</strong> if the question is "what should the software do?", start in Problem-Solving. If the question is "how do we know it does it?", that is this doc. If the question is "how is that knowledge enforced and shipped?", that is CI/CD &amp; Deployment.</p>
+
+<h2>1e. Underlying theory — oracles, isolation, determinism, and risk</h2>
+
+<p>A useful test contains four ideas:</p>
+
+<ul>
+  <li><strong>Stimulus</strong> — the input or event that exercises the system.</li>
+  <li><strong>Oracle</strong> — the source of truth that says what should happen: an assertion, specification, invariant, previous version, model, or human judgment.</li>
+  <li><strong>Isolation</strong> — the degree to which the test controls collaborators so a failure points to the intended unit.</li>
+  <li><strong>Feedback</strong> — how quickly and clearly the test tells the developer what changed.</li>
+</ul>
+
+<p>Determinism matters because a test that can pass and fail without any code change is not evidence — it is noise. Time, randomness, concurrency, network calls, shared databases, and order-dependent state are the usual causes. Good tests control them explicitly with clocks, seeds, dependency injection, isolated fixtures, and controlled collaborators.</p>
+
+<p>Risk matters because testing is sampling. You cannot execute every input, every state, every deployment topology, and every user path. A mature strategy asks: where would a defect be most likely, most costly, and least visible? Then it spends test effort there.</p>
+
+<h2>1f. Mental models — how senior engineers think about tests</h2>
+
+<ul>
+  <li><strong>Tests are executable questions.</strong> A good test asks one precise question: "given this state, should this happen?" If a test needs a paragraph to explain, it is probably asking too many questions.</li>
+  <li><strong>Coverage is not confidence.</strong> Code coverage tells you what was executed, not what was verified. 90% line coverage can miss the one branch that corrupts money, data, or access control.</li>
+  <li><strong>The test pyramid is a heuristic, not a law.</strong> Fast, isolated tests should usually dominate; broad tests should usually be fewer. But the right shape depends on architecture, risk, tooling, and team discipline.</li>
+  <li><strong>A flaky suite is a broken communication channel.</strong> If the team stops trusting red, red becomes decorative. Flakiness is not an annoyance; it is a quality defect in the evidence system.</li>
+  <li><strong>Tests are design pressure.</strong> If a unit is painful to test, the pain often reveals hidden coupling, unclear boundaries, or too many responsibilities. TDD uses that pressure deliberately.</li>
+</ul>
+
+<h2>2. Testing levels — from one unit to the whole system</h2>
+
+<table>
+  <thead><tr><th>Level</th><th>What it checks</th><th>Typical strengths</th><th>Typical risks</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unit test</strong></td><td>A small, isolated unit of behavior</td><td>Fast, precise, cheap to run frequently</td><td>Can prove a unit works while the system is still wrong</td></tr>
+    <tr><td><strong>Integration test</strong></td><td>Two or more units working together</td><td>Catches wiring, persistence, serialization, and boundary errors</td><td>Slower, more setup, more failure ambiguity</td></tr>
+    <tr><td><strong>Contract test</strong></td><td>Whether a provider and consumer share the same interface expectations</td><td>Excellent for services and APIs; avoids full end-to-end brittleness</td><td>Only checks the contract, not full user journeys</td></tr>
+    <tr><td><strong>Component test</strong></td><td>A cohesive component or module with controlled collaborators</td><td>Balanced confidence without full environment cost</td><td>Boundary definition can be fuzzy</td></tr>
+    <tr><td><strong>End-to-end test</strong></td><td>A user journey through the real application stack</td><td>Highest behavioral realism</td><td>Slowest, most brittle, hardest to debug</td></tr>
+    <tr><td><strong>Acceptance test</strong></td><td>Whether the feature satisfies agreed business behavior</td><td>Connects implementation to intent</td><td>Can become vague if the expected behavior is vague</td></tr>
+    <tr><td><strong>Smoke test</strong></td><td>Whether the system is alive enough to justify deeper testing</td><td>Very fast signal after build or deployment</td><td>Shallow by design</td></tr>
+    <tr><td><strong>Regression test</strong></td><td>Whether previously correct behavior still works</td><td>Protects accumulated behavior as the system evolves</td><td>Can become bloated if every bug becomes a permanent test</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The practical rule:</strong> use the lowest level that can produce trustworthy evidence for the question being asked. Do not use an end-to-end test to prove a pure calculation, and do not use a mocked unit test to prove a deployment is healthy.</p>
+
+<h2>3. Testing techniques — how to choose inputs that matter</h2>
+
+<table>
+  <thead><tr><th>Technique</th><th>What it does</th><th>When it earns its keep</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Boundary value analysis</strong></td><td>Tests values at and around edges: empty, zero, one, maximum, just over maximum</td><td>Numeric validation, limits, pagination, ranges</td></tr>
+    <tr><td><strong>Equivalence partitioning</strong></td><td>Groups inputs that should behave the same and samples from each group</td><td>Large input spaces where exhaustive testing is impossible</td></tr>
+    <tr><td><strong>State-transition testing</strong></td><td>Models valid and invalid transitions between states</td><td>Workflows, orders, sessions, UI state machines</td></tr>
+    <tr><td><strong>Property-based testing</strong></td><td>States an invariant and generates many inputs to search for violations</td><td>Parsers, serializers, algorithms, data transformations</td></tr>
+    <tr><td><strong>Fuzz testing</strong></td><td>Sends malformed, random, or adversarial inputs to find crashes and unsafe handling</td><td>Parsers, file formats, network protocols, security-sensitive inputs</td></tr>
+    <tr><td><strong>Mutation testing</strong></td><td>Introduces small code changes and checks whether tests detect them</td><td>Measuring suite effectiveness beyond line coverage</td></tr>
+    <tr><td><strong>Exploratory testing</strong></td><td>Human-guided investigation based on risk, curiosity, and emerging evidence</td><td>Usability, unknown-unknowns, complex workflows, new features</td></tr>
+  </tbody>
+</table>
+
+<p>The strongest suites mix techniques. Example tests are readable; property tests hunt beyond imagination; exploratory tests expose assumptions that nobody wrote down.</p>
+
+<h2>4. Test doubles — mocks, stubs, fakes, and spies</h2>
+
+<p>A <strong>test double</strong> replaces a collaborator so the test can control behavior, speed, and failure modes. The names are not interchangeable:</p>
+
+<table>
+  <thead><tr><th>Double</th><th>What it does</th><th>Good use</th><th>Common abuse</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Stub</strong></td><td>Returns canned answers</td><td>Control inputs from a dependency</td><td>Stubbing so much that the test only verifies the stub</td></tr>
+    <tr><td><strong>Mock</strong></td><td>Verifies expected interactions</td><td>Check that a boundary call happened correctly</td><td>Coupling tests to implementation details</td></tr>
+    <tr><td><strong>Fake</strong></td><td>A working simplified implementation</td><td>In-memory repository or local service simulator</td><td>Becoming an unmaintained second system</td></tr>
+    <tr><td><strong>Spy</strong></td><td>Records calls while behaving like the real object</td><td>Observe side effects at a boundary</td><td>Using observation where a clearer state assertion would work</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The design rule:</strong> double the collaborator at a boundary you own, not deep inside someone else's implementation. Mocking every dependency makes tests fast but evasive; using real collaborators everywhere makes tests slow and brittle. The senior move is to test domain logic directly and isolate infrastructure at narrow seams.</p>
+
+<h2>5. Test-Driven Development — tests as design pressure</h2>
+
+<p>TDD is not "write all tests first." It is a small loop:</p>
+
+<ol>
+  <li><strong>Red</strong> — write one failing test for the next meaningful behavior.</li>
+  <li><strong>Green</strong> — write the simplest implementation that passes.</li>
+  <li><strong>Refactor</strong> — improve the design while keeping the tests green.</li>
+</ol>
+
+<p>The benefit is not moral purity; it is feedback. TDD forces the developer to state the behavior before writing the implementation, keep changes small, and notice when the design resists being tested. It works best for logic with clear oracles: rules, transformations, calculations, state transitions. It works less naturally for exploratory UI, integration-heavy code, or behavior whose oracle is still unknown.</p>
+
+<h2>6. Test strategy — what to automate, and what not to</h2>
+
+<p>The test pyramid says: many fast low-level tests, fewer medium-level tests, very few broad end-to-end tests. It is useful because broad tests are expensive, brittle, and slow. But it is not a religion. The right strategy starts with risk and feedback time:</p>
+
+<ul>
+  <li><strong>Automate high-value, repeatable checks.</strong> Business rules, regression-prone paths, API contracts, security-sensitive boundaries.</li>
+  <li><strong>Keep fast feedback fast.</strong> The suite that runs on every push should answer quickly; broader suites can run later or on a schedule.</li>
+  <li><strong>Do not automate what is cheaper to explore.</strong> Early UX, rapidly changing prototypes, and rare one-off checks may be better explored manually before being frozen into brittle scripts.</li>
+  <li><strong>Prefer behavior over implementation.</strong> Tests that mirror private method calls break when the code is refactored but behavior did not change.</li>
+  <li><strong>Design for failure readability.</strong> A failed test should tell you what behavior broke, where, and why — not merely that line 437 returned false.</li>
+</ul>
+
+<h2>7. Non-functional testing — proving the qualities that users feel</h2>
+
+<table>
+  <thead><tr><th>Quality</th><th>What testing asks</th><th>Typical checks</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Performance</strong></td><td>Does it stay fast enough under expected and peak load?</td><td>Load, stress, latency budgets, throughput, regression benchmarks</td></tr>
+    <tr><td><strong>Security</strong></td><td>Can hostile input or users break confidentiality, integrity, or availability?</td><td>Vulnerability scans, fuzzing, authz checks, dependency scanning, secret scanning</td></tr>
+    <tr><td><strong>Accessibility</strong></td><td>Can people use it with assistive technology and diverse interaction needs?</td><td>Keyboard navigation, contrast, ARIA semantics, screen-reader flows, automated + manual checks</td></tr>
+    <tr><td><strong>Compatibility</strong></td><td>Does it behave across browsers, devices, versions, and environments?</td><td>Matrix testing, responsive checks, API-version compatibility</td></tr>
+    <tr><td><strong>Resilience</strong></td><td>Does it degrade safely under dependency, network, or infrastructure failure?</td><td>Timeouts, retries, circuit breakers, chaos experiments, backup/restore drills</td></tr>
+  </tbody>
+</table>
+
+<p>These qualities cannot be bolted on at release time. The testable budget must be defined early: how fast, how accessible, how available, how compatible? Otherwise the team only discovers the quality target after production violates it.</p>
+
+<h2>8. Production verification — testing does not stop at deployment</h2>
+
+<p>Production is the only environment with real data shape, real traffic, real third-party behavior, and real operational constraints. Verification therefore continues after deployment:</p>
+
+<ul>
+  <li><strong>Smoke checks</strong> confirm the deployment is alive and serving the expected version.</li>
+  <li><strong>Health checks</strong> report readiness and liveness to the platform.</li>
+  <li><strong>Logs, metrics, and traces</strong> expose behavior that pre-production tests could not reproduce.</li>
+  <li><strong>Alerts</strong> turn anomalies into actionable signals.</li>
+  <li><strong>SLOs and error budgets</strong> define how much failure is acceptable before reliability work outranks feature work.</li>
+  <li><strong>Canaries</strong> expose a small slice of traffic first, so real-world evidence arrives before full release.</li>
+</ul>
+
+<p>This does not replace pre-production testing; it completes it. The delivery doc explains the deployment mechanics; this doc's rule is simpler: <strong>ship only when you can observe whether the ship worked.</strong></p>
+
+<h2>9. AI-era testing — generated code and nondeterministic systems</h2>
+
+<p>AI changes testing in two directions at once:</p>
+
+<ul>
+  <li><strong>AI writes code and tests.</strong> The volume of generated artifacts rises, but the human question becomes sharper: does this test encode intended behavior, or merely mirror the generated implementation? Evaluation skill becomes the bottleneck.</li>
+  <li><strong>AI systems must be tested differently.</strong> A language model, recommender, or classifier may not have one exact expected output. Evaluation uses datasets, scenarios, rubrics, invariants, safety constraints, and statistical thresholds rather than only equality assertions.</li>
+</ul>
+
+<p>For deterministic code, traditional assertions remain the backbone. For AI behavior, define what must always be true: no leaked secrets, no forbidden content, bounded latency, grounded answers, valid tool calls, safe fallback behavior. Then measure how often the system meets those constraints across representative cases.</p>
+
+<h2>10. Worked example — a feature tested from unit to production</h2>
+
+<pre>
+Feature: users can apply a discount code at checkout
+
+Problem-Solving: define valid/invalid code rules, expiry, stacking, rounding
+Unit tests: discount calculation, expiry rule, rounding boundary, max discount
+Integration tests: checkout service + coupon repository + pricing service
+Contract tests: coupon API response shape expected by checkout
+E2E test: one critical journey from cart to paid order
+Security checks: invalid codes cannot reveal valid ones; rate-limit brute force
+Performance check: coupon validation stays within latency budget
+CI: fast unit + integration checks on every PR; broader checks before deploy
+Deploy: canary to 5% traffic
+Production verification: error rate, checkout latency, failed-payment rate, alert thresholds
+Rollback/flag: disable coupon path if errors rise; investigate with traces
+</pre>
+
+<p>The point is not to build every possible test. The point is to place each question at the cheapest level that can answer it reliably.</p>
+
+<h2>11. The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>Why it happens</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Coverage worship</strong></td><td>The team optimizes for a percentage instead of evidence.</td><td>Track risk, defect escape, and mutation-detection value; review critical paths explicitly.</td></tr>
+    <tr><td><strong>Mock-heavy suites</strong></td><td>Tests mirror implementation and stop proving behavior.</td><td>Test public behavior; use doubles only at meaningful boundaries.</td></tr>
+    <tr><td><strong>Flaky tests tolerated</strong></td><td>Intermittent failures train the team to ignore red.</td><td>Quarantine, fix determinism, control time/randomness/concurrency, remove or rewrite.</td></tr>
+    <tr><td><strong>Only happy paths</strong></td><td>Examples come from the implementation, not the risk model.</td><td>Add boundaries, invalid inputs, failure modes, security and resilience checks.</td></tr>
+    <tr><td><strong>End-to-end suite as the only safety net</strong></td><td>Slow feedback makes tests run rarely and debug poorly.</td><td>Push checks down to the cheapest trustworthy level; keep E2E for critical journeys.</td></tr>
+    <tr><td><strong>No production verification</strong></td><td>The team assumes green CI proves live health.</td><td>Add smoke checks, observability, alerts, canary metrics, and clear release/rollback criteria.</td></tr>
+    <tr><td><strong>AI-generated tests accepted blindly</strong></td><td>Generated tests restate the code rather than the intent.</td><td>Review tests as specifications; add missing oracles, edge cases, and adversarial cases.</td></tr>
+  </tbody>
+</table>
+
+<h2>12. The complete mental checklist</h2>
+
+<p>If you remember only one image, remember this: <strong>a test is a question with an oracle; a suite is a strategy for producing evidence at the right speed and scope.</strong></p>
+
+<table>
+  <thead><tr><th>Question to ask</th><th>Check</th></tr></thead>
+  <tbody>
+    <tr><td>Do I know what behavior this test is trying to prove?</td><td>Clear stimulus, clear oracle, clear failure message.</td></tr>
+    <tr><td>Is the test deterministic?</td><td>Time, randomness, concurrency, network, and shared state are controlled.</td></tr>
+    <tr><td>Am I testing behavior or implementation details?</td><td>Refactors should not break tests unless behavior changed.</td></tr>
+    <tr><td>Do I have evidence at the right levels?</td><td>Unit, integration, contract, E2E, security, performance, and production checks as risk demands.</td></tr>
+    <tr><td>Would the team trust a red build immediately?</td><td>No flaky suite; failures are investigated, not normalized.</td></tr>
+    <tr><td>Do I know how production will prove the release healthy?</td><td>Smoke checks, health signals, metrics, logs, traces, alerts, and SLOs exist.</td></tr>
+    <tr><td>Are AI-generated tests reviewed as claims about intent?</td><td>Tests encode expected behavior, not merely current output.</td></tr>
+  </tbody>
+</table>
+
+<p>The maturity test is not "how many tests do we have?" It is "how quickly do we learn the truth about a change, and how confidently can we act on it?"</p>
+
+<section class="cite">
+  <strong>Primary sources</strong>
+  <a href="https://standards.ieee.org/standard/1012-2016.html">IEEE 1012 — Software Verification and Validation.</a> ·
+  <a href="https://junit.org/junit5/">JUnit 5 — developer testing framework.</a> ·
+  <a href="https://martinfowler.com/bliki/TestPyramid.html">Fowler, M. — The Test Pyramid.</a> ·
+  <a href="https://martinfowler.com/articles/practical-test-pyramid.html">Vocke, H. — The Practical Test Pyramid.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Test-driven_development">Test-driven development — overview.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Property-based_testing">Property-based testing — overview.</a> ·
+  <a href="https://sre.google/sre-book/service-level-objectives/">Google SRE — Service Level Objectives.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take one feature I'm building and help me map its risks to unit, integration, contract, and production checks."</li>
+    <li>"Show me a test that looks strong but is actually coupled to implementation details, and refactor it with me."</li>
+    <li>"For one AI-generated test suite, how do we tell whether the tests encode intent or just mirror the code?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Software Testing — How We Prove Software Works, Fails, and Stays Safe</span>
+  <span>Upstream: <a href="./problem-solving.html">Problem-Solving</a> · Process: <a href="./software-development-process.html">Software Development Process</a> · Delivery: <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> · Umbrella: <a href="./cs-and-software-engineering.html">CS &amp; SE</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

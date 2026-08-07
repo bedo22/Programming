@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0016 — CS &amp; SE: The Discipline · The Umbrella Behind Everything</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Bridge Lesson 5 · The Exploration Journey · Bridge (5/6)</p>
+  <h1>CS &amp; SE — The Discipline Behind the Code</h1>
+  <p class="meta">You've been practicing two disciplines without knowing their names. Computer Science (the science of computation) and Software Engineering (the engineering of software) are the umbrella under which every reference on this shelf sits. Here's the 90-year history, the key difference, and the engineering principles that survive every framework. Anchored to <a href="../reference/cs-and-software-engineering.html">CS &amp; SE</a>.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Where this fits</h3>
+  <p>The <a href="./0012-problem-solving-polyas-four-phases.html">problem-solving lessons</a> (L12–14) and the <a href="./0015-the-rhythm-deepened.html">rhythm deepened</a> (L15) gave you the thinking skills. This lesson names the <strong>discipline</strong> those skills sit inside — the umbrella that explains why HackerRank (CS) and your React job (SE) feel different even though both involve JavaScript. The next lesson (L17) teaches solution evaluation: Big O, quality attributes, and trade-offs.</p>
+</section>
+
+<h2>1. Two disciplines, one name</h2>
+<p>You've been practicing two disciplines without knowing their names. They share a foundation but have different goals, different success criteria, and different mindsets:</p>
+<ul>
+  <li><strong>Computer Science</strong> — the <em>science of computation</em>. What can be computed? How efficiently? What are the theoretical limits? It's a science: it discovers what's possible and proves theorems. <em>Founded by Alan Turing in 1936.</em></li>
+  <li><strong>Software Engineering</strong> — the <em>engineering of software</em>. How do we build reliable, maintainable systems at scale? How do we make trade-offs under real constraints? It's an engineering discipline: it builds things, makes trade-offs, and is judged by outcomes. <em>Named at the 1968 NATO conference in response to the "software crisis."</em></li>
+</ul>
+<p>The key difference: <strong>CS asks "is it correct and efficient?" SE asks "is it reliable, maintainable, and shipped?"</strong> HackerRank optimizes for CS (solve the problem, minimize Big O). Your React job optimizes for SE (build the feature, make it maintainable, ship it). Both use JavaScript. Both use algorithms. But they're judged by different criteria — and knowing the difference explains why they feel different.</p>
+
+<h2>2. The 90-year lineage — two threads that braid</h2>
+<table>
+  <thead><tr><th>Year</th><th>Event</th><th>What it contributed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1936</strong></td><td>Turing, "On Computable Numbers"</td><td>Defined the Turing machine. Proved some problems are <em>provably unsolvable</em> (the halting problem). The founding moment of CS — before any computer existed.</td></tr>
+    <tr><td><strong>1968</strong></td><td>Knuth, "The Art of Computer Programming"</td><td>Coined "analysis of algorithms" — the formal study of time and space complexity. Big O notation adopted for CS. <em>The birth of solution evaluation.</em></td></tr>
+    <tr><td><strong>1968</strong></td><td>NATO Software Engineering Conference</td><td>The "software crisis" declared. Named "software engineering" as a discipline. <em>The founding moment of SE.</em></td></tr>
+    <tr><td><strong>1975</strong></td><td>Brooks, "The Mythical Man-Month"</td><td>"Adding manpower to a late project makes it later." SE is about people and coordination, not just code.</td></tr>
+    <tr><td><strong>1999</strong></td><td>Hunt &amp; Thomas, "The Pragmatic Programmer"</td><td>DRY, rubber duck debugging. The engineering principles as practice.</td></tr>
+    <tr><td><strong>2000</strong></td><td>Robert C. Martin, SOLID principles</td><td>Five design principles for maintainable code. The acronym coined by Michael Feathers (~2004).</td></tr>
+    <tr><td><strong>2011</strong></td><td>ISO/IEC 25010</td><td>The international standard for software quality: 8 characteristics. The formal framework for "what makes a solution good."</td></tr>
+  </tbody>
+</table>
+<p><strong>The two threads braid:</strong> the science thread (Turing → Knuth) gave us the measures (Big O). The engineering thread (NATO → Dijkstra → Brooks → SOLID) gave us the parameters (quality attributes) and the principles (DRY, SOLID, KISS). The judgment — which parameters matter when — is the skill that sits at the braid. <a href="./0017-solution-evaluation.html">Lesson 17</a> teaches it.</p>
+
+<h2>3. The engineering principles — the constants that survive everything</h2>
+<p>These principles have survived from Knuth (1968) to the React Compiler (2024). They're the heuristics that guide trade-off decisions:</p>
+<ul>
+  <li><strong>KISS — Keep It Simple, Stupid.</strong> Origin: Kelly Johnson, Lockheed (1960s). The simplest solution is usually the most maintainable, testable, and fastest to ship. This is The Rhythm's "do the simplest thing that could possibly work" (L7).</li>
+  <li><strong>YAGNI — You Aren't Gonna Need It.</strong> Origin: Kent Beck, XP (1999). Don't build flexibility you don't need yet. This is The Rhythm's "defer decisions until you need them" (L15).</li>
+  <li><strong>DRY — Don't Repeat Yourself.</strong> Origin: Hunt &amp; Thomas (1999). Every piece of knowledge has a single authoritative representation. <em>But:</em> DRY is about <em>knowledge</em> duplication, not <em>code</em> duplication — two similar functions with different business rules should NOT be merged.</li>
+  <li><strong>SOLID</strong> — five principles for maintainable design: Single Responsibility (one job per module), Open-Closed (extend, don't edit), Liskov Substitution (subtypes must work), Interface Segregation (small interfaces), Dependency Inversion (depend on abstractions). Origin: Robert C. Martin (2000).</li>
+</ul>
+
+<h2>Retrieve it</h2>
+<p>Answer from memory. The effort is what makes it stick.</p>
+
+<details class="quiz" data-answer="science-vs-engineering" data-explain="CS is the science of computation (discovers what's possible, proves theorems, judges by correctness and efficiency). SE is the engineering of software (builds under constraints, makes trade-offs, judges by reliability, maintainability, and whether it shipped). HackerRank is CS; your React job is SE.">
+  <summary>What is the key difference between Computer Science and Software Engineering?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q1" value="science-vs-engineering"> CS discovers; SE builds under constraints</label>
+      <label><input type="radio" name="q1" value="cs-is-older"> CS is older than SE by decades</label>
+      <label><input type="radio" name="q1" value="se-subset-cs"> SE is a subset of CS</label>
+      <label><input type="radio" name="q1" value="same-thing"> They are the same thing</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="1968-nato" data-explain="The 1968 NATO Software Engineering Conference (Garmisch, Germany) declared the 'software crisis' and named software engineering as a discipline — arguing software should be engineered like bridges, with rigor and accountability.">
+  <summary>When and why was Software Engineering named as a discipline?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q2" value="1968-nato"> 1968, in response to the software crisis</label>
+      <label><input type="radio" name="q2" value="1936-turing"> 1936, by Alan Turing</label>
+      <label><input type="radio" name="q2" value="2001-agile"> 2001, with the Agile Manifesto</label>
+      <label><input type="radio" name="q2" value="1999-xp"> 1999, with Extreme Programming</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<details class="quiz" data-answer="knowledge-not-code" data-explain="DRY is about knowledge duplication, not code duplication. Two functions that look identical but represent different business rules should NOT be merged — merging them creates coupling that breaks when one rule changes.">
+  <summary>What does DRY actually mean — and what is the common trap?</summary>
+  <div class="quiz-body">
+    <ul class="quiz-options">
+      <label><input type="radio" name="q3" value="knowledge-not-code"> Knowledge duplication, not code duplication</label>
+      <label><input type="radio" name="q3" value="never-duplicate"> Never write similar code twice</label>
+      <label><input type="radio" name="q3" value="merge-all"> Always merge similar-looking functions</label>
+      <label><input type="radio" name="q3" value="only-comments"> Only applies to comments, not code</label>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <pre class="quiz-reveal" style="display:none"></pre>
+  </div>
+</details>
+
+<section class="win">
+  <h3>The win</h3>
+  <p>You now hold the <strong>umbrella</strong> — the discipline behind everything on this shelf. CS (the science of computation, founded by Turing 1936) and SE (the engineering of software, named at the 1968 NATO conference) are two threads that braid. CS gives you the measures (Big O); SE gives you the parameters (quality attributes) and the principles (DRY, SOLID, KISS, YAGNI). <strong>HackerRank is CS, your React job is SE — knowing the difference explains why they feel different.</strong></p>
+</section>
+
+<section class="next">
+  <h3>Where to go next</h3>
+  <ul>
+    <li><strong>Go deeper now:</strong> <a href="../reference/cs-and-software-engineering.html">CS &amp; SE</a> — the full 90-year history (§1b), the underlying theory (§1e), the engineering mindset (§1f), and the complete principle catalog (§8).</li>
+    <li><strong>Next lesson:</strong> <a href="./0017-solution-evaluation.html">Lesson 17 — Solution Evaluation</a> — Big O notation, quality attributes, trade-offs, and the judgment skill.</li>
+    <li><strong>Reinforce later:</strong> re-answer these tomorrow. Then ask: "Am I doing CS or SE right now?"</li>
+  </ul>
+  <p class="cite"><a href="https://en.wikipedia.org/wiki/Computer_science">Computer Science (Wikipedia)</a> and <a href="https://en.wikipedia.org/wiki/Software_engineering">Software Engineering (Wikipedia)</a> — the two disciplines and their histories.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Anything unclear? Follow-up questions are how we find the gaps. For example:</p>
+  <ul>
+    <li>"I solve HackerRank and build React features — how do I know when I'm doing CS vs SE?"</li>
+    <li>"Which SOLID principles matter most for React components?"</li>
+    <li>"What's the 'software crisis' — is it still happening today?"</li>
+  </ul>
+  <p>Just ask. No question is too basic.</p>
+</section>
+
+<footer class="lesson-foot">
+  <span>Bridge Lesson 5 · <a href="../reference/cs-and-software-engineering.html">Reference: CS &amp; SE</a></span>
+  <span>Next → <a href="./0017-solution-evaluation.html">Lesson 17 · Solution Evaluation</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>
