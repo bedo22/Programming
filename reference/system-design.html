@@ -54,7 +54,7 @@
 
 ---
 
-<h2>1. Definition — what system design <em>is</em> and what it is <em>not</em></h3>
+<h2>1. Definition — what system design <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 
@@ -512,6 +512,264 @@
 
 ---
 
+<h2>6b. Capacity planning — how to estimate load, storage, and latency</h2>
+
+<p>Capacity planning is not perfect prediction. It is choosing an architecture that survives uncertainty — the discipline that turns §9's back-of-envelope numbers into a repeatable process.</p>
+
+<h3>Capacity planning process</h3>
+
+<ol>
+  <li>Identify the <strong>primary operations</strong> (the handful of requests that carry 90% of traffic).</li>
+  <li>Estimate <strong>daily volume</strong> per operation from business reality, not hope.</li>
+  <li>Convert to <strong>average QPS/TPS</strong> (divide by 86,400 seconds).</li>
+  <li>Apply a <strong>peak multiplier</strong> (typically 5–10× average; more for retail/social).</li>
+  <li>Estimate <strong>payload sizes</strong> for requests and responses.</li>
+  <li>Project <strong>storage growth</strong>: rows/day × row size × retention period.</li>
+  <li>Estimate <strong>hot data</strong> that must live in memory for acceptable latency.</li>
+  <li>Estimate <strong>bandwidth</strong> (requests × payload size) for egress cost and CDN placement.</li>
+  <li>Capture the <strong>read/write ratio</strong> — it decides cache vs primary DB architecture.</li>
+  <li>State <strong>latency requirements</strong> (p50, p95, p99) per journey.</li>
+  <li>Add <strong>seasonality and burst behavior</strong> (Black Friday, end-of-month, marketing pushes).</li>
+  <li>Add <strong>headroom</strong> — plan around ~70% utilization for stateful systems; the latency curve goes vertical before 100%.</li>
+</ol>
+
+<h3>Formulas</h3>
+
+<table>
+  <thead><tr><th>Metric</th><th>Formula</th></tr></thead>
+  <tbody>
+    <tr><td>Average QPS</td><td>requests per day / 86,400</td></tr>
+    <tr><td>Peak QPS</td><td>average QPS × peak multiplier</td></tr>
+    <tr><td>Storage growth</td><td>rows per day × row size × retention period</td></tr>
+    <tr><td>Bandwidth</td><td>requests per second × payload size</td></tr>
+    <tr><td>Cache memory</td><td>hot keys × average value size × overhead (~1.3–1.5×)</td></tr>
+    <tr><td>Queue depth</td><td>arrival rate × average processing time (Little's Law: L = λW)</td></tr>
+  </tbody>
+</table>
+
+<h3>Latency guidance</h3>
+
+<ul>
+  <li>Use <strong>percentiles, not averages</strong> — a mean hides the 1% of requests that take 10× longer.</li>
+  <li>p50 is the typical experience; p95/p99 are the <strong>tail pain</strong> that produces user complaints and SLO burn.</li>
+  <li>Latency grows <strong>non-linearly near saturation</strong> (queueing kicks in past ~70% utilization).</li>
+  <li><strong>Load test before assuming linear scaling</strong> — the throughput ceiling is discovered, not assumed.</li>
+</ul>
+
+<p><strong>The rule:</strong> if the capacity model can't fit on one page, the architecture is too complex to reason about under load. The model is a decision-support artifact, not a spreadsheet for its own sake.</p>
+
+<h2>6c. Data architecture — storage, partitioning, replication, and evolution</h2>
+
+<p>Data ownership (§7) says <em>who</em> writes; data architecture says <em>how it is stored, partitioned, replicated, and evolved</em>. Choose storage by access pattern, not by popularity.</p>
+
+<h3>Storage decision matrix</h3>
+
+<table>
+  <thead><tr><th>Need</th><th>Good default</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Strong consistency, relational integrity</td><td>PostgreSQL / MySQL</td><td>ACID, joins, constraints</td></tr>
+    <tr><td>Simple key-value at scale</td><td>Redis, DynamoDB</td><td>Fast lookup by key</td></tr>
+    <tr><td>Flexible, semi-structured records</td><td>MongoDB, DynamoDB</td><td>Document-oriented schemas</td></tr>
+    <tr><td>Massive write scale</td><td>Cassandra, ScyllaDB, Bigtable</td><td>Wide-column partitioned writes</td></tr>
+    <tr><td>Time-series data</td><td>InfluxDB, TimescaleDB, Prometheus</td><td>Append-heavy, downsampling</td></tr>
+    <tr><td>Search / full-text</td><td>Elasticsearch, OpenSearch, Meilisearch</td><td>Inverted indexes</td></tr>
+    <tr><td>Analytics / OLAP</td><td>ClickHouse, BigQuery, Snowflake</td><td>Columnar scans over wide tables</td></tr>
+    <tr><td>Large immutable files</td><td>S3, GCS, Azure Blob</td><td>Object storage, cheap egress options</td></tr>
+    <tr><td>Graph relationships</td><td>Neo4j, Neptune, pg_graph</td><td>Traversal-heavy queries</td></tr>
+    <tr><td>Replayable ordered event log</td><td>Kafka, Pulsar, Kinesis</td><td>Durable, replayable stream</td></tr>
+  </tbody>
+</table>
+
+<p>The worst choice is a database selected because it is <em>familiar</em>, then forced into an access pattern it does not fit.</p>
+
+<h3>Partitioning / sharding</h3>
+
+<table>
+  <thead><tr><th>Strategy</th><th>Use when</th><th>Risk</th></tr></thead>
+  <tbody>
+    <tr><td>Hash partitioning</td><td>Even distribution by key</td><td>Range queries become cross-shard</td></tr>
+    <tr><td>Range partitioning</td><td>Natural time or sequential ranges</td><td>Hotspots at the tail (today's data)</td></tr>
+    <tr><td>Tenant partitioning</td><td>Multi-tenant isolation</td><td>Noisy neighbor, uneven tenant sizes</td></tr>
+    <tr><td>Geo partitioning</td><td>Data residency or latency</td><td>Cross-region consistency</td></tr>
+    <tr><td>Composite keys</td><td>Access by multiple dimensions</td><td>Secondary index complexity</td></tr>
+  </tbody>
+</table>
+
+<h3>Replication</h3>
+
+<ul>
+  <li><strong>Leader/follower</strong> — one writer, many readers; simplest, read scaling with lag.</li>
+  <li><strong>Multi-leader</strong> — writers in multiple locations; needed for geo-write, costs conflict resolution.</li>
+  <li><strong>Leaderless / quorum</strong> — N replicas, W+R consistency; latency trade-offs via PACELC.</li>
+  <li>Every replication strategy introduces <strong>lag</strong> — decide what <em>read-your-writes</em> and <em>monotonic reads</em> mean for your API before users hit the gap.</li>
+  <li><strong>Failover risks:</strong> split-brain (two leaders accepting writes) is the failure mode that corrupts state — it's why quorum and fencing exist.</li>
+</ul>
+
+<h3>Schema evolution</h3>
+
+<ul>
+  <li><strong>Expand-and-contract</strong> — add the new column/table while old code still runs; migrate readers; drop the old field. Never mutate in place.</li>
+  <li>Prefer <strong>backward-compatible changes</strong> (additive fields, nullable defaults) — old consumers keep working.</li>
+  <li><strong>Dual writing</strong> for migrations — write to both old and new representations until the switchover.</li>
+  <li><strong>Backfills</strong> run as background jobs with checkpoints; they fail mid-way and must resume.</li>
+  <li><strong>Online migrations</strong> (pgroll, gh-ost) beat downtime migrations for any always-on system.</li>
+  <li>Define <strong>retention</strong> up front — storage growth is a capacity and cost decision (§6b, cost row).</li>
+  <li>Treat <strong>irreversible data changes</strong> (deletes, rewrites) as one-way doors needing an ADR.</li>
+</ul>
+
+<h2>6d. Caching architecture — where to cache, what to cache, and how to invalidate</h2>
+
+<p>Caching is a scaling lever in §6; here it becomes a design discipline. Every cache is a copy of data with a <strong>staleness contract</strong> — the question is always "how stale is acceptable?"</p>
+
+<h3>Cache levels</h3>
+
+<table>
+  <thead><tr><th>Level</th><th>Example</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td>Browser cache</td><td>HTML, JS, CSS, images</td><td>Static assets; zero network cost</td></tr>
+    <tr><td>CDN cache</td><td>CloudFront, Fastly, Cloudflare</td><td>Global read-heavy static (and edge-dynamic) content</td></tr>
+    <tr><td>Edge cache</td><td>Vercel Edge, Workers KV</td><td>Personalized fragments, feature flags, low-latency reads</td></tr>
+    <tr><td>Application cache</td><td>In-process memory</td><td>Repeated computation, request-scoped data</td></tr>
+    <tr><td>Distributed cache</td><td>Redis, Memcached</td><td>Shared hot data across instances</td></tr>
+    <tr><td>Database cache</td><td>Buffer pool, query cache</td><td>Storage-layer reads</td></tr>
+    <tr><td>Client data cache</td><td>React Query / SWR, Apollo</td><td>Server-state reuse in the UI (link: <a href="./how-developers-think-frontend.html">Developer Loop</a>)</td></tr>
+  </tbody>
+</table>
+
+<h3>Write policies</h3>
+
+<table>
+  <thead><tr><th>Policy</th><th>Meaning</th><th>Trade-off</th></tr></thead>
+  <tbody>
+    <tr><td>Cache-aside</td><td>App reads/writes cache explicitly</td><td>Simple, but cache and DB can drift</td></tr>
+    <tr><td>Write-through</td><td>Write to cache and storage together</td><td>Stronger freshness, higher write latency</td></tr>
+    <tr><td>Write-behind</td><td>Write cache first, persist asynchronously</td><td>Fast writes, risk of loss on crash</td></tr>
+    <tr><td>Refresh-ahead</td><td>Refresh before expiry</td><td>Fewer misses, extra load on hot keys</td></tr>
+    <tr><td>Stale-while-revalidate</td><td>Serve stale while refreshing</td><td>Good UX, temporary staleness</td></tr>
+  </tbody>
+</table>
+
+<h3>Cache failure patterns</h3>
+
+<ul>
+  <li><strong>Cache stampede / thundering herd</strong> — expiry hits, every request recomputes against the DB. Fix: jittered TTLs, request coalescing, refresh-ahead.</li>
+  <li><strong>Hot keys</strong> — one key absorbs a disproportionate share. Fix: replication or local caching of the hot key.</li>
+  <li><strong>Oversized values</strong> — megabytes in a single key degrade every read. Fix: shrink or store metadata only.</li>
+  <li><strong>Unbounded TTLs</strong> — memory grows forever. Fix: TTL, eviction policy (LRU/LFU), size limits.</li>
+  <li><strong>Inconsistent invalidation</strong> — cache not invalidated on write → stale data served. Fix: version keys or write-through.</li>
+  <li><strong>Caching unauthorized or personalized data</strong> — the most serious: data leaks across tenants/users. Never cache at a layer that skips authorization (<a href="./how-developers-think-frontend.html">see Developer Loop §13c</a> for the same warning).</li>
+</ul>
+
+<h2>6e. Event and queue reliability — the operational layer under async</h2>
+
+<p>§10's event-driven example is the happy path. Event systems earn their complexity in these details — without them, async delivery is silent data loss.</p>
+
+<table>
+  <thead><tr><th>Concern</th><th>Pattern</th></tr></thead>
+  <tbody>
+    <tr><td>At-least-once delivery</td><td>Idempotent consumers (dedupe on event_id)</td></tr>
+    <tr><td>Ordering</td><td>Partition key per aggregate — all events for one entity go to one partition</td></tr>
+    <tr><td>Duplicate events</td><td>Event ID deduplication at the consumer</td></tr>
+    <tr><td>Poison messages</td><td>Dead-letter queue (DLQ) + alerting</td></tr>
+    <tr><td>Failed processing</td><td>Retry with exponential backoff, jitter, and a max-attempt cap</td></tr>
+    <tr><td>Schema evolution</td><td>Schema registry (Confluent Schema Registry, JSON/Protobuf)</td></tr>
+    <tr><td>Event versioning</td><td>Version field; upcast old events or run versioned consumers</td></tr>
+    <tr><td>Transactional emit</td><td>Outbox pattern (below)</td></tr>
+    <tr><td>Database-to-stream sync</td><td>Change Data Capture (Debezium)</td></tr>
+    <tr><td>Replay</td><td>Durable event log; replay is the ultimate recovery tool</td></tr>
+    <tr><td>Consumer lag</td><td>Monitor lag; autoscale consumers before lag becomes stale data</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The outbox pattern.</strong> When a service writes to its database <em>and</em> must emit an event, do both atomically: write the event row into an <strong>outbox table</strong> in the same transaction as the business write. A relay publishes outbox rows to the broker. It prevents the classic failure — "database updated, event never sent" — the exact scenario that silently breaks the inventory/order consistency in §10.</p>
+</blockquote>
+
+<p><strong>The rule:</strong> an event system is production-ready only when every message can be accounted for — consumed, dead-lettered, or replayable. If an event can vanish silently, the architecture is incomplete.</p>
+
+<h2>6f. Reliability and disaster recovery — SLOs, degradation, and recovery</h2>
+
+<p>A reliable system is not one that never fails. It is one that <em>fails in controlled, observable, recoverable ways</em>.</p>
+
+<h3>The vocabulary</h3>
+
+<table>
+  <thead><tr><th>Concept</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>SLI</td><td>The measured indicator — latency, error rate, availability</td></tr>
+    <tr><td>SLO</td><td>Internal reliability objective ("99.9% of reads &lt; 200ms p99")</td></tr>
+    <tr><td>SLA</td><td>External contractual commitment (usually looser than the SLO)</td></tr>
+    <tr><td>Error budget</td><td>Allowed unreliability — when it's spent, reliability work outranks features</td></tr>
+    <tr><td>RPO</td><td>Recovery Point Objective — maximum acceptable data loss</td></tr>
+    <tr><td>RTO</td><td>Recovery Time Objective — maximum acceptable downtime</td></tr>
+    <tr><td>Blast radius</td><td>What fails when one part fails (§5b failure domains)</td></tr>
+    <tr><td>Graceful degradation</td><td>What still works during partial failure</td></tr>
+  </tbody>
+</table>
+
+<h3>Disaster recovery patterns</h3>
+
+<table>
+  <thead><tr><th>Pattern</th><th>RTO/RPO</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td>Backup and restore</td><td>Hours / hours-to-a-day</td><td>Default for most systems; cheapest</td></tr>
+    <tr><td>Point-in-time recovery</td><td>Minutes / minutes</td><td>Data corruption is the feared failure</td></tr>
+    <tr><td>Warm standby</td><td>Minutes / near-zero</td><td>Availability matters, cost is secondary</td></tr>
+    <tr><td>Pilot light</td><td>Minutes / near-zero</td><td>Cost-efficient standby: minimal replicas, scale on failover</td></tr>
+    <tr><td>Active-passive failover</td><td>Seconds–minutes / near-zero</td><td>Region-level resilience</td></tr>
+    <tr><td>Active-active multi-region</td><td>Seconds / near-zero</td><td>Global read + local write; costs consistency complexity</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Drill everything.</strong> A backup that has never been restored is a hope, not a plan. Restore drills and failover drills are scheduled work, not incident-time work.</p>
+
+<h3>Overload protection</h3>
+
+<ul>
+  <li><strong>Timeouts</strong> on every external call — a missing timeout is a hanging dependency.</li>
+  <li><strong>Retry budgets</strong> — cap total retries; unbounded retries become cascading load.</li>
+  <li><strong>Exponential backoff with jitter</strong> — prevents thundering-herd retry storms.</li>
+  <li><strong>Circuit breakers</strong> — fail fast to a broken dependency instead of piling onto it.</li>
+  <li><strong>Bulkheads</strong> — isolate thread pools/connections per dependency (§6 failure patterns).</li>
+  <li><strong>Load shedding</strong> — drop low-value work (analytics, non-critical reads) before it takes down critical paths.</li>
+  <li><strong>Rate limiting</strong> — per-client and per-service caps.</li>
+  <li><strong>Queue backpressure</strong> — when producers outpace consumers, let the queue signal back instead of buffering forever.</li>
+  <li><strong>Cancellation propagation</strong> — when a caller gives up, cancel downstream work so it doesn't keep burning resources.</li>
+</ul>
+
+<h2>6g. Observability — designing systems that can be understood in production</h2>
+
+<p>Observability is not "add logs later." It is an architectural requirement with a name: if a failure cannot be seen, localized, and reproduced, the architecture is not operationally complete.</p>
+
+<h3>The four signals</h3>
+
+<table>
+  <thead><tr><th>Signal</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Metrics</td><td>Cheap aggregate health: latency, errors, saturation (USE/RED)</td></tr>
+    <tr><td>Logs</td><td>Discrete events with context</td></tr>
+    <tr><td>Traces</td><td>Request flow across service boundaries — the only way to localize</td></tr>
+    <tr><td>Profiles</td><td>CPU/memory hotspots when performance is the problem</td></tr>
+  </tbody>
+</table>
+
+<h3>Architectural requirements</h3>
+
+<ul>
+  <li><strong>Correlation IDs</strong> propagated through every request and event — one ID ties logs, traces, and metrics to a single journey (§10 does this for orders).</li>
+  <li><strong>Structured logs</strong> (JSON), not free text — searchable, filterable, machine-parseable.</li>
+  <li><strong>Trace propagation</strong> (OpenTelemetry) across every service boundary — a trace that stops at one service is a localization failure.</li>
+  <li><strong>Dependency health</strong> — each service reports the state of the services it calls (the failure domain map, made visible).</li>
+  <li><strong>Queue lag, cache hit ratio, saturation</strong> — the metrics that predict problems before users feel them.</li>
+  <li><strong>Business metrics</strong> — checkouts, signups, payments. Technical health alone can't prove the product works.</li>
+  <li><strong>Alerts tied to user impact</strong> — noisy alerts get ignored; SLO-burn alerting (§6f) ties alarms to the error budget.</li>
+  <li><strong>Dashboards per service and per critical journey</strong> — a green service can still have a broken journey.</li>
+</ul>
+
+<p><strong>The rule:</strong> ship observability with the service, not after it. A system you cannot understand in production is not designed — it is merely deployed.</p>
+
+---
+
 <h2>7. Component layer (micro) — where system design meets code</h2>
 
 <p>This layer is the direct upstream of the <a href="./how-developers-think-frontend.html">developer loop</a>. Every component the developer builds lives inside a boundary defined here.</p>
@@ -632,7 +890,7 @@
     <tr><td>Custom alias</td><td>Unique index on <code>alias</code> column in PostgreSQL</td><td>ACID guarantee. Reject on conflict. Low contention.</td></tr>
     <tr><td>Analytics</td><td>Async event: <code>RedirectOccurred</code> → Kafka → ClickHouse / BigQuery</td><td>Write path stays fast. Analytics is eventual.</td></tr>
     <tr><td>API Gateway</td><td>Rate limit (1000/min per IP), schema validation, auth for custom alias</td><td>Protect Resolve from abuse. Auth only for write path.</td></tr>
-    <tr><td>Availability</td><td>Multi-AZ PostgreSQL (sync replica), Redis Cluster (3 masters), Resolve stateless (K8s HPA)</td><td>99.99% = 52 min/yr downtime. Budget: 2 min/month for deployments.</td></tr>
+    <tr><td>Availability</td><td>Multi-AZ PostgreSQL (sync replica), Redis Cluster (3 masters), Resolve stateless (K8s HPA)</td><td>99.99% = ~52.6 min/yr ≈ 4.4 min/month of downtime. Zero-downtime deploys (traffic-shifted) keep that budget intact.</td></tr>
   </tbody>
 </table>
 
@@ -688,9 +946,9 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
   <tbody>
     <tr><td>Writes/day</td><td>100M</td><td>~1,150/s average, ~5,000/s peak</td></tr>
     <tr><td>Reads/day</td><td>10B</td><td>~115k/s average, ~500k/s peak</td></tr>
-    <tr><td>Redis memory (hot 20%)</td><td>~20M keys × 200B = 4 GB</td><td>Fits in single r6g.xlarge</td></tr>
+    <tr><td>Redis memory (hot 20%)</td><td>~20M keys × 200B = 4 GB</td><td>Fits in single r6g.xlarge. Back-of-envelope only — actual use needs key metadata, serialization overhead, fragmentation, and replication factored in.</td></tr>
     <tr><td>PostgreSQL size</td><td>100M rows × 500B = 50 GB</td><td>Single primary + 1 sync replica</td></tr>
-    <tr><td>Kafka throughput</td><td>115k events/s × 500B = 57 MB/s</td><td>3 broker cluster, 100 GB SSD each</td></tr>
+    <tr><td>Kafka throughput</td><td>115k events/s × 500B = 57 MB/s</td><td>3 broker cluster, 100 GB SSD each. Multiply by replication factor and acks for true disk/network load.</td></tr>
   </tbody>
 </table>
 
@@ -835,7 +1093,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+<h2>13. Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The system design discipline is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -892,7 +1150,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
     </tr>
     <tr>
       <td><strong>Formal Specification / Verification</strong></td>
-      <td>TLA+, Alloy, P, AWS P, Quint, FizzBee</td>
+      <td>TLA+, Alloy, P, Quint, FizzBee. (AWS has publicly described using TLA+ for critical services like S3 and DynamoDB.)</td>
       <td>Critical protocol → spec-checked, model-verified design</td>
       <td>Spec coverage: % critical paths specified; Bug prevention: caught vs production; Learning curve</td>
     </tr>
@@ -909,7 +1167,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>13. The future — where system design is going</h2>
+<h2>14. The future — where system design is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for system design</th></tr></thead>
@@ -943,7 +1201,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>14. Summary — the architectural checklist</h2>
+<h2>15. Summary — the architectural checklist</h2>
 
 <p>Before any code is written for a new domain, verify:</p>
 
@@ -959,6 +1217,11 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
     <tr><td>Is idempotency designed into every mutating endpoint?</td><td>Stop. Retries will corrupt state.</td></tr>
     <tr><td>Does the service topology match the team topology (Conway)?</td><td>Stop. Org/arch mismatch = friction forever.</td></tr>
     <tr><td>Are the architectural decisions recorded as ADRs?</td><td>Stop. Oral tradition loses context in 6 months.</td></tr>
+    <tr><td>Does every mutating endpoint have an idempotency key and a retry budget?</td><td>Stop. Retries will corrupt state (§6e).</td></tr>
+    <tr><td>Is there a dead-letter queue and a replay path for every event stream?</td><td>Stop. Silent event loss is undetectable data corruption (§6e).</td></tr>
+    <tr><td>Are SLOs defined and tied to user impact, with error-budget alerting?</td><td>Stop. No SLO = no agreed definition of "working" (§6f).</td></tr>
+    <tr><td>Is the failure visible, localizable, and reproducible (correlation IDs, traces, structured logs)?</td><td>Stop. An unobservable system is not operationally complete (§6g).</td></tr>
+    <tr><td>Is storage chosen by access pattern, with a schema-evolution path?</td><td>Stop. The familiar database that doesn't fit the pattern becomes a bottleneck (§6c).</td></tr>
   </tbody>
 </table>
 

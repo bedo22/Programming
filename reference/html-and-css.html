@@ -28,15 +28,15 @@
   <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — the developer loop builds components using HTML elements and CSS rules as primitives. The loop's "shape" decisions (component API, state shape) are constrained by what the platform makes expressible.</li>
   <li>Cross-cutting to <a href="./javascript-the-language.html">JavaScript: The Language</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them.</li>
   <li>Cross-cutting to <a href="./system-design.html">System Design</a> — rendering strategy (SSR, RSC, Islands, SPA) is a decision about <em>who emits the initial HTML and when CSS arrives</em>. The platform contract (HTML parsing, CSS blocking, font loading) is the ground truth every strategy negotiates with.</li>
-  <li>Context from <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — each camp (React, Vue, Svelte, Solid, Qwik, Astro) is a different abstraction over the same substrate. The substrate doesn't change; the abstraction's leakiness does.</</li>
-  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</</li>
+  <li>Context from <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — each camp (React, Vue, Svelte, Solid, Qwik, Astro) is a different abstraction over the same substrate. The substrate doesn't change; the abstraction's leakiness does.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
 </ul>
 
 <blockquote class="callout">
   <p><strong>The two-tree answer to "what is the web platform?"</strong></p>
   <ul>
     <li><strong>The DOM (Document Object Model)</strong> — the parsed HTML tree. Elements, attributes, text nodes. The structure the browser exposes to JavaScript. <code>document.querySelector('article')</code> returns a DOM node.</li>
-    <li><strong>The AOM (Accessibility Object Model) / Accessibility Tree</strong> — a parallel tree derived from the DOM, filtered for semantics. <code><button></code> becomes a <code>role="button"</code> node; <code><div onclick></code> becomes a generic node with no role. Screen readers traverse <em>this</em> tree, not the DOM.</</li>
+    <li><strong>The AOM (Accessibility Object Model) / Accessibility Tree</strong> — a parallel tree derived from the DOM, filtered for semantics. <code><button></code> becomes a <code>role="button"</code> node; <code><div onclick></code> becomes a generic node with no role. Screen readers traverse <em>this</em> tree, not the DOM.</li>
   </ul>
   <p>CSS operates on a third structure: the <strong>Render Tree</strong> (DOM + computed styles → boxes). The cascade, layout, paint, and composite all happen here. Three trees, one source: the HTML you write.</p>
 </blockquote>
@@ -187,7 +187,7 @@
     <tr>
       <td><strong>Frontend Camps Survey</strong></td>
       <td>React (JSX → HTML), Vue (SFC → HTML), Svelte (compile → HTML+CSS), Astro (islands → HTML)</td>
-      <td>Each camp is an <em>abstraction over the substrate</em>. React</em> substrate</em>. The substrate (HTML parsing, CSS cascade, layout) is identical; the abstraction's leakiness (hydration, style scoping, serialization) differs.</<td>
+      <td>Each camp is an <em>abstraction over the substrate</em>. The substrate (HTML parsing, CSS cascade, layout) is identical; the abstraction's leakiness (hydration, style scoping, serialization) differs.</td>
     </tr>
     <tr>
       <td><strong>Accessibility (WCAG / ARIA)</strong></td>
@@ -343,9 +343,274 @@
 </blockquote>
 
 ---
+<h2>6. Practical surface — the controls the platform hands you</h2>
+
+<p>The theory in §5 is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
+
+<h2>6b. HTML platform primitives — the kitchen it ships with</h2>
+
+<p>Semantic HTML is the accessibility API (§1.3). This is the working map of what the platform gives you before any CSS or JS.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Elements / APIs</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Document metadata</strong></td><td><code>html</code>, <code>head</code>, <code>meta charset</code>, <code>title</code>, <code>meta viewport</code>, <code>meta theme-color</code>, <code>link</code>, <code>script</code></td><td>Parsing, viewport, theming, resource loading. The head is the document's contract with the platform.</td></tr>
+    <tr><td><strong>Landmarks</strong></td><td><code>header</code>, <code>nav</code>, <code>main</code>, <code>aside</code>, <code>footer</code>, <code>section</code>, <code>article</code></td><td>Navigate-by-landmark; screen reader jump targets; document outline.</td></tr>
+    <tr><td><strong>Text semantics</strong></td><td><code>p</code>, <code>h1</code>–<code>h6</code>, <code>strong</code>, <code>em</code>, <code>mark</code>, <code>time</code>, <code>code</code>, <code>abbr</code>, <code>blockquote</code></td><td>Meaning + styling hooks + reading structure without guesswork.</td></tr>
+    <tr><td><strong>Lists</strong></td><td><code>ul</code>, <code>ol</code>, <code>dl</code>, <code>li</code>, <code>dt</code>, <code>dd</code></td><td>Grouping semantics, counted lists, term/definition pairs — not "bullets."</td></tr>
+    <tr><td><strong>Tables</strong></td><td><code>table</code>, <code>thead</code>, <code>tbody</code>, <code>caption</code>, <code>th</code>, <code>td</code>, <code>scope</code></td><td>Tabular data with header association; part of the <code>table</code> AOM contract.</td></tr>
+    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (§6e).</td></tr>
+    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (§6f).</td></tr>
+    <tr><td><strong>Disclosure & dialog</strong></td><td><code>details</code>, <code>summary</code>, <code>dialog</code>, Popover API</td><td>Native expand/collapse and overlays before any JS — keyboard and focus included.</td></tr>
+    <tr><td><strong>Scripting boundary</strong></td><td><code>script</code>, <code>noscript</code>, <code>template</code></td><td>Behavior injection, progressive-enhancement escape hatch, inert markup fragments.</td></tr>
+  </tbody>
+</table>
+
+<h3>Element-choice decision table</h3>
+
+<table>
+  <thead><tr><th>Need</th><th>Use</th><th>Not</th></tr></thead>
+  <tbody>
+    <tr><td>Click performs an action</td><td><code>button</code></td><td><code>div</code>/<code>span</code> with <code>onClick</code></td></tr>
+    <tr><td>Click navigates</td><td><code>a</code> with <code>href</code></td><td>a <code>button</code> faking navigation</td></tr>
+    <tr><td>Expand/collapse content</td><td><code>details</code> / <code>summary</code></td><td>custom accordion without keyboard support</td></tr>
+    <tr><td>Transient overlay</td><td><code>dialog</code> or Popover API</td><td>custom modal without focus management</td></tr>
+    <tr><td>Tabular data</td><td><code>table</code></td><td>grid of <code>div</code>s</td></tr>
+    <tr><td>Layout grid</td><td>CSS Grid</td><td><code>table</code></td></tr>
+    <tr><td>Related form controls</td><td><code>fieldset</code> + <code>legend</code></td><td>unlabelled inputs</td></tr>
+    <tr><td>List of items</td><td><code>ul</code> / <code>ol</code></td><td>many sibling <code>div</code>s</td></tr>
+    <tr><td>Definition pairs</td><td><code>dl</code></td><td>styled <code>div</code>s</td></tr>
+    <tr><td>Emphasis vs strong importance</td><td><code>em</code> / <code>strong</code></td><td>a styled <code>span</code> alone</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>A <code>div</code> with <code>onClick</code> is not a button.</strong> It is a liability: no keyboard, no role, no name, no focus, no form association until you hand-roll all of it. Prefer the platform control; reach for ARIA only when semantics gap (accessibility is covered in <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>).</p>
+</blockquote>
+
+<h2>6c. Units, math, and sizing</h2>
+
+<table>
+  <thead><tr><th>Unit</th><th>Meaning</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>px</code></td><td>Absolute CSS pixel</td><td>Borders, fine control, hairlines</td></tr>
+    <tr><td><code>rem</code></td><td>Root font size</td><td>Typography, spacing, scalable UI</td></tr>
+    <tr><td><code>em</code></td><td>Local font size</td><td>Component-relative sizing — careful with compounding</td></tr>
+    <tr><td><code>ch</code></td><td>Width of the <code>0</code> glyph</td><td>Line length, monospace alignment</td></tr>
+    <tr><td><code>%</code></td><td>Relative to containing block</td><td>Fluid layout</td></tr>
+    <tr><td><code>vw</code>/<code>vh</code></td><td>Viewport width/height</td><td>Full-screen layout (mind mobile toolbar) </td></tr>
+    <tr><td><code>svh</code>/<code>lvh</code>/<code>dvh</code></td><td>Small/large/dynamic viewport height</td><td>Mobile address-bar-safe full height</td></tr>
+    <tr><td><code>cqw</code>/<code>cqh</code></td><td>Container-query units</td><td>Component-relative sizing under <code>@container</code></td></tr>
+    <tr><td><code>fr</code></td><td>Fractional grid track</td><td>Grid track distribution</td></tr>
+  </tbody>
+</table>
+
+<p>Prefer <code>rem</code> for scalable type and spacing, <code>px</code> for borders and hairline detail, <code>%</code>/<code>fr</code>/<code>clamp()</code> for fluid layout. Use <code>dvh</code> (fallback <code>vh</code>) for mobile full-height to survive the address bar.</p>
+
+<h3>Math functions</h3>
+
+<table>
+  <thead><tr><th>Function</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>calc()</code></td><td>Mixed-unit arithmetic</td></tr>
+    <tr><td><code>min()</code></td><td>Upper bound (subtractive sizing)</td></tr>
+    <tr><td><code>max()</code></td><td>Lower bound</td></tr>
+    <tr><td><code>clamp()</code></td><td>Fluid typography/spacing between bounds</td></tr>
+    <tr><td><code>round()</code>/<code>mod()</code></td><td>Snapping and advanced layout math</td></tr>
+  </tbody>
+</table>
+
+<pre><code>font-size: clamp(1rem, 0.5rem + 1vw, 1.25rem);
+padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
+
+<h2>6d. Responsive strategy and layout patterns</h2>
+
+<p>Responsiveness is a judgment of where the boundary lives, not a fixed pixel set. Pick the tool that matches the context.</p>
+
+<table>
+  <thead><tr><th>Need</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Page/environment-level layout change</td><td><code>@media</code></td></tr>
+    <tr><td>Component adapts to its container</td><td><code>@container</code></td></tr>
+    <tr><td>Fluid typography/spacing</td><td><code>clamp()</code></td></tr>
+    <tr><td>Flexible images</td><td><code>max-width: 100%</code>, <code>srcset</code>, <code>sizes</code></td></tr>
+    <tr><td>Mobile URL-bar jump</td><td><code>dvh</code>/<code>svh</code>/<code>lvh</code></td></tr>
+    <tr><td>Touch vs hover behavior</td><td><code>@media (hover: hover)</code> and <code>(pointer: coarse)</code></td></tr>
+    <tr><td>Notch / home-indicator spacing</td><td><code>env(safe-area-inset-*)</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Layout pattern library</h3>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Best tool</th></tr></thead>
+  <tbody>
+    <tr><td>Vertical stack</td><td>Flex column + <code>gap</code></td></tr>
+    <tr><td>Horizontal cluster</td><td>Flex row + <code>wrap</code> + <code>gap</code></td></tr>
+    <tr><td>Sidebar layout</td><td>Grid named areas or flex</td></tr>
+    <tr><td>Card grid</td><td>Grid + <code>auto-fit</code> + <code>minmax()</code></td></tr>
+    <tr><td>Centering</td><td>Grid <code>place-items</code> or flex center</td></tr>
+    <tr><td>Overlap</td><td>Grid stacking (same cell / layered items)</td></tr>
+    <tr><td>Sticky header/footer</td><td>Grid rows + <code>position: sticky</code></td></tr>
+    <tr><td>Media object</td><td>Grid or flex</td></tr>
+    <tr><td>Full-bleed inside a text container</td><td>Grid with named columns</td></tr>
+    <tr><td>Masonry-like</td><td>CSS columns or grid, <code>masonry</code> with caution</td></tr>
+    <tr><td>Data-table on small screens</td><td>Horizontal scroll, row transform, or stacking</td></tr>
+  </tbody>
+</table>
+
+<p>Start mobile-first (smallest viewport base, enhance upward) — this is the progressive-enhancement contract applied to layout.</p>
+
+<h2>6e. Forms and validation — platform behavior, not styled inputs</h2>
+
+<p>A form is native platform behavior: submission, focus, validation, autofill, and keyboard accessibility come built in. Style it, don't rebuild it.</p>
+
+<table>
+  <thead><tr><th>Need</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Short text</td><td><code>input type="text"</code></td></tr>
+    <tr><td>Email</td><td><code>input type="email"</code></td></tr>
+    <tr><td>Phone</td><td><code>input type="tel"</code></td></tr>
+    <tr><td>URL</td><td><code>input type="url"</code></td></tr>
+    <tr><td>Number</td><td><code>input type="number"</code> or text with <code>inputmode="numeric"</code></td></tr>
+    <tr><td>Search</td><td><code>input type="search"</code></td></tr>
+    <tr><td>Date</td><td><code>input type="date"</code></td></tr>
+    <tr><td>Date + time</td><td><code>input type="datetime-local"</code></td></tr>
+    <tr><td>File</td><td><code>input type="file"</code></td></tr>
+    <tr><td>Single choice</td><td>radio group</td></tr>
+    <tr><td>Multiple choice</td><td>checkboxes</td></tr>
+    <tr><td>Many choices</td><td><code>select</code> or combobox</td></tr>
+    <tr><td>Long text</td><td><code>textarea</code></td></tr>
+    <tr><td>Submit</td><td><code>button type="submit"</code></td></tr>
+    <tr><td>Reset</td><td>avoid unless genuinely useful</td></tr>
+  </tbody>
+</table>
+
+<h3>Form checklist</h3>
+<ul>
+  <li>Every input has a real <code>label</code> (click targets it, name comes from it).</li>
+  <li>Group related fields with <code>fieldset</code> + <code>legend</code>.</li>
+  <li>Use correct types (<code>email</code>, <code>tel</code>, <code>url</code>, <code>number</code>, <code>search</code>, <code>date</code>, <code>password</code>) — right on-screen keyboard, right validation.</li>
+  <li>Use <code>autocomplete</code> values (<code>email</code>, <code>name</code>, <code>country</code>, …) for autofill.</li>
+  <li>Use <code>required</code>, <code>min</code>/<code>max</code>, <code>minlength</code>/<code>maxlength</code>, <code>pattern</code> where helpful.</li>
+  <li>Use <code>inputmode</code> and <code>enterkeyhint</code> for mobile keyboards.</li>
+  <li>Never disable zoom, and never suppress validating of a field the user hasn't touched: validate on <code>blur</code>/<code>submit</code>, and use <code>:user-invalid</code> for after-interaction errors — matched in <a href="./ui-ux-web-design.html">UI/UX forms</a>.</li>
+  <li>Associate errors with the field via <code>aria-describedby</code>.</li>
+  <li>Preserve user input after a validation failure.</li>
+</ul>
+
+<h2>6f. Media and responsive images</h2>
+
+<table>
+  <thead><tr><th>Technique</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>srcset</code> + <code>sizes</code></td><td>Resolution switching</td></tr>
+    <tr><td><code>picture</code></td><td>Art direction and format switching (AVIF/WebP)</td></tr>
+    <tr><td><code>loading="lazy"</code></td><td>Below-the-fold images</td></tr>
+    <tr><td><code>fetchpriority="high"</code></td><td>LCP hero image</td></tr>
+    <tr><td><code>decoding="async"</code></td><td>Non-critical decoding</td></tr>
+    <tr><td><code>aspect-ratio</code></td><td>Prevent layout shift (CLS)</td></tr>
+    <tr><td><code>object-fit</code></td><td>Cropping/fitting behavior</td></tr>
+  </tbody>
+</table>
+
+<p>Video: <code>controls</code> for native controls, <code>track</code> for captions/subtitles, <code>preload</code> for load strategy, <code>poster</code> as a placeholder, muted/autoplay only for safe ambient video. Always give dimensions (or <code>aspect-ratio</code>) to avoid CLS; lazy-load non-critical media; provide <code>alt</code> for informative images and <code>alt=""</code> for decorative ones; put meaningful content in HTML, not background images. Podcast/audio and captions interplay lives in <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>.</p>
+
+<h2>6g. Typography and font loading</h2>
+
+<p>Typography on the web is a loading + wrapping + wrapping contract — control it declaratively.</p>
+
+<table>
+  <thead><tr><th>Property/feature</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>font-family</code> stack with web fallbacks</td><td>Resilience when a font fails</td></tr>
+    <tr><td><code>font-display: swap</code></td><td>Avoid invisible text (FOIT)</td></tr>
+    <tr><td><code>font-display: optional</code></td><td>Skip font-driven layout shift for non-critical fonts</td></tr>
+    <tr><td><code>preload</code> font files</td><td>Faster critical text swap (align with LCP)</td></tr>
+    <tr><td>Variable fonts</td><td>Many weights/styles from one file</td></tr>
+    <tr><td><code>font-optical-sizing</code></td><td>Optical adjustments at size</td></tr>
+    <tr><td><code>text-rendering</code></td><td>Careful, mostly default</td></tr>
+  </tbody>
+</table>
+
+<pre><code>--text-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+--text-title: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);</code></pre>
+
+<ul>
+  <li>Body text ≥ 16px; line-height ~1.4–1.6; line length ~45–75 characters.</li>
+  <li>Avoid all-caps for long text; justify only with controlled hyphenation.</li>
+  <li>Keep type scaling and wrapping fluid — never captured at a fixed width (see <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> for proportion/contrast decisions).</li>
+</ul>
+
+<h2>6h. Color systems and theming</h2>
+
+<table>
+  <thead><tr><th>Layer</th><th>Example</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Primitive</strong></td><td><code>blue-500</code>, <code>gray-900</code></td><td>Raw palette</td></tr>
+    <tr><td><strong>Semantic</strong></td><td><code>color-bg</code>, <code>color-text-muted</code>, <code>color-border</code></td><td>Meaning, not hue</td></tr>
+    <tr><td><strong>Component</strong></td><td><code>button-bg</code>, <code>input-border</code></td><td>Scoped use</td></tr>
+    <tr><td><strong>State</strong></td><td><code>button-bg-hover</code>, <code>input-border-focus</code></td><td>Interaction</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Mode</th><th>Platform hook</th></tr></thead>
+  <tbody>
+    <tr><td>Light / dark</td><td><code>prefers-color-scheme</code>, <code>color-scheme</code></td></tr>
+    <tr><td>High contrast</td><td><code>forced-colors</code></td></tr>
+    <tr><td>Reduced transparency</td><td><code>prefers-reduced-transparency</code></td></tr>
+    <tr><td>Color-vision diversity</td><td>never rely on color alone</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Use semantic tokens, not raw hex (see §5 "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
+  <li>Meet WCAG AA contrast; don't communicate by color alone.</li>
+  <li>Test dark mode with images, shadows, brand colors; test forced-colors mode.</li>
+  <li>Adjust with OKLCH/OKLAB for perceptual uniformity; provide fallbacks for wide-gamut output.</li>
+</ul>
+
+<h2>6i. Motion and transitions</h2>
+
+<table>
+  <thead><tr><th>Tool</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>transition</code></td><td>Simple state changes</td></tr>
+    <tr><td><code>animation</code> / <code>@keyframes</code></td><td>Multi-step or looping motion</td></tr>
+    <tr><td>View Transitions</td><td>Element/page morphing</td></tr>
+    <tr><td>FLIP</td><td>JS-assisted performant movement</td></tr>
+    <tr><td><code>transform</code> / <code>opacity</code></td><td>Compositor-friendly animation</td></tr>
+    <tr><td><code>prefers-reduced-motion</code></td><td>Disable non-essential motion</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Animate <code>transform</code>/<code>opacity</code>, not layout properties.</li>
+  <li>Keep durations short for feedback; ease to match the object's meaning.</li>
+  <li>Respect <code>prefers-reduced-motion</code>; never autoplay distracting motion.</li>
+  <li>Use motion to explain state change — as meaning, not decoration (Principle 8).</li>
+</ul>
+
+<h2>6j. Core Web Vitals ↔ platform knobs</h2>
+
+<p>Performance is a platform feature you configure (§8). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>.</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>HTML/CSS relevance</th></tr></thead>
+  <tbody>
+    <tr><td><strong>LCP</strong></td><td>Hero image (<code>fetchpriority="high"</code>, <code>preload</code>), critical CSS, font loading (<code>font-display: swap</code>)</td></tr>
+    <tr><td><strong>CLS</strong></td><td><code>aspect-ratio</code> and dimensions on media, font swapping, injected content, reserved space</td></tr>
+    <tr><td><strong>INP</strong></td><td>Main-thread pressure from heavy CSS/JS; long tasks; animate compositor props only</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Owned elsewhere — boundaries respected:</strong> performance and CWV measurement methodology is owned by <a href="./system-design.html">System Design</a>; browser-rendering strategy (SSR/RSC/Islands, streaming, hydration) is owned by <a href="./system-design.html">System Design</a> and <a href="./frontend-camps-survey.html">Frontend Camps Survey</a>; interaction/focus/model depth by the <a href="./javascript-the-language.html">JavaScript</a> docs; accessibility testing workflow by <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>. This doc owns the platform controls that make those systems actual.</p>
+
+---
 <h2>7. Methodologies / named frameworks</h2>
 
-<p>Multiple named authoring approaches exist. None is canonical; each packages the rhythm for a different context.</</p>
+<p>Multiple named authoring approaches exist. None is canonical; each packages the rhythm for a different context.</p>
 
 <table>
   <thead><tr><th>Methodology</th><th>Core idea</th><th>Origin</th><th>Best for</th></tr></thead>
@@ -407,7 +672,7 @@
   </tbody>
 </table>
 
-<p>All ten share the same DNA: <em>write semantic HTML → let the cascade resolve → scope styles to components → encode decisions as tokens → validate in browser → iterate</em>. The differences are authoring ergonomics, scoping mechanism, and where the token source lives.</</p>
+<p>All nine share the same DNA: <em>write semantic HTML → let the cascade resolve → scope styles to components → encode decisions as tokens → validate in browser → iterate</em>. The differences are authoring ergonomics, scoping mechanism, and where the token source lives.</p>
 
 ---
 <h2>8. Principles — the shared constants</h2>
@@ -584,7 +849,7 @@
   <li><strong>Dark mode</strong> — tokens swap via <code>@media (prefers-color-scheme: dark)</code>. OKLCH preserves perceptual lightness; no "vibrating" brand colors.</li>
   <li><strong>RTL</strong> — logical properties (<code>margin-inline-start</code>, <code>padding-inline-end</code>, <code>border-inline-start</code>) mirror automatically. Flex/Grid honor <code>dir="rtl"</code> on <code><html></code>. The badge stays leading; footer actions reverse.</li>
   <li><strong>Reduced motion</strong> — <code>@media (prefers-reduced-motion: reduce)</code> zeros motion tokens. Transitions become instant. No vestibular triggers.</li>
-  <li><strong>High contrast / forced colors</strong> — <code>@media (forced-colors: active)</code> disables backgrounds/shadows; system colors take over. <code>border: 1px solid CanvasText</code> ensures visibility.</</li>
+  <li><strong>High contrast / forced colors</strong> — <code>@media (forced-colors: active)</code> disables backgrounds/shadows; system colors take over. <code>border: 1px solid CanvasText</code> ensures visibility.</li>
 </ul>
 
 <h3>Step 5 — Screen reader verification (AOM diff)</h3>
@@ -697,7 +962,7 @@
     <tr>
       <td><strong>Mobile zoom disabled via viewport</strong></td>
       <td><code><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"></code></td>
-      <td>Accessibility violation (WCAG 1.4.4). Fix: never disable zoom. <code>maximum-scale=1</code> and <code>user-scalable=no</code> are anti-patterns.</<td>
+      <td>Accessibility violation (WCAG 1.4.4). Fix: never disable zoom. <code>maximum-scale=1</code> and <code>user-scalable=no</code> are anti-patterns.</td>
     </tr>
     <tr>
       <td><strong>CSS-in-JS runtime in production</strong></td>
@@ -708,6 +973,51 @@
       <td><strong>Form validation UX: red border on keystroke</strong></td>
       <td>User types first character; field turns red; "invalid" before they finish</td>
       <td>Validating on <code>onChange</code> / <code>input</code>. Fix: validate on <code>blur</code> or <code>submit</code>; show inline error <em>after</em> interaction; use <code>:user-invalid</code> (native, after interaction).</td>
+    </tr>
+    <tr>
+      <td><strong>Magic numbers drift</strong></td>
+      <td>Hardcoded <code>px</code>/<code>hex</code> everywhere; a "small spacing" change means an audit</td>
+      <td>No token layer. Fix: hoist to custom properties (§5 "Tokens over magic numbers").</td>
+    </tr>
+    <tr>
+      <td><strong>Utility soup</strong></td>
+      <td>Markup becomes <code>&lt;div class="pt-4 flex gap-2 text-sm text-muted item-center"&gt;</code>; semantics gone</td>
+      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (§7 Methodologies).</td>
+    </tr>
+    <tr>
+      <td><strong>Sticky misuse: doesn't stick</strong></td>
+      <td><code>position: sticky</code> element never sticks</td>
+      <td>Sticky sticks within its nearest scrolling ancestor; broken by <code>overflow: hidden</code>, or the cell/column, or no allowed travel. Fix: inspect the containing block and overflow ancestors.</td>
+    </tr>
+    <tr>
+      <td><strong>Mobile viewport confusion</strong></td>
+      <td>Layout jumps when the browser tab bar collapses/expands</td>
+      <td><code>vh</code> tracks the largest viewport. Fix: <code>dvh</code>/<code>svh</code>/<code>lvh</code> or <code>100%</code> on the scroll parent.</td>
+    </tr>
+    <tr>
+      <td><strong>CSS-only overreach</strong></td>
+      <td>Tabs, accordions, form validation logic forced into <code>:nth-child</code> and selectors</td>
+      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (§5 "State lives in attributes").</td>
+    </tr>
+    <tr>
+      <td><strong>Unused / undelivered CSS</strong></td>
+      <td>Huge stylesheet, slow first paint, dead rules confusing later authors</td>
+      <td>No cleanup path. Fix: purge unused classes, code-split critical CSS, keep selectors to delivered components.</td>
+    </tr>
+    <tr>
+      <td><strong>Dark mode inverted media hack</strong></td>
+      <td><code>filter: invert() hue-rotate(...)</code> breaks images, brand colors, shadows</td>
+      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (§6h).</td>
+    </tr>
+    <tr>
+      <td><strong>Animation overuse</strong></td>
+      <td>Entry animations everywhere; vestibular discomfort; heavy main-thread load</td>
+      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (§6i).</td>
+    </tr>
+    <tr>
+      <td><strong>Token bureaucracy</strong></td>
+      <td>Every local decision must route through a token; components lose judgment</td>
+      <td>Tokens overgoverned. Fix: govern the palette/spacing, allow documented per-component exceptions.</td>
     </tr>
   </tbody>
 </table>
@@ -729,7 +1039,7 @@
 
 <h2>11. Ecosystem — tooling catalog with decision metrics</h2>
 
-<p>The platform is only as good as the tooling that makes its primitives visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+<p>The platform is only as good as the tooling that makes its primitives visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
 <table>
   <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
@@ -886,7 +1196,7 @@
   <a href="https://www.w3.org/TR/css-contain-3/">W3C (2024). <em>CSS Container Queries Level 3</em>.</a> ·
   <a href="https://www.w3.org/TR/css-cascade-5/#layering">W3C (2024). <em>CSS Cascade Layers</em>.</a> ·
   <a href="https://www.w3.org/TR/selectors-4/">W3C (2024). <em>Selectors Level 4</em> (<code>:has()</code>, <code>:focus-visible</code>, <code>:user-invalid</code>).</a> ·
-  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAIC (2023). <em>WCAG 2.2 Quick Reference</em>.</a> ·
+  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAI (2023). <em>WCAG 2.2 Quick Reference</em>.</a> ·
   <a href="https://www.w3.org/TR/html-aam-1.0/">W3C (2023). <em>HTML Accessibility API Mappings 1.0</em>.</a> ·
   <a href="https://tokens.dtcg.io/">W3C Design Tokens Community Group (2024). <em>Design Tokens Format Module</em>.</a> ·
   <a href="https://www.w3.org/TR/css-color-4/">W3C (2024). <em>CSS Color Level 4</em> (OKLCH, OKLAB).</a> ·

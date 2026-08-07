@@ -1,0 +1,1269 @@
+## Overall verdict
+
+This is a **very strong API Design reference**. It is conceptually clear, well positioned, and more mature than most API docs because it treats API design as **contract engineering**, not “choose REST vs GraphQL.”
+
+Its strongest parts:
+
+- The macro/micro split: interface contract vs wire contract.
+- “Contract as product” mentality.
+- Schema as source of truth.
+- Consumer-driven contracts.
+- Idempotency as a first-class mutation concern.
+- Error contract as API, not accident.
+- Versioning and deprecation as deliberate cost.
+- Migration paths between API styles.
+- The shipment tracking worked example.
+
+The document is already excellent as a **contract philosophy**. The main weakness is that it is lighter on **operational API mechanics**: pagination, filtering, caching, concurrency, long-running operations, webhooks, streaming, security flows, governance, and frontend-specific contract concerns.
+
+So: **not fully complete yet**, but close. It needs more practical depth in the patterns teams actually hit after the first endpoint ships.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Conceptual framing | Very strong |
+| Contract philosophy | Very strong |
+| History and evolution | Strong |
+| Style comparison | Strong |
+| Worked example | Strong |
+| Operational API patterns | Needs expansion |
+| Security architecture | Needs expansion |
+| Frontend contract concerns | Needs expansion |
+| AI/tool API design | Needs expansion |
+| Governance and deprecation | Needs expansion |
+| Duplication control | Good |
+
+I would rate it approximately:
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 9 / 10 |
+| Conceptual completeness | 9 / 10 |
+| Practical completeness | 7.5 / 10 |
+| Frontend relevance | 7 / 10 |
+| AI-era readiness | 7 / 10 |
+
+---
+
+# 1. What the document already does especially well
+
+## 1.1 The contract framing is excellent
+
+The distinction between:
+
+- **interface contract**: resources, operations, versioning, auth, errors, pagination, deprecation,
+- **wire contract**: serialization, schema evolution, nullability, enum extensibility, timestamps, transport,
+
+is one of the strongest parts of the doc.
+
+Many API docs only talk about REST vs GraphQL. This doc correctly says the real work is defining **stable promises between independently deployable systems**.
+
+Keep this.
+
+---
+
+## 1.2 “Contract as product” is the right mental model
+
+The idea that the API is a product for consumers is exactly the right framing.
+
+This means API design includes:
+
+- support policy,
+- deprecation timeline,
+- changelog,
+- migration guides,
+- adoption metrics,
+- consumer communication,
+- compatibility guarantees.
+
+This should remain central.
+
+---
+
+## 1.3 Idempotency is correctly treated as non-optional
+
+The document is right to make idempotency a core principle for mutations.
+
+This is one of the most common real-world API failures:
+
+- client retries,
+- network timeout,
+- server succeeded,
+- client does not know,
+- duplicate side effect happens.
+
+The doc’s guidance — client-generated idempotency keys plus server deduplication — is correct and important.
+
+---
+
+## 1.4 Error contract as API is strong
+
+The use of RFC 9457 Problem Details is good.
+
+The principle:
+
+> Clients switch on `type`, not string matching.
+
+is exactly right.
+
+This should be expanded, but the foundation is strong.
+
+---
+
+## 1.5 The migration paths section is valuable
+
+Many API docs describe styles statically. This doc correctly describes movement between styles:
+
+- REST → GraphQL,
+- REST → tRPC,
+- REST → gRPC,
+- sync → event-driven,
+- manual contract → AI-augmented contract.
+
+This is one of the document’s best structural ideas.
+
+---
+
+# 2. Duplication boundaries
+
+The doc mostly stays in its lane, but as you expand it, these boundaries should stay clear.
+
+| Topic | Best owner | What API Design should do |
+|---|---|---|
+| Service boundaries and data ownership | System Design | Link; API Design materializes boundaries as contracts |
+| UI error/loading affordances | UI/UX | Link; API Design owns machine-readable error contract |
+| Frontend data consumption loop | How Developers Think | Link; API Design should describe contract impact, not implementation loop |
+| Pipeline enforcement | Version Control / CI/CD | Link; API Design can require schema checks but not teach pipeline mechanics |
+| Test technique details | Testing & Debugging | Link; API Design can require contract tests but not teach all testing |
+| Architecture-level security | System Design | Link; API Design owns auth contract, scopes, token validation, request-level trust |
+| Product discovery | Design Thinking | Link; API Design receives validated product constraints |
+
+The main risk as you improve this doc is accidentally absorbing:
+
+- System Design service topology,
+- UI state design,
+- Testing methodology,
+- CI/CD pipeline mechanics.
+
+Keep those as links. API Design should own **contract shape, evolution, semantics, safety, and consumer experience**.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important additions.
+
+---
+
+## 3.1 Add API naming and convention guidance
+
+The doc talks about resource topology, but it should give concrete conventions.
+
+Add a section:
+
+> **API conventions — the rules that keep contracts predictable**
+
+Include:
+
+| Convention | Recommendation |
+|---|---|
+| Resource names | Plural nouns: `/orders`, `/shipments`, `/users` |
+| Actions | Use HTTP verbs, not verb paths where possible |
+| Subresources | Use when ownership is clear: `/orders/{id}/items` |
+| Deep nesting | Avoid more than two levels |
+| Field casing | Choose one: snake_case or camelCase; enforce it |
+| IDs | Opaque, stable, URL-safe identifiers |
+| Timestamps | ISO 8601 UTC: `2026-01-01T12:00:00Z` |
+| Dates | `YYYY-MM-DD` |
+| Durations | ISO 8601 duration or explicit seconds/milliseconds |
+| Money | Decimal string or minor units + currency code |
+| Booleans | Prefer positive names: `enabled`, `active` |
+| Enums | Uppercase or snake_case; document unknown-value handling |
+| Null vs absent | Define explicit semantics |
+
+This would make the doc much more practical.
+
+---
+
+## 3.2 Add identifier design guidance
+
+The failure modes section says internal IDs should not leak, but the doc should explain what to do instead.
+
+Add:
+
+| Identifier type | Use when |
+|---|---|
+| UUID v4 | Public IDs where unpredictability matters |
+| ULID / UUIDv7 | Sortable public IDs with time component |
+| Namespaced IDs | Multi-resource clarity: `shp_123`, `ord_456` |
+| Opaque cursors | Pagination tokens |
+| Natural keys | Stable business identifiers, if truly stable |
+
+Add principles:
+
+- Do not expose database auto-increment IDs unless harmless.
+- Do not expose object IDs that reveal storage implementation.
+- Keep IDs stable even if internal storage changes.
+- Use prefixes for readability: `shp_`, `inv_`, `usr_`.
+- Make IDs URL-safe.
+
+This is a high-value addition.
+
+---
+
+## 3.3 Add pagination, filtering, sorting, and search conventions
+
+The doc mentions cursor pagination, but it needs a full section.
+
+Add:
+
+> **Collection contracts — pagination, filtering, sorting**
+
+### Pagination
+
+| Style | Use when | Risk |
+|---|---|---|
+| Offset pagination | Small datasets, admin UIs | Slow at scale, inconsistent under writes |
+| Cursor/keyset pagination | Large or active datasets | Requires stable sort key |
+| Page-number pagination | Simple UI, low scale | Same problems as offset |
+| Streaming/SSE | Continuous updates | More complex client state |
+
+### Cursor guidance
+
+Add:
+
+- Cursors should be opaque.
+- Cursors should encode sort position, not raw IDs unless safe.
+- Cursors should handle deleted items gracefully.
+- Include `next_cursor`, not just boolean `has_more`.
+- Define cursor expiry if it contains signed state.
+
+### Filtering/sorting
+
+Add:
+
+```http
+GET /shipments?status=IN_TRANSIT&created_after=2026-01-01T00:00:00Z&limit=50&cursor=abc123
+```
+
+Define conventions:
+
+- `filter[field]` or direct field names,
+- `sort=created_at:desc`,
+- multiple sort fields,
+- default sort,
+- maximum `limit`,
+- invalid filter errors.
+
+This is a major practical gap.
+
+---
+
+## 3.4 Add validation error details
+
+The error section is good, but it should include field-level validation errors.
+
+Add:
+
+```json
+{
+  "type": "https://api.example.com/errors/validation-failed",
+  "title": "Validation Failed",
+  "status": 422,
+  "detail": "Request body failed validation.",
+  "instance": "/v1/shipments",
+  "errors": [
+    {
+      "field": "status",
+      "code": "invalid_enum",
+      "message": "Status must be one of CREATED, PICKED_UP, IN_TRANSIT."
+    },
+    {
+      "field": "location.country_code",
+      "code": "invalid_format",
+      "message": "Country code must be two uppercase letters."
+    }
+  ]
+}
+```
+
+Add principles:
+
+- Machine-readable `code` per error.
+- Human-readable `message` per error.
+- Field path for nested errors.
+- Stable error types.
+- Do not expose stack traces.
+- Distinguish client errors from server errors.
+
+This is essential for frontend forms and API consumers.
+
+---
+
+## 3.5 Add caching and conditional requests
+
+This is a major missing topic.
+
+Add:
+
+> **Caching contracts — HTTP caching, ETags, conditional requests**
+
+### Read caching
+
+| Mechanism | Use for |
+|---|---|
+| `Cache-Control` | Public/private caching policy |
+| `ETag` | Resource version |
+| `If-None-Match` | Conditional GET |
+| `Last-Modified` | Simpler conditional GET |
+| `stale-while-revalidate` | Fast UX with background refresh |
+
+Example:
+
+```http
+GET /v1/shipments/SHP-123
+If-None-Match: "v17"
+```
+
+Response:
+
+```http
+304 Not Modified
+```
+
+or:
+
+```http
+200 OK
+ETag: "v18"
+Cache-Control: private, max-age=0, must-revalidate
+```
+
+### Write concurrency
+
+Add:
+
+```http
+PATCH /v1/shipments/SHP-123
+If-Match: "v18"
+```
+
+If version changed:
+
+```http
+412 Precondition Failed
+```
+
+This gives APIs optimistic concurrency control.
+
+Add:
+
+- Use ETags for mutable resources.
+- Use version tokens for complex aggregates.
+- Do not rely on client-side read-modify-write without concurrency control.
+- Personalized responses should usually be `private` or uncached.
+
+This would significantly improve completeness.
+
+---
+
+## 3.6 Add concurrency and optimistic locking
+
+This belongs with caching but deserves explicit mention.
+
+Add:
+
+| Problem | Contract solution |
+|---|---|
+| Two clients update same resource | `If-Match` with ETag |
+| Stale read before mutation | Resource version field |
+| Batch updates conflict | Per-item status and version |
+| Concurrent cancellation | Idempotency + version check |
+
+Example resource field:
+
+```json
+{
+  "id": "shp_123",
+  "version": 18,
+  "status": "IN_TRANSIT"
+}
+```
+
+Then clients can send:
+
+```http
+If-Match: "18"
+```
+
+or:
+
+```json
+{
+  "base_version": 18,
+  "status": "OUT_FOR_DELIVERY"
+}
+```
+
+This is important for real systems.
+
+---
+
+## 3.7 Add long-running operations
+
+The worked example has SSE, but the doc should cover asynchronous operations more generally.
+
+Add:
+
+> **Long-running operations — 202, job resources, webhooks**
+
+Pattern:
+
+```http
+POST /v1/reports
+Idempotency-Key: 4f9c2...
+
+202 Accepted
+Location: /v1/reports/jobs/job_123
+```
+
+Job resource:
+
+```json
+{
+  "id": "job_123",
+  "status": "RUNNING",
+  "submitted_at": "2026-01-01T12:00:00Z",
+  "expires_at": "2026-01-01T13:00:00Z",
+  "result_url": null,
+  "error": null
+}
+```
+
+States:
+
+```text
+QUEUED → RUNNING → SUCCEEDED
+                 → FAILED
+                 → CANCELED
+```
+
+Add guidance:
+
+- Return `202 Accepted` for work that is not immediate.
+- Provide a job resource.
+- Support cancellation if possible.
+- Provide webhook notification on completion.
+- Make job status idempotent to poll.
+- Define expiry for results.
+- Do not make clients poll forever.
+
+This is a major real-world gap.
+
+---
+
+## 3.8 Add webhook design guidance
+
+The doc mentions webhooks, but not enough.
+
+Add:
+
+> **Webhooks — push contracts**
+
+### Webhook event envelope
+
+```json
+{
+  "id": "evt_123",
+  "type": "shipment.delivered",
+  "created_at": "2026-01-01T12:00:00Z",
+  "data": {
+    "shipment_id": "shp_123",
+    "status": "DELIVERED"
+  }
+}
+```
+
+### Delivery requirements
+
+| Concern | Requirement |
+|---|---|
+| Authentication | HMAC signature header |
+| Replay protection | Timestamp + nonce or event ID dedupe |
+| Ordering | Do not guarantee unless explicitly designed |
+| Retries | Exponential backoff |
+| Idempotency | Consumers must deduplicate by event ID |
+| Failure | Dead-letter queue and replay option |
+| Testing | Test endpoint or CLI |
+| Secret rotation | Support multiple active secrets |
+
+Add:
+
+> A webhook is not “fire and forget.” It is a contract with delivery, signature, retry, and idempotency requirements.
+
+This is essential for modern APIs.
+
+---
+
+## 3.9 Add realtime/streaming API guidance
+
+The example uses SSE, but the doc should explain when to use what.
+
+Add:
+
+| Pattern | Use when |
+|---|---|
+| Polling | Simple, low frequency, tolerant latency |
+| Long polling | Server can hold request until change |
+| SSE | Server-to-client updates over HTTP |
+| WebSocket | Bidirectional low-latency communication |
+| gRPC streaming | Service-to-service high-throughput streams |
+| WebTransport / QUIC | Experimental low-latency bidirectional transport |
+
+### SSE guidance
+
+Add:
+
+- Use `event:` names.
+- Use `id:` for resume.
+- Support `Last-Event-ID` reconnection.
+- Keep messages small.
+- Send periodic heartbeats.
+- Authenticate before opening stream if possible.
+
+### WebSocket guidance
+
+Add:
+
+- Define message envelope.
+- Use sequence numbers.
+- Handle reconnection and resynchronization.
+- Send heartbeats.
+- Limit message size.
+- Apply rate limits.
+- Authenticate on connect or via ticket.
+
+This would make the doc more complete for frontend and real-time systems.
+
+---
+
+## 3.10 Add security and authorization patterns
+
+The doc mentions auth, but it needs more depth.
+
+Add:
+
+> **Security contracts — authentication, authorization, and browser constraints**
+
+### Authentication patterns
+
+| Client type | Recommended flow |
+|---|---|
+| Browser SPA | Authorization Code + PKCE, or same-site session cookies |
+| Native mobile | Authorization Code + PKCE |
+| Service-to-service | Client credentials, mTLS, or workload identity |
+| Public browser JS | Never use long-lived secret or raw API key |
+| Partner integrations | Scoped API keys or OAuth client credentials |
+| End-user delegation | OAuth access tokens with narrow scopes |
+
+### Token guidance
+
+Add:
+
+- Validate `iss`, `aud`, `exp`, `nbf`, signature.
+- Keep token lifetimes short.
+- Use refresh tokens securely.
+- Rotate signing keys.
+- Do not put sensitive claims in unencrypted JWT payloads.
+- Do not treat JWT possession as full authorization; check scopes/resource ownership.
+
+### Scopes
+
+Example:
+
+```text
+shipments:read
+shipments:write
+webhooks:manage
+reports:read
+```
+
+### Browser constraints
+
+Add:
+
+- CORS allowlists must be explicit.
+- Avoid `Access-Control-Allow-Origin: *` with credentials.
+- Understand preflight for custom headers.
+- Use SameSite cookies correctly.
+- Do not expose secrets to browser bundles.
+
+This is important for your frontend-heavy shelf.
+
+---
+
+## 3.11 Add schema evolution compatibility matrix
+
+The doc mentions evolution rules, but it should formalize them.
+
+Add:
+
+> **Compatibility matrix — what is safe and what breaks**
+
+| Change | REST/JSON | Protobuf | GraphQL |
+|---|---|---|---|
+| Add optional output field | Safe | Safe | Safe |
+| Add required output field | Breaking | Usually breaking | Breaking if clients rely on shape |
+| Remove output field | Breaking if consumed | Safe only if field reserved and unused | Breaking if queried |
+| Rename field | Breaking | Breaking | Breaking unless alias/migration |
+| Change field type | Breaking | Breaking | Breaking |
+| Add enum value | Conditionally safe | Usually safe | Safe only if clients handle unknown |
+| Add optional input field | Safe | Safe | Safe |
+| Add required input field | Breaking | Breaking | Breaking |
+| Remove input field | Breaking if sent | Breaking if sent | Breaking if used |
+| Change validation rules | Can break clients | Can break clients | Can break clients |
+
+Add:
+
+> “Safe” means safe for well-behaved clients. Typed clients that exhaustively switch on enums or require exact shapes can still break. Document client compatibility expectations.
+
+This is extremely useful.
+
+---
+
+## 3.12 Add API style selection matrix
+
+The doc describes styles, but should help choose.
+
+Add:
+
+| Context | Good default | Why |
+|---|---|---|
+| Public HTTP API, many clients | REST + JSON | Simple, cacheable, widely understood |
+| Mobile/web with complex data needs | GraphQL | Client controls shape, reduces over/under-fetching |
+| Internal high-performance services | gRPC | Binary, typed, streaming, codegen |
+| Full-stack TypeScript monorepo | tRPC / Zod | End-to-end types, low ceremony |
+| Event notifications | AsyncAPI / webhooks | Loose coupling, replay, multiple consumers |
+| Realtime user-facing updates | SSE or WebSocket | Push updates |
+| Batch data ingestion | REST batch or event stream | Idempotency and throughput |
+| Public partner platform | REST + OpenAPI + SDKs | Stability and ecosystem support |
+
+This would make the style section more actionable.
+
+---
+
+## 3.13 Add GraphQL operational guidance
+
+The doc mentions GraphQL but does not cover its operational pitfalls.
+
+Add:
+
+| Concern | Guidance |
+|---|---|
+| N+1 queries | Use DataLoader / batching |
+| Query depth | Enforce max depth |
+| Query complexity | Enforce cost/complexity limits |
+| Persisted queries | Use for caching and security |
+| Field authorization | Enforce at resolver level |
+| Caching | Use HTTP caching for queries or persisted query CDN |
+| Introspection | Disable in production if public |
+| Subscriptions | Use sparingly; consider SSE/webhooks first |
+| Error semantics | Return partial data with errors where appropriate |
+
+This is important because GraphQL is easy to adopt but easy to misuse.
+
+---
+
+## 3.14 Add gRPC operational guidance
+
+Similarly, gRPC needs practical guidance.
+
+Add:
+
+| Concern | Guidance |
+|---|---|
+| Deadlines | Every client call should set one |
+| Cancellation | Propagate context/cancellation |
+| Error codes | Use standard gRPC codes, not arbitrary strings |
+| Streaming | Define backpressure and reconnect behavior |
+| Proto evolution | Reserve removed field numbers |
+| Browser support | Use gRPC-Web or gateway |
+| Debugging | Include request IDs and trace context |
+| Service identity | Use mTLS or workload identity |
+
+This would balance the styles section.
+
+---
+
+## 3.15 Add event-driven schema governance
+
+The doc mentions AsyncAPI and CloudEvents, but should cover schema registry concerns.
+
+Add:
+
+| Concern | Guidance |
+|---|---|
+| Compatibility mode | BACKWARD, FORWARD, FULL, NONE |
+| Event versioning | Version in schema, not only topic |
+| Upcasting | Transform old events to new shape |
+| Ordering | Partition by aggregate ID |
+| Idempotency | Deduplicate by event ID |
+| Dead-letter queue | Capture poison messages |
+| Replay | Keep durable log if replay matters |
+| Schema registry | Enforce compatibility in CI |
+
+Add:
+
+> Event contracts are harder than request/response contracts because consumers are often unknown. Compatibility rules must be explicit.
+
+This is valuable for system-level completeness.
+
+---
+
+## 3.16 Add API governance and deprecation playbook
+
+The doc has deprecation policy, but it should become a process.
+
+Add:
+
+> **API governance — how contracts stay healthy over time**
+
+Include:
+
+- API style guide.
+- Design review checklist.
+- ADRs for major contract decisions.
+- Changelog policy.
+- Sunset policy.
+- Exception process.
+- Consumer inventory.
+- Telemetry for deprecated fields/endpoints.
+- Breaking-change review gate.
+
+### Deprecation playbook
+
+```text
+1. Identify affected consumers.
+2. Announce deprecation with timeline.
+3. Add Sunset and Deprecation headers.
+4. Emit telemetry when deprecated fields are used.
+5. Publish migration guide.
+6. Provide support window.
+7. Disable deprecated access gradually.
+8. Remove after sunset.
+```
+
+This makes the doc more mature.
+
+---
+
+## 3.17 Add API developer experience
+
+The doc mentions docs and SDKs, but should treat DX as a first-class concern.
+
+Add:
+
+| DX artifact | Purpose |
+|---|---|
+| Reference docs | Endpoint/schema details |
+| Guides | Common integration tasks |
+| Quickstart | First successful call |
+| Postman/Insomnia collection | Runnable examples |
+| SDKs | Ergonomic client libraries |
+| Changelog | Consumer-visible changes |
+| Error catalog | All error types and remedies |
+| Sandbox/test mode | Safe experimentation |
+| Status page | Availability communication |
+
+Add metrics:
+
+- time to first successful call,
+- doc search success,
+- support ticket volume,
+- SDK adoption,
+- integration failure rate,
+- breaking-change incidents.
+
+This reinforces “API as product.”
+
+---
+
+## 3.18 Add API observability and telemetry
+
+The doc has a principle, but should expand.
+
+Add:
+
+| Signal | Purpose |
+|---|---|
+| Request ID | Trace one request across systems |
+| Trace context | Distributed tracing |
+| Latency percentiles | p50/p95/p99 performance |
+| Error rate by status/type | Contract health |
+| 4xx breakdown | Client misuse/validation issues |
+| 5xx breakdown | Provider faults |
+| Retry-After compliance | Rate-limit effectiveness |
+| Deprecated field usage | Migration tracking |
+| Payload size | Efficiency |
+| Cache hit ratio | Read performance |
+| Client version distribution | Compatibility planning |
+
+Add:
+
+> If you cannot see which clients use which fields, deprecation is guesswork.
+
+This is a strong practical addition.
+
+---
+
+## 3.19 Add file upload/download contracts
+
+This is a common API need and currently missing.
+
+Add:
+
+| Pattern | Use when |
+|---|---|
+| Direct multipart upload | Small files, simple API |
+| Presigned URL upload | Large files, offload to object storage |
+| Resumable upload | Large/unreliable networks |
+| Streaming download | Large files |
+| Range requests | Partial content/resume |
+
+Include concerns:
+
+- content type validation,
+- size limits,
+- virus scanning,
+- signed URLs with expiry,
+- access control,
+- checksums,
+- metadata separation from binary.
+
+This is practical and useful.
+
+---
+
+## 3.20 Add AI/tool API design
+
+The future section talks about AI-assisted contract authoring, but the doc should also cover designing APIs for AI agents.
+
+Add:
+
+> **APIs for AI agents — tool contracts**
+
+AI agents need APIs that are especially explicit and safe.
+
+| Concern | Guidance |
+|---|---|
+| Tool schema | Strict JSON Schema / typed input |
+| Idempotency | Tools that mutate must be retry-safe |
+| Least privilege | Scope tools narrowly |
+| Human approval | Require confirmation for destructive actions |
+| Audit logging | Record tool calls and outcomes |
+| Rate/cost caps | Prevent runaway loops |
+| Sandbox mode | Allow safe exploration |
+| Error clarity | Return actionable machine-readable errors |
+| Side effects | Describe them explicitly in tool metadata |
+| Reversibility | Prefer undoable operations |
+
+Add:
+
+> For AI agents, an API is not just a contract for a developer. It is a capability boundary. Ambiguous tools become unsafe actions.
+
+This is increasingly important and fits the shelf’s AI direction.
+
+---
+
+# 4. Improvements to existing sections
+
+## 4.1 Definition section
+
+Add these contract dimensions:
+
+- compatibility,
+- discoverability,
+- operability,
+- debuggability,
+- developer experience,
+- abuse resistance.
+
+The current list is strong, but these would round it out.
+
+---
+
+## 4.2 History section
+
+The history is good. If expanding, add:
+
+- OAuth 2.0 / OpenID Connect,
+- JWT adoption,
+- Stripe/Twilio-style developer experience,
+- HTTP/2 and HTTP/3 impact,
+- OpenAPI Initiative governance,
+- API gateways as product.
+
+Not all are required, but they would enrich the lineage.
+
+---
+
+## 4.3 Evolution section
+
+Add one more inversion:
+
+> From “API as integration point” to “API as developer product.”
+
+Before:
+
+- APIs were internal integration seams.
+
+After:
+
+- APIs are products with docs, DX, metrics, lifecycles, and support.
+
+This matches the critique section and strengthens the narrative.
+
+---
+
+## 4.4 Theory section
+
+Add:
+
+### Hyrum’s Law
+
+> With enough consumers, every observable behavior of your API will be depended upon, even if undocumented.
+
+This is highly relevant to API evolution.
+
+### Fallacies of Distributed Computing
+
+Mention:
+
+- network is reliable,
+- latency is zero,
+- bandwidth is infinite,
+- topology does not change.
+
+API contracts should assume failure, not perfection.
+
+---
+
+## 4.5 Mental models section
+
+Add:
+
+### “Make impossible states impossible”
+
+Contracts should reduce invalid combinations:
+
+- use discriminated unions,
+- avoid optional fields that must appear together,
+- make error types explicit,
+- avoid stringly typed state.
+
+### “Contract telemetry is part of design”
+
+If you cannot measure usage, you cannot evolve safely.
+
+---
+
+## 4.6 Principles section
+
+Add:
+
+| Principle | Meaning |
+|---|---|
+| Make common cases easy | Optimize for the 80% consumer path |
+| Make invalid states unrepresentable | Use schema constraints |
+| Be explicit about unknowns | Unknown fields/enum values must have defined behavior |
+| Design for retries | Mutations are idempotent; reads are safe |
+| Design for abuse | Rate limits, quotas, validation, authz |
+| Document what is stable | Consumers need to know the compatibility promise |
+
+---
+
+## 4.7 Worked example improvements
+
+The shipment example is good, but it should include more operational reality.
+
+Add:
+
+### Collection query parameters
+
+```http
+GET /v1/shipments?status=IN_TRANSIT&created_after=2026-01-01T00:00:00Z&limit=50&cursor=abc123
+```
+
+### Validation error example
+
+```json
+{
+  "type": "https://api.shiptrack.example/errors/validation-failed",
+  "title": "Validation Failed",
+  "status": 422,
+  "detail": "Request body failed validation.",
+  "errors": [
+    {
+      "field": "status",
+      "code": "invalid_enum",
+      "message": "Status must be one of the allowed shipment states."
+    }
+  ]
+}
+```
+
+### Conditional request example
+
+```http
+PATCH /v1/shipments/SHP-123
+If-Match: "v18"
+```
+
+### Webhook event example
+
+```json
+{
+  "id": "evt_123",
+  "type": "shipment.delivered",
+  "created_at": "2026-01-01T12:00:00Z",
+  "data": {
+    "id": "SHP-123",
+    "status": "DELIVERED"
+  }
+}
+```
+
+### SSE example
+
+```text
+event: shipment.updated
+id: 42
+data: {"id":"SHP-123","status":"OUT_FOR_DELIVERY"}
+```
+
+These additions would make the example much more complete.
+
+---
+
+## 4.8 Failure modes section
+
+Add these failure modes:
+
+| Failure mode | What happens | Fix |
+|---|---|---|
+| Missing field-level validation errors | Clients cannot display form errors | Return structured validation errors |
+| Unknown enum values crash clients | Typed clients exhaustively switch | Document unknown-value handling; avoid breaking enum assumptions |
+| Webhooks replayed | Duplicate side effects | Event ID dedupe + signatures |
+| SSE stream not resumable | Client misses events after disconnect | Use event IDs and `Last-Event-ID` |
+| GraphQL N+1 | Resolver makes DB call per item | DataLoader/batching |
+| GraphQL query abuse | Huge nested queries exhaust server | Depth/complexity limits, persisted queries |
+| API keys in browser | Secrets leaked to client | Use OAuth/session; never ship secrets to browser |
+| CORS misconfiguration | Unauthorized cross-origin access or broken legit clients | Explicit allowlist, credentials policy |
+| No concurrency control | Lost updates | ETag/If-Match/version token |
+| Deprecated fields removed blindly | Consumers break | Track usage, migrate gradually |
+| Rate limits bypassed | Abuse or outage | Enforce per identity/IP/route, monitor |
+| Inconsistent timestamp formats | Clients parse incorrectly | ISO 8601 UTC everywhere |
+
+---
+
+## 4.9 Ecosystem section
+
+Consider adding these categories:
+
+| Category | Examples |
+|---|---|
+| API security testing | OWASP ZAP, Burp Suite, APIsec tools |
+| API governance | Optic, Bump.sh, Spectral, custom style gates |
+| API analytics | PostHog, Amplitude, gateway analytics |
+| Webhook delivery | Svix, Hookdeck, custom queues |
+| API mocking | MSW, Prism, WireMock |
+| Schema registry | Confluent Schema Registry, Apicurio, Buf |
+| API changelogs | Mintlify, ReadMe, custom docs pipelines |
+
+---
+
+# 5. Factual and precision improvements
+
+These are mostly small but worth tightening.
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| Idempotency | “Exactly-once semantics” can be too strong | Say “at-least-once delivery plus idempotent handling gives exactly-once business effect” |
+| Versioning by media type | Presented as mental model but example uses URL versioning | Add note: media-type versioning is purer; URL versioning is often simpler for public APIs |
+| GraphQL caching | “Caching story weaker” is too absolute | Say “HTTP caching is less natural; requires persisted queries, CDN strategy, or client cache” |
+| gRPC browser support | “Not browser-native without proxy” | Mention gRPC-Web exists but adds proxy complexity |
+| PATCH | PATCH is not inherently idempotent | Clarify that PATCH needs idempotency keys or version checks |
+| Rate limit headers | `X-RateLimit-*` are common but not standard | Mention standard `RateLimit` header drafts or keep as convention |
+| Enum extension | “Breaking in typed clients” | Good; add explicit guidance: clients should not exhaustively switch without default handling |
+| OpenAPI SSE | OpenAPI is weaker for streams | Mention AsyncAPI for event/stream contracts |
+| OAuth 2.1 | Still evolving in some contexts | Say “consolidates modern OAuth best practices” rather than implying total finality |
+| Postel’s Law | Can conflict with security | Nuance: accept unknown fields, but validate security-critical inputs strictly |
+
+---
+
+# 6. Suggested new sections in priority order
+
+If you want to improve the document efficiently, add these in order.
+
+## Priority 1 — essential practical additions
+
+1. **API conventions**: naming, IDs, dates, money, enums, nullability.
+2. **Pagination/filtering/sorting contracts**.
+3. **Validation error details**.
+4. **Caching and conditional requests**.
+5. **Concurrency control**.
+6. **Long-running operations**.
+7. **Webhook design**.
+8. **Streaming/realtime guidance**.
+9. **Security/auth patterns**.
+10. **Schema compatibility matrix**.
+
+## Priority 2 — important expansions
+
+11. API style selection matrix.
+12. GraphQL operational pitfalls.
+13. gRPC operational pitfalls.
+14. Event-driven schema governance.
+15. API governance and deprecation playbook.
+16. API developer experience.
+17. API telemetry and observability.
+18. File upload/download.
+19. AI/tool API contracts.
+20. Frontend/browser contract concerns.
+
+## Priority 3 — optional enrichment
+
+21. HATEOAS pragmatic guidance.
+22. API product metrics.
+23. Data contracts / data mesh relationship.
+24. Localization and internationalization.
+25. Compliance/privacy constraints.
+26. Mobile/offline contract concerns.
+27. Multi-tenant API patterns.
+28. API rate limiting algorithms.
+29. Batch/bulk API patterns.
+30. Money and financial precision patterns.
+
+---
+
+# 7. Concrete snippets you can add
+
+## 7.1 Convention snippet
+
+```md
+API conventions are not cosmetic. They reduce consumer errors.
+
+- Use plural resource names.
+- Use opaque, stable IDs.
+- Use ISO 8601 UTC timestamps.
+- Use decimal strings or minor units for money.
+- Define null vs absent explicitly.
+- Document enum extensibility.
+- Make unknown fields safe to ignore.
+```
+
+## 7.2 Pagination snippet
+
+```md
+Prefer cursor pagination for collections that can grow or change during reads.
+
+- Cursors should be opaque.
+- Include `next_cursor`.
+- Define maximum `limit`.
+- Return stable ordering.
+- Handle deleted items gracefully.
+```
+
+## 7.3 Concurrency snippet
+
+```md
+For mutable resources, support optimistic concurrency.
+
+- Return an ETag or version.
+- Require `If-Match` on updates where conflicts matter.
+- Return 412 when the client’s version is stale.
+- Do not let clients silently overwrite each other.
+```
+
+## 7.4 Webhook snippet
+
+```md
+A webhook contract must define more than the event payload.
+
+It must define:
+- signature verification,
+- event ID deduplication,
+- retry policy,
+- ordering guarantees,
+- secret rotation,
+- replay protection,
+- failure handling.
+```
+
+## 7.5 AI tool snippet
+
+```md
+APIs consumed by AI agents must be capability-safe.
+
+Every tool should have:
+- a strict schema,
+- explicit side effects,
+- idempotent mutations,
+- least-privilege scopes,
+- rate and cost caps,
+- audit logging,
+- human approval for destructive actions.
+```
+
+---
+
+# 8. Checklist additions
+
+Your final checklist is strong. Add these questions:
+
+| Question | Why it matters |
+|---|---|
+| Are IDs opaque, stable, and URL-safe? | Prevents leaking implementation details |
+| Are timestamps ISO 8601 UTC? | Avoids parsing ambiguity |
+| Are collections cursor-paginated where scale matters? | Prevents offset timeout and instability |
+| Are validation errors field-level and machine-readable? | Enables form UX and programmatic recovery |
+| Are mutations idempotent? | Prevents retry corruption |
+| Are updates protected by ETag/version? | Prevents lost updates |
+| Are long-running operations modeled explicitly? | Prevents blocked clients and timeout ambiguity |
+| Are webhooks signed and replay-safe? | Prevents duplicate side effects and spoofing |
+| Are streams resumable? | Prevents lost events |
+| Are CORS and auth flows safe for the client type? | Prevents credential leakage |
+| Are deprecated fields tracked before removal? | Prevents surprise breakage |
+| Are unknown fields and enum values handled safely? | Prevents brittle clients |
+
+---
+
+# 9. Bottom line
+
+This document is already excellent as a **contract discipline reference**. Its core framing is correct:
+
+> API design is not choosing REST vs GraphQL. It is defining stable, evolvable promises between independent systems.
+
+To become complete, it needs more practical depth in:
+
+1. conventions,
+2. collections,
+3. validation errors,
+4. caching,
+5. concurrency,
+6. long-running operations,
+7. webhooks,
+8. streaming,
+9. security,
+10. compatibility matrices,
+11. governance,
+12. AI/tool contracts.
+
+## Final recommendation
+
+**Publishable conceptually now, but should be expanded before being treated as a complete API design reference.**
+
+The highest-leverage improvements are not more REST vs GraphQL comparison. The highest-leverage improvements are:
+
+> **pagination, validation errors, caching, concurrency, async operations, webhooks, security flows, schema compatibility, and AI-safe tool contracts.**

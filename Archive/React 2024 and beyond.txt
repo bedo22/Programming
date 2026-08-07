@@ -1,0 +1,738 @@
+## Overall verdict
+
+This is a **strong, timely, and focused doc**. It correctly identifies the major post-hooks shifts in React:
+
+- the React Compiler becoming stable,
+- React Server Components splitting rendering across processes,
+- the React Foundation changing governance,
+- RSC security becoming a real trust-boundary concern,
+- the signals debate,
+- Preact as a structural branch,
+- React 19.2 and the routing/framework renaissance.
+
+Its biggest strength is that it does **not** try to re-teach hooks. It treats the class-to-hooks doc as the mental-model foundation and builds the 2024+ layer on top. That is the right positioning.
+
+However, compared with the rest of your shelf, this doc is **narrower and less complete**. It reads more like an excellent “state of React 2024+” essay than a full shelf reference. To become complete, it needs more practical structure:
+
+- React 19 core features,
+- RSC rules and anti-patterns,
+- Actions/forms,
+- framework choice guidance,
+- migration paths,
+- failure modes,
+- principles,
+- ecosystem/tooling,
+- future section,
+- summary checklist.
+
+It also has a few precision issues that should be fixed before treating it as canonical.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Core thesis | Strong |
+| Post-hooks positioning | Strong |
+| Compiler coverage | Strong, but needs adoption limits and debugging guidance |
+| RSC coverage | Good conceptually, needs practical rules and corrections |
+| Security section | Very good, needs systematic checklist |
+| Signals/Preact sections | Interesting, but need precision and possible trimming |
+| React 19 coverage | Incomplete |
+| Framework/routing guidance | Needs expansion |
+| Migration guidance | Missing |
+| Failure modes | Missing |
+| Shelf consistency | Missing several standard sections |
+| Duplication control | Mostly good |
+
+I would rate it approximately:
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 8 / 10 |
+| Conceptual completeness | 7.5 / 10 |
+| Practical completeness | 6.5 / 10 |
+| Shelf consistency | 6 / 10 |
+| Duplication control | 8.5 / 10 |
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The Compiler section is strong
+
+The doc correctly frames the React Compiler as a major shift:
+
+- manual memoization becomes less central,
+- `useMemo`, `useCallback`, and `React.memo` become escape hatches,
+- the compiler can insert memoization where hooks cannot legally go,
+- lint rules encode the Rules of React,
+- compiler upgrades should be treated carefully.
+
+This is the right mental model.
+
+The advice:
+
+> Do not pin the compiler to a SemVer range; use exact versions and test upgrades.
+
+is especially good.
+
+---
+
+## 1.2 The RSC section has the right core idea
+
+The split-process framing is excellent:
+
+> Client components: `UI = f(state)`  
+> Server components: `UI = f(data)`  
+> Combined: `UI = f(data, state)`
+
+This is one of the clearest ways to explain RSC without making it sound like “just SSR.”
+
+The doc is also right that RSC is not a replacement for hooks. It is a decision about **where a component runs**, not a new component model for client interactivity.
+
+---
+
+## 1.3 The security section is valuable
+
+The RSC security lesson is one of the most useful parts of the doc.
+
+The practical takeaways are correct:
+
+- Server Functions should be treated as public endpoints.
+- Secrets should not be hardcoded in Server Function source.
+- React security patches may require multiple releases.
+- Framework security cadence matters.
+
+This is exactly the kind of production-aware guidance the shelf needs.
+
+---
+
+## 1.4 The Signals section is useful
+
+The doc correctly identifies that signals became the dominant reactivity primitive outside React, while React chose a different path.
+
+The core contrast is valuable:
+
+- Signals: fine-grained subscriptions.
+- React: component rendering plus compiler-assisted memoization.
+
+This is a good conceptual boundary.
+
+---
+
+## 1.5 The Preact section is interesting and mostly useful
+
+Preact is a legitimate structural branch of the React model:
+
+- same component idea,
+- smaller runtime,
+- web-first,
+- less abstraction tax,
+- useful for islands/embedded/constrained contexts.
+
+The doc’s argument that Preact and React are stable structural branches rather than temporary competitors is strong.
+
+---
+
+# 2. Duplication boundaries
+
+This doc mostly avoids duplication, but the boundaries should be made explicit.
+
+| Topic | Best owner | What this doc should do |
+|---|---|---|
+| Hooks mental model, closures, capture, effects | `class-to-hooks-paradigm-shift.html` | Link; do not re-teach |
+| React basics, JSX, component model | `class-to-hooks-paradigm-shift.html` | Link |
+| Angular/Vue/Svelte/Solid/HTMX/Astro camps | `frontend-camps-survey.html` | Link; mention signals only as cross-camp context |
+| Next.js routing/caching/deployment details | `nextjs-deep-dive.html` | Link; mention only React-level implications |
+| JavaScript language semantics | `javascript-the-language.html` | Link |
+| TypeScript shift | `javascript-across-stacks.html` | Link |
+| System security architecture | `system-design.html` | Link; own React-specific trust boundaries |
+| React 2024+ platform shifts | This doc | Own fully |
+| RSC mental model | This doc | Own fully, but link framework specifics |
+| Compiler mental model | This doc | Own fully |
+| React governance/security posture | This doc | Own fully |
+
+The main duplication risk is the Preact section and the signals discussion. Those topics may also appear in `frontend-camps-survey.html`. If that doc covers framework camps broadly, this doc should keep Preact/signals only as they relate to React’s structural evolution.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important additions.
+
+---
+
+## 3.1 Add a scope and boundary section
+
+The doc needs a clear opening section that says what it owns.
+
+Suggested addition:
+
+> This doc covers what changed in React after the hooks paradigm settled: the Compiler, React Server Components, governance, security, routing/framework shifts, and the ecosystem consequences. It assumes you already understand hooks from the class-to-hooks doc. It does not teach React fundamentals, compare all frontend camps, or deeply cover Next.js internals.
+
+This prevents the doc from being judged as a complete React reference.
+
+---
+
+## 3.2 Add a React 19 core features section
+
+The doc mentions React 19.2, but React 19 itself is a major missing piece.
+
+Add:
+
+> **React 19 — the platform shift**
+
+Include:
+
+| Feature | What it changes |
+|---|---|
+| Actions | Async transitions and form submission as first-class React behavior |
+| `useActionState` | State for async actions: pending, error, data |
+| `useFormStatus` | Pending status for form submission |
+| `useOptimistic` | Optimistic UI with automatic rollback |
+| `use()` | Read promises and context in render with Suspense integration |
+| Server Actions | Server-side mutations integrated with forms and transitions |
+| `ref` as prop | Less need for `forwardRef` in function components |
+| Document metadata | Native `<title>`, `<meta>`, `<link>` hoisting support |
+| Stylesheet precedence | Better control over stylesheet ordering |
+| Async script support | Scripts integrated with React rendering |
+| Resource loading APIs | Preload/preinit helpers for fonts, scripts, styles |
+
+This is important because React 19 is part of “2024 and beyond.”
+
+---
+
+## 3.3 Add Actions and forms guidance
+
+React 19’s Actions are one of the biggest practical changes.
+
+Add a subsection:
+
+> **Actions, forms, and progressive enhancement**
+
+Include:
+
+```tsx
+<form action={updateProfile}>
+  <input name="name" />
+  <SubmitButton />
+</form>
+```
+
+Then explain:
+
+- forms can use an `action` function,
+- Actions integrate with transitions,
+- pending states are handled with `useFormStatus`,
+- async state is handled with `useActionState`,
+- optimistic UI is handled with `useOptimistic`,
+- server actions should still validate and authorize input.
+
+Add a warning:
+
+> Server Actions are not safe by being “server.” They are endpoints. Validate input, check authorization, rate-limit sensitive operations, and treat arguments as untrusted.
+
+This connects directly to the security section.
+
+---
+
+## 3.4 Expand RSC into practical rules
+
+The RSC section is conceptually good but needs practical rules.
+
+Add:
+
+> **RSC boundary rules**
+
+| Rule | Meaning |
+|---|---|
+| Server components cannot use hooks | No `useState`, `useEffect`, `useReducer`, etc. |
+| Server components cannot use browser APIs | No `window`, `localStorage`, `document`, etc. |
+| Server components can be async | They can await data access directly |
+| Server components can render client components | Server can compose client interactivity |
+| Client components can receive server-rendered children | Composition through `children` is the main pattern |
+| Client components cannot pass functions to server components | Props crossing into server components must be serializable |
+| Context is not available in server components | Context belongs to client component trees |
+| Server components should not ship secrets | Server code stays on server, but data exposure still matters |
+
+Most importantly, fix the composition explanation.
+
+The current line says:
+
+> a client component can pass props into a server component via a callback slot
+
+This should be corrected.
+
+Suggested rewrite:
+
+> A server component can render a client component and pass serializable props into it. A client component can receive server-rendered content as `children`. But a client component cannot pass arbitrary functions or non-serializable values into a server component.
+
+This is a significant precision fix.
+
+---
+
+## 3.5 Add RSC boundary design guidance
+
+Add:
+
+> **Where to place the client boundary**
+
+Guidelines:
+
+- Default to server components for data display.
+- Move to client components only when you need:
+  - state,
+  - effects,
+  - event handlers,
+  - browser APIs,
+  - context providers/consumers,
+  - interactivity.
+- Push client boundaries down to leaves when possible.
+- Use server components to fetch data, then pass serializable props to client leaves.
+- Use `children` composition to let server components wrap client components without moving the whole tree client-side.
+
+Example:
+
+```text
+Server page
+  → server data fetching
+  → server layout
+  → client interactive card
+    → server-provided content via children
+```
+
+This makes the RSC section much more actionable.
+
+---
+
+## 3.6 Add caching and revalidation mental model
+
+React 2024+ is incomplete without discussing caching.
+
+Add:
+
+> **Caching is now part of the React rendering model**
+
+Include:
+
+| Concept | Question |
+|---|---|
+| Request memoization | Does this data request deduplicate during a render pass? |
+| Router cache | Does the framework cache server-rendered UI on the client? |
+| HTTP cache | Is the response cacheable by browsers/CDNs? |
+| Data cache | Is the framework persisting fetched data across requests? |
+| Revalidation | When does cached data become stale? |
+| Personalization | Is cached content accidentally user-specific? |
+
+Add warning:
+
+> The hardest RSC bugs are often not rendering bugs. They are caching bugs: stale data, over-cached personalized content, or data that appears fresh but was rendered at the wrong time.
+
+If Next.js details belong in the Next.js doc, keep this at the React/framework boundary level.
+
+---
+
+## 3.7 Add state management in the RSC era
+
+This is a major practical gap.
+
+Add:
+
+> **State management after RSC**
+
+| State type | Where it belongs |
+|---|---|
+| Server-fetched data | Server components / framework data cache |
+| URL state | Router/search params |
+| Local UI state | Client component `useState`/`useReducer` |
+| Shared client state | Context, Zustand, Redux Toolkit, Jotai, etc. |
+| Server mutation state | Actions, `useActionState`, optimistic state |
+| Cross-component server data | Usually framework cache or query client, not global client store |
+
+Add:
+
+> RSC reduces the need to put server data into client state. If the data is read-only and server-owned, keep it on the server. Client state should mostly be interaction state.
+
+This is essential for modern React.
+
+---
+
+## 3.8 Add framework choice guidance
+
+The doc mentions that React is moving up-stack and that CRA is sunset, but it should help readers choose a framework.
+
+Add:
+
+> **Choosing a React framework in the post-CRA era**
+
+| Framework | Best for | Avoid when |
+|---|---|---|
+| Next.js | Full-stack React, RSC, SSR, SEO, server actions, app complexity | Very simple static sites or teams wanting minimal framework surface |
+| React Router framework mode | Web-standard routing, loaders/actions, progressive SPA-to-SSR migration | Teams already deep in Next/RSC patterns |
+| Expo | React Native mobile apps | Web-only projects |
+| Vite SPA | Simple client-rendered apps, dashboards, internal tools | SEO-heavy public pages or server-data-heavy apps |
+| Astro with React islands | Content-first sites with small interactive islands | Highly interactive app shells |
+
+Add:
+
+> CRA’s sunset means “just a React app” is no longer the default production recommendation. New apps should usually start with a framework or a very deliberate build-tool setup.
+
+This is practical and timely.
+
+---
+
+## 3.9 Add migration paths
+
+This is missing and very valuable.
+
+Add:
+
+> **Migration paths into React 2024+**
+
+| From → To | Trigger | Strategy | Risk |
+|---|---|---|---|
+| CRA → Next.js | Need SSR/RSC/SEO/full-stack React | Incremental route migration; keep client components where needed | Caching/routing learning curve |
+| CRA → React Router framework mode | Need routing/data layer without full RSC | Adopt loaders/actions incrementally | Different data model |
+| CRA → Vite SPA | Need simple modern build without framework | Replace CRA build; keep app client-rendered | Still missing SSR/RSC benefits |
+| React 18 → React 19 | Need Actions, compiler compatibility, modern APIs | Run codemods, test forms/effects, update libraries | Breaking changes in edge cases |
+| Manual memoization → Compiler | Performance maintenance burden | Enable compiler exact version, run lint, test hotspots | False sense of safety if Rules of React are violated |
+| Client-only app → RSC | Too much client data fetching/bundle weight | Move data display to server components; keep interactivity client-side | Boundary design mistakes |
+| Redux-heavy server data → server/RSC data | Server data wrongly stored in client state | Move fetching to server/query layer; keep UI state local | State ownership confusion |
+
+This would greatly strengthen the doc.
+
+---
+
+## 3.10 Add failure modes
+
+The doc currently lacks a failure modes section. Add one.
+
+| Failure mode | What happens | Fix |
+|---|---|---|
+| Treating Server Actions as internal-only | No validation/authz; abuse or data corruption | Treat every Server Function as a public endpoint |
+| Client boundary too high | Entire page becomes client; bundle bloat, lost server data benefits | Push client boundaries to leaves |
+| Server boundary too high | Interactive components placed on server; hooks/effects fail | Move interactive components to client |
+| Passing non-serializable props across RSC boundary | Runtime errors or unexpected behavior | Pass serializable data; use children composition |
+| Using context in server components | Not supported | Move context into client component tree |
+| Overtrusting the compiler | Developers ignore Rules of React | Keep lint rules; test behavior |
+| Disabling lint rules to make compiler pass | Latent bugs hide | Fix the rule violation, not the lint rule |
+| Storing server data in global client state | Duplication, stale data, unnecessary bundle | Use server components/framework cache/query layer |
+| Confusing RSC with SSR | Wrong mental model; hydration confusion | Teach split-process model: server components serialize UI, not just HTML |
+| Ignoring security patches | CVE exposure | Pin, monitor, and apply React/framework security releases |
+| Upgrading compiler casually | Memoization behavior changes expose latent bugs | Exact pin, changelog review, full test pass |
+| Using signals mentally inside React | Expecting fine-grained DOM updates | Understand React’s render model and compiler memoization |
+
+This is a major completeness improvement.
+
+---
+
+## 3.11 Add principles
+
+Add shelf-standard principles.
+
+Suggested:
+
+| Principle | Meaning |
+|---|---|
+| Client and server are different processes | RSC is a boundary decision, not a styling or SSR trick |
+| The compiler automates memoization, not correctness | Rules of React still matter |
+| Server Functions are endpoints | Validate, authorize, rate-limit, and audit |
+| Frameworks are now the default React surface | Routing, data, caching, and rendering are framework concerns |
+| React is becoming platform-governed | Stability and ecosystem coordination matter more than single-company urgency |
+| Server data should stay server-owned when possible | Do not move read-only server data into client state unnecessarily |
+| Interactivity belongs at the edge | Client components should be as small and leaf-like as practical |
+| Upgrade carefully | Compiler and framework security changes require disciplined upgrades |
+
+---
+
+## 3.12 Add ecosystem/tooling section
+
+The doc mentions many ideas but lacks an ecosystem catalog.
+
+Add:
+
+| Category | Tools | Purpose |
+|---|---|---|
+| Frameworks | Next.js, React Router, Expo, Astro, Vite | Rendering/routing/deployment surface |
+| Compiler | `babel-plugin-react-compiler`, ESLint rules | Memoization and Rules of React enforcement |
+| DevTools | React DevTools, Performance Tracks, React Scan | Profiling and render inspection |
+| Data/client cache | TanStack Query, SWR, Apollo, RTK Query | Client/server data synchronization |
+| State | Zustand, Redux Toolkit, Jotai, Context | Client UI state |
+| Testing | Vitest/Jest, Testing Library, Playwright, Cypress | Component/integration/E2E evidence |
+| Type safety | TypeScript, Zod, typed forms/actions | Boundary validation |
+| Security | dependency audit, lockfiles, CVE monitoring | Supply-chain hygiene |
+
+Keep this brief if the doc should stay focused.
+
+---
+
+## 3.13 Add future section
+
+The doc discusses current changes but needs a future outlook.
+
+Add:
+
+| Signal | Meaning |
+|---|---|
+| Compiler-first React | Manual memoization continues to decline |
+| Server-first architecture | More apps begin with server components and push interactivity outward |
+| Framework standardization | React’s ecosystem becomes more framework-defined |
+| RSC protocol hardening | More security and interoperability attention |
+| Signals pressure | React must keep proving the compiler model against fine-grained reactivity |
+| AI-assisted component generation | More generated UI, more need for boundary/security review |
+| Foundation governance | Slower, more deliberate platform evolution |
+
+---
+
+## 3.14 Add summary checklist
+
+Add a final checklist:
+
+| Question | Check |
+|---|---|
+| Do I know whether this component is client or server? | Boundary explicit |
+| Does this component need hooks/effects/browser APIs? | If yes, client |
+| Is data server-owned and read-only? | Prefer server component |
+| Are Server Functions validated and authorized? | Yes |
+| Are props across RSC boundaries serializable? | Yes |
+| Is the compiler exact-pinned and tested? | Yes |
+| Are lint rules enforcing Rules of React? | Yes |
+| Is the framework choice deliberate? | Next/React Router/Expo/Vite/etc. |
+| Is caching behavior understood? | Request/router/data/HTTP caches |
+| Is upgrade/security cadence defined? | Yes |
+
+---
+
+# 4. Factual and precision improvements
+
+These should be checked or corrected.
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| RSC composition | “a client component can pass props into a server component via a callback slot” | Correct this: clients cannot pass functions into server components; server components render client components and pass serializable props; clients can receive server-rendered children |
+| Compiler vs signals | “the compiler internally achieves the same fine-grained update that signals give you” | Soften: the compiler reduces unnecessary re-rendering through memoization; it is not the same as signal-style fine-grained DOM subscription |
+| Preact date | “Preact appeared in 2013” | Verify; Preact is commonly associated with 2015, not 2013 |
+| Security timeline | “The Dec 2023 fixes shipped to 19.0.x, 19.1.x, and 19.2.x” | Likely should be Dec 2025, given React 19.2 timeline; verify |
+| React Foundation | “React, React Native, and JSX are no longer owned by Meta” | Verify exact legal/governance phrasing; “moved under the React Foundation” may be safer |
+| Signals link | Link to “Why Isn’t X a Hook?” may not directly represent React’s signals position | Use official React team statements or RFCs if available |
+| CRA sunset | “Sunsetting Create React App Feb 14, 2025” | Verify date and official wording |
+| React Router framework mode | “React Router shipped a framework mode” | Clarify version and what framework mode means |
+| Server components | “they only render once” | Clarify: they render per request or per revalidation, not per client state change |
+| RSC payload | “browser only receives rendered UI — not the raw data, not the dependencies, not the bundler” | Clarify: client receives serialized UI payload and only the client component code it needs |
+| Expo SDK/compiler | “Expo SDK 54+ ships it enabled” | Verify |
+| CVE IDs | Specific CVEs should be verified | Link official advisories |
+
+Because this doc contains many near-future or very recent claims, it should be carefully verified before being treated as canonical.
+
+---
+
+# 5. Structural improvements
+
+The doc would benefit from being reorganized into a more shelf-consistent shape.
+
+## Suggested outline
+
+1. **How to use this doc**
+   - scope,
+   - relationship to class-to-hooks,
+   - boundaries with camps/Next/system design.
+
+2. **React 19 platform shift**
+   - Actions,
+   - forms,
+   - `useActionState`,
+   - `useFormStatus`,
+   - `useOptimistic`,
+   - `use()`,
+   - metadata/resources.
+
+3. **The React Compiler**
+   - what it does,
+   - what it does not do,
+   - adoption,
+   - lint rules,
+   - upgrade policy.
+
+4. **React Server Components**
+   - split-process model,
+   - boundary rules,
+   - serialization,
+   - composition,
+   - caching,
+   - state management,
+   - security.
+
+5. **The framework era**
+   - CRA sunset,
+   - Next.js,
+   - React Router framework mode,
+   - Expo,
+   - Vite SPA,
+   - Astro islands.
+
+6. **Governance and security**
+   - React Foundation,
+   - CVE response,
+   - upgrade cadence,
+   - Server Function security.
+
+7. **Signals and React’s reactivity bet**
+   - signals outside React,
+   - why React chose compiler memoization,
+   - how to read other frameworks.
+
+8. **Preact**
+   - structural branch,
+   - when it wins,
+   - practical differences,
+   - relationship to React.
+
+9. **Migration paths**
+   - CRA migration,
+   - React 18 → 19,
+   - compiler adoption,
+   - incremental RSC adoption.
+
+10. **Failure modes**
+
+11. **Principles**
+
+12. **Ecosystem**
+
+13. **Future**
+
+14. **Summary checklist**
+
+This would bring it much closer to the rest of the shelf.
+
+---
+
+# 6. Suggested concrete additions
+
+## 6.1 RSC boundary rules snippet
+
+```md
+Server components:
+- can fetch data directly,
+- can be async,
+- can render client components,
+- cannot use hooks,
+- cannot use browser APIs,
+- cannot consume React context.
+
+Client components:
+- can use hooks,
+- can use browser APIs,
+- can receive serializable props,
+- can receive server-rendered children,
+- cannot pass functions into server components.
+```
+
+## 6.2 Actions snippet
+
+```md
+React 19 makes form submission a first-class React concern.
+
+A form can use an action function. While the action runs,
+React can expose pending state, error state, and optimistic state.
+
+Server Actions are not safe because they are “server-side.”
+They are endpoints. Validate input, check authorization,
+and treat arguments as untrusted.
+```
+
+## 6.3 Compiler snippet
+
+```md
+The React Compiler automates memoization for code that follows
+the Rules of React. It does not replace correctness.
+
+Adoption rule:
+- pin exact compiler version,
+- enable lint rules,
+- fix rule violations instead of disabling them,
+- test compiler upgrades like framework upgrades.
+```
+
+## 6.4 State management snippet
+
+```md
+In the RSC era, not all state belongs in the client.
+
+Server-owned data should usually stay on the server.
+URL state belongs to the router.
+Local UI state belongs in client components.
+Shared interactive state may belong in context or a client store.
+```
+
+## 6.5 Framework choice snippet
+
+```md
+CRA’s sunset ends the era of “just start a React app” as the default.
+
+Choose deliberately:
+- Next.js for full-stack React and RSC.
+- React Router framework mode for web-standard routing and data.
+- Expo for React Native.
+- Vite for simple client-rendered apps.
+- Astro for content-first sites with React islands.
+```
+
+---
+
+# 7. Priority roadmap
+
+## Must add
+
+1. Scope/boundary statement.
+2. React 19 core features.
+3. Actions/forms section.
+4. RSC boundary rules and composition correction.
+5. RSC security checklist.
+6. Framework choice table.
+7. Migration paths.
+8. Failure modes.
+9. Principles.
+10. Summary checklist.
+
+## Should add
+
+11. Caching/revalidation mental model.
+12. State management in RSC era.
+13. Compiler debugging/limits.
+14. Signals comparison table.
+15. Ecosystem/tooling catalog.
+16. Future section.
+17. React Native note or scope clarification.
+
+## Optional enrichment
+
+18. Testing in the RSC/compiler era.
+19. Performance profiling guidance.
+20. Error handling/error boundaries in RSC apps.
+21. Typed server actions/TypeScript boundary guidance.
+22. Web Components/React interop note.
+23. Partial prerendering/streaming note.
+
+---
+
+# 8. Bottom line
+
+This doc has an excellent core. Its treatment of the Compiler, RSC, governance, and security is strong and relevant.
+
+But to become a complete shelf reference, it needs to move beyond “what changed” and into:
+
+- **how to use the new model**,
+- **where the boundaries are**,
+- **how to migrate**,
+- **what failure looks like**,
+- **which framework to choose**,
+- **what checklist to run**.
+
+## Final recommendation
+
+**Strong draft, but not yet complete.**
+
+The highest-leverage improvements are:
+
+> React 19 features, RSC practical rules, Actions/forms, framework choice guidance, migration paths, failure modes, and precision fixes around RSC composition and compiler/signals equivalence.

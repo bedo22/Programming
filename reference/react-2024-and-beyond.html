@@ -12,136 +12,360 @@
 <header class="lesson-head">
   <p class="kicker">Reference · React ecosystem — post-hooks developments</p>
   <h1>React 2024 and beyond — compiler, RSC, foundation</h1>
-  <p class="meta">What changed in React after hooks settled: the React Compiler v1.0, React Server Components splitting rendering across computers, the React Foundation under the Linux Foundation, the RSC security lesson (CVE-2025/2026), why React didn't adopt signals, .5b Preact as the structural branch, and React 19.2's <code>useEffectEvent</code> and <code>Activity</code>. The class-to-hooks story is complete; this doc is what happened next.</p>
+  <p class="meta">What changed in React after hooks settled: React 19's platform shift, the React Compiler v1.0, React Server Components splitting rendering across computers, the React Foundation under the Linux Foundation, the RSC security lesson (Dec 2025), why React didn't adopt signals, Preact as the structural branch, and the framework/routing era. The class-to-hooks story is complete; this doc is what happened next.</p>
 </header>
 
 <section class="recap">
   <h3 style="margin-top:0">How this relates to the main paradigm-shift doc</h3>
-  <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm-shift reference</a> ends at the compiler era (§12) and sends you here for the 2024+ details. Everything in this doc builds on the hooks mental model from that reference — client components still capture values per render, <code>useState</code> still works exactly as described there. The big news: the compiler is stable, RSC splits the process, and React is now foundation-governed.</p>
+  <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm-shift reference</a> ends at the compiler era (§12) and sends you here for the 2024+ details. Everything in this doc builds on the hooks mental model from that reference — client components still capture values per render, <code>useState</code> still works exactly as described there. The big news: React 19 made the platform features real, the compiler is stable, RSC splits the process, and React is now foundation-governed.</p>
 </section>
 
-<h2>1. The React Compiler is stable (Oct 2025) and ship-by-default (2026)</h2>
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a> → this guide → <a href="./frontend-camps-survey.html">frontend-camps-survey</a> (camps map) → <a href="./nextjs-deep-dive.html">nextjs-deep-dive</a> (the framework most likely in your React-at-work path). Standalone: each section explains one post-hooks shift — what it is, what changed for code, and where the boundary with the paradigm-shift reference sits.</p>
+
+<blockquote class="callout">
+  <p><strong>Scope.</strong> This guide covers what changed in React after the hooks paradigm settled: the platform ship (React 19), the Compiler, React Server Components, governance, security, the framework era, and the ecosystem consequences. It assumes you already understand hooks from the class-to-hooks doc and <em>does not</em> re-teach them. It does not teach React fundamentals, does not compare all frontend camps (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>), and does not deeply cover Next.js internals (<a href="./nextjs-deep-dive.html">nextjs-deep-dive</a>).</p>
+</blockquote>
+
+<h2>1. React 19 — the platform shift</h2>
+
+<p>React 19 (Dec 2024) turned several community patterns into platform features. This is the release the compiler and RSC depend on, and the one every "2024 and beyond" check in this guide is measured against. The mental model from class-to-hooks is unchanged — what changed is that more things the ecosystem used to build with libraries are now part of React itself.</p>
+
+<table>
+  <thead><tr><th>Feature</th><th>What it changes for reading code</th></tr></thead>
+  <tbody>
+    <tr><td><code>Actions</code> (form/transition actions)</td><td>Async state transitions and form submission are first-class React behavior (§2)</td></tr>
+    <tr><td><code>useActionState</code></td><td>State for an async action: pending, error, result</td></tr>
+    <tr><td><code>useFormStatus</code></td><td>Pending status for form submission, read from a child</td></tr>
+    <tr><td><code>useOptimistic</code></td><td>Optimistic UI with automatic rollback on failure</td></tr>
+    <tr><td><code>use()</code></td><td>Read a promise or context in render, under Suspense</td></tr>
+    <tr><td>Server Actions</td><td>Server-side mutations wired to forms and transitions (§2, §5)</td></tr>
+    <tr><td><code>ref</code> as a prop</td><td><code>forwardRef</code> largely unnecessary</td></tr>
+    <tr><td>Document metadata</td><td>Native <code>&lt;title&gt;</code>/<code>&lt;meta&gt;</code>/<code>&lt;link&gt;</code> hoisting, no external head manager</td></tr>
+    <tr><td>Stylesheet precedence + async scripts</td><td>Ordering of stylesheets and scripts becomes declarative</td></tr>
+    <tr><td>Resource preloading</td><td>Preload/preinit helpers for fonts, scripts, styles</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>Reading 19-era code:</strong> when you see <code>useActionState</code> + a <code>&lt;form action={asyncFn}&gt;</code> + <code>useOptimistic</code>, the shape is "mutate, show predicted, reconcile." This replaces the old "submit + setLoading + setError" hand-rolled dance. The patterns from class-to-hooks §1 still apply — this is a new <em>arrangement</em> of the same state rules, not a new state model.</p>
+</blockquote>
+
+<h2>2. Actions and forms — progressive enhancement returns</h2>
+
+<p>React 19 made <em>form submission</em> a React concern. A form can take an <code>action</code> function instead of (or alongside) an <code>onSubmit</code>:</p>
+
+<pre><code>function ProfileForm() {
+  const [state, action, pending] = useActionState(updateProfile, null);
+  return (
+    &lt;form action={action}&gt;
+      &lt;input name="name" /&gt;
+      {pending ? "Saving…" : &lt;SaveButton /&gt;}
+      {state?.error &gt;&amp;&amp; &lt;p className="error"&gt;{state.error}&lt;/p&gt;}
+    &lt;/form&gt;
+  );
+}</code></pre>
+
+<p>Reading map:</p>
+<ul>
+  <li><strong>Action</strong> — the async function that runs the mutation. When an action starts, React automatically defers the update to a transition priority (non-blocking UI).</li>
+  <li><strong><code>useFormStatus</code></strong> — a child form control asks "is my enclosing form pending?" without lifting state.</li>
+  <li><strong><code>useActionState</code></strong> — the pairing of "this function" with "its latest result + pending flag." The first arg is the previous state (enables resubmission with the same shape).</li>
+  <li><strong><code>useOptimistic</code></strong> — render a predicted value immediately; React rolls back to the server-authoritative value when the action settles.</li>
+  <li><strong>Server Action</strong> — an action marked <code>"use server"</code> that executes on the server. Form + server action = modern progressive enhancement.</li>
+</ul>
+
+<blockquote class="callout">
+  <p><strong>Server Actions are endpoints.</strong> Being "server-side" does not make a function safe. Server Actions are public HTTP endpoints: validate every argument, authorize the caller, rate-limit sensitive operations, and treat return values as untrusted. Form data is user input — never assume the types at the boundary (§4).</p>
+</blockquote>
+
+<h2>3. The React Compiler is stable (Oct 2025) and ship-by-default (2026)</h2>
 
 <p>The <a href="https://react.dev/blog/2025/10/07/react-compiler-1">React Compiler v1.0</a> shipped October 7, 2025 — the first stable release after nearly a decade of research (the team's Prepack experiments started in 2017). The compiler is a Babel plugin that lowers your code into its own High-Level Intermediate Representation, runs data-flow and mutability analysis, and inserts memoization where it helps — including in places where <code>useMemo</code> cannot legally go, like after an early return.</p>
 
-<p>What changed in 2026: <strong>new apps now start with the compiler on by default.</strong> Expo SDK 54+ ships it enabled. Vite and Next.js <code>create-*</code> templates include it as an opt-in choice. The compiler also powers the <em>lint</em> rules in <code>eslint-plugin-react-hooks</code>'s <code>recommended</code> preset — so even teams not ready to adopt the compiler get its validation. The rules encode the <a href="https://react.dev/reference/rules">Rules of React</a> and surface latent bugs (set-state-in-render, set-state-in-effect, unsafe ref access during render).</p>
+<p>What changed in 2025-2026: <strong>new apps now start with the compiler on by default.</strong> Expo SDK 54+ enables it in new templates. Vite and Next.js <code>create-*</code> templates include it as an opt-in choice. The compiler also powers the <em>lint</em> rules in <code>eslint-plugin-react-hooks</code>'s <code>recommended</code>/<code>recommended-latest</code> presets — so even teams not ready to adopt the compiler get its validation. The rules encode the <a href="https://react.dev/reference/rules">Rules of React</a> and surface latent bugs (set-state-in-render, set-state-in-effect, unsafe ref access during render).</p>
 
-<p>For you, reading code at work: <code>useMemo</code>, <code>useCallback</code>, and <code>React.memo</code> become <em>escape hatches</em>, not the default. New code written under the compiler can be the simple version from the main doc's "original function-component vision" — a plain function with hooks, no manual memoization, no wrapper components — because the compiler puts the optimization back. Existing code keeps working; you do not have to remove existing memoization to adopt the compiler.</p>
+<p>For you, reading code at work: <code>useMemo</code>, <code>useCallback</code>, and <code>React.memo</code> become <em>escape hatches</em>, not the default. New code written under the compiler can be the simple version from the main doc's "original function-component vision" — a plain function with hooks, no manual memoization — because the compiler puts the optimization back. Existing code keeps working; you do not need to remove existing memoization to adopt the compiler.</p>
 
-<p>One real lesson from the past year: <strong>do not pin the compiler to a SemVer range.</strong> The team recommends <code>--save-exact</code> (e.g. <code>1.0.0</code>, not <code>^1.0.0</code>) and manual upgrades with end-to-end testing. The compiler rewrites memoization, and in code that quietly breaks the Rules of React, a different memoization pattern can change which effects fire. Treat a compiler upgrade the way you'd treat a React major upgrade — read the changelog and run the suite.</p>
+<p><strong>Adoption and upgrade rules</strong> (the parts practice-care about):</p>
+<ul>
+  <li><strong>Do not pin the compiler to a SemVer range.</strong> The team recommends <code>--save-exact</code> (e.g. <code>1.0.0</code>, not <code>^1.0.0</code>) and manual upgrades with end-to-end testing.</li>
+  <li><strong>Turn on the lint rules first.</strong> The compiler is only as correct as the code feeding it; the lint rules tell you when that code breaks the Rules of React before the compiler can mangle behavior.</li>
+  <li><strong>Test effect dependencies after enabling.</strong> Compiler-generated memoization can change which effects fire when code quietly violates the Rules of React. Read the changelog and run the suite — treat a compiler upgrade like a React major upgrade.</li>
+</ul>
 
-<h2>2. React Server Components split rendering across two computers</h2>
+<h2>4. React Server Components split rendering across two processes</h2>
 
-<p>The Class→Hooks arc was about <em>how</em> a component manages state inside one process. React Server Components (RSC) answered a different question: <em>which process</em> the component runs in — yours (the browser) or the server's. Dan Abramov framed it cleanly in <a href="https://overreacted.io/the-two-reacts/">The Two Reacts</a> (Jan 2024):</p>
+<p>The class→hooks arc was about <em>how</em> a component manages state inside one process. RSC answers a different question: <em>which process</em> a component runs in — yours (the browser) or the server's. Dan Abramov framed it cleanly in <a href="https://overreacted.io/the-two-reacts/">The Two Reacts</a> (Jan 2024):</p>
 
 <ul>
   <li><strong>Client components:</strong> <code>UI = f(state)</code>. State lives in the browser, code runs in the browser, interactions are instant. Your <code>Counter</code> component from the paradigm-shift doc lives here.</li>
-  <li><strong>Server components:</strong> <code>UI = f(data)</code>. Data lives on the server, code runs on the server (at request time or build time), and the browser only receives the rendered UI — not the raw data, not the dependencies, not the bundler. <code>PostPreview</code> reads files with <code>fs.readFile</code> at build time and ships only the rendered HTML and a serialized payload to the client.</li>
+  <li><strong>Server components:</strong> <code>UI = f(data)</code>. Data lives on the server, code runs on the server (at request time or build time), and the browser receives the serialized UI payload plus only the client-component code it needs — not the raw data, not the server deps, not the entire bundler. <code>PostPreview</code> reads files with <code>fs.readFile</code> at build time and ships just the rendered output to the client.</li>
 </ul>
 
-<p>The combined formula is <code>UI = f(data, state)</code>. The two components interleave freely: a server component can render a client component as a child; a client component can pass props into a server component via a callback slot. The mental extension is small: everything from the paradigm-shift doc still applies to client components, and server components are functions closer to the data — they don't have <code>useState</code> or <code>useEffect</code> because they don't have a render loop, they only render once.</p>
+<p>The combined formula is <code>UI = f(data, state)</code>. The two component kinds interleave: a <em>server component can render a client component</em> (passing serializable props into it), and a <em>client component can receive server-rendered content as <code>children</code></em>. What a client component cannot do is pass arbitrary functions or non-serializable values into a server component — props crossing the boundary must be serializable. The mental extension is small: everything from the paradigm-shift doc applies to client components; server components are functions closer to the data — no <code>useState</code>/<code>useEffect</code> because they aren't per-frame re-rendered the way client components are (they run per request or per revalidation).</p>
 
-<p>RSC is not a new paradigm replacing hooks — it is the function+hooks model deciding <em>where</em> each function runs. Read it as: "client component" still means everything in the paradigm-shift doc; "server component" is a subset (no hooks, no events, no <code>window</code>) that buys you zero-bundle-size code and direct access to server-only APIs.</p>
+<p>RSC is not a new paradigm replacing hooks — it is the function+hooks model deciding <em>where each function runs</em>. Read "client component" as everything in the paradigm-shift doc; "server component" as a strict subset (no hooks, no events, no <code>window</code>) that buys zero-bundle-size code and direct access to server-only APIs.</p>
 
-<h2>3. The React Foundation (Feb 2026): Meta is no longer the sole owner</h2>
+<h3>4.1 The RSC boundary rules</h3>
 
-<p>On February 24, 2026, the <a href="https://react.dev/blog/2026/02/24/the-react-foundation">React Foundation</a> launched under the Linux Foundation. React, React Native, and JSX are no longer owned by Meta — they're owned by the foundation, governed by a board with eight Platinum founding members: <strong>Amazon, Callstack, Expo, Huawei, Meta, Microsoft, Software Mansion, and Vercel</strong>.</p>
+<p>These are the rules that <em>define</em> the boundary. Everything in this doc about the compiler (§3) still applies to client components; these apply to server vs client:</p>
 
-<p>Why this matters for reading code at work: <strong>who funds React shapes what gets prioritized.</strong> When one company owns a framework, that company's internal needs shape the roadmap (this was the story of React 16-18 — Meta's newsfeed constraints drove features like concurrent rendering and Suspense). With eight companies on the board — including hyperscalers (Amazon, Microsoft) and major mobile players (Expo, Software Mansion) — the priorities broaden. Expect less single-company urgency and more ecosystem coordination: stable APIs for hosting vendors, clearer upgrade contracts for enterprises, and a slower, more deliberate release rhythm.</p>
+<table>
+  <thead><tr><th>Rule</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>Server components cannot use hooks</td><td>No <code>useState</code>, <code>useEffect</code>, <code>useReducer</code>, <code>useContext</code>…</td></tr>
+    <tr><td>Server components cannot use browser APIs</td><td>No <code>window</code>, <code>localStorage</code>, <code>document</code>…</td></tr>
+    <tr><td>Server components <em>can</em> be async</td><td>They can await data access directly (fetch, DB, fs)</td></tr>
+    <tr><td>Server components can render client components</td><td>Server comp<em>oses</em> client interactivity — passes serializable props down</td></tr>
+    <tr><td>Client components can receive server-rendered <code>children</code></td><td>The composition escape hatch: the server wraps the client part</td></tr>
+    <tr><td>Client components cannot pass functions into server components</td><td>Props into server components must be serializable (server can't execute client data)</td></tr>
+    <tr><td>Context is client-only</td><td>Providers/consumers live in the client tree; server components can't read client context</td></tr>
+    <tr><td>Server code must not ship secrets</td><td>Server files don't go to the client — but data leaked <em>through</em> server output still matters (§5)</td></tr>
+  </tbody>
+</table>
 
-<p>Technical governance stays independent of the board — the contributors set technical direction, the foundation manages assets and infrastructure. A provisional leadership council is determining the long-term structure. The next React Conf is being planned.</p>
+<h3>4.2 Where to place the client boundary</h3>
 
-<h2>4. The security lesson: RSC changed what counts as a "trust boundary" (Dec 2025 – Jan 2026)</h2>
+<p>Default to server components for data display; push client down to the interactive leaves. Move a component to client only when it needs state, effects, an event handler, a browser API, or context.</p>
 
-<p>Server Functions and the RSC wire protocol gave attackers a new surface. In <strong>December 2025</strong>, a critical CVE (CVSS 10.0) allowed remote code execution through the RSC protocol. The fixes shipped, then researchers found follow-ups — a high-severity Denial of Service (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55184">CVE-2025-55184</a>), a medium-severity source-code exposure (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55183">CVE-2025-55183</a>), and a further DoS in January 2026 (<a href="https://www.cve.org/CVERecord?id=CVE-2026-23864">CVE-2026-23864</a>).</p>
+<pre><code>Server page
+  → server data fetching (async server component)
+  → server layout
+  → client interactive card (gets serializable props + server-rendered children)</code></pre>
 
-<p>Three practical takeaways for production code:</p>
+<h3>4.3 Caching and revalidation — the mental model</h3>
+
+<p>RSC's hardest bugs are almost never render bugs — they're <em>caching bugs</em>: stale data, over-cached personalized content, or data that appears fresh but was rendered from the wrong cache. When reading RSC-fed code, ask which cache is in play:</p>
+
+<table>
+  <thead><tr><th>Cache layer</th><th>Question it answers</th></tr></thead>
+  <tbody>
+    <tr><td>Request memoization</td><td>Does this fetch dedupe within one render pass?</td></tr>
+    <tr><td>Router cache</td><td>Does the framework cache server-rendered UI on the client across navigations?</td></tr>
+    <tr><td>HTTP cache</td><td>Is this response cacheable by browsers/CDNs now?</td></tr>
+    <tr><td>Data cache</td><td>Is fetched data persisted across requests?</td></tr>
+    <tr><td>Revalidation</td><td>When does cached data go stale, and who forces a refresh?</td></tr>
+    <tr><td>Personalization</td><td>Is user-specific content accidentally shared with the cache?</td></tr>
+  </tbody>
+</table>
+
+<p>Framework specifics (Next.js router/data caches) live in the <a href="./nextjs-deep-dive.html">Next.js deep dive</a>; from React's angle, only know: server data is cache-owned by the framework, and interacting UI must not silently depend on that cache's freshness.</p>
+
+<h3>4.4 State management after RSC</h3>
+
+<p>RSC changes <em>where state belongs</em>. The old "everything in a global client store" model predates server-owned data:</p>
+
+<table>
+  <thead><tr><th>State type</th><th>Where it belongs</th></tr></thead>
+  <tbody>
+    <tr><td>Server-fetched data</td><td>Server components / framework data cache — <em>not</em> a client store</td></tr>
+    <tr><td>URL state</td><td>Router / search params</td></tr>
+    <tr><td>Local UI state</td><td>Client <code>useState</code> / <code>useReducer</code></td></tr>
+    <tr><td>Shared interactive state</td><td>Context, Zustand, Redux Toolkit, Jotai</td></tr>
+    <tr><td>Mutation state (pending/optimistic/error)</td><td>Actions + <code>useActionState</code> + <code>useOptimistic</code> (§2)</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The rule:</strong> if data is server-owned and read-only, keep it on the server. Client state is for <em>interaction</em> — not a shadow copy of server data. The era of "fetch into Redux on mount" is over; the compiler memoizes, the server owns data, and client state shrinks to what's interactive.</p>
+</blockquote>
+
+<h3>4.5 Error handling and error boundaries</h3>
+
+<p>Error boundaries are client-only — they cannot be server components. A server component at the root of a failing subtree has no <code>error.tsx</code>-equivalent for the whole tree, and nested error boundaries wrap <em>client</em> trees. The practical shape in the framework era: a route-level error file (Next.js <code>error.tsx</code>, React Router error elements) is the server-aware catch-all; component-level boundaries belong on interactive client leaves. Errors must be serialized only as strings across the boundary — never share live objects or functions (§4.1).</p>
+
+<h3>4.6 Streaming and partial prerendering</h3>
+
+<p>Server rendering can ship progressively. Streaming (Suspense on the server) sends the shell first and each suspended server component's content as it finishes; <a href="https://react.dev/blog/2023/10/04/partial-prerendering">partial prerendering (PPR, Oct 2023)</a> pre-renders the static shell at build time and streams only the dynamic parts per request. When reading code, a "shell plus suspense around one region" shape usually means the slow, user-specific part is isolated so the static majority ships instantly — the same Suspense mental model, now precomputed.</p>
+
+<h2>5. The security boundary: RSC changed what a "trust boundary" means (Dec 2025 – Jan 2026)</h2>
+
+<p>Server Functions and the RSC wire protocol gave attackers a new surface. In <strong>December 2025</strong>, a critical CVE (CVSS 10.0) allowed remote code execution through the RSC protocol. The fixes shipped, then researchers found follow-ups — high-severity Denial of Service (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55184">CVE-2025-55184</a>), medium-severity source-code exposure (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55183">CVE-2025-55183</a>), and a further DoS in January 2026 (<a href="https://www.cve.org/CVERecord?id=CVE-2026-23864">CVE-2026-23864</a>).</p>
+
+<p>The practical checklist for production:</p>
 <ol>
-  <li><strong>Treat any Server Function as a public endpoint.</strong> It runs on your server with your secrets. Validate inputs the way you'd validate a REST route. Don't accept the argument that "it's internal — only my client calls it."</li>
-  <li><strong>Never hardcode secrets in Server Function source.</strong> CVE-2025-55183 leaked source code through stringified arguments. <code>process.env.SECRET</code> was unaffected; <code>const key = "sk_live_..."</code> was. Use env vars.</li>
-  <li><strong>Pin React dependencies and read the blog.</strong> The Dec 2023 fixes shipped to 19.0.x, 19.1.x, and 19.2.x <em>three times</em> — the first patch was incomplete. This is now normal for critical CVEs in any framework; budget for it.</li>
+  <li><strong>Treat every Server Function as a public endpoint.</strong> It runs with your server's secrets and privileges. Validate and authorize every argument; don't accept "it's internal — only my client calls it." A public RSC protocol reaches it directly.</li>
+  <li><strong>Never hardcode secrets in Server Function source.</strong> CVE-2025-55183 leaked source code through stringified arguments. <code>process.env.SECRET</code> is fine; <code>const key = "sk_live_..."</code> is not. Env vars, secrets manager.</li>
+  <li><strong>Validate at the boundary regardless of types.</strong> TypeScript checking ends at the server boundary. Schema-validate every Server Function argument (zod/typebox/valibot) — types erased, payloads untyped.</li>
+  <li><strong>Pin React deps and read the security blog.</strong> The Dec 2025 fixes shipped to the affected 19.x lines <em>multiple times</em> — the first patch was incomplete. This is now normal practice for critical CVEs in any framework; budget for it.</li>
+  <li><strong>Run framework security releases like OS updates.</strong> Next.js adopted a formal monthly security cadence with advance notice — schedule them, don't let them drift.</li>
 </ol>
 
-<p>Next.js adopted a formal monthly security release cadence in July 2026, with advance notice before each patch drops. Treat framework security releases like OS updates — schedule them, don't let them drift.</p>
+<h2>6. The React Foundation (Feb 2026): Meta is no longer the sole owner</h2>
 
-<h2>5. The Signals question — and why React didn't adopt them</h2>
+<p>On February 24, 2026, the <a href="https://react.dev/blog/2026/02/24/the-react-foundation">React Foundation</a> launched under the Linux Foundation. React, React Native, and JSX are no longer owned by Meta — they are now owned by the foundation, governed by a board with eight Platinum founding members: <strong>Amazon, Callstack, Expo, Huawei, Meta, Microsoft, Software Mansion, and Vercel</strong>. Seth Webster serves as executive director.</p>
 
-<p>By 2026, every other major reactive framework standardized on <strong>Signals</strong> as the primary reactivity primitive: Angular (v17+), Vue 3.5+, Svelte 5 (runes), Solid, Preact, and even Ember. A Signal is a fine-grained reactive cell — when its value changes, only the DOM that reads it updates, not the whole component. The pitch is faster updates and a simpler mental model: state is a value with subscribers, not a "re-render the function" event.</p>
+<p>Why this matters for reading code: <strong>who funds React shapes what gets prioritized.</strong> One company's (Meta's) internal needs drove React 16-18's roadmap — newsfeed constraints produced concurrent rendering and Suspense. Eight board members — hyperscalers (Amazon, Microsoft), mobile players (Expo, Software Mansion), hosting (Vercel) — broaden the priorities. Expect less single-company urgency and more ecosystem coordination: stable APIs for hosting vendors, clearer upgrade contracts for enterprise, a slower, more deliberate release rhythm.</p>
 
-<p><a href="https://overreacted.io/why-isnt-x-a-hook/">React's answer is still no</a> — for the reasons Dan Abramov laid out in 2019: signals-as-primitives break composition (one custom hook subscribing to signals would interfere with another), and they make debugging harder (the data flow goes through hidden subscriptions instead of explicit props). React's bet is that the <strong>Compiler</strong> closes the performance gap without changing the mental model: you write plain functions and props, the compiler tracks which values each component depends on, and re-renders only what changed. The compiler internally achieves the same fine-grained update that signals give you — but as a build step, not a language feature.</p>
+<p>Technical governance stays independent of the board — contributors set technical direction; the board manages assets and infrastructure. A provisional leadership council is determining the long-term structure; React Conf planning continues.</p>
 
-<p>For reading code at work: if you touch Angular, Vue, Svelte, or Solid, you will see signals (named <code>signal()</code>, <code>ref()</code>, <code>$state</code>, or <code>createSignal</code>). They look like <code>useState</code> but behave differently — the component doesn't re-run; the binding updates. Don't translate 1:1. Read each framework's signals doc before assuming the same model.</p>
+<h2>7. React 19.2 and the framework/routing era</h2>
 
-<h2>6. Preact — the branch that asks "what if React were 3.5 kB?"</h2>
+<p><a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (Oct 1, 2025) shipped three features that change daily code: <code>&lt;Activity /&gt;</code> (preserves a hidden subtree's state — the "navigated away and lost my form" problem solved at the framework level), <code>useEffectEvent</code> (the documented fix for the "deps array lies because I want latest props in the handler" pattern from the paradigm-shift doc's §11), and React Performance Tracks (DevTools overlays for what re-rendered and why).</p>
 
-<p>Preact appeared in 2013, the same year React open-sourced. It is a separate implementation of the same component model — same JSX, same hooks (eventually), same mental model you read in the paradigm-shift doc — but a different codebase, with different goals. The original pitch was threefold (and is still on <a href="https://preactjs.com/about/project-goals">the project goals page</a>):</p>
+<p>In parallel, React's official recommendation for new apps shifted: <a href="https://react.dev/blog/2025/02/14/sunsetting-create-react-app">Sunsetting Create React App</a> (Feb 14, 2025) made it explicit — <strong>new React apps should use a framework</strong>. CRA deprecation ended "just a Vite React app" as the default starting point. The pattern: React is moving <em>up-stack</em>. The component model is settled; the next layer is the framework — routing, data fetching, code splitting, server rendering, caching.</p>
+
+<h3>7.1 Choosing a React framework after CRA</h3>
+
+<table>
+  <thead><tr><th>When you need</th><th>Reach for</th><th>Be careful</th></tr></thead>
+  <tbody>
+    <tr><td>Full-stack React, RSC, SEO, server actions</td><td><strong>Next.js</strong></td><td>Framework surface, cache model to learn</td></tr>
+    <tr><td>Web-standard routing + progressive SPA→SSR</td><td><strong>React Router framework mode</strong></td><td>Not RSC-native; loaders/actions data model</td></tr>
+    <tr><td>React Native mobile</td><td><strong>Expo</strong></td><td>Not a web SPA</td></tr>
+    <tr><td>Simple client-rendered app, dashboards, internal tools</td><td><strong>Vite SPA</strong></td><td>No SSR/RSC benefits; SEO harder</td></tr>
+    <tr><td>Content-first sites, small interactive islands</td><td><strong>Astro + React islands</strong></td><td>Highly interactive everything-app isn't its lane</td></tr>
+  </tbody>
+</table>
+
+<h2>8. The signals question — and why React didn't adopt them</h2>
+
+<p>By 2026, every other major reactive framework standardized on <strong>signals</strong> as the primary reactivity primitive: Angular (v17+), Vue 3.5+, Svelte 5 (runes), Solid, Preact, and even Ember. A signal is a fine-grained reactive cell — when its value changes, only the DOM that subscribes updates, not the whole component. The pitch: faster updates and a simpler mental model — state as a value with subscribers, rather than "re-render the function."</p>
+
+<p><a href="https://overreacted.io/why-isnt-x-a-hook/">React's answer is still no</a> — for the reasons Dan Abramov laid out in 2019: signals-as-primitives break composition (a hook subscribing to signals interferes with another), and they make debugging harder (data flows through hidden subscriptions instead of explicit props). React's bet is that the <strong>compiler</strong> closes the performance gap without changing the mental model: you write plain functions and props, the compiler tracks dependencies, re-renders only what changed. To be precise: the compiler <em>reduces unnecessary re-rendering through memoization</em> — it is <em>not</em> signal-style fine-grained DOM subscription. They are solving the same symptom through different mechanisms; the mental model difference (explicit props vs hidden subscriptions) is the whole point of React's "no".</p>
+
+<p>For reading code at work: if you touch Angular (<code>signal()</code>), Vue (<code>ref()</code>), Svelte (<code>$state</code>), Solid (<code>createSignal</code>), or Preact (<code>signal()</code>), they look like <code>useState</code> but behave differently — the component doesn't re-run; the binding updates. Don't translate 1:1 between the two reactivity models; read each framework's signals doc.</p>
+
+<h2>9. Preact — the structural branch that asks "what if React were 3.5 kB?"</h2>
+
+<p>Preact appeared in 2015. It is a separate implementation of the same component model — same JSX, same hooks (eventually), same mental model — but a different codebase with different goals. The original pitch (still on <a href="https://preactjs.com/about/project-goals">the project goals page</a>):</p>
 <ul>
-  <li><strong>Size:</strong> ~3.5 kB minified+gzip, vs React's ~30-40 kB. mattered a lot in 2013-2016 when mobile data was slow and bundlers were primitive.</li>
-  <li><strong>Performance:</strong> avoid React's synthetic event system and the rest of the abstraction tax; use the browser's native <code>addEventListener</code> directly.</li>
+  <li><strong>Size:</strong> ~3-4 kB minified+gzip, vs React DOM's ~40 kB+. mattered a lot in 2015-2016 when mobile data was slow.</li>
+  <li><strong>Performance:</strong> avoids React's synthetic event system and the rest of the abstraction tax; uses the browser's native <code>addEventListener</code> directly.</li>
   <li><strong>Understandability:</strong> the whole codebase is readable in a few hours. React's is not.</li>
 </ul>
 
-<h3>6.1 Why wasn't Preact folded into React?</h3>
+<h3>9.1 Why wasn't Preact folded into React?</h3>
 
-<p>Three reasons, and they're the same reasons Preact still exists separately in 2026:</p>
-
+<p>Three reasons, same reasons Preact still exists separately in 2026:</p>
 <ol>
-  <li><strong>Different non-goals, by design.</strong> React's team optimizes for a complex, multi-platform abstraction (web, native, VR, server, fibers, concurrent rendering, Suspense, RSC). Preact's non-goals explicitly exclude <code>PropTypes</code>, the synthetic event system, and legacy IE8 compatibility. Folding Preact into React would mean abandoning those non-goals; folding React into Preact would mean abandoning the abstraction tax Preact was built to avoid. <a href="https://preactjs.com/guide/v10/differences-to-react">Preact's differences page</a> is unusually direct: "Preact is not intended to be a reimplementation of React. … The reason Preact does not attempt to include every single feature of React is in order to remain <strong>small</strong> and <strong>focused</strong> — otherwise it would make more sense to simply submit optimizations to the React project, which is already a very complex and well-architected codebase."</li>
-  <li><strong>Cross-platform vs web-only.</strong> React was always written for multiple targets (the React Native renderer, the custom renderers in the React-Three-Fiber family, RSC's split-process model). Preact is honest about being web-only — it follows the DOM specification more closely (<code>class</code> not <code>className</code>, <code>onInput</code> not <code>onChange</code>, native SVG attributes, native Custom Element and Custom Event support). The trade-off is real and there is no neutral middle.</li>
-  <li><strong>Compatibility is already a solved problem.</strong> <code>preact/compat</code> is a thin aliasing layer — point your bundler at "preact/compat" instead of "react" and most React libraries work. So the React ecosystem already absorbs Preact through tooling, not through merger. You don't need Preact to be React; you need Preact to <em>run</em> React-component-shaped code, and it does.</li>
+  <li><strong>Different non-goals, by design.</strong> React optimizes for a complex, multi-platform abstraction (web, native, VR, fibers, concurrent rendering, Suspense, RSC). Preact's non-goals exclude the synthetic event system, PropType-like ceremony, and legacy IE8. <a href="https://preactjs.com/guide/v10/differences-to-react">"Preact is not intended to be a reimplementation of React… otherwise it would make more sense to simply submit optimizations to the React project."</a></li>
+  <li><strong>Cross-platform vs web-only.</strong> React targets multiple renderers (React Native, RSC split process). Preact is honest about being web-only and follows the DOM spec more closely (<code>class</code> not <code>className</code>, <code>onInput</code> not <code>onChange</code>, native Custom Element support).</li>
+  <li><strong>Compatibility is a solved problem.</strong> <code>preact/compat</code> is a thin aliasing layer — point the bundler at <code>preact/compat</code> and most React libraries work. The ecosystem absorbs Preact through tooling, not merger.</li>
 </ol>
 
-<h3>6.2 Why Preact matters even more in 2026</h3>
+<h3>9.2 Why Preact matters even more in 2026</h3>
 
-<p>Preact's small size and web-first stance made it the natural fit for two camps the rest of this doc describes elsewhere:</p>
 <ul>
-  <li><strong>HTML-first / islands frameworks.</strong> Astro supports Preact as a first-class island renderer, and many Astro sites use Preact for their interactive islands precisely so the islands ship minimal JavaScript. If you're going to add 5 KB of JS to an otherwise-static marketing page, you reach for the 3.5 kB React-shaped library, not the 35 kB one.</li>
-  <li><strong>Embedded / constrained environments.</strong> Web views inside native apps, kiosks, low-end Android, edge-rendered SPAs where every kilobyte shows up in core-web-vitals. Preact's users here overlap heavily with the WASM-from-React crowd.</li>
+  <li><strong>Islands frameworks.</strong> Astro supports Preact as a first-class island renderer — minimal JS for interactive islands on mostly-static pages. If you're adding 5 kB to a marketing page, you reach for the 3.5 kB React-shaped library, not the 35 kB one.</li>
+  <li><strong>Embedded / constrained environments.</strong> Web views in native apps, kiosks, low-end Android, edge SPAs where every kilobyte shows up in core-web-vitals.</li>
 </ul>
 
-<p>Preact <em>also</em> adopted signals early (Sep 2022 — <a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals</a>, before the broader signals wave) and ships them as an official add-on. So if you read in §5 that signals beat re-render-the-component for fine-grained updates and you wonder "does anyone actually use that in a React-shaped API?" — yes, Preact does, and it is the proof-by-existence that the React team's "no" is about <em>React's</em> governance decision (composition, debugging, backward compat) not about technical impossibility.</p>
+<p>Preact also adopted signals early (Sep 2022, <a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals</a>) as an official add-on — proof-by-existence that React's "no" is a governance/design decision (§8), not a technical impossibility.</p>
 
-<h3>6.3 Reading Preact at work</h3>
+<h3>9.3 Reading Preact at work</h3>
 
-<p>If you encounter a Preact codebase, the differences from React that will trip you are exactly the ones on Preact's differences page:</p>
-<ul>
-  <li>JSX uses native DOM attribute names: <code>class</code>, <code>for</code>, <code>tabindex</code>, <code>stroke-width</code> — not <code>className</code>, <code>htmlFor</code>, <code>tabIndex</code>, <code>strokeWidth</code>. Quirks of React vanish.</li>
-  <li>Form input uses <code>onInput</code>, not React's <code>onChange</code>. (Unless <code>preact/compat</code> is enabled — then React's <code>onChange</code> semantics are restored.)</li>
-  <li>Class components can take <code>render(props, state)</code> as arguments — a small Preact-only convenience. You'll see it in Preact-class code; don't reproduce it in React.</li>
-  <li>Events don't bubble through <code>Portal</code> — a behavioral difference from React that occasionally surfaces in modal and tooltip code.</li>
-</ul>
-<p>Everything else from the paradigm-shift doc — closures, hooks, deps arrays, the storage models, the lifecycle table — applies as-is. Preact's <a href="https://preactjs.com/guide/v10/differences-to-react">version compatibility policy</a> tracks current and previous React major releases.</p>
+<p>The differences that will trip you are exactly the ones on Preact's differences page: native DOM attribute names (<code>class</code>, <code>for</code>, <code>stroke-width</code>), <code>onInput</code> instead of <code>onChange</code> (unless <code>preact/compat</code>), class components can take <code>render(props, state)</code> arguments, and events don't bubble through portals. Everything else — closures, hooks, deps arrays, lifecycle — applies as-is from the paradigm-shift doc.</p>
 
-<h3>6.4 Will Preact replace React (or vice versa)?</h3>
+<h3>9.4 Will Preact replace React?</h3>
 
-<p>No. The split is stable because it is structural, not stylistic:</p>
-<ul>
-  <li><strong>React</strong> is the multi-platform, abstraction-rich, foundation-backed default. It is what enterprise teams, RSC apps, and React Native reach for. The compiler closes the perf gap on the dimension Preact used to win outright (re-render optimization) — but React's bundle size will not collapse to Preact's, because React carries the cross-platform and RSC tax by choice.</li>
-  <li><strong>Preact</strong> is the web-only, web-spec-first, size-and-readability-first branch. It wins where minimal JS matters (Astro islands, embeddable widgets, low-end devices, learning resources, demos) and where the synthetic-event abstraction is cost without benefit. It also functions as the proof that the React component model — the same mental model from the entire paradigm-shift doc — is small and simple enough to fit in 3.5 kB when you drop the parts React keeps for non-web reasons.</li>
-</ul>
-<p>The likely 2026-and-beyond state: both continue, both share the React-ecosystem libraries via <code>preact/compat</code>, and the choice between them is per-project, settled by the size vs abstraction trade-off — not by either one "winning." The React Foundation makes this easier, not harder: a foundation-governed spec and a community-maintained smaller implementation is a healthier long-term arrangement than one company owning both.</p>
+<p>No. The split is stable because it is structural, not stylistic: React is the multi-platform, abstraction-rich, foundation-backed default; Preact is the web-only, web-spec-first, size-first branch. The compiler closes the re-render gap on one of Preact's dimensions, but React's bundle will not collapse to Preact's — the cross-platform and RSC tax is a deliberate choice. A foundation-governed spec alongside a community-maintained smaller implementation is, if anything, more sustainable than one company owning both.</p>
 
-<h2>7. React 19.2 and the routing renaissance</h2>
+<h2>10. Migration paths into React 2024+</h2>
 
-<p><a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (Oct 2025) shipped three features that change daily code: <code>Activity</code> (preserves a subtree's state when it's hidden from the tree — solves the "I navigated away and lost my form" problem at the framework level), <code>useEffectEvent</code> (a non-reactive hook for event handlers — the documented solution to the "deps array lies because I want latest props in the handler" pattern from the paradigm-shift doc's §11), and React Performance Tracks (DevTools overlays for what actually re-rendered and why).</p>
+<table>
+  <thead><tr><th>From → To</th><th>Trigger</th><th>Strategy</th><th>Main risk</th></tr></thead>
+  <tbody>
+    <tr><td>CRA → Next.js</td><td>Need SSR/RSC/SEO/full-stack</td><td>Incremental route migration; keep client components</td><td>Caching/routing learning curve</td></tr>
+    <tr><td>CRA → React Router framework mode</td><td>Routing + data layer without RSC</td><td>Adopt loaders/actions incrementally</td><td>Different data model</td></tr>
+    <tr><td>CRA → Vite SPA</td><td>Modern build without framework</td><td>Replace CRA build only; keep client-rendered</td><td>Miss SSR/RSC benefits</td></tr>
+    <tr><td>React 18 → 19</td><td>Actions, compiler compat, modern APIs</td><td>Codemods, test forms/effects, update libs</td><td>Edge-case breaking changes</td></tr>
+    <tr><td>Manual memoization → compiler</td><td>Perf maintenance burden</td><td>Exact-pin, enable lint, test hotspots</td><td>False safety if Rules of React violated</td></tr>
+    <tr><td>Client-only app → RSC</td><td>Too much client fetching/bundle</td><td>Move data display to server, keep leaves client</td><td>Boundary design mistakes (§4.1)</td></tr>
+    <tr><td>Server data in global client store → server data</td><td>Duplication, staleness, bundle weight</td><td>Move to server components/framework cache/query layer</td><td>State ownership confusion (§4.4)</td></tr>
+  </tbody>
+</table>
 
-<p>In parallel, React Router shipped a "framework mode" and React's official recommendation for new apps shifted. <a href="https://react.dev/blog/2025/02/14/sunsetting-create-react-app">Sunsetting Create React App</a> (Feb 14, 2025) made it explicit: <strong>new React apps should use a framework</strong> — Next.js, React Router (in framework mode), or Expo. CRA deprecation is the end of "just a Vite React app" as the default starting point. Build tools (Vite, Parcel, Rsbuild) remain valid for learners and for apps that genuinely don't need routing.</p>
+<h2>11. Failure modes</h2>
 
-<p>The pattern: React is moving up-stack. The component model (covered in the paradigm-shift doc) is settled. The next layer is the framework — routing, data fetching, code splitting, server rendering, caching — and React's team now writes about that layer, not about hooks.</p>
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Treating Server Actions as internal-only</td><td>No validation/authz; abuse, corruption</td><td>Treat every Server Function as a public endpoint (§5)</td></tr>
+    <tr><td>Client boundary too high</td><td>Whole page client-side; bundle bloat, lost server data</td><td>Push client boundaries to leaves (§4.2)</td></tr>
+    <tr><td>Server boundary too high</td><td>Interactive components on the server, hooks fail</td><td>Move interactive components to client</td></tr>
+    <tr><td>Passing non-serializable props across the boundary</td><td>Runtime errors / silent behavior changes</td><td>Pass serializable props; use <code>children</code> composition</td></tr>
+    <tr><td>Using context in server components</td><td>Not supported</td><td>Move context into the client tree</td></tr>
+    <tr><td>Overtrusting the compiler</td><td>Developers ignore Rules of React</td><td>Keep lint rules; test behavior (§3)</td></tr>
+    <tr><td>Disabling lint rules to make compiler pass</td><td>Latent bugs hide</td><td>Fix the rule violation, not the lint rule</td></tr>
+    <tr><td>Storing server data in global client state</td><td>Duplication, stale data, bundle weight</td><td>Server components / framework cache / query layer (§4.4)</td></tr>
+    <tr><td>Confusing RSC with SSR</td><td>Wrong mental model; hydration confusion</td><td>Split-process model: server components serialize UI, not just HTML</td></tr>
+    <tr><td>Ignoring security patches</td><td>CVE exposure</td><td>Pin, monitor, apply React/framework security releases (§5)</td></tr>
+    <tr><td>Upgrading the compiler casually</td><td>Memoization changes expose latent bugs</td><td>Exact pin, changelog review, full test pass (§3)</td></tr>
+    <tr><td>Using signals mentally inside React</td><td>Expecting fine-grained DOM updates that models don't give</td><td>Understand React's render + compiler memoization model (§8)</td></tr>
+  </tbody>
+</table>
 
-<h2>8. What stays the same for you, reading code at work</h2>
+<h2>12. Principles</h2>
 
-<p>None of this doc changes the core mental model from the paradigm-shift reference:</p>
-<ul>
-  <li>Client components still capture values per render. <code>useState</code>, <code>useEffect</code>, <code>useRef</code> still behave exactly as described there.</li>
-  <li><code>useEffectEvent</code> is the new official tool for "I want the latest value without adding it to the deps array" — read it as the fix for the patterns described as bugs in the paradigm-shift doc's §11.</li>
-  <li>Server components are a <em>subset</em> of function components — no hooks, no events, run once. If you understood the capture-vs-mutate distinction, you already understand the boundary: server components are pure-capture-only, client components get the full model.</li>
-  <li>Class components remain in legacy code, still readable using the lifecycle table from the paradigm-shift doc's §15.</li>
-</ul>
+<table>
+  <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>Client and server are different processes</td><td>RSC is a boundary decision, not a styling or SSR trick (§4)</td></tr>
+    <tr><td>The compiler automates memoization, not correctness</td><td>The Rules of React still matter (§3)</td></tr>
+    <tr><td>Server Functions are endpoints</td><td>Validate, authorize, rate-limit, audit (§5)</td></tr>
+    <tr><td>Frameworks are now the default React surface</td><td>Routing, data, caching, rendering live in the framework (§7)</td></tr>
+    <tr><td>React is becoming platform-governed</td><td>Stability and ecosystem coordination over single-company urgency (§6)</td></tr>
+    <tr><td>Server data stays server-owned when possible</td><td>Don't move read-only server data into client state (§4.4)</td></tr>
+    <tr><td>Interactivity belongs at the edge</td><td>Client components as small and leaf-like as practical (§4.2)</td></tr>
+    <tr><td>Upgrade carefully</td><td>Compiler and framework security changes require disciplined upgrades (§3, §5)</td></tr>
+  </tbody>
+</table>
 
-<p>The arc is now: classes (2013-2018) → functions+hooks (2018-2024) → functions+hooks+compiler+split-process (2024-now). The compiler removes manual memoization. RSC splits the process. Signals did not win inside React; the compiler did the same work without changing the model. The foundation move makes the model's long-term stability a governance question, not a single-company question.</p>
+<h2>13. Ecosystem — the tools worth naming</h2>
 
-<p>For the wider landscape — Next.js specifically, the Angular/Vue/Svelte/HTMX/Astro/CMS camps, the WASM frontier, and the JS-to-TypeScript shift — see the companion docs: <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> for the map, <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> for the framework most likely to be in your React-at-work path, and <a href="./frontend-income-markets.html">Frontend Income Markets</a> for how these skills turn into work.</p>
+<table>
+  <thead><tr><th>Layer</th><th>Tools</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Frameworks</td><td>Next.js, React Router, Expo, Astro, Vite</td><td>Rendering/routing/deployment surface (§7)</td></tr>
+    <tr><td>Compiler toolchain</td><td><code>babel-plugin-react-compiler</code>, <code>eslint-plugin-react-hooks</code></td><td>Memoization + Rules-of-React enforcement (§3)</td></tr>
+    <tr><td>DevTools</td><td>React DevTools Performance Tracks, React Scan</td><td>Render inspection and profiling</td></tr>
+    <tr><td>Server/client data</td><td>TanStack Query, SWR, Apollo, RTK Query</td><td>Cache — sync server data with UI (§4.3)</td></tr>
+    <tr><td>Client state</td><td>Zustand, Redux Toolkit, Jotai, Context</td><td>Interactive UI state (§4.4)</td></tr>
+    <tr><td>Testing</td><td>Vitest/Jest, Testing Library, Playwright</td><td>Component / integration / E2E evidence</td></tr>
+    <tr><td>Boundary validation</td><td>Zod / TypeBox / Valibot + TypeScript</td><td>Validate Server Function args (§5)</td></tr>
+    <tr><td>Supply chain</td><td>deps audit, lockfile, CVE monitor</td><td>Security hygiene (§5)</td></tr>
+  </tbody>
+</table>
+
+<h2>14. The future — signals to watch</h2>
+
+<table>
+  <thead><tr><th>Signal</th><th>What it would mean</th></tr></thead>
+  <tbody>
+    <tr><td>Compiler-first React</td><td>Manual memoization continues to decline</td></tr>
+    <tr><td>Server-first architecture</td><td>New apps start server-components-first and push interactivity outward</td></tr>
+    <tr><td>Framework standardization</td><td>Ecosystem becomes more framework-defined than "React"</td></tr>
+    <tr><td>RSC protocol resifting</td><td>More security/interop attention on the wire protocol</td></tr>
+    <tr><td>Signals pressure</td><td>React must keep proving compiler-memoization vs fine-grained reactivity</td></tr>
+    <tr><td>Foundation governance hardening</td><td>Slower, more deliberate platform evolution with multi-company input</td></tr>
+  </tbody>
+</table>
+
+<h2>15. Summary checklist</h2>
+
+<table>
+  <thead><tr><th>Question</th><th>Check</th></tr></thead>
+  <tbody>
+    <tr><td>Is this component client or server — explicitly?</td><td>Boundary is explicit (§4)</td></tr>
+    <tr><td>Does it need hooks/effects/browser APIs?</td><td>If yes, it's client</td></tr>
+    <tr><td>Is the data server-owned and read-only?</td><td>Prefer server component</td></tr>
+    <tr><td>Are Server Functions validated and authorized?</td><td>Yes — treat as endpoints (§5)</td></tr>
+    <tr><td>Are props across the RSC boundary serializable?</td><td>Yes (§4.1)</td></tr>
+    <tr><td>Is the compiler exact-pinned and tested on upgrade?</td><td>Yes (§3)</td></tr>
+    <tr><td>Are lint rules enforcing the Rules of React?</td><td>Yes (§3)</td></tr>
+    <tr><td>Is the framework choice deliberate?</td><td>Next/Router/Expo/Vite/Astro (§7)</td></tr>
+    <tr><td>Is the caching behavior understood?</td><td>Request/router/data/HTTP (§4.3)</td></tr>
+    <tr><td>Is the security/upgrade cadence defined?</td><td>Yes (§5)</td></tr>
+  </tbody>
+</table>
+
+<section class="win">
+  <h3>What this doc covers</h3>
+  <p>What changed in React after hooks: React 19's platform features, Actions/forms, the compiler, RSC (boundary, caching, state), the trust boundary, foundation governance, the framework era, signals, Preact, and the practical machinery (migration, failure modes, principles, ecosystem, future, checklist). Not the class→hooks mental model (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a>), not the full frontend-camp landscape (<a href="./frontend-camps-survey.html">camps</a>), not Next.js internals (<a href="./nextjs-deep-dive.html">nextjs</a>), not system architecture or TypeScript (<a href="./system-design.html">system-design</a>, <a href="./javascript-across-stacks.html">across-stacks</a>).</p>
+</section>
 
 <footer class="lesson-foot">
   <span>Reference · React 2024+ compiler/RSC/foundation</span>

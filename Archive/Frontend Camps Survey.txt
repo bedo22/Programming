@@ -1,0 +1,890 @@
+Ignoring display artifacts and reviewing substance only.
+
+## Overall verdict
+
+This is a **strong orientation doc**. Its core purpose — helping a developer open an unfamiliar frontend repo and recognize which “camp” it belongs to — is well served by the current structure.
+
+Its strongest parts:
+
+- The camp map: CMS/classic, HTML-first/islands, SPA, meta-frameworks, signals world, WASM.
+- The “centers of gravity, not exclusive clubs” framing.
+- The mental models table comparing how practitioners in each camp reason.
+- The transfer-trap warning for React developers entering signals frameworks.
+- The migration paths table.
+- The ecosystem/tooling catalog.
+
+However, compared with the rest of the shelf, it is still **less complete as a practical field manual**. It tells the reader what camps exist, but it does not yet fully teach:
+
+1. how to identify the camp from a real repository,
+2. how to choose a camp for a new product,
+3. how rendering, state, routing, and data differ across camps,
+4. what the camp-specific failure modes are,
+5. how camps overlap and hybridize,
+6. how each camp affects SEO, accessibility, performance, security, and deployment,
+7. how to read a camp-specific codebase step by step.
+
+So: **very good conceptual survey, but not yet complete as a practical recognition-and-decision reference**.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Camp taxonomy | Strong |
+| Mental model comparison | Very strong |
+| Migration paths | Strong |
+| Practical repo recognition | Needs expansion |
+| Camp selection guidance | Needs expansion |
+| Rendering/state/data detail | Needs expansion |
+| Camp-specific failure modes | Needs expansion |
+| Duplication control | Good |
+| Shelf consistency | Good but could add principles/checklist/worked example |
+
+I would rate it approximately:
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 8.5 / 10 |
+| Conceptual completeness | 8.5 / 10 |
+| Practical completeness | 7 / 10 |
+| Duplication control | 9 / 10 |
+| Usefulness for reading at work | 7.5 / 10 |
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The camp framing is excellent
+
+The table at the top:
+
+| Camp | Unit of work | Default runtime | JS load strategy |
+|---|---|---|---|
+| CMS/classic | Page/template | Server | Optional progressive enhancement |
+| HTML-first | Document + islands | Server HTML | Ship almost no framework |
+| SPA | Client app shell | Browser | Large initial JS |
+| Meta-framework | Route + data + UI | Server/browser split | Framework decides |
+| WASM/systems UI | Compiled module | Browser/edge | JS as glue |
+
+is one of the best parts of the doc.
+
+It gives the reader immediate orientation without forcing a religious framework debate.
+
+Keep this.
+
+---
+
+## 1.2 The “centers of gravity” warning is important
+
+The doc correctly says:
+
+> These camps overlap. Treat the labels as centers of gravity, not exclusive clubs.
+
+This is essential because real codebases are often hybrids:
+
+- WordPress with a React admin SPA,
+- Astro with React islands,
+- Next.js App Router with client-heavy routes,
+- Angular with signals but legacy zone.js,
+- React SPA with a WASM hot path.
+
+This framing should remain central.
+
+---
+
+## 1.3 The mental models table is the best section
+
+The table comparing:
+
+- CMS/classic,
+- HTML-first/islands,
+- SPA React,
+- meta-framework RSC,
+- signals,
+- WASM,
+
+is excellent.
+
+It correctly identifies that the hardest part of reading another camp is not syntax, but the mental model:
+
+- CMS: page = template + data,
+- islands: static document + precision holes,
+- SPA React: UI = f(state), re-render + diff,
+- RSC: server functions + client React,
+- signals: reactive graph, not component re-run,
+- WASM: compiled module + JS glue.
+
+This is the highest-value part of the doc.
+
+---
+
+## 1.4 The transfer-trap warning is very useful
+
+The warning:
+
+> Bringing React’s re-render model to signals frameworks causes over-subscription. Bringing signals’ dirty-flag model to React causes missing memoization.
+
+is exactly the kind of cross-camp insight the doc should contain.
+
+This should be expanded, not removed.
+
+---
+
+## 1.5 The migration paths table is strong
+
+The migration table is one of the most practical sections:
+
+- CMS → HTML-first islands,
+- HTML-first → meta-framework,
+- SPA → meta-framework,
+- Angular → React/Next,
+- signals library → React.
+
+This is useful because teams rarely stay in one camp forever.
+
+---
+
+# 2. Duplication boundaries
+
+The doc mostly avoids duplication, but a few boundaries should be made explicit.
+
+| Topic | Best owner | What this doc should do |
+|---|---|---|
+| React re-render/hooks mental model | `class-to-hooks-paradigm-shift.html` | Link; do not re-teach |
+| Next.js App Router details | `nextjs-deep-dive.html` | Link; keep Next as one meta-framework example |
+| TypeScript theory and cross-stack story | `javascript-across-stacks.html` | Link; keep only frontend-specific note |
+| Rendering strategy as architecture | `system-design.html` | Link; camps show implementation consequences |
+| UI/UX/accessibility/state visibility | `ui-ux-web-design.html` | Link; mention camp implications only |
+| HTML/CSS platform contract | `html-and-css.html` | Link; camps abstract over the same substrate |
+| React Compiler/RSC/Foundation | `react-2024-and-beyond.html` | Link; mention only as camp D shift |
+| Camp recognition and comparison | This doc | Own fully |
+| Camp mental models | This doc | Own fully |
+| Camp migration paths | This doc | Own fully |
+
+The main risk is that the signals section and TypeScript section could drift into teaching frameworks or language theory. Keep them high-level and link outward.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important improvements.
+
+---
+
+## 3.1 Add a scope statement
+
+The doc should explicitly say what it covers.
+
+Suggested addition:
+
+> This doc surveys web frontend camps: how real products ship UI in the browser. It does not deeply cover native mobile, desktop, backend architecture, or design systems, except where they affect frontend camp recognition. React Native/Expo are adjacent to the meta-framework camp but are covered in the React 2024+ and Next.js docs where relevant.
+
+This prevents readers from expecting a full “all software UI” survey.
+
+---
+
+## 3.2 Add a repository identification checklist
+
+This is the biggest practical gap.
+
+The doc tells the reader what camps are, but not how to detect them from an unfamiliar repo.
+
+Add:
+
+> **How to identify the camp from a repository**
+
+### First files to check
+
+| Check | What it tells you |
+|---|---|
+| `package.json` dependencies | Framework family |
+| Config files | Meta-framework or build tool |
+| Folder structure | Routing/rendering model |
+| Entry HTML | SPA shell vs server-rendered document |
+| Page/component files | Server/client boundary |
+| Network HTML source | Whether content is server-rendered or client-hydrated |
+
+### Camp smells
+
+| Camp | Signals in the repo |
+|---|---|
+| CMS/classic | PHP/ERB/Jinja templates, `wp-content`, themes, jQuery, server routes rendering full pages |
+| HTML-first/islands | `.astro`, `client:*`, HTMX `hx-*`, Alpine, partial HTML swaps, very little JS |
+| SPA | `index.html` with empty root, client router, store, API client, Vite/Webpack SPA config |
+| Meta-framework | `app/`, `pages/`, `route.ts`, `page.tsx`, `layout.tsx`, loaders/actions, `use client`, SSR/SSG/ISR config |
+| Signals world | `signal()`, `computed()`, `ref()`, `reactive()`, `$state`, `createSignal`, Svelte runes, Vue Composition API |
+| WASM hybrid | `.wasm`, Rust/C++ source, `wasm-bindgen`, Blazor, Emscripten, JS glue files |
+
+This would make the doc much more useful for “reading at work.”
+
+---
+
+## 3.3 Add a camp selection framework
+
+The doc says “not to pick a religion,” but teams still need to choose.
+
+Add:
+
+> **Choosing a camp — constraint-based selection**
+
+| Constraint | Favored camp |
+|---|---|
+| Content-heavy, editorial workflow, SEO | CMS/classic or HTML-first |
+| Marketing site with a few interactive widgets | HTML-first islands |
+| Authenticated app behind login, high interactivity | SPA or meta-framework |
+| Public + app pages in one codebase | Meta-framework |
+| Server-owned data, SEO, streaming, RSC | Meta-framework, especially Next.js |
+| Extremely low JS budget | HTML-first/islands |
+| Existing Angular/Vue/Svelte team | Signals/world camp matching team skill |
+| Heavy compute in browser | WASM hybrid inside SPA/meta-framework |
+| Simple internal tool | SPA or meta-framework depending on data needs |
+| Team primarily knows React | SPA or meta-framework React path |
+
+Add:
+
+> Do not choose a camp because it is fashionable. Choose it based on content-to-interactivity ratio, SEO needs, performance budget, team skill, data ownership, and deployment constraints.
+
+This turns the survey into a decision tool.
+
+---
+
+## 3.4 Add rendering and hydration strategy table
+
+The camps differ most in how HTML and JS arrive.
+
+Add:
+
+| Strategy | Camp association | JS shipped | Interactivity model | Main risk |
+|---|---|---:|---|---|
+| Server-rendered full page | CMS/classic | Minimal | Round-trip or small enhancement | Page reload friction |
+| Static HTML + islands | HTML-first | Very low | Islands hydrate selectively | Island sprawl |
+| CSR/SPA | SPA | High | Client owns UI after load | First paint/SEO/bundle size |
+| SSR | Meta-framework | Medium | Server renders, client hydrates | Hydration cost/mismatches |
+| SSG/ISR | Meta-framework | Low-medium | Pre-rendered HTML + client hydration | Stale data/invalidation complexity |
+| Streaming/RSC | Meta-framework | Targeted | Server components + client islands | Boundary/cache complexity |
+| Resumability | Qwik-style meta-framework | Low | Serialize app state instead of hydrating | Ecosystem maturity |
+| WASM module | WASM hybrid | Binary module + JS glue | Compiled logic, JS DOM glue | Toolchain/memory complexity |
+
+This is essential for understanding camp differences.
+
+---
+
+## 3.5 Add state and data ownership per camp
+
+The doc mentions state libraries in Camp C, but it should map state ownership across camps.
+
+Add:
+
+| Camp | Server state | Client state | URL state | Typical tools |
+|---|---|---|---|---|
+| CMS/classic | Database/template context | Minimal widget state | Page URL | CMS APIs, jQuery, small scripts |
+| HTML-first/islands | Server-rendered content | Island-local state | Links/fragments/query | Astro props, HTMX, Alpine |
+| SPA | API cache | Global/local client store | Router/search params | Redux, Zustand, Pinia, NgRx, TanStack Query |
+| Meta-framework | Server data/cache | Client interactive state | Router/search params | RSC, loaders/actions, React Query, Next cache |
+| Signals world | API/store layer | Fine-grained signals/stores | Router state | Vue refs, Svelte runes, Solid signals, Angular signals |
+| WASM hybrid | API or local memory | App state often in WASM | JS router/glue | wasm-bindgen, Blazor state, JS interop |
+
+Add:
+
+> The first question in any camp is not “which framework?” but “where does the source of truth live?”
+
+---
+
+## 3.6 Add routing model per camp
+
+Routing is another major differentiator.
+
+Add:
+
+| Camp | Routing model |
+|---|---|
+| CMS/classic | Server URLs, template rendering, sometimes client-side admin router |
+| HTML-first | Native links, server routes, HTMX partial swaps |
+| SPA | Client router: React Router, Vue Router, Angular Router |
+| Meta-framework | File-system or config routes, server/client navigation, loaders/actions |
+| Signals world | Framework router: Angular, Vue, SvelteKit, SolidStart |
+| WASM hybrid | Usually host app router; WASM does not own routing |
+
+This helps readers understand navigation behavior.
+
+---
+
+## 3.7 Add camp-specific failure modes
+
+The doc has transfer traps, but it needs explicit failure modes per camp.
+
+Add:
+
+| Camp | Failure mode | What happens | Fix |
+|---|---|---|---|
+| CMS/classic | jQuery soup | Scattered DOM scripts, no clear state | Introduce islands or small components |
+| CMS/classic | Headless without plan | CMS API exists but frontend has no rendering strategy | Choose rendering camp deliberately |
+| HTML-first | Island sprawl | Too many islands recreate a poorly designed SPA | Consolidate islands, define hydration budget |
+| HTML-first | HTMX complexity leak | Server-rendered fragments become stateful and hard to trace | Keep server state explicit, use progressive enhancement carefully |
+| SPA | Bundle bloat | First load slow, SEO weak | Code-split, defer, or move public pages to meta-framework/islands |
+| SPA | State duplication | Server data duplicated in global store | Separate server cache from UI state |
+| Meta-framework | Abstraction leak | Developers do not understand server/client boundary | Teach RSC/loader boundaries, add lint/review rules |
+| Meta-framework | Cache confusion | Stale or over-cached pages | Make caching explicit, document revalidation |
+| Signals | React transfer trap | Developer expects component re-render semantics | Learn camp-native reactivity model |
+| Signals | Effect overuse | Derived state duplicated in effects | Prefer computed/derived signals |
+| WASM | Toolchain tax | Simple feature becomes build/toolchain problem | Use WASM only for hot paths, keep UI in JS |
+| WASM | Memory/debugging pain | Crash or performance issue hard to trace | Keep JS/WASM boundary narrow and observable |
+
+This would significantly improve practical completeness.
+
+---
+
+## 3.8 Add hybrid patterns
+
+The doc says camps overlap, but it should name common hybrids.
+
+Add:
+
+| Hybrid | Description |
+|---|---|
+| CMS + SPA admin | Public pages server-rendered, admin/dashboard is a client SPA |
+| CMS + islands | CMS content rendered server-side, interactive widgets as islands |
+| Headless CMS + meta-framework | CMS provides content API, Next/Nuxt/SvelteKit renders |
+| Meta-framework + islands | App routes use RSC/SSR, marketing pages behave HTML-first |
+| SPA + WASM | React/Vue app shell, WASM module for heavy compute |
+| Server-driven UI + SPA | Native/mobile or web client renders server-provided component tree |
+| Micro-frontend | Multiple camps/frameworks coexist under one shell |
+
+Add:
+
+> When a repo seems confusing, it may not be poorly designed. It may be a deliberate hybrid. Identify the primary camp first, then identify the embedded secondary camp.
+
+---
+
+## 3.9 Add SEO/accessibility/performance/security implications
+
+The doc should connect camps to operational concerns.
+
+Add:
+
+| Camp | SEO | Accessibility | Performance | Security |
+|---|---|---|---|---|
+| CMS/classic | Strong if server HTML complete | Depends on semantic templates | Server response time matters | Template injection/CMS plugin risk |
+| HTML-first | Strong | Strong if semantic HTML | Excellent JS budget | HTML injection/HTMX response risk |
+| SPA | Weak unless pre-rendered | Focus management on route change | Bundle/hydration cost | XSS, token handling |
+| Meta-framework | Strong if SSR/SSG/RSC used well | Server HTML + client focus management | Depends on boundary/cache design | Server/client secret boundary |
+| Signals | Depends on rendering mode | Reactive updates must preserve focus/semantics | Fine-grained updates can be efficient | Usual web security |
+| WASM | Depends on host app | JS UI remains responsible | Binary size/memory/load time | WASM sandbox but JS glue still vulnerable |
+
+This makes the survey more engineering-complete.
+
+---
+
+## 3.10 Add deployment/operations implications
+
+Add:
+
+| Camp | Typical deployment |
+|---|---|
+| CMS/classic | PHP/Rails/Django server, CDN for assets |
+| HTML-first | Static hosting/CDN, optional server for partials |
+| SPA | Static hosting/CDN + API backend |
+| Meta-framework | Node/edge server, Vercel/Netlify/Cloudflare/self-hosted |
+| Signals | Depends on framework: static, SSR, or meta-framework |
+| WASM | Static/CDN with binary artifacts, or edge modules |
+
+Add:
+
+> Camp choice changes operations. A static islands site and a streaming RSC app have very different hosting, caching, and observability needs.
+
+---
+
+## 3.11 Add a “reading a repo” worked example
+
+The doc would benefit from a full worked example.
+
+Suggested example:
+
+> You open a repo with:
+>
+> - `package.json` containing `next`, `react`, `tailwindcss`,
+> - `app/` directory,
+> - `layout.tsx`, `page.tsx`,
+> - several files starting with `"use client"`,
+> - a `posts/[slug]/page.tsx`,
+> - some marketing pages with no client components.
+
+Then walk through:
+
+1. Primary camp: meta-framework.
+2. Rendering model: App Router RSC with client islands.
+3. Data model: server components likely fetch content; client components handle interactivity.
+4. Risk zones: server/client boundary, caching, hydration mismatches.
+5. React mental model applies only inside client components.
+6. Marketing pages may behave more like HTML-first/static output.
+
+This would make the doc much more concrete.
+
+---
+
+## 3.12 Add principles section
+
+Add shelf-standard principles.
+
+| Principle | Meaning |
+|---|---|
+| Camps are centers of gravity | Real apps are often hybrids |
+| Rendering strategy is the main divide | Where HTML is produced matters more than framework syntax |
+| State location defines the mental model | Server, client, URL, or WASM memory changes reasoning |
+| JS budget is a camp constraint | HTML-first and WASM care about bytes differently |
+| Do not transfer mental models blindly | React re-render ≠ signals graph ≠ server templates |
+| Choose by constraints, not fashion | Content, interactivity, SEO, team, budget decide |
+| Migration should be incremental | Strangler fig, route-by-route, island-by-island |
+| The platform is shared | All camps compile down to HTML/CSS/JS/browser APIs |
+
+---
+
+## 3.13 Add a final checklist
+
+Add:
+
+| Question | If you cannot answer… |
+|---|---|
+| What is the primary camp? | Check dependencies, config, folders, HTML output |
+| Is the first HTML server-rendered or client-rendered? | View source or inspect network response |
+| Where does state live? | Server, client store, signals, URL, WASM |
+| Who owns routing? | Server, client router, meta-framework, HTMX |
+| What is the JS budget strategy? | Minimal islands, SPA bundle, selective hydration |
+| Does the React re-render model apply? | Only in React client components/islands |
+| Are there secondary camps embedded? | CMS admin SPA, WASM hot path, HTMX fragments |
+| What is the migration path if the camp changes? | Incremental route/island migration, not big bang |
+
+---
+
+# 4. Medium-priority improvements
+
+These are not as urgent, but they would strengthen the doc.
+
+---
+
+## 4.1 Add a brief history/constraint inversion section
+
+Most shelf docs explain how the discipline evolved.
+
+Add a short table:
+
+| Constraint | Resulting camp shift |
+|---|---|
+| Documents needed links and server rendering | CMS/classic web |
+| Apps needed richer interaction | SPA |
+| SEO/performance suffered under heavy SPA | SSR/SSG/meta-frameworks |
+| JS bundle size became costly | Islands/partial hydration |
+| Server data and client interactivity both needed | RSC/meta-framework split |
+| Fine-grained reactivity demanded | Signals world |
+| Heavy compute in browser needed | WASM hybrids |
+| AI codegen increased output volume | Camp detection/review becomes more important |
+
+This would give the survey the same evolutionary depth as the other docs.
+
+---
+
+## 4.2 Expand Camp A: CMS
+
+Camp A is good, but could distinguish:
+
+- traditional CMS: WordPress, Rails, Django, Laravel rendering templates,
+- headless CMS: Contentful/Sanity/Strapi feeding another camp,
+- page builders: Gutenberg, Webflow, Shopify sections,
+- admin SPAs inside CMS products.
+
+Add:
+
+> A headless CMS is not itself a frontend camp. It is a content source. The frontend camp is whichever renderer consumes it.
+
+This is an important clarification.
+
+---
+
+## 4.3 Expand Camp B: HTML-first
+
+Add more detail on:
+
+- Astro islands,
+- HTMX partial swaps,
+- Alpine behavior,
+- Hotwire/Turbo,
+- server-driven HTML fragments,
+- progressive enhancement.
+
+Also add warning:
+
+> HTMX is not “no JavaScript.” It moves application logic to the server and HTML attributes. The state model becomes server-rendered fragments, which requires different debugging and accessibility care.
+
+---
+
+## 4.4 Expand Camp C: SPA
+
+Add:
+
+- SPA is still valid for authenticated products,
+- SPA is not dead, but no longer the default for public content,
+- state management is a major concern,
+- routing and code splitting matter,
+- SEO requires pre-rendering or server rendering if public.
+
+Add:
+
+> In a SPA, the first HTML is usually a shell. The real UI begins after JavaScript loads and the client router takes over.
+
+---
+
+## 4.5 Expand Camp D: meta-frameworks
+
+Add clearer subcategories:
+
+| Meta-framework | Primary model |
+|---|---|
+| Next.js | RSC/SSR/SSG/ISR/App Router |
+| Remix/React Router framework mode | Web standards, loaders/actions |
+| Nuxt | Vue SSR/islands |
+| SvelteKit | Svelte SSR/CSR/adapters |
+| SolidStart | Solid fine-grained SSR |
+| Qwik | Resumability |
+| Astro | Content/islands, but can also be meta-framework-like |
+
+Add:
+
+> Meta-frameworks differ not just by framework, but by rendering philosophy: hydration, resumability, islands, streaming, or server components.
+
+---
+
+## 4.6 Expand Camp E: signals world
+
+The signals table is good. Add a reading guide:
+
+| Framework | What to look for |
+|---|---|
+| Angular | Signals, computed, effects, zone.js or zoneless |
+| Vue | `ref`, `reactive`, `computed`, watchers |
+| Svelte 5 | `$state`, `$derived`, `$effect` runes |
+| Solid | `createSignal`, `createMemo`, `createEffect`, JSX without VDOM diffing |
+| Preact | React-like hooks plus optional `@preact/signals` |
+
+Add:
+
+> In signals code, do not ask “why did this component re-render?” Ask “which signal changed, which computed derived from it, and which effect or binding subscribed?”
+
+This directly supports the mental models section.
+
+---
+
+## 4.7 Expand Camp F: WASM
+
+Add:
+
+- WASM is usually not the whole frontend camp,
+- it is an acceleration layer inside another camp,
+- JS still usually owns DOM and application glue,
+- debugging and memory require different tools,
+- binary size and streaming compilation matter.
+
+Add:
+
+> WASM is best treated as a compute strategy, not a full UI philosophy. The surrounding app still belongs to SPA, meta-framework, or another camp.
+
+---
+
+## 4.8 Clarify cross-camp labels
+
+Some technologies appear in multiple camps.
+
+Examples:
+
+- Preact can be Camp E or Camp B island renderer.
+- Angular can be Camp D meta-framework-like or Camp E signals world.
+- Astro can be Camp B or Camp D depending on usage.
+- React can be Camp B island, Camp C SPA, or Camp D meta-framework.
+
+Add:
+
+> Frameworks are not camps. A framework can serve multiple camps depending on rendering strategy, state ownership, and JS budget.
+
+This is an important conceptual clarification.
+
+---
+
+## 4.9 Add AI-era guardrails
+
+The AI-era layer is good, but should include risks.
+
+Add:
+
+| AI-era risk | Why it matters |
+|---|---|
+| Generated code mixes camp idioms | AI may write React patterns in Svelte or Angular |
+| Camp detection becomes harder | Generated boilerplate may hide the real rendering model |
+| Overgenerated components | Teams accept UI without understanding state boundaries |
+| Framework hallucinations | AI invents APIs or outdated patterns |
+| Review skill becomes premium | The human must identify camp, constraints, and correctness |
+
+Add:
+
+> AI does not remove camp differences. It makes camp recognition more important because generated code can look plausible in the wrong camp.
+
+---
+
+## 4.10 Expand ecosystem/tooling section
+
+The current ecosystem table is good, but can be more camp-specific.
+
+Add categories or examples:
+
+| Category | Additions |
+|---|---|
+| Camp detection | package.json/config heuristics, browser View Source, Wappalyzer |
+| Framework DevTools | React DevTools, Angular DevTools, Vue DevTools, Svelte DevTools, Solid DevTools |
+| Rendering debugging | Next.js DevTools, Astro toolbar, Hydration warnings, React Scan |
+| Performance | Lighthouse, WebPageTest, Chrome DevTools, CWV dashboards |
+| Testing | Playwright, Cypress, Vitest, Testing Library, framework-specific unit tools |
+| Visual regression | Chromatic, Percy, Playwright screenshots |
+| Error/RUM monitoring | Sentry, Datadog RUM, PostHog |
+| Migration | codemods, framework migrate CLIs, Mitosis, AI-assisted translation |
+
+This makes the ecosystem section more actionable.
+
+---
+
+## 4.11 Add camp-specific success metrics
+
+Add:
+
+| Camp | Success metric |
+|---|---|
+| CMS/classic | Editorial velocity, page stability, plugin/theme maintainability |
+| HTML-first | JS bytes, Lighthouse/Core Web Vitals, content freshness |
+| SPA | TTI, bundle size, state consistency, feature velocity |
+| Meta-framework | LCP/hydration cost, cache correctness, server/client boundary clarity |
+| Signals | Reactivity bugs, bundle size, fine-grained update efficiency |
+| WASM | Module load time, memory usage, compute throughput |
+
+This helps teams evaluate whether the camp is working.
+
+---
+
+## 4.12 Add migration anti-patterns
+
+The migration table is good, but add anti-patterns:
+
+| Anti-pattern | What happens | Fix |
+|---|---|---|
+| Big-bang rewrite | Two systems, long risk window | Strangler fig, route-by-route |
+| Dual runtime without plan | Bundle bloat and state sync bugs | Shared shell, clear boundary |
+| Migrating rendering without migrating data | Old data fetching patterns break new rendering | Move data layer with rendering layer |
+| Ignoring SEO regression | Public pages lose crawlability | Compare rendered HTML before/after |
+| Ignoring mental model training | Team writes old-camp code in new framework | Teach camp-native model before migration |
+| Rewriting design system during camp migration | Too many moving parts | Freeze or isolate design system changes |
+
+---
+
+# 5. Factual and precision improvements
+
+These are mostly small but worth tightening.
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| Angular signals | “Angular v17+ → v22” may be too version-specific | Say “modern Angular (v16+) introduced signals; zone.js legacy vs zoneless transition is ongoing” and verify current stable status |
+| Vue signals | “Vue 3.5+” | Vue’s reactivity predates 3.5; say “Vue 3’s `ref`/`reactive` are signal-like” |
+| Svelte | “Svelte 5 runes” | Correct, but mention runes replace much of the older reactive statement model |
+| Preact | Appears in Camp E and Camp B | Clarify Preact is a React-shaped renderer that can serve signals camp or islands camp |
+| Angular | Appears in Camp D and Camp E | Clarify Angular can be meta-framework-like and signals-based simultaneously |
+| Blazor | “JS still usually owns DOM glue” | Nuance: Blazor has its own rendering/interop model, but still runs in browser with JS interop |
+| Qwik/resumability | If mentioned, distinguish resumability from partial hydration | Resumability serializes app state instead of hydrating components |
+| CRA sunset | “Feb 2025” | Verify exact wording/date if used as factual anchor |
+| AI survey claim | “Stack Overflow 2024 large majorities” | Soften or cite if exact claim matters |
+| Migration timelines | “2–4 sprints,” “6–18 months” | Label as indicative, not fixed |
+
+---
+
+# 6. Structural improvements
+
+The doc would benefit from a more shelf-consistent shape.
+
+## Suggested outline
+
+1. **How to use this map**
+   - scope,
+   - camps as centers of gravity,
+   - relationship to React mental model.
+
+2. **Camp identification**
+   - repo smells,
+   - first files to inspect,
+   - rendered HTML test.
+
+3. **The camps**
+   - CMS/classic,
+   - HTML-first/islands,
+   - SPA,
+   - meta-frameworks,
+   - signals world,
+   - WASM.
+
+4. **Cross-camp dimensions**
+   - rendering/hydration,
+   - state ownership,
+   - routing,
+   - data fetching,
+   - deployment,
+   - SEO/a11y/performance/security.
+
+5. **Mental models**
+   - how practitioners reason,
+   - transfer traps.
+
+6. **Hybrid patterns**
+   - CMS + SPA admin,
+   - meta-framework + islands,
+   - SPA + WASM,
+   - micro-frontends.
+
+7. **Camp selection framework**
+   - constraints,
+   - decision matrix,
+   - when to standardize.
+
+8. **Migration paths**
+   - incremental patterns,
+   - anti-patterns.
+
+9. **AI-era layer**
+   - generation,
+   - review,
+   - camp idiom risk.
+
+10. **Market gravity**
+   - employer shapes,
+   - hiring implications.
+
+11. **Ecosystem/tooling**
+   - detection,
+   - debugging,
+   - migration,
+   - performance,
+   - testing.
+
+12. **Principles and checklist**
+
+---
+
+# 7. Concrete snippets you can add
+
+## 7.1 Scope snippet
+
+```md
+This doc surveys web frontend camps: the major ways real products ship UI in the browser.
+It is not a framework tutorial and not a religious ranking.
+Its goal is recognition: open a repo, identify the camp, and know which mental model applies.
+```
+
+## 7.2 Repo identification snippet
+
+```md
+To identify the camp, check four things:
+
+1. Dependencies: Next, Astro, Angular, Vue, Svelte, Solid, Preact, HTMX, Alpine.
+2. Config: next.config, astro.config, angular.json, vite.config, nuxt.config.
+3. Rendering evidence: view source. Is the content already in the HTML?
+4. Boundary markers: "use client", client:*, hx-*, signal(), $state, loaders/actions.
+```
+
+## 7.3 Camp selection snippet
+
+```md
+Choose a camp by constraints:
+
+- Content-heavy public site → CMS or HTML-first.
+- Interactive authenticated product → SPA or meta-framework.
+- Public + app in one codebase → meta-framework.
+- Minimal JS budget → HTML-first/islands.
+- Heavy compute in browser → WASM hybrid.
+- Team skill and hiring often decide between otherwise valid options.
+```
+
+## 7.4 Signals reading snippet
+
+```md
+In signals code, do not ask “why did this component re-render?”
+Ask:
+
+- Which signal changed?
+- Which computed value derived from it?
+- Which effect or binding subscribed?
+- Did I accidentally read a signal where I should have derived?
+```
+
+## 7.5 Hybrid snippet
+
+```md
+When a repo seems confusing, check whether it is a hybrid:
+
+- CMS content + React admin SPA
+- Astro marketing pages + Next.js app pages
+- React SPA + WASM compute module
+- Server-rendered pages + HTMX fragments
+
+Identify the primary camp first, then the embedded secondary camp.
+```
+
+---
+
+# 8. Priority roadmap
+
+## Must add
+
+1. Scope statement.
+2. Repository identification checklist.
+3. Camp selection framework.
+4. Rendering/hydration strategy table.
+5. State/data ownership table.
+6. Camp-specific failure modes.
+7. Hybrid patterns section.
+8. Worked example.
+9. Principles.
+10. Final checklist.
+
+## Should add
+
+11. SEO/accessibility/performance/security implications.
+12. Deployment/operations implications.
+13. Routing model table.
+14. AI-era guardrails.
+15. Camp-specific success metrics.
+16. Migration anti-patterns.
+17. Brief history/constraint inversions.
+18. Expanded ecosystem/tooling categories.
+
+## Optional enrichment
+
+19. Native mobile/desktop boundary note.
+20. Micro-frontends/module federation.
+21. Web Components as cross-camp primitive.
+22. PWA/offline implications.
+23. Internationalization implications.
+24. Design systems across camps.
+25. Testing patterns per camp.
+
+---
+
+# 9. Bottom line
+
+This document is already one of the most useful orientation docs in the shelf. Its camp taxonomy, mental models table, and migration paths are strong.
+
+To become complete, it needs to move from **“what camps exist”** to **“how to recognize, choose, read, and migrate between camps in practice.”**
+
+The highest-leverage improvements are:
+
+> repository identification, camp selection framework, rendering/state/routing tables, camp-specific failure modes, hybrid patterns, and a worked example.
+
+## Final recommendation
+
+**Strong draft, publishable as an orientation map, but should be expanded before being treated as a complete practical field manual.**
+
+The doc’s core thesis is correct:
+
+> Camps are centers of gravity, not religions. The skill is recognizing which mental model a codebase expects.
+
+With the additions above, it becomes a much stronger tool for reading real frontend code at work.

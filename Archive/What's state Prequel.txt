@@ -1,0 +1,1033 @@
+Ignoring display artifacts and reviewing substance only.
+
+## Overall verdict
+
+This is a **strong conceptual foundation doc**, but it is currently more a **“foundations of programming/computation” doc** than a tightly focused **“What is state?” prequel**.
+
+Its best ideas:
+
+- the data → value → variable → state chain,
+- the Turing “state register” origin,
+- the lambda calculus vs von Neumann contrast,
+- Shannon’s bits needing interpretation,
+- lifetime/scope/reachability as the real definition of state,
+- the mental models table.
+
+However, for completeness and for avoiding duplication, it needs to become more **state-centered** and less broad. Right now it spends a lot of time on general programming history, computation theory, and JS/React-adjacent explanations that could overlap with other docs.
+
+The main improvements are:
+
+1. Define “state” earlier and more directly.
+2. Add state vs non-state distinctions.
+3. Add state lifecycle and ownership.
+4. Add state machines/transitions.
+5. Add state locations beyond variables.
+6. Add stateful vs stateless.
+7. Add derived state/cache/config distinctions.
+8. Add misconceptions/failure modes.
+9. Trim or redirect broad history/theory into state relevance.
+10. Keep React-specific details as a small bridge only.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Core concept | Strong |
+| Theoretical grounding | Very strong |
+| State-specific focus | Needs tightening |
+| Practical completeness | Needs expansion |
+| Duplication control | Needs boundary cleanup |
+| Use as React prequel | Good, but needs a clearer bridge |
+
+I would rate it approximately:
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 8.5 / 10 |
+| Conceptual completeness | 8 / 10 |
+| State-specific completeness | 7 / 10 |
+| Practical usefulness | 7 / 10 |
+| Duplication control | 7.5 / 10 |
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The data → value → variable → state chain is excellent
+
+This is one of the best parts of the doc:
+
+| Layer | Meaning |
+|---|---|
+| Data | Abstract information |
+| Value | Encoded data with a type |
+| Variable | A named handle to a value |
+| State | A variable whose value persists across events and affects future behavior |
+
+This chain is the conceptual spine of the doc. It should be moved earlier and made the centerpiece.
+
+---
+
+## 1.2 The Turing origin of “state” is valuable
+
+Connecting the word “state” to Turing’s state register is exactly right.
+
+This gives the doc a strong historical anchor:
+
+> “State” originally meant the configuration of a machine at a moment in time.
+
+That is still the mental model behind UI state, backend state, session state, and component state.
+
+Keep this.
+
+---
+
+## 1.3 The lambda calculus vs von Neumann contrast is useful
+
+The doc correctly contrasts:
+
+- lambda calculus: pure transformations, no mutable memory,
+- von Neumann: memory addresses, assignment, sequential mutation.
+
+This helps explain why functional programming and imperative programming think differently about state.
+
+This is especially useful as a prequel to React, because React moves toward functional rendering while still depending on persistent state.
+
+---
+
+## 1.4 Lifetime, scope, and reachability are the right properties
+
+The distinction between:
+
+- lifetime,
+- scope,
+- reachability,
+
+is one of the most useful parts of the doc.
+
+It correctly says that “state” is not a different kind of memory cell. It is a role played by a variable when:
+
+- it persists,
+- it can be reached,
+- future behavior depends on it.
+
+This is a strong insight.
+
+---
+
+## 1.5 The mental models table is good
+
+The table comparing:
+
+- imperative,
+- object-oriented,
+- functional,
+- reactive,
+
+models of state is useful.
+
+It helps readers understand that “state” is not one fixed idea; different paradigms treat it differently.
+
+---
+
+# 2. Duplication boundaries
+
+Since you asked for **no duplication**, this doc needs very clear boundaries.
+
+## Recommended ownership
+
+| Topic | Best owner | What this doc should do |
+|---|---|---|
+| General CS discipline/history | `cs-and-software-engineering.html` | Link; do not fully re-teach |
+| JavaScript language mechanics | `javascript-the-language.html` | Link; use only minimal examples |
+| React hooks/state slots | `class-to-hooks-paradigm-shift.html` | Small bridge only |
+| UI state patterns | `ui-ux-web-design.html`, `how-developers-think-frontend.html`, React docs | Link; do not teach UI patterns |
+| Algorithmic working state | `problem-solving.html` | Link; mention accumulators briefly |
+| Data ownership at system scale | `system-design.html` | Link; introduce ownership generally |
+| State as abstract concept | This doc | Own fully |
+
+The main duplication risks are:
+
+1. broad programming history,
+2. JavaScript type/value details,
+3. React hooks specifics,
+4. reactive/signals model,
+5. computation theory beyond what state needs.
+
+The doc should become the **conceptual owner of “state”**, but not the owner of every related topic.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important additions.
+
+---
+
+## 3.1 Define state earlier
+
+The title is “What Is State?”, but the doc spends a long time on programming history and computation theory before directly defining state.
+
+Add an early definition:
+
+> **State is persistent information whose value can change over time and whose current value affects future behavior.**
+
+Then add a simple test:
+
+| Question | If yes… |
+|---|---|
+| Does the value persist across events, calls, renders, or requests? | It may be state |
+| Does future behavior depend on it? | It is likely state |
+| Can it change? | It is mutable state |
+| Is it merely computed from other values? | It is derived, not primary state |
+| Is it just a temporary scratch value? | It is a local variable, not state |
+
+This should appear near the top.
+
+---
+
+## 3.2 Add state vs non-state distinctions
+
+This is a major missing piece.
+
+Add a table:
+
+| Concept | What it is | Is it state? |
+|---|---|---|
+| Data | Abstract information | Not yet state |
+| Value | Data encoded with a type | Not necessarily state |
+| Variable | Named handle to a value | Only if persistent/meaningful across events |
+| Constant | Fixed value | Usually not state |
+| Input | Value entering a function/system | Not state by itself |
+| Output | Value produced by a function/system | Not state by itself |
+| Derived value | Computed from other state | Should not be stored as primary state |
+| Cache | Rebuildable stored result | Secondary/optimization state |
+| Configuration | Environment-provided settings | Usually external state, not program state |
+| Event | Something that happened | Not state, but can change state |
+| State | Persistent value affecting future behavior | Yes |
+
+This would make the doc much more precise.
+
+---
+
+## 3.3 Add the state transition model
+
+The doc should explicitly describe state as something that changes through events.
+
+Add:
+
+```text
+current state + event → next state
+```
+
+Or:
+
+```text
+S_next = transition(S_current, event)
+output = f(S_current)
+```
+
+Examples:
+
+| Current state | Event | Next state |
+|---|---|---|
+| `count = 0` | click increment | `count = 1` |
+| `mode = "idle"` | fetch started | `mode = "loading"` |
+| `cart = []` | add item | `cart = [item]` |
+| `loggedIn = false` | login success | `loggedIn = true` |
+
+This is essential for understanding UI state, backend state, and state machines.
+
+---
+
+## 3.4 Add state machines
+
+The doc mentions Turing states, but it should add practical finite state machines.
+
+Add:
+
+> A state machine is an explicit model of state: a finite set of states, events, and transitions.
+
+Example:
+
+```text
+idle → loading → success
+             ↘ error
+```
+
+Or:
+
+| State | Event | Next state |
+|---|---|---|
+| idle | submit | loading |
+| loading | success | success |
+| loading | failure | error |
+| error | retry | loading |
+| success | reset | idle |
+
+Why this matters:
+
+- makes impossible states explicit,
+- prevents invalid combinations,
+- clarifies UI behavior,
+- clarifies backend workflow,
+- improves testing.
+
+This is a high-value addition and does not duplicate other docs if kept conceptual.
+
+---
+
+## 3.5 Add state locations beyond variables
+
+The doc talks about variables and closures, but state can live in many places.
+
+Add:
+
+| Location | Lifetime | Example |
+|---|---|---|
+| Stack local | One function call | Temporary calculation |
+| Closure variable | As long as closure is reachable | Counter factory |
+| Module variable | Module/program lifetime | Singleton counter |
+| Object field | Object lifetime | `user.name`, `order.status` |
+| Database row | Beyond process lifetime | User record |
+| URL/search params | Across navigation/sharing | Filter state |
+| Cookie/localStorage | Browser persistence | Theme, session token |
+| Server session | Server-side client state | Logged-in user |
+| Cache | Until invalidated | Query result |
+| Component state | Component lifetime | React hook slot |
+
+This makes the doc much more complete.
+
+---
+
+## 3.6 Add state ownership
+
+The doc mentions reachability, but should introduce ownership.
+
+Add:
+
+> Every useful piece of state needs an owner: something responsible for creating it, updating it, reading it, and destroying it.
+
+Principles:
+
+- one logical owner per piece of state,
+- avoid multiple sources of truth,
+- avoid shared mutable state unless necessary,
+- if many parts need the state, lift it or externalize it,
+- if state can be derived, do not own it.
+
+This is a general principle that helps later with React, system design, and API design without duplicating them.
+
+---
+
+## 3.7 Add state minimization
+
+This is a crucial missing principle.
+
+Add:
+
+> The best state is often no state.
+
+Rules:
+
+- If a value can be computed from existing state, derive it.
+- If a value is only needed during one computation, keep it local.
+- If a value is input from outside, treat it as input, not owned state.
+- If a value is rebuildable, treat it as cache, not truth.
+- If a value never changes, treat it as constant.
+
+This is especially important as a React prequel because React bugs often come from storing derived state.
+
+---
+
+## 3.8 Add stateful vs stateless
+
+The doc should define these terms.
+
+Add:
+
+| Term | Meaning | Example |
+|---|---|---|
+| Stateful | Retains information that affects future behavior | Object with fields, session, component with state |
+| Stateless | Does not retain internal information between interactions | Pure function, HTTP request considered alone |
+| Externally stateful | The unit itself is stateless, but relies on external state | HTTP server using cookies/database |
+
+Important nuance:
+
+> “Stateless” does not mean “no information exists.” It means the unit does not internally retain state between interactions.
+
+This is useful for HTTP, functions, APIs, and UI components.
+
+---
+
+## 3.9 Add derived state, cache, and configuration
+
+This deserves its own section.
+
+Add:
+
+| Kind | Source of truth? | Can be lost? | Example |
+|---|---:|---:|---|
+| Primary state | Yes | Loss matters | User input, order status |
+| Derived state | No | Can recompute | Filtered list, total price |
+| Cache | No | Can rebuild | API response cache |
+| Configuration | External | Usually loaded again | Theme setting, environment variable |
+| Temporary value | No | Dies with computation | Loop index, intermediate result |
+
+Add:
+
+> A common design mistake is promoting derived values into primary state. That creates two sources of truth that can drift apart.
+
+This is one of the most practical lessons the doc can add.
+
+---
+
+## 3.10 Add state lifecycle
+
+State is not just “exists.” It has a lifecycle.
+
+Add:
+
+| Stage | Question |
+|---|---|
+| Initialization | What is the starting value? |
+| Reading | Who can see the current value? |
+| Updating | Who can change it, and how? |
+| Resetting | When does it return to initial state? |
+| Destruction | When is it removed? |
+| Persistence | Does it survive reload, restart, or navigation? |
+
+This would make the concept much more concrete.
+
+---
+
+## 3.11 Add identity vs state
+
+This is a useful conceptual distinction.
+
+Add:
+
+> Identity is the thing that persists; state is the information that can change about that thing.
+
+Example:
+
+| Identity | State |
+|---|---|
+| User account | Username, email, preferences |
+| Order | Status, items, payment state |
+| Component instance | Current input value, loading state |
+| Document | Title, content, cursor position |
+
+Why this matters:
+
+- same identity can have different state over time,
+- changing state does not necessarily change identity,
+- replacing identity usually resets state.
+
+This is useful for programming, OOP, UI, and databases.
+
+---
+
+## 3.12 Add immutable vs mutable state
+
+The doc touches functional programming, but should make this explicit.
+
+Add:
+
+| Model | State change | Benefit | Cost |
+|---|---|---|---|
+| Mutable | Same storage is overwritten | Simple, efficient | Harder to reason about |
+| Immutable | New value replaces old value | Predictable, easy comparison | Allocation/copy cost |
+| Persistent data structure | Shares unchanged parts | Efficient immutability | More complex implementation |
+
+Add:
+
+> Immutable state does not mean “no state.” It means state changes by producing a new value instead of mutating the old one.
+
+This is important for React and functional programming.
+
+---
+
+## 3.13 Add examples for each concept
+
+The doc needs more concrete examples.
+
+Suggested examples:
+
+### Counter
+
+```js
+let count = 0;
+
+function increment() {
+  count++;
+}
+```
+
+`count` is state because:
+
+- it persists across calls,
+- future behavior depends on it,
+- it changes through events.
+
+---
+
+### Temporary variable
+
+```js
+function add(a, b) {
+  let sum = a + b;
+  return sum;
+}
+```
+
+`sum` is not state because:
+
+- it dies when the function returns,
+- no future event depends on it.
+
+---
+
+### Derived value
+
+```js
+const total = items.reduce((sum, item) => sum + item.price, 0);
+```
+
+`total` is derived, not primary state.
+
+If `items` is the source of truth, `total` should be computed, not independently stored.
+
+---
+
+### External state
+
+```text
+URL: /products?filter=active
+```
+
+The filter is state, but it lives in the URL, not in a variable.
+
+This helps readers understand that state is not only in memory.
+
+---
+
+## 3.14 Add common misconceptions/failure modes
+
+This doc would benefit from a failure modes section like the other docs.
+
+Add:
+
+| Misconception | Problem | Fix |
+|---|---|---|
+| Every variable is state | Temporary locals are not state | Ask whether it persists and affects future behavior |
+| Constants are state | Unchanging values are not usually state | Treat constants as data, not state |
+| Derived values should be stored | Creates duplicate truth | Compute derived values |
+| Global state is free | Global reach increases coupling | Minimize reachability |
+| State is always mutable | Functional models use immutable state | Distinguish mutation from state change |
+| Stateless means no information | State may live externally | Distinguish internal vs external state |
+| State is just storage | State is a role, not a memory cell | Consider lifetime, ownership, transitions |
+| More state is better | More state means more consistency work | Minimize state |
+| Input is state | Inputs are received values | Own only what must persist/change |
+| Cache is truth | Cache can be invalidated/rebuilt | Treat cache as rebuildable state |
+
+---
+
+## 3.15 Add principles section
+
+Add shelf-standard principles.
+
+| Principle | Meaning |
+|---|---|
+| State is persistence with consequence | It matters only if future behavior depends on it |
+| State is a role, not a storage type | The same value becomes state by lifetime and use |
+| Every state needs an owner | Someone must create, update, and reset it |
+| Minimize state | Derive what can be derived |
+| Make transitions explicit | State should change through clear events/operations |
+| Separate state from representation | The same state can be encoded many ways |
+| State has cost | Initialization, consistency, invalidation, debugging, persistence |
+| Prefer local over shared state | Shared state increases coupling |
+| External state is still state | URL, database, storage, and sessions count |
+| Impossible states are design errors | Model states so invalid combinations cannot exist |
+
+---
+
+## 3.16 Add a final state checklist
+
+Add:
+
+| Question | If you cannot answer… |
+|---|---|
+| Does this value persist across events? | It may not be state |
+| Does future behavior depend on it? | It may be just data |
+| Who owns it? | It will become ambiguous |
+| Where does it live? | It will be hard to debug |
+| How is it initialized? | It will have hidden assumptions |
+| How is it updated? | It will have uncontrolled mutation |
+| When is it reset or destroyed? | It will leak or become stale |
+| Can it be derived instead? | It may be unnecessary state |
+| Is it shared? | It may need lifting or external storage |
+| What transitions are valid? | It may allow impossible states |
+
+---
+
+# 4. Medium-priority improvements
+
+These are not as urgent, but they would strengthen the doc.
+
+---
+
+## 4.1 Add algorithmic state
+
+Since `problem-solving.html` exists, this doc can briefly connect state to algorithms.
+
+Add:
+
+> In algorithms, state is the working information that changes as the algorithm progresses.
+
+Examples:
+
+- accumulator in a loop,
+- visited set in graph traversal,
+- memoization table,
+- dynamic programming table,
+- current index,
+- current best candidate.
+
+This helps connect the prequel to problem-solving without duplicating it.
+
+---
+
+## 4.2 Add state in UI at a high level
+
+Do not teach UI patterns, but add one conceptual note:
+
+> In UI, state is what the interface remembers: input values, loading status, selected items, visibility of dialogs, and so on.
+
+Then link to:
+
+- `how-developers-think-frontend.html`,
+- `ui-ux-web-design.html`,
+- `class-to-hooks-paradigm-shift.html`.
+
+Keep it short.
+
+---
+
+## 4.3 Add state in backend at a high level
+
+Add:
+
+> In backend systems, state often lives outside the process: databases, sessions, caches, queues, and external services.
+
+Examples:
+
+- user session,
+- order status,
+- payment state,
+- rate-limit counter,
+- queue position.
+
+This connects to system design without duplicating it.
+
+---
+
+## 4.4 Add concurrency note
+
+State becomes harder when multiple events try to change it at once.
+
+Add:
+
+> When multiple actors can update the same state, you must consider ordering, atomicity, and consistency.
+
+Do not go deep; just name the issue and link to System Design for distributed state.
+
+---
+
+## 4.5 Add event log vs current state
+
+This is a useful advanced distinction.
+
+Add:
+
+> An event log records what happened. Current state is often the result of folding those events into a present value.
+
+Example:
+
+```text
+events: [created, item_added, item_removed, paid]
+current state: paid order with one item
+```
+
+This helps with event sourcing, audit logs, and undo/redo, but should remain brief.
+
+---
+
+## 4.6 Add state and serialization
+
+Since Shannon’s section talks about encoding, connect it to state:
+
+> When state crosses a boundary — saved to disk, sent over network, passed to another process — it must be encoded. The encoding is not the state; it is a representation of the state.
+
+Examples:
+
+- JSON,
+- URL query string,
+- cookie,
+- binary protocol,
+- database row.
+
+This is a good bridge from information theory to practical programming.
+
+---
+
+## 4.7 Add state and time
+
+Add a short conceptual section:
+
+> State is a value at a moment in time. A system’s behavior is often a function of its current state and the events it receives over time.
+
+This gives the doc a clean philosophical framing.
+
+---
+
+# 5. Duplication cleanup recommendations
+
+These are the specific parts I would trim, move, or link.
+
+---
+
+## 5.1 Trim general programming history
+
+The section “When did programming appear?” is interesting but broad.
+
+For a state prequel, it should be reduced to what matters for state:
+
+- Turing: state register,
+- von Neumann: memory/assignment,
+- Shannon: encoded information,
+- maybe Fortran/high-level variables.
+
+The broader Lovelace/Zuse/ENIAC history can be shortened or linked to CS & SE / JavaScript language docs.
+
+---
+
+## 5.2 Keep computation theory, but make it state-focused
+
+The four theories are valuable, but each should end with a direct state lesson:
+
+| Theory | State lesson |
+|---|---|
+| Turing machine | State is the machine’s current configuration |
+| Lambda calculus | Pure computation can be stateless |
+| Von Neumann | State is stored memory modified by assignment |
+| Information theory | State must be encoded and interpreted |
+| Halting problem | Stateful behavior can be impossible to fully predict |
+
+This keeps the theory without turning into a full CS theory doc.
+
+---
+
+## 5.3 Reduce JavaScript-specific detail
+
+Examples using `typeof`, JS strings, `JSON.stringify`, etc. are helpful, but too much JS detail belongs in `javascript-the-language.html`.
+
+Keep JS examples minimal and conceptual.
+
+For example:
+
+```js
+let count = 0;
+count++;
+```
+
+is enough to show mutable state.
+
+Deep JS type behavior should link to the JavaScript language doc.
+
+---
+
+## 5.4 Keep React-specific content as a bridge only
+
+The detailed `useState` explanation may duplicate `class-to-hooks-paradigm-shift.html`.
+
+Replace it with a short bridge:
+
+> React makes this concrete: a component’s state is persistent storage owned by React. A render reads a snapshot of that state, and a setter requests a change. The full React state model is covered in the class-to-hooks doc.
+
+Do not fully explain hook slots, re-render snapshots, or setter mechanics here unless extremely brief.
+
+---
+
+## 5.5 Keep reactive/signals mental model high-level
+
+The mental models table’s reactive row is useful, but it should not expand into React vs signals.
+
+Keep it as:
+
+> Reactive models treat state as observable values whose changes propagate to dependents.
+
+Then link to frontend/React docs for specifics.
+
+---
+
+# 6. Factual and precision improvements
+
+These are mostly small but worth fixing.
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| Z3 | “first working programmable computer” | Say “one of the earliest working programmable computers” |
+| ENIAC | “first general-purpose electronic programmable computer” | Add nuance: early stored-program concepts evolved; ENIAC initially programmed by wiring |
+| Church-Turing thesis | Quantum computers mention | Clarify: quantum computers may change efficiency, not known to expand computability beyond Church-Turing |
+| Shannon/types | “Types exist because Shannon proved bits cannot interpret themselves” | Soften: Shannon showed information requires encoding/interpretation; programming languages formalize this with types |
+| `const PI` | “not state” | Add nuance: a const binding to an immutable value is not state; a const reference to a mutable object can still hold mutable state |
+| JavaScript types | “variables don't have types; values do” | Correct for JS, but keep brief and link to JS language doc |
+| `useState` section | React-specific depth | Trim to bridge to avoid duplication |
+| Halting problem | Good, but connect to state | Add: stateful systems can be hard/impossible to fully predict statically |
+| Turing machine | “state register” | Excellent; make it central |
+| Reactive row | May overlap with React docs | Keep high-level |
+
+---
+
+# 7. Structural improvements
+
+The doc would benefit from being reorganized around state rather than around theory.
+
+## Suggested outline
+
+1. **How to use this doc**
+   - scope,
+   - boundaries,
+   - links.
+
+2. **What state is**
+   - one-paragraph definition,
+   - state test,
+   - state vs non-state table.
+
+3. **The chain: data → value → variable → state**
+   - current strong section,
+   - move earlier.
+
+4. **State transitions**
+   - current state + event → next state,
+   - examples,
+   - state machines.
+
+5. **Where state lives**
+   - local,
+   - closure,
+   - module,
+   - object,
+   - database,
+   - URL,
+   - storage,
+   - session,
+   - cache.
+
+6. **Lifetime, scope, reachability**
+   - keep current table,
+   - add examples.
+
+7. **Ownership and minimization**
+   - owner,
+   - single source of truth,
+   - derive don’t store,
+   - cost of state.
+
+8. **Stateful vs stateless**
+   - pure functions,
+   - HTTP,
+   - external state.
+
+9. **Derived state, cache, config, constants**
+   - table of state-like concepts.
+
+10. **Mutable vs immutable state**
+   - mutation,
+   - new values,
+   - identity.
+
+11. **Theories that explain state**
+   - Turing,
+   - lambda calculus,
+   - von Neumann,
+   - Shannon,
+   - halting problem,
+   - each with a state lesson.
+
+12. **Mental models**
+   - imperative,
+   - OOP,
+   - functional,
+   - reactive,
+   - keep short.
+
+13. **Misconceptions/failure modes**
+
+14. **Principles**
+
+15. **Checklist**
+
+16. **Bridge to React**
+   - very short,
+   - link to class-to-hooks.
+
+This structure would make the doc much more focused.
+
+---
+
+# 8. Concrete snippets to add
+
+## 8.1 State definition snippet
+
+```md
+State is persistent information whose value can change over time
+and whose current value affects future behavior.
+
+A value is state when:
+- it survives beyond the current operation,
+- future behavior depends on it,
+- it can be updated,
+- it has an owner and a lifetime.
+```
+
+## 8.2 State transition snippet
+
+```md
+State changes through events.
+
+current state + event → next state
+
+Example:
+idle + submit → loading
+loading + success → success
+loading + failure → error
+```
+
+## 8.3 Derived state snippet
+
+```md
+If a value can be computed from existing state, it is derived.
+Do not store derived values as primary state.
+
+Primary state: items
+Derived state: totalPrice = sum(items)
+
+Storing both independently creates two sources of truth.
+```
+
+## 8.4 State ownership snippet
+
+```md
+Every piece of state needs an owner.
+
+The owner decides:
+- how the state is initialized,
+- who can read it,
+- who can update it,
+- when it resets,
+- when it is destroyed.
+
+Unowned state becomes ambiguous.
+Shared mutable state becomes a coordination problem.
+```
+
+## 8.5 State cost snippet
+
+```md
+State is not free.
+
+Every piece of state adds:
+- initialization,
+- storage,
+- update rules,
+- consistency concerns,
+- invalidation,
+- debugging surface,
+- possible persistence.
+
+The best state is often the state you do not need.
+```
+
+## 8.6 React bridge snippet
+
+```md
+React applies this idea directly:
+- component state is persistent storage,
+- a render reads a snapshot of that state,
+- a setter requests a state change,
+- derived values should usually be computed during render.
+
+The full React model belongs to the class-to-hooks doc.
+```
+
+---
+
+# 9. Priority roadmap
+
+## Must add
+
+1. Early state definition.
+2. State vs non-state table.
+3. State transition model.
+4. State machines.
+5. State locations/lifetime table.
+6. Ownership and minimization.
+7. Derived/cache/config distinctions.
+8. Stateful vs stateless.
+9. Misconceptions/failure modes.
+10. Final checklist.
+11. Duplication boundaries with JS/React/CS docs.
+
+## Should add
+
+12. Identity vs state.
+13. Mutable vs immutable state.
+14. Algorithmic state examples.
+15. Backend/UI high-level state examples.
+16. Concurrency note.
+17. Event log vs current state.
+18. Serialization/state encoding.
+19. State and time.
+20. Principles section.
+
+## Optional enrichment
+
+21. Persistent data structures.
+22. State explosion/combinatorial states.
+23. Undo/redo as state history.
+24. State in distributed systems.
+25. Philosophical identity over time.
+26. More historical examples.
+
+---
+
+# 10. Bottom line
+
+This doc is conceptually strong but needs to become more **state-centered**.
+
+Right now it reads like:
+
+> “Here is the history and theory of programming/computation, and eventually we arrive at state.”
+
+It should read like:
+
+> “Here is what state is, where it lives, how it changes, why it costs something, and how the major theories explain it.”
+
+The highest-leverage improvements are:
+
+> define state early, add state transitions/state machines, distinguish state from derived/cache/config/input, add ownership/minimization, add state locations, and trim broad history/JS/React details to avoid duplication.
+
+## Final recommendation
+
+**Good draft, but not yet complete as a focused prequel.**
+
+With the changes above, it becomes a clean, non-duplicative foundation doc that perfectly prepares the reader for:
+
+- JavaScript language mechanics,
+- React state/hooks,
+- UI state,
+- algorithmic state,
+- system-level data ownership.

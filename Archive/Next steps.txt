@@ -1,0 +1,38 @@
+Based on the cross-links and references inside the 10 documents we’ve already reviewed, you have built a massive, interconnected "shelf." We have successfully reviewed the entire **Conceptual, Process, and Architecture layers** (CS&SE, Problem Solving, Design Thinking, System Design, API Design, UI/UX, The Rhythm, Process, Testing, and CI/CD).
+
+The remaining unreveiwed documents make up the **Substrate, Language, and Framework layers**. These are the technologies that *implement* the concepts we've been discussing. 
+
+Here are the remaining high-value documents on your shelf, categorized by their role:
+
+### 1. The Core Substrate (Highest Priority)
+These are the foundational technologies that the UI/UX, Rhythm, and API docs rely on. If these aren't conceptually rigorous, the higher-level docs lose their grounding.
+*   **`html-and-css.html` (HTML & CSS)** 
+    *   *Why it's high value:* This is the rendering substrate. It needs to cover the mental model of the DOM, the CSS cascade, layout algorithms (Flexbox/Grid), parser-blocking behavior, and accessibility semantics. It bridges the gap between UI/UX design and frontend implementation.
+*   **`javascript-the-language.html` (JavaScript: The Language)**
+    *   *Why it's high value:* This needs to cover the deep mental models of JS: the event loop, closures, prototypes, asynchronous execution (Promises/async-await), and type coercion. It is the engine that powers "The Rhythm" and "Problem Solving."
+
+### 2. The Runtime & Ecosystem Layer
+*   **`javascript-across-stacks.html` (JavaScript Across Stacks)**
+    *   *Why it's high value:* Mentioned frequently in System Design and API Design. This doc likely covers the fragmentation and convergence of JS runtimes (Browser vs. Node vs. Deno vs. Bun vs. Cloudflare Workers/Edge). It explains how language choices constrain or enable architectural decisions (e.g., Edge computing, SSR).
+
+### 3. The Framework & Paradigm Layer
+These docs apply "The Rhythm" and "System Design" to specific, modern ecosystem realities.
+*   **`react-2024-and-beyond.html` (React 2024+)**
+    *   *Why it's high value:* Covers the massive paradigm shifts in React: Server Components (RSC), the React Compiler, Suspense, and the blurring line between client and server. This directly impacts the "Model thread" in *The Rhythm*.
+*   **`nextjs-deep-dive.html` (Next.js Deep Dive)**
+    *   *Why it's high value:* Next.js is where System Design, API Design, and Frontend Rendering collide. This doc likely covers the App Router, caching layers, server actions, and rendering strategies (SSR/ISR/SSG).
+*   **`class-to-hooks-paradigm-shift.html` (Class to Hooks)**
+    *   *Why it's high value:* A focused mental-model doc. It explains the shift from object-oriented lifecycle methods (mount/update/unmount) to functional reactive closures and algebraic effects (Hooks). Crucial for developers transitioning their mental models.
+
+### 4. Meta & Reference (Lower Priority for Deep Review)
+*   **`frontend-camps-survey.html`** (Likely a landscape analysis of React vs. Vue vs. Svelte vs. Solid, etc.)
+*   **`glossary.html`** (The shared vocabulary index across all docs).
+
+---
+
+### Recommendation on What to Review Next:
+If you want to maintain the high conceptual standard of the shelf, I highly recommend tackling **`html-and-css.html`** or **`javascript-the-language.html`** next. 
+
+Because we just finished API Design and UI/UX, reviewing **HTML & CSS** will perfectly close the loop on how data (API) becomes pixels (UI/UX) via the browser's rendering engine (HTML/CSS).
+
+Whenever you are ready, upload the next file and let me know if there are any specific constraints (like the "no editorial errors" rule you used previously)!

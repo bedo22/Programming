@@ -304,7 +304,7 @@
     </tr>
     <tr>
       <td><strong>WCAG / POUR Principles</strong></td>
-      <td>W3C WAIC, WCAG 2.0 (2008), 2.1 (2018), 2.2 (2023)</td>
+      <td>W3C WAI, WCAG 2.0 (2008), 2.1 (2018), 2.2 (2023)</td>
       <td>Perceivable, Operable, Understandable, Robust. Testable success criteria (A/AA/AAA). Accessibility as civil right, not feature.</td>
     </tr>
   </tbody>
@@ -319,7 +319,7 @@
   <tbody>
     <tr>
       <td><strong>State visibility matrix</strong></td>
-      <td>Every interactive element has states (idle, hover, focus, active, disabled, loading, error, success). The matrix maps component × state → visual + a11y treatment. Missing states = invisible failures.</td>
+      <td>Every interactive element has states (idle, hover, focus, active, disabled, loading, error, success) plus the data states seen in §8b: empty, offline, stale, syncing, skeleton, optimistic-pending, rollback, selected, read-only, streaming. The matrix maps component × state → visual + a11y treatment. Missing states = invisible failures.</td>
       <td>Component design; design system building; handoff to engineering.</td>
       <td>Designing only the "happy path" default state.</td>
     </tr>
@@ -466,6 +466,296 @@
   <li><strong>Flexibility and efficiency of use.</strong> Accelerators for experts (keyboard shortcuts, power commands, bulk actions) hidden from novices. Modes visible, not hidden.</li>
   <li><strong>Aesthetic and minimalist design.</strong> Every element competes for attention. Remove what doesn't serve the task. Visual hierarchy guides scanning. Motion carries meaning, not decoration.</li>
 </ol>
+
+---
+
+<h2>8b. Common interface patterns — and how to choose between them</h2>
+
+<p>Principles say <em>what to respect</em>; patterns say <em>which shape to pick</em>. The same intent can be built several ways, and the ways are not equal — the choice is a UX decision, not a taste decision. Use the decision tables below the way you use the state matrix: as a spec, not a suggestion.</p>
+
+<h3>When to choose one pattern over another</h3>
+
+<table>
+  <thead><tr><th>Decision</th><th>Choose X when</th><th>Choose Y when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Modal vs page</strong></td><td>Short, focused task; context must remain visible; no shareable URL needed</td><td>Complex task; needs its own URL, deep link, back button, or shareability</td></tr>
+    <tr><td><strong>Inline error vs toast</strong></td><td>Field-specific problem the user must fix in place</td><td>System-level event that happened regardless of the field</td></tr>
+    <tr><td><strong>Toast vs banner</strong></td><td>Temporary, low-importance feedback (saved, copied)</td><td>Persistent condition that changes how the page behaves (offline, beta)</td></tr>
+    <tr><td><strong>Select vs radio buttons</strong></td><td>Many options; constrained space</td><td>Few options (≤5) where comparison is part of the decision</td></tr>
+    <tr><td><strong>Checkbox vs toggle</strong></td><td>Data entry submitted with a form; state applies on save</td><td>Immediate system-state change the user commits as they flip it</td></tr>
+    <tr><td><strong>Accordion vs tabs</strong></td><td>Long content, one section at a time, sequential scanning</td><td>Few parallel views at the same level the user hops between</td></tr>
+    <tr><td><strong>Pagination vs infinite scroll</strong></td><td>User needs location, control, footer access, or findability</td><td>Continuous browsing with no task endpoint (social feeds)</td></tr>
+    <tr><td><strong>Autocomplete vs recent items</strong></td><td>Large, unpredictable search space</td><td>Frequent repeated actions with a short history</td></tr>
+    <tr><td><strong>Wizard vs long form</strong></td><td>High complexity, branching, unfamiliar task; cognitive load must be chunked</td><td>Expert users; low complexity; one screen suffices</td></tr>
+    <tr><td><strong>Optimistic vs blocking UI</strong></td><td>Low-risk, reversible action where speed builds trust</td><td>High-risk, irreversible action (payment, delete) where honesty beats speed</td></tr>
+    <tr><td><strong>Skeleton vs spinner</strong></td><td>Layout structure known while content loads (lists, cards)</td><td>Indeterminate wait with no layout to preview</td></tr>
+    <tr><td><strong>Search vs browse</strong></td><td>Known-item seeking or large content set</td><td>Discovery, comparison, or users who don't know the term</td></tr>
+  </tbody>
+</table>
+
+<h3>The state matrix, expanded — every state needs a treatment</h3>
+
+<table>
+  <thead><tr><th>State</th><th>UI need</th><th>Accessibility need</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Idle</strong></td><td>Clear affordance, signifier</td><td>Name, role, state exposed</td></tr>
+    <tr><td><strong>Hover / focus</strong></td><td>Visible response on pointer and keyboard</td><td>Visible focus indicator; state announced</td></tr>
+    <tr><td><strong>Active / pressed</strong></td><td>Immediate feedback</td><td>State change perceivable</td></tr>
+    <tr><td><strong>Disabled</strong></td><td>Why it's blocked explained or avoidable</td><td>Accessible name still present; don't rely on gray alone</td></tr>
+    <tr><td><strong>Loading</strong></td><td>Progress or skeleton; context preserved</td><td><code>aria-busy</code>, live region for async</td></tr>
+    <tr><td><strong>Empty</strong></td><td>Next action shown, not a dead end</td><td>Not announced as an error; heading + guidance</td></tr>
+    <tr><td><strong>Success</strong></td><td>Confirmation</td><td>Status announced via <code>role="status"</code>/<code>aria-live</code></td></tr>
+    <tr><td><strong>Error</strong></td><td>Recovery path, inline</td><td>Error associated with the control (<code>aria-describedby</code>)</td></tr>
+    <tr><td><strong>Stale</strong></td><td>Freshness indicator ("updated 2m ago")</td><td>Not misleading; refresh announced</td></tr>
+    <tr><td><strong>Offline</strong></td><td>Capability limits; queued changes stated</td><td>Clear status; don't claim saved when unsynced</td></tr>
+    <tr><td><strong>Optimistic-pending</strong></td><td>Pending marker + rollback path</td><td>State change announced on confirm and on rollback</td></tr>
+    <tr><td><strong>Selected</strong></td><td>Clear, non-color-only selection state</td><td>Selection state exposed (<code>aria-selected</code>, <code>aria-pressed</code>)</td></tr>
+    <tr><td><strong>Read-only</strong></td><td>Visually and semantically non-editable</td><td>Not focusable as editable; <code>aria-readonly</code> where apt</td></tr>
+    <tr><td><strong>Skeleton</strong></td><td>Structure while content streams</td><td>Region labeled loading; not announced per skeleton node</td></tr>
+    <tr><td><strong>Streaming</strong></td><td>Partial content with progress</td><td>Progress communicated; completion announced</td></tr>
+  </tbody>
+</table>
+
+<h3>Forms — the most common real interface</h3>
+
+<ul>
+  <li>Use visible labels, not placeholder-only labels (placeholder disappears, breaks recognition).</li>
+  <li>Group related fields; order by the user's mental model, not the database schema.</li>
+  <li>Use the correct <code>input</code> type and keyboard (<code>type="email"</code>, <code>inputmode="numeric"</code>, <code>autocomplete</code> attributes) — mobile keyboards follow the input type.</li>
+  <li>Mark optional fields explicitly, or design the form so almost everything is required and nothing needs marking.</li>
+  <li>Validate on blur, not on every keystroke; re-validate on submit.</li>
+  <li>Preserve input after an error — never wipe the form because one field failed.</li>
+  <li>Explain errors inline, next to the offending field, with the fix.</li>
+  <li>Support browser autofill with correct <code>autocomplete</code> values.</li>
+  <li>Never disable submit without explaining why and when it will work again.</li>
+  <li>Make destructive form actions recoverable (undo, grace period, confirmation).</li>
+  <li>Test every form with keyboard and screen reader before shipping.</li>
+</ul>
+
+<h3>Navigation and information architecture (IA)</h3>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Flat navigation</strong></td><td>Small number of primary sections that all sit at the same level</td></tr>
+    <tr><td><strong>Hierarchical navigation</strong></td><td>Deep content with clear parent–child categories</td></tr>
+    <tr><td><strong>Tabs</strong></td><td>Few parallel views at the same level</td></tr>
+    <tr><td><strong>Sidebar</strong></td><td>Many persistent sections or tools (dashboards, admin)</td></tr>
+    <tr><td><strong>Breadcrumbs</strong></td><td>Deep hierarchy where users need orientation and a way back</td></tr>
+    <tr><td><strong>Search</strong></td><td>Large content set or known-item seeking</td></tr>
+    <tr><td><strong>Faceted search</strong></td><td>Filtering across many attributes (e-commerce, libraries)</td></tr>
+    <tr><td><strong>Mega menu</strong></td><td>Large sites with many grouped categories</td></tr>
+    <tr><td><strong>Bottom navigation</strong></td><td>Mobile-first apps with few primary destinations</td></tr>
+  </tbody>
+</table>
+
+<p><strong>IA methods:</strong> card sorting (how users categorize), tree testing (can users find items in the structure), labeling tests (do names mean what you think), search-log analysis (what users actually type), analytics findability review (which pages have dead-end exits). IA is a discipline, not a sitemap: the label and the structure are testable hypotheses.</p>
+
+<h3>Loading and perceived performance</h3>
+
+<p>Users forgive a slow system that <em>looks</em> like it's working; they abandon a fast one that looks frozen. Response-time budget (Nielsen, adapted):</p>
+
+<table>
+  <thead><tr><th>Duration</th><th>User perception</th><th>UI response</th></tr></thead>
+  <tbody>
+    <tr><td><strong>&lt; 100ms</strong></td><td>Instant</td><td>No loader needed; respond synchronously</td></tr>
+    <tr><td><strong>100ms – 1s</strong></td><td>Noticeable but fast</td><td>Subtle feedback (button state, cursor)</td></tr>
+    <tr><td><strong>1s – 3s</strong></td><td>Waiting</td><td>Spinner or skeleton; keep the context visible</td></tr>
+    <tr><td><strong>3s – 10s</strong></td><td>Long</td><td>Progress, partial content, cancellation path</td></tr>
+    <tr><td><strong>&gt; 10s</strong></td><td>Too long</td><td>Async task: background it, notify on completion, provide retry</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Content type</th><th>Best loading pattern</th></tr></thead>
+  <tbody>
+    <tr><td>Buttons / actions</td><td>Inline spinner or label change; keep button enabled where possible</td></tr>
+    <tr><td>Lists / cards</td><td>Skeleton screens (structure shown, content fills in)</td></tr>
+    <tr><td>Images</td><td>Blur-up or progressive loading; stable dimensions to avoid layout shift</td></tr>
+    <tr><td>Dashboards</td><td>Stale data + refresh indicator, not a blank wait</td></tr>
+    <tr><td>Forms</td><td>Disable submit, preserve all state, show inline progress</td></tr>
+    <tr><td>Navigation</td><td>View transition or skeleton; never a full-page white flash</td></tr>
+    <tr><td>Long tasks</td><td>Progress + cancel option; explain the wait</td></tr>
+  </tbody>
+</table>
+
+<p>Tools: optimistic UI, stale-while-revalidate, perceived speed (skeleton beats spinner), zero layout shift, and <code>prefers-reduced-motion</code> respect. This is the UI side of the performance budget; the delivery side lives in System Design and the frontend loop.</p>
+
+<h3>Visual fundamentals — the functional skin</h3>
+
+<p>Visual design is a pillar of this discipline, not decoration. The levers are functional: they create hierarchy and scanning order.</p>
+
+<ul>
+  <li><strong>Hierarchy levers</strong> — size, weight, color contrast, spacing, position, motion, texture, alignment. Change one lever at a time; two heavy levers on the same element scream.</li>
+  <li><strong>Typography</strong> — a small type scale (3–5 steps), line height ~1.4–1.6, line length 45–75 characters, ≥16px body as a floor, responsive type, accessible contrast.</li>
+  <li><strong>Color</strong> — semantic roles (primary, surface, text, error, success, warning), text-on-color contrast, state colors (hover/active/disabled), dark-mode adaptation, color-blindness safety, and never color-only meaning (always pair with icon or label).</li>
+  <li><strong>Spacing & layout</strong> — 4/8pt base grid, grouping through proximity (Gestalt), consistent container behavior, intrinsic sizing, responsive density. Spacing is the cheapest hierarchy tool there is.</li>
+</ul>
+
+<h3>Motion — implementation constraints on "motion as meaning"</h3>
+
+<table>
+  <thead><tr><th>Concern</th><th>Guidance</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Duration</strong></td><td>Shorter for small elements (100–200ms), longer for larger surfaces (200–400ms)</td></tr>
+    <tr><td><strong>Easing</strong></td><td>Natural acceleration/deceleration; avoid linear for UI motion (Material standard easing)</td></tr>
+    <tr><td><strong>Choreography</strong></td><td>Related elements move together; hierarchy stays visible during motion</td></tr>
+    <tr><td><strong>Performance</strong></td><td>Prefer <code>transform</code>/<code>opacity</code>; never animate layout properties</td></tr>
+    <tr><td><strong>Reduced motion</strong></td><td>Disable non-essential motion under <code>prefers-reduced-motion</code>; keep meaningful state changes</td></tr>
+    <tr><td><strong>Meaning</strong></td><td>Confirm action, show origin/destination, guide attention</td></tr>
+    <tr><td><strong>Decoration</strong></td><td>Remove or minimize under reduced motion</td></tr>
+  </tbody>
+</table>
+
+---
+
+<h2>8c. UX research, usability measurement, and triage</h2>
+
+<p>UI/UX synthesizes research into decisions — but it must also <em>produce</em> the evidence when none exists. Research is not a phase; it is a feedback source for the rhythm. Stakeholder preference is not user evidence; research exists to replace assumptions with observed behavior.</p>
+
+<h3>Research methods</h3>
+
+<table>
+  <thead><tr><th>Method</th><th>Question it answers</th><th>When to use</th><th>Output</th></tr></thead>
+  <tbody>
+    <tr><td><strong>User interviews</strong></td><td>What do users need, fear, and expect?</td><td>Early discovery</td><td>Insights, mental models</td></tr>
+    <tr><td><strong>Contextual inquiry</strong></td><td>How do users actually work?</td><td>Complex workflows</td><td>Task reality, workarounds</td></tr>
+    <tr><td><strong>Usability testing</strong></td><td>Can users complete the task?</td><td>Before and after design</td><td>Task success, errors, friction</td></tr>
+    <tr><td><strong>Card sorting</strong></td><td>How do users categorize content?</td><td>Navigation / IA design</td><td>Taxonomy structure</td></tr>
+    <tr><td><strong>Tree testing</strong></td><td>Can users find items in the IA?</td><td>Validating navigation</td><td>Findability rates</td></tr>
+    <tr><td><strong>First-click testing</strong></td><td>Is the first action obvious?</td><td>Early flow validation</td><td>Entry-point clarity</td></tr>
+    <tr><td><strong>Surveys</strong></td><td>What do many users report?</td><td>Broad attitudinal data</td><td>Trends, satisfaction</td></tr>
+    <tr><td><strong>Analytics</strong></td><td>Where do users drop off?</td><td>Live products</td><td>Funnels, rage clicks, retention</td></tr>
+    <tr><td><strong>Session replay</strong></td><td>What behavior patterns occur?</td><td>Diagnosing confusion</td><td>Interaction evidence</td></tr>
+    <tr><td><strong>A/B testing</strong></td><td>Which version performs better?</td><td>Live optimization</td><td>Statistical comparison</td></tr>
+  </tbody>
+</table>
+
+<h3>Usability metrics</h3>
+
+<table>
+  <thead><tr><th>Metric</th><th>What it measures</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Task success rate</strong></td><td>Effectiveness — could the user get it done?</td></tr>
+    <tr><td><strong>Time on task</strong></td><td>Efficiency</td></tr>
+    <tr><td><strong>Error rate</strong></td><td>Safety / clarity of the flow</td></tr>
+    <tr><td><strong>Recovery rate</strong></td><td>Can users recover from errors?</td></tr>
+    <tr><td><strong>SUS score</strong></td><td>Perceived usability (System Usability Scale)</td></tr>
+    <tr><td><strong>CSAT / NPS</strong></td><td>Satisfaction / loyalty</td></tr>
+    <tr><td><strong>Conversion rate</strong></td><td>Business outcome</td></tr>
+    <tr><td><strong>Feature adoption</strong></td><td>Value discovery</td></tr>
+    <tr><td><strong>Drop-off points</strong></td><td>Flow friction</td></tr>
+    <tr><td><strong>Rage clicks</strong></td><td>Interaction failure signals</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Anti-pattern:</strong> research theater — running studies, writing reports, changing nothing. Research earns its keep when a decision can be traced to evidence. One usability test that changes a flow beats ten persona decks nobody reads.</p>
+
+<h3>Severity and triage</h3>
+
+<table>
+  <thead><tr><th>Severity</th><th>Meaning</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Critical</strong></td><td>Blocks the primary task or causes harm</td><td>Cannot pay; destructive action without warning</td></tr>
+    <tr><td><strong>High</strong></td><td>Major friction for many users</td><td>Unclear checkout error; keyboard trap</td></tr>
+    <tr><td><strong>Medium</strong></td><td>Noticeable friction but recoverable</td><td>Confusing label; slow feedback</td></tr>
+    <tr><td><strong>Low</strong></td><td>Minor polish issue</td><td>Inconsistent spacing; weak microcopy</td></tr>
+  </tbody>
+</table>
+
+<p>Accessibility failures that block access are <strong>critical or high by default, never cosmetic</strong> — a contrast failure is not a polish issue, it is a door closed to a user.</p>
+
+<h3>Accessibility testing workflow</h3>
+
+<table>
+  <thead><tr><th>Layer</th><th>What it catches</th><th>What it misses</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Semantic HTML</strong></td><td>Keyboard, roles, focus basics</td><td>Experience quality</td></tr>
+    <tr><td><strong>Automated tools (axe, WAVE)</strong></td><td>Common ARIA / contrast / label issues</td><td>Task-level usability</td></tr>
+    <tr><td><strong>Manual keyboard test</strong></td><td>Focus order, traps, visible focus</td><td>Screen reader behavior</td></tr>
+    <tr><td><strong>Screen reader test</strong></td><td>Announcements, flow, state changes</td><td>Visual / motor experience</td></tr>
+    <tr><td><strong>Zoom / reflow test</strong></td><td>Text scaling, layout breakage</td><td>Interaction flow</td></tr>
+    <tr><td><strong>Reduced-motion test</strong></td><td>Animation safety</td><td>Meaning of motion</td></tr>
+    <tr><td><strong>Color contrast test</strong></td><td>Legibility</td><td>Cognitive clarity</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Automated accessibility checks are necessary but not sufficient.</strong> A component can pass axe and still be unusable — the doc's §9 worked example ships with a manual screen-reader pass as definition-of-done, not a compliance audit.</p>
+
+---
+
+<h2>8d. Ethics, dark patterns, localization, and inclusive design</h2>
+
+<p>Good UI/UX serves the user's long-term interest. Bad UI/UX converts the user. The difference is ethical design: <strong>the honest action is the easy action</strong>. This is not a PR concern — deceptive patterns are increasingly illegal (EU Digital Services Act, FTC negative-option rule, California Delete Act).</p>
+
+<h3>Dark patterns to avoid</h3>
+
+<table>
+  <thead><tr><th>Dark pattern</th><th>Harm</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Roach motel</strong></td><td>Easy to enter, hard to leave (subscription hell)</td></tr>
+    <tr><td><strong>Forced continuity</strong></td><td>Silent renewal without clear consent</td></tr>
+    <tr><td><strong>Hidden costs</strong></td><td>Fees revealed late in checkout</td></tr>
+    <tr><td><strong>Confirm-shaming</strong></td><td>Language that punishes decline ("No, I don't want to save money")</td></tr>
+    <tr><td><strong>Misdirection</strong></td><td>Visual emphasis manipulates the choice</td></tr>
+    <tr><td><strong>Sneak into basket</strong></td><td>Unwanted items added without notice</td></tr>
+    <tr><td><strong>Privacy zuckering</strong></td><td>Confusing settings lead to oversharing</td></tr>
+    <tr><td><strong>Disguised ads</strong></td><td>Ads that look like content</td></tr>
+    <tr><td><strong>Urgency fabrication</strong></td><td>False scarcity or fake countdowns</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Ethical principles:</strong> make consent explicit · make cancellation as easy as signup · make destructive actions visible · avoid manipulative urgency · respect attention · minimize data collection · explain permissions in context.</p>
+
+<h3>Permission UX</h3>
+
+<ul>
+  <li>Ask in context, at the moment the permission matters.</li>
+  <li>Explain why in plain language, with the value to the user.</li>
+  <li>Allow refusal without punishing the user.</li>
+  <li>Provide a recovery path if the user denies ("Enable in Settings").</li>
+  <li>Avoid permission fatigue — ask once per decision, not per feature.</li>
+  <li>Show current state and how to change it.</li>
+  <li>Handle revoked permissions gracefully (degrade, don't break).</li>
+</ul>
+
+<h3>Localization and internationalization</h3>
+
+<p>Design in tokens and flexible layouts from the start — <strong>retrofitting localization is expensive</strong>. Checklist:</p>
+
+<ul>
+  <li>Text expansion and contraction (German grows ~30%; plan generous container widths).</li>
+  <li>Right-to-left layouts (mirror the whole page, not just text).</li>
+  <li>Date / time and number / currency formats.</li>
+  <li>Pluralization rules (English has 2 forms; Arabic has 6; Russian 3).</li>
+  <li>Translated microcopy — error messages and empty states are content, not strings.</li>
+  <li>Font support for non-Latin scripts (CJK, Arabic, Devanagari) and font fallbacks.</li>
+  <li>Icon and color meaning (red ≠ danger everywhere; thumbs-up ≠ approval everywhere).</li>
+  <li>Legal and regulatory differences per market.</li>
+  <li>Address and phone formats.</li>
+</ul>
+
+<h3>Inclusive design — beyond compliance</h3>
+
+<p>WCAG is the testable baseline. Inclusive design is the broader practice of designing for diverse abilities, contexts, languages, devices, and constraints:</p>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Design consideration</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Vision</strong></td><td>Contrast, text size, color blindness, screen readers</td></tr>
+    <tr><td><strong>Motor</strong></td><td>Target size, keyboard, voice, switch control</td></tr>
+    <tr><td><strong>Hearing</strong></td><td>Captions, transcripts, visual alternatives</td></tr>
+    <tr><td><strong>Cognitive</strong></td><td>Clear language, predictable flow, error recovery</td></tr>
+    <tr><td><strong>Neurodiversity</strong></td><td>Reduced motion, low sensory load, clear hierarchy</td></tr>
+    <tr><td><strong>Language</strong></td><td>Plain language, localization, translation quality</td></tr>
+    <tr><td><strong>Literacy</strong></td><td>Avoid jargon, support scanning</td></tr>
+    <tr><td><strong>Connectivity</strong></td><td>Low bandwidth, offline, slow devices</td></tr>
+    <tr><td><strong>Age</strong></td><td>Larger targets, clarity, recovery</td></tr>
+    <tr><td><strong>Situational</strong></td><td>Bright sunlight, one-handed use, noisy environment</td></tr>
+  </tbody>
+</table>
+
+<p>Boundary note: UI/UX designs the interface and interaction. <strong>Product design additionally owns business goals, prioritization, and strategy.</strong> UI/UX must understand those goals but does not replace them. Similarly, a usable interface is not always the one with the highest short-term conversion — ethical UX optimizes for understanding, trust, and long-term value.</p>
 
 ---
 
@@ -618,6 +908,31 @@
       <td>Perfect ARIA tree; contrast 2.1:1; focus outline removed; error text gray on gray.</td>
       <td>Accessibility = "passes axe" not "usable by humans." Fix: manual testing with zoom 200%, high contrast, screen reader.</td>
     </tr>
+    <tr>
+      <td><strong>Research theater</strong></td>
+      <td>Personas, surveys, and reports produced but no decision changes; "we already did research" blocks new evidence.</td>
+      <td>Method becomes the output. Fix: tie every research artifact to a decision and a metric; a test that changes a flow beats a deck that doesn't.</td>
+    </tr>
+    <tr>
+      <td><strong>Placeholder-as-label</strong></td>
+      <td>Input shows "Email" until focused; the label vanishes the moment the user needs to check the field.</td>
+      <td>Placeholder serves affordance, not identity. Fix: always-visible labels; floating labels only with care and an a11y pass.</td>
+    </tr>
+    <tr>
+      <td><strong>Icon-only buttons</strong></td>
+      <td>A trash icon with no label, no tooltip, no accessible name; the meaning is a guess.</td>
+      <td>Icons are ambiguous out of context. Fix: label, tooltip, and <code>aria-label</code> — or defensible convention (universal icons) with accessible names.</td>
+    </tr>
+    <tr>
+      <td><strong>Disabled buttons without explanation</strong></td>
+      <td>Submit is grayed out; the user can't tell why or what to fix; assistive tech may skip focus entirely.</td>
+      <td>Blocked actions are the system being uncommunicative. Fix: explain near the control ("Enter a valid card first") or keep enabled and validate on press.</td>
+    </tr>
+    <tr>
+      <td><strong>Infinite scroll with no anchors</strong></td>
+      <td>Endless feed with no position saved; footer and footer links unreachable; back lands at the top.</td>
+      <td>Continuous content without location. Fix: "Load more" with preserved position, or pagination where location/recovery matter.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -639,7 +954,7 @@
 
 <h2>11. Ecosystem — tooling catalog with decision metrics</h2>
 
-<p>The discipline is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+<p>The discipline is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
 <table>
   <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
@@ -711,7 +1026,7 @@
 
 ---
 
-<h2>11. The future — where UI/UX is going</h2>
+<h2>12. The future — where UI/UX is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for UI/UX</th></tr></thead>
@@ -757,7 +1072,7 @@
 
 ---
 
-<h2>12. Summary — the usability checklist</h2>
+<h2>13. Summary — the usability checklist</h2>
 
 <p>Before any interface ships, verify:</p>
 
@@ -773,6 +1088,11 @@
     <tr><td>Is the primary flow testable with a screen reader (VoiceOver/NVDA) without sighted assistance?</td><td>Stop. Semantic HTML + ARIA incomplete; test manually.</td></tr>
     <tr><td>Are design tokens the single source of truth for color, space, type, motion (no magic numbers in CSS)?</td><td>Stop. Drift guaranteed; dark mode breaks; density breaks.</td></tr>
     <tr><td>Does the empty state explain <em>why</em> it's empty and <em>how</em> to fill it?</td><td>Stop. "No data" = dead end. "No orders yet — start shopping" = path forward.</td></tr>
+    <tr><td>Is the primary task backed by evidence (usability test, analytics), not stakeholder opinion?</td><td>Stop. Research theater or no research; tie the decision to observed behavior.</td></tr>
+    <tr><td>Are labels, errors, and empty states written in the user's language and localizable?</td><td>Stop. Content is a spec; retrofit localization is expensive.</td></tr>
+    <tr><td>Are all states designed — offline, stale, optimistic, empty, error, success?</td><td>Stop. Happy-path-only design = invisible failures in production.</td></tr>
+    <tr><td>Does every pattern choice survive an honest "does this manipulate the user?" review?</td><td>Stop. Dark patterns read as dark patterns; make the honest action easy.</td></tr>
+    <tr><td>Does loading <em>feel</em> fast and avoid layout shift?</td><td>Stop. Skeleton, stale data, or eager rendering; never a white flash.</td></tr>
   </tbody>
 </table>
 
@@ -785,7 +1105,7 @@
   <a href="https://www.nngroup.com/articles/ten-usability-heuristics/">Nielsen, J. (1994/2020). <em>10 Usability Heuristics for User Interface Design</em>.</a> ·
   <a href="https://www.cs.umd.edu/~ben/shneiderman.golden.rules.html">Shneiderman, B. (1992). <em>Designing the User Interface: 8 Golden Rules</em>.</a> ·
   <a href="https://jnd.org/the-design-of-everyday-things/">Norman, D. (1988/2013). <em>The Design of Everyday Things</em>.</a> ·
-  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAIC (2023). <em>WCAG 2.2 Quick Reference</em>.</a> ·
+  <a href="https://www.w3.org/WAI/WCAG22/quickref/">W3C WAI (2023). <em>WCAG 2.2 Quick Reference</em>.</a> ·
   <a href="https://www.iso.org/standard/63500.html">ISO (2018). <em>ISO 9241-11:2018 Ergonomics of human-system interaction — Usability: Definitions and concepts</em>.</a> ·
   <a href="https://www.frost.io/atomic-design/">Frost, B. (2013). <em>Atomic Design</em>.</a> ·
   <a href="https://tokens.dtcg.io/">W3C Design Tokens Community Group (2024). <em>Design Tokens Format Module</em>.</a> ·
@@ -793,7 +1113,7 @@
   <a href="https://www.interaction-design.org/literature/topics/gestalt-principles">Wertheimer, M. (1923). "Laws of Organization in Perceptual Forms" (Gestalt).</a> ·
   <a href="https://doi.org/10.1037/h0055392">Fitts, P. (1954). "The information capacity of the human motor system in controlling the amplitude of movement."</a> ·
   <a href="https://doi.org/10.1037/h0054411">Hick, W.E. (1952). "On the rate of gain of information."</a> ·
-  <ahttps://www.krishna.golden.com/no-interface/>Krishna, G. (2013). <em>The Best Interface Is No Interface</em>.</a> ·
+  <a href="https://www.krishna.golden.com/no-interface/">Krishna, G. (2013). <em>The Best Interface Is No Interface</em>.</a> ·
   <a href="https://developer.apple.com/design/human-interface-guidelines/">Apple (2024). <em>Human Interface Guidelines</em> (incl. visionOS).</a> ·
   <a href="https://m3.material.io/">Google (2024). <em>Material Design 3</em>.</a>
 </section>

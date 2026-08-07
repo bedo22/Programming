@@ -242,6 +242,72 @@
         the problem type, not the thinker.
       </p>
 
+      <h3>Problem triage — is this a problem this doc solves?</h3>
+      <p>
+        Before applying Pólya's four phases, decide what <em>kind</em> of
+        problem you're facing. Triage determines which layer of the shelf owns
+        the problem — and whether this doc is even the right tool. Well-defined
+        problems (clear input/output) get algorithms; wicked problems (evolving,
+        subjective) get a rhythm elsewhere on the shelf.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Problem type</th>
+            <th>Example</th>
+            <th>Where it belongs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Product / design problem</td>
+            <td>"Users don't understand this screen"</td>
+            <td><a href="./design-thinking.html">Design Thinking</a></td>
+          </tr>
+          <tr>
+            <td>Algorithmic problem</td>
+            <td>"Count word frequencies efficiently"</td>
+            <td>This doc (core)</td>
+          </tr>
+          <tr>
+            <td>Debugging problem</td>
+            <td>"Why does this function return undefined?"</td>
+            <td>This doc, §9</td>
+          </tr>
+          <tr>
+            <td>UI feature problem</td>
+            <td>"Build a todo list"</td>
+            <td>This doc, then the dev loop</td>
+          </tr>
+          <tr>
+            <td>Architecture problem</td>
+            <td>"How should services own this data?"</td>
+            <td><a href="./system-design.html">System Design</a></td>
+          </tr>
+          <tr>
+            <td>Contract problem</td>
+            <td>"Should this API be REST or GraphQL?"</td>
+            <td>API Design</td>
+          </tr>
+          <tr>
+            <td>Process problem</td>
+            <td>"Why do our releases keep slipping?"</td>
+            <td>
+              <a href="./software-development-process.html"
+                >Software Development Process</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The triage test is simple: if you can write down a concrete
+        Input/Operation/Output and the success criteria are objective, this doc
+        owns the problem. If the problem has no crisp output or the criteria are
+        subjective, it's an upstream (design) or downstream (feature) problem —
+        start there and come back only when you have a well-defined core.
+      </p>
+
       <h2>1b. History — from mathematics to programming (1945–present)</h2>
 
       <p>
@@ -351,7 +417,7 @@
             <td>Deliberate practice at scale</td>
             <td>Online platforms</td>
             <td>
-              HackerRank (2009), LeetCode (2015), CodeWars, CSES, USACO Guide —
+              HackerRank (2012), LeetCode (2015), CodeWars, CSES, USACO Guide —
               platform-enabled practice with tight feedback loops.
             </td>
           </tr>
@@ -843,6 +909,104 @@
         Input/Operation/Output clearly, you've understood the problem. If you
         can't, go back and read it again.
       </p>
+
+      <h4>Constraints checklist — Phase 1 is incomplete without it</h4>
+      <p>
+        In algorithmic problem-solving, constraints often <em>choose the
+        algorithm</em>: the maximum input size determines what complexity is
+        acceptable, and the input's properties decide which data structure is
+        legal. Run through these before planning:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Why it matters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>What is the maximum input size?</td>
+            <td>
+              Determines acceptable complexity — n ≤ 20 tolerates brute force;
+              n ≈ 10⁶ demands O(n) or O(n log n) (see complexity budget below).
+            </td>
+          </tr>
+          <tr>
+            <td>What are the input types?</td>
+            <td>Strings, numbers, arrays, trees, graphs each change the toolset.</td>
+          </tr>
+          <tr>
+            <td>What are the value ranges?</td>
+            <td>Overflow, negatives, and floats create different edge cases.</td>
+          </tr>
+          <tr>
+            <td>Is the input sorted?</td>
+            <td>Sorted input may unlock binary search or two pointers (§7b).</td>
+          </tr>
+          <tr>
+            <td>Are duplicates allowed?</td>
+            <td>Changes whether a Set is safe or a Map with counts is required.</td>
+          </tr>
+          <tr>
+            <td>Are edge cases specified?</td>
+            <td>Empty, null, single item, max size — spelled out or implied?</td>
+          </tr>
+          <tr>
+            <td>What output format is required?</td>
+            <td>Object, array, boolean, number — the contract your plan must hit.</td>
+          </tr>
+          <tr>
+            <td>Are there time/memory limits?</td>
+            <td>Competitive-programming constraints; plan complexity to fit them.</td>
+          </tr>
+          <tr>
+            <td>Are there real-world constraints?</td>
+            <td>
+              Maintainability, readability, security — often more important than
+              raw speed in production code.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Complexity budget — inferring acceptable complexity from input size</h4>
+      <p>
+        A practical rule of thumb for picking the paradigm during Phase 2. The
+        full Big O treatment lives in
+        <a href="./cs-and-software-engineering.html">CS &amp; Software
+        Engineering</a>; this is the quick budget:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Input size n</th>
+            <th>Usually acceptable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>n ≤ 20</td>
+            <td>O(2ⁿ), O(n!) sometimes acceptable</td>
+          </tr>
+          <tr>
+            <td>n ≤ 1000</td>
+            <td>O(n²) often acceptable</td>
+          </tr>
+          <tr>
+            <td>n ≤ 10⁵</td>
+            <td>O(n log n) or O(n) usually needed</td>
+          </tr>
+          <tr>
+            <td>n ≤ 10⁶</td>
+            <td>O(n) usually needed</td>
+          </tr>
+          <tr>
+            <td>n &gt; 10⁶</td>
+            <td>O(n log n) may be too slow; needs strong optimization</td>
+          </tr>
+        </tbody>
+      </table>
 
       <h3>Phase 2 — Devise a plan</h3>
       <p>
@@ -1482,6 +1646,162 @@
         </p>
       </blockquote>
 
+      <h3>7a. Choosing the data structure</h3>
+      <p>
+        Paradigms choose the <em>approach</em>; data structures choose the
+        <em>operations</em>. During Phase 2, after picking a paradigm, ask what
+        operations you need (lookup, counting, ordering, min/max, adjacency) —
+        that dictates the structure:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Need</th>
+            <th>Natural data structure</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fast lookup by key</td>
+            <td>Map / object</td>
+            <td>Average O(1) lookup</td>
+          </tr>
+          <tr>
+            <td>Count occurrences</td>
+            <td>Map</td>
+            <td>Keys store running counts</td>
+          </tr>
+          <tr>
+            <td>Remove duplicates</td>
+            <td>Set</td>
+            <td>Unique membership, O(1) add/check</td>
+          </tr>
+          <tr>
+            <td>Preserve order</td>
+            <td>Array</td>
+            <td>Ordered iteration, indexing</td>
+          </tr>
+          <tr>
+            <td>First-in-first-out</td>
+            <td>Queue</td>
+            <td>FIFO behavior (BFS)</td>
+          </tr>
+          <tr>
+            <td>Last-in-first-out</td>
+            <td>Stack</td>
+            <td>LIFO behavior (DFS, undo)</td>
+          </tr>
+          <tr>
+            <td>Min/max quickly</td>
+            <td>Heap / priority queue</td>
+            <td>Efficient min/max extraction (Top K, Dijkstra)</td>
+          </tr>
+          <tr>
+            <td>Relationships</td>
+            <td>Graph / adjacency list</td>
+            <td>Nodes and edges</td>
+          </tr>
+          <tr>
+            <td>Hierarchy</td>
+            <td>Tree</td>
+            <td>Parent/child structure</td>
+          </tr>
+          <tr>
+            <td>Fast prefix search</td>
+            <td>Trie</td>
+            <td>Prefix matching</td>
+          </tr>
+          <tr>
+            <td>Range queries</td>
+            <td>Sorted array / prefix sums</td>
+            <td>Efficient range operations</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>7b. Paradigm recognition — reading the signal in the problem</h3>
+      <p>
+        The most practical recognition skill (§1f) is matching
+        <em>phrases in the problem statement</em> to a paradigm. These signals
+        are heuristics, not proofs — but they're right often enough to start:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Signal in problem statement</th>
+            <th>Likely paradigm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"Count occurrences" / "how many times"</td>
+            <td>Hash map (§7)</td>
+          </tr>
+          <tr>
+            <td>"Find duplicates"</td>
+            <td>Set / hash map</td>
+          </tr>
+          <tr>
+            <td>"Two elements that sum to X"</td>
+            <td>Hash map or two pointers</td>
+          </tr>
+          <tr>
+            <td>Input is sorted</td>
+            <td>Binary search / two pointers</td>
+          </tr>
+          <tr>
+            <td>"All combinations" / "all permutations"</td>
+            <td>Backtracking</td>
+          </tr>
+          <tr>
+            <td>"Shortest path" in unweighted graph</td>
+            <td>BFS</td>
+          </tr>
+          <tr>
+            <td>"Shortest path" with positive weights</td>
+            <td>Dijkstra</td>
+          </tr>
+          <tr>
+            <td>"Dependencies must be ordered"</td>
+            <td>Topological sort</td>
+          </tr>
+          <tr>
+            <td>"Maximum/minimum subarray"</td>
+            <td>Kadane / DP</td>
+          </tr>
+          <tr>
+            <td>"Overlapping intervals"</td>
+            <td>Sort + greedy</td>
+          </tr>
+          <tr>
+            <td>"Top K elements"</td>
+            <td>Heap</td>
+          </tr>
+          <tr>
+            <td>"Optimal solution with overlapping subproblems"</td>
+            <td>Dynamic programming</td>
+          </tr>
+          <tr>
+            <td>"Split into independent halves"</td>
+            <td>Divide &amp; conquer</td>
+          </tr>
+          <tr>
+            <td>Small n, "find any solution"</td>
+            <td>Brute force</td>
+          </tr>
+        </tbody>
+      </table>
+      <blockquote class="callout">
+        <p>
+          <strong>The recognition loop:</strong> these signals are not learned by
+          reading — they're learned by filing (§10). Each problem you solve and
+          file under its signal adds one more row to your mental version of this
+          table. After 50 filed problems, "count occurrences" fires the hash-map
+          reflex before you finish the sentence.
+        </p>
+      </blockquote>
+
       <p>
         <strong
           >Your HackerRank word-frequency counter uses the hash table
@@ -1663,6 +1983,66 @@
         debugging process itself.
       </p>
 
+      <h3>The debugging toolbox — practical techniques</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Technique</th>
+            <th>Use for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Minimal reproduction</td>
+            <td>Isolate the bug — strip everything not needed to trigger it</td>
+          </tr>
+          <tr>
+            <td>Binary search debugging</td>
+            <td>Locate where state breaks in a long process (§9 above)</td>
+          </tr>
+          <tr>
+            <td>Console/log assertions</td>
+            <td>Verify hypotheses — print the state you predicted</td>
+          </tr>
+          <tr>
+            <td>Breakpoints / state inspection</td>
+            <td>Inspect live state at the moment of failure</td>
+          </tr>
+          <tr>
+            <td>Git bisect</td>
+            <td>Find the commit that introduced the bug (automated binary search)</td>
+          </tr>
+          <tr>
+            <td>Rubber duck</td>
+            <td>Expose hidden assumptions by explaining the code aloud</td>
+          </tr>
+          <tr>
+            <td>Compare expected vs actual</td>
+            <td>Clarify the mismatch — write down what should happen, then what does</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        These are not separate tricks — they're the hypothesis-driven method
+        (§9) with specific instruments. Pick the cheapest instrument that can
+        confirm or refute your current hypothesis.
+      </p>
+      <blockquote class="callout">
+        <p>
+          <strong>Where debugging continues beyond this doc:</strong> this
+          section covers debugging as applied problem-solving — the thinking
+          loop. The <em>engineering practice</em> — the evidence when a test
+          fails, and the team-scale toolbox (isolation, observability, test
+          oracles) — is developed in
+          <a href="./software-testing.html">Testing &amp; Debugging §9</a>, and
+          finding <em>when</em> a wrong change arrived plus recovering from it
+          (git bisect, blame, revert, rollback) is covered in
+          <a href="./version-control-ci-cd-deployment.html"
+            >Version Control &amp; CI/CD</a
+          >. This doc owns the loop; those docs own the team-scale tools.
+        </p>
+      </blockquote>
+
       <h2>10. The "Look back" phase in depth — what everyone skips</h2>
 
       <p>
@@ -1802,6 +2182,144 @@
         recognize categories from the problem statement. After 200, you'll
         recognize them from the first sentence.
       </p>
+
+      <h4>The pattern card — a reusable filing format</h4>
+      <p>
+        "File the pattern" is advice until you give it a format. Use a template
+        so every pattern you file answers the same questions — that consistency
+        is what makes them comparable and searchable later:
+      </p>
+      <pre
+        style="font-size: 0.82rem; line-height: 1.5; overflow-x: auto"
+      ><code>Pattern name:
+  Signal:                    ← the phrase in the statement that triggers it
+  Problem type:              ← counting, searching, ordering, optimization...
+  Core idea:
+  Data structure:
+  Paradigm:
+  Typical complexity:
+  Common edge cases:
+  Example problems:
+  Mistakes to avoid:</code></pre>
+      <p>Filled in for the word-frequency counter:</p>
+      <pre
+        style="font-size: 0.82rem; line-height: 1.5; overflow-x: auto"
+      ><code>Pattern name: Frequency counting
+  Signal:            "count how many times each X appears"
+  Problem type:      counting / grouping
+  Core idea:         use a map from item to count
+  Data shape:        Map (key → count)
+  Paradigm:          hash map
+  Typical complexity: O(n)
+  Common edge cases: empty input, Unicode/case, "is a number a word?"
+  Mistakes made:     forgetting the empty-string split bug (§13)</code></pre>
+      <p>
+        Keep a single file of these (physical index card or a Markdown file).
+        Each solved problem earns one card. Reviewing the deck weekly (§11 — the
+        retrieval practice) is how the table in §7b becomes your reflexes.
+      </p>
+
+      <h4>Correctness is not the same as passing tests</h4>
+      <p>
+        Passing the sample cases means your code works <em>for those examples</em>
+        — it doesn't mean it's correct. A correctness argument tells you why it
+        works <em>for all valid inputs</em>:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Correctness concept</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>What must be true before the function runs?</td>
+            <td>Preconditions</td>
+          </tr>
+          <tr>
+            <td>What must be true after it returns?</td>
+            <td>Postconditions</td>
+          </tr>
+          <tr>
+            <td>What stays true on <em>every</em> loop iteration?</td>
+            <td>Loop invariant</td>
+          </tr>
+          <tr>
+            <td>What stops the recursion?</td>
+            <td>Base case</td>
+          </tr>
+          <tr>
+            <td>Does each recursive call reduce toward the base case?</td>
+            <td>Termination</td>
+          </tr>
+          <tr>
+            <td>Does the output satisfy the contract for all valid inputs?</td>
+            <td>Correctness</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        For the word-frequency counter, the loop invariant is "after processing
+        token <em>k</em>, the Map holds the correct count for the first <em>k</em>
+        tokens." If that's true at the start, stays true after each iteration,
+        and the loop terminates, the result is correct — you don't need to hope.
+        This is the reasoning that AI (§13d) can't do for you.
+      </p>
+
+      <h4>Verification strategy — testing is part of solving</h4>
+      <p>
+        The edge-case catalog above is part of verification. The full toolbox,
+        from cheapest to most powerful:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Technique</th>
+            <th>When to use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sample test</td>
+            <td>Basic sanity — run the given example first</td>
+          </tr>
+          <tr>
+            <td>Edge cases</td>
+            <td>Empty, single, max, boundary — the §10 catalog</td>
+          </tr>
+          <tr>
+            <td>Hand trace</td>
+            <td>Before coding — verify the <em>plan</em>, not the code</td>
+          </tr>
+          <tr>
+            <td>Unit assertions</td>
+            <td>During implementation — check each step as you write it</td>
+          </tr>
+          <tr>
+            <td>
+              Brute-force comparator
+            </td>
+            <td>
+              When a slow-but-obviously-correct solution exists — run both on
+              random small inputs and diff. The most powerful practical check in
+              algorithmic work.
+            </td>
+          </tr>
+          <tr>
+            <td>Random stress test</td>
+            <td>Catch hidden edge cases across thousands of random inputs</td>
+          </tr>
+          <tr>
+            <td>Property-based test</td>
+            <td>Assert invariants the output must satisfy (sorted, unique, etc.)</td>
+          </tr>
+          <tr>
+            <td>Performance test</td>
+            <td>Confirm the complexity holds at the maximum input size</td>
+          </tr>
+        </tbody>
+      </table>
 
       <h2>11. Fluency vs storage strength in problem-solving</h2>
 
@@ -2241,8 +2759,79 @@
         the plan working, or am I improvising?" If your code starts diverging
         from your numbered plan — you're adding cases you didn't plan for —
         that's a signal to stop, go back to Phase 2, and revise the plan. The
-        plan is the contract; the code is the implementation. If they diverge,
-        the plan was incomplete — fix it first.
+        plan was incomplete — fix it first.
+      </p>
+
+      <h2>13a. A second worked example — two-sum, traced through Pólya</h2>
+
+      <p>
+        The word-frequency example (§13) showed the hash-map paradigm. This one
+        shows the same four phases producing a <em>different</em> paradigm — so
+        you see the rhythm does not change even when the technique does.
+        Problem: given an array of integers and a target, return the indices of
+        the two numbers that add up to the target.
+      </p>
+
+      <pre
+        style="font-size: 0.82rem; line-height: 1.5; overflow-x: auto"
+      ><code>/*
+  Input: an array of numbers [2, 7, 11, 15] and a target (9)   ← PHASE 1: data
+  Operation: find the two numbers whose sum is the target      ← PHASE 1: condition
+  Output: their indices (as [0, 1])                            ← PHASE 1: unknown
+  Constraints: exactly one solution exists; can I reuse an element? (§3 checklist)
+
+  Brute-force plan (correct):                                    ← PHASE 2
+  1- for each i, for each j > i, check if nums[i] + nums[j] == target
+  O(n²), fine for small n.
+
+  Upgrade via pattern recognition:                             ← PHASE 2 (analogy)
+  "Find two that sum to X" → hash-map signal (§7b).
+  1- create an empty Map (number → its index)
+  2- for each value at index i:
+     a- compute complement = target - value
+     b- if complement is already a key in the Map, return [key.index, i]
+     c- else store value → i
+  3- return [] (no solution -- a sentinel)
+*/</code></pre>
+
+      <p>
+        <strong>Tracing the example</strong> (§8): target 9. i=0, value 2 →
+        complement 7 not in Map → store {2:0}. i=1, value 7 → complement 2
+        IS in Map → return [0, 1]. The hand trace confirms the plan before any
+        code is written.
+      </p>
+      <ul>
+        <li>
+          <strong>Correctness argument</strong> (§10): the loop invariant is
+          "for every element seen so far, its complement relationship is
+          recorded." If a solution exists, when we reach the second of its two
+          numbers, the first is already in the Map — so the solution is found
+          exactly once. This is a correctness argument, not just passing the
+          sample.
+        </li>
+        <li>
+          <strong>Complexity</strong>: O(n) time, O(n) space — this is the same
+          O(n) the hash-map signal predicts for "two elements that sum to X."
+        </li>
+        <li>
+          <strong>Edge cases</strong>: reuse of the same index (a number
+          shouldn't pair with itself) — handled because we check the Map
+          <em>before</em> storing the current value. Empty array, no solution,
+          negative/zero values.
+        </li>
+        <li>
+          <strong>Pattern card</strong>: name "two-sum", signal "two elements
+          that sum to X", paradigm hash map, complexity O(n), filed next to
+          frequency-counting under "hash-map complement."
+        </li>
+      </ul>
+      <p>
+        <strong>The lesson:</strong> the phases were identical to the
+        word-frequency example — Input/Operation/Output, a brute-force baseline,
+        an upgrade chosen by recognition, a concrete trace, a correctness
+        argument, edge cases, and a filed pattern. The technique changed; the
+        rhythm did not. That constancy is the meta-skill §13d says survives every
+        paradigm shift.
       </p>
 
       <h2>13b. The most common failure modes</h2>
@@ -2374,6 +2963,86 @@
           </tr>
         </tbody>
       </table>
+
+      <h3>Emotional and cognitive regulation — the traps that feel like thinking</h3>
+      <p>
+        Schoenfeld's fifth resource is "beliefs" (§5): what you believe about
+        problem-solving changes how well you solve. Several failure modes aren't
+        about technique at all — they're about your state while solving. These
+        traps are worth naming because you can't debug a problem you can't name:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>What it feels like</th>
+            <th>The fix</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Panic</strong></td>
+            <td>
+              "I don't know where to start." Working memory seizes; the blank
+              page intimidates.
+            </td>
+            <td>
+              Return to the smallest concrete step: write Input / Operation /
+              Output — just the first line. Action dissolves the panic faster
+              than reassurance.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Tunnel vision (Einstellung)</strong></td>
+            <td>
+              "This approach must work, I'll tweak it once more." Fixated on the
+              first idea that came to mind.
+            </td>
+            <td>
+              The metacognitive check (§5): "Am I progressing or spinning? Is
+              this the right paradigm?" Timebox the current approach.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Sunk cost</strong></td>
+            <td>
+              "I've already spent 30 minutes on this, I can't abandon it."
+            </td>
+            <td>
+              Judge only the <em>next</em> 30 minutes, not the last. The
+              investment is gone either way.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Fluency illusion</strong></td>
+            <td>
+              "I understand this solution now" — after reading it, not solving
+              it.
+            </td>
+            <td>
+              Re-solve from memory later (§11). Understanding that can't be
+              reproduced is fluency, not storage.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Overwhelm</strong></td>
+            <td>
+              "Too many details, too many constraints, where do I even begin?"
+            </td>
+            <td>
+              Decompose (§6): reduce scope to a solved sub-problem, then expand.
+              The complexity budget (§2) helps by proving the full scale is
+              tractable.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        These states are not personal failings — they're predictable cognitive
+        responses, and each has a known mechanical fix. Naming the state (as
+        with debugging's "guess, don't gamble") is the first step of getting out
+        of it.
+      </p>
 
       <h2>13c. Ecosystem — tooling catalog with decision metrics</h2>
 
@@ -2511,12 +3180,57 @@
               <strong>Use with caution.</strong> AI is a fluency trap amplifier
               (§11): it makes understanding feel easy without building storage
               strength. Use AI to <em>check</em> your plan, not to
-              <em>replace</em> Phase 2. Never let AI generate the plan you
-              should have devised yourself.
+              <em>replace</em> Phase 2. Do not let AI replace your own planning
+              attempt — the retention cost is real.
             </td>
           </tr>
         </tbody>
       </table>
+
+      <h3>The safe AI problem-solving workflow</h3>
+      <p>
+        Treat any AI-generated solution as
+        <strong>plausible but unverified</strong> — a hypothesis, not a proof.
+        Verification (Phase 4) is exactly the step AI can't do for you, and it's
+        where the human value now concentrates. Concretely:
+      </p>
+      <ol>
+        <li>
+          <strong>Attempt the problem yourself first.</strong> The effortful
+          attempt (§11) is what builds storage strength — AI can't do it for you.
+        </li>
+        <li>
+          <strong>Write Input / Operation / Output.</strong> — Phase 1 before
+          you touch AI, so you know the problem you're asking it about.
+        </li>
+        <li>
+          <strong>Ask AI for a hint, not a solution.</strong> — a nudge toward
+          the paradigm keeps the thinking yours.
+        </li>
+        <li>
+          <strong>Ask AI to critique your plan.</strong> — "what edge cases am I
+          missing?" rather than "solve this."
+        </li>
+        <li>
+          <strong>Only after you have a plan, ask for alternatives.</strong> —
+          compare approaches the way you'd compare with a colleague.
+        </li>
+        <li>
+          <strong>Verify everything AI produces.</strong> — run it through the
+          §10 edge-case catalog and a brute-force comparator. Trust, but verify.
+        </li>
+        <li>
+          <strong>Re-solve the problem later without AI.</strong> — if you can't,
+          it was fluency, not storage strength.
+        </li>
+        <li>
+          <strong>Never paste secrets or proprietary code.</strong> — assume any
+          tool's data handling is not private.
+        </li>
+      </ol>
+      <p>
+        The rule in one line: <em>AI can be your rubber duck, not your brain.</em>
+      </p>
 
       <blockquote class="callout">
         <p>

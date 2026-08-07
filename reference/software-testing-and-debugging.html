@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Software Testing — How We Prove Software Works, Fails, and Stays Safe</title>
+<title>Testing &amp; Debugging — How We Prove Software Works, Find Faults, and Stay Safe</title>
 <link rel="stylesheet" href="../assets/lesson.css">
 </head>
 <body>
 <main>
 
 <header class="lesson-head">
-  <p class="kicker">Reference · Evidence about behavior — from a unit test to production verification</p>
-  <h1>Software Testing</h1>
-  <p class="meta">What testing is (a disciplined way to produce evidence about software behavior), how it differs from verification, validation, and QA, the history from debugging to continuous and AI-era testing, the levels and techniques that build useful confidence, test doubles and TDD, how to choose a test strategy without worshipping the pyramid, how non-functional qualities are tested, and how production observability completes the loop. Read this to understand what evidence your code needs before the delivery pipeline should trust it.</p>
+  <p class="kicker">Reference · Evidence about behavior — from a unit test to finding the fault</p>
+  <h1>Testing &amp; Debugging</h1>
+  <p class="meta">What testing is (a disciplined way to produce evidence about software behavior) and what debugging is (the disciplined search for a fault when the evidence says behavior is wrong). Covers how testing differs from debugging, verification, validation, and QA, the history from debugging to continuous and AI-era testing, the levels and techniques that build useful confidence, test doubles and TDD, how to choose a test strategy without worshipping the pyramid, non-functional testing, production verification, and the debugging toolbox. Read this to understand what evidence your code needs before the delivery pipeline should trust it — and what to do when that evidence fails.</p>
 </header>
 
 <blockquote class="callout">
@@ -38,11 +38,11 @@
   <li>Quality: <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — quality attributes and trade-offs that testing evaluates.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared terms.</li>
 </ul>
-<p><strong>If you've ever wondered why unit tests are not enough, when mocks hurt more than they help, what TDD really buys you, or how a team knows a deployment is healthy after release, this doc answers that.</strong> Read §1–§3 first, then §4–§8 for the practical toolbox, then §9–§12 for strategy, production, and the AI frontier.</p>
+<p><strong>If you've ever wondered why unit tests are not enough, when mocks hurt more than they help, what TDD really buys you, or how a team knows a deployment is healthy after release, this doc answers that.</strong> Read §1–§3 first, then §4–§8 for the practical toolbox, §9 for production verification and §10 for debugging (the evidence when a test fails), then §11–§15 for the AI frontier, a worked example, the tooling map, failure modes, and the checklist.</p>
 
 <h2>1. Definition — what testing is, and what it is <em>not</em></h2>
 
-<p><strong>Software testing</strong> is the discipline of producing useful evidence about a software system by observing or checking its behavior under selected conditions. A test is not just code that runs — it is a claim about expected behavior paired with an observation that can confirm or refute it (<a href="https://standards.ieee.org/standard/1012-2016.html">IEEE 1012</a>).</p>
+<p><strong>Software testing</strong> is the discipline of producing useful evidence about a software system by observing or checking its behavior under selected conditions. A test is not just code that runs — it is a claim about expected behavior paired with an observation that can confirm or refute it. Testing sits inside the wider <em>verification and validation</em> (V&amp;V) practice framed by <a href="https://standards.ieee.org/standard/1012-2016.html">IEEE 1012</a>.</p>
 
 <ul>
   <li><strong>Verification</strong> asks: did we build the system right? It compares the artifact to its specification.</li>
@@ -123,6 +123,27 @@
 <p>Determinism matters because a test that can pass and fail without any code change is not evidence — it is noise. Time, randomness, concurrency, network calls, shared databases, and order-dependent state are the usual causes. Good tests control them explicitly with clocks, seeds, dependency injection, isolated fixtures, and controlled collaborators.</p>
 
 <p>Risk matters because testing is sampling. You cannot execute every input, every state, every deployment topology, and every user path. A mature strategy asks: where would a defect be most likely, most costly, and least visible? Then it spends test effort there.</p>
+
+<h3>Test data and environments — what makes evidence trustworthy</h3>
+
+<p>Suites often fail not because the test is wrong but because data and environments are unreliable. Controls, by concern:</p>
+
+<table>
+  <thead><tr><th>Concern</th><th>Good practice</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Data setup</strong></td><td>Build data with factories/builders, not copied production dumps you half-understand.</td></tr>
+    <tr><td><strong>Data isolation</strong></td><td>Each test owns its data; no coupling across tests through shared records.</td></tr>
+    <tr><td><strong>Time</strong></td><td>Inject clocks or fake timers for dates, timeouts, and expiries.</td></tr>
+    <tr><td><strong>Randomness</strong></td><td>Seed random generators so the "random" inputs are reproducible.</td></tr>
+    <tr><td><strong>External services</strong></td><td>Use stubs, fakes, contract tests, or sandboxes rather than live third parties.</td></tr>
+    <tr><td><strong>Databases</strong></td><td>Reset or transactionally isolate state so a test starts clean.</td></tr>
+    <tr><td><strong>Production data</strong></td><td>Avoid it unless anonymized and approved for that purpose.</td></tr>
+    <tr><td><strong>Environments</strong></td><td>Prefer ephemeral environments over long-lived shared ones.</td></tr>
+    <tr><td><strong>Secrets</strong></td><td>Never use real credentials or secrets in tests.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The rule:</strong> a test's evidence is only as trustworthy as the data and environment it ran against. If you cannot reproduce the same outcome twice, you do not have evidence, you have noise.</p>
 
 <h2>1f. Mental models — how senior engineers think about tests</h2>
 
@@ -209,6 +230,31 @@
   <li><strong>Design for failure readability.</strong> A failed test should tell you what behavior broke, where, and why — not merely that line 437 returned false.</li>
 </ul>
 
+<p><strong>A written strategy</strong> is the agreement about where evidence will be produced, how fast it will run, and who will trust it. It is not a test plan enumerating every case. A reusable starting template:</p>
+
+<pre>
+Test strategy
+  System / feature:
+  Main risks:                       (risk-based: likelihood × impact × invisibility)
+  Behavior sources:                 (spec, examples, invariants, acceptance criteria)
+  Test levels:
+    Unit:
+    Integration:
+    Contract:
+    E2E:
+    Security:
+    Performance:
+  Environments:
+  Test data:
+  Automation policy:             (what runs on every push vs on merge vs on schedule)
+  Manual / exploratory policy:
+  Production verification:       (smoke, health, telemetry, alerts, canaries)
+  Release / rollback criteria:
+  Ownership:                     (who maintains which suite)
+</pre>
+
+<p>Tighten the template to your risk model (its "risk" rows should come straight from the §1e risk analysis) — and let the <em>weakest</em> rows tell you what to improve next.</p>
+
 <h2>7. Non-functional testing — proving the qualities that users feel</h2>
 
 <table>
@@ -224,7 +270,29 @@
 
 <p>These qualities cannot be bolted on at release time. The testable budget must be defined early: how fast, how accessible, how available, how compatible? Otherwise the team only discovers the quality target after production violates it.</p>
 
-<h2>8. Production verification — testing does not stop at deployment</h2>
+<h2>8. Testing metrics — how to know whether the evidence is useful</h2>
+
+<p>Metrics measure the evidence system itself, not just the product. Watch the trend, not the single number:</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>What it tells you</th><th>Warning sign</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Pass rate</strong></td><td>Are checks currently green?</td><td>Red is ignored or normalized as normal</td></tr>
+    <tr><td><strong>Suite duration</strong></td><td>Is feedback fast enough to run on every change?</td><td>Developers skip tests because they are slow</td></tr>
+    <tr><td><strong>Flakiness rate</strong></td><td>Can the suite be trusted?</td><td>Random failures are rerun instead of investigated</td></tr>
+    <tr><td><strong>Coverage</strong></td><td>What code was actually executed?</td><td>High coverage but low defect detection</td></tr>
+    <tr><td><strong>Risk coverage</strong></td><td>Are the critical paths tested?</td><td>Coverage is high where risk is low</td></tr>
+    <tr><td><strong>Mutation score</strong></td><td>Do tests detect behavior changes?</td><td>Tests execute code but do not assert meaningfully</td></tr>
+    <tr><td><strong>Defect escape rate</strong></td><td>How many bugs reach production?</td><td>CI is green but users still find failures</td></tr>
+    <tr><td><strong>Change failure rate</strong></td><td>How often does a change break production?</td><td>Deployment stays risky despite tests</td></tr>
+    <tr><td><strong>Mean time to recovery (MTTR)</strong></td><td>How fast failures are recovered</td><td>Detection exists but recovery is slow</td></tr>
+    <tr><td><strong>Test maintenance cost</strong></td><td>Are tests expensive to keep alive?</td><td>Tests break more often than production code</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Do not optimize one metric alone.</strong> Coverage without risk analysis becomes vanity. Pass rate without trust becomes decoration. Speed without correctness becomes noise. The metrics that matter are the ones that tell you whether the evidence can be believed — and whether it arrives in time to act on it.</p>
+
+<h2>9. Production verification — testing does not stop at deployment</h2>
 
 <p>Production is the only environment with real data shape, real traffic, real third-party behavior, and real operational constraints. Verification therefore continues after deployment:</p>
 
@@ -239,7 +307,46 @@
 
 <p>This does not replace pre-production testing; it completes it. The delivery doc explains the deployment mechanics; this doc's rule is simpler: <strong>ship only when you can observe whether the ship worked.</strong></p>
 
-<h2>9. AI-era testing — generated code and nondeterministic systems</h2>
+<h2>10. Debugging — the evidence when a test fails</h2>
+
+<p>Testing and debugging are often treated as the same activity, but they are two directions through the same loop:</p>
+
+<ul>
+  <li><strong>Testing</strong> asks "does the evidence show this behaves as intended?" It is forward-looking — run checks, confirm behavior, collect evidence.</li>
+  <li><strong>Debugging</strong> starts where testing ends: it asks "why does the evidence say the behavior is wrong?" and works <em>backward</em> from the failed evidence to the fault — the inverted four-phase loop from <a href="./problem-solving.html">Problem-Solving §9</a>. This doc owns the team-scale <em>tooling</em> that finds and proves the fault; that doc owns the <em>thinking loop</em>.</li>
+</ul>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Testing</th><th>Debugging</th></tr></thead>
+  <tbody>
+    <tr><td>Starting point</td><td>A claim to verify (expected behavior)</td><td>An observed failure (evidence says it is wrong)</td></tr>
+    <tr><td>Direction</td><td>Forward — establish behavior</td><td>Backward — from symptom to cause</td></tr>
+    <tr><td>Key skill</td><td>Designing checks that prove intent</td><td>Forming and testing hypotheses about the cause</td></tr>
+    <tr><td>End state</td><td>Confidence that behavior is correct</td><td>A fix for the identified fault</td></tr>
+  </tbody>
+</table>
+
+<h3>The debugging toolbox</h3>
+
+<p>A systematic debug proceeds from reproduction to hypothesis to the smallest confirming instrument. In order from cheapest to most targeted:</p>
+
+<table>
+  <thead><tr><th>Technique</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Minimal reproduction</strong></td><td>Isolate the bug — strip everything not needed to trigger it. A failing test (or a new one) is ideal: it makes the fault reproducible and then becomes a permanent regression guard.</td></tr>
+    <tr><td><strong>Binary-search debugging</strong></td><td>Locate where state breaks in a long process — checkpoint the middle, decide which half, repeat. The same divide-and-conquer idea applies over code, data, and history.</td></tr>
+    <tr><td><strong>Logging with context</strong></td><td>Verify a hypothesis that mostly holds — capture the actual state at the point you predicted. Copies of "expected vs actual" at that moment expose the divergence.</td></tr>
+    <tr><td><strong>Breakpoints / state inspection</strong></td><td>Pause execution at a suspected point and inspect live state when the output can be inspected directly.</td></tr>
+    <tr><td><strong>Compare expected vs actual</strong></td><td>Clarify the mismatch — write down what <em>should</em> happen at a step, then the actual value; the gap names the wrong assumption.</td></tr>
+    <tr><td><strong>Rubber duck</strong></td><td>Explain the code aloud to expose hidden assumptions — often the assumption itself is the fault.</td></tr>
+    <tr><td><strong>Isolate the dependency</strong></td><td>On async, race, or state-heavy failures: make the test deterministic (control time, randomness, concurrency) or double the collaborator (§4; §1e's isolation and determinism).</td></tr>
+    <tr><td><strong>Production observability</strong></td><td>For failures that only reproduce under real traffic: logs, metrics, traces, and error dashboards (§9) provide evidence that pre-production tests cannot.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Cross-doc handoff.</strong> This is the engineering practice of debugging — the tools and evidence. The thinking loop underneath it (observe → hypothesize → predict → test → conclude, and the &ldquo;don't guess, explore hypotheses&rdquo; anti-pattern) is <a href="./problem-solving.html">Problem-Solving §9</a>; the way version history enables the search (git bisect, blame, revert) is <a href="./version-control-ci-cd-deployment.html">Version Control &amp; CI/CD</a>. Three docs, one loop: this doc owns the tools, Problem-Solving owns the thinking, Version Control owns the timeline.</p>
+
+<h2>11. AI-era testing — generated code and nondeterministic systems</h2>
 
 <p>AI changes testing in two directions at once:</p>
 
@@ -250,7 +357,39 @@
 
 <p>For deterministic code, traditional assertions remain the backbone. For AI behavior, define what must always be true: no leaked secrets, no forbidden content, bounded latency, grounded answers, valid tool calls, safe fallback behavior. Then measure how often the system meets those constraints across representative cases.</p>
 
-<h2>10. Worked example — a feature tested from unit to production</h2>
+<h3>Guardrails</h3>
+
+<p>For AI-generated code and tests:</p>
+<table>
+  <thead><tr><th>Risk</th><th>Guardrail</th></tr></thead>
+  <tbody>
+    <tr><td>Plausible but wrong code</td><td>Human review plus tests; never authorless merge.</td></tr>
+    <tr><td>Tautological tests</td><td>Verify the oracle is independent of the implementation it is checking.</td></tr>
+    <tr><td>Missing edge cases</td><td>Add boundary, invalid, and adversarial cases beyond the examples generated.</td></tr>
+    <tr><td>Outdated API usage</td><td>Check recommendations against current docs/versions.</td></tr>
+    <tr><td>Security issues</td><td>Scan and review for injection, secrets, and authorization gaps.</td></tr>
+    <tr><td>License contamination</td><td>Review generated dependencies and snippets before use.</td></tr>
+    <tr><td>Overconfidence</td><td>Require evidence and reviews, not just a confident explanation.</td></tr>
+  </tbody>
+</table>
+
+<p>For AI systems and agents:</p>
+<table>
+  <thead><tr><th>Risk</th><th>Guardrail</th></tr></thead>
+  <tbody>
+    <tr><td>Hallucination</td><td>Grounding checks and source validation.</td></tr>
+    <tr><td>Prompt injection</td><td>Adversarial scenario tests.</td></tr>
+    <tr><td>Unsafe tool use</td><td>Permission boundaries and a dry-run mode.</td></tr>
+    <tr><td>Cost overruns</td><td>Budget caps and rate limits.</td></tr>
+    <tr><td>Drift</td><td>Eval regression suite plus monitoring.</td></tr>
+    <tr><td>Poor fallback behavior</td><td>Safe default and human escalation.</td></tr>
+    <tr><td>Nondeterminism</td><td>Statistical thresholds and scenario suites.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Review AI-generated tests as specifications.</strong> The question is not "does this test pass?" but "does this test express the behavior we actually want?"</p>
+
+<h2>12. Worked example — a feature tested from unit to production</h2>
 
 <pre>
 Feature: users can apply a discount code at checkout
@@ -270,7 +409,32 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
 
 <p>The point is not to build every possible test. The point is to place each question at the cheapest level that can answer it reliably.</p>
 
-<h2>11. The most common failure modes</h2>
+<h2>13. Tooling ecosystem — how the concepts land in practice</h2>
+
+<p>Tools change; the concepts above do not. Treat this as a map of categories, not a recommendation list:</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Examples</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unit testing</strong></td><td>Jest, Vitest, JUnit, pytest</td><td>Fast, isolated behavior checks</td></tr>
+    <tr><td><strong>Component testing</strong></td><td>Testing Library, Storybook</td><td>UI behavior and rendering</td></tr>
+    <tr><td><strong>E2E testing</strong></td><td>Playwright, Cypress</td><td>Critical user journeys</td></tr>
+    <tr><td><strong>API testing</strong></td><td>Postman, Supertest, REST-assured</td><td>Contract and behavior checks</td></tr>
+    <tr><td><strong>Contract testing</strong></td><td>Pact, OpenAPI validation</td><td>Provider/consumer compatibility</td></tr>
+    <tr><td><strong>Property-based testing</strong></td><td>fast-check, Hypothesis</td><td>Invariant-based input generation</td></tr>
+    <tr><td><strong>Mutation testing</strong></td><td>Stryker, mutmut</td><td>Suite effectiveness beyond coverage</td></tr>
+    <tr><td><strong>Accessibility</strong></td><td>axe, Lighthouse</td><td>Automated a11y checks (manual still required)</td></tr>
+    <tr><td><strong>Performance</strong></td><td>k6, JMeter, Lighthouse</td><td>Load and client performance</td></tr>
+    <tr><td><strong>Security</strong></td><td>OWASP ZAP, dependency scanners</td><td>Vulnerability detection</td></tr>
+    <tr><td><strong>Mocking / service virtualization</strong></td><td>MSW, WireMock</td><td>Boundary control (§4)</td></tr>
+    <tr><td><strong>Test data</strong></td><td>Factories, fixtures, Testcontainers</td><td>Deterministic data (§1e)</td></tr>
+    <tr><td><strong>Observability</strong></td><td>Sentry, Datadog, Grafana, OpenTelemetry</td><td>Production evidence (§9)</td></tr>
+  </tbody>
+</table>
+
+<p>Choose the smallest set that covers your strategy (§6), and change tools without changing the evidence model.</p>
+
+<h2>14. The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>Why it happens</th><th>Fix</th></tr></thead>
@@ -285,7 +449,7 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
   </tbody>
 </table>
 
-<h2>12. The complete mental checklist</h2>
+<h2>15. The complete mental checklist</h2>
 
 <p>If you remember only one image, remember this: <strong>a test is a question with an oracle; a suite is a strategy for producing evidence at the right speed and scope.</strong></p>
 
@@ -326,7 +490,7 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
 </section>
 
 <footer class="lesson-foot">
-  <span>Reference · Software Testing — How We Prove Software Works, Fails, and Stays Safe</span>
+  <span>Reference · Testing &amp; Debugging — How We Prove Software Works, Find Faults, and Stay Safe</span>
   <span>Upstream: <a href="./problem-solving.html">Problem-Solving</a> · Process: <a href="./software-development-process.html">Software Development Process</a> · Delivery: <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> · Umbrella: <a href="./cs-and-software-engineering.html">CS &amp; SE</a></span>
 </footer>
 

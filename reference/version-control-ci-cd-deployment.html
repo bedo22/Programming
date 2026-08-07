@@ -1,289 +1,1419 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Version Control, CI/CD &amp; Deployment — The Pipeline from Git to Live</title>
-<link rel="stylesheet" href="../assets/lesson.css">
-</head>
-<body>
-<main>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Version Control, CI/CD &amp; Deployment — The Pipeline from Git to Live
+    </title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header class="lesson-head">
+        <p class="kicker">
+          Reference · The delivery layer — getting code from a commit to users
+          running it
+        </p>
+        <h1>Version Control, CI/CD &amp; Deployment</h1>
+        <p class="meta">
+          What version control is (a team's shared, versioned history of
+          source), how Git works inside (the content-addressed DAG that explains
+          every command, branches, and the pull-request loop), and how teams
+          take a passing push all the way to production — Continuous Integration
+          (verify every change), Continuous Delivery, and the deployment
+          strategies (rolling, blue-green, canary, feature flags) that ship it
+          safely. Read this to understand the layer that sits between a commit
+          on your machine and live code running in front of users.
+        </p>
+      </header>
 
-<header class="lesson-head">
-  <p class="kicker">Reference · The delivery layer — getting code from a commit to users running it</p>
-  <h1>Version Control, CI/CD &amp; Deployment</h1>
-  <p class="meta">What version control is (a team's shared, versioned history of source), how Git works inside (the content-addressed DAG that explains every command, branches, and the pull-request loop), and how teams take a passing push all the way to production — Continuous Integration (verify every change), Continuous Delivery, and the deployment strategies (rolling, blue-green, canary, feature flags) that ship it safely. Read this to understand the layer that sits between a commit on your machine and live code running in front of users.</p>
-</header>
+      <blockquote class="callout">
+        <p>
+          <strong>Where this fits.</strong> This doc is the
+          <em>delivery layer</em> — the counterpart to
+          <a href="./software-development-process.html"
+            >Software Development Process</a
+          >
+          at the far end of the loop:
+        </p>
+        <ul>
+          <li>
+            <a href="./how-developers-think-frontend.html">The Rhythm</a> — the
+            <em>feature-scale loop</em>: how you build one feature (Model → View
+            → Flow).
+          </li>
+          <li>
+            <a href="./software-development-process.html">The Process</a> — the
+            <em>macro-process</em>: how a team navigates the SDLC (sprints,
+            backlogs, weeks-to-months).
+          </li>
+          <li>
+            <strong>This doc</strong> — the <em>delivery layer</em>: version
+            control, CI/CD, and deployment — how committed code reaches users,
+            continuously and safely.
+          </li>
+          <li>
+            <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the
+            <em>umbrella discipline</em> that contains them all.
+          </li>
+          <li>
+            Reference: <a href="./glossary.html">Glossary</a> — shared
+            vocabulary.
+          </li>
+        </ul>
+        <p>
+          The Rhythm produces commits; the Process structures them; this doc
+          ships them. Each answers a different "how".
+        </p>
+      </blockquote>
 
-<blockquote class="callout">
-  <p><strong>Where this fits.</strong> This doc is the <em>delivery layer</em> — the counterpart to <a href="./software-development-process.html">Software Development Process</a> at the far end of the loop:</p>
-  <ul>
-    <li><a href="./how-developers-think-frontend.html">The Rhythm</a> — the <em>feature-scale loop</em>: how you build one feature (Model → View → Flow).</li>
-    <li><a href="./software-development-process.html">The Process</a> — the <em>macro-process</em>: how a team navigates the SDLC (sprints, backlogs, weeks-to-months).</li>
-    <li><strong>This doc</strong> — the <em>delivery layer</em>: version control, CI/CD, and deployment — how committed code reaches users, continuously and safely.</li>
-    <li><a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the <em>umbrella discipline</em> that contains them all.</li>
-    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
-  </ul>
-  <p>The Rhythm produces commits; the Process structures them; this doc ships them. Each answers a different "how".</p>
-</blockquote>
+      <h2>0. How to use this doc</h2>
 
-<h2>0. How to use this doc</h2>
+      <p>
+        Reading order: standalone, but most useful <em>after</em> the
+        feature-scale rhythm (<a href="./how-developers-think-frontend.html"
+          >The Rhythm</a
+        >) and alongside the process doc (<a
+          href="./software-development-process.html"
+          >Software Development Process</a
+        >). Cross-links:
+      </p>
+      <ul>
+        <li>
+          Upstream:
+          <a href="./software-development-process.html"
+            >Software Development Process</a
+          >
+          — CI/CD automates its Testing → Deployment → Maintenance phases.
+        </li>
+        <li>
+          Umbrella:
+          <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the
+          discipline that contains both.
+        </li>
+        <li>
+          Neighbor: <a href="./system-design.html">System Design</a> —
+          deployment shapes systems; systems constrain deployment.
+        </li>
+        <li>
+          Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.
+        </li>
+      </ul>
+      <p>
+        <strong
+          >If you've ever wondered what a "branch," a "pull request," a
+          "pipeline," or a "rollback" actually is — and why teams do them — this
+          doc answers that.</strong
+        >
+        Read §1 (Definition) and §2 (the model) first; then §4–§6 for the
+        pipeline stages; then §9c for the future and §9d for the checklist.
+      </p>
 
-<p>Reading order: standalone, but most useful <em>after</em> the feature-scale rhythm (<a href="./how-developers-think-frontend.html">The Rhythm</a>) and alongside the process doc (<a href="./software-development-process.html">Software Development Process</a>). Cross-links:</p>
-<ul>
-  <li>Upstream: <a href="./software-development-process.html">Software Development Process</a> — CI/CD automates its Testing → Deployment → Maintenance phases.</li>
-  <li>Umbrella: <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — the discipline that contains both.</li>
-  <li>Neighbor: <a href="./system-design.html">System Design</a> — deployment shapes systems; systems constrain deployment.</li>
-  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
-</ul>
-<p><strong>If you've ever wondered what a "branch," a "pull request," a "pipeline," or a "rollback" actually is — and why teams do them — this doc answers that.</strong> Read §1 (Definition) and §2 (the model) first; then §4–§6 for the pipeline stages; then §9c for the future and §9d for the checklist.</p>
+      <h2>
+        1. Definition — what version control is and what it is <em>not</em>
+      </h2>
 
-<h2>1. Definition — what version control is and what it is <em>not</em></h2>
+      <p>
+        <strong>Version control</strong> is a system that tracks changes to
+        source over time, letting many developers work without overwriting each
+        other, and lets anyone recover any past state (<a
+          href="https://en.wikipedia.org/wiki/Version_control"
+          >Wikipedia</a
+        >). <strong>Git</strong> (2005, Linus Torvalds) is the dominant
+        distributed version-control system; teams commonly pair it with GitHub,
+        GitLab, or Bitbucket for hosting, review, and automation.
+      </p>
 
-<p><strong>Version control</strong> is a system that tracks changes to source over time, letting many developers work without overwriting each other, and lets anyone recover any past state (<a href="https://en.wikipedia.org/wiki/Version_control">Wikipedia</a>). <strong>Git</strong> (2005, Linus Torvalds) is the dominant distributed version-control system; teams commonly pair it with GitHub, GitLab, or Bitbucket for hosting, review, and automation.</p>
+      <p>
+        But version control alone is half the story. <strong>CI/CD</strong> is
+        shorthand for two continuous practices:
+      </p>
+      <ul>
+        <li>
+          <strong>Continuous Integration (CI)</strong> — every change integrated
+          into a shared mainline and <em>verified automatically</em> (build +
+          tests) and fast (<a
+            href="https://martinfowler.com/articles/continuousIntegration.html"
+            >Fowler</a
+          >).
+        </li>
+        <li>
+          <strong>Continuous Delivery</strong> — the team keeps the deliverable
+          production-ready and releases it manually or by flag;
+          <strong>continuous deployment</strong> releases without a human gate.
+          The two are often conflated; §4 keeps them apart.
+        </li>
+      </ul>
+      <p>
+        <strong>Deployment</strong> is putting a verified, versioned release
+        into a running environment — strategy in §5.
+      </p>
 
-<p>But version control alone is half the story. <strong>CI/CD</strong> is shorthand for two continuous practices:</p>
-<ul>
-  <li><strong>Continuous Integration (CI)</strong> — every change integrated into a shared mainline and <em>verified automatically</em> (build + tests) and fast (<a href="https://martinfowler.com/articles/continuousIntegration.html">Fowler</a>).</li>
-  <li><strong>Continuous Delivery</strong> — the team keeps the deliverable production-ready and releases it manually or by flag; <strong>continuous deployment</strong> releases without a human gate. The two are often conflated; §4 keeps them apart.</li>
-</ul>
-<p><strong>Deployment</strong> is putting a verified, versioned release into a running environment — strategy in §5.</p>
+      <h3>What this doc is NOT</h3>
+      <ul>
+        <li>
+          <strong>Not the process layer.</strong> This is not about
+          sprints/backlogs/Agile — that's
+          <a href="./software-development-process.html">The Process</a>. This
+          doc is the layer of automation that ships code.
+        </li>
+        <li>
+          <strong>Not a testing manual.</strong> The pipeline automates test
+          evidence;
+          <a href="./software-testing-and-debugging.html">Software Testing</a> explains test
+          levels, test strategy, doubles, and production verification.
+        </li>
+        <li>
+          <strong>Not a click-through manual.</strong> The goal is the model, so
+          every command and service makes sense — not a sequence of steps.
+        </li>
+        <li>
+          <strong>Not infrastructure operations or SRE.</strong> Monitoring and
+          deployment health appear where they affect safe delivery; deep
+          operations practice is a separate specialty.
+        </li>
+      </ul>
+      <h2>
+        1b. History — from file-locking to Git and the distributed pull request
+        (2005–present)
+      </h2>
 
-<h3>What this doc is NOT</h3>
-<ul>
-  <li><strong>Not the process layer.</strong> This is not about sprints/backlogs/Agile — that's <a href="./software-development-process.html">The Process</a>. This doc is the layer of automation that ships code.</li>
-  <li><strong>Not a testing manual.</strong> The pipeline automates test evidence; <a href="./software-testing.html">Software Testing</a> explains test levels, test strategy, doubles, and production verification.</li>
-  <li><strong>Not a click-through manual.</strong> The goal is the model, so every command and service makes sense — not a sequence of steps.</li>
-  <li><strong>Not infrastructure operations or SRE.</strong> Monitoring and deployment health appear where they affect safe delivery; deep operations practice is a separate specialty.</li>
-</ul>
-<h2>1b. History — from file-locking to Git and the distributed pull request (2005–present)</h2>
+      <p>
+        Version control has a clear lineage, each generation solving the
+        previous one's failure mode:
+      </p>
 
-<p>Version control has a clear lineage, each generation solving the previous one's failure mode:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>System / event</th>
+            <th>What it contributed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1970s–80s</strong></td>
+            <td>RCS (local, single-file)</td>
+            <td>
+              Revision control on files, local, per-file. Could only see one
+              file's deltas at a time — tiny scope.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>1986</strong></td>
+            <td>CVS</td>
+            <td>
+              One of the first widely used <em>central</em> concurrent-version
+              systems: many files, many developers, "check in/check out".
+              Introduced the idea of a shared server as the source of truth —
+              but merges were clumsy.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>2000</strong></td>
+            <td>SVN (Subversion)</td>
+            <td>
+              Fixed CVS's non-atomic commits and poor rename/reference handling.
+              For a decade, the default. Still centralized — the server is the
+              only store of truth.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>2005</strong></td>
+            <td><strong>Git</strong> (Linus Torvalds)</td>
+            <td>
+              Built for the Linux kernel to solve the failure of distributed
+              collaboration. <strong>Distributed</strong>: every clone is a
+              complete repository with full history, not a snapshot.
+              Content-addressed, DAG-based (see §2/§1e). No central server
+              required (<a
+                href="https://git-scm.com/book/en/v2/Getting-Started-A-Short-History-of-Git"
+                >Pro Git</a
+              >).
+            </td>
+          </tr>
+          <tr>
+            <td><strong>2008</strong></td>
+            <td>GitHub</td>
+            <td>
+              Gave Git a web UI, a social layer, and popularized the pull-request
+              workflow (PRs as reviewable, gated units of change). Made the
+              distributed tool collaborative for teams and normalized hosted
+              review plus automation workflows.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>2010s</strong></td>
+            <td>GitLab, Bitbucket, GitHub Actions</td>
+            <td>
+              Joined hosting with CI/CD — the "monorepo-to-release" pipeline
+              became one product.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-<table>
-  <thead><tr><th>Year</th><th>System / event</th><th>What it contributed</th></tr></thead>
-  <tbody>
-    <tr><td><strong>1970s–80s</strong></td><td>RCS (local, single-file)</td><td>Revision control on files, local, per-file. Could only see one file's deltas at a time — tiny scope.</td></tr>
-    <tr><td><strong>1986</strong></td><td>CVS</td><td>The first <em>central</em> concurrent-version system: many files, many developers, "check in/check out". Introduced the idea of a shared server as the source of truth — but merges were clumsy.</td></tr>
-    <tr><td><strong>2000</strong></td><td>SVN (Subversion)</td><td>Fixed CVS's non-atomic commits and poor rename/reference handling. For a decade, the default. Still centralized — the server is the only store of truth.</td></tr>
-    <tr><td><strong>2005</strong></td><td><strong>Git</strong> (Linus Torvalds)</td><td>Built for the Linux kernel to solve the failure of distributed collaboration. <strong>Distributed</strong>: every clone is a complete repository with full history, not a snapshot. Content-addressed, DAG-based (see §2/§1e). No central server required (<a href="https://git-scm.com/book/en/v2/Getting-Started-A-Short-History-of-Git">Pro Git</a>).</td></tr>
-    <tr><td><strong>2008</strong></td><td>GitHub</td><td>Gave Git a web UI, social layer, and the pull request. Made the distributed tool collaborative for teams and normalized hosted review plus automation workflows.</td></tr>
-    <tr><td><strong>2010s</strong></td><td>GitLab, Bitbucket, GitHub Actions</td><td>Joined hosting with CI/CD — the "monorepo-to-release" pipeline became one product.</td></tr>
-  </tbody>
-</table>
+      <p>
+        <strong>The recurring theme</strong> — the same frustration the Process
+        doc traces in methodology: each generation moves from
+        <em>locking edges / a single truth / manual merging</em> toward
+        <em>parallel, cheap, reversible, distributed</em>. Git + the PR loop is
+        where "collaboration without a human bottleneck" arrived.
+      </p>
 
-<p><strong>The recurring theme</strong> — the same frustration the Process doc traces in methodology: each generation moves from <em>locking edges / a single truth / manual merging</em> toward <em>parallel, cheap, reversible, distributed</em>. Git + the PR loop is where "collaboration without a human bottleneck" arrived.</p>
+      <h2>1c. Evolution — the constraint inversions</h2>
 
-<h2>1c. Evolution — the constraint inversions</h2>
+      <p>
+        Version control's evolution is a sequence of constraint inversions, one
+        per era:
+      </p>
+      <ul>
+        <li>
+          <strong>From "file-by-file" to "snapshot-of-the-whole-tree".</strong>
+          RCS tracked per-file; Git snapshots the entire tree each commit.
+          Change is atomic across the whole project, so a multi-file feature is
+          one recoverable unit.
+        </li>
+        <li>
+          <strong
+            >From <em>central authority</em> to
+            <em>every clone is the repository</em>.</strong
+          >
+          Centralized systems such as SVN depend operationally on a server-side
+          repository. Git gives every clone a complete local history, so
+          collaboration and recovery do not depend on one central copy being
+          continuously available.
+        </li>
+        <li>
+          <strong>From PATCHES (applied) to MERGES + PR.</strong> Not a single
+          "patch" but a request to integrate a branch: reviewable, divisible,
+          gated. The pull request refactored "change-joined-mainline" into a
+          social collaboration artifact.
+        </li>
+        <li>
+          <strong>From "build it somewhere else" to "pipeline as code."</strong>
+          Deploys moved from a human's runbook into a checked-in workflow file —
+          versioned like code, so the delivery definition is under control too
+          (the same versioning the source gets).
+        </li>
+      </ul>
 
-<p>Version control's evolution is a sequence of constraint inversions, one per era:</p>
-<ul>
-  <li><strong>From "file-by-file" to "snapshot-of-the-whole-tree".</strong> RCS tracked per-file; Git snapshots the entire tree each commit. Change is atomic across the whole project, so a multi-file feature is one recoverable unit.</li>
-  <li><strong>From <em>central authority</em> to <em>every clone is the repository</em>.</strong> Centralized systems such as SVN depend operationally on a server-side repository. Git gives every clone a complete local history, so collaboration and recovery do not depend on one central copy being continuously available.</li>
-  <li><strong>From PATCHES (applied) to MERGES + PR.</strong> Not a single "patch" but a request to integrate a branch: reviewable, divisible, gated. The pull request refactored "change-joined-mainline" into a social collaboration artifact.</li>
-  <li><strong>From "build it somewhere else" to "pipeline as code."</strong> Deploys moved from a human's runbook into a checked-in workflow file — versioned like code, so the delivery definition is under control too (the same versioning the source gets).</li>
-</ul>
+      <h2>
+        1d. Intersection with neighbors — the delivery layer at the border
+      </h2>
 
-<h2>1d. Intersection with neighbors — the delivery layer at the border</h2>
+      <p>
+        Version control &amp; CI/CD sit where several practice boundaries meet:
+      </p>
+      <ul>
+        <li>
+          <strong>Into The Process.</strong> CI/CD is the automated face of the
+          SDLC's Testing, Deployment, and Maintenance phases (<a
+            href="./software-development-process.html"
+            >Software Development Process</a
+          >). Kanban's "deploy small, often" is CI/CD at the delivery end.
+        </li>
+        <li>
+          <strong>Into CS &amp; SE</strong> (<a
+            href="./cs-and-software-engineering.html"
+            >CS &amp; SE</a
+          >) — the engineering discipline in ground (how changes get from "idea"
+          to verified artifact).
+        </li>
+        <li>
+          <strong>Into System Design</strong> (<a href="./system-design.html"
+            >System Design</a
+          >) — deployment strategies shape how you run services; real systems
+          (dashboards, stateless scaling) constrain what deployment can look
+          like. A stateless app is trivially rollable; a sharded stateful DB is
+          not.
+        </li>
+        <li>
+          <strong>Into APIs</strong> (<a href="./api-design.html">API Design</a
+          >) — Semantic Versioning applies directly to a public API; the
+          changelog that tags versions is a co-founder of API governance.
+        </li>
+        <li>
+          <strong>Shared vocabulary</strong> —
+          <a href="./glossary.html">Glossary</a> defines the common terms
+          (merge, branch, deploy, rollback).
+        </li>
+      </ul>
+      <h2>
+        1e. Underlying theory — content-addressing and the snapshot model (why
+        every Git command clicks)
+      </h2>
 
-<p>Version control &amp; CI/CD sit where several practice boundaries meet:</p>
-<ul>
-  <li><strong>Into The Process.</strong> CI/CD is the automated face of the SDLC's Testing, Deployment, and Maintenance phases (<a href="./software-development-process.html">Software Development Process</a>). Kanban's "deploy small, often" is CI/CD at the delivery end.</li>
-  <li><strong>Into CS &amp; SE</strong> (<a href="./cs-and-software-engineering.html">CS &amp; SE</a>) — the engineering discipline in ground (how changes get from "idea" to verified artifact).</li>
-  <li><strong>Into System Design</strong> (<a href="./system-design.html">System Design</a>) — deployment strategies shape how you run services; real systems (dashboards, stateless scaling) constrain what deployment can look like. A stateless app is trivially rollable; a sharded stateful DB is not.</li>
-  <li><strong>Into APIs</strong> (<a href="./api-design.html">API Design</a>) — Semantic Versioning applies directly to a public API; the changelog that tags versions is a co-founder of API governance.</li>
-  <li><strong>Shared vocabulary</strong> — <a href="./glossary.html">Glossary</a> defines the common terms (merge, branch, deploy, rollback).</li>
-</ul>
-<h2>1e. Underlying theory — content-addressing and the snapshot model (why every Git command clicks)</h2>
+      <p>
+        Git isn't a list of files with version numbers — it's a
+        <strong
+          >content-addressed, snapshot-based, directed acyclic graph
+          (DAG)</strong
+        >. Understand that, and every command decomposes into three primitives
+        (<a href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"
+          >Pro Git: Git Objects</a
+        >):
+      </p>
 
-<p>Git isn't a list of files with version numbers — it's a <strong>content-addressed, snapshot-based, directed acyclic graph (DAG)</strong>. Understand that, and every command decomposes into three primitives (<a href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects">Pro Git: Git Objects</a>):</p>
+      <ul>
+        <li>
+          <strong>Blob</strong> — a file's contents, stored once by a hash of
+          that content.
+        </li>
+        <li>
+          <strong>Tree</strong> — a sorted list of entries (blobs and sub-trees)
+          with names and modes; the entire directory structure at one point.
+        </li>
+        <li>
+            <strong>Commit</strong> — points at <em>one</em> tree, plus the parent
+            commit(s), author and committer, message/timestamp. Commits are the
+            DAG's nodes; each commit carries the full snapshot.
+        </li>
+      </ul>
 
-<ul>
-  <li><strong>Blob</strong> — a file's contents, stored once by a hash of that content.</li>
-  <li><strong>Tree</strong> — a sorted list of entries (blobs and sub-trees) with names and modes; the entire directory structure at one point.</li>
-  <li><strong>Commit</strong> — points at <em>one</em> tree, plus the parent commit(s), author/message/timestamp. Commits are the DAG's nodes; each commit carries the full snapshot.</li>
-</ul>
+      <p>The commands operate across four locations:</p>
 
-<p>The commands operate across four locations:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>What lives there</th>
+            <th>Commands that move it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Working tree</strong></td>
+            <td>The files you edit on disk.</td>
+            <td>
+              <code>checkout</code>, <code>switch</code>, <code>restore</code>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Index / staging area</strong></td>
+            <td>
+              The snapshot you are preparing for the next commit. This is why
+              <code>git add</code> and <code>git commit</code> are separate
+              steps.
+            </td>
+            <td><code>add</code>, <code>restore --staged</code></td>
+          </tr>
+          <tr>
+            <td><strong>Local repository</strong></td>
+            <td>
+              Committed objects and local refs: branches, tags, and
+              <code>HEAD</code> — the pointer to your current branch or commit.
+            </td>
+            <td>
+              <code>commit</code>, <code>merge</code>, <code>rebase</code>,
+              <code>reset</code>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Remote repository</strong></td>
+            <td>
+              The shared repository plus your local remote-tracking refs, such
+              as <code>origin/main</code>.
+            </td>
+            <td><code>fetch</code>, <code>push</code>, <code>pull</code></td>
+          </tr>
+        </tbody>
+      </table>
 
-<table>
-  <thead><tr><th>Location</th><th>What lives there</th><th>Commands that move it</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Working tree</strong></td><td>The files you edit on disk.</td><td><code>checkout</code>, <code>switch</code>, <code>restore</code></td></tr>
-    <tr><td><strong>Index / staging area</strong></td><td>The snapshot you are preparing for the next commit. This is why <code>git add</code> and <code>git commit</code> are separate steps.</td><td><code>add</code>, <code>restore --staged</code></td></tr>
-    <tr><td><strong>Local repository</strong></td><td>Committed objects and local refs: branches, tags, and <code>HEAD</code> — the pointer to your current branch or commit.</td><td><code>commit</code>, <code>merge</code>, <code>rebase</code>, <code>reset</code></td></tr>
-    <tr><td><strong>Remote repository</strong></td><td>The shared repository plus your local remote-tracking refs, such as <code>origin/main</code>.</td><td><code>fetch</code>, <code>push</code>, <code>pull</code></td></tr>
-  </tbody>
-</table>
+      <p>Two consequences that explain Git's "weird" behavior:</p>
+      <ol>
+        <li>
+          <strong
+            >Git objects are content-addressed and normally immutable.</strong
+          >
+          Identical content hashes to the same blob, so storing many snapshots
+          costs little. Commits and other objects are not edited after creation,
+          but refs, the index, and the working tree do move, and unreachable
+          objects can eventually be garbage-collected.
+        </li>
+        <li>
+          <strong>Branches are just names pointing at commits.</strong> A branch
+          is a <em>movable pointer</em>, not a container. Moving HEAD
+          (<code>checkout</code>, <code>switch</code>), adding a node
+          (<code>commit</code>), and moving the branch pointer
+          (<code>merge</code>) are all just "point the names at nodes".
+          <code>rebase</code> goes further: it replays commits as
+          <em>new</em> commit objects onto a new base, then moves the branch
+          pointer. That's why branches are nearly free and merging is a graph
+          problem, not a file-copy problem.
+        </li>
+      </ol>
 
-<p>Two consequences that explain Git's "weird" behavior:</p>
-<ol>
-  <li><strong>Git objects are content-addressed and normally immutable.</strong> Identical content hashes to the same blob, so storing many snapshots costs little. Commits and other objects are not edited after creation, but refs, the index, and the working tree do move, and unreachable objects can eventually be garbage-collected.</li>
-  <li><strong>Branches are just names pointing at commits.</strong> A branch is a <em>movable pointer</em>, not a container. Moving HEAD (<code>checkout</code>, <code>switch</code>), adding a node (<code>commit</code>), and moving the branch pointer (<code>merge</code>) are all just "point the names at nodes". <code>rebase</code> goes further: it replays commits as <em>new</em> commit objects onto a new base, then moves the branch pointer. That's why branches are nearly free and merging is a graph problem, not a file-copy problem.</li>
-</ol>
+      <p>
+        <strong>Why this matters beyond "knowing Git":</strong> the DAG snapshot
+        model is the <em>same</em> shape as the pipeline: immutable artifacts
+        connected by provenance. Every release you ship is a commit's content
+        that was verified; every artifact the CI builds is a tree snapshot.
+        Understand the graph, and CI/CD reads as "walk the verified chain of
+        commits to production."
+      </p>
 
-<p><strong>Why this matters beyond "knowing Git":</strong> the DAG snapshot model is the <em>same</em> shape as the pipeline: immutable artifacts connected by provenance. Every release you ship is a commit's content that was verified; every artifact the CI builds is a tree snapshot. Understand the graph, and CI/CD reads as "walk the verified chain of commits to production."</p>
+      <h2>
+        1f. Mental models — how senior engineers actually reason about delivery
+      </h2>
 
-<h2>1f. Mental models — how senior engineers actually reason about delivery</h2>
+      <p>
+        Experts don't memorize git commands; they carry mental models that make
+        the command set follow:
+      </p>
 
-<p>Experts don't memorize git commands; they carry mental models that make the command set follow:</p>
+      <ul>
+        <li>
+          <strong
+            >"Branches are cheap pointers; the cheap thing is to branch, the
+            expensive thing is to not merge."</strong
+          >
+          Branch often, keep them short-lived, merge/mainline frequently.
+          Long-lived un-merged branches are where the pain lives.
+        </li>
+        <li>
+          <strong>"Everything is append-only; recoverable."</strong> Commits are
+          never lost (barring GC). <code>git reflog</code> recovers a "lost"
+          commit; <code>git reset</code>/<code>rebase</code> rewrite pointers,
+          not history. Safety is a mental given, so trying things is free.
+        </li>
+        <li>
+          <strong>"Deploy is not the same as release."</strong> Code can be
+          <em>deployed</em> (present in an environment) but
+          <em>not released</em> (not exposed to users) — feature flags,
+          canaries. Separating the two is the senior move that makes "ship
+          small, often" safe.
+        </li>
+        <li>
+          <strong>"CI is a gate, not a report."</strong> Green on every push is
+          the guarantee that main is always releasable. When CI turns red, it
+          <em>blocks</em> — because "main is broken" is the highest-priority
+          bug; everything else stops until green returns.
+        </li>
+      </ul>
+      <h2>2. Branching strategies — how teams share the DAG</h2>
 
-<ul>
-  <li><strong>"Branches are cheap pointers; the cheap thing is to branch, the expensive thing is to not merge."</strong> Branch often, keep them short-lived, merge/mainline frequently. Long-lived un-merged branches are where the pain lives.</li>
-  <li><strong>"Everything is append-only; recoverable."</strong> Commits are never lost (barring GC). <code>git reflog</code> recovers a "lost" commit; <code>git reset</code>/<code>rebase</code> rewrite pointers, not history. Safety is a mental given, so trying things is free.</li>
-  <li><strong>"Deploy is not the same as release."</strong> Code can be <em>deployed</em> (present in an environment) but <em>not released</em> (not exposed to users) — feature flags, canaries. Separating the two is the senior move that makes "ship small, often" safe.</li>
-  <li><strong>"CI is a gate, not a report."</strong> Green on every push is the guarantee that main is always releasable. When CI turns red, it <em>blocks</em> — because "main is broken" is the highest-priority bug; everything else stops until green returns.</li>
-</ul>
-<h2>2. Branching strategies — how teams share the DAG</h2>
+      <p>
+        Branches are how <em>many</em> people safely work on <em>one</em> shared
+        history. A strategy is a policy for "who is allowed to protect them, how
+        often they merge, and how they're integrated." The two dominant
+        approaches (<a href="https://trunkbaseddevelopment.com"
+          >trunkbaseddevelopment.com</a
+        >):
+      </p>
 
-<p>Branches are how <em>many</em> people safely work on <em>one</em> shared history. A strategy is a policy for "who is allowed to protect them, how often they merge, and how they're integrated." The two dominant approaches (<a href="https://trunkbaseddevelopment.com">trunkbaseddevelopment.com</a>):</p>
+      <h3>Trunk-based development (the CI-friendly default)</h3>
+      <ul>
+        <li>
+          All work happens on short-lived
+          <strong>feature branches</strong> branching off <code>main</code> and
+          merging back <em>within a day or two</em> (short branches, frequent
+          integration).
+        </li>
+        <li>
+          Main is always releasable; CI verifies every merge. This is the model
+          CI <em>wants</em> — small, frequent, integrated.
+        </li>
+        <li>
+          GitHub Flow is trunk-based with a PR as the merge vehicle: branch →
+          commit → PR → review → merge → deploy.
+        </li>
+      </ul>
 
-<h3>Trunk-based development (the CI-friendly default)</h3>
-<ul>
-  <li>All work happens on short-lived <strong>feature branches</strong> branching off <code>main</code> and merging back <em>within a day or two</em> (short branches, frequent integration).</li>
-  <li>Main is always releasable; CI verifies every merge. This is the model CI <em>wants</em> — small, frequent, integrated.</li>
-  <li>GitHub Flow is trunk-based with a PR as the merge vehicle: branch → commit → PR → review → merge → deploy.</li>
-</ul>
+      <h3>GitFlow (more ceremony — for release trains)</h3>
+      <ul>
+        <li>
+          Adds <code>develop</code> (integration), <code>release/*</code>,
+          <code>hotfix/*</code> branches. Better for scheduled versioned
+          releases with long-lived support; heavier, and generally overkill for
+          teams deploying daily.
+        </li>
+      </ul>
 
-<h3>GitFlow (more ceremony — for release trains)</h3>
-<ul>
-  <li>Adds <code>develop</code> (integration), <code>release/*</code>, <code>hotfix/*</code> branches. Better for scheduled versioned releases with long-lived support; heavier, and generally overkill for teams deploying daily.</li>
-</ul>
+      <p>
+        <strong>How to choose:</strong> can you deploy <code>main</code> to prod
+        at any moment? Then GitHub Flow/trunk-based. Do you publish tagged
+        versions to paying customers with a strict cadence? Then a release
+        branch adds structure. When in doubt, start trunk-based — the ceremony
+        emerges when a release actually needs it (§9b "over-engineering").
+      </p>
 
-<p><strong>How to choose:</strong> can you deploy <code>main</code> to prod at any moment? Then GitHub Flow/trunk-based. Do you publish tagged versions to paying customers with a strict cadence? Then a release branch adds structure. When in doubt, start trunk-based — the ceremony emerges when a release actually needs it (§9b "over-engineering").</p>
+      <h3>The pull request as the unit of change (with CI + review)</h3>
+      <p>
+        GitHub-style workflows treat a <strong>pull request</strong> as the
+        reviewable, gated unit: branch → commit a slice → push → open a PR → CI
+        runs checks → peers review → merge (or at a green gate). The PR is where
+        the Process doc's "verify before you integrate" physically lives — the
+        enforced discipline of committing small, reviewable, and gated
+        <em>live</em> by branch protection that won't merge a busted main.
+      </p>
 
-<h3>The pull request as the unit of change (with CI + review)</h3>
-<p>GitHub-style workflows treat a <strong>pull request</strong> as the reviewable, gated unit: branch → commit a slice → push → open a PR → CI runs checks → peers review → merge (or at a green gate). The PR is where the Process doc's "verify before you integrate" physically lives — the enforced discipline of committing small, reviewable, and gated <em>live</em> by branch protection that won't merge a busted main.</p>
+      <h2>
+        2b. The collaboration loop — push/pull, merge, and the pull request
+      </h2>
 
-<h2>2b. The collaboration loop — push/pull, merge, and the pull request</h2>
+      <p>The daily rhythm of a contributor who uses the model above:</p>
+      <ol>
+        <li>
+          <strong>Branch</strong> off a green <code>main</code>:
+          <code>git checkout -b feat/login-ui</code>.
+        </li>
+        <li>
+          <strong>Work, committing small slices</strong>: each commit is a
+          recoverable snapshot.
+        </li>
+        <li>
+          <strong>Push</strong> your branch to the remote (<code
+            >git push -u origin feat/...</code
+          >) — the branch now exists for everyone; CI builds it.
+        </li>
+        <li>
+          <strong>Open a PR</strong> (or merge request) describing what changed
+          and why; the review + CI gate it.
+        </li>
+        <li><strong>Merge</strong> to main when green and reviewed.</li>
+        <li>
+          <strong>Pull</strong> others' changes regularly —
+          <code>git pull</code> fetches remote changes and then integrates them,
+          usually by merge but sometimes by rebase depending on flags or
+          configuration. Resolve the occasional
+          <strong>merge conflict</strong> — which is Git asking <em>you</em> to
+          arbitrate two legitimate edits to the same line, not a failure.
+        </li>
+      </ol>
 
-<p>The daily rhythm of a contributor who uses the model above:</p>
-<ol>
-  <li><strong>Branch</strong> off a green <code>main</code>: <code>git checkout -b feat/login-ui</code>.</li>
-  <li><strong>Work, committing small slices</strong>: each commit is a recoverable snapshot.</li>
-  <li><strong>Push</strong> your branch to the remote (<code>git push -u origin feat/...</code>) — the branch now exists for everyone; CI builds it.</li>
-  <li><strong>Open a PR</strong> (or merge request) describing what changed and why; the review + CI gate it.</li>
-  <li><strong>Merge</strong> to main when green and reviewed.</li>
-  <li><strong>Pull</strong> others' changes regularly — <code>git pull</code> fetches remote changes and then integrates them, usually by merge but sometimes by rebase depending on flags or configuration. Resolve the occasional <strong>merge conflict</strong> — which is Git asking <em>you</em> to arbitrate two legitimate edits to the same line, not a failure.</li>
-</ol>
+      <p>
+        <strong>Merge vs rebase (one mental lever each):</strong>
+        <code>merge</code> fuses lines of history and preserves both;
+        <code>rebase</code> replays your commits as new commits onto a new base
+        for a linear history. Teams favor one; don't mix both. Never force-push
+        a shared branch casually; if a coordinated rewrite is unavoidable, use
+        protected branches and <code>--force-with-lease</code>.
+      </p>
 
-<p><strong>Merge vs rebase (one mental lever each):</strong> <code>merge</code> fuses lines of history and preserves both; <code>rebase</code> replays your commits as new commits onto a new base for a linear history. Teams favor one; don't mix both. Never force-push a shared branch casually; if a coordinated rewrite is unavoidable, use protected branches and <code>--force-with-lease</code>.</p>
-<h2>3. Continuous Integration — what a pipeline actually runs, and why it's a gate</h2>
+      <h3>Resolving a merge conflict (in brief)</h3>
+      <p>
+        A conflict is not an error — it is Git asking a human to arbitrate two
+        legitimate edits to the same line. Resolve deliberately:
+      </p>
+      <ol>
+        <li>Understand both sides: the <em>current</em> change vs the
+        <em>incoming</em> change.</li>
+        <li>Decide the intended final behavior, then edit the conflicted
+        file.</li>
+        <li>Remove the conflict markers (<code>&lt;&lt;&lt;&lt;&lt;</code>,
+        <code>======</code>, <code>&gt;&gt;&gt;&gt;&gt;</code>).</li>
+        <li>Stage the resolved file and complete the merge/rebase.</li>
+        <li>Run the tests and let CI verify the result before proceeding.</li>
+      </ol>
 
-<p>CI is the practice of integrating every change into the shared mainline and verifying it <em>automatically and fast</em>, so errors surface minutes after they're written, not weeks later at release (<a href="https://martinfowler.com/articles/continuousIntegration.html">Fowler</a>). Concretely, CI:</p>
+      <h3>Pick one merge strategy per repository</h3>
+      <p>
+        A repo should choose its integration style deliberately; mixed styles
+        make history, <code>blame</code>, and <code>bisect</code> harder to
+        trust:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Strategy</th>
+            <th>What it produces</th>
+            <th>Good for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Merge commit</strong></td>
+            <td>Preserves the full branch history</td>
+            <td>Feature context, auditability</td>
+          </tr>
+          <tr>
+            <td><strong>Squash merge</strong></td>
+            <td>One clean commit per PR</td>
+            <td>Simple <code>main</code> history, tidy revert</td>
+          </tr>
+          <tr>
+            <td><strong>Rebase merge</strong></td>
+            <td>Linear history with individual commits</td>
+            <td>Bisectable history; requires discipline</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The wrong choice is not a specific strategy — it is <em>no strategy</em>.
+        Set it once (often squash on <code>main</code>, merge commit for feature
+        branches) and keep it consistent.
+      </p>
 
-<ol>
-  <li><strong>Trigger</strong> — runs on push / on the PR, not on a button.</li>
-  <li><strong>Checkout &amp; install</strong> — get clean source; install pinned dependencies in a clean env (proving "doesn't work only on my machine" false).</li>
-  <li><strong>Verify</strong> — lint, type checks, tests, compile/bundle, and security checks appropriate to the change. <a href="./software-testing.html">Software Testing</a> explains test levels and strategy; the pipeline's job is to run them quickly and consistently.</li>
-  <li><strong>Gate</strong> — a failed required check blocks the PR/merge (branch protection: cannot be overridden casually). Main stays usable.</li>
-  <li><strong>Artifact</strong> — when the pipeline's job includes packaging, CI or a later build stage produces a versioned build artifact (bundle/image) that deployment consumes. Some CI runs only validate source and do not package; the principle is the same — verified output must be traceable to source.</li>
-</ol>
+      <h3>What makes a PR reviewable</h3>
+      <p>A PR is a unit of intent, evidence, and risk — not just code transfer:</p>
+      <ul>
+        <li><strong>Small</strong> — large PRs are hard to review and revert.</li>
+        <li><strong>Clear title and "why"</strong> — context matters more than the
+        diff.</li>
+        <li><strong>Tests included</strong> — evidence accompanies the change.</li>
+        <li><strong>Migrations / flags noted</strong> — data and release-exposure
+        risks are visible, not buried.</li>
+        <li><strong>Visual evidence</strong> — a preview URL or screenshot for UI
+        changes.</li>
+        <li><strong>CI green</strong> — the gate should pass before review begins.</li>
+      </ul>
 
-<p><strong>Why the gate is the point, not the report:</strong> a CI that only reports is decoration. A CI that <em>blocks</em> makes "main is verified" enforceable rather than aspirational. Green is not proof that production is safe — it only means the configured checks passed. Migrations, environment differences, dependency drift, and operations still need the release and observability controls below. Tools (per §9): GitHub Actions, GitLab CI, Jenkins, CircleCI — all "workflow/pipeline as a file in the repo."</p>
+      <h3>Branch protection (what to lock down)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Require status checks / CI</td>
+            <td>Prevent a broken merge.</td>
+          </tr>
+          <tr>
+            <td>Require up-to-date branch</td>
+            <td>Merge is tested against current <code>main</code>.</td>
+          </tr>
+          <tr>
+            <td>Require a review</td>
+            <td>No unreviewed change lands.</td>
+          </tr>
+          <tr>
+            <td>Dismiss stale reviews</td>
+            <td>New commits need fresh approval.</td>
+          </tr>
+          <tr>
+            <td>Restrict force-push / deletion</td>
+            <td>Preserve shared history from accident.</td>
+          </tr>
+          <tr>
+            <td>Require signed commits <em>(optional)</em></td>
+            <td>Stronger provenance (§3 supply chain).</td>
+          </tr>
+        </tbody>
+      </table>
 
-<h3>Pipeline security and supply-chain integrity</h3>
-<p>A modern pipeline verifies more than application behavior. The build itself is part of the software supply chain, so it should also check and protect:</p>
-<ul>
-  <li><strong>Lockfiles and pinned dependencies</strong> — keep dependency resolution reproducible instead of silently changing between builds.</li>
-  <li><strong>Dependency vulnerability scanning</strong> — detect known vulnerable packages before promotion.</li>
-  <li><strong>Secret scanning</strong> — stop credentials before they enter history or artifacts; rotate anything that leaks.</li>
-  <li><strong>SBOMs</strong> — record the exact dependency inventory that produced an artifact.</li>
-  <li><strong>Artifact signing and provenance</strong> — prove "this artifact came from this source, built by this trusted workflow" (<a href="https://slsa.dev">SLSA</a>).</li>
-  <li><strong>Protected build environments</strong> — run untrusted code and secrets with least privilege; do not let a PR inherit production credentials casually.</li>
-</ul>
+      <h3>Monorepos and local reproducibility</h3>
+      <p>
+        <strong>Monorepos</strong> hold many packages/services in one repository:
+        they make cross-package changes atomic, but demand smarter CI — affected-only
+        testing, caching, and explicit ownership rules.
+        <strong>Local reproducibility</strong> shrinks the "works on my machine"
+        gap: setup scripts, lockfiles, devcontainers, or documented environment
+        variables keep local and CI environments close.
+      </p>
 
-<h2>4. Continuous Delivery &amp; Continuous Deployment — get the distinction right</h2>
+      <h2>2c. Debugging across time — bisect, blame, and recover</h2>
 
-<p>The "CD" umbrella hides two genuinely different promises (<a href="https://martinfowler.com/bliki/ContinuousDelivery.html">Fowler</a>, <a href="https://continuousdelivery.com">continuousdelivery.com</a>):</p>
+      <p>
+        Version control is not just where code is stored; it is a searchable
+        history. When a symptom appears and pre-production tests (<a
+          href="./software-testing-and-debugging.html"
+          >Testing &amp; Debugging §10</a
+        >) cannot tell you which change caused it, the snapshot model (§1e)
+        turns the search into a timeline. The thinking loop underneath is
+        <a href="./problem-solving.html">Problem-Solving §9</a> (observe,
+        hypothesize, predict, test, conclude); these are Git's timeline tools
+        that make the search efficient:
+      </p>
 
-<table>
-  <thead><tr><th></th><th>Continuous Delivery (CD for short)</th><th>Continuous Deployment</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Definition</strong></td><td>Keep every change in a <em>production-ready</em> state; releasing is a deliberate, low-cost extra step.</td><td>Every merge that passes the pipeline goes <em>automatically</em> to production. No human gate.</td></tr>
-    <tr><td><strong>The release decision</strong></td><td>A human presses "deploy" (or a flag flips) — business can batch, schedule, or pair with a change</td><td>Automatic by default — every passing push is live.</td></tr>
-    <tr><td><strong>When to choose</strong></td><td>Almost always the right default — you get control <em>and</em> frequency.</td><td>When deploys are tiny, reversible, and fully warmed by flags/canaries (§6) so automation is safe.</td></tr>
-    <tr><td><strong>Joke to remember</strong></td><td>You <em>could</em> deploy at any time.</td><td>You <em>do</em> deploy every time it passes.</td></tr>
-  </tbody>
-</table>
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>What it answers</th>
+            <th>The mental model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>git bisect</code></td>
+            <td>"Which commit introduced this bug?"</td>
+            <td>
+              Binary-search debugging (§10 of Testing &amp; Debugging) over
+              history: mark a known-good commit and a known-bad one, and Git
+              checks out the midpoint; you say good or bad; it halves the range
+              each step until the culprit commit is isolated — O(log n) commits
+              tested instead of every one.
+            </td>
+          </tr>
+          <tr>
+            <td><code>git blame</code></td>
+            <td>"Who changed this line, and in what commit, and why?"</td>
+            <td>
+              Annotates each line with the commit that introduced it — jump from
+              a suspicious line to the change, the author, and the message
+              describing the intent.
+            </td>
+          </tr>
+          <tr>
+            <td>Revert / rollback</td>
+            <td>"How do I get healthy again quickly?"</td>
+            <td>
+              <code>git revert</code> records a new commit undoing a bad one
+              (history stays intact, safe on shared branches).
+              <code>git reset</code> moves a branch pointer back (rewrites
+              history — only for unshared/unpushed work). Deployment rollback is
+              the live-environment counterpart (§5).
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-<p>Both share a hard precondition: the pipeline must be so reliable and the rollback so cheap that "every passing change to live" (or "any change to live in minutes") is safe. Without §6's strategies and §8's rollback, neither can be honest.</p>
-<h2>5. Deployment strategies — the "ship it safely" toolbox</h2>
+      <p>
+        <strong>The handoff in one line:</strong> Testing &amp; Debugging finds
+        <em>that</em> a behavior is wrong and hunts the fault in present state;
+        this doc's <code>bisect</code>/<code>blame</code>/<code>revert</code>
+        find <em>when</em> a wrong change arrived and (recover) undo it. Same
+        bigger loop — this doc owns the timeline, Testing &amp; Debugging owns
+        the evidence, Problem-Solving owns the thinking.
+      </p>
 
-<p>Deployment is not one button; it's a set of strategies trading <em>risk/frequency/rollback</em>. Typical modern constellation (frontend) <a href="https://vercel.com">Vercel</a>/<a href="https://netlify.com">Netlify</a>: a preview deploy per PR (see below), then a production deploy on merge. The classic strategies (<a href="https://martinfowler.com/bliki/BlueGreenDeployment.html">Fowler: blue-green</a>):</p>
+      <h2>
+        3. Continuous Integration — what a pipeline actually runs, and why it's
+        a gate
+      </h2>
 
-<table>
-  <thead><tr><th>Strategy</th><th>What it does</th><th>When it shines</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Rolling update</strong></td><td>Replace the old version with the new one incrementally across instances (many small waves).</td><td>Simple, always-on; you have a working old version at every instant.</td></tr>
-    <tr><td><strong>Blue-green</strong></td><td>Run two identical environments; deploy to the idle (green), then flip the router to it; the old (blue) becomes the rapid rollback target.</td><td>Near-zero downtime and quick traffic reversal — useful when you can afford duplicate environments and your data/schema changes remain compatible.</td></tr>
-    <tr><td><strong>Canary</strong></td><td>Send a small percentage of real traffic to the new version; watch; if fine, ramp to 100%.</td><td>When you want <em>real-world</em> validation on live users before committing all.</td></tr>
-    <tr><td><strong>Feature flags</strong></td><td>Ship code dark (deployed, not enabled); toggle visibility for an audience instead of deploying newer builds.</td><td>Separating "deploy" from "release" — reduce exposure by flag. A flag does not undo data writes, schema changes, external side effects, or incompatible code paths.</td></tr>
-  </tbody>
-</table>
+      <p>
+        CI is the practice of integrating every change into the shared mainline
+        and verifying it <em>automatically and fast</em>, so errors surface
+        minutes after they're written, not weeks later at release (<a
+          href="https://martinfowler.com/articles/continuousIntegration.html"
+          >Fowler</a
+        >). Concretely, CI:
+      </p>
 
-<p><strong>Deploy ≠ release.</strong> Deployed code can be invisible (flag off), and a release can be gradual (canary). This mental split lets teams ship small (deploy) while controlling user exposure (release later / partially). That's exactly §1f's senior model, now mechanized.</p>
+      <ol>
+        <li>
+          <strong>Trigger</strong> — runs on push / on the PR, not on a button.
+        </li>
+        <li>
+          <strong>Checkout &amp; install</strong> — get clean source; install
+          pinned dependencies in a clean env (proving "doesn't work only on my
+          machine" false).
+        </li>
+        <li>
+          <strong>Verify</strong> — lint, type checks, tests, compile/bundle,
+          and security checks appropriate to the change.
+          <a href="./software-testing-and-debugging.html">Software Testing</a> explains test
+          levels and strategy; the pipeline's job is to run them quickly and
+          consistently.
+        </li>
+        <li>
+          <strong>Gate</strong> — a failed required check blocks the PR/merge
+          (branch protection: cannot be overridden casually). Main stays usable.
+        </li>
+        <li>
+          <strong>Artifact</strong> — when the pipeline's job includes
+          packaging, CI or a later build stage produces a versioned build
+          artifact (bundle/image) that deployment consumes. Some CI runs only
+          validate source and do not package; the principle is the same —
+          verified output must be traceable to source.
+        </li>
+      </ol>
 
-<h3>Deployment targets and environment promotion</h3>
-<p>The same pipeline idea changes shape by target:</p>
-<table>
-  <thead><tr><th>Target</th><th>Typical artifact</th><th>Typical deployment shape</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Static / frontend</strong></td><td>Versioned static bundle</td><td>Preview URL per PR; production on merge; instant content rollback.</td></tr>
-    <tr><td><strong>Server application</strong></td><td>Versioned package or VM image</td><td>Rolling or blue-green replacement across instances; health checks gate promotion.</td></tr>
-    <tr><td><strong>Container</strong></td><td>Signed container image</td><td>Image built once, promoted across environments; orchestration handles rollout.</td></tr>
-    <tr><td><strong>Kubernetes / orchestrated service</strong></td><td>Container image + declarative manifests</td><td>Rolling updates, readiness/liveness checks, canary via service mesh or ingress.</td></tr>
-    <tr><td><strong>Infrastructure</strong></td><td>Terraform/OpenTofu plan or policy bundle</td><td>Plan reviewed in CI; applied through environment promotion with state protection.</td></tr>
-  </tbody>
-</table>
-<p>The common pattern is <strong>build once, promote many</strong>: development → staging → production uses the same artifact and configuration inputs, not a rebuild that might silently differ.</p>
+      <p>
+        <strong>Why the gate is the point, not the report:</strong> a CI that
+        only reports is decoration. A CI that <em>blocks</em> makes "main is
+        verified" enforceable rather than aspirational. Green is not proof that
+        production is safe — it only means the configured checks passed.
+        Migrations, environment differences, dependency drift, and operations
+        still need the release and observability controls below. Tools (per §9):
+        GitHub Actions, GitLab CI, Jenkins, CircleCI — all "workflow/pipeline as
+        a file in the repo."
+      </p>
 
-<h3>Observability and deployment verification</h3>
-<p>Deployment is not finished when the command exits. It is finished when production evidence says the new version is healthy:</p>
-<ul>
-  <li><strong>Health checks</strong> — readiness and liveness tell the platform whether an instance should receive traffic.</li>
-  <li><strong>Smoke checks</strong> — a small set of critical requests proves the deployment is alive and serving the expected version.</li>
-  <li><strong>Metrics</strong> — error rate, latency, saturation, and business indicators reveal behavior tests did not cover.</li>
-  <li><strong>Logs and traces</strong> — explain <em>why</em> a failure happened across service boundaries.</li>
-  <li><strong>Alerts and SLOs</strong> — define when a degradation is urgent and how much error the service can afford (<a href="https://sre.google/sre-book/service-level-objectives/">Google SRE</a>).</li>
-  <li><strong>Canary analysis</strong> — compare the canary's real-traffic metrics against the stable version before increasing exposure.</li>
-</ul>
+      <h3>Keeping CI fast and trustworthy</h3>
+      <p>
+        A slow pipeline changes team behavior: developers batch changes, skip
+        checks, or merge late. Speed is a safety property. Levers that preserve
+        trust while cutting feedback time:
+      </p>
+      <ul>
+        <li>
+          <strong>Dependency caching</strong> — reuse restored packages instead
+          of re-downloading on every run.
+        </li>
+        <li>
+          <strong>Test splitting and parallelism</strong> — shard a large suite
+          across runners.
+        </li>
+        <li>
+          <strong>Fail fast</strong> — run cheap checks (lint, type, format)
+          before expensive ones so red arrives in seconds.
+        </li>
+        <li>
+          <strong>Quarantine flaky tests</strong> — a flaky test trains the team
+          to ignore red; isolate it and fix it rather than rerunning blindly
+          (<a href="./software-testing-and-debugging.html"
+            >Testing &amp; Debugging §14</a
+          >).
+        </li>
+        <li>
+          <strong>Build the artifact once</strong> — a single verified build
+          promoted across stages, never rebuilt per environment (§5).
+        </li>
+        <li>
+          <strong>Separate required from optional checks</strong> — protect
+          <code>main</code> with the short, essential set; run slow, deep checks
+          on a schedule or in parallel without blocking every merge.
+        </li>
+      </ul>
 
-<h3>Database changes, migrations, and rollback limits</h3>
-<p>Application rollback is easy only while the database contract remains compatible. If a new version changes schema or writes data the old version cannot read, "roll back the app" may be unsafe. Mature delivery uses:</p>
-<ul>
-  <li><strong>Backward-compatible migrations</strong> — make the schema work for both old and new versions during rollout.</li>
-  <li><strong>Expand-and-contract</strong> — add the new shape, deploy code that can use both, migrate data, then remove the old shape after compatibility is no longer needed.</li>
-  <li><strong>Separate data and schema risk</strong> — a flag can hide a feature, but it cannot un-write corrupted data.</li>
-  <li><strong>Roll-forward</strong> — sometimes the safer recovery is a small forward fix, not a return to an incompatible previous artifact.</li>
-  <li><strong>Rollback drills</strong> — prove the recovery path before the incident; untested rollback is a hope, not a plan.</li>
-</ul>
+      <h3>Pipeline security and supply-chain integrity</h3>
+      <p>
+        A modern pipeline verifies more than application behavior. The build
+        itself is part of the software supply chain, so it should also check and
+        protect:
+      </p>
+      <ul>
+        <li>
+          <strong>Lockfiles and pinned dependencies</strong> — keep dependency
+          resolution reproducible instead of silently changing between builds.
+        </li>
+        <li>
+          <strong>Dependency vulnerability scanning</strong> — detect known
+          vulnerable packages before promotion.
+        </li>
+        <li>
+          <strong>Secret scanning</strong> — stop credentials before they enter
+          history or artifacts; rotate anything that leaks.
+        </li>
+        <li>
+          <strong>SBOMs</strong> — record the exact dependency inventory that
+          produced an artifact.
+        </li>
+        <li>
+          <strong>Artifact signing and provenance</strong> — prove "this
+          artifact came from this source, built by this trusted workflow" (<a
+            href="https://slsa.dev"
+            >SLSA</a
+          >).
+        </li>
+        <li>
+          <strong>Protected build environments</strong> — run untrusted code and
+          secrets with least privilege; do not let a PR inherit production
+          credentials casually.
+        </li>
+      </ul>
 
-<h2>5b. SemVer and releases — naming the snapshots you ship</h2>
+      <h2>
+        4. Continuous Delivery &amp; Continuous Deployment — get the distinction
+        right
+      </h2>
 
-<p>Commits are for developers; <strong>versions</strong> are the language for users and consumers. The near-universal scheme is <strong>Semantic Versioning (SemVer 2.0.0)</strong>, <a href="https://semver.org/spec/v2.0.0.html">semver.org</a>): <code>MAJOR.MINOR.PATCH</code>:</p>
-<ul>
-  <li><strong>MAJOR</strong> — breaking changes (public API/behavior that breaks consumers).</li>
-  <li><strong>MINOR</strong> — additive, backward-compatible features.</li>
-  <li><strong>PATCH</strong> — backward-compatible bug fixes.</li>
-</ul>
-<p>Plus pre-release labels: <code>1.0.0-alpha</code>, <code>2.3.0-rc.1</code>. Precedence: <code>1.0.0-alpha &lt; 1.0.0-beta &lt; 1.0.0</code> (pre-releases sort below their release).</p>
-<p><strong>Why SemVer in this doc:</strong> your pipeline reads the version — bump on release, <code>git tag</code> the commit, build artifact named <code>v2.1.0</code>, reference the exact artifact for deploy/rollback. Version control + CI + releases all speak = <code>MAJOR.MINOR.PATCH</code>, the one string that ties a commit to a live artifact (cf. §1d, API Design).</p>
+      <p>
+        The "CD" umbrella hides two genuinely different promises (<a
+          href="https://martinfowler.com/bliki/ContinuousDelivery.html"
+          >Fowler</a
+        >, <a href="https://continuousdelivery.com">continuousdelivery.com</a>):
+      </p>
 
-<h3>Release governance — deciding what users get, and when</h3>
-<p>A deploy makes code present; a release makes it meaningful to users. Governance makes that decision explicit:</p>
-<ul>
-  <li><strong>Release notes and changelogs</strong> — explain user-visible changes, migrations, and known risks.</li>
-  <li><strong>Approvals and ownership</strong> — define who can promote to production and under what evidence.</li>
-  <li><strong>Release trains</strong> — batch changes on a predictable cadence when coordination or customer communication matters.</li>
-  <li><strong>Artifact retention</strong> — keep enough verified artifacts to roll back or audit what ran.</li>
-  <li><strong>Environment promotion</strong> — advance the same artifact through development, staging, and production with environment-specific configuration.</li>
-</ul>
-<h2>6. A concrete walkthrough — one push taken through every stage</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Continuous Delivery (CD for short)</th>
+            <th>Continuous Deployment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Definition</strong></td>
+            <td>
+              Keep every change in a <em>production-ready</em> state; releasing
+              is a deliberate, low-cost extra step.
+            </td>
+            <td>
+              Every merge that passes the pipeline goes
+              <em>automatically</em> to production. No human gate.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>The release decision</strong></td>
+            <td>
+              A human presses "deploy" (or a flag flips) — business can batch,
+              schedule, or pair with a change
+            </td>
+            <td>Automatic by default — every passing push is live.</td>
+          </tr>
+          <tr>
+            <td><strong>When to choose</strong></td>
+            <td>
+              Almost always the right default — you get control
+              <em>and</em> frequency.
+            </td>
+            <td>
+              When deploys are tiny, reversible, and fully warmed by
+              flags/canaries (§6) so automation is safe.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Joke to remember</strong></td>
+            <td>You <em>could</em> deploy at any time.</td>
+            <td>You <em>do</em> deploy every time it passes.</td>
+          </tr>
+        </tbody>
+      </table>
 
-<p>Everything so far, as a single flow from "a dev hits save" to "real users run it."</p>
+      <p>
+        Both share a hard precondition: the pipeline must be so reliable and the
+        rollback so cheap that "every passing change to live" (or "any change to
+        live in minutes") is safe. Without §6's strategies and §8's rollback,
+        neither can be honest.
+      </p>
+      <h2>5. Deployment strategies — the "ship it safely" toolbox</h2>
 
-<pre>
+      <p>
+        Deployment is not one button; it's a set of strategies trading
+        <em>risk/frequency/rollback</em>. Typical modern constellation
+        (frontend) <a href="https://vercel.com">Vercel</a>/<a
+          href="https://netlify.com"
+          >Netlify</a
+        >: a preview deploy per PR (see below), then a production deploy on
+        merge. The classic strategies (<a
+          href="https://martinfowler.com/bliki/BlueGreenDeployment.html"
+          >Fowler: blue-green</a
+        >):
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Strategy</th>
+            <th>What it does</th>
+            <th>When it shines</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Rolling update</strong></td>
+            <td>
+              Replace the old version with the new one incrementally across
+              instances (many small waves).
+            </td>
+            <td>
+              Simple, always-on; you have a working old version at every
+              instant.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Blue-green</strong></td>
+            <td>
+              Run two identical environments; deploy to the idle (green), then
+              flip the router to it; the old (blue) becomes the rapid rollback
+              target.
+            </td>
+            <td>
+              Near-zero downtime and quick traffic reversal — useful when you
+              can afford duplicate environments and your data/schema changes
+              remain compatible.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Canary</strong></td>
+            <td>
+              Send a small percentage of real traffic to the new version; watch;
+              if fine, ramp to 100%.
+            </td>
+            <td>
+              When you want <em>real-world</em> validation on live users before
+              committing all.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Feature flags</strong></td>
+            <td>
+              Ship code dark (deployed, not enabled); toggle visibility for an
+              audience instead of deploying newer builds.
+            </td>
+            <td>
+              Separating "deploy" from "release" — reduce exposure by flag. A
+              flag does not undo data writes, schema changes, external side
+              effects, or incompatible code paths.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <strong>Deploy ≠ release.</strong> Deployed code can be invisible (flag
+        off), and a release can be gradual (canary). This mental split lets
+        teams ship small (deploy) while controlling user exposure (release later
+        / partially). That's exactly §1f's senior model, now mechanized.
+      </p>
+
+      <h3>Feature flag lifecycle — flags are not free</h3>
+      <p>
+        Flags separate deploy from release, but every active flag adds
+        conditional complexity. A flag should move through a deliberate
+        lifecycle:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Question it answers</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Create</strong></td>
+            <td>Why does this flag exist, and who owns it?</td>
+          </tr>
+          <tr>
+            <td><strong>Enable</strong></td>
+            <td>Which users or environments see the feature first?</td>
+          </tr>
+          <tr>
+            <td><strong>Monitor</strong></td>
+            <td>What metrics prove it is safe before wider rollout?</td>
+          </tr>
+          <tr>
+            <td><strong>Expand</strong></td>
+            <td>What criteria justify moving to more / all users?</td>
+          </tr>
+          <tr>
+            <td><strong>Cleanup</strong></td>
+            <td>
+              When is the flag removed? Old flags become dead code and security
+              surface.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Kill switch</strong></td>
+            <td>Can exposure be disabled instantly if something is wrong?</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Treat flag removal as part of the delivery process — a flag with no
+        cleanup date is debt accruing interest.
+      </p>
+
+      <h3>Frontend static deployments</h3>
+      <p>
+        Static/frontend has its own caching shape (unlike server or container
+        targets, the artifact is a set of files served by a CDN):
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Concern</th>
+            <th>Good practice</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>HTML entry</strong></td>
+            <td>
+              Do not cache aggressively — HTML should point at the current
+              assets.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>JS/CSS assets</strong></td>
+            <td>Use content hashes in filenames; cache these forever.</td>
+          </tr>
+          <tr>
+            <td><strong>CDN</strong></td>
+            <td>Invalidate or version assets correctly; an old build must not
+            linger.</td>
+          </tr>
+          <tr>
+            <td><strong>Preview deploys</strong></td>
+            <td>One URL per PR so review is "browse the preview."</td>
+          </tr>
+          <tr>
+            <td><strong>Rollback</strong></td>
+            <td>Redeploy the previous immutable bundle; verify caching too.</td>
+          </tr>
+          <tr>
+            <td><strong>Feature flags</strong></td>
+            <td>Control runtime behavior without redeploying (§5).</td>
+          </tr>
+          <tr>
+            <td><strong>Client secrets</strong></td>
+            <td>Never ship secrets or tokens in the bundle.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        For frontend, "rollback" often means redeploying a prior immutable
+        bundle — but browser and CDN caching still need verifying, or an old
+        cached client can keep talking to code that changed underneath it.
+      </p>
+
+      <h3>Deployment targets and environment promotion</h3>
+      <p>The same pipeline idea changes shape by target:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Target</th>
+            <th>Typical artifact</th>
+            <th>Typical deployment shape</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Static / frontend</strong></td>
+            <td>Versioned static bundle</td>
+            <td>
+              Preview URL per PR; production on merge; instant content rollback.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Server application</strong></td>
+            <td>Versioned package or VM image</td>
+            <td>
+              Rolling or blue-green replacement across instances; health checks
+              gate promotion.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Container</strong></td>
+            <td>Signed container image</td>
+            <td>
+              Image built once, promoted across environments; orchestration
+              handles rollout.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Kubernetes / orchestrated service</strong></td>
+            <td>Container image + declarative manifests</td>
+            <td>
+              Rolling updates, readiness/liveness checks, canary via service
+              mesh or ingress.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Infrastructure</strong></td>
+            <td>Terraform/OpenTofu plan or policy bundle</td>
+            <td>
+              Plan reviewed in CI; applied through environment promotion with
+              state protection.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Mobile / app store</strong></td>
+            <td>Versioned store build</td>
+            <td>
+              Store review and staged rollout; external approval and
+              forced-update constraints.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        App stores change the risk model: release approval is external, rollback
+        is slower, and users may run old versions long after a new build ships —
+        compatibility windows widen accordingly.
+      </p>
+      <p>
+        The common pattern is <strong>build once, promote many</strong>:
+        development → staging → production uses the same artifact and
+        configuration inputs, not a rebuild that might silently differ.
+      </p>
+
+      <h3>Artifact registries and immutability</h3>
+      <p>
+        Artifacts live in a registry, not just on a build machine: e.g. npm /
+        GitHub Packages (JS), Docker Hub / GHCR / ECR (containers), PyPI /
+        Artifactory (Python), Nexus / GitHub Releases (generic binaries).
+        Two practices keep promotion and rollback trustworthy:
+      </p>
+      <ul>
+        <li>
+          <strong>Immutable by version</strong> — if <code>v2.1.0</code> can be
+          overwritten after release, rollback and audit become unreliable.
+        </li>
+        <li>
+          <strong>Deploy by digest</strong> (containers) — reference the image by
+          SHA, not just a mutable tag, so the artifact you ship is exactly the one
+          you built and signed (§3).
+        </li>
+      </ul>
+
+      <h3>Secrets and configuration</h3>
+      <ul>
+        <li>
+          <strong>Secrets storage</strong> — use a secret manager/vault, never the
+          repo (<a href="./software-testing-and-debugging.html"
+            >Testing &amp; Debugging §1e</a
+          >), and rotate anything that leaks.
+        </li>
+        <li>
+          <strong>Short-lived credentials</strong> — prefer OIDC/openID federation
+          over long-lived tokens stored in CI.
+        </li>
+        <li>
+          <strong>Environment separation</strong> — dev/staging/prod secrets stay
+          separate; preview deploys must not inherit production credentials.
+        </li>
+        <li>
+          <strong>Config vs code</strong> — keep environment-specific config out
+          of the artifact; configuration drift between staging and prod makes
+          staging evidence weaker.
+        </li>
+      </ul>
+
+      <h3>Observability and deployment verification</h3>
+      <p>
+        Deployment is not finished when the command exits. It is finished when
+        production evidence says the new version is healthy:
+      </p>
+      <ul>
+        <li>
+          <strong>Health checks</strong> — readiness and liveness tell the
+          platform whether an instance should receive traffic.
+        </li>
+        <li>
+          <strong>Smoke checks</strong> — a small set of critical requests
+          proves the deployment is alive and serving the expected version.
+        </li>
+        <li>
+          <strong>Metrics</strong> — error rate, latency, saturation, and
+          business indicators reveal behavior tests did not cover.
+        </li>
+        <li>
+          <strong>Logs and traces</strong> — explain <em>why</em> a failure
+          happened across service boundaries.
+        </li>
+        <li>
+          <strong>Alerts and SLOs</strong> — define when a degradation is urgent
+          and how much error the service can afford (<a
+            href="https://sre.google/sre-book/service-level-objectives/"
+            >Google SRE</a
+          >).
+        </li>
+        <li>
+          <strong>Canary analysis</strong> — compare the canary's real-traffic
+          metrics against the stable version before increasing exposure.
+        </li>
+      </ul>
+
+      <h3>Database changes, migrations, and rollback limits</h3>
+      <p>
+        Application rollback is easy only while the database contract remains
+        compatible. If a new version changes schema or writes data the old
+        version cannot read, "roll back the app" may be unsafe. Mature delivery
+        uses:
+      </p>
+      <ul>
+        <li>
+          <strong>Backward-compatible migrations</strong> — make the schema work
+          for both old and new versions during rollout.
+        </li>
+        <li>
+          <strong>Expand-and-contract</strong> — add the new shape, deploy code
+          that can use both, migrate data, then remove the old shape after
+          compatibility is no longer needed.
+        </li>
+        <li>
+          <strong>Separate data and schema risk</strong> — a flag can hide a
+          feature, but it cannot un-write corrupted data.
+        </li>
+        <li>
+          <strong>Roll-forward</strong> — sometimes the safer recovery is a
+          small forward fix, not a return to an incompatible previous artifact.
+        </li>
+        <li>
+          <strong>Rollback drills</strong> — prove the recovery path before the
+          incident; untested rollback is a hope, not a plan.
+        </li>
+      </ul>
+
+      <h2>5b. SemVer and releases — naming the snapshots you ship</h2>
+
+      <p>
+        Commits are for developers; <strong>versions</strong> are the language
+        for users and consumers. The near-universal scheme is
+        <strong>Semantic Versioning (SemVer 2.0.0)</strong>,
+        <a href="https://semver.org/spec/v2.0.0.html">semver.org</a>):
+        <code>MAJOR.MINOR.PATCH</code>:
+      </p>
+      <ul>
+        <li>
+          <strong>MAJOR</strong> — breaking changes (public API/behavior that
+          breaks consumers).
+        </li>
+        <li>
+          <strong>MINOR</strong> — additive, backward-compatible features.
+        </li>
+        <li><strong>PATCH</strong> — backward-compatible bug fixes.</li>
+      </ul>
+      <p>
+        Plus pre-release labels: <code>1.0.0-alpha</code>,
+        <code>2.3.0-rc.1</code>. Precedence:
+        <code>1.0.0-alpha &lt; 1.0.0-beta &lt; 1.0.0</code> (pre-releases sort
+        below their release).
+      </p>
+      <p>
+        <strong>Conventional Commits</strong> (<code>feat</code>, <code>fix</code>,
+        <code>chore</code>, <code>docs</code>, <code>ci</code>, and
+        <code>feat!</code>/<code>BREAKING CHANGE</code>) connect daily commit
+        messages to SemVer: <code>fix</code> → PATCH, <code>feat</code> → MINOR,
+        breaking → MAJOR. Combined with automation (e.g. semantic-release,
+        release-please, changesets), these messages can generate changelogs, bump
+        versions, and create release tags without hand-editing.
+      </p>
+      <p>
+        <strong>Release channels</strong> let users opt into risk:
+        <code>alpha</code> (internal) → <code>beta</code> (early users) → release
+        candidate (near-final validation) → <code>stable</code> (general
+        availability) → LTS (long-term support). Not required for every web
+        product, but they matter for libraries, platforms, and downloadable
+        software.
+      </p>
+      <p>
+        <strong>Why SemVer in this doc:</strong> your pipeline reads the version
+        — bump on release, <code>git tag</code> the commit, build artifact named
+        <code>v2.1.0</code>, reference the exact artifact for deploy/rollback.
+        Version control + CI + releases all speak =
+        <code>MAJOR.MINOR.PATCH</code>, the one string that ties a commit to a
+        live artifact (cf. §1d, API Design).
+      </p>
+
+      <h3>Release governance — deciding what users get, and when</h3>
+      <p>
+        A deploy makes code present; a release makes it meaningful to users.
+        Governance makes that decision explicit:
+      </p>
+      <ul>
+        <li>
+          <strong>Release notes and changelogs</strong> — explain user-visible
+          changes, migrations, and known risks.
+        </li>
+        <li>
+          <strong>Approvals and ownership</strong> — define who can promote to
+          production and under what evidence.
+        </li>
+        <li>
+          <strong>Release trains</strong> — batch changes on a predictable
+          cadence when coordination or customer communication matters.
+        </li>
+        <li>
+          <strong>Artifact retention</strong> — keep enough verified artifacts
+          to roll back or audit what ran.
+        </li>
+        <li>
+          <strong>Environment promotion</strong> — advance the same artifact
+          through development, staging, and production with environment-specific
+          configuration.
+        </li>
+      </ul>
+      <h2>6. A concrete walkthrough — one push taken through every stage</h2>
+
+      <p>
+        Everything so far, as a single flow from "a dev hits save" to "real
+        users run it."
+      </p>
+
+      <pre>
 dev:  git add . && git commit -m "add dark mode"
       git push -u origin feature/dark-mode
       # opens a Pull Request
@@ -299,144 +1429,584 @@ CD example (continuous delivery):
 Users: run the new version. If a defect slips through:
   recovery = rollback only if data/schema are compatible; otherwise roll forward
   reduce exposure with a flag where the failure is feature-level and reversible
-</pre>
+</pre
+      >
 
-<p>Every box is something earlier sections defined: the DAG (section 1e) produced traceable commits; branches + PR (section 2/2b) structured the change; CI (section 3) verified and secured it; SemVer (section 5b) named the artifact; section 5's strategy shipped it; observability confirmed health; recovery chose rollback or roll-forward based on data compatibility. The whole pipeline is "walk the verified chain of commits to production."</p>
+      <p>
+        Every box is something earlier sections defined: the DAG (section 1e)
+        produced traceable commits; branches + PR (section 2/2b) structured the
+        change; CI (section 3) verified and secured it; SemVer (section 5b)
+        named the artifact; section 5's strategy shipped it; observability
+        confirmed health; recovery chose rollback or roll-forward based on data
+        compatibility. The whole pipeline is "walk the verified chain of commits
+        to production."
+      </p>
 
-<h2>7. The ecosystem — platforms and how they differ</h2>
+      <h2>7. The ecosystem — platforms and how they differ</h2>
 
-<p>Where CI/CD actually runs (each cited to the primary source):</p>
-<table>
-  <thead><tr><th>Tool</th><th>Role / shape</th></tr></thead>
-  <tbody>
-    <tr><td><a href="https://docs.github.com/actions">GitHub Actions</a></td><td>CI/CD as <em>workflow files</em> versioned in the repo (.github/workflows/*.yml); event-triggered (push/PR); the modern default.</td></tr>
-    <tr><td>GitLab CI</td><td>Hosted CI in the GitLab repo — similar "pipeline as file" model; merged CI/CD + review apps.</td></tr>
-    <tr><td><a href="https://www.jenkins.io">Jenkins</a></td><td>One of the oldest self-hosted CI/CD servers (history since 2004 as Hudson; renamed Jenkins in 2011), pipeline-as-code (Jenkinsfile); the "server" model — powerful and heavy.</td></tr>
-    <tr><td><a href="https://vercel.com">Vercel</a> / <a href="https://netlify.com">Netlify</a></td><td>Frontend deploy platforms: git-connected auto preview deploys per PR + production deploys on merge; rapid rollback from the dashboard. The preview-per-PR is the modern frontend workflow.</td></tr>
-    <tr><td><a href="https://www.docker.com">Docker</a> / <a href="https://kubernetes.io">Kubernetes</a></td><td>Container packaging and orchestrated deployment: images built once, promoted across environments, rolled out with health checks and rollout controls.</td></tr>
-    <tr><td><a href="https://www.terraform.io">Terraform</a> / <a href="https://opentofu.org">OpenTofu</a></td><td>Infrastructure as code: infrastructure changes reviewed and promoted like application changes, with plans and protected state.</td></tr>
-    <tr><td><a href="https://slsa.dev">SLSA</a></td><td>Supply-chain integrity framework: provenance, trusted builds, and artifact-to-source verification.</td></tr>
-    <tr><td><a href="https://semver.org/spec/v2.0.0.html">SemVer</a></td><td>Version naming contract — the "language" versions/releases speak.</td></tr>
-    <tr><td>GitHub / GitLab / Bitbucket</td><td>Hosting the repo, PRs, issues, and increasingly CI/CD together — the collaboration hub (section 1b).</td></tr>
-  </tbody>
-</table>
-<p><strong>Decision logic</strong> — use the hosting you already have: code on GitHub means GitHub Actions is the frictionless start; for frontend-only work, a git-connected platform (Vercel/Netlify) gives preview + deploy + rollback with the least config; for server/container work, Actions/GitLab/Jenkins. Don't run a third pipeline engine alongside the repo — fewer places wins.</p>
+      <p>Where CI/CD actually runs (each cited to the primary source):</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Role / shape</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="https://docs.github.com/actions">GitHub Actions</a>
+            </td>
+            <td>
+              CI/CD as <em>workflow files</em> versioned in the repo
+              (.github/workflows/*.yml); event-triggered (push/PR); the modern
+              default.
+            </td>
+          </tr>
+          <tr>
+            <td>GitLab CI</td>
+            <td>
+              Hosted CI in the GitLab repo — similar "pipeline as file" model;
+              merged CI/CD + review apps.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://www.jenkins.io">Jenkins</a></td>
+            <td>
+              One of the oldest self-hosted CI/CD servers (history since 2004 as
+              Hudson; renamed Jenkins in 2011), pipeline-as-code (Jenkinsfile);
+              the "server" model — powerful and heavy.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://vercel.com">Vercel</a> /
+              <a href="https://netlify.com">Netlify</a>
+            </td>
+            <td>
+              Frontend deploy platforms: git-connected auto preview deploys per
+              PR + production deploys on merge; rapid rollback from the
+              dashboard. The preview-per-PR is the modern frontend workflow.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://www.docker.com">Docker</a> /
+              <a href="https://kubernetes.io">Kubernetes</a>
+            </td>
+            <td>
+              Container packaging and orchestrated deployment: images built
+              once, promoted across environments, rolled out with health checks
+              and rollout controls.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://www.terraform.io">Terraform</a> /
+              <a href="https://opentofu.org">OpenTofu</a>
+            </td>
+            <td>
+              Infrastructure as code: infrastructure changes reviewed and
+              promoted like application changes, with plans and protected state.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://slsa.dev">SLSA</a></td>
+            <td>
+              Supply-chain integrity framework: provenance, trusted builds, and
+              artifact-to-source verification.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://semver.org/spec/v2.0.0.html">SemVer</a></td>
+            <td>
+              Version naming contract — the "language" versions/releases speak.
+            </td>
+          </tr>
+          <tr>
+            <td>GitHub / GitLab / Bitbucket</td>
+            <td>
+              Hosting the repo, PRs, issues, and increasingly CI/CD together —
+              the collaboration hub (section 1b).
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Decision logic</strong> — use the hosting you already have: code
+        on GitHub means GitHub Actions is the frictionless start; for
+        frontend-only work, a git-connected platform (Vercel/Netlify) gives
+        preview + deploy + rollback with the least config; for server/container
+        work, Actions/GitLab/Jenkins. Don't run a third pipeline engine
+        alongside the repo — fewer places wins.
+      </p>
 
-<h2>8. Principles — the shared constants</h2>
+      <h2>8. Principles — the shared constants</h2>
 
-<p>The invariants that survive tool churn (each underlined in a section above):</p>
-<table>
-  <thead><tr><th>Principle</th><th>Where you saw it</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Everything is versioned</strong></td><td>Code, the pipeline definition (workflow files), and the release config live in the repo (section 1b/6); a deploy without a versioned artifact is not reproducible or auditable.</td></tr>
-    <tr><td><strong>Main is always releasable</strong></td><td>Section 2/3 — the CI gate protects main; a broken main stops the team, so it's the highest-priority bug.</td></tr>
-    <tr><td><strong>Verify before you integrate, integrate before you ship</strong></td><td>Section 3 CI gates a merge; section 4 CD keeps it releasable. No unverified promotion.</td></tr>
-    <tr><td><strong>Deploy is not release</strong></td><td>Section 5 — flags/canaries keep them separable; risk and frequency stay independent.</td></tr>
-    <tr><td><strong>Small, frequent, reversible</strong></td><td>Section 2 trunk-based; section 5 strategies; section 6 rollback — every step backs out cleanly.</td></tr>
-    <tr><td><strong>Never rewrite shared history</strong></td><td>Section 2b — no force-push on shared branches; shared history is append-only.</td></tr>
-  </tbody>
-</table>
-<h2>9. Worked example — the HackerRank repo, shipped</h2>
+      <p>
+        The invariants that survive tool churn (each underlined in a section
+        above):
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Principle</th>
+            <th>Where you saw it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Everything is versioned</strong></td>
+            <td>
+              Code, the pipeline definition (workflow files), and the release
+              config live in the repo (section 1b/6); a deploy without a
+              versioned artifact is not reproducible or auditable.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Main is always releasable</strong></td>
+            <td>
+              Section 2/3 — the CI gate protects main; a broken main stops the
+              team, so it's the highest-priority bug.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong
+                >Verify before you integrate, integrate before you ship</strong
+              >
+            </td>
+            <td>
+              Section 3 CI gates a merge; section 4 CD keeps it releasable. No
+              unverified promotion.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Deploy is not release</strong></td>
+            <td>
+              Section 5 — flags/canaries keep them separable; risk and frequency
+              stay independent.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Small, frequent, reversible</strong></td>
+            <td>
+              Section 2 trunk-based; section 5 strategies; section 6 rollback —
+              every step backs out cleanly.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Never rewrite shared history</strong></td>
+            <td>
+              Section 2b — no force-push on shared branches; shared history is
+              append-only.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-<p>Make it concrete with a real project: your solutions repo (built during Problem-Solving practice). Goals: nothing ever lost, tests run on every push, and a clean versioned release per completed challenge.</p>
+      <h3>Delivery metrics — measuring the pipeline's health</h3>
+      <p>
+        Delivery health is measured by behavior, not effort. The four DORA
+        metrics anchor it:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>What it tells you</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Deployment frequency</strong></td>
+            <td>How often you ship.</td>
+          </tr>
+          <tr>
+            <td><strong>Lead time for changes</strong></td>
+            <td>Commit-to-production time.</td>
+          </tr>
+          <tr>
+            <td><strong>Change failure rate</strong></td>
+            <td>How often a deployed change causes failure.</td>
+          </tr>
+          <tr>
+            <td><strong>Mean time to recovery</strong></td>
+            <td>How fast you recover from a failed deployment.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Pipeline health supplements these: CI duration (is feedback fast enough
+        for every push?), flaky-test rate (can the gate be trusted?), and
+        rollback/failed-deploy rate (is the automation reliable?). A team that
+        deploys often but fails often is not fast — it is risky.
+      </p>
+      <p>
+        <em>Don't use velocity or story points here.</em> Delivery metrics
+        measure the pipeline, not individual developer effort — the Process doc
+        owns team cadence.
+      </p>
+      <h2>9. Worked example — the HackerRank repo, shipped</h2>
 
-<p><strong>Setup (one-time):</strong></p>
-<ol>
-  <li><code>git init</code> a repo, add <code>challenges/&lt;name&gt;/solution.ext</code>, commit, push to GitHub (or GitLab).</li>
-  <li>Add a CI workflow (<code>.github/workflows/ci.yml</code>): on push and pull_request to main → run your test runner (e.g. <code>npm test</code> / pytest), plus dependency and secret scanning if available.</li>
-  <li>Enable branch protection on main: require CI checks and a review before merge.</li>
-</ol>
+      <p>
+        Make it concrete with a real project: your solutions repo (built during
+        Problem-Solving practice). Goals: nothing ever lost, tests run on every
+        push, and a clean versioned release per completed challenge.
+      </p>
 
-<p><strong>The rhythm (every challenge):</strong></p>
-<ol>
-  <li><code>git checkout -b challenge/heap-median</code> — branch off a green main.</li>
-  <li>Solve it (Problem-Solving rhythm), commit small slices, push. CI lints/tests each push — red means fix before proceeding.</li>
-  <li>Open a PR; a reviewer checks it (Big-O, trade-offs, test evidence). CI gates merge.</li>
-  <li>Merge to main — protected, CI green, so main stays verified by the configured checks.</li>
-  <li>Tag milestones if the repo needs named checkpoints: <code>git tag v1.3.0</code>. Define the repo's own tagging convention; SemVer is only required when the repository has a public API or compatibility contract.</li>
-</ol>
+      <p><strong>Setup (one-time):</strong></p>
+      <ol>
+        <li>
+          <code>git init</code> a repo, add
+          <code>challenges/&lt;name&gt;/solution.ext</code>, commit, push to
+          GitHub (or GitLab).
+        </li>
+        <li>
+          Add a CI workflow (<code>.github/workflows/ci.yml</code>): on push and
+          pull_request to main → run your test runner (e.g.
+          <code>npm test</code> / pytest), plus dependency and secret scanning
+          if available.
+        </li>
+        <li>
+          Enable branch protection on main: require CI checks and a review
+          before merge.
+        </li>
+      </ol>
 
-<p><strong>What this buys you:</strong> every solution recoverable (git history + reflog); nothing breaks silently (CI); a versioned, reviewable record of growth (tags + PRs); and if you later deploy it as a site, you push to Vercel and every merge ships a preview URL first. All the theory above, used daily.</p>
+      <p><strong>The rhythm (every challenge):</strong></p>
+      <ol>
+        <li>
+          <code>git checkout -b challenge/heap-median</code> — branch off a
+          green main.
+        </li>
+        <li>
+          Solve it (Problem-Solving rhythm), commit small slices, push. CI
+          lints/tests each push — red means fix before proceeding.
+        </li>
+        <li>
+          Open a PR; a reviewer checks it (Big-O, trade-offs, test evidence). CI
+          gates merge.
+        </li>
+        <li>
+          Merge to main — protected, CI green, so main stays verified by the
+          configured checks.
+        </li>
+        <li>
+          Tag milestones if the repo needs named checkpoints:
+          <code>git tag v1.3.0</code>. Define the repo's own tagging convention;
+          SemVer is only required when the repository has a public API or
+          compatibility contract.
+        </li>
+      </ol>
 
-<h2>9b. The most common failure modes</h2>
+      <p>
+        <strong>What this buys you:</strong> every solution recoverable (git
+        history + reflog); nothing breaks silently (CI); a versioned, reviewable
+        record of growth (tags + PRs); and if you later deploy it as a site, you
+        push to Vercel and every merge ships a preview URL first. All the theory
+        above, used daily.
+      </p>
 
-<table>
-  <thead><tr><th>Failure</th><th>Why it happens</th><th>Fix</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Long-lived integration branches</strong></td><td>Branches that never merge to main → huge late merges, conflicts, big unreviewable releases.</td><td>Trunk-based; integrate small and often (CI wants frequency).</td></tr>
-    <tr><td><strong>Broken builds ignored</strong></td><td>CI fails but the team moves on → "green main" dies; a month of change ships as one broken release.</td><td>Make CI blocking (branch protection); fix a red build immediately.</td></tr>
-    <tr><td><strong>Force-push to shared branches</strong></td><td>Rebase + <code>git push --force</code> rewrites history others pulled; work "disappears".</td><td>Force-push only private/unpushed branches; protect main; recover via the reflog.</td></tr>
-    <tr><td><strong>Releases as a manual big-bang</strong></td><td>No CD, no strategy → release day is an outage window; each release is a risk event.</td><td>Automate build→staging; use blue-green/canary so releases are routine.</td></tr>
-    <tr><td><strong>No recovery plan</strong></td><td>The team can ship but can't safely undo or move forward → a bad deploy stays bad while they scramble.</td><td>Every deploy has a tested recovery route: compatible rollback, roll-forward, or exposure control. Check migrations and side effects.</td></tr>
-    <tr><td><strong>Secrets in the repo</strong></td><td>API keys/tokens committed and pushed.</td><td>.gitignore + environment secrets/vault; if leaked, rotate and scrub history.</td></tr>
-    <tr><td><strong>Confusing deploy with release</strong></td><td>A risky feature goes to everyone by default.</td><td>Separate them via feature flags; expose to a small slice first.</td></tr>
-    <tr><td><strong>Over-engineered branch model</strong></td><td>A 2-person project running full GitFlow ceremony for zero payoff.</td><td>Start with GitHub Flow; add structure only when a release needs it.</td></tr>
-  </tbody>
-</table>
-<h2>9c. The future — where the delivery layer is heading</h2>
+      <h2>9b. The most common failure modes</h2>
 
-<p>Trends with real momentum, not speculation:</p>
-<ul>
-  <li><strong>The pipeline is already code; AI writes more of it.</strong> Workflow files are versioned in the repo; AI-assisted pipeline authoring and self-healing failing builds are the visible next step — delegating the "fix a red build" loop.</li>
-  <li><strong>Supply-chain integrity becomes a standard pipeline output.</strong> SBOMs, signed builds, provenance, and policy gates verify "this exact artifact = this exact source + dependency set" — integrity and audit move from afterthought to pipeline gate.</li>
-  <li><strong>Environments everywhere.</strong> Preview/environment-branch deploys mean every PR ships its own URL to browse — the review loop becomes "browse the preview," and production is just the last environment.</li>
-  <li><strong>Shift-left security.</strong> Secret scanning, vulnerability checks, and policy gates move earlier into CI, so the pipeline verifies more than "does it build".</li>
-</ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Failure</th>
+            <th>Why it happens</th>
+            <th>Fix</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Long-lived integration branches</strong></td>
+            <td>
+              Branches that never merge to main → huge late merges, conflicts,
+              big unreviewable releases.
+            </td>
+            <td>
+              Trunk-based; integrate small and often (CI wants frequency).
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Broken builds ignored</strong></td>
+            <td>
+              CI fails but the team moves on → "green main" dies; a month of
+              change ships as one broken release.
+            </td>
+            <td>
+              Make CI blocking (branch protection); fix a red build immediately.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Force-push to shared branches</strong></td>
+            <td>
+              Rebase + <code>git push --force</code> rewrites history others
+              pulled; work "disappears".
+            </td>
+            <td>
+              Force-push only private/unpushed branches; protect main; recover
+              via the reflog.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Releases as a manual big-bang</strong></td>
+            <td>
+              No CD, no strategy → release day is an outage window; each release
+              is a risk event.
+            </td>
+            <td>
+              Automate build→staging; use blue-green/canary so releases are
+              routine.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>No recovery plan</strong></td>
+            <td>
+              The team can ship but can't safely undo or move forward → a bad
+              deploy stays bad while they scramble.
+            </td>
+            <td>
+              Every deploy has a tested recovery route: compatible rollback,
+              roll-forward, or exposure control. Check migrations and side
+              effects.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Secrets in the repo</strong></td>
+            <td>API keys/tokens committed and pushed.</td>
+            <td>
+              .gitignore + environment secrets/vault; if leaked, rotate and
+              scrub history.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Confusing deploy with release</strong></td>
+            <td>A risky feature goes to everyone by default.</td>
+            <td>
+              Separate them via feature flags; expose to a small slice first.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Over-engineered branch model</strong></td>
+            <td>
+              A 2-person project running full GitFlow ceremony for zero payoff.
+            </td>
+            <td>
+              Start with GitHub Flow; add structure only when a release needs
+              it.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h2>9c. The future — where the delivery layer is heading</h2>
 
-<h2>9d. The complete mental checklist</h2>
+      <p>Trends with real momentum, not speculation:</p>
+      <ul>
+        <li>
+          <strong>The pipeline is already code; AI writes more of it.</strong>
+          Workflow files are versioned in the repo; AI-assisted pipeline
+          authoring and self-healing failing builds are the visible next step —
+          delegating the "fix a red build" loop.
+        </li>
+        <li>
+          <strong
+            >Supply-chain integrity becomes a standard pipeline output.</strong
+          >
+          SBOMs, signed builds, provenance, and policy gates verify "this exact
+          artifact = this exact source + dependency set" — integrity and audit
+          move from afterthought to pipeline gate.
+        </li>
+        <li>
+          <strong>Environments everywhere.</strong> Preview/environment-branch
+          deploys mean every PR ships its own URL to browse — the review loop
+          becomes "browse the preview," and production is just the last
+          environment.
+        </li>
+        <li>
+          <strong>Shift-left security.</strong> Secret scanning, vulnerability
+          checks, and policy gates move earlier into CI, so the pipeline
+          verifies more than "does it build".
+        </li>
+      </ul>
 
-<p>If you remember only one image, remember the DAG-and-pipeline picture: <strong>commits are snapshots in a content-addressed graph; branches are pointers; CI verifies every change; CD keeps it releasable; deployment ships it reversibly.</strong></p>
+      <h2>9d. The complete mental checklist</h2>
 
-<table>
-  <thead><tr><th>Question to ask</th><th>Check</th></tr></thead>
-  <tbody>
-    <tr><td>Can I recover any past state, and can anyone see the history?</td><td>Committed, pushed to a remote, meaningful messages.</td></tr>
-    <tr><td>Is every push verified automatically before it matters?</td><td>CI runs on push + PR; a red build blocks merge.</td></tr>
-    <tr><td>Is main always releasable?</td><td>Green CI, protected branch, review required.</td></tr>
-    <tr><td>If a deploy goes wrong, can I recover within minutes?</td><td>Known tested route: compatible rollback, roll-forward, or exposure control; migrations considered.</td></tr>
-    <tr><td>Do I know which exact version is live, and can I find its commit?</td><td>SemVer tag → release → artifact; changelog kept.</td></tr>
-    <tr><td>Are secrets out of the repo?</td><td>No secrets in git history; env/vault at deploy time.</td></tr>
-    <tr><td>Am I keeping deploy separate from release where it matters?</td><td>Feature flags for reversible feature exposure; canary with metrics for real-traffic validation.</td></tr>
-    <tr><td>Can I prove the deployment is healthy after release?</td><td>Smoke checks, health signals, metrics, logs, traces, alerts, and SLO/error-budget criteria.</td></tr>
-    <tr><td>Can I prove this artifact came from trusted source and dependencies?</td><td>Lockfiles, SBOM, signed artifact/provenance, protected build environment.</td></tr>
-  </tbody>
-</table>
+      <p>
+        If you remember only one image, remember the DAG-and-pipeline picture:
+        <strong
+          >commits are snapshots in a content-addressed graph; branches are
+          pointers; CI verifies every change; CD keeps it releasable; deployment
+          ships it reversibly.</strong
+        >
+      </p>
 
-<p>The maturity test: count how many you answer "yes" without effort. Every "no" is the next thing to automate. That checklist is the delivery layer in practice — the same feedback-loop discipline the <a href="./software-development-process.html">Process doc</a> describes, made mechanical.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Question to ask</th>
+            <th>Check</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Can I recover any past state, and can anyone see the history?
+            </td>
+            <td>Committed, pushed to a remote, meaningful messages.</td>
+          </tr>
+          <tr>
+            <td>Is every push verified automatically before it matters?</td>
+            <td>CI runs on push + PR; a red build blocks merge.</td>
+          </tr>
+          <tr>
+            <td>Is main always releasable?</td>
+            <td>Green CI, protected branch, review required.</td>
+          </tr>
+          <tr>
+            <td>If a deploy goes wrong, can I recover within minutes?</td>
+            <td>
+              Known tested route: compatible rollback, roll-forward, or exposure
+              control; migrations considered.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Do I know which exact version is live, and can I find its commit?
+            </td>
+            <td>SemVer tag → release → artifact; changelog kept.</td>
+          </tr>
+          <tr>
+            <td>Are secrets out of the repo?</td>
+            <td>No secrets in git history; env/vault at deploy time.</td>
+          </tr>
+          <tr>
+            <td>Am I keeping deploy separate from release where it matters?</td>
+            <td>
+              Feature flags for reversible feature exposure; canary with metrics
+              for real-traffic validation.
+            </td>
+          </tr>
+          <tr>
+            <td>Can I prove the deployment is healthy after release?</td>
+            <td>
+              Smoke checks, health signals, metrics, logs, traces, alerts, and
+              SLO/error-budget criteria.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Can I prove this artifact came from trusted source and
+              dependencies?
+            </td>
+            <td>
+              Lockfiles, SBOM, signed artifact/provenance, protected build
+              environment.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-<section class="cite">
-  <strong>Primary sources</strong>
-  <a href="https://git-scm.com/book/en/v2/Getting-Started-A-Short-History-of-Git">Torvalds, L. (2005). Git — short history (Pro Git).</a> ·
-  <a href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects">Git objects — the content-addressed model (Pro Git).</a> ·
-  <a href="https://martinfowler.com/articles/continuousIntegration.html">Fowler, M. Continuous Integration.</a> ·
-  <a href="https://martinfowler.com/bliki/ContinuousDelivery.html">Fowler, M. Continuous Delivery.</a> ·
-  <a href="https://continuousdelivery.com">Humble, J. &amp; Farley, D. (2010). Continuous Delivery. Addison-Wesley.</a> ·
-  <a href="https://martinfowler.com/bliki/BlueGreenDeployment.html">Fowler, M. BlueGreenDeployment.</a> ·
-  <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning 2.0.0 (semver.org).</a> ·
-  <a href="https://trunkbaseddevelopment.com">Hammant, P. Trunk-Based Development.</a> ·
-  <a href="https://slsa.dev">SLSA — software supply-chain security framework.</a> ·
-  <a href="https://sre.google/sre-book/service-level-objectives/">Google SRE — Service Level Objectives.</a> ·
-  <a href="https://en.wikipedia.org/wiki/Jenkins_(software)">Jenkins (software) — history (Wikipedia).</a> ·
-  <a href="https://vercel.com">Vercel — preview deploys &amp; rollback.</a> ·
-  <a href="https://netlify.com">Netlify — git-connected deploys.</a>
-</section>
+      <p>
+        The maturity test: count how many you answer "yes" without effort. Every
+        "no" is the next thing to automate. That checklist is the delivery layer
+        in practice — the same feedback-loop discipline the
+        <a href="./software-development-process.html">Process doc</a> describes,
+        made mechanical.
+      </p>
 
-<section class="teacher">
-  <h3>Ask your teacher</h3>
-  <p>Three follow-ups to deepen this:</p>
-  <ul>
-    <li>"Walk me through my last merge conflict — what exactly did Git have to combine, and why did it need me?"</li>
-    <li>"If I want my HackerRank repo to auto-run tests on every push, what's the smallest CI setup that does it?"</li>
-    <li>"What does a blue-green deploy look like for a React site on Vercel or Netlify — where's the flip?"</li>
-  </ul>
-</section>
+      <section class="cite">
+        <strong>Primary sources</strong>
+        <a
+          href="https://git-scm.com/book/en/v2/Getting-Started-A-Short-History-of-Git"
+          >Torvalds, L. (2005). Git — short history (Pro Git).</a
+        >
+        ·
+        <a href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"
+          >Git objects — the content-addressed model (Pro Git).</a
+        >
+        ·
+        <a href="https://martinfowler.com/articles/continuousIntegration.html"
+          >Fowler, M. Continuous Integration.</a
+        >
+        ·
+        <a href="https://martinfowler.com/bliki/ContinuousDelivery.html"
+          >Fowler, M. Continuous Delivery.</a
+        >
+        ·
+        <a href="https://continuousdelivery.com"
+          >Humble, J. &amp; Farley, D. (2010). Continuous Delivery.
+          Addison-Wesley.</a
+        >
+        ·
+        <a href="https://martinfowler.com/bliki/BlueGreenDeployment.html"
+          >Fowler, M. BlueGreenDeployment.</a
+        >
+        ·
+        <a href="https://semver.org/spec/v2.0.0.html"
+          >Semantic Versioning 2.0.0 (semver.org).</a
+        >
+        ·
+        <a href="https://trunkbaseddevelopment.com"
+          >Hammant, P. Trunk-Based Development.</a
+        >
+        ·
+        <a href="https://slsa.dev"
+          >SLSA — software supply-chain security framework.</a
+        >
+        ·
+        <a href="https://sre.google/sre-book/service-level-objectives/"
+          >Google SRE — Service Level Objectives.</a
+        >
+        ·
+        <a href="https://en.wikipedia.org/wiki/Jenkins_(software)"
+          >Jenkins (software) — history (Wikipedia).</a
+        >
+        ·
+        <a href="https://vercel.com"
+          >Vercel — preview deploys &amp; rollback.</a
+        >
+        ·
+        <a href="https://netlify.com">Netlify — git-connected deploys.</a>
+      </section>
 
-<footer class="lesson-foot">
-  <span>Reference · Version Control, CI/CD &amp; Deployment — The Pipeline from Git to Live</span>
-  <span>Downstream of: <a href="./software-development-process.html">Software Development Process</a> · <a href="./cs-and-software-engineering.html">CS &amp; SE</a> · Neighbors: <a href="./system-design.html">System Design</a> · <a href="./api-design.html">API Design</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
-</footer>
+      <section class="teacher">
+        <h3>Ask your teacher</h3>
+        <p>Three follow-ups to deepen this:</p>
+        <ul>
+          <li>
+            "Walk me through my last merge conflict — what exactly did Git have
+            to combine, and why did it need me?"
+          </li>
+          <li>
+            "If I want my HackerRank repo to auto-run tests on every push,
+            what's the smallest CI setup that does it?"
+          </li>
+          <li>
+            "What does a blue-green deploy look like for a React site on Vercel
+            or Netlify — where's the flip?"
+          </li>
+        </ul>
+      </section>
 
-</main>
-<script src="../assets/lesson.js"></script>
-</body>
+      <footer class="lesson-foot">
+        <span
+          >Reference · Version Control, CI/CD &amp; Deployment — The Pipeline
+          from Git to Live</span
+        >
+        <span
+          >Downstream of:
+          <a href="./software-development-process.html"
+            >Software Development Process</a
+          >
+          · <a href="./cs-and-software-engineering.html">CS &amp; SE</a> ·
+          Neighbors: <a href="./system-design.html">System Design</a> ·
+          <a href="./api-design.html">API Design</a> · Glossary:
+          <a href="./glossary.html">shared terms</a></span
+        >
+      </footer>
+    </main>
+    <script src="../assets/lesson.js"></script>
+  </body>
 </html>

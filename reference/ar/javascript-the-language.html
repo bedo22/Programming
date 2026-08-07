@@ -148,7 +148,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
     <tr><td>ES4</td><td>مهمل</td><td>طموح زائد (كلاسات، حزم، مساحات أسماء، نظام أنواع). موت سياسي.</td></tr>
     <tr><td>ES5</td><td>2009</td><td>الإنقاذ. وضع صارم، <code>JSON</code>، خصائص وصول (<code>get</code>/<code>set</code>)، <code>Object.create</code>، <code>Array.isArray</code>، <code>Function.prototype.bind</code>.</td></tr>
     <tr><td>ES6 / ES2015</td><td>2015</td><td><strong>إعادة الكتابة.</strong> <code>let</code>/<code>const</code>، دوال سهمية، <code>class</code>، وحدات (<code>import</code>/<code>export</code>)، Promises، <code>Map</code>/<code>Set</code>، تفكيك، معاملات افتراضية، rest/spread، <code>Symbol</code>، <code>Proxy</code>، <code>Reflect</code>. JS الحديثة تولد.</td></tr>
-    <tr><td>ES2016+</td><td>سنوي</td><td>إيقاع سنوي. <code>async/await</code> (٢٠١٧)، تسلسل اختياري <code>?.</code> (٢٠٢٠)، دمج معدوم <code>??</code> (٢٠٢٠)، await أعلى مستوى (٢٠٢٢)، حقول خاصة <code>#x</code> (٢٠٢٢)، <code>Array.groupBy</code> (٢٠٢٤)، إلخ.</td></tr>
+    <tr><td>ES2016+</td><td>سنوي</td><td>إيقاع سنوي. <code>async/await</code> (٢٠١٧)، تسلسل اختياري <code>?.</code> (٢٠٢٠)، دمج معدوم <code>??</code> (٢٠٢٠)، await أعلى مستوى (٢٠٢٢)، حقول خاصة <code>#x</code> (٢٠٢٢)، <code>Object.groupBy</code> / <code>Map.groupBy</code> (٢٠٢٤)، إلخ.</td></tr>
   </tbody>
 </table>
 
@@ -194,13 +194,13 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   <tbody>
     <tr>
       <td><strong>التدقيق والتنسيق</strong></td>
-      <td>ESLint، Biome، Prettier، dprint، Rome، Oxlint، Quick-lint-js</td>
+      <td>ESLint، Biome، Prettier، dprint، Oxlint، Quick-lint-js</td>
       <td>أسلوب غير متناسق / أخطاء كامنة ← مفروض، مصحح تلقائياً، محكوم بـ CI</td>
       <td>تغطية القاعدة؛ معدل الإيجابيات الكاذبة؛ زمن الإصلاح؛ انحراف التكوين؛ وقت CI</td>
     </tr>
     <tr>
       <td><strong>فحص الأنواع</strong></td>
-      <td>TypeScript (tsc)، JSDoc + TS Check، Flow، Hegelia</td>
+      <td>TypeScript (tsc)، JSDoc + TS Check، Flow (legacy، wind-down)، oxc-parser</td>
       <td>أنواع ديناميكية ← عقود ثابتة، पकड़ التراجعات عند البناء</td>
       <td>تغطية الأنواع؛ % any؛ كثافة الأخطاء؛ وقت الترجمة؛ سرعة الهجرة</td>
     </tr>
@@ -230,7 +230,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
     </tr>
     <tr>
       <td><strong>ملف الأداء</strong></td>
-      <td>Chrome DevTools، Node --inspect، 0x، Clinic.js، PySpy، Speedscope، Perfetto</td>
+      <td>Chrome DevTools، Node --inspect، 0x، Clinic.js، Speedscope، Perfetto</td>
       <td>كود بطيء ← عقدة اختبار محددة ← مسار ساخن محسن</td>
       <td>وقت الوصول للعقدة؛ وضوح رسم اللهب؛ كشف التراجع؛ النفقات العامة</td>
     </tr>
@@ -242,7 +242,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
     </tr>
     <tr>
       <td><strong>التوثيق ومرجع API</strong></td>
-      <td>TypeDoc، JSDoc، TSDoc، API Extractor، DocFX، Docusaurus، Nextra، VitePress</td>
+      <td>TypeDoc، JSDoc، TSDoc، API Extractor، Docusaurus، Nextra، VitePress</td>
       <td>كود مصدر ← وثائق حية، قابلة للبحث، مصداردة</td>
       <td>التغطية؛ الانحراف (الكود مقابل الوثائق)؛ تجربة البحث؛ الإصدار؛ وقت النشر</td>
     </tr>

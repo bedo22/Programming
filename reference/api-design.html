@@ -465,6 +465,299 @@
 
 ---
 
+<h2>8b. Conventions & identifiers — the rules that keep contracts predictable</h2>
+
+<p>Conventions are not cosmetic. They reduce consumer error and make contracts boring in the good way — so the <em>interesting</em> decisions stand out.</p>
+
+<table>
+  <thead><tr><th>Convention</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Resource names</td><td>Plural nouns: <code>/orders</code>, <code>/shipments</code>, <code>/users</code></td></tr>
+    <tr><td>Actions</td><td>Use HTTP verbs, not verb paths, wherever possible</td></tr>
+    <tr><td>Subresources</td><td>Use when ownership is clear: <code>/orders/{id}/items</code></td></tr>
+    <tr><td>Deep nesting</td><td>Avoid more than two levels — nesting past that hides the top-level resource</td></tr>
+    <tr><td>Field casing</td><td>Pick one (snake_case or camelCase) and enforce it</td></tr>
+    <tr><td>IDs</td><td>Opaque, stable, URL-safe, prefixed: <code>shp_123</code>, <code>ord_456</code></td></tr>
+    <tr><td>Timestamps</td><td>ISO 8601 UTC: <code>2026-01-01T12:00:00Z</code></td></tr>
+    <tr><td>Dates (no time)</td><td><code>YYYY-MM-DD</code></td></tr>
+    <tr><td>Durations</td><td>ISO 8601 duration (<code>PT2H</code>) or explicit seconds/milliseconds</td></tr>
+    <tr><td>Money</td><td>Decimal string or integer minor units + currency code</td></tr>
+    <tr><td>Booleans</td><td>Prefer positive names: <code>enabled</code>, <code>active</code></td></tr>
+    <tr><td>Enums</td><td>Uppercase, document unknown-value handling</td></tr>
+    <tr><td>Null vs absent</td><td>Define it: <code>null</code> = known-empty, absent = not provided</td></tr>
+  </tbody>
+</table>
+
+<h3>Identifier design</h3>
+
+<table>
+  <thead><tr><th>Identifier</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td>UUID v4</td><td>Public IDs where unpredictability matters</td></tr>
+    <tr><td>ULID / UUIDv7</td><td>Sortable public IDs (time component lets you sort by creation)</td></tr>
+    <tr><td>Namespaced IDs</td><td>Multi-resource clarity: <code>shp_123</code>, <code>ord_456</code></td></tr>
+    <tr><td>Opaque cursors</td><td>Pagination tokens — never raw offsets</td></tr>
+    <tr><td>Natural keys</td><td>Stable business identifiers, only if genuinely stable</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Principles:</strong> do not expose database auto-increment IDs; do not leak storage-internal object IDs; keep IDs stable even if the internal store changes; use prefixes for readability; make IDs URL-safe. An identifier is a contract, not an implementation leak — see §5b "Internal models leak" and §11.</p>
+
+<h2>8c. Collections — pagination, filtering, sorting, and search</h2>
+
+<p>Collections are where most contracts earn their complexity. Decide these once and reuse across every list.</p>
+
+<h3>Pagination styles</h3>
+
+<table>
+  <thead><tr><th>Style</th><th>Use when</th><th>Risk</th></tr></thead>
+  <tbody>
+    <tr><td>Offset (<code>?offset=</code>)</td><td>Small datasets, admin UIs</td><td>O(n) scans; drift under concurrent writes</td></tr>
+    <tr><td>Cursor / keyset</td><td>Large or actively written datasets</td><td>Requires a stable sort key</td></tr>
+    <tr><td>Page number</td><td>Simple low-scale UI</td><td>Same problems as offset</td></tr>
+    <tr><td>Streaming / SSE</td><td>Continuous, append-heavy updates</td><td>More complex client state</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Cursor guidance:</strong> cursors are opaque; encode the sort position, not the raw ID unless safe; handle deleted items gracefully; return <code>next_cursor</code> (not just a boolean <code>has_more</code>); define expiry if the cursor contains signed state.</p>
+
+<h3>Filtering / sorting conventions</h3>
+
+<pre><code>GET /shipments?
+    status=IN_TRANSIT&amp;
+    created_after=2026-01-01T00:00:00Z&amp;
+    sort=created_at:desc,status:asc&amp;
+    limit=50&amp;
+    cursor=abc123
+</code></pre>
+
+<ul>
+  <li>Use direct field names or <code>filter[field]</code> — pick one syntax and stay consistent.</li>
+  <li><code>sort=field:asc|desc</code>, repeatable for multiple fields; document the default sort.</li>
+  <li>Enforce a maximum <code>limit</code>; document what happens when a client exceeds it.</li>
+  <li>Invalid filter values are <code>400</code> with a field-level validation error (§8d), never a silent ignore.</li>
+</ul>
+
+<h2>8d. Validation errors &amp; transactional safety</h2>
+
+<p>A <code>422</code> that just says "bad request" is a dead end for a frontend form. Field-level validation errors turn an error into recoverable UI state.</p>
+
+<pre><code>{
+  "type": "https://api.example.com/errors/validation-failed",
+  "title": "Validation Failed",
+  "status": 422,
+  "detail": "Request body failed validation.",
+  "instance": "/v1/shipments",
+  "errors": [
+    { "field": "status",       "code": "invalid_enum",   "message": "Status must be one of CREATED, PICKED_UP, IN_TRANSIT." },
+    { "field": "destination.country_code", "code": "invalid_format", "message": "Country code must be two uppercase letters." }
+  ]
+}
+</code></pre>
+
+<ul>
+  <li>One machine-readable <code>code</code> per error; one human-readable <code>message</code>.</li>
+  <li>Field paths handle nested errors (<code>location.country_code</code>).</li>
+  <li>Keep error types stable — they're part of the contract, so version them.</li>
+  <li>Never expose stack traces or internals in error bodies.</li>
+  <li>Distinguish client errors (4xx) from server errors (5xx) — clients branch on it.</li>
+</ul>
+
+<h3>Concurrency &amp; optimistic locking</h3>
+
+<p>When two clients mutate the same resource, naive read-modify-write loses updates silently.</p>
+
+<table>
+  <thead><tr><th>Problem</th><th>Contract solution</th></tr></thead>
+  <tbody>
+    <tr><td>Two clients update the same resource</td><td><code>If-Match</code> with an ETag / version</td></tr>
+    <tr><td>Stale read before a mutation</td><td>Return a version field on the resource</td></tr>
+    <tr><td>Batch updates conflict</td><td>Per-item status and version</td></tr>
+    <tr><td>Concurrent cancellation</td><td>Idempotency + version check</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Return a version token (<code>version</code> field or ETag) on every mutable resource.</li>
+  <li>Require <code>If-Match: "18"</code> on updates where a lost update is harmful — return <code>412 Precondition Failed</code> when stale.</li>
+  <li>Treat PATCH as lossy without a version; idempotency keys (post) and versions (requests) look different, but both guard mutation safety.</li>
+  <li>Document a client default: fetch, apply change, re-PATCH with the current version, retry once on 412.</li>
+</ul>
+
+<h2>8e. Long-running operations — <code>202</code>, job resources, and webhooks</h2>
+
+<p>Not every operation finishes inside one request. Where work is not immediate, model it explicitly so clients are not blocked, misled, or polling forever.</p>
+
+<pre><code>POST /v1/reports
+Idempotency-Key: 4f9c2...
+
+202 Accepted
+Location: /v1/reports/jobs/job_123</code></pre>
+
+<p>Job resource:</p>
+
+<pre><code>{ "id": "job_123", "status": "RUNNING", "queued_at": "2026-01-01T12:00:00Z",
+  "expires_at": "2026-01-01T13:00:00Z", "result_url": null, "error": null }</code></pre>
+
+<p>States: <code>QUEUED → RUNNING → SUCCEEDED | FAILED | CANCELED</code>.</p>
+
+<ul>
+  <li>Return <code>202 Accepted</code> + <code>Location</code> for work that is not immediate; never fake a synchronous completion.</li>
+  <li>Provide a job resource; support cancellation where feasible.</li>
+  <li>Offer webhook notification on completion so clients do not poll.</li>
+  <li>Make job-status reads idempotent; define result expiry; always let clients stop polling (a deadline, never forever).</li>
+  <li>For events, see §8g and the streaming patterns.</li>
+</ul>
+
+<p>For push completion, a webhook is the natural counterpart — its delivery contract matters as much as its payload:</p>
+
+<table>
+  <thead><tr><th>Concern</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Authentication</td><td>HMAC signature header, verified with a shared secret</td></tr>
+    <tr><td>Replay protection</td><td>Timestamp + nonce, or event-ID deduplication</td></tr>
+    <tr><td>Ordering</td><td>Do not guarantee unless explicitly designed (and documented as such)</td></tr>
+    <tr><td>Retries</td><td>Exponential backoff, with a cap</td></tr>
+    <tr><td>Idempotency</td><td>Consumers <em>must</em> deduplicate by event ID</td></tr>
+    <tr><td>Failure handling</td><td>Dead-letter queue + replay option</td></tr>
+    <tr><td>Testing</td><td>Test endpoint or CLI</td></tr>
+    <tr><td>Secret rotation</td><td>Support multiple active secrets</td></tr>
+  </tbody>
+</table>
+
+<p><strong>A webhook is not "fire and forget."</strong> It is a contract with delivery, signature, retry, and idempotency requirements. Design it like any other endpoint, not as a side effect.</p>
+
+<h2>8f. Realtime and streaming contracts</h2>
+
+<p>When a client needs updates pushed, the transport choice is a contract decision with UX consequences.</p>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td>Polling</td><td>Simple, low frequency, latency-tolerant</td></tr>
+    <tr><td>Long polling</td><td>Server can hold the request until something changes</td></tr>
+    <tr><td>Server-Sent Events (SSE)</td><td>One-directional server-to-client updates over HTTP</td></tr>
+    <tr><td>WebSocket</td><td>Bidirectional, low-latency interaction</td></tr>
+    <tr><td>gRPC streaming</td><td>Service-to-service high-throughput streams</td></tr>
+  </tbody>
+</table>
+
+<h3>SSE guidance</h3>
+
+<ul>
+  <li>Use <code>event:</code> names; use <code>id:</code> for resume; <em>support</em> <code>Last-Event-ID</code> on reconnect.</li>
+  <li>Keep messages small; send periodic heartbeats so proxies know the stream is alive.</li>
+  <li>Authenticate before opening the stream where possible.</li>
+</ul>
+
+<h3>WebSocket guidance</h3>
+
+<ul>
+  <li>Define a message envelope (event type + payload + sequence number).</li>
+  <li>Handle reconnection and resynchronization (e.g., replay missed sequence numbers).</li>
+  <li>Send heartbeats; limit message size; apply rate limits; authenticate on connect or via a short-lived ticket.</li>
+</ul>
+
+<p>An API that cannot explain what a client misses after a disconnect — or what a reconnect restores — is not streaming, it is firing. The schema (<code>event:</code> names) is the contract; see §11 for the failure that ignores it.</p>
+
+<h2>8g. Schema evolution — the compatibility matrix</h2>
+
+<p>Every change is "safe" or "breaking" relative to the <em>typed clients you actually have</em>. Judgment + schema automation beats dogma.</p>
+
+<table>
+  <thead><tr><th>Change</th><th>REST / JSON</th><th>Protobuf</th><th>GraphQL</th></tr></thead>
+  <tbody>
+    <tr><td>Add optional output field</td><td>Safe</td><td>Safe</td><td>Safe</td></tr>
+    <tr><td>Add required output field</td><td>Breaking</td><td>Usually breaking</td><td>Breaking if clients rely on shape</td></tr>
+    <tr><td>Remove output field</td><td>Breaking if consumed</td><td>Safe only if reserved/unused</td><td>Breaking if queried</td></tr>
+    <tr><td>Rename field</td><td>Breaking</td><td>Breaking</td><td>Breaking unless alias/migration</td></tr>
+    <tr><td>Change field type</td><td>Breaking</td><td>Breaking</td><td>Breaking</td></tr>
+    <tr><td>Add enum value</td><td>Conditionally safe</td><td>Usually safe</td><td>Safe only if clients handle unknown</td></tr>
+    <tr><td>Add optional input field</td><td>Safe</td><td>Safe</td><td>Safe</td></tr>
+    <tr><td>Add required input field</td><td>Breaking</td><td>Breaking</td><td>Breaking</td></tr>
+    <tr><td>Remove input field</td><td>Breaking if sent</td><td>Breaking if sent</td><td>Breaking if used</td></tr>
+    <tr><td>Change validation rules</td><td>Can break clients</td><td>Can break clients</td><td>Can break clients</td></tr>
+  </tbody>
+</table>
+
+<p><strong>"Safe" means safe for well-behaved clients.</strong> Typed clients that <em>exhaustively switch</em> on enums or require exact shapes still break on changes marked safe. Document your client-compat expectations so "safe" is not a guess.</p>
+
+<h2>8h. Security &amp; browser contracts</h2>
+
+<p>Authentication and authorization are part of the contract — the client type dictates the flow. A recommended flow per client is a design decision, not folklore.</p>
+
+<h3>Authentication patterns</h3>
+
+<table>
+  <thead><tr><th>Client type</th><th>Recommended flow</th></tr></thead>
+  <tbody>
+    <tr><td>Browser SPA</td><td>Authorization Code + PKCE, or same-site session cookies</td></tr>
+    <tr><td>Native mobile</td><td>Authorization Code + PKCE</td></tr>
+    <tr><td>Service-to-service</td><td>Client credentials, mTLS, or workload identity</td></tr>
+    <tr><td>Public browser JS</td><td>Never ship a long-lived secret or raw API key</td></tr>
+    <tr><td>Partner integrations</td><td>Scoped API keys or OAuth client credentials</td></tr>
+    <tr><td>End-user delegation</td><td>OAuth access tokens with narrow scopes</td></tr>
+  </tbody>
+</table>
+
+<h3>Token &amp; scope contracts</h3>
+
+<ul>
+  <li>Validate <code>iss</code>, <code>aud</code>, <code>exp</code>, <code>nbf</code>, and the signature.</li>
+  <li>Keep token lifetimes short; rotate signing keys; handle refresh tokens securely.</li>
+  <li>Do not put sensitive claims in an unencrypted JWT payload.</li>
+  <li>Do not treat JWT possession as authorization — <em>check scopes and resource ownership</em>.</li>
+  <li>Scopes: <code>shipments:read</code>, <code>shipments:write</code>, <code>webhooks:manage</code>, <code>reports:read</code>.</li>
+</ul>
+
+<h3>Browser constraints</h3>
+
+<ul>
+  <li>CORS allowlists must be explicit; never <code>Access-Control-Allow-Origin: *</code> with credentials.</li>
+  <li>Understand preflight for custom headers (e.g., <code>Idempotency-Key</code>).</li>
+  <li>Use SameSite cookies correctly; never expose secrets to browser bundles.</li>
+</ul>
+
+<h2>8i. File uploads &amp; binary contracts</h2>
+
+<p>Binary exchange has its own patterns. The contract must cover transport, validation, and access control, not just the endpoint.</p>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td>Direct multipart upload</td><td>Small files, simple API</td></tr>
+    <tr><td>Presigned URL upload</td><td>Large files — offload to object storage</td></tr>
+    <tr><td>Resumable upload</td><td>Large or unreliable networks</td></tr>
+    <tr><td>Streaming download</td><td>Large files</td></tr>
+    <tr><td>Range requests</td><td>Partial content / resume</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Always cover:</strong> content-type validation, size limits, virus scanning, signed URLs with expiry, access control, checksums, and separation of metadata from the binary.</p>
+
+<h2>8j. AI-safe tool contracts</h2>
+
+<p>AI agents consume APIs as <em>tools</em> — a capability boundary that must be especially explicit and safe. Ambiguous tools become unsafe actions.</p>
+
+<table>
+  <thead><tr><th>Concern</th><th>Guidance</th></tr></thead>
+  <tbody>
+    <tr><td>Tool schema</td><td>Strict JSON Schema / typed input</td></tr>
+    <tr><td>Idempotency</td><td>Mutations must be retry-safe</td></tr>
+    <tr><td>Least privilege</td><td>Scope tools narrowly</td></tr>
+    <tr><td>Human approval</td><td>Require confirmation for destructive actions</td></tr>
+    <tr><td>Audit logging</td><td>Record tool calls and outcomes</td></tr>
+    <tr><td>Rate / cost caps</td><td>Prevent runaway agent loops</td></tr>
+    <tr><td>Error clarity</td><td>Return actionable machine-readable errors</td></tr>
+    <tr><td>Side effects</td><td>Describe them explicitly in tool metadata</td></tr>
+    <tr><td>Reversibility</td><td>Prefer undoable operations</td></tr>
+  </tbody>
+</table>
+
+<p><strong>For AI agents, an API is a capability boundary.</strong> The same contract that gives a human a form gives an agent an action. A fuzzy, destructive tool with no approval gate is an exploitation vector — design tools as if they will be called by an automatic, over-optimistic caller.</p>
+
+---
+
 <h2>9. Worked example — "Design a Public Shipment Tracking API"</h2>
 
 <p>A realistic public API problem, walked end-to-end through the rhythm.</p>
@@ -715,6 +1008,36 @@ type Shipment {
       <td>OpenAPI file exists but implementation diverges; CI doesn't validate; generated SDK is wrong.</td>
       <td>Schema-first adopted as process theater. The fix: CI fails if implementation response doesn't match schema (Pact, Dredd, Schemathesis).</td>
     </tr>
+    <tr>
+      <td><strong>Validation errors that leave the client in the dark</strong></td>
+      <td>PATCH returns generic <code>400 Bad Request</code>; the form shows one vague message and the user can't fix anything.</td>
+      <td>No field-level error catalog (§8d). A validation error is UI state for a frontend form — it needs field paths, machine codes, and messages clients can branch on, not a dead-end status.</td>
+    </tr>
+    <tr>
+      <td><strong>Lost updates from blind read-modify-write</strong></td>
+      <td>Two support agents edit the same shipment's destination; the later overwrite silently drops the other's change.</td>
+      <td>No version token or <code>If-Match</code> on the write (§8d). Idempotency keys stop duplicate creates but not concurrent overwrites — a version check returns 412 so the client can retry against the current state.</td>
+    </tr>
+    <tr>
+      <td><strong>Spinning a client on "forever" operations</strong></td>
+      <td>Carrier polls a report status for 20 minutes; timeout kills the job mid-run; no signal.</td>
+      <td>Long work was exposed as a synchronous call instead of <code>202</code> + job resource + webhook on completion (§8e). Operations that can exceed a request budget need an explicit job lifecycle so clients don't poll into a wall.</td>
+    </tr>
+    <tr>
+      <td><strong>Webhook replay wrecks downstream state</strong></td>
+      <td>Event delivered twice (retry after timeout); consumer double-charges a shipment on the duplicate.</td>
+      <td>Webhook treated as fire-and-forget with no idempotency or signature check (§8e). Consumers must dedupe on event-ID and verify the HMAC — a webhook is an endpoint, not a side effect.</td>
+    </tr>
+    <tr>
+      <td><strong>Streaming that isn't resumable</strong></td>
+      <td>SSE/WebSocket drops mid-push; client silently misses events and shows a stale tracking page.</td>
+      <td>No event <code>id</code> + <code>Last-Event-ID</code> resume, no sequence numbers (§8f). "Real-time" is only a contract if a reconnect can recover exactly what was missed.</td>
+    </tr>
+    <tr>
+      <td><strong>Scopes that never shrink</strong></td>
+      <td>A public client with a token minted for <code>shipments:write</code> also gets reports and user reads.</td>
+      <td>Token possession treated as authorization (§8h). Authorization is a scope + ownership check per request, not "has a valid JWT." Every permission should be as narrow as the calling client needs.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -801,7 +1124,7 @@ type Shipment {
 
 ---
 
-<h2>11. The future — where API design is going</h2>
+<h2>12. The future — where API design is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for API design</th></tr></thead>
@@ -839,7 +1162,7 @@ type Shipment {
 
 ---
 
-<h2>12. Summary — the contract checklist</h2>
+<h2>13. Summary — the contract checklist</h2>
 
 <p>Before any API change merges, verify:</p>
 
@@ -854,6 +1177,8 @@ type Shipment {
     <tr><td>Is pagination cursor-based (not offset) for collections that grow?</td><td>Stop. Offset pagination is O(n) and times out at scale.</td></tr>
     <tr><td>Does the contract pass schema validation in CI (implementation matches schema)?</td><td>Stop. Schema drift = generated SDKs lie.</td></tr>
     <tr><td>Are rate limits, quotas, and <code>Retry-After</code> headers documented and returned?</td><td>Stop. Clients can't back off; they hammer and get banned.</td></tr>
+    <tr><td>Do mutable resources expose a version token (ETag / <code>If-Match</code>) for safe concurrent writes?</td><td>Stop. Read-modify-write will silently lose updates (§8d).</td></tr>
+    <tr><td>Do long-running and push contracts exist deliberately — <code>202</code> + job resource, webhook with signature + event-ID, resumable streams?</td><td>Stop. Clients will poll, replay, or miss events with no way out (§8e, §8f).</td></tr>
     <tr><td>Is there a deprecation calendar communicated to registered consumers?</td><td>Stop. Surprise deprecation = lost trust, churn.</td></tr>
   </tbody>
 </table>

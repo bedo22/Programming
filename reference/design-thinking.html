@@ -57,6 +57,7 @@
     <tr><td>Design Sprint</td><td>A 5-day time-boxed process (Google Ventures)</td><td>A sprint is <em>one execution</em> of Design Thinking under a deadline; Design Thinking is the broader discipline.</td></tr>
     <tr><td>Product Management</td><td>Roadmaps, prioritization, metrics, stakeholder management</td><td>PM owns the <em>business outcome</em>; Design Thinking is a <em>method PMs use</em> to de-risk what to build.</td></tr>
     <tr><td>Agile / Scrum</td><td>Iterative delivery with fixed timeboxes</td><td>Agile assumes the backlog items are <em>already valid</em>. Design Thinking questions the backlog itself.</td></tr>
+    <tr><td>Growth hacking / A/B testing</td><td>Optimizing an existing funnel for conversion</td><td>Growth hacking optimizes a funnel; Design Thinking questions whether the funnel should exist at all.</td></tr>
   </tbody>
 </table>
 
@@ -369,6 +370,12 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
       <td>OKR setting; portfolio review; sprint demo; performance reviews.</td>
       <td>Velocity; feature count; "design delivered."</td>
     </tr>
+    <tr>
+      <td><strong>Jobs to be Done (JTBD)</strong></td>
+      <td>Users don't "buy" products; they "hire" them to make progress in specific circumstances.</td>
+      <td>Demographics fail to explain behavior; a feature is losing to a non-obvious substitute.</td>
+      <td>Persona segments; "the user wants X."</td>
+    </tr>
   </tbody>
 </table>
 
@@ -452,6 +459,205 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   <li><strong>Fail forward.</strong> A failed prototype is a successful learning event. The goal is to invalidate bad hypotheses cheap.</li>
 </ol>
 
+<h2>8b. Synthesis — from raw field data to an insight statement</h2>
+
+<p>Principles say <em>respect the user</em>; synthesis is the <em>mechanics</em> of turning raw observations into a defensible problem statement. This is where most teams get stuck: they interview, then panic. Four tools close the gap between the Empathize and Define stages.</p>
+
+<table>
+  <thead><tr><th>Tool</th><th>What it does</th><th>Input → Output</th><th>When it wins</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Affinity diagramming</strong></td>
+      <td>Cluster raw quotes and observations bottom-up into emergent themes; no theme is imposed in advance.</td>
+      <td>Sticky notes → theme groups → theme labels</td>
+      <td>When you have 20+ pieces of raw data and no obvious structure.</td>
+    </tr>
+    <tr>
+      <td><strong>Empathy mapping</strong></td>
+      <td>Sort observations into <em>Says / Thinks / Does / Feels</em> to expose contradictions between stated intent and actual behavior.</td>
+      <td>Observation log → four-quadrant map</td>
+      <td>When someone "says" they want A but demonstrably "does" B. The contradiction is the insight.</td>
+    </tr>
+    <tr>
+      <td><strong>Journey mapping (current state)</strong></td>
+      <td>Map the user's actual steps, emotional highs/lows, and workarounds to localize friction precisely.</td>
+      <td>Observations → step-by-step journey with emotions</td>
+      <td>When the pain point is distributed across a process rather than one moment.</td>
+    </tr>
+    <tr>
+      <td><strong>POV madlib</strong></td>
+      <td>Force convergence into one sentence: a formula that won't let you hide vagueness.</td>
+      <td>Themes → one insight statement</td>
+      <td>When you must decide what to act on. Every Subsequent decision anchors here.</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The POV madlib.</strong> <code>[User] needs a way to [Need] because [Surprising insight/constraint].</code> The §9 worked example is exactly this shape: "Patients need a way to see their medication trigger at the right moment <em>because the bottle is hidden by their environment.</em>" If your statement survives without the "because," you haven't found the insight yet — keep synthesizing.</p>
+</blockquote>
+
+<p><strong>Synthesis order:</strong> Affinity diagram the raw data → build one empathy map (or journey map) to expose the contradiction → write a POV madlib. Stop when the POV surprises someone who was in the field. If it surprises no one, you've clustered, not synthesized.</p>
+
+<h2>8c. Ideation and prototype catalogs — the mechanics behind "40 sketches"</h2>
+
+<p>§9 shows Crazy 8s once. A practitioner needs a catalog of moves to pick against the <em>kind</em> of block they're hitting, and a taxonomy of prototypes to test without writing code.</p>
+
+<h3>Ideation techniques</h3>
+
+<table>
+  <thead><tr><th>Technique</th><th>Move</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>How Might We (HMW)</strong></td>
+      <td>Translate an insight into open-ended design questions.</td>
+      <td>You have an insight statement and need diverging starting points.</td>
+    </tr>
+    <tr>
+      <td><strong>Crazy 8s</strong></td>
+      <td>8 sketches in 8 minutes force breadth before judgment.</td>
+      <td>Ideas are stuck or the team is converging too early.</td>
+    </tr>
+    <tr>
+      <td><strong>Analogous inspiration</strong></td>
+      <td>Study how a different industry solves the same structural problem.</td>
+      <td>The obvious space feels exhausted (e.g., pit-crew tire changes to improve ER handoffs).</td>
+    </tr>
+    <tr>
+      <td><strong>Reverse brainstorming</strong></td>
+      <td>"How could we make this problem <em>worse</em>?" Reveals assumptions and failure paths.</td>
+      <td>Hidden assumptions or systemic flaws need exposing.</td>
+    </tr>
+    <tr>
+      <td><strong>Constraint-based ideation</strong></td>
+      <td>Remove one core assumption to force innovation (e.g., "design this as if the user has no screen").</td>
+      <td>Solutions look identical; you need a hard constraint clamp.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Conceptual prototype taxonomy (testing without code)</h3>
+
+<table>
+  <thead><tr><th>Prototype</th><th>Mechanics</th><th>What it validates</th><th>Classic example</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Concierge MVP</strong></td>
+      <td>A human manually delivers the service to test the value proposition before any system exists.</td>
+      <td>A business problem worth fixing and worth paying for</td>
+      <td>Early Zappos — the founder manually fulfilled orders to test demand for online shoe buying.</td>
+    </tr>
+    <tr>
+      <td><strong>Wizard of Oz</strong></td>
+      <td>The front looks automated; a human hides behind the curtain pulling the strings.</td>
+      <td>The <em>perceived</em> experience, not the actual tech</td>
+      <td>A demo chat that a human actually types into.</td>
+    </tr>
+    <tr>
+      <td><strong>Painted door / fake door</strong></td>
+      <td>A landing page or button for a feature that doesn't exist yet; measure click-through intent.</td>
+      <td>Demand — does anyone want it enough to click?</td>
+      <td>A "sign up" link routed to a waitlist instead of a product.</td>
+    </tr>
+    <tr>
+      <td><strong>Concept video / storyboard</strong></td>
+      <td>Sell the future state to stakeholders or users to test emotional resonance and mental-model fit.</td>
+      <td>Emotional response; whether the mental model click-in</td>
+      <td>A short film of the imagined workflow.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Selection by learning goal:</strong> desirability = painted door / concierge; perceived experience = Wizard of Oz; emotional resonance = concept video; business value = concierge. March the prototype to the learning goal, never to "what we can build."</p>
+
+<h2>8d. Desirability testing and the handoff — proving value, then transferring it</h2>
+
+<p>The value of a concept is proven by behavior, and a validated concept then needs a path out of Design Thinking and into System Design (§1d). Two halves:</p>
+
+<h3>Desirability — behaving over saying</h3>
+
+<table>
+  <thead><tr><th>Signal</th><th>Why it's reliable</th><th>How to observe it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Behavioral commitment</strong></td>
+      <td>Users lie to be polite; stated preference is cheap.</td>
+      <td>Make the user "pay" with time, reputation, email, or money — not words.</td>
+    </tr>
+    <tr>
+      <td><strong>The Mom Test rule</strong></td>
+      <td>Cheery questions ("would you buy this?") always read "yes."</td>
+      <td>Never ask about a hypothetical; ask "When did you last solve this, and what did you <em>pay</em>?"</td>
+    </tr>
+    <tr>
+      <td><strong>Willingness to recommend</strong></td>
+      <td>Reputation is a real cost; recommending has stakes.</td>
+      <td>"Who would you tell about this, and why?"</td>
+    </tr>
+    <tr>
+      <td><strong>Emotional resonance</strong></td>
+      <td>Relief / delight correlates with real need.</td>
+      <td>Observe the moment of first understanding, not the after-test survey.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The handoff — translation artifacts that let other processes carry the insight</h3>
+
+<table>
+  <thead><tr><th>Artifact</th><th>What it captures</th><th>Hands off to</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Opportunity Solution Tree</strong></td>
+      <td>Desired outcome → opportunities (user needs) → solutions → assumption tests.</td>
+      <td>Product Management; continuous discovery</td>
+    </tr>
+    <tr>
+      <td><strong>Hypothesis statement</strong></td>
+      <td>"We believe [solution] will produce [outcome] for [user]. We'll know when [measurable behavior]."</td>
+      <td>Lean UX; the System Design build</td>
+    </tr>
+    <tr>
+      <td><strong>Design brief / problem frame</strong></td>
+      <td>The constraints, the accepted insight, and the success metrics — the watertight problem definition.</td>
+      <td>System Design and UI/UX</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Handoff rule:</strong> Design Thinking is done only when the output is an artifact the next process can consume without re-running discovery. A raw pile of quotes is not a handoff; an opportunity tree or hypothesis statement is.</p>
+
+<blockquote class="callout">
+  <p><strong>Layered handoff.</strong> Insight (Design Thinking) → <em>this is the problem</em>. Then System Design owns <em>architecture fits it at scale</em> (§1d), and UI/UX owns <em>the pixels that carry the empathy</em>. The artifacts above are what survive the move across those seams.</p>
+</blockquote>
+
+<h2>8e. Managing the room and the organization</h2>
+
+<p>Design Thinking fails as often from <em>social</em> rejection as from method error. Two forces you never get to ignore:</p>
+
+<table>
+  <thead><tr><th>Force</th><th>Look</th><th>Countermove</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>The HiPPO</strong></td>
+      <td>The highest-paid opinion overrides evidence the team actually gathered.</td>
+      <td>Let the artifact speak first: anonymous vote on insights, or play the user clip before the leader states a view.</td>
+    </tr>
+    <tr>
+      <td><strong>Buyer vs. user (B2B)</strong></td>
+      <td>The person who feels the pain (user) isn't the one who signs the check (buyer).</td>
+      <td>Map both journeys; the tool must satisfy the <em>workflow</em> of the user and the <em>inertia/compliance</em> of the buyer.</td>
+    </tr>
+    <tr>
+      <td><strong>Extractive research</strong></td>
+      <td>Taking data and insights without giving back — the "helicopter research" backlash.</td>
+      <td>Compensate lived experience as professional labor; share back the findings; run harm mapping to find who's excluded.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Design thinking is a joint activity. See also §3b's migration-path risks (leadership reverts, token inclusion) and §12's co-design future.</p>
+
 ---
 
 <h2>9. Worked example — "Reduce missed medication doses"</h2>
@@ -517,6 +723,16 @@ Reframed problem: How might we make the medication trigger visible at the right 
       <td><strong>Premature Convergence</strong></td>
       <td>Team picks the first plausible idea and polishes it. Never explores the fringe where the real insight lives.</td>
       <td>Ambiguity intolerance. Organizations reward "decisiveness" over "exploration."</td>
+    </tr>
+    <tr>
+      <td><strong>Extractive Research</strong></td>
+      <td>Team takes user data and insights without giving anything back, eroding community trust.</td>
+      <td>"Helicopter research" — the benefit flows to the team, the burden stays with the community.</td>
+    </tr>
+    <tr>
+      <td><strong>The Frankenstein Prototype</strong></td>
+      <td>Theory + Ideation end with every stakeholder's favorite feature bolted into one bloated, untestable monster.</td>
+      <td>Convergence without a filter; prototype tries to prove every hypothesis at once so it proves none.</td>
     </tr>
   </tbody>
 </table>
@@ -603,7 +819,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2>11. The future — where Design Thinking is going</h2>
+<h2>12. The future — where Design Thinking is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for Design Thinking</th></tr></thead>
@@ -629,7 +845,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2>12. Summary — the mental checklist</h2>
+<h2>13. Summary — the mental checklist</h2>
 
 <p>Before any feature enters the backlog, verify:</p>
 
@@ -641,6 +857,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
     <tr><td>Have we generated at least 20 distinct ideas before converging?</td><td>Go to Ideate. Diverge more.</td></tr>
     <tr><td>Do we have a testable prototype that costs < 1 day to build?</td><td>Go to Prototype. Lower fidelity.</td></tr>
     <tr><td>Did we test with 5+ representative users and learn something surprising?</td><td>Go to Test. The surprise is the signal.</td></tr>
+    <tr><td>Did the user "pay" for the prototype with time, data, or money — not just call it "nice"?</td><td>Go to Prototype. A politely praised concept proves nothing.</td></tr>
   </tbody>
 </table>
 
