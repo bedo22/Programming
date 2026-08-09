@@ -1,0 +1,595 @@
+## Overall verdict
+
+This is a **strong, well-structured document** that fills a genuine gap in the shelf: the platforms beyond the browser. The "platform bridge" metaphor is effective, the decision matrix is practical, and the worked example (habit tracker across platforms) is well-chosen. The doc correctly identifies that the web developer's skills transfer to these platforms through bridges, not replacements.
+
+However, the doc is **broad but shallow** in several areas. It covers five platforms (React Native, Electron, Smart TV, Gaming, PWA/Capacitor) but doesn't go deep enough on any of them to be truly useful as a reference. The React Native section is the deepest but still misses critical topics (native modules, OTA updates, deep linking, push notifications, offline-first). The Electron section covers architecture but misses security model details, packaging, and auto-update. The Smart TV and Gaming sections are the shallowest.
+
+The doc also misses several important cross-cutting topics: app store submission, CI/CD for native apps, native testing strategies, native accessibility, and monetization (IAP/subscriptions).
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Bridge metaphor and decision matrix | Strong |
+| React Native architecture (old → new) | Good but incomplete |
+| React Native practical topics | Missing many critical topics |
+| Electron architecture | Good but incomplete |
+| Electron practical topics | Missing security, packaging, auto-update |
+| PWA / Capacitor | Too shallow |
+| Smart TV | Too shallow |
+| Gaming | Too shallow |
+| Cross-cutting topics (app store, CI/CD, testing, accessibility) | Missing |
+| Intersection with neighbors | Good |
+| Worked example | Good |
+| Failure modes | Good |
+| Ecosystem | Good |
+| Future | Good |
+
+### Rough ratings
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 8.5 / 10 |
+| Conceptual completeness | 7 / 10 |
+| Practical completeness | 5.5 / 10 |
+| Depth per platform | 5 / 10 |
+| Cross-cutting topics | 4 / 10 |
+| Shelf consistency | 8 / 10 |
+| Duplication control | 8.5 / 10 |
+
+---
+
+# 1. What the document does well
+
+## 1.1 The bridge metaphor is effective
+
+The central metaphor — that each platform is a "bridge" between JS and a native platform — is effective. It correctly frames the relationship: JS is the glue, the native platform provides the capabilities, and the bridge connects them. This avoids the common mistake of treating these platforms as "alternatives to the web" rather than "extensions of the web."
+
+The spectrum diagram (browser → PWA → Capacitor → React Native → Electron → Smart TV → Gaming) is a good visual for understanding the trade-offs at each point.
+
+## 1.2 The decision matrix is practical
+
+The "does the user need to INSTALL this, and does it need NATIVE capabilities?" question is the right framing. The four-way short version (no install/no native → web; install + native + JS team → React Native; install + desktop + JS team → Electron/Tauri; install + maximum fidelity + native team → Kotlin/Swift) is practical and actionable.
+
+## 1.3 The React Native architecture section is good
+
+The old architecture (JSON bridge, async, batched) vs new architecture (JSI, direct C++ references, synchronous) comparison is accurate and well-explained. The doc correctly identifies that the bridge was the bottleneck and that the new architecture removes it.
+
+The "what transfers from React and what doesn't" table is useful. It correctly identifies that components, props, state, hooks, context, reducers, composition, and the re-render model transfer, but DOM APIs, CSS, browser storage, and the assumption that "the browser renders my HTML" do not.
+
+## 1.4 The Electron architecture section is good
+
+The main process / renderer process / IPC diagram is accurate. The doc correctly identifies that the main process owns the OS (filesystem, menus, tray, notifications) and the renderer process owns the UI (React app, DOM, CSS).
+
+The Electron vs Tauri vs alternatives table is practical. The bundle size comparison (Electron ~150MB vs Tauri ~3-10MB) is the key trade-off.
+
+## 1.5 The worked example is well-chosen
+
+The habit tracker example across five platforms (Web PWA, React Native, Capacitor, Electron, Native rejected) is well-chosen. It demonstrates the decision matrix in practice and shows how the same product maps to different platforms.
+
+## 1.6 The failure modes are practical
+
+The failure modes table covers common mistakes: treating RN like web, ignoring platform differences, not handling the back button, assuming JS is always running, emulator-only testing, ignoring review times, Electron security misconfiguration, native when RN suffices, web when native is needed.
+
+## 1.7 The ecosystem table is comprehensive
+
+The ecosystem table covers the major tools for each platform: React Native (Expo, React Navigation, Reanimated, MMKV), Electron (electron-builder, electron-updater, electron-forge), Tauri (tauri-cli, tauri-api), Smart TV (Tizen Studio, webOS TV SDK), Gaming (Phaser, PixiJS, Three.js, Cocos Creator).
+
+---
+
+# 2. Duplication boundaries
+
+The doc correctly identifies its neighbors and avoids duplicating them:
+
+| Neighbor | What it owns | What stays there vs here |
+|---|---|---|
+| Terminal & Deployment Substrate | Shell, pipes, SSH, Docker, deployment | There: the substrate. Here: the platforms that run on it. |
+| JavaScript Across Stacks | Node as a stack, the runtime | There: the runtime. Here: the platforms that use it. |
+| Backend Engineering | HTTP servers, request lifecycle | There: servers. Here: the platforms that aren't servers. |
+| Open Source | Licenses, contributing | There: the social process. Here: the technical platforms. |
+
+The doc correctly avoids duplicating the React paradigm shift doc (class-to-hooks) and the frontend camps survey. It references them but doesn't re-teach their content.
+
+---
+
+# 3. Completeness gaps — high priority
+
+These are the gaps that make the doc incomplete as a reference.
+
+## 3.1 React Native: Native module development
+
+The doc mentions native modules briefly ("custom native modules — you write Kotlin/Swift and expose it to JS via JSI") but doesn't go deep. This is a critical topic for RN developers who need capabilities beyond what Expo modules provide.
+
+Add a section:
+
+**Native Modules in React Native**
+
+| Topic | What to cover |
+|---|---|
+| When to write a native module | When Expo modules don't cover the capability (e.g., custom hardware, proprietary SDK) |
+| Old architecture native modules | Bridge-based modules (RCT_EXPORT_MODULE, RCT_EXPORT_METHOD) |
+| New architecture native modules (TurboModules) | JSI-based modules, Codegen for type-safe interfaces |
+| Kotlin for Android modules | Basic Kotlin syntax, Android SDK, Gradle |
+| Swift/Objective-C for iOS modules | Basic Swift syntax, Xcode, CocoaPods |
+| JSI bindings | How JS calls C++/Kotlin/Swift through JSI |
+| Testing native modules | Unit testing native code, integration testing with JS |
+
+## 3.2 React Native: OTA updates (Over-The-Air)
+
+The doc doesn't cover OTA updates at all. This is a critical topic for RN apps.
+
+Add a section:
+
+**OTA Updates in React Native**
+
+| Topic | What to cover |
+|---|---|
+| What OTA updates are | Pushing JS bundle updates without going through the app store |
+| Expo Updates | Expo's OTA update system, `expo-updates` module |
+| CodePush (Microsoft) | Alternative OTA update system (now part of App Center) |
+| Limitations of OTA | Can only update JS bundle, not native code. Native changes still require app store review. |
+| Update strategies | Immediate update, update on next launch, rollback |
+| Version management | How to manage multiple versions, rollback strategy |
+
+## 3.3 React Native: Deep linking
+
+The doc doesn't cover deep linking at all. This is a critical topic for RN apps.
+
+Add a section:
+
+**Deep Linking in React Native**
+
+| Topic | What to cover |
+|---|---|
+| What deep linking is | Opening a specific screen in the app from a URL |
+| URL schemes | Custom URL schemes (myapp://screen/123) |
+| Universal Links (iOS) | HTTPS links that open the app (https://myapp.com/screen/123) |
+| App Links (Android) | HTTPS links that open the app (https://myapp.com/screen/123) |
+| React Navigation deep linking | Configuring React Navigation for deep links |
+| Expo linking | Expo's linking API |
+
+## 3.4 React Native: Push notifications
+
+The doc doesn't cover push notifications at all. This is a critical topic for RN apps.
+
+Add a section:
+
+**Push Notifications in React Native**
+
+| Topic | What to cover |
+|---|---|
+| What push notifications are | Server-to-client notifications |
+| APNs (Apple Push Notification service) | iOS push notification service |
+| FCM (Firebase Cloud Messaging) | Android push notification service |
+| Expo Notifications | Expo's push notification API |
+| react-native-push-notification | Alternative push notification library |
+| Push notification flow | Server → APNs/FCM → device → app |
+| Local vs remote notifications | Local notifications (scheduled on device) vs remote (sent from server) |
+
+## 3.5 React Native: Offline-first architecture
+
+The doc doesn't cover offline-first architecture at all. This is a critical topic for RN apps.
+
+Add a section:
+
+**Offline-First Architecture in React Native**
+
+| Topic | What to cover |
+|---|---|
+| What offline-first means | App works without network, syncs when online |
+| SQLite | Local database (expo-sqlite, react-native-sqlite-storage) |
+| WatermelonDB | Alternative local database optimized for RN |
+| Realm | Alternative local database |
+| Sync strategies | Optimistic updates, conflict resolution, sync queue |
+| Network detection | NetInfo API, detecting network changes |
+| Offline storage | AsyncStorage, MMKV for key-value storage |
+
+## 3.6 Electron: Security model
+
+The doc mentions sandboxing briefly but doesn't go deep on Electron's security model. This is a critical topic.
+
+Add a section:
+
+**Electron Security Model**
+
+| Topic | What to cover |
+|---|---|
+| contextIsolation | Isolates the preload script from the renderer |
+| nodeIntegration | Disables Node.js in the renderer (should be false) |
+| preload scripts | Scripts that run before the renderer, with access to Node.js APIs |
+| contextBridge | Safe bridge between preload and renderer |
+| Content Security Policy | CSP headers for Electron |
+| Remote module | Deprecated, should not be used |
+| webSecurity | Should not be disabled |
+| allowRunningInsecureContent | Should be false |
+| experimentalFeatures | Should be false |
+| webviewTag | Should be false |
+
+## 3.7 Electron: Packaging and distribution
+
+The doc doesn't cover packaging and distribution at all. This is a critical topic.
+
+Add a section:
+
+**Electron Packaging and Distribution**
+
+| Topic | What to cover |
+|---|---|
+| electron-builder | Packaging tool for Electron apps |
+| electron-forge | Alternative packaging tool |
+| Code signing | Signing apps for macOS (notarization) and Windows (Authenticode) |
+| Auto-update | electron-updater, update strategies |
+| Distribution channels | Direct download, app stores (Mac App Store, Microsoft Store) |
+| Installer types | DMG (macOS), NSIS (Windows), AppImage (Linux) |
+
+## 3.8 Electron: Auto-update
+
+The doc mentions electron-updater briefly but doesn't go deep. This is a critical topic.
+
+Add a section:
+
+**Electron Auto-Update**
+
+| Topic | What to cover |
+|---|---|
+| electron-updater | Electron's auto-update module |
+| Update channels | Latest, beta, alpha |
+| Update server | Where updates are hosted (GitHub Releases, S3, custom) |
+| Update strategies | Check on launch, check periodically, manual check |
+| Differential updates | Download only the changed parts |
+| Rollback | How to rollback a bad update |
+
+## 3.9 PWA deeper
+
+The doc mentions PWA briefly but doesn't go deep. Add a section:
+
+**Progressive Web Apps (PWA) — Deeper**
+
+| Topic | What to cover |
+|---|---|
+| Service Workers | What they are, how they work, lifecycle |
+| Offline strategies | Cache-first, network-first, stale-while-revalidate |
+| Push notifications | Web Push API, push notifications in PWA |
+| Install prompts | beforeinstallprompt event, install criteria |
+| Web App Manifest | manifest.json, icons, theme color |
+| Workbox | Google's Service Worker library |
+| PWA limitations | No access to native APIs, limited push notification support on iOS |
+
+## 3.10 Capacitor deeper
+
+The doc mentions Capacitor briefly but doesn't go deep. Add a section:
+
+**Capacitor — Deeper**
+
+| Topic | What to cover |
+|---|---|
+| Capacitor vs Cordova | Capacitor is the successor to Cordova |
+| Capacitor architecture | WebView + native plugins |
+| Capacitor plugins | Official plugins, community plugins |
+| Capacitor vs React Native | When to choose Capacitor vs RN |
+| Capacitor CLI | cap init, cap add, cap sync |
+| Native project structure | Xcode project (iOS), Android Studio project (Android) |
+
+## 3.11 Smart TV deeper
+
+The Smart TV section is the shallowest. Add more depth:
+
+**Smart TV Development — Deeper**
+
+| Topic | What to cover |
+|---|---|
+| Tizen development workflow | Tizen Studio, Tizen SDK, emulator |
+| webOS development workflow | webOS TV SDK, emulator |
+| Remote-driven UX patterns | D-pad navigation, focus management, 10-foot UI |
+| Focus management | How focus works on TV, focus trapping |
+| Key event handling | Key codes, key events |
+| DRM | DRM on TV (Widevine, PlayReady), EME API |
+| Media playback | AVPlay (Tizen), media pipeline |
+| Certification process | Samsung TV Seller Office, LG store certification |
+| Model year fragmentation | Fixed Chromium per model year, feature detection |
+
+## 3.12 Gaming deeper
+
+The Gaming section is shallow. Add more depth:
+
+**Gaming on the Web — Deeper**
+
+| Topic | What to cover |
+|---|---|
+| Game loop architecture | requestAnimationFrame, fixed timestep, variable timestep |
+| Phaser | 2D game framework, scenes, sprites, physics |
+| PixiJS | 2D rendering engine, WebGL |
+| Three.js | 3D rendering engine, WebGL |
+| Babylon.js | 3D rendering engine, WebGL/WebGPU |
+| WebGPU | Next generation web graphics API, successor to WebGL |
+| WebXR | AR/VR on the web, Quest browser |
+| Web Workers | Offloading game logic to workers |
+| SharedArrayBuffer | Shared memory between workers |
+| Asset loading | Asset loading strategies, asset compression |
+| Audio | Web Audio API, Howler.js |
+
+## 3.13 Cross-cutting: App store submission
+
+The doc doesn't cover app store submission at all. This is a critical topic.
+
+Add a section:
+
+**App Store Submission**
+
+| Topic | What to cover |
+|---|---|
+| App Store (iOS) | App Store Connect, review process, guidelines |
+| Play Store (Android) | Play Console, review process, guidelines |
+| Common rejection reasons | Crashes, privacy policy, IAP violations, guideline violations |
+| App review timeline | Typical review times (iOS: 1-3 days, Android: 1-7 days) |
+| Pre-launch testing | TestFlight (iOS), Play Store internal testing |
+| App metadata | App name, description, screenshots, keywords |
+
+## 3.14 Cross-cutting: CI/CD for native apps
+
+The doc doesn't cover CI/CD for native apps at all. This is a critical topic.
+
+Add a section:
+
+**CI/CD for Native Apps**
+
+| Topic | What to cover |
+|---|---|
+| Fastlane | CI/CD tool for iOS and Android |
+| EAS Build (Expo) | Expo's cloud build service |
+| App Store Connect API | Automating App Store submissions |
+| Play Store API | Automating Play Store submissions |
+| Code signing automation | Automating code signing in CI |
+| Test automation | Running tests on real devices, simulators |
+
+## 3.15 Cross-cutting: Native testing strategies
+
+The doc doesn't cover native testing strategies at all. This is a critical topic.
+
+Add a section:
+
+**Native Testing Strategies**
+
+| Topic | What to cover |
+|---|---|
+| Jest for React Native | Unit testing RN components |
+| React Native Testing Library | Testing RN components |
+| Detox | E2E testing for RN apps |
+| Appium | E2E testing for native apps |
+| Maestro | E2E testing for native apps |
+| Native module testing | Testing native modules |
+| Device testing | Testing on real devices vs simulators |
+
+## 3.16 Cross-cutting: Native accessibility
+
+The doc doesn't cover native accessibility at all. This is a critical topic.
+
+Add a section:
+
+**Native Accessibility**
+
+| Topic | What to cover |
+|---|---|
+| VoiceOver (iOS) | Screen reader on iOS |
+| TalkBack (Android) | Screen reader on Android |
+| accessibilityLabel | Label for screen readers |
+| accessibilityRole | Role for screen readers |
+| accessibilityState | State for screen readers |
+| TV accessibility | Accessibility on TV |
+| Testing accessibility | Testing with VoiceOver/TalkBack |
+
+## 3.17 Cross-cutting: Monetization (IAP, subscriptions)
+
+The doc doesn't cover monetization at all. This is a critical topic.
+
+Add a section:
+
+**Monetization on Native Platforms**
+
+| Topic | What to cover |
+|---|---|
+| In-App Purchases (IAP) | Consumable, non-consumable, subscription |
+| StoreKit (iOS) | Apple's IAP API |
+| Play Billing (Android) | Google's IAP API |
+| RevenueCat | Cross-platform IAP abstraction |
+| expo-iap | Expo's IAP module |
+| Subscription management | Subscription lifecycle, grace period, retry |
+| Ad integration | AdMob, AdSense, banner/interstitial/rewarded ads |
+
+## 3.18 Cross-cutting: Error tracking on native
+
+The doc doesn't cover error tracking on native platforms at all. This is a critical topic.
+
+Add a section:
+
+**Error Tracking on Native Platforms**
+
+| Topic | What to cover |
+|---|---|
+| Sentry for React Native | Error tracking for RN apps |
+| Firebase Crashlytics | Error tracking for native apps |
+| Native crash reporting | Native crash reports (iOS, Android) |
+| Symbolication | Converting native crash reports to readable stack traces |
+| Source maps | Uploading source maps for JS error reporting |
+
+## 3.19 Missing: React Native for Web
+
+React Native can also target web (react-native-web). This is a missing dimension.
+
+Add a note:
+
+**React Native for Web**
+
+React Native can also target web via `react-native-web`. This allows you to write React Native components that run on the web. However, not all React Native APIs are available on web, and the web version may have performance limitations. Use `react-native-web` when you want to share components between React Native and web, but be aware of the limitations.
+
+## 3.20 Missing: WebGPU
+
+The doc mentions WebGL but doesn't cover WebGPU, the next generation of web graphics.
+
+Add a note:
+
+**WebGPU**
+
+WebGPU is the next generation of web graphics API, successor to WebGL. It provides lower-level access to the GPU, better performance, and modern graphics features. WebGPU is supported in Chrome, Edge, and Firefox (behind a flag). Use WebGPU for high-performance 3D graphics, compute shaders, and machine learning inference.
+
+---
+
+# 4. Accuracy issues
+
+| Claim | Assessment | Suggested fix |
+|---|---|---|
+| "React Native old architecture: JSON bridge (async, batched)" | Accurate | No fix needed |
+| "React Native new architecture: JSI (JavaScript Interface), direct C++ references, synchronous" | Accurate | No fix needed |
+| "Electron: Chromium (~150MB) + Node.js (~30MB)" | Approximately accurate | No fix needed |
+| "Tauri: System WebView + Rust backend, ~3-10MB" | Approximately accurate | No fix needed |
+| "WeChat mini-games: ~4MB first package" | Accurate | No fix needed |
+| "React Native: Hermes on Android, JavaScriptCore on iOS" | Accurate | No fix needed |
+| "Electron: IPC (ipcMain/ipcRenderer)" | Accurate | No fix needed |
+| "Tizen: every Samsung TV since 2015" | Approximately accurate | No fix needed |
+| "webOS: every LG TV" | Approximately accurate | No fix needed |
+| "Phaser, PixiJS, Three.js, Babylon.js run in a browser tab" | Accurate | No fix needed |
+
+No major accuracy issues found.
+
+---
+
+# 5. Structural improvements
+
+## 5.1 Add a "Platform capability matrix"
+
+The decision matrix is good but could be more detailed. Add a capability matrix:
+
+| Capability | Web (PWA) | Capacitor | React Native | Electron | Smart TV | Gaming |
+|---|---|---|---|---|---|---|
+| Install required | No | Yes | Yes | Yes | Yes | Yes |
+| Native UI | No | No | Yes | No | No | No |
+| Native APIs | Limited | Via plugins | Full | Full (Node.js) | Limited | Limited |
+| Offline | Service Worker | Via plugins | SQLite, MMKV | Full | Limited | Limited |
+| Push notifications | Limited (iOS) | Via plugins | Full | Full | Limited | Limited |
+| Deep linking | Limited | Via plugins | Full | Full | Limited | Limited |
+| IAP | No | Via plugins | Full | Full | Limited | Limited |
+| Bundle size | ~0 (browser) | ~5MB | ~10MB | ~150MB | ~50MB | ~100MB |
+
+## 5.2 Add a "When to use what" decision tree
+
+The decision matrix is good but could be more detailed. Add a decision tree:
+
+```
+Does the user need to install?
+├── No → Web (PWA)
+│   └── Does it need native APIs?
+│       ├── No → Web (PWA)
+│       └── Yes → Capacitor
+└── Yes
+    ├── Does it need native UI?
+    │   ├── Yes → React Native
+    │   └── No
+    │       ├── Is it desktop?
+    │       │   ├── Yes → Electron / Tauri
+    │       │   └── No → Capacitor
+    │       └── Is it TV?
+    │           ├── Yes → Tizen / webOS
+    │           └── Is it gaming?
+    │               ├── Yes → Phaser / Three.js / Cocos
+    │               └── No → Capacitor
+    └── Does it need maximum fidelity?
+        ├── Yes → Native (Kotlin/Swift)
+        └── No → React Native
+```
+
+## 5.3 Add a "Platform-specific gotchas" section
+
+Each platform has specific gotchas that developers should know about. Add a section:
+
+**Platform-Specific Gotchas**
+
+| Platform | Gotcha | Fix |
+|---|---|---|
+| React Native | Android back button | Handle back button with React Navigation |
+| React Native | Keyboard avoiding view | Use KeyboardAvoidingView |
+| React Native | FlatList performance | Use FlatList instead of ScrollView for long lists |
+| React Native | Native module compatibility | Check native module compatibility with RN version |
+| Electron | Renderer security | Disable nodeIntegration, enable contextIsolation |
+| Electron | Auto-update on macOS | Code signing and notarization required |
+| Electron | IPC performance | Don't send large data over IPC |
+| Smart TV | Focus management | Handle focus explicitly, don't rely on browser focus |
+| Smart TV | Model year fragmentation | Feature detect, don't assume features |
+| Gaming | Memory management | Manage memory explicitly, avoid leaks |
+| Gaming | Asset loading | Load assets asynchronously, show loading screen |
+
+---
+
+# 6. Summary — the complete mental checklist
+
+Before you build for any platform beyond the browser, verify:
+
+| Question | If no… |
+|---|---|
+| Does the user need to install this? | If no, use web (PWA). |
+| Does it need native capabilities? | If no, use web (PWA) or Capacitor. |
+| Does it need native UI? | If yes, use React Native. If no, use Capacitor or Electron. |
+| Is it desktop? | If yes, use Electron or Tauri. |
+| Is it TV? | If yes, use Tizen or webOS. |
+| Is it gaming? | If yes, use Phaser, Three.js, or Cocos. |
+| Does it need maximum fidelity? | If yes, use native (Kotlin/Swift). |
+| Have you tested on real devices? | If no, test on real devices before shipping. |
+| Have you handled the platform-specific gotchas? | If no, handle them before shipping. |
+| Have you tested accessibility? | If no, test with VoiceOver/TalkBack. |
+| Have you set up error tracking? | If no, set up Sentry or Crashlytics. |
+| Have you set up CI/CD? | If no, set up Fastlane or EAS Build. |
+| Have you set up OTA updates? (RN) | If no, set up Expo Updates or CodePush. |
+| Have you set up deep linking? | If no, set up deep linking. |
+| Have you set up push notifications? | If needed, set up push notifications. |
+| Have you set up IAP? | If needed, set up IAP with RevenueCat or expo-iap. |
+| Have you submitted to the app store? | If no, submit to App Store / Play Store. |
+
+---
+
+# 7. Priority roadmap
+
+## Must add (high priority)
+
+1. React Native: Native module development
+2. React Native: OTA updates
+3. React Native: Deep linking
+4. React Native: Push notifications
+5. React Native: Offline-first architecture
+6. Electron: Security model
+7. Electron: Packaging and distribution
+8. Electron: Auto-update
+9. Cross-cutting: App store submission
+10. Cross-cutting: CI/CD for native apps
+11. Cross-cutting: Native testing strategies
+12. Cross-cutting: Native accessibility
+13. Cross-cutting: Monetization (IAP, subscriptions)
+14. Cross-cutting: Error tracking on native
+
+## Should add (medium priority)
+
+15. PWA deeper (Service Workers, offline strategies, push notifications)
+16. Capacitor deeper (architecture, plugins, vs RN)
+17. Smart TV deeper (development workflow, remote-driven UX, certification)
+18. Gaming deeper (game loop, Phaser, Three.js, WebGPU)
+19. React Native for Web
+20. WebGPU
+21. Platform capability matrix
+22. Decision tree
+23. Platform-specific gotchas
+
+---
+
+# 8. Bottom line
+
+This is a **strong, well-structured document** that fills a genuine gap in the shelf. The bridge metaphor is effective, the decision matrix is practical, and the worked example is well-chosen. The doc correctly identifies that the web developer's skills transfer to these platforms through bridges, not replacements.
+
+However, the doc is **broad but shallow**. It covers five platforms but doesn't go deep enough on any of them to be truly useful as a reference. The React Native section is the deepest but still misses critical topics (native modules, OTA updates, deep linking, push notifications, offline-first). The Electron section covers architecture but misses security model details, packaging, and auto-update. The Smart TV and Gaming sections are the shallowest.
+
+The doc also misses several important cross-cutting topics: app store submission, CI/CD for native apps, native testing strategies, native accessibility, and monetization (IAP/subscriptions).
+
+The highest-priority additions are:
+
+1. React Native practical topics (native modules, OTA updates, deep linking, push notifications, offline-first)
+2. Electron practical topics (security model, packaging, auto-update)
+3. Cross-cutting topics (app store submission, CI/CD, testing, accessibility, monetization, error tracking)
+
+With these additions, the doc would be a comprehensive reference for building beyond the browser.

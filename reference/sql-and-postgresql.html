@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL &amp; PostgreSQL — the query language and the engine</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · SQL &amp; PostgreSQL — the query language and the engine</p>
+  <h1>SQL &amp; PostgreSQL</h1>
+  <p class="meta">The query language that opens every schema: SELECT anatomy and execution order, NULL handling, JOINs in all their forms, aggregation and GROUP BY, subqueries and CTEs, window functions, writing data (INSERT/UPDATE/DELETE/UPSERT), transactions in SQL, the PostgreSQL features that win (JSONB, arrays, full-text, LISTEN/NOTIFY, RLS, partitioning, extensions), reading slow queries with EXPLAIN ANALYZE, the MySQL/MariaDB differences that matter for WordPress, and SQLite for local development — with a worked example that turns the shelf's shipment-tracking schema into real queries. Read this after <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> (you design the vault there; you open it here).</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> teaches how to <em>design</em> the schema — tables, keys, constraints, indexes, migrations. <a href="./backend-engineering.html">Backend Engineering</a> teaches the request loop that <em>calls</em> the database. Neither teaches the language itself. This doc is the missing middle — the SQL that connects them:</p>
+  <pre>SCHEMA DESIGN (data-modeling)          THE QUERY LAYER (this doc)
+tables, keys, constraints, indexes     SELECT, JOIN, GROUP BY, window functions
+migrations, isolation levels           BEGIN/COMMIT, UPSERT, EXPLAIN ANALYZE
+                                       |
+THE REQUEST LOOP (backend)             THE ENGINES
+the server calls these queries         PostgreSQL (shelf default) ← the depth
+ORMs vs raw SQL (§1e)                  MySQL/MariaDB (WordPress)
+N+1 problem (§1e)                      SQLite (local dev, tests)
+                                       hosted faces: Supabase, Neon, PlanetScale</pre>
+  <p>Neighbors and how they split the work:</p>
+  <ul>
+    <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — owns schema design, index strategy, and the EXPLAIN tuning loop as a <em>concept</em>. This doc owns the language and shows the syntax the concepts are about.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — owns the ORM-vs-raw-SQL decision (§1e), the N+1 problem, and transactions as a server concern. This doc shows the SQL underneath: the JOINs that fix N+1, the BEGIN/COMMIT syntax.</li>
+    <li><a href="./api-design.html">API Design</a> — owns idempotency keys. This doc provides their database side: <code>INSERT ... ON CONFLICT</code>.</li>
+    <li><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> — WordPress runs on MySQL/MariaDB; the differences section here is its database companion.</li>
+    <li><a href="./terminal-and-deployment-substrate.html">Terminal &amp; the Deployment Substrate</a> — the shell where <code>psql</code> and <code>pg_dump</code> run; the database-administration depth deliberately stays outside this shelf.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p><em>No other doc on the shelf teaches how to query a database.</em> The data-modeling doc designs schemas and even shows two example queries; the backend doc names ORMs and transactions — but nobody teaches the language itself: what a JOIN is, when GROUP BY applies, what a window function does, how UPSERT makes an idempotent write. That gap matters for every audience on this shelf: the freelancer debugging a WordPress <code>wp_postmeta</code> query, the React developer wiring a Supabase query to a Next.js page, the backend engineer optimizing an N+1, and the systems designer explaining why the index table exists. SQL is the single most transferable skill in backend work — the language is ~90% identical across PostgreSQL, MySQL, and SQLite. This doc teaches it once, engine-agnostic first, with PostgreSQL as the engine of record (it is the shelf's default) and a dedicated section for the WordPress-relevant MySQL differences. One scope note: <strong>this is not a database-administration course</strong> — WAL tuning, <code>pg_hba.conf</code>, and server configuration belong to the platform, not to this shelf.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read this after <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> (so the schema vocabulary is warm) and alongside <a href="./backend-engineering.html">Backend Engineering</a> §1e (the ORM-vs-raw-SQL decision). Cross-links:</p>
+<ul>
+  <li>Schema design, keys, constraints, indexes: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — this doc queries what that doc designs.</li>
+  <li>ORMs vs. raw SQL, the N+1 problem: <a href="./backend-engineering.html">Backend Engineering</a> §1e.</li>
+  <li>Transactions and concurrency as a server concern: <a href="./backend-engineering.html">Backend Engineering</a> §5; isolation levels as a schema concern: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> §Isolation levels.</li>
+  <li>Idempotent writes in APIs: <a href="./api-design.html">API Design</a> — the UPSERT section here is their SQL face.</li>
+  <li>WordPress's engine: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> — the MySQL differences section here.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you can design a schema but freeze at the query — or you've memorized "JOIN" without knowing what the engine actually does — this is the map.</strong> Read the Definition (what SQL is and is not), then the Query fundamentals and JOINs before anything else; the rest is depth on demand.</p>
+
+<h2>Definition — what SQL is, and what it is not</h2>
+
+<p><strong>SQL is a declarative language.</strong> You say <em>what</em> you want ("all shipments for this customer, newest first"), and the engine decides <em>how</em> to get it — which indexes to walk, how to join, what order to do things in. That is the opposite of your imperative code: in the request loop you write steps; in SQL you write the goal. The job of a good SQL writer is to phrase the goal so the engine's planner can see the cheap path (which is what the index and EXPLAIN sections are about).</p>
+
+<table>
+  <thead><tr><th>What SQL is</th><th>What SQL is not</th></tr></thead>
+  <tbody>
+    <tr><td>A declarative set language — you describe the result set</td><td>An imperative language — you do not describe the steps</td></tr>
+    <tr><td>Standardized (SQL-92, SQL:1999, SQL:2003, SQL:2016, SQL:2023) with vendor dialects</td><td>One dialect — every engine adds its own superset (PostgreSQL's <code>ON CONFLICT</code>, MySQL's <code>ON DUPLICATE KEY</code>)</td></tr>
+    <tr><td>The same language across PostgreSQL, MySQL, SQLite, SQL Server — ~90% shared</td><td>A backend "stack" — SQL is not Node or .NET; it is what they both call</td></tr>
+    <tr><td>About sets: WHERE filters rows, JOIN combines sets, GROUP BY folds sets, window functions rank within sets</td><td>About imperative loops — the N+1 problem happens exactly when you translate loops into queries</td></tr>
+  </tbody>
+</table>
+
+<p><strong>SQL vs NoSQL:</strong> relational engines give you ACID, joins, and constraints; document stores give you flexible schemas and horizontal scale-out. The shelf's position (<a href="./data-modeling-and-databases.html">Data Modeling</a> §Definition, §Beyond the relational default): relational by default, document stores when the schema is genuinely variable — and PostgreSQL's JSONB covers most of those cases without leaving the relational world. SQL is not going anywhere; it is the lingua franca of data.</p>
+
+<p><strong>The three engines you will actually use — and their hosted faces:</strong></p>
+
+<table>
+  <thead><tr><th>Engine</th><th>Where it appears in your world</th><th>Hosted face</th></tr></thead>
+  <tbody>
+    <tr><td><strong>PostgreSQL</strong></td><td>The shelf's default — data-modeling examples, backend examples, JSONB, pgvector</td><td>Supabase, Neon, AWS RDS — <a href="./nextjs-deep-dive.html">Next.js</a> projects commonly reach it via Supabase</td></tr>
+    <tr><td><strong>MySQL / MariaDB</strong></td><td>WordPress — the engine under the most websites on earth (<a href="./wordpress-and-cms-internet.html">WordPress doc</a>)</td><td>PlanetScale, AWS RDS</td></tr>
+    <tr><td><strong>SQLite</strong></td><td>Local development, tests, low-traffic production — a single file, no server</td><td>— (it runs in your process; the terminal substrate's <code>sqlite3</code> command opens it)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Statement classes:</strong> DDL (schema: <code>CREATE TABLE</code>, <code>ALTER</code>) — the data-modeling doc's territory; DML (data: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) — this doc's core; TCL (transactions: <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code>); DCL (permissions: <code>GRANT</code>). This doc teaches DML and the TCL you need to keep writes safe.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+  <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a></td><td>Schema design: keys, constraints, normalization, index <em>strategy</em>, the EXPLAIN tuning loop as a discipline, isolation levels</td><td>There: why the schema is shaped that way, which index type for which query. Here: the query syntax that exercises them, the concrete EXPLAIN reading</td></tr>
+    <tr><td><a href="./backend-engineering.html">Backend Engineering</a></td><td>The request loop, ORM-vs-raw-SQL decision, N+1 as a server pattern, transactions as a concurrency concern</td><td>There: when to use an ORM, why N+1 hurts, isolation as a knob. Here: the JOIN that fixes N+1, the <code>BEGIN</code>/<code>COMMIT</code> syntax, UPSERT</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a></td><td>Contracts, idempotency keys, cursor pagination</td><td>There: the HTTP semantics. Here: <code>INSERT ... ON CONFLICT</code> as the idempotent write, keyset-pagination queries</td></tr>
+    <tr><td><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a></td><td>The CMS, themes, plugins, the Loop</td><td>There: WordPress itself. Here: the MySQL differences and the <code>wp_postmeta</code>/<code>wp_options</code> query patterns</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a></td><td>Replication, partitioning as a scaling lever, vector stores as a system dependency</td><td>There: when and why. Here: the PostgreSQL syntax — <code>PARTITION BY RANGE</code>, pgvector operators</td></tr>
+  </tbody>
+</table>
+
+<h2>Query fundamentals — the SELECT anatomy</h2>
+
+<p>Every query is one sentence: <em>from these tables, filter to these rows, shape them into these columns.</em> The single most important mental model in SQL is that <strong>the written order and the execution order are different</strong>:</p>
+
+<pre>-- WRITTEN order (how you type it):
+SELECT   department, COUNT(*)
+FROM     employees
+WHERE    hired_at &gt; '2020-01-01'
+GROUP BY department
+HAVING   COUNT(*) &gt; 5
+ORDER BY department
+LIMIT    10;
+
+-- EXECUTION order (how the engine actually does it):
+-- 1. FROM        pick the source rows (joins happen here)
+-- 2. WHERE       filter rows            (cannot use aliases!)
+-- 3. GROUP BY    fold rows into groups
+-- 4. HAVING      filter groups          (cannot use aliases!)
+-- 5. SELECT      compute output columns (aliases born here)
+-- 6. ORDER BY    sort the output        (can use aliases)
+-- 7. LIMIT       cut the output</pre>
+
+<p>Most SQL bugs are order bugs: a <code>WHERE</code> that should be a <code>HAVING</code>, an alias used where it does not exist yet. Memorize the execution order once and the rest is vocabulary.</p>
+
+<table>
+  <thead><tr><th>Clause</th><th>What it does</th><th>Traps</th></tr></thead>
+  <tbody>
+    <tr><td><code>SELECT</code></td><td>Pick and compute columns; <code>SELECT DISTINCT</code> dedupes whole rows</td><td><code>SELECT *</code> in production — see Failure modes</td></tr>
+    <tr><td><code>FROM ... JOIN ...</code></td><td>Choose sources and combine them</td><td>Forgot the join key → cartesian product</td></tr>
+    <tr><td><code>WHERE</code></td><td>Filter rows <em>before</em> grouping</td><td>Filtering a group property here instead of in HAVING</td></tr>
+    <tr><td><code>ORDER BY</code></td><td>Sort; <code>DESC</code> for newest-first; multiple keys in priority order</td><td>Sorting costs time and blocks LIMIT pagination on big sets</td></tr>
+    <tr><td><code>LIMIT ... OFFSET ...</code></td><td>Cut output; page with OFFSET</td><td>Deep OFFSET scans and skips — use keyset pagination instead (see Window functions)</td></tr>
+  </tbody>
+</table>
+
+<h3>NULL — the number one source of SQL bugs</h3>
+
+<p><code>NULL</code> is not a value; it is the <em>absence</em> of a value, and it does not compare like one. <code>NULL = NULL</code> is not true — it is <code>NULL</code> (unknown). The three rules that end the confusion:</p>
+
+<pre>WHERE email IS NULL          -- the ONLY way to test for absence (never = NULL)
+WHERE email IS NOT NULL      -- its inverse
+WHERE score IS DISTINCT FROM 5   -- "not equal, counting NULL as a value" (PostgreSQL)
+
+SELECT COALESCE(nickname, full_name, 'Anonymous')  -- first non-NULL, left to right
+SELECT NULLIF(a, b)          -- NULL if a = b, else a   (handy for divide-by-zero)
+SELECT COUNT(*)              -- counts rows, including NULLs
+SELECT COUNT(email)          -- counts only non-NULL values — a subtle difference!</pre>
+
+<h3>CASE and casting</h3>
+
+<p><code>CASE</code> is SQL's <code>if/else</code> — an expression that returns a value per row, usable anywhere an expression is (SELECT, WHERE, ORDER BY). Casting with <code>::</code> (PostgreSQL) or <code>CAST(x AS type)</code> (standard) converts types — and is a classic performance trap when applied to indexed columns (see Performance).</p>
+
+<pre>SELECT CASE WHEN total &gt; 1000 THEN 'large'
+            WHEN total &gt; 100  THEN 'medium'
+            ELSE 'small' END AS size
+FROM shipments;
+
+SELECT '42'::int,  total::numeric(10,2)   -- PostgreSQL cast syntax
+SELECT CAST('42' AS INT);                -- standard, works everywhere</pre>
+
+<h2>JOINs — the core skill</h2>
+
+<p>Relational data lives in separate tables; JOINs bring it back together. A JOIN is a <em>pairing rule</em>: for each row on the left, find matching rows on the right by a key. Everything else is which rows you keep.</p>
+
+<pre>SELECT s.tracking_number, c.name AS customer
+FROM   shipments s
+JOIN   customers c ON c.id = s.customer_id;</pre>
+
+<table>
+  <thead><tr><th>Join type</th><th>What it keeps</th><th>Mental model</th></tr></thead>
+  <tbody>
+    <tr><td><strong>INNER JOIN</strong> (plain <code>JOIN</code>)</td><td>Only matched pairs</td><td>The intersection — "orders that have a customer"</td></tr>
+    <tr><td><strong>LEFT JOIN</strong></td><td>All left rows + matches; unmatched left rows get NULLs on the right</td><td>"Every customer, and their orders if any" — the workhorse</td></tr>
+    <tr><td><strong>RIGHT JOIN</strong></td><td>Mirror of LEFT — all right rows</td><td>Rarely used; flip the tables and use LEFT instead</td></tr>
+    <tr><td><strong>FULL OUTER JOIN</strong></td><td>All rows from both sides</td><td>"Both sides, matched where possible" — for reconciliation reports</td></tr>
+    <tr><td><strong>CROSS JOIN</strong></td><td>Every row of one × every row of the other</td><td>The cartesian product — almost always a bug; deliberate only for grids of combinations</td></tr>
+    <tr><td><strong>Self-join</strong></td><td>A table joined to itself (aliases required)</td><td>Hierarchies: <code>e.manager_id = m.id</code> — employees and their managers in one table</td></tr>
+  </tbody>
+</table>
+
+<p><strong>How the engine joins (why the same query can be fast or slow):</strong> the planner picks an algorithm per join. <strong>Nested loop</strong> — for each left row, probe the right side (great when one side is tiny or the key is indexed). <strong>Hash join</strong> — build a hash table of one side, probe with the other (great for large equi-joins, the default for big sets). <strong>Merge join</strong> — both sides sorted, walk them in lockstep (great when both sides are already sorted by the key). You do not choose these; you shape them by giving the planner what it needs — <strong>an index on the join key</strong>. A missing join-key index is the classic way a fine-looking query secretly table-scans.</p>
+
+<p><strong>JOIN vs subquery:</strong> anything a subquery does in the FROM or via a correlated filter, a JOIN usually expresses more readably. The exception: <code>NOT IN</code>-style anti-joins and existence checks, where <code>EXISTS</code> is both clearer and faster (see Subqueries). The rule of thumb: <strong>prefer JOINs for combining; prefer EXISTS for testing.</strong></p>
+
+<p><strong>The N+1 problem — where loops and queries collide.</strong> The anti-pattern: fetch 50 orders with one query, then run 50 more queries — one per order — to fetch each customer (this is what ORMs silently do when you access an unloaded relation). The fix is one JOIN (or one <code>IN</code> query), and the shelf's home for the pattern is <a href="./backend-engineering.html">Backend Engineering</a> §1e; this is the SQL that fixes it:</p>
+
+<pre>-- N+1 (51 queries): the loop fetches customers one by one
+-- one JOIN (1 query):
+SELECT o.id, o.total, c.name
+FROM   orders o
+JOIN   customers c ON c.id = o.customer_id
+WHERE  o.created_at &gt; now() - interval '7 days';</pre>
+
+<p><strong>LATERAL — the correlated subquery as a join.</strong> A normal JOIN can't reference the row it's joining from; LATERAL can. That makes it the tool for "top N per group" and per-row helpers the planner can't otherwise express:</p>
+
+<pre>-- each customer's 3 most recent orders
+SELECT c.name, recent.id, recent.total
+FROM   customers c
+CROSS JOIN LATERAL (
+  SELECT o.id, o.total FROM orders o
+  WHERE  o.customer_id = c.id
+  ORDER  BY o.created_at DESC LIMIT 3
+) recent;</pre>
+
+<p>Read it as "for each customer, run this inner query using the customer's id" — which is exactly how the engine executes it. Use LATERAL when a correlated subquery returns a set you want to join against; use a window function when the "top N per group" is computed over the whole partition at once (Window functions section) — LATERAL wins when you need <em>other</em> columns from the inner query.</p>
+
+<h2>Aggregation — folding rows into groups</h2>
+
+<p>Aggregation is WHERE's sibling at the set level: <strong>WHERE filters rows; GROUP BY folds them into groups; HAVING filters the groups.</strong> Every column in the SELECT must be either an aggregate function or a GROUP BY column — the engine enforces this, and the error is your friend.</p>
+
+<pre>SELECT   department, COUNT(*) AS headcount, AVG(salary) AS avg_salary
+FROM     employees
+WHERE    status = 'active'            -- row filter, before grouping
+GROUP BY department
+HAVING   AVG(salary) &gt; 50000           -- group filter, after grouping
+ORDER BY headcount DESC;</pre>
+
+<table>
+  <thead><tr><th>Aggregate</th><th>What it does</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td><code>COUNT(*)</code> / <code>COUNT(col)</code></td><td>Rows / non-NULL values</td><td>The NULL difference is a classic off-by-one</td></tr>
+    <tr><td><code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code></td><td>Numeric / ordered aggregates</td><td><code>SUM(NULL)</code> → NULL; use <code>COALESCE</code> for zero</td></tr>
+    <tr><td><code>COUNT(DISTINCT col)</code></td><td>Unique values</td><td>Expensive on big sets — needs a sort or hash</td></tr>
+    <tr><td><code>FILTER (WHERE ...)</code></td><td>PostgreSQL: aggregate over a subset of rows</td><td>One pass instead of several CASE tricks: <code>COUNT(*) FILTER (WHERE status='failed')</code></td></tr>
+    <tr><td><code>GROUPING SETS</code>, <code>ROLLUP</code>, <code>CUBE</code></td><td>Multiple grouping levels in one query</td><td>Report subtotals — reach for it when a dashboard needs totals alongside per-group rows</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Aggregate + JOIN trap:</strong> joining before grouping can multiply rows (one order, two line items → COUNT(*) says 2). Count from the joined side's own key or use <code>COUNT(DISTINCT o.id)</code>. When a report disagrees with a simple query, suspect a fan-out.</p>
+
+<p><strong>ROLLUP — subtotals and a grand total in one query.</strong> Dashboards want per-group rows <em>and</em> the totals; ROLLUP emits both, sparing you three queries and the client-side summing that always drifts:</p>
+
+<pre>SELECT carrier, COUNT(*)
+FROM   shipments
+GROUP BY ROLLUP (carrier);
+-- rows: one per carrier, then one NULL row = the grand total
+-- CUBE does the same for every combination of the grouping columns (ROLLUP's superset)</pre>
+
+<h2>Subqueries and CTEs — composing queries</h2>
+
+<p>A query can appear inside another query in three places, with three different meanings:</p>
+
+<table>
+  <thead><tr><th>Kind</th><th>Shape</th><th>Use it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Scalar subquery</strong></td><td>Returns one value, used in an expression</td><td><code>WHERE total &gt; (SELECT AVG(total) FROM orders)</code> — a single computed threshold</td></tr>
+    <tr><td><strong>Derived table</strong> (in FROM)</td><td>Returns a set, aliased, queried like a table</td><td>Aggregate first, then filter/join on the result — the "subquery in FROM" workhorse</td></tr>
+    <tr><td><strong>Correlated subquery</strong></td><td>References the outer query's row</td><td>Per-row calculations — but it runs once per outer row; re-check as a JOIN or window function</td></tr>
+    <tr><td><strong>EXISTS / NOT EXISTS</strong></td><td>Tests whether any row matches</td><td>The fast, clear way to filter by related data — often beats <code>IN</code> and subqueries</td></tr>
+  </tbody>
+</table>
+
+<pre>-- EXISTS vs IN: same question, different engines
+SELECT * FROM customers c
+WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id);  -- stops at first match
+
+SELECT * FROM customers
+WHERE id IN (SELECT customer_id FROM orders);                      -- builds the full list first
+
+-- Derived table: the max per group, then joined back
+SELECT t.department, t.max_salary, e.name
+FROM   (SELECT department, MAX(salary) AS max_salary FROM employees GROUP BY department) t
+JOIN   employees e ON e.department = t.department AND e.salary = t.max_salary;</pre>
+
+<p><strong>CTEs — the <code>WITH</code> clause.</strong> A CTE names an intermediate result so the query reads top-down like a pipeline. They do not magically run once (until PostgreSQL materializes them, they are more like macros) — their superpower is <strong>readability</strong>, and their unique trick is <strong>recursion</strong>:</p>
+
+<pre>WITH active_customers AS (
+  SELECT id, name FROM customers WHERE last_order_at &gt; now() - interval '90 days'
+)
+SELECT c.name, COUNT(o.id) AS orders
+FROM   active_customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name;
+
+-- Recursive CTE: walk a tree (categories, org charts, comment threads)
+WITH RECURSIVE tree AS (
+  SELECT id, name, 1 AS depth FROM categories WHERE parent_id IS NULL
+  UNION ALL
+  SELECT c.id, c.name, t.depth + 1 FROM categories c
+  JOIN tree t ON c.parent_id = t.id
+)
+SELECT * FROM tree;</pre>
+
+<h2>Window functions — ranking and running totals</h2>
+
+<p>Aggregates fold rows into one result per group. <strong>Window functions compute an aggregate-style value but keep every row.</strong> That is the entire difference — and why "top N per group" needs them (GROUP BY would collapse the rows you want to keep).</p>
+
+<pre>SELECT  name, department, salary,
+        ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rank_in_dept,
+        SUM(salary)   OVER (PARTITION BY department)                       AS dept_total,
+        AVG(salary)   OVER (PARTITION BY department ORDER BY hire_date)    AS running_avg
+FROM employees;</pre>
+
+<table>
+  <thead><tr><th>Window function</th><th>What it does</th><th>Classic use</th></tr></thead>
+  <tbody>
+    <tr><td><code>ROW_NUMBER()</code></td><td>Position within the partition</td><td>Top-N per group: rank rows, then filter <code>rank &lt;= 10</code> in an outer query</td></tr>
+    <tr><td><code>RANK()</code> / <code>DENSE_RANK()</code></td><td>Rank with ties (RANK skips numbers, DENSE_RANK does not)</td><td>Leaderboards</td></tr>
+    <tr><td><code>LAG(col)</code> / <code>LEAD(col)</code></td><td>The previous / next row's value in the partition</td><td>Deltas: <code>total - LAG(total)</code> = change since last month</td></tr>
+    <tr><td><code>SUM(...) OVER (ORDER BY ...)</code></td><td>Cumulative sum over the ordered window</td><td>Running totals, balances</td></tr>
+    <tr><td><code>NTILE(n)</code></td><td>Split the partition into n buckets</td><td>Percentiles, A/B bucketing</td></tr>
+    <tr><td><code>FIRST_VALUE</code> / <code>LAST_VALUE</code></td><td>Edges of the window</td><td>"First purchase date per customer"</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Window syntax in one line:</strong> <code>FUNCTION OVER (PARTITION BY X ORDER BY Y)</code> — PARTITION BY draws the groups (like GROUP BY), ORDER BY defines the order the function walks within each group. A window with neither partitions nor order computes over the whole set.</p>
+
+<p><strong>Frames — the window within the window.</strong> By default <code>ORDER BY</code> in a window makes the frame "all rows up to and including the current one" (that's why running totals work). You can shrink the frame explicitly — the tool behind moving averages and "last 7 days":</p>
+
+<pre>-- running total (default frame: current row and everything before it)
+SUM(amount) OVER (ORDER BY date)
+
+-- moving average of the last 3 rows
+AVG(amount)  OVER (ORDER BY date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
+
+-- trailing 7-day sum
+SUM(amount)  OVER (ORDER BY date RANGE BETWEEN INTERVAL '7 days' PRECEDING AND CURRENT ROW)</pre>
+
+<p>Reach for a frame clause the moment "window of last N rows" or "last 7 days" shows up — without it you get the whole running total, and the number is subtly wrong.</p>
+
+<p><strong>Top-N per group, complete:</strong></p>
+
+<pre>SELECT * FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+  FROM employees
+) ranked
+WHERE rn &lt;= 3;</pre>
+
+<p><strong>Keyset pagination (the OFFSET killer):</strong> <code>OFFSET 100000</code> makes the engine walk and discard 100000 rows. Cursor-style pagination — "give me rows after this one" — uses the index directly. <a href="./api-design.html">API Design</a> owns the cursor contract; this is the query:</p>
+
+<pre>-- OFFSET (slow on deep pages):  SELECT * FROM events ORDER BY id LIMIT 20 OFFSET 100000;
+-- Keyset (fast, uses the index):
+SELECT * FROM events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;</pre>
+
+<h2>Writing data — INSERT, UPDATE, DELETE, UPSERT</h2>
+
+<p>Reads dominate the language, but writes are where correctness lives. The four verbs, with the PostgreSQL extras that make writes safer:</p>
+
+<pre>INSERT INTO shipments (tracking_number, customer_id, status)
+VALUES ('TRK-1001', 42, 'pending')
+RETURNING id, tracking_number;          -- get the row back in one round trip
+
+UPDATE shipments SET status = 'in_transit'
+WHERE  id = 7;                          -- never UPDATE without WHERE
+
+DELETE FROM shipments WHERE id = 7;     -- never DELETE without WHERE
+TRUNCATE  shipments;                    -- wipe all rows instantly (no WHERE allowed)
+
+UPDATE shipments SET status = 'delivered'
+FROM   customers c                      -- UPDATE ... FROM: join in the update
+WHERE  shipments.customer_id = c.id AND c.plan = 'premium';</pre>
+
+<p><strong>UPSERT — the idempotent write.</strong> The API-design doc's idempotency keys need a database that does not error on the second attempt. PostgreSQL's <code>INSERT ... ON CONFLICT</code> is exactly that: try to insert; if a unique constraint trips, do something else (update, or do nothing):</p>
+
+<pre>-- The idempotent write: retry-safe, no "duplicate key" error on the second call
+INSERT INTO payment_events (idempotency_key, amount, status)
+VALUES (:key, :amount, 'captured')
+ON CONFLICT (idempotency_key) DO UPDATE SET status = EXCLUDED.status
+RETURNING id;
+
+INSERT INTO tags (name) VALUES ('sale')
+ON CONFLICT (name) DO NOTHING;          -- the "get-or-create" pattern
+
+-- MySQL spelling, for the WordPress-era mental model:
+-- INSERT INTO tags (name) VALUES ('sale') ON DUPLICATE KEY UPDATE name = name;</pre>
+
+<p><code>RETURNING</code> (PostgreSQL) returns the affected rows — the lazy developer's gift: one round trip to insert and read the generated id, which is exactly what a request handler needs to build its response. (SQLite supports it too; MySQL's equivalent is a follow-up <code>LAST_INSERT_ID()</code>.)</p>
+
+<h2>Transactions in SQL — BEGIN, COMMIT, ROLLBACK</h2>
+
+<p>A transaction is a batch of statements that succeed or fail together. The request loop's multi-step writes (charge + create shipment + notify) are only atomic if wrapped:</p>
+
+<pre>BEGIN;                                  -- or START TRANSACTION
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;                                 -- both become visible together
+
+-- on any error instead:
+ROLLBACK;                               -- both vanish; the world never saw a half-write</pre>
+
+<p><strong>ACID in practice:</strong> <em>Atomicity</em> is exactly what BEGIN/COMMIT/ROLLBACK buy you. <em>Consistency</em> is the schema's constraints doing their job. <em>Isolation</em> is the level knob — the shelf's home is <a href="./data-modeling-and-databases.html">Data Modeling §Isolation levels</a> and <a href="./backend-engineering.html">Backend Engineering §5</a>; the one-liner for here: <em>READ COMMITTED</em> (PostgreSQL default, per-statement snapshot) vs <em>REPEATABLE READ</em> (per-transaction snapshot — the same SELECT twice sees the same data). <em>Durability</em> is the WAL, which you trust the platform to own.</p>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th><th>Avoidance</th></tr></thead>
+  <tbody>
+    <tr><td>Held-too-long transaction</td><td>Locks block every other writer; the connection pool drains</td><td>Keep transactions short — no API calls or loops inside; commit and move on</td></tr>
+    <tr><td>Deadlock</td><td>Two transactions each hold a lock the other wants; the engine kills one</td><td>Always lock rows in the same order (e.g., by id); retry the killed transaction</td></tr>
+    <tr><td>Orphaned rollbacks</td><td>Application crashes mid-transaction</td><td>That is what ROLLBACK on disconnect is for — the pool cleans up; just don't leak a transaction across requests</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Savepoints — roll back part of a transaction, not all of it.</strong> A long write (import a customer, then their orders, then their payments) shouldn't die wholesale because one row was bad. Mark a point, and on error rewind only to it:</p>
+
+<pre>BEGIN;
+INSERT INTO customers (name) VALUES ('Lina') RETURNING id;   -- id = 10
+SAVEPOINT orders_done;
+INSERT INTO orders (customer_id, total) VALUES (10, 99);      -- fails (bad constraint)
+ROLLBACK TO SAVEPOINT orders_done;                            -- customer survives, order rolled back
+COMMIT;</pre>
+
+<p><strong>Row locking — claim rows so two workers don't claim the same one.</strong> <code>SELECT ... FOR UPDATE</code> locks the returned rows until commit, which is how a queue makes sure two workers never pick the same job:</p>
+
+<pre>SELECT * FROM jobs WHERE id = 42 FOR UPDATE;                  -- lock this row for the transaction
+SELECT * FROM jobs WHERE id = 42 FOR UPDATE SKIP LOCKED;     -- skip rows already locked by others
+SELECT * FROM jobs WHERE id = 42 FOR UPDATE NOWAIT;          -- error out instead of waiting</pre>
+
+<p>Three words, three queue behaviors: <em>plain</em> waits for the lock (and can deadlock), <em>SKIP LOCKED</em> jumps to the next free row (the queue-worker default), <em>NOWAIT</em> fails fast (better than a long wait when the row is someone else's). The <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> doc's retry habit is what makes SKIP LOCKED safe at scale.</p>
+
+<p><strong>Advisory locks — locking on your own terms.</strong> For application-level critical sections that aren't tied to a table row (a cache rebuild, a price re-bucket), PostgreSQL lets you lock an arbitrary integer:</p>
+
+<pre>SELECT pg_advisory_lock(12345);       -- session lock; release with pg_advisory_unlock(12345)
+SELECT pg_advisory_xact_lock(12345);  -- transaction lock; releases automatically on COMMIT/ROLLBACK</pre>
+
+<p>The session form follows the connection, so a leaked lock holds until the connection closes; the xact form follows the transaction, which is the one the request-loop's short transactions want. Use table locks rarely and advisory locks rarely; the queue's SKIP LOCKED pattern covers most real needs.</p>
+
+<h2>PostgreSQL features — why the shelf defaults to it</h2>
+
+<p>The data-modeling doc chooses PostgreSQL for good reason; this section is the syntax behind that choice. Everything here is PostgreSQL-specific (until noted), and each feature answers a real shelf need.</p>
+
+<h3>JSONB — documents inside a relational world</h3>
+
+<pre>CREATE TABLE events (
+  id   bigserial PRIMARY KEY,
+  meta jsonb NOT NULL DEFAULT '{}'
+);
+
+SELECT meta-&gt;&gt;'user_agent'                AS ua          -- -&gt;&gt; text, -&gt; json
+FROM   events
+WHERE  meta @&gt; '{"plan": "premium"}'      -- @&gt; containment: does meta contain this?
+ORDER BY (meta-&gt;&gt;'score')::numeric DESC;
+
+CREATE INDEX ON events USING GIN (meta);  -- GIN makes the @&gt; query use an index</pre>
+
+<p>JSONB stores binary JSON, indexed via GIN, with <code>@&gt;</code> containment and the <code>?</code> key-existence operators. The data-modeling doc's rule stands: JSONB for genuinely variable shapes, not as a substitute for columns you actually query. It also covers most document-store use cases — the reason MongoDB stays "later" on this shelf.</p>
+
+<h3>Arrays, full-text search, LISTEN/NOTIFY, RLS, partitioning</h3>
+
+<pre>-- Arrays as a column type
+CREATE TABLE posts (id bigserial PRIMARY KEY, tags text[] NOT NULL DEFAULT '{}');
+SELECT * FROM posts WHERE 'sale' = ANY(tags);
+SELECT * FROM posts WHERE tags @&gt; ARRAY['sale','new'];
+
+-- Full-text search without Elasticsearch
+CREATE INDEX ON posts USING GIN (to_tsvector('english', title || ' ' || body));
+SELECT * FROM posts
+WHERE to_tsvector('english', title || ' ' || body) @@ to_tsquery('sales &amp; report');
+
+-- LISTEN/NOTIFY — pub/sub inside the database (Supabase Realtime's engine)
+NOTIFY events_changed, 'shipment-1001';
+LISTEN events_changed;                   -- a waiting connection receives the payload
+
+-- Row-Level Security: multi-tenant enforcement in the engine, not the app
+CREATE POLICY tenant_isolation ON shipments
+  USING (tenant_id = current_setting('app.tenant_id'));
+ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
+
+-- Partitioning — the scaling lever from system-design, in syntax
+CREATE TABLE events_part (id bigint, created_at timestamptz)
+PARTITION BY RANGE (created_at);
+CREATE TABLE events_2026 PARTITION OF events_part
+  FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');</pre>
+
+<table>
+  <thead><tr><th>Feature</th><th>The one-liner</th><th>Shelf connection</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Arrays</strong></td><td>Native <code>text[]</code> columns with <code>ANY</code>/containment operators</td><td>Tags and permissions without a join table</td></tr>
+    <tr><td><strong>Full-text</strong></td><td><code>tsvector</code>/<code>tsquery</code> + GIN index — search without a search service</td><td>System Design's "search" mentions, at small scale</td></tr>
+    <tr><td><strong>LISTEN/NOTIFY</strong></td><td>In-database pub/sub</td><td>Supabase Realtime; real-time UIs without a message broker at small scale</td></tr>
+    <tr><td><strong>RLS</strong></td><td>Row visibility enforced by the engine per user/tenant</td><td>Data-modeling's multi-tenancy section, enforced</td></tr>
+    <tr><td><strong>Partitioning</strong></td><td>One logical table, many physical ranges</td><td>System Design's scaling levers</td></tr>
+    <tr><td><strong>DISTINCT ON</strong></td><td>First row per distinct value — "the latest event per shipment" in one clause</td><td>Top-1-per-group without a window function</td></tr>
+    <tr><td><strong>Generated columns</strong></td><td><code>GENERATED ALWAYS AS (expr) STORED</code> — a column computed and stored by the engine</td><td>Derived totals that can't drift out of sync</td></tr>
+    <tr><td><strong>TABLESAMPLE</strong></td><td>Sample rows without scanning everything</td><td>Testing, approximate stats, subset exports</td></tr>
+    <tr><td><strong>Extensions</strong></td><td>PostGIS (geo), pg_cron (scheduled jobs), pg_stat_statements (query analytics), pgvector (embeddings)</td><td>pgvector is the <a href="./system-design.html">System Design</a> AI dependency, in Postgres</td></tr>
+  </tbody>
+</table>
+
+<pre>-- pgvector: the vector-store row from system-design, in syntax
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE TABLE documents (id bigserial PRIMARY KEY, content text, embedding vector(1536));
+CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops);
+SELECT content FROM documents ORDER BY embedding &lt;-&gt; :query_embedding LIMIT 5;   -- &lt;-&gt; = cosine distance
+
+-- DISTINCT ON: the most recent event per shipment (ORDER BY picks which row wins)
+SELECT DISTINCT ON (shipment_id) shipment_id, type, happened_at
+FROM   shipment_events
+ORDER  BY shipment_id, happened_at DESC;
+
+-- Generated column: total that can't drift out of sync with its inputs
+CREATE TABLE order_lines (
+  id        bigserial PRIMARY KEY,
+  price     numeric(10,2) NOT NULL,
+  quantity  integer NOT NULL,
+  total     numeric(10,2) GENERATED ALWAYS AS (price * quantity) STORED
+);
+
+-- TABLESAMPLE: a 1% slice for testing, without a full scan
+SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
+
+<h2>Performance — reading and fixing slow queries</h2>
+
+<p>The tuning loop belongs to <a href="./data-modeling-and-databases.html">Data Modeling §Indexing</a> and §Reading EXPLAIN ANALYZE — this section is the query side of that loop: what to look for, and the anti-patterns that defeat the planner.</p>
+
+<pre>EXPLAIN ANALYZE SELECT ... -- run the query for real, show the plan + measured timings
+-- what to look for, in order:
+--   1. Seq Scan on a big table  → the WHERE/JOIN column needs an index
+--   2. "rows=..." wildly off    → stale statistics (ANALYZE) or a cast hiding the index
+--   3. Nested Loop with huge re-probes → the inner key is not indexed</pre>
+
+<table>
+  <thead><tr><th>Anti-pattern</th><th>Why it is slow</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><code>SELECT *</code></td><td>Drags every column across the network; kills covering indexes</td><td>Name the columns the request actually needs</td></tr>
+    <tr><td>Function on an indexed column: <code>WHERE DATE(created_at) = '2026-01-01'</code></td><td>The index is on <code>created_at</code>; the function hides the value</td><td>Range form: <code>WHERE created_at &gt;= '2026-01-01' AND created_at &lt; '2026-01-02'</code></td></tr>
+    <tr><td>Implicit cast: comparing text to int</td><td>Same story — the planner cannot use the index through a cast</td><td>Cast the parameter, not the column</td></tr>
+    <tr><td>Missing index on a JOIN key</td><td>Hash join becomes fine, nested loop becomes a scan per row</td><td>Index every foreign key you join on (data-modeling §Indexing says the same)</td></tr>
+    <tr><td>Deep <code>OFFSET</code> pagination</td><td>Walks and discards every skipped row</td><td>Keyset pagination (Window functions section)</td></tr>
+    <tr><td>N+1 from the ORM</td><td>A loop of small queries instead of one set</td><td>Eager loading / one JOIN (JOINs section)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Finding the slow ones:</strong> <code>pg_stat_statements</code> (an extension) tracks every query's total time and call count — the "top 10 slowest queries" list. <strong>VACUUM and autovacuum:</strong> PostgreSQL does not overwrite rows in place; dead rows accumulate until VACUUM reclaims them. Autovacuum normally handles this — the production problems happen when it is disabled or overwhelmed, and bloat shows up as tables growing beyond reason. Know that it exists; leave the tuning to the platform.</p>
+
+<p><strong>Connection pooling (PgBouncer):</strong> PostgreSQL's per-connection memory makes hundreds of idle app connections wasteful. PgBouncer sits in front and reuses a small pool. <em>Transaction mode</em> — a connection is held only for the duration of one transaction, which is what stateless request loops want; <em>session mode</em> pins a connection per client session, needed for prepared statements that must survive. The shelf's statelessness rule (Backend §Serverless) is exactly the constraint that makes transaction mode the default choice.</p>
+
+<h2>MySQL / MariaDB — the WordPress engine</h2>
+
+<p><a href="./wordpress-and-cms-internet.html">WordPress</a> runs on MySQL/MariaDB. The language you just learned is ~90% the same; this section is the 10% that differs, plus the schema shape you will actually query as a freelancer.</p>
+
+<table>
+  <thead><tr><th>Feature</th><th>PostgreSQL</th><th>MySQL / MariaDB</th></tr></thead>
+  <tbody>
+    <tr><td>UPSERT</td><td><code>INSERT ... ON CONFLICT (k) DO UPDATE</code></td><td><code>INSERT ... ON DUPLICATE KEY UPDATE</code></td></tr>
+    <tr><td>JSON</td><td><code>JSONB</code> — binary, indexed (GIN)</td><td><code>JSON</code> — text-based, weaker indexing (MariaDB: <code>JSON</code> as alias for <code>LONGTEXT</code> + <code>CHECK</code>)</td></tr>
+    <tr><td>Arrays</td><td>Native column type</td><td>Not supported — use JSON or a join table</td></tr>
+    <tr><td>Full-text search</td><td><code>tsvector</code>/<code>tsquery</code> + GIN</td><td><code>FULLTEXT</code> index — simpler, weaker</td></tr>
+    <tr><td>Window functions / CTEs</td><td>Since 8.4 (2009)</td><td>Since 8.0 (2018) — old WordPress-era MySQL may lack them entirely</td></tr>
+    <tr><td>Row-Level Security</td><td>Native</td><td>Not native — enforce in the application layer</td></tr>
+    <tr><td>Limit</td><td><code>LIMIT n OFFSET m</code></td><td>Same — plus the handy <code>LIMIT m, n</code> comma form</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The WordPress schema — what you will actually touch:</strong> everything lives in a handful of tables with the <code>wp_</code> prefix, and the engine's <code>wpdb</code> object issues the queries. The two tables that look nothing like a normal schema deserve a mental note: <strong><code>wp_options</code></strong> is a giant key-value store (site settings, plugin options) — one row per option, values in a <code>LONGTEXT</code> column; <strong><code>wp_postmeta</code></strong> is an entity-attribute-value table — one row per post-metadata pair, which makes "posts with meta" queries a join against a tall table (exactly the EAV shape the data-modeling doc warns about, and the reason heavy meta usage is a performance smell).</p>
+
+<pre>-- "Find posts of type 'product' that have meta 'on_sale' = '1'"
+SELECT p.ID, p.post_title
+FROM   wp_posts p
+JOIN   wp_postmeta m ON m.post_id = p.ID
+WHERE  p.post_type = 'product' AND p.post_status = 'publish'
+  AND  m.meta_key = 'on_sale' AND m.meta_value = '1';
+
+-- "Count published posts per category"
+SELECT t.name, COUNT(*) AS post_count
+FROM   wp_terms t
+JOIN   wp_term_taxonomy tt ON tt.term_id = t.term_id
+JOIN   wp_term_relationships tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+JOIN   wp_posts p ON p.ID = tr.object_id
+WHERE  tt.taxonomy = 'category' AND p.post_status = 'publish'
+GROUP BY t.name;</pre>
+
+<h2>SQLite — the embedded engine</h2>
+
+<p>SQLite is not a server — it is a library that reads and writes a single file. It is the most deployed database engine on earth (every phone and browser ships one) and the shelf's local-development companion: tests, prototypes, and the terminal substrate's own file-backed stores.</p>
+
+<table>
+  <thead><tr><th>When SQLite wins</th><th>When it does not</th></tr></thead>
+  <tbody>
+    <tr><td>Local development and automated tests — zero setup, in-memory mode</td><td>Concurrent writes — one writer at a time (an app with many users writing simultaneously will serialize)</td></tr>
+    <tr><td>Small, low-traffic production (a tool, a dashboard, an internal app)</td><td>High write throughput — the single-writer limit is the ceiling</td></tr>
+    <tr><td>Reading/exporting data with the <code>sqlite3</code> CLI on any machine</td><td>Distributed deployment — one file, one machine</td></tr>
+  </tbody>
+</table>
+
+<p>The good news: the SQL you learned here is SQLite's SQL. The <a href="./data-modeling-and-databases.html">data-modeling</a> ecosystem rule applies — SQLite for embedded/local, PostgreSQL for anything non-trivial. The migration path is a dump-and-load (<code>.dump</code> in SQLite; <code>pg_dump</code> + <code>psql</code> in PostgreSQL) with a few type-name touch-ups.</p>
+
+<h2>Worked example — the query layer for shipment tracking</h2>
+
+<p>The shelf has designed this system twice: the schema in <a href="./data-modeling-and-databases.html">Data Modeling §Worked example</a>, the API in <a href="./api-design.html">API Design</a>. Here is the query layer that connects them — the actual SQL behind four endpoints, each optimized with the tools from this doc.</p>
+
+<p><strong>1. The detail endpoint — one shipment with its customer (LEFT JOIN, index on the FK):</strong></p>
+
+<pre>SELECT s.tracking_number, s.status, s.estimated_delivery,
+       c.name AS customer_name, c.email
+FROM   shipments s
+LEFT JOIN customers c ON c.id = s.customer_id
+WHERE  s.tracking_number = :tracking_number;</pre>
+
+<p><strong>2. The timeline — the latest 20 events, keyset paginated (window-function pagination, not OFFSET):</strong></p>
+
+<pre>SELECT * FROM shipment_events
+WHERE  shipment_id = :id AND event_id &lt; :cursor   -- keyset: continue after the cursor
+ORDER BY event_id DESC
+LIMIT  20;</pre>
+
+<p><strong>3. The dashboard — status counts per carrier this week (GROUP BY + FILTER):</strong></p>
+
+<pre>SELECT carrier,
+       COUNT(*)                                            AS total,
+       COUNT(*) FILTER (WHERE status = 'delivered')       AS delivered,
+       COUNT(*) FILTER (WHERE status = 'in_transit')      AS in_transit,
+       COUNT(*) FILTER (WHERE status = 'exception')       AS exceptions
+FROM   shipments
+WHERE  created_at &gt;= now() - interval '7 days'
+GROUP BY carrier
+ORDER BY total DESC;</pre>
+
+<p><strong>4. The idempotent webhook handler (UPSERT — retry-safe against the same webhook arriving twice):</strong></p>
+
+<pre>INSERT INTO shipment_events (shipment_id, status, payload, webhook_id)
+VALUES (:shipment_id, :status, :payload, :webhook_id)
+ON CONFLICT (webhook_id) DO NOTHING
+RETURNING id;</pre>
+
+<p><strong>The optimization pass:</strong> run each through <code>EXPLAIN ANALYZE</code>. The tell-tale <code>Seq Scan</code> on <code>shipment_events</code> for query 2 says the index is missing; the fix is the index the data-modeling doc already prescribes: <code>CREATE INDEX ON shipment_events (shipment_id, event_id DESC);</code> — the pair covers the WHERE and the ORDER BY in one structure. That is the whole loop: query → explain → index → re-explain.</p>
+
+<h2>Query recipes — the patterns production actually uses</h2>
+
+<p>Three patterns appear in almost every real codebase. Each is a small, memorizable recipe that folds the earlier sections together.</p>
+
+<p><strong>Soft delete — "deleted" as a timestamp, not a removal.</strong> Destructive deletes are scary (audit trails, FK errors, no undo); the pattern is to flag the row and filter it everywhere:</p>
+
+<pre>ALTER TABLE orders ADD COLUMN deleted_at timestamptz;      -- NULL = live, timestamp = deleted
+UPDATE orders SET deleted_at = now() WHERE id = 42;        -- "delete"
+SELECT * FROM orders WHERE deleted_at IS NULL;             -- the live view (every read must add this)
+CREATE INDEX ON orders (customer_id) WHERE deleted_at IS NULL;   -- partial index: only live rows</pre>
+
+<p>The cost is discipline — every query needs the <code>deleted_at IS NULL</code> filter or deletes leak into results, and <code>UNIQUE</code> constraints now collide with old rows (a re-created customer fights a soft-deleted one). Use it when you need an audit trail or "undo"; for pure junk, hard delete. The partial index is the PostgreSQL idiom that keeps soft-deleted tables fast.</p>
+
+<p><strong>Job queue — claim rows so only one worker gets each job.</strong> Backend work (emails, image resizes, webhook retries) goes through a table; workers claim jobs with the <code>FOR UPDATE SKIP LOCKED</code> from the Transactions section:</p>
+
+<pre>-- worker picks exactly one unclaimed job, without fighting other workers:
+UPDATE job_queue SET status = 'processing', locked_at = now(), locked_by = :worker
+WHERE id = (
+  SELECT id FROM job_queue
+  WHERE status = 'pending'
+  ORDER BY created_at
+  FOR UPDATE SKIP LOCKED LIMIT 1
+)
+RETURNING *;</pre>
+
+<p>That's the entire queue primitive: a table of jobs, a claim with <code>SKIP LOCKED</code> so concurrent workers never collide, and a retry column for the <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> doc's retry habit. Add <code>attempts</code>/<code>max_attempts</code> counters and a <code>RETURNING *</code> — and you have the same shape as Redis-backed queues, without the second system. This is the pattern behind "why is my job stuck in 'pending'" — usually a worker died after claiming, so add a timeout that requeues stale <code>processing</code> rows.</p>
+
+<h2>psql &amp; COPY — the operator's quick tools</h2>
+
+<p>The <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> doc opens databases with <code>psql</code>; here are the meta-commands that make it a REPL, not a toy:</p>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>\d table_name</code></td><td>Describe a table: columns, types, indexes, constraints — the fastest way to learn a schema you didn't write</td></tr>
+    <tr><td><code>\dt</code> / <code>\di</code></td><td>List tables / list indexes</td></tr>
+    <tr><td><code>\l</code></td><td>List databases</td></tr>
+    <tr><td><code>\du</code></td><td>List roles/users</td></tr>
+    <tr><td><code>\timing</code></td><td>Toggle per-query timing — the poor person's EXPLAIN</td></tr>
+    <tr><td><code>\x</code></td><td>Toggle expanded vertical output — wide rows stop wrapping</td></tr>
+    <tr><td><code>\i file.sql</code></td><td>Run a SQL file — how migrations get applied by hand</td></tr>
+    <tr><td><code>\copy table FROM 'file.csv'</code></td><td>Client-side import — works without server file access</td></tr>
+  </tbody>
+</table>
+
+<p><strong>COPY — bulk load/export without INSERT loops.</strong> The request loop inserts rows one at a time; when you have a thousand, COPY is the engine's native bulk path:</p>
+
+<pre>COPY shipments FROM '/tmp/shipments.csv' WITH (FORMAT csv, HEADER true);   -- import
+COPY (SELECT * FROM shipments WHERE created_at &gt; '2026-01-01')
+  TO '/tmp/export.csv' WITH (FORMAT csv, HEADER true);                     -- export a query</pre>
+
+<p>COPY in the app runs as <code>\copy</code> in psql (client-side, no server path needed). For real migrations of millions of rows, the data-modeling doc's migration discipline applies — COPY into a staging table, validate, then swap.</p>
+
+<h2>The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>What it looks like</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><code>SELECT *</code> in production</td><td>Slow pages, fat payloads, indexes ignored</td><td>Name the columns you need</td></tr>
+    <tr><td>Missing index on the JOIN key</td><td>EXPLAIN shows a scan; joins crawl as tables grow</td><td>Index every FK you join on — the data-modeling rule</td></tr>
+    <tr><td>N+1 from the ORM</td><td>Logs full of identical one-row queries</td><td>Eager-load or write the JOIN (JOINs section)</td></tr>
+    <tr><td><code>= NULL</code></td><td>Rows silently missing from results</td><td><code>IS NULL</code> — the NULL rules in Query fundamentals</td></tr>
+    <tr><td>Function or cast on an indexed column</td><td>Index exists, planner ignores it</td><td>Rewrite to a range form</td></tr>
+    <tr><td>Transaction held open across work</td><td>Writers block; pool drains; timeouts</td><td>Short transactions, commit early</td></tr>
+    <tr><td>Deep OFFSET pagination</td><td>Page 10,000 crawls</td><td>Keyset pagination</td></tr>
+    <tr><td>Unparameterized queries</td><td>SQL injection — the <a href="./security-and-threat-modeling.html">Security</a> doc's top data risk</td><td>Parameterized queries / prepared statements, always — never string-concatenate user input into SQL</td></tr>
+    <tr><td>Bloat from dead VACUUM</td><td>Table size grows far past its data</td><td>Let autovacuum run; check <code>pg_stat_user_tables</code></td></tr>
+    <tr><td>Fan-out before GROUP BY</td><td>Counts double after a JOIN</td><td><code>COUNT(DISTINCT ...)</code> or aggregate before joining</td></tr>
+  </tbody>
+</table>
+
+<h2>Ecosystem — tooling catalog with decision metrics</h2>
+
+<table>
+  <thead><tr><th>Tool</th><th>What it is</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr><td><strong>psql</strong></td><td>The PostgreSQL CLI — the terminal substrate's friend</td><td>Always available; scripts what the GUIs click</td></tr>
+    <tr><td><strong>pgAdmin / DBeaver / TablePlus / DataGrip</strong></td><td>GUI clients, from free to paid</td><td>DBeaver free for multi-engine; DataGrip for heavy SQL work</td></tr>
+    <tr><td><strong>node-postgres (<code>pg</code>)</strong></td><td>The raw driver for Node</td><td>Use when you want SQL without an ORM layer — Backend §1e's decision</td></tr>
+    <tr><td><strong>Prisma / Drizzle / Knex</strong></td><td>TypeScript data layers, ORM to query builder</td><td>Drizzle: thin and SQL-first; Prisma: batteries included, heavier</td></tr>
+    <tr><td><strong>PgBouncer / Pgpool-II</strong></td><td>Connection pools</td><td>PgBouncer transaction mode for stateless loops</td></tr>
+    <tr><td><strong>pg_stat_statements / pgBadger</strong></td><td>Query analytics</td><td>stat_statements = the top-slow list; pgBadger = log reports</td></tr>
+    <tr><td><strong>pg_dump / pg_restore / pg_basebackup</strong></td><td>Backup and restore</td><td>pg_dump for logical/portable; pg_basebackup for physical — the platform usually owns this</td></tr>
+    <tr><td><strong>Supabase / Neon / PlanetScale</strong></td><td>Hosted faces of Postgres/MySQL</td><td>Supabase = Postgres + auth + realtime + pgvector — the <a href="./nextjs-deep-dive.html">Next.js</a> pairing; PlanetScale = serverless MySQL</td></tr>
+  </tbody>
+</table>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>SQL is declarative — you say WHAT, the planner decides HOW; your job is phrasing the goal for the index.</td></tr>
+    <tr><td>2</td><td>Execution order: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT. Order bugs are the #1 class.</td></tr>
+    <tr><td>3</td><td><code>NULL</code> never equals anything, including NULL — use <code>IS NULL</code>, <code>COALESCE</code>, <code>IS DISTINCT FROM</code>.</td></tr>
+    <tr><td>4</td><td>JOINs pair by key; LEFT JOIN keeps the left side; index the join keys; one JOIN beats N+1 queries.</td></tr>
+    <tr><td>5</td><td>WHERE filters rows, GROUP BY folds sets, HAVING filters groups, window functions rank without folding.</td></tr>
+    <tr><td>6</td><td>CTEs read top-down; recursive CTEs walk trees; EXISTS beats IN for existence checks.</td></tr>
+    <tr><td>7</td><td>UPSERT (<code>ON CONFLICT</code>) is the idempotent write; RETURNING is the free round trip.</td></tr>
+    <tr><td>8</td><td>Writes are atomic only inside BEGIN/COMMIT; keep transactions short; lock in consistent order.</td></tr>
+    <tr><td>9</td><td>PostgreSQL wins on JSONB, arrays, full-text, LISTEN/NOTIFY, RLS, partitioning, and extensions — that is why the shelf defaults to it.</td></tr>
+    <tr><td>10</td><td>Slow query? EXPLAIN ANALYZE → find the Seq Scan → index the WHERE/JOIN column → re-explain.</td></tr>
+    <tr><td>11</td><td>MySQL differs in UPSERT syntax, JSON, arrays, and feature dates — WordPress's engine, same language.</td></tr>
+    <tr><td>12</td><td>SQLite is a file, not a server — for local dev and small loads; the SQL transfers.</td></tr>
+    <tr><td>13</td><td>Parameterize everything; user input in SQL is the security doc's injection, in syntax.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.postgresql.org/docs/current/queries.html">PostgreSQL — Queries documentation</a> ·
+  <a href="https://www.postgresql.org/docs/current/sql-select.html">PostgreSQL — SELECT reference</a> ·
+  <a href="https://use-the-index-luke.com/">Use The Index, Luke — SQL indexing for developers</a> ·
+  <a href="https://dev.mysql.com/doc/refman/8.0/en/">MySQL 8.0 Reference Manual</a> ·
+  <a href="https://www.sqlite.org/lang.html">SQLite — SQL language reference</a> ·
+  <a href="https://supabase.com/docs">Supabase — Postgres, auth, realtime, pgvector</a> ·
+  <a href="https://developer.wordpress.org/advanced-administration/before-install/howto-install/">WordPress — database schema overview</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take my favorite slow query and walk me through its EXPLAIN ANALYZE — what would you index first, and why?"</li>
+    <li>"Show me a real production incident where a JOIN or a transaction gone wrong took a system down — what was the fix?"</li>
+    <li>"Where do you draw the line between a JOIN query and the ORM in your own code — and when do you write raw SQL?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · SQL &amp; PostgreSQL — the query language and the engine</span>
+  <span>Design: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> · Runtime: <a href="./backend-engineering.html">Backend Engineering</a> · Contracts: <a href="./api-design.html">API Design</a> · WordPress: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

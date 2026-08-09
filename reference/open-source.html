@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Source — ecosystem, licenses, and contributing</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Open Source — the ecosystem and practice of shared code</p>
+  <h1>Open Source — ecosystem, licenses, and contributing</h1>
+  <p class="meta">For: the developer who wants to move from <em>using</em> shared code to <em>participating</em> in it — reading codebases, submitting pull requests, and understanding the legal and cultural rules of the commons.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The shelf teaches you to build, test, deploy, and design — everything happens <em>inside</em> your own code. This doc is the layer above: how code moves between developers. Almost everything you depend on — React, Next.js, the npm packages in your lockfile, the CLI tools you run — is open source, and every one of them has a contributor's door.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│        WHAT YOU DEPEND ON (all open source)                    │
+│   React · Next.js · Node · npm · the CLI tools you run daily   │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│   THE PARTICIPATION LAYER (THIS DOC)                           │
+│   licenses → governance → the contributor journey → review →  │
+│   maintenance → how the commons actually works                 │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│   THE MECHANICS (OWNED ELSEWHERE)                              │
+│   Git/PRs/branching → Version Control, CI/CD                   │
+│   testing → Software Testing & Debugging                       │
+│   supply-chain security → Security & Threat Modeling           │
+└───────────────────────────────────────────────────────────────┘
+   The mechanics docs teach the tools. This doc teaches the
+   ecosystem those tools run in — and how to get in the door.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (the Git/PR mechanics — this doc is the ecosystem around them) · <a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> (what a contribution must prove) · <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (supply chain, the supply-chain risk layer) · <a href="./terminal-applications.html">Building CLIs &amp; Terminal Applications</a> (a concrete type of project you might contribute to) · <a href="./glossary.html">Glossary</a></p>
+</blockquote>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read the Definition (what "open source" actually means — it is narrower than you think), then the License table so you can read a LICENSE file, then the Governance table, then the Contributor Journey — the walkthrough you'll actually live. The mechanics of forking and PRs live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a>; this doc is why you do them and how the process works socially. Cross-links:</p>
+<ul>
+  <li>Mechanics (how to do the Git work): <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> — branching, PRs, review, CI as the green gate.</li>
+  <li>History (where the movement came from): <a href="./cs-and-software-engineering.html">Computer Science &amp; Software Engineering</a> — the timeline of Unix, GNU, the GPL, and Linux.</li>
+  <li>Income (how open source pays): <a href="./frontend-income-markets.html">Frontend Income Markets</a> §7 — sponsorship and DevRel as income streams.</li>
+  <li>Supply chain (the security side): <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — dependency auditing, SBOMs, the xz backdoor.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever wanted to contribute to a project but didn't know where to start, or read a LICENSE file and weren't sure what it allowed — this is the map.</strong> Read the contributor journey once; the licenses and governance tables are your reference at each step.</p>
+
+<h2>Definition — what "open source" is, and what it is not</h2>
+
+<p><strong>Open source</strong> is a practice of <em>licensing and collaboration</em>: source code made publicly available under a license that grants others the right to view, modify, and distribute it. That last word — <em>license</em> — is the whole legal engine. "Open source" is not "free," not "no license," and not "public domain":</p>
+
+<table>
+  <thead><tr><th>Term</th><th>What it means</th><th>The trap</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Open source</strong></td><td>Source available under a license granting use/modify/distribute</td><td>Some "open" licenses restrict commercial use — read the license, not the label</td></tr>
+    <tr><td><strong>No license</strong></td><td>Default: all rights reserved by the author</td><td>Source on GitHub with no license is <em>not</em> usable — you cannot legally copy it</td></tr>
+    <tr><td><strong>Public domain</strong></td><td>All rights waived (CC0, Unlicense)</td><td>Rarely automatic; waiving rights legally is itself a license choice</td></tr>
+    <tr><td><strong>Free software</strong></td><td>The GNU four freedoms: run, study, share, modify</td><td>Ideologically stricter; nearly all free software is also open source (the reverse is not always true)</td></tr>
+    <tr><td><strong>Free of charge</strong></td><td>Price = 0</td><td>Unrelated to either; MIT code is often sold inside commercial products</td></tr>
+  </tbody>
+</table>
+
+<p>The practical rule: <strong>a project's LICENSE file is the contract that makes it usable by you, and that governs what you may do with a contribution.</strong> Read it before you depend on the project, and know it before you contribute.</p>
+
+<h2>History — how the commons came to be</h2>
+
+<p>The short version: the 1980s saw proprietary software lock down source code; Richard Stallman founded GNU and invented copyleft to guarantee the right to share; Linus Torvalds released Linux under the GPL in 1991; Eric Raymond's 1997 essay "The Cathedral and the Bazaar" named the peer-production model; and in 1998 the term "open source" was coined as a pragmatic, business-friendly rebrand of the same practice. The shelf's history timeline in <a href="./cs-and-software-engineering.html">Computer Science &amp; Software Engineering</a> covers this in depth — this doc inherits that history and focuses on the present practice.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+  <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a></td><td>Branching, the pull request, review, CI gates, SemVer releases</td><td>There: <em>how to do the Git work</em>. Here: <em>how the ecosystem works</em> — licensing, governance, and the journey a PR travels socially.</td></tr>
+    <tr><td><a href="./cs-and-software-engineering.html">Computer Science &amp; Software Engineering</a></td><td>The historical timeline (GNU, GPL, Linux, the bazaar)</td><td>There: <em>what happened</em>. Here: <em>what to do now</em> — the license table and contributor playbook.</td></tr>
+    <tr><td><a href="./frontend-income-markets.html">Frontend Income Markets</a></td><td>Sponsorship and DevRel as income streams</td><td>There: <em>how to get paid</em>. Here: <em>how to participate</em>. Business models appear here only as a licensing/governance lens.</td></tr>
+    <tr><td><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a></td><td>Supply-chain attacks, dependency auditing, SBOMs</td><td>There: <em>how to stay safe</em>. Here: <em>how trust works</em> — reviewed code, maintainer accountability, the social side of the same risk.</td></tr>
+    <tr><td><a href="./terminal-applications.html">Building CLIs &amp; Terminal Applications</a></td><td>How a CLI project is architectured internally</td><td>There: <em>reading a CLI codebase</em>. Here: <em>contributing to any codebase</em> — the CLI doc is a worked instance of this one.</td></tr>
+  </tbody>
+</table>
+
+<h2>Underlying theory — the commons, and how it stays alive</h2>
+
+<p>Open source works because of a specific economic shape: the cost of copying is near zero, and the value of a shared pool grows with contributors. Three mechanisms keep the pool healthy:</p>
+
+<ul>
+  <li><strong>Linus's Law.</strong> "Given enough eyeballs, all bugs are shallow." Code is reviewed in public; the review itself is the quality mechanism. This is why your contribution's <em>reviewability</em> matters as much as its correctness.</li>
+  <li><strong>Scratch an itch.</strong> Most contributions are people fixing their own problem, not charity. The best first contributions are the ones you personally need — the "good first issue" framing is how projects lower the barrier to that.</li>
+  <li><strong>The maintainer bottleneck.</strong> Contributors are many, maintainers are few, and maintenance is unpaid. The scarcest resource in open source is not code — it is <em>review attention</em>. Every contribution either spends or earns that attention.</li>
+</ul>
+
+<h2>Mental models — frames for thinking about open source</h2>
+
+<table>
+  <thead><tr><th>Frame</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>"The license is the contract"</td><td>Read the LICENSE before you depend on or contribute to anything</td></tr>
+    <tr><td>"Review attention is the currency"</td><td>Make your PR trivial to review — small, focused, documented — and it will be reviewed</td></tr>
+    <tr><td>"The maintainer has a backlog of thousands"</td><td>Be gracious when a maintainer is slow; your PR is one of many, and they owe you nothing</td></tr>
+    <tr><td>"The project owns its scope"</td><td>A maintainer's "no" to your feature is a scope decision, not a rejection of you</td></tr>
+    <tr><td>"Your first PR is a contribution, not a claim"</td><td>You are proving you can help, not demanding a place — trust builds contribution by contribution</td></tr>
+  </tbody>
+</table>
+
+<h2>Licenses — the legal contract, permissively or copyleft</h2>
+
+<p>Licenses fall into two families. The difference is what happens to <em>derivative work</em>:</p>
+
+<table>
+  <thead><tr><th>Family</th><th>Common licenses</th><th>The rule</th><th>For you as a contributor</th><th>For you as a consumer</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Permissive</strong></td><td>MIT, BSD, ISC, Apache-2.0</td><td>Anyone can use, modify, and distribute, including in closed/commercial software</td><td>Your contribution is licensed to the project under the same terms; no obligations follow you</td><td>Use it in anything; only constraints are attribution (MIT/BSD) and patent clauses (Apache)</td></tr>
+    <tr><td><strong>Copyleft (strong)</strong></td><td>GPL-3.0</td><td>Derivative works must also be GPL — the source stays open forever</td><td>Your code goes into a permanently-open pool</td><td>If you distribute a modified version, you must publish its source under GPL</td></tr>
+    <tr><td><strong>Copyleft (weak)</strong></td><td>LGPL, MPL-2.0</td><td>Library can be linked into proprietary software; changes to the library itself stay copyleft</td><td>Same as GPL for the library's own code</td><td>You may link it from closed code without open-sourcing yours</td></tr>
+    <tr><td><strong>Network copyleft</strong></td><td>AGPL-3.0</td><td>GPL, extended to software served over a network (a SAAS loophole closer)</td><td>Same as GPL</td><td>If you serve a modified AGPL app to users, you must offer its source</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Choosing a license for your own project:</strong> if you want maximum adoption, MIT. If you want to guarantee your code stays open forever, GPL. If you don't want to choose, <a href="https://choosealicense.com">choosealicense.com</a> walks the decision. And one practical note: a project's license usually requires contributors to license their code under the project's terms — some projects ask you to confirm this with a Developer Certificate of Origin (DCO, "Signed-off-by") or a Contributor License Agreement (CLA) before merging your PR.</p>
+
+<p><strong>Compatibility — which licenses can combine.</strong> The rule that governs every dependency: permissive licenses (MIT, BSD, Apache) combine with anything, including proprietary code. Copyleft licenses do not — GPL requires any work that links or incorporates it to also be GPL, which is why proprietary products avoid GPL dependencies and SaaS avoids AGPL. Weak copyleft (LGPL, MPL) lets closed code link the library without open-sourcing the caller. The practical read for a consumer: <em>read the LICENSE before you depend on it</em> — if you're building proprietary software, a GPL dependency forces your whole product open.</p>
+
+<p><strong>Who owns your contribution.</strong> By default you own code you wrote; contributing it under a project's license is a grant, not a transfer. The exception is code written as part of your job — your employment contract often assigns that copyright to your employer, so check before contributing "I wrote it at work" code. The DCO/CLA you sign is the project recording this ownership line, not creating it.</p>
+
+<h2>Governance — who runs the project, and how</h2>
+
+<p>Governance decides who can merge, who decides scope, and how disputes resolve. It shapes your experience as a contributor more than you'd think:</p>
+
+<table>
+  <thead><tr><th>Model</th><th>Examples</th><th>How it feels to contribute</th></tr></thead>
+  <tbody>
+    <tr><td><strong>BDFL</strong> (one benevolent dictator)</td><td>Python (van Rossum), early React</td><td>Fast decisions, strong taste; the single maintainer's view dominates</td></tr>
+    <tr><td><strong>Meritocracy</strong> (trust earned by work)</td><td>Apache, the Linux kernel</td><td>Gradual: start with small fixes, earn commit access over many contributions</td></tr>
+    <tr><td><strong>Foundation-governed</strong></td><td>CNCF, OpenJS, the React Foundation (2026)</td><td>Formal structure, legal backstop, slower but more stable; contribution paths are documented</td></tr>
+    <tr><td><strong>Corporate-backed</strong></td><td>Vercel/Next.js, Meta/React, Google/Angular</td><td>Employees dominate maintainership; your contribution may need a sponsor on the team to merge</td></tr>
+  </tbody>
+</table>
+
+<p>The practical read: a project's governance model is visible in its CONTRIBUTING.md and its maintainer list. Foundation and meritocratic projects reward patient, incremental contribution; corporate-backed ones often need an issue first, and sometimes an internal champion. Read the room before you commit effort.</p>
+<h2>The contributor journey — from finding a project to your first merge</h2>
+
+<p>The path is the same for every project. The mechanics (fork, branch, PR, merge) live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a>; here is the <em>strategy</em> of the journey:</p>
+
+<ol>
+  <li><strong>Find the project.</strong> The best targets are ones you already use — a package in your lockfile, the CLI you run daily. Searching for "good first issue" on GitHub surfaces the intentionally-labeled entry points. Read the project's scope first: its README, its issues, and what's deliberately <em>out</em> of scope.</li>
+  <li><strong>Read the conventions before writing code.</strong> CONTRIBUTING.md names the workflow; the lint and test setup names the standards; the commit style is visible in <code>git log</code>. Your PR is judged against all three. A project's review culture is one of the most important factors to consider before committing your time — if a project has no maintainer activity for months, a PR is a wasted gift.</li>
+  <li><strong>Claim the issue.</strong> Say "I'd like to work on this" on the issue before you start — it prevents two people doing the same work, and it starts a conversation with the maintainer.</li>
+  <li><strong>Make the smallest useful change.</strong> A focused PR that fixes one thing well beats a broad PR that touches ten. The scope rule is the same one from <a href="./product-strategy.html">Product Strategy</a> — small slices merge, big ones stall.</li>
+  <li><strong>Write a PR that reviews itself.</strong> Explain what you changed, why, and how you tested it. Link the issue. The easier you make the maintainer's job, the faster it merges.</li>
+  <li><strong>Survive review.</strong> Feedback is about the code, not you. Respond to every point; where you disagree, push back with evidence — respectful pushback is normal and respected. Expect a few rounds.</li>
+  <li><strong>Merge, then repeat.</strong> The first merge is the emotional milestone; regular contribution is the career signal. Maintainers notice contributors who show up, take feedback, and keep going.</li>
+</ol>
+
+<p><strong>How to choose between candidates — the health signals.</strong> Step 1 says "find a project you use," but between two projects you use, pick the one that will actually review your PR. Five minutes on the repo answers it:</p>
+
+<table>
+  <thead><tr><th>Signal</th><th>Healthy means</th><th>Where to look</th></tr></thead>
+  <tbody>
+    <tr><td>Commit activity</td><td>Commits within the last ~30 days</td><td>Repo "Commits" page</td></tr>
+    <tr><td>Issue response</td><td>Issues answered within about a week</td><td>Recent issue threads</td></tr>
+    <tr><td><code>good first issue</code> label</td><td>Maintainer explicitly welcomes newcomers</td><td>GitHub issue search</td></tr>
+    <tr><td>CONTRIBUTING.md</td><td>Exists and names the workflow</td><td>Repo root or <code>.github/</code></td></tr>
+    <tr><td>CI status</td><td>Green — the quality gate works</td><td>CI badge / Actions tab</td></tr>
+    <tr><td>Contributor count</td><td>More than a couple of active people</td><td>Repo "Contributors" page</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The red flags are the same signals inverted:</strong> no commits in months, issues left unanswered, a red CI, or a hostile tone in threads — all mean a PR is a wasted gift. And match your skill to the need: docs, tests, bug fixes, translation, and design are all valid first contributions, not just features. A "good first issue" you can fix in an evening beats an important one you'll still be wrestling in a month.</p>
+
+<p><strong>Filing an issue is a contribution too</strong> — a well-written bug report is the fastest way to start being useful before your first PR. The minimum: a title that names <em>what</em> and <em>where</em> ("Crash on empty config in <code>load()</code>"), the exact reproduction steps, what you expected vs. what happened, and your environment (OS, versions). The highest-value addition is a <em>minimal reproduction</em> — the smallest code that triggers the bug — because it lets the maintainer debug without your setup. Vague beats nothing, but "The app crashes" is a burden; "This 10-line snippet crashes when <code>handleClick</code> gets a null" is a gift. For a feature request, say what problem you're solving and how people work around it today — not the API you assume — and maintainers read it as product thinking, not a demand.</p>
+
+<p><strong>The emotional arc is real and normal:</strong> imposter syndrome before the first PR, anxiety during review, relief at the merge, then — after enough contributions — being offered review duties or maintainer access. That arc is the whole point; it is how the community renews itself.</p>
+
+<h2>Code review — from both sides of the table</h2>
+
+<table>
+  <thead><tr><th>As a contributor</th><th>As a reviewer</th></tr></thead>
+  <tbody>
+    <tr><td>Read feedback as a description of the code, not of you</td><td>Comment on the code, never the person; say what and why, not who</td></tr>
+    <tr><td>Ask when a comment is unclear — clarification is free</td><td>Offer suggestions as suggestions, not commands — "how about" over "do this"</td></tr>
+    <tr><td>Push back when the code is right and the reviewer is wrong — with evidence and grace</td><td>Distinguish blocking issues (correctness, tests, scope) from nice-to-haves</td></tr>
+    <tr><td>Rebase and keep the branch tidy rather than stacking commits</td><td>Review in small pieces; a 30-line PR gets far more attention than a 500-line one</td></tr>
+    <tr><td>Say thanks when a reviewer spends their scarce attention on your work</td><td>Remember review is unpaid — gratitude is the payment that keeps reviewers reviewing</td></tr>
+  </tbody>
+</table>
+
+<p>Review is the quality mechanism Linus's Law describes. The fastest way to become a better contributor is to review other people's PRs first — reading someone else's code against the project's conventions teaches you the standards you'll be held to.</p>
+
+<h2>Maintaining a project — the other side of the wall</h2>
+
+<p>Contributing and maintaining are different crafts. If you maintain:</p>
+
+<ul>
+  <li><strong>Triage is the job.</strong> Issues and PRs accumulate faster than you can act. Close duplicates, mark stale items, label intent — a well-triaged tracker is a calm tracker.</li>
+  <li><strong>Releases are a discipline, not an event.</strong> SemVer, changelogs, tags, and CI publishing — the release mechanics live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> §5b; the habit is yours to build. Release small and often; the community trusts a project that ships.</li>
+  <li><strong>Burnout is the systemic risk.</strong> Maintainership is unpaid, endless, and public. Sustainable projects automate (CI, templates, bots), document (CONTRIBUTING, ROADMAP), and delegate (trusted contributors, triage teams).</li>
+  <li><strong>Handing off is a success, not a failure.</strong> Archiving, transferring to a foundation, or naming new maintainers keeps the commons alive when your life changes. A graceful handoff is how mature projects survive their founders.</li>
+</ul>
+
+<h2>Business models — how open source pays for itself</h2>
+
+<p>Open source code is free; the work around it is not. The models that keep projects alive (each has a licensing consequence worth knowing):</p>
+
+<table>
+  <thead><tr><th>Model</th><th>How it works</th><th>Example</th><th>License note</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Open core</strong></td><td>Free core, paid enterprise features</td><td>GitLab, Grafana</td><td>Core is usually permissive or copyleft; paid parts stay proprietary</td></tr>
+    <tr><td><strong>Hosted / SaaS</strong></td><td>Free software, paid hosting</td><td>Supabase, PlanetScale</td><td>AGPL is chosen precisely to stop competitors re-hosting the same code</td></tr>
+    <tr><td><strong>Support &amp; consulting</strong></td><td>Free software, paid expertise</td><td>Red Hat (historically)</td><td>Works with any license; the value is the people</td></tr>
+    <tr><td><strong>Sponsorship / donations</strong></td><td>Voluntary funding of maintainers</td><td>GitHub Sponsors, Open Collective</td><td>Independent of license; sustains the people, not the product</td></tr>
+    <tr><td><strong>Dual licensing</strong></td><td>Free under one license, paid for a different one</td><td>MySQL, MongoDB</td><td>The paid license grants terms the free one deliberately doesn't</td></tr>
+  </tbody>
+</table>
+
+<p>The income dimension — how much, and whether it's a realistic primary income — is covered in <a href="./frontend-income-markets.html">Frontend Income Markets</a> §7. Here, the takeaway is the licensing consequence: a project's funding model and its license are chosen together, and the license you pick for your own project shapes what funding is possible.</p>
+
+<h2>Contributing to AI-agent CLIs — the concrete case</h2>
+
+<p>The most direct place to apply all of this is the CLI tools you use daily. AI-agent CLIs (Claude Code, Codex, Aider, Continue) are open source projects with unusually clean extension points, and they are actively looking for contributors:</p>
+
+<ul>
+  <li><strong>Where the extension points are.</strong> Most expose three seams: <em>tools</em> (what the agent can do), <em>providers</em> (which model/backend it talks to), and <em>prompts/system</em> (how it behaves). A new tool or provider is a classic "good first issue" shape.</li>
+  <li><strong>How to read the codebase.</strong> The architecture — REPL loop, tool calling, streaming responses, permission systems — is covered in <a href="./terminal-applications.html">Building CLIs &amp; Terminal Applications</a>. Read that first; then the repo is familiar territory.</li>
+  <li><strong>The testing challenge is different.</strong> Agent behavior is non-deterministic — the same prompt may produce different tool calls. Projects handle this with eval suites (behavioral tests) rather than unit assertions. Understand their eval harness before you write tests that can't be evaluated.</li>
+  <li><strong>Governance is young.</strong> Several of these projects are corporate-backed or brand-new, so governance is still settling — which makes early contributions land harder and be valued more.</li>
+</ul>
+
+<h2>Principles — the shared constants of open source</h2>
+
+<ul>
+  <li><strong>Read the LICENSE before you touch anything.</strong> It is the contract that makes the code usable.</li>
+  <li><strong>Read the room before you commit effort.</strong> CONTRIBUTING.md, recent activity, and maintainer responsiveness tell you whether a PR is worth writing.</li>
+  <li><strong>Respect review attention.</strong> Small, focused, self-explaining PRs are the ones that merge.</li>
+  <li><strong>The project owns its scope.</strong> A "no" to a feature is a scope decision, not a personal judgment.</li>
+  <li><strong>Contribution is a journey, not an event.</strong> The first PR is the door; the career signal is the pattern of showing up.</li>
+  <li><strong>Give back what you take.</strong> Reporting a bug well, writing documentation, or reviewing one PR is a real contribution — not everything is code.</li>
+</ul>
+
+<h2>Worked example — one contribution, end to end</h2>
+
+<p>Suppose you use a small open-source CLI for formatting and hit a bug: it mangles files with an unusual path. Here's the full journey:</p>
+
+<pre>1 · Confirm the bug: read the README, reproduce in your terminal, search
+     the issues (maybe it's already filed — then you comment, not re-file).
+
+2 · Read the room: CONTRIBUTING.md says "fork, branch, PR, add tests."
+     git log shows recent activity — the project is alive.
+
+3 · Claim the issue: "I'd like to work on this" + your reproduction.
+
+4 · Read the codebase: find where paths are handled. The CLI architecture
+     doc (<a href="./terminal-applications.html">terminal-applications</a>) tells you where to look — entry → routing
+     → the function that processes paths.
+
+5 · Make the smallest fix + a test that fails on the old code and passes
+     on the new. Run the project's lint and test suite locally.
+
+6 · Open the PR: one paragraph — what, why, how tested, "Fixes #123".
+     The CI runs; it passes.
+
+7 · Review: maintainer asks for a small change ("handle trailing slashes
+     too"). You update, push, respond. Second round, merged.
+
+8 · Aftermath: the fix ships in the next release. You filed a bug, fixed
+     it, survived review, and the maintainer now knows your name.
+     That is the entire career mechanism, compressed.
+</pre>
+
+<p>The same journey on an AI-agent CLI differs only in step 4 (you're tracing the tool-calling seam) and step 5 (tests are eval-based). The arc — find, claim, fix small, survive review, merge — is universal.</p>
+
+<h2>Most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Forking a dead project</td><td>Choosing by familiarity, not by activity</td><td>Check commits/issues/PRs in the last month before investing</td></tr>
+    <tr><td>The five-hundred-line first PR</td><td>Trying to prove yourself in one shot</td><td>Smallest useful change; scope grows with trust</td></tr>
+    <tr><td>No tests with the fix</td><td>Thinking the change is "obviously correct"</td><td>A fix without a failing-then-passing test is a guess</td></tr>
+    <tr><td>Taking review personally</td><td>Conflating the code with the self</td><td>Feedback is about the change; respond to points, not feelings</td></tr>
+    <tr><td>Ignoring project conventions</td><td>Applying your own style to someone else's repo</td><td>Read CONTRIBUTING.md, lint config, and git log first</td></tr>
+    <tr><td>Leaving a good issue open and unclaimed</td><td>Assuming someone else will do it</td><td>Claiming it and starting a conversation is itself a contribution</td></tr>
+    <tr><td>Assuming "open source" means "free to copy"</td><td>Reading the label, not the LICENSE</td><td>No license = all rights reserved; read it before you depend</td></tr>
+  </tbody>
+</table>
+
+<h2>Ecosystem — the terrain you'll navigate</h2>
+
+<table>
+  <thead><tr><th>Layer</th><th>Tools / platforms</th><th>What they're for</th></tr></thead>
+  <tbody>
+    <tr><td>Hosting</td><td>GitHub, GitLab, Codeberg, SourceHut</td><td>Where the code and the collaboration live; GitHub is the default, the rest are ideological alternatives</td></tr>
+    <tr><td>Registries</td><td>npm, PyPI, crates.io, Maven Central</td><td>Distribution — where "open source" becomes a one-command install</td></tr>
+    <tr><td>Foundations</td><td>Linux Foundation, CNCF, Apache, OpenJS, React Foundation</td><td>Legal backstop, governance, and funding for big projects</td></tr>
+    <tr><td>Funding</td><td>GitHub Sponsors, Open Collective, Patreon</td><td>Voluntary money for maintainers, independent of license</td></tr>
+    <tr><td>Supply-chain safety</td><td>npm audit, Snyk, Socket, SLSA/sigstore</td><td>Verifying what you install — the security layer lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a></td></tr>
+  </tbody>
+</table>
+
+<h2>The future — trust becomes the product</h2>
+
+<p>Two trends are reshaping open source. First, <strong>the supply chain became an attack surface</strong> — the 2024 xz-utils backdoor showed that a patient contributor can inject a backdoor into a widely-installed library. The response is provenance (SLSA, sigstore signatures, SBOMs) and a sharper eye on who maintains what. Second, <strong>AI changes who contributes</strong>: models can now draft PRs, which floods maintainers with review work and makes the review bottleneck tighter than ever. The result is the same shift the rest of the shelf predicts — <em>evaluation and judgment become the premium skills</em>. In open source, that means the contributors who understand the code, the project's scope, and the culture — the ones this doc teaches you to be — are more valuable, not less.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Print this. It is the entire doc in eleven lines:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>The LICENSE is the contract — read it before you depend, know it before you contribute.</td></tr>
+    <tr><td>2</td><td>Permissive (MIT/Apache) opens the door for commercial use; copyleft (GPL/AGPL) keeps derivative code open.</td></tr>
+    <tr><td>3</td><td>Compatibility: permissive combines with anything; copyleft infects whatever it touches; weak copyleft links without infecting.</td></tr>
+    <tr><td>4</td><td>Governance decides who merges — read the room before you commit effort.</td></tr>
+    <tr><td>5</td><td>Find a project you use with live signals — commits this month, answered issues, a green CI — and skip the dead ones.</td></tr>
+    <tr><td>6</td><td>Claim an issue and make the smallest useful change.</td></tr>
+    <tr><td>7</td><td>File issues like a gift: title, repro steps, expected vs. actual, a minimal reproduction.</td></tr>
+    <tr><td>8</td><td>A PR that reviews itself (what, why, how tested) is the PR that merges.</td></tr>
+    <tr><td>9</td><td>Review is about the code, not you; push back with evidence, thank reviewers for attention.</td></tr>
+    <tr><td>10</td><td>Maintaining is triage + releases + burnout management; handing off is a success.</td></tr>
+    <tr><td>11</td><td>You own what you write — unless your employer's contract says otherwise. The first merge is the door; showing up is the career signal.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2>Primary sources</h2>
+  <ol>
+    <li>Stallman, Richard — <a href="https://www.gnu.org/philosophy/free-sw.html">The GNU Free Software Definition</a> — the four freedoms.</li>
+    <li>Open Source Initiative — <a href="https://opensource.org/osd">The Open Source Definition</a> — the pragmatic counterpart to GNU's four freedoms.</li>
+    <li>Raymond, Eric — <a href="http://www.catb.org/~esr/writings/cathedral-bazaar/">The Cathedral and the Bazaar</a> (1997) — the essay that named peer-production development.</li>
+    <li>Fowler, Martin — <a href="https://choosealicense.com">choosealicense.com</a> — the license-selection decision tree.</li>
+    <li>GitHub — <a href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors">CONTRIBUTING guidelines</a> — the entry-point conventions projects expect.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2>Ask your teacher</h2>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Pick one dependency from my current projects, read its LICENSE and CONTRIBUTING.md, and walk me through what a first contribution to it would look like."</li>
+    <li>"Give me a real example of a 'good first issue' and show me the exact steps — including the Git commands — to claim it and open the PR."</li>
+    <li>"Where does open source actually fit in my path? Which project, if I contributed to it steadily for a year, would most change my career options?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Open Source — ecosystem, licenses, and contributing</span>
+  <span>Mechanics: <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> · History: <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> · Security: <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> · Income: <a href="./frontend-income-markets.html">Income Markets</a> · Projects: <a href="./terminal-applications.html">Building CLIs</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

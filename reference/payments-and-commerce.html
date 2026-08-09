@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments &amp; Commerce — the money that moves the web</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<header class="lesson-head">
+  <p class="kicker">Reference Shelf · The Real Web</p>
+  <h1>Payments &amp; Commerce — the money that moves the web</h1>
+  <p class="meta">For: the developer who must make money move, not lose the money in motion.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The engineering docs cover requests, data, and security; this one covers what those systems exist to do — move money. Most "full-stack" curricula stop at CRUD; real products stop at <em>settlement</em>.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│                    THE WEB YOU'VE BEEN TAUGHT                 │
+│   HTML → CSS → JS → React → APIs → databases → security      │
+│            ...and then the shelf just... stops               │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│               THE WEB THAT ACTUALLY PAYS                       │
+│   checkout → PSP → card networks → banks → settlement →       │
+│   reconciliation → subscriptions → refunds → disputes →       │
+│   marketplaces → fraud → tax → getting paid yourself          │
+└───────────────────────────────────────────────────────────────┘
+   A product that can't take money politely isn't a product;
+   a developer who can't ship payments safely will learn
+   it from a chargeback.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./backend-engineering.html">Backend Engineering</a> (webhooks, transactions, idempotency — the machinery payments rides on) · <a href="./api-design.html">API Design</a> (the checkout exchange) · <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (PCI, fraud, secrets) · <a href="./data-modeling-and-databases.html">Data Modeling</a> (orders, invoices, ledger rows) · <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> (WooCommerce vs. Shopify) · <a href="./freelance-web-practice.html">Freelance Web Practice</a> (getting paid as a freelancer) · <a href="./income-stream-landscape.html">Income Streams</a> and <a href="./frontend-income-markets.html">Income Markets</a> (the business side of money)</p>
+</blockquote>
+
+<section class="recap">
+  <p><strong>Why this doc exists separately.</strong> Everything else on the shelf assumes correctness costs a retry; payments assume failure costs <em>money</em>. The invariants change (money is data until it settles; promises must be idempotent; fraud follows value), the vocabulary changes (authorization, capture, settlement, chargeback), and the compliance surface appears (PCI, KYC, money-transmission law). This is the seam where "the app" ends and "the bank's rules" begin — and knowing exactly where that seam is, is the skill.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Four modes of use, in order of how often you'll need them:</p>
+<ul>
+  <li><strong>Ship a checkout.</strong> Read the Definition + Underlying theory, then jump straight to <em>Integration patterns</em> and the worked example. The provider does the heavy lifting; your job is knowing which surface is yours.</li>
+  <li><strong>Understand why money moves the way it does.</strong> Read the History and Mental models — the ledger, settlement lag, and the pipeline of handoffs explain every weird bank behavior you'll meet.</li>
+  <li><strong>Deal with a live payment system.</strong> Read the <em>How payments work</em> mechanics and the webhooks section — the webhook is where your code meets reality, and where most production bugs live.</li>
+  <li><strong>Design a business model.</strong> Subscriptions, marketplaces, and payouts are the strategy sections; the Failure modes table is the due-diligence checklist.</li>
+</ul>
+
+<h2>Definition — what "taking payment" actually is</h2>
+
+<p><strong>You never move money. You move instructions to move money.</strong> Every payment is a message between institutions — your business, a payment service provider (PSP), card networks, banks — and the money itself arrives days later, if the message survives. Everything surprising about payments is a consequence of this fact: the settlement lag, the reversal rules, the fees, the fraud surface, and the regulation.</p>
+
+<p>Three terms you must be able to say without flinching:</p>
+<ul>
+  <li><strong>Authorization</strong> — asking "is this card good for this amount?" A hold on the card, not money moving.</li>
+  <li><strong>Capture</strong> — the moment the money is actually requested. Between auth and capture, the hold can be voided.</li>
+  <li><strong>Settlement</strong> — when the money actually lands in your account. Days after capture, in practice.</li>
+</ul>
+
+<p><strong>Every payment is a promise until settlement.</strong> The customer's card is good (authorized), the money is requested (captured) — and then the payment can still fail, be disputed, or be clawed back. The merchant's account balance is the last thing to change in the whole chain, and the only fact you can safely trust at the end.</p>
+
+<p><strong>The money-movement parties:</strong></p>
+
+<table>
+<thead><tr><th>Party</th><th>Role</th><th>Whose side they're on</th></tr></thead>
+<tbody>
+<tr><td><strong>You (the merchant)</strong></td><td>Provide goods/service; request payment</td><td>Keep the revenue</td></tr>
+<tr><td><strong>The customer</strong></td><td>Authorizes payment with their account/card</td><td>Keep their money (or get their stuff)</td></tr>
+<tr><td><strong>Issuing bank</strong></td><td>Holds the customer's account, issues the card</td><td>The customer's money is their liability</td></tr>
+<tr><td><strong>Acquiring bank</strong></td><td>Holds your merchant account, receives settlement</td><td>Your revenue is their liability — they eat chargeback losses first</td></tr>
+<tr><td><strong>Card networks (Visa, Mastercard, Amex)</strong></td><td>Route authorization messages and settle between banks</td><td>The rails; they set the rules and the interchange fees</td></tr>
+<tr><td><strong>Payment service provider (PSP — Stripe, Adyen, PayPal, Square)</strong></td><td>Gives you one API/terminal that touches all of the above</td><td>You — for a fee, and up to their risk tolerance</td></tr>
+</tbody>
+</table>
+
+<p><strong>Why a PSP exists:</strong> the alternative is a merchant account with an acquirer, a separate payment gateway, card-network certifications, PCI scope, and a bank relationship each — a full department. A PSP compresses the entire institution stack into an API. The fee you pay is the price of not building a bank.</p>
+
+<p><strong>Commerce vs. payments:</strong> payments are the money movement; commerce is the business around it — catalog, cart, orders, inventory, tax, subscriptions, marketplaces. Stripe processes; Shopify (or WooCommerce, or your own stack) sells. The docs' rule: <a href="./wordpress-and-cms-internet.html">choose the commerce platform by who edits the catalog and who owns the customers</a>; choose the payments provider by geography, fee structure, and developer experience.</p>
+
+<h2>History — how money learned to move digitally</h2>
+
+<table>
+<thead><tr><th>Era</th><th>Constraint</th><th>Inversion</th><th>The consequence we still live with</th></tr></thead>
+<tbody>
+<tr><td><strong>Cash &amp; checks</strong></td><td>Money is a physical object; payment = physical exchange</td><td>→ Checks: instructions to move money, paper edition</td><td>Clearing time (days), NSF risk — the ancestors of settlement lag and failed payments</td></tr>
+<tr><td><strong>Cards (1950s–80s)</strong></td><td>Credit = trust between merchant and issuer</td><td>→ The card network: one brand, many banks, unified acceptance</td><td>Interchange, merchant discount fees, and the network as rule-setter</td></tr>
+<tr><td><strong>Online retail (1994–98)</strong></td><td>Cards need a terminal and a signature</td><td>→ The merchant site takes card numbers itself (early SSL shopping carts)</td><td>The worst security era in payments: merchants stored PANs; breaches were inevitable. PCI exists because of this era</td></tr>
+<tr><td><strong>PSPs (1998–2010s)</strong></td><td>Accepting cards = a bank + a gateway + certifications</td><td>→ PayPal, then Stripe/Square: the institution stack becomes an API</td><td>The developer wave: subscriptions, marketplaces, and code-first businesses became possible</td></tr>
+<tr><td><strong>Mobile &amp; wallets (2010s–)</strong></td><td>Card numbers are the only identity; typing them is friction</td><td>→ Apple/Google Pay, one-tap tokenized payments</td><td>Tokenization as the norm; the card number becomes optional plumbing</td></tr>
+<tr><td><strong>Embedded finance &amp; A2A (2020s–)</strong></td><td>PSPs sell you payment processing</td><td>→ Payments as a feature inside everything: banking, lending, accounting, payouts</td><td>Open banking (A2A transfers), instant settlement, BNPL — the rails fragment again</td></tr>
+</tbody>
+</table>
+
+<p><strong>The pattern:</strong> every inversion pushed the same direction — <em>less physical, more institutional, more abstracted.</em> Money became data; the data became a message; the message became an API. The layer you work with (the API) is the newest; the rules underneath (settlement, clearing, disputes) are decades old and move at bank speed.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+<thead><tr><th>Topic</th><th>Where it lives</th><th>This doc's boundary</th></tr></thead>
+<tbody>
+<tr><td>Webhooks, async work, retries</td><td>Backend Engineering §3 and the events patterns</td><td>Only the payment-state machine and webhook-as-source-of-truth — the money-specific failure cases</td></tr>
+<tr><td>Transactions, concurrency, idempotency</td><td>Backend Engineering §5</td><td>Only the payment-specific applications: idempotency keys on charges, double-charge protection</td></tr>
+<tr><td>Secrets, auth, threat modeling</td><td>Security &amp; Threat Modeling</td><td>Only PCI scope and payment-specific fraud — the rest is theirs</td></tr>
+<tr><td>Auth exchanges, tokens, sessions</td><td>API Design</td><td>The checkout flow's session/redirect dance is theirs; the money state machine is here</td></tr>
+<tr><td>Orders, invoices, ledger rows</td><td>Data Modeling &amp; Databases</td><td>One example: the money model — <code>order → payment → ledger</code> — but the schema discipline is theirs</td></tr>
+<tr><td>WooCommerce vs. Shopify</td><td>WordPress &amp; the CMS Internet</td><td>Platform choice lives there; payment mechanics apply to either</td></tr>
+<tr><td>Freelancer income, client billing</td><td>Freelance Web Practice + Income docs</td><td>Delivery and client-money mechanics are theirs; payment rails (Wise, invoicing) are introduced here, lived there</td></tr>
+</tbody>
+</table>
+
+<h2>Underlying theory — the invariants of money in motion</h2>
+
+<p>Five invariants explain almost every payment behavior you'll ever be surprised by:</p>
+
+<ol>
+  <li><strong>Money is data until it settles.</strong> The only ground truth is the ledger state at a bank, reached days after the click. Everything before that is a promise.</li>
+  <li><strong>Every leg is a message between institutions, and every message can fail.</strong> Authorization can time out; capture can be refused after auth; settlement can be reversed. Your code must survive a failure at any leg.</li>
+  <li><strong>Idempotency is the contract.</strong> Retries are how distributed systems survive, and retries must not double-charge. A charge with the same idempotency key is the same charge, forever.</li>
+  <li><strong>The webhook is the source of truth.</strong> The synchronous API response tells you the request was accepted; the webhook tells you what actually happened. Reconciliation = "did our records match what the provider settled?"</li>
+  <li><strong>Fraud follows value.</strong> Any flow that moves money will be attacked at its softest point — refunds, chargebacks, account takeover, social engineering. Every money-handling feature is a security feature.</li>
+</ol>
+
+<h2>Mental models — frames for thinking about payments</h2>
+
+<ul>
+  <li><strong>The pipeline of handoffs.</strong> Money flow = merchant → PSP → network → issuer, each leg with its own rules and failure modes. Debug by asking "which leg is this failure from?" — the answer tells you who owns the fix.</li>
+  <li><strong>The promise until settlement.</strong> A payment is "successful" only when it settles; treat captures and webhooks as provisional. Your accounting and your optimism both depend on this.</li>
+  <li><strong>The PSP as your bank-shaped dependency.</strong> Like a plugin or a database, it's a dependency with an SLA, a fee structure, and a risk policy. It can freeze accounts; it can fail; it has a support queue. Plan for the PSP as a system, not a black box with a nice dashboard.</li>
+  <li><strong>The chargeback as gravity.</strong> Disputes are not exceptional — they are the default way money returns in card systems. Design for the reversal before you design for the sale.</li>
+  <li><strong>The three-way fee split.</strong> Every card transaction pays interchange (set by networks, most of the cost) + scheme fees + processor markup. Your "2.9% + 30¢" is mostly not yours to negotiate — and some payment methods (ACH, local schemes, wallets) are dramatically cheaper. Fees are a design input, not a cost of doing business.</li>
+  <li><strong>The checkout as a security boundary.</strong> The page where card data is entered is the seam between the merchant's app and the PSP's PCI-scoped surface. Whoever hosts that page owns the compliance — which is why hosted checkout is the lazy winner.</li>
+</ul>
+<h2>How payments work — the mechanics</h2>
+
+<h3>The card flow, end to end</h3>
+<pre>
+Customer → card data → PSP → ① AUTHORIZATION request → card network → issuing bank
+                                          │
+   your site  ←  "approved"  ←  PSP  ←  network  ←  "funds held" (auth hold)
+   (you don't see card data if hosted checkout)
+                                          │
+   ① CAPTURE (you ask for the money, or the PSP auto-captures)
+                                          ▼
+   settlement in days  →  money in your account  →  reconciliation against webhooks
+</pre>
+
+<ul>
+  <li><strong>Auth + capture as separate steps</strong> matters for order flows: you can authorize at checkout, ship later, capture on fulfillment, and void un-shipped orders. Most simple integrations auto-capture immediately — fine — but know which one you chose, because "we charged them but never shipped" is an auth/capture misconfiguration story.</li>
+  <li><strong>Tokenization:</strong> the card number is exchanged once for a token (a merchant-scoped reference), and only the token touches your system. Your database never stores PANs; your compliance scope shrinks to nothing. This is the single most important security habit in payments.</li>
+</ul>
+
+<h3>Payment methods — the landscape</h3>
+
+<table>
+<thead><tr><th>Method</th><th>How it works</th><th>When it wins</th></tr></thead>
+<tbody>
+<tr><td><strong>Cards (credit/debit)</strong></td><td>Auth/capture/settlement over card networks</td><td>Global default; the highest fee surface (interchange) and the chargeback surface</td></tr>
+<tr><td><strong>Wallets (Apple Pay, Google Pay, Shop Pay)</strong></td><td>Tokenized card on the device, one-tap, 3DS built in</td><td>Mobile-first checkout; lower fraud, higher conversion — often cheaper fees</td></tr>
+<tr><td><strong>ACH / bank debits (US), SEPA Direct Debit (EU)</strong></td><td>Bank-to-bank pull with your permission</td><td>Much lower fees; slow (days) and reversible — subscriptions love it; one-time checkouts hate the friction</td></tr>
+<tr><td><strong>Account-to-account (A2A / open banking, e.g. bank transfer, Pay by Bank)</strong></td><td>Instant bank-to-bank push with the customer authenticating in their banking app</td><td>Near-zero fees, no chargebacks (transfers are final), instant — growing fast in Europe (PSD2) and now elsewhere</td></tr>
+<tr><td><strong>Buy now, pay later (Klarna, Afterpay)</strong></td><td>The BNPL provider pays you upfront; the customer owes them</td><td>Higher conversion on big-ticket items; fees + consumer-debt reputation costs; provider becomes the checkout gatekeeper</td></tr>
+<tr><td><strong>Cash / offline</strong></td><td>Physical money</td><td>Point-of-sale only; never digital</td></tr>
+</tbody>
+</table>
+
+<p><strong>The selection rule:</strong> start with cards + wallets (everyone accepts them), add ACH/SEPA for subscriptions (fees compound on recurring), add BNPL only when ticket size justifies it, and let geography decide the rest (PayPal is still a checkout expectation in some markets; Paystack/Mercado Pago rule their regions; Alipay/WeChat Pay are non-negotiable in China). The PSP's country/payment-method coverage is a first-class requirement, not a detail.</p>
+
+<h3>Fees — read the three-way split</h3>
+
+<p>Your PSP's pricing is "interchange + scheme fees + PSP markup." Interchange is set by the networks per card type/country and is <em>not negotiable by you</em>; the PSP markup is what you actually shop for. Fee levers you control: payment method (ACH beats cards), card present vs. card not present (lower in-person rates), regional processing, and volume negotiations. Treat fees as a product decision — a subscription at 2.9% per month over years is a tax on your margin that ACH avoids.</p>
+
+<h2>Multi-currency and international payments — money without borders, rules with borders</h2>
+
+<p>A global product meets currency conversion, cross-border fees, and local payment habits on day one. Three rule-groups:</p>
+
+<ul>
+  <li><strong>How money is stored:</strong> integer minor units with an ISO 4217 currency code — <code>100</code> cents + <code>USD</code>, never <code>1.00</code> as a float. Floating-point is forbidden for money: <code>0.1 + 0.2 ≠ 0.3</code> in binary, and rounding errors in invoices are how you lose the difference at scale. The amount-currency pair is inseparable — a <code>100</code> without a currency is a bug.</li>
+  <li><strong>Who sets the rate:</strong> conversion happens at a leg your code doesn't control (the PSP, the card network, or the customer's issuing bank, depending on the product). Watch for <strong>Dynamic Currency Conversion (DCC)</strong> — the customer is offered their home currency at checkout at a poor rate; it's usually a bad deal for them and a fee source for the processor. And know your settlement currency: Stripe settles your whole balance in one currency, so multi-currency sales mean <em>conversion at payout</em>, with FX cost you price into the business.</li>
+  <li><strong>Local methods are the requirement:</strong> cards are a minority payment method in much of the world. The PSP's country/payment-method coverage decides who can pay, before your dashboard decides anything.</li>
+</ul>
+
+<table>
+<thead><tr><th>Method</th><th>Region</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td><strong>UPI</strong></td><td>India</td><td>Instant bank-to-bank, no card needed — the default consumer payment</td></tr>
+<tr><td><strong>PIX</strong></td><td>Brazil</td><td>Instant, QR-code based — Brazil's default since 2020</td></tr>
+<tr><td><strong>iDEAL / Bancontact</strong></td><td>Netherlands / Belgium</td><td>Bank redirect — near-total domestic coverage</td></tr>
+<tr><td><strong>Alipay / WeChat Pay</strong></td><td>China</td><td>QR-code wallets — non-negotiable for Chinese customers</td></tr>
+<tr><td><strong>Konbini</strong></td><td>Japan</td><td>Pay at a convenience store — for customers without cards or bank apps</td></tr>
+<tr><td><strong>SEPA Direct Debit</strong></td><td>EU</td><td>Bank pull for subscriptions — the EU's recurring-payment workhorse (also in the methods table above)</td></tr>
+</tbody>
+</table>
+
+<p><strong>The lazy rule:</strong> store minor units + currency from day one (retrofitting currency is a migration), let the PSP own conversion and local methods, and choose your PSP by the map of <em>where your customers already pay</em> — your customers' payment habits are the requirement, not your favorite dashboard.</p>
+
+<h2>Integration patterns — where the code meets the money</h2>
+
+<h3>Hosted checkout — the lazy default</h3>
+<ul>
+  <li><strong>Stripe Checkout / Payment Links, Shopify, PayPal, Lemon Squeezy</strong> — the provider hosts the payment page; you redirect, they return you (and the customer) to your success page. Zero card data on your servers, zero PCI scope, built-in wallets and 3DS, refunds and receipts managed in a dashboard.</li>
+  <li><strong>When it wins:</strong> almost always — small products, client sites, anything where checkout isn't a competitive differentiator. The <a href="./wordpress-and-cms-internet.html">CMS</a> and <a href="./freelance-web-practice.html">freelance</a> paths both default here.</li>
+</ul>
+
+<h3>Embedded elements — the custom surface</h3>
+<ul>
+  <li><strong>Stripe Elements / Payment Elements, Adyen Components</strong> — the provider's SDK renders the card inputs inside your page; you style the UI, the provider still owns the data. Card data touches your DOM but not your servers. Moderate PCI scope (SAQ A-EP-ish via the provider's iframe/JS), full design control.</li>
+  <li><strong>When it wins:</strong> checkout design matters (conversion is a business metric), custom pricing at checkout, one-page apps that can't redirect.</li>
+</ul>
+
+<h3>API-direct charges</h3>
+<ul>
+  <li><strong><code>POST /v1/payment_intents</code></strong> with your own tokenized payment method — the full control surface: custom flows, saved cards for subscriptions, split payments, everything. You own the entire flow, the error handling, and the compliance scope for whatever data you touch.</li>
+  <li><strong>When it wins:</strong> subscriptions, marketplaces, recurring billing, any custom money logic.</li>
+</ul>
+
+<h3>Bundled billing (Clerk Billing) — the new lazy default</h3>
+<ul>
+  <li><strong>Clerk Billing</strong> (launched 2025) bundles subscription billing into the auth provider: you define plans/features in the Clerk dashboard, drop in prebuilt pricing/checkout components, and the active plan ships as claims on the session token — feature gating reuses your existing <code>has()</code> auth check, no webhook plumbing, no subscription table. Stripe only processes; Clerk is not a merchant of record.</li>
+  <li><strong>The trade:</strong> 0.7% on top of Stripe's fees; plans are defined in Clerk (not synced with Stripe Billing — your <code>plan_status</code> column is the token, not a webhook table); USD-only so far. Worth it when auth is already Clerk (see <a href="./nextjs-deep-dive.html">Next.js</a>) and billing needs are simple; the webhook-based state machine below still applies when you outgrow it.</li>
+</ul>
+
+<p><strong>The decision rule:</strong> hosted checkout unless you have a reason (conversion, custom UX, recurring logic). Every layer of custom integration you take on is PCI scope and failure surface you now own — the same "who owns the failure" math as everywhere else on this shelf. The pattern is provider-agnostic: the state machine, webhooks, idempotency, and reconciliation are the same whether the PSP is Stripe, PayPal, Adyen, or a regional leader — only the dashboard, test cards, and event names change.</p>
+
+<h3>Idempotency — the double-charge guard</h3>
+
+<p>The rule from Backend Engineering §5, applied to money: <strong>a retry must not become a second charge.</strong></p>
+<ul>
+  <li>Every charge carries an <code>idempotency_key</code> — a per-operation unique string (an order id, a UUID you generated per attempt). The provider promises: same key → same charge, forever. Retry-safe by construction.</li>
+  <li>Generate the key per logical operation, <em>not</em> per HTTP request — a client that retries the checkout request must reuse the key, or it's a double charge with extra steps.</li>
+  <li>Your own API should expose the same contract: the client sends an idempotency key, your handler keys the charge on it. (This is the CRUD Create rule from <a href="./backend-engineering.html">Backend Engineering</a>, and it's how payment APIs stay sane.)</li>
+</ul>
+
+<h3>Webhooks — the source of truth, not the API response</h3>
+
+<p>Every payment outcome your code needs to trust — <em>paid, failed, refunded, disputed, subscription renewed</em> — arrives as a webhook event, hours or days after the synchronous request. Three rules:</p>
+<ul>
+  <li><strong>Never reconcile from the synchronous response.</strong> It tells you the request was accepted; it cannot tell you about capture failures, disputes, or chargebacks that arrive later. The webhook is the ledger.</li>
+  <li><strong>Verify signatures and dedupe.</strong> Verify the webhook signature (the provider's secret-based HMAC) on every event, and dedupe by event id — providers retry on failure, and your handler must be idempotent (the Backend Engineering §3 rule, money edition).</li>
+  <li><strong>Handle it as a state transition, not a notification.</strong> The payment lifecycle is a state machine (below). The webhook says "transition to this state"; your database records the transition and the <em>timestamp it happened at the provider</em>, not when your handler ran.</li>
+</ul>
+
+<h3>The payment state machine</h3>
+<pre>
+   created ──→ requires_action (3DS) ──→ processing
+       │                                  │
+       └────────── failed ────────────────┘
+                       │
+                 processing ──→ succeeded
+                       │            │
+                       ▼            ▼
+                    (no capture)  captured ──→ settled
+                                       │
+                          refunded ←───┘
+                          disputed ──→ won / lost (chargeback)
+</pre>
+
+<p>Every state has a row in your database, and every transition arrives via webhook or a successful synchronous confirm. "We got a webhook that says failed" is normal; "we saw a success page but no succeeded event" is the classic bug — the success page must be client-side <em>optimism</em>, and the state machine must be the server-side truth. Show the user the good news, but make the database wait for the webhook.</p>
+
+<h2>Subscriptions — money that repeats</h2>
+
+<p>A subscription is a state machine plus a scheduler: <code>trialing → active → past_due → canceled / paused → ended</code>, with renewal attempts on a cadence. The engineering is in the edges:</p>
+<ul>
+  <li><strong>Dunning:</strong> when a renewal fails (expired card, insufficient funds), the payment retries on a schedule (e.g., 3 attempts over days) with increasingly firm customer emails. Without dunning, ~30% of churn is just "card declined, never retried."</li>
+  <li><strong>Proration and plan changes:</strong> upgrade/downgrade mid-cycle must compute the credit/debit difference — a rounding minefield; let the billing library (Stripe Billing, Recurly, Chargebee) own it.</li>
+  <li><strong>Usage vs. fixed billing:</strong> fixed (same amount monthly) is trivial; usage-based (per-seat, per-API-call) requires metering events and end-of-cycle aggregation — a data pipeline with invoices.</li>
+  <li><strong>The money is recurring; so is the risk:</strong> subscription chargebacks happen at the failed-renewal boundary, and cancellation UX is where customer-relations karma is made. Make canceling easy — the lazy rule that also retains more customers than any dark pattern.</li>
+</ul>
+
+<h3>The lifecycle decisions the billing engine can't make</h3>
+
+<p>The provider owns dunning, proration math, and retries — but these product decisions are yours, and customers feel them immediately:</p>
+<ul>
+  <li><strong>Trial conversion:</strong> decide the exact moment the trial ends (exact timestamp vs. end-of-day), and what happens when the card fails at conversion — grace period with a clear "update your card" prompt, not an instant lockout.</li>
+  <li><strong>Cancellation timing:</strong> immediate or end-of-period? The customer's expectation, your revenue recognition, and your refund policy all hang on this one line in the pricing page.</li>
+  <li><strong>Pause/hold:</strong> if pausing exists, define what happens to the billing cycle and to usage during the pause.</li>
+  <li><strong>Grandfathering:</strong> when you change pricing, existing subscribers keep their old price until they change plans — and that promise needs to be communicated, not discovered.</li>
+  <li><strong>Free tier → paid:</strong> is the free tier a $0 plan or a separate product? The upgrade prompt is a conversion feature, not an afterthought.</li>
+</ul>
+
+<h2>Marketplaces and splits — other people's money</h2>
+
+<p>Platforms that pay their sellers (marketplaces, marketplaces-of-services, freelancing platforms) move <em>other people's</em> money — which is a legal category, not just a technical one:</p>
+<ul>
+  <li><strong>The architecture:</strong> the platform takes the customer's payment, splits it — seller share (via the PSP's connected-account / application-fee system, e.g. Stripe Connect or Adyen platform payments) and platform fee — and the seller's share settles to the seller's own account.</li>
+  <li><strong>KYC is yours:</strong> you are responsible for verifying each seller (the PSP's onboarding flows do this) — "know your customer" applies to sellers and buyers; holding or routing other people's money without the right licensing is a compliance crime, not a technical bug.</li>
+  <li><strong>The anti-pattern:</strong> receiving customer money into <em>your</em> account and manually sending payouts ("the PayPal-and-a-spreadsheet marketplace"). That's called "operating a money-transmission business without a license," and it is how small platforms die. Use the PSP's split/settlement rails; they exist exactly for this.</li>
+  <li><strong>Failure modes:</strong> seller payouts failing (bank details wrong), seller disputes eating platform fees, and the marketplace itself being on the hook for refunds when a seller vanishes — platform liability is a business-model decision, priced into the fee, not a code decision.</li>
+</ul>
+
+<h2>Refunds, chargebacks, and disputes — the money that comes back</h2>
+
+<table>
+<thead><tr><th>Mechanism</th><th>Who initiates</th><th>What happens</th><th>Your posture</th></tr></thead>
+<tbody>
+<tr><td><strong>Refund</strong></td><td>You (merchant-initiated)</td><td>Money returns; you pay the original fees; done</td><td>Normal business — generous refunds are cheap compared to disputes</td></tr>
+<tr><td><strong>Chargeback (dispute)</strong></td><td>The customer's bank</td><td>Money is pulled back from you, plus a dispute fee, while evidence is reviewed; you can respond with evidence; the bank decides</td><td>Defensive: evidence packs (order data, delivery proof, communications), a dispute-response workflow, and a dashboard to track it</td></tr>
+<tr><td><strong>Friendly fraud / chargeback fraud</strong></td><td>The customer (abusing the system)</td><td>"I didn't make this purchase" for purchases they did make — the largest dispute category</td><td>Evidence discipline + fraud screening at checkout; some losses are the price of the rails</td></tr>
+</tbody>
+</table>
+
+<p><strong>The rules:</strong> a chargeback is not an appeal — you get one evidence window, the bank's bias is toward the cardholder, and repeated disputes can get your processing terminated (high dispute ratios are a PSP-offboarding cause). The professional posture is prevention (clear descriptors on statements, delivery tracking, good support) plus a repeatable evidence workflow, not outrage. Refunds are always cheaper than disputes; the "no refunds ever" policy converts into chargeback fees.</p>
+
+<h2>PCI DSS and compliance — the rules you inherited</h2>
+
+<ul>
+  <li><strong>PCI DSS</strong> is the card-industry security standard (12 requirements: network security, encryption of card data, access control, monitoring, and more). It applies to anyone who stores, processes, or transmits card data — which is why the entire industry's lazy move is <em>not being in scope</em>.</li>
+  <li><strong>Scope is a design choice.</strong> Hosted checkout → SAQ A (the lightest, "we don't touch card data"). Iframe/JS elements → SAQ A-EP. Storing PANs yourself → full SAQ D audits, a serious program. The tokenization habit (<a href="./security-and-threat-modeling.html">and the security discipline behind it</a>) is how the scope stays small.</li>
+  <li><strong>What actually matters in practice:</strong> never store full PANs, log full card numbers, or print them; use the provider's tokenization everywhere; keep secrets out of code; and let the PSP's dashboard/JS do the heavy lifting. Compliance is mostly "don't have card data" plus "patch your stuff" — the same hygiene as the rest of this shelf, with a named standard and fines attached.</li>
+</ul>
+
+<h3>The regulatory landscape beyond PCI</h3>
+
+<table>
+<thead><tr><th>Regulation</th><th>What it governs</th><th>Why it matters to you</th></tr></thead>
+<tbody>
+<tr><td><strong>PSD2/PSD3 (EU)</strong></td><td>Payment services, open banking, SCA</td><td>Strong Customer Authentication mandates 3DS for most EU card transactions — which is why European customers trigger challenges (see the fraud section)</td></tr>
+<tr><td><strong>AML/KYC</strong></td><td>Anti-money laundering, identity verification</td><td>Platforms that move other people's money must verify identities — the marketplace section's "KYC is yours" is this</td></tr>
+<tr><td><strong>Sanctions screening (OFAC, EU lists)</strong></td><td>Who you may do business with</td><td>Every payment must be screened; PSPs do this for you, but it explains frozen accounts</td></tr>
+<tr><td><strong>Sales tax / VAT / GST</strong></td><td>Tax on digital goods</td><td>Destination-based (customer's location decides); registration thresholds per jurisdiction; tax-inclusive (EU) vs. tax-exclusive (US) pricing changes your checkout UX</td></tr>
+<tr><td><strong>Money-transmitter licensing (US)</strong></td><td>State-by-state licensing for money movement</td><td>Holding or routing customer money without a license is a compliance crime, not a technical bug — the marketplace anti-pattern again</td></tr>
+</tbody>
+</table>
+
+<p><strong>The lazy rule:</strong> let a service own the regulatory updates. Stripe Tax, Paddle (merchant of record), and Quaderno exist because tax and compliance are moving targets — building your own tax engine is a product, not a feature.</p>
+<h2>Fraud — the tax on trust</h2>
+
+<p>Every money flow is attacked at its softest point. The fraud surface, in practice:</p>
+
+<table>
+<thead><tr><th>Attack</th><th>How it works</th><th>Defense</th></tr></thead>
+<tbody>
+<tr><td><strong>Stolen cards</strong></td><td>Card data from breaches or carding markets, used at your checkout</td><td>3DS (customer authenticates with their bank — pushes liability to the issuer), AVS/CVV checks, velocity limits (per-card, per-IP, per-email), provider's built-in risk rules (Stripe Radar, Adyen risk)</td></tr>
+<tr><td><strong>Account takeover</strong></td><td>Credentials from other breaches used to buy with saved payment methods</td><td>Login anomaly detection, device fingerprinting, step-up auth on checkout, MFA (the <a href="./security-and-threat-modeling.html">Security doc</a> owns the account side)</td></tr>
+<tr><td><strong>Friendly fraud</strong></td><td>Chargeback abuse (see above)</td><td>Evidence workflows, delivery confirmation, statement descriptors</td></tr>
+<tr><td><strong>Refund abuse</strong></td><td>Buy with a real card, claim refund, keep the goods</td><td>Refund velocity rules, manual review flags, returns policy discipline</td></tr>
+<tr><td><strong>Triangulation</strong></td><td>Seller lists cheap goods, buys them with stolen cards, ships to the buyer; the real cardholder disputes, you eat it</td><td>Marketplace seller KYC and velocity review — the <a href="./freelance-web-practice.html">marketplace</a> side of fraud</td></tr>
+</tbody>
+</table>
+
+<p><strong>The tradeoff is real:</strong> every fraud control adds checkout friction, and friction costs conversions. The professional position is measured: start with the provider's default rules (Radar, Adyen risk, PSP-level 3DS) + CVV + a sanity amount threshold, add velocity rules when the chargeback ratio says so, and price fraud into the business (chargebacks are a cost line, not a surprise). Fraud prevention that breaks your own checkout is a fraud on your conversion.</p>
+
+<h3>3D Secure (3DS) — the authentication tax</h3>
+
+<p>3DS is the protocol where the customer authenticates with their <em>issuing bank</em> during checkout — a challenge (OTP, biometric, app confirmation) or a silent approval (the frictionless flow). PSD2/SCA mandates it for most EU card transactions, which is why it's the state machine's <code>requires_action</code> state. The provider's risk engine decides when to request it; you can also request it explicitly for high-risk transactions.</p>
+
+<p><strong>The liability shift is the point:</strong> without 3DS, fraud chargebacks are your problem; with 3DS, the issuing bank is liable in most cases. That is the entire reason 3DS exists — it trades a little checkout friction for a transfer of fraud risk. The provider balances the tradeoff with its risk engine; your job is only to render the <code>requires_action</code> state honestly (hosted checkout does this for free).</p>
+
+<h2>Worked example — a small SaaS takes its first payment</h2>
+
+<p><strong>The product:</strong> a subscription tool. The constraints: two-person team, no compliance ambitions, must ship this week. The answer to every question is "the laziest correct thing":</p>
+
+<p><strong>Step 1 — the platform decision.</strong> Stripe (or your regional equivalent) with <strong>Stripe Checkout</strong>, a subscription product in Stripe Billing, and the <a href="./backend-engineering.html">backend</a> receiving webhooks. No card data ever touches the app; PCI scope is SAQ A; dunning, 3DS, and receipts come free. If the checkout page must match the brand later, swap to Payment Elements — but not today.</p>
+
+<p><strong>Step 2 — the order of implementation (the lazy path):</strong></p>
+<ul>
+  <li>Create the subscription product + price in the dashboard. Use the <strong>test-mode</strong> cards (4242…, declined cards, 3DS cards) — test mode is where you learn every failure before a customer pays you.</li>
+  <li>Redirect the customer to Checkout from your pricing page; <code>success_url</code> and <code>cancel_url</code> handled with <code>client_reference_id</code> = your user id so the webhook can join the dots.</li>
+  <li>Write the webhook endpoint: verify the signature, dedupe by event id, and handle the events that matter — <code>checkout.session.completed</code> (mark the user active), <code>customer.subscription.updated</code> (plan changes, cancellations), <code>customer.subscription.deleted</code> (end), <code>invoice.payment_failed</code> (dunning state). Every handler is a state transition on the user's <code>plan_status</code> column, keyed on provider timestamps. Idempotent: reprocessing an event must be a no-op.</li>
+  <li>Gate the app: the paid feature checks <code>plan_status = active</code> server-side (the <a href="./backend-engineering.html">authorization</a> rule — a client-side flag is marketing, not entitlement).</li>
+  <li>Reconciliation habit from day one: a weekly script (or just a dashboard query) that compares "users we think are active" vs. "subscriptions the provider thinks are active". Mismatches are how silent revenue leaks are found.</li>
+</ul>
+
+<p><strong>Step 3 — the first crisis, handled calmly.</strong> A customer's card fails at renewal. The webhook says <code>past_due</code>; Stripe's dunning retries; the customer gets the provider's email; the product shows "payment failed — update your card" via your own email triggered by the webhook. You did not write a retry loop, a card-update flow, or a dunning scheduler — the provider did, and your job was only to <em>render the state</em> honestly. That's the whole lesson of this doc: <strong>know which layer is yours</strong>. The state machine is yours to store and render; the banking is the provider's; the compliance is whoever touches card data; the customer relationship is everyone's.</p>
+
+<h2>Testing payments — the free education</h2>
+
+<p>Test mode is where you learn every failure before a customer pays you. The test cards are free lessons — every provider ships equivalents (these are Stripe's):</p>
+
+<table>
+<thead><tr><th>Test card</th><th>What it simulates</th><th>The lesson</th></tr></thead>
+<tbody>
+<tr><td><code>4242 4242 4242 4242</code></td><td>Success</td><td>The happy path: auth → capture → webhook arrives</td></tr>
+<tr><td><code>4000 0000 0000 0002</code></td><td>Declined</td><td>The decline path: your UI must render the failure honestly</td></tr>
+<tr><td><code>4000 0027 6000 3184</code></td><td>3DS challenge required</td><td><code>requires_action</code>: the customer must authenticate before capture</td></tr>
+<tr><td><code>4000 0000 0000 9995</code></td><td>Insufficient funds</td><td>Declines happen at renewal too — dunning's job</td></tr>
+<tr><td><code>4000 0000 0000 0069</code></td><td>Expired card</td><td>The subscription killer — where card updaters earn their keep</td></tr>
+</tbody>
+</table>
+
+<p><strong>Test the webhook path explicitly</strong> — it's where production bugs live:</p>
+<ul>
+  <li>Verify signatures work (send an unsigned event; it must be rejected).</li>
+  <li>Send the same event twice — the handler must be idempotent (no second activation, no double credit).</li>
+  <li>Send events out of order (a <code>succeeded</code> before its <code>processing</code>) — the state machine must tolerate it.</li>
+  <li>Simulate a delivery failure — the provider retries; your handler must survive a replay.</li>
+</ul>
+
+<p><strong>For subscriptions, use test clocks</strong> (Stripe test clocks) to fast-forward time: trial → paid conversion, failed renewal → dunning → cancellation, and proration on a mid-cycle plan change. The full lifecycle, on demand, in minutes.</p>
+
+<h2>Reconciliation — proving the numbers</h2>
+
+<p>Reconciliation is the question "did our records match what the provider settled?" — concretely:</p>
+
+<ol>
+  <li><strong>Pull</strong> the provider's settlement report (or query the API for the period's payments, refunds, chargebacks, and payouts).</li>
+  <li><strong>Compare</strong> against your own payment records: every payment you think succeeded, every refund, every dispute, every payout amount (including fees).</li>
+  <li><strong>Flag mismatches.</strong> App says succeeded, provider says failed → a missed webhook; update your state from the provider's record. Amount mismatch → FX conversion, fees, or a partial refund. Missing payment → webhook delivery failure.</li>
+  <li><strong>Resolve:</strong> most mismatches are missed webhooks, and the fix is "update your state from the provider's record" — not a manual ledger edit.</li>
+</ol>
+
+<p><strong>The lazy rule:</strong> automate the comparison, escalate the mismatches. A weekly scheduled job beats a human dashboard-scroller, and the audit trail is a product, not a chore. Frequency: daily for high-volume products, weekly otherwise, after every payout for marketplaces.</p>
+
+<h2>Most common failure modes</h2>
+
+<table>
+<thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><strong>Trusting the synchronous response</strong></td><td>Customer "paid" per API, never got access — capture failed or the webhook never reconciled</td><td>The webhook is the source of truth; the success page is optimism</td></tr>
+<tr><td><strong>Double charges</strong></td><td>Retry (network timeout, double-click) → two charges</td><td>Idempotency keys on every charge, generated per logical operation</td></tr>
+<tr><td><strong>No webhook dedup/signature check</strong></td><td>Duplicate events, or a forged event granting access</td><td>Verify signatures; key by event id; handlers are idempotent state transitions</td></tr>
+<tr><td><strong>Webhook endpoint down / not retried</strong></td><td>Paid customers never activated; silent revenue leak</td><td>Retry policy + a reconciliation sweep; webhook monitoring (the Backend Engineering §3 rules, money edition)</td></tr>
+<tr><td><strong>No reconciliation</strong></td><td>Payout amounts don't match records; nobody knows</td><td>Weekly compare of app state vs. provider state — the audit is a product</td></tr>
+<tr><td><strong>Storing card data (or logs of it)</strong></td><td>PCI scope explosion; a breach of card numbers is a catastrophic event</td><td>Tokenization everywhere; never persist PANs; hosted/embedded surfaces only</td></tr>
+<tr><td><strong>Client-trusted amounts</strong></td><td>Price edited in the request, discount applied client-side</td><td>Amounts computed server-side from the catalog; the client never states its own price</td></tr>
+<tr><td><strong>Subscriptions without dunning</strong></td><td>30%+ churn to expired cards</td><td>Provider dunning on; communicate the retry schedule</td></tr>
+<tr><td><strong>Manual payouts / holding other people's money</strong></td><td>License exposure for marketplaces; seller disputes</td><td>PSP split/settlement rails, never your own float (see marketplaces above)</td></tr>
+<tr><td><strong>Chargeback neglect</strong></td><td>Dispute fees stack; processing risk rises</td><td>Evidence workflow, prevention, statement descriptors</td></tr>
+<tr><td><strong>All fees, no measurement</strong></td><td>2.9% on every recurring transaction, forever</td><td>Fee analysis at product-design time: ACH/SEPA for subscriptions, regional methods, volume negotiation</td></tr>
+<tr><td><strong>Sandbox shaming</strong></td><td>First production charge happens with untested declined/3DS flows</td><td>Test mode cards for every path before launch — free education, always available</td></tr>
+<tr><td><strong>Floating-point money</strong></td><td>Rounding errors in invoices; <code>0.1 + 0.2 ≠ 0.3</code></td><td>Integer minor units + currency code, never floats</td></tr>
+<tr><td><strong>No 3DS / SCA handling</strong></td><td>EU customers can't complete checkout (SCA mandate); fraud liability stays yours</td><td>Handle <code>requires_action</code>; hosted checkout gives it to you</td></tr>
+<tr><td><strong>No payment metrics</strong></td><td>You can't tell a checkout bug from a decline problem</td><td>Track authorization rate, decline rate, chargeback rate — the dashboard's four numbers</td></tr>
+</tbody>
+</table>
+
+<h2>Ecosystem — tooling catalog with decision metrics</h2>
+
+<table>
+<thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
+<tbody>
+<tr><td><strong>Payments platforms (PSPs)</strong></td><td>Stripe, Adyen, Braintree, PayPal, Square, Paddle, Lemon Squeezy</td><td>Geography coverage × payment methods × developer experience × fees — in that order; Paddle/Lemon Squeezy add merchant-of-record (they own sales tax/refund compliance) for global SaaS</td></tr>
+<tr><td><strong>Regional leaders</strong></td><td>Paystack/Flutterwave (Africa), Mercado Pago (LatAm), Razorpay (India), Adyen (EU + global), GoCardless (EU/UK bank debits)</td><td>Your customers' payment habits are the requirement, not your favorite dashboard</td></tr>
+<tr><td><strong>Billing &amp; subscription engines</strong></td><td>Stripe Billing, Recurly, Chargebee, Paddle (merchant of record), Clerk Billing (bundled with auth)</td><td>Dunning, proration, usage metering, tax — the recurring lifecycle is a product, buy it until your scale justifies owning it</td></tr>
+<tr><td><strong>Marketplace rails</strong></td><td>Stripe Connect, Adyen platform, PayPal Commerce Platform</td><td>Connected accounts, KYC onboarding, split settlement — never build your own float</td></tr>
+<tr><td><strong>Fraud &amp; risk</strong></td><td>Stripe Radar, Adyen risk, Sift, Signifyd, 3DS providers</td><td>Chargeback ratio is the KPI; buy risk rules before writing your own ML</td></tr>
+<tr><td><strong>Tax &amp; compliance</strong></td><td>Stripe Tax, Quaderno, Avalara, tax in Paddle/merchant-of-record</td><td>Sales tax/VAT on digital goods is a rule surface that changes — let a service own the updates</td></tr>
+<tr><td><strong>Payouts (getting paid yourself)</strong></td><td>Wise, Payoneer, Stripe Payouts, Airwallex</td><td>Cross-border freelancer payouts: FX fees, speed, recipient convenience — see <a href="./freelance-web-practice.html">Freelance Web Practice</a></td></tr>
+<tr><td><strong>Accounting integration</strong></td><td>QuickBooks, Xero, Stripe's ledger exports, (Stripe apps: Outbox, etc.)</td><td>Reconciliation should flow into the books automatically — exporting CSVs weekly is a chore that becomes a lie</td></tr>
+</tbody>
+</table>
+
+<p><strong>Merchant of record (MoR) — Paddle, Lemon Squeezy, FastSpring, Polar</strong> sit one level above a PSP: they are the <em>legal seller</em> of your product. They own sales tax/VAT calculation and remittance, refunds, chargebacks, and PCI scope — the entire compliance surface — for a larger fee (typically 5%+ vs. ~2.9% processing). The tradeoff: the MoR's name appears on the customer's bank statement, checkout customization is limited, and the fee compounds on volume. Worth it when you sell globally and the fee premium is cheaper than a tax/compliance person; not worth it when volume is high or the checkout is a brand surface. Note: Stripe acquired Lemon Squeezy (2024), which continues standalone; Polar is the open-source indie option.</p>
+
+<h2>The future — where money movement is going</h2>
+
+<table>
+<thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
+<tbody>
+<tr><td><strong>Account-to-account / open banking</strong></td><td>Instant bank transfers with no interchange and no chargebacks — the fee structure and the risk model both shift; PSD2-led in Europe, spreading</td></tr>
+<tr><td><strong>Instant settlement</strong></td><td>Real-time rails (Faster Payments, FedNow, SEPA Instant) compress the settlement lag — the "promise until settlement" window shrinks toward zero</td></tr>
+<tr><td><strong>Embedded finance</strong></td><td>Payments, lending, and banking become APIs inside every product — the PSP stops being a checkout and becomes a business stack</td></tr>
+<tr><td><strong>Regulation tightening</strong></td><td>PSD3, DORA, consumer-protection rules — compliance becomes a product feature; merchant-of-record models grow</td></tr>
+<tr><td><strong>Stablecoins &amp; crypto rails</strong></td><td>Borderless settlement with new custody/regulation risk — real in specific corridors (cross-border payouts), hype everywhere else</td></tr>
+</tbody>
+</table>
+
+<p>The direction: <em>faster settlement, lower fees, more abstraction, more regulation.</em> The invariants hold — money is data until it settles, every leg can fail, retries must be idempotent — but the legs get faster and the regulators get closer. The skill is unchanged: know exactly where your code's responsibility ends and the institution's begins.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<table>
+<thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
+<tbody>
+<tr><td>Who moves the money, and who owns the failure?</td><td>Hosted checkout + a PSP is the default; every custom layer is scope you chose</td></tr>
+<tr><td>What is the payment state machine, and where is it stored?</td><td>Webhooks are the source of truth; your DB records transitions, not optimism</td></tr>
+<tr><td>Is every charge idempotent?</td><td>Retries must not double-charge — idempotency keys per logical operation</td></tr>
+<tr><td>Does any card data touch my servers, logs, or database?</td><td>Tokenize; hosted/embedded surfaces only; PCI scope is a design decision</td></tr>
+<tr><td>What happens on the failed/canceled/refunded path?</td><td>Dunning on, refund policy sane, dispute workflow rehearsed — before launch</td></tr>
+<tr><td>How do I reconcile provider payouts against my records?</td><td>A weekly sweep and an audit trail — the ledger is a product</td></tr>
+<tr><td>What does this cost me per transaction, forever?</td><td>Fee design (ACH for recurring, regional methods) is a business decision, not an invoice</td></tr>
+<tr><td>If this is a marketplace: am I holding other people's money?</td><td>You must not — use split/settlement rails, or you're unlicensed banking</td></tr>
+<tr><td>Do I store money as integer minor units with a currency code?</td><td>Floating-point money is a bug; fix it before the first invoice</td></tr>
+<tr><td>Do I handle 3DS/SCA, and do I know my authorization and decline rates?</td><td>EU checkout fails without SCA; you can't diagnose failures without metrics</td></tr>
+<tr><td>How do I get paid myself?</td><td>The rails in <a href="./freelance-web-practice.html">Freelance Web Practice</a> — Wise/Payoneer/invoicing — are as deliberate as the checkout</td></tr>
+</tbody>
+</table>
+
+<p>Print this table. Run it before you ship any money-moving feature — and before you agree to build one for a client. The whole discipline compresses to: <strong>know which layer is yours.</strong> The rest is the provider's, the bank's, and the regulator's — priced into your fees.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://stripe.com/docs/payments">Stripe Payments docs</a> ·
+  <a href="https://stripe.com/docs/payments/payment-intents">Payment Intents API</a> ·
+  <a href="https://stripe.com/docs/webhooks">Stripe Webhooks guide</a> ·
+  <a href="https://stripe.com/docs/billing">Stripe Billing</a> ·
+  <a href="https://stripe.com/docs/connect">Stripe Connect (marketplaces)</a> ·
+  <a href="https://www.pcisecuritystandards.org/">PCI Security Standards Council</a> ·
+  <a href="https://docs.adyen.com/">Adyen docs</a> ·
+  <a href="https://www.braintreepayments.com/">Braintree</a> ·
+  <a href="https://developer.paypal.com/">PayPal Developer</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a payment incident you actually had — the failed renewal, the double charge, the dispute you lost. What was the root cause, and what did you change?"</li>
+    <li>"How do you reconcile payouts where you work — and what broke when nobody did it?"</li>
+    <li>"Take a real product idea of mine and walk me through: platform, provider, fee design, PCI scope, webhook events, and the dispute workflow."</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Payments &amp; Commerce — the money that moves the web</span>
+  <span>Engineering: <a href="./backend-engineering.html">Backend Engineering</a> · <a href="./api-design.html">API Design</a> · <a href="./security-and-threat-modeling.html">Security</a> · Platforms: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> · Delivery: <a href="./freelance-web-practice.html">Freelance Web Practice</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

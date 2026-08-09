@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full-Stack Thinking — decisions at the seam</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Full-Stack Thinking — where logic, state, and data live across the boundary</p>
+  <h1>Full-Stack Thinking &amp; the Seam</h1>
+  <p class="meta">For: the developer who builds both sides and keeps hitting questions neither the frontend docs nor the backend docs answer — where does this logic live, where does this state live, and how do I trace a bug across the boundary?</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> Every other doc on the shelf answers a question from ONE side: <a href="./backend-engineering.html">Backend Engineering</a> asks "how does the server handle the request?" and <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> asks "how do I build this component?" This doc is the <em>seam</em> — the space between the sides where decisions belong to neither alone. It is NOT "knowing React AND Node." It is knowing where the boundary is, what goes on each side, and how to move it.</p>
+<pre>
+┌─────────────────────────────────────────────┐
+│   FRONTEND DOCS                              │
+│   HTML &amp; CSS · JS · React/Next.js ·         │
+│   How Developers Think · UI/UX               │
+│   "How do I build this component?"           │
+└─────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│   THE SEAM (THIS DOC)                        │
+│   "Where does this logic live?"              │
+│   "Where does this state live?"              │
+│   "How do I trace a bug across the boundary?"│
+│   "How do I test the full flow?"             │
+└─────────────────────────────────────────────┘
+                    ▲
+                    │
+┌─────────────────────────────────────────────┐
+│   BACKEND DOCS                               │
+│   Backend Engineering · SQL · Data Modeling  │
+│   "How does the server handle the request?"  │
+└─────────────────────────────────────────────┘
+   Full-stack is not the sum of both sides. It
+   is the decisions that only exist BETWEEN them.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./backend-engineering.html">Backend Engineering</a> (the server loop) · <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> (the frontend loop, including the state taxonomy) · <a href="./api-design.html">API Design</a> (the contract) · <a href="./system-design.html">System Design</a> (the architecture, and the data-ownership rules) · <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> (server vs client components) · <a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> (the test levels) · <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (the auth seam) · <a href="./glossary.html">Glossary</a></p>
+</blockquote>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read the Definition (what full-stack thinking is and isn't — the boundary vocabulary matters), then the Full Request Journey — the single frame this doc is built on — then the two core decision tools: Where Does This Belong and the Three Shapes of Data. The worked example ties it together. Cross-links:</p>
+<ul>
+  <li>The server side of the journey: <a href="./backend-engineering.html">Backend Engineering</a> §1b — the request lifecycle.</li>
+  <li>The client side of the journey: <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> — the three-thread loop, and §5a for the state taxonomy.</li>
+  <li>The contract between the sides: <a href="./api-design.html">API Design</a>.</li>
+  <li>The architecture above both: <a href="./system-design.html">System Design</a>, especially §7 (data ownership).</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever shipped a feature end to end and hit the question "wait — where is this supposed to live?" — this is the map.</strong> One journey, two decision tables, and the discipline of tracing across the boundary.</p>
+
+<h2>Definition — what full-stack thinking is, and what it is not</h2>
+
+<p><strong>Full-stack thinking is the discipline of making decisions at the seam between frontend and backend.</strong> It is not "knowing both sides" — that is two skills, not one. It is knowing where the boundary is, what belongs on each side, and how to move the boundary when the feature demands it.</p>
+
+<table>
+  <thead><tr><th>It is NOT</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>"Knowing React AND Node"</td><td>Two skills you happen to hold, not a way of thinking</td></tr>
+    <tr><td>System Design</td><td>That decides the <em>architecture</em>; full-stack decides where logic lives <em>within</em> it</td></tr>
+    <tr><td>API Design</td><td>That defines the <em>contract</em>; full-stack decides what goes on each side of it</td></tr>
+    <tr><td>A framework tutorial</td><td>This is the thinking layer, not the implementation layer</td></tr>
+  </tbody>
+</table>
+
+<p>The questions this doc answers are the ones neither side answers alone: <strong>"Should this data be fetched on the server or the client?" "Should this validation happen client-side, server-side, or both?" "Should this state live in the database, the API cache, or the component?" "How do I trace a bug from the UI to the database?" "How do I test the full flow?"</strong> Every one of those is a seam question.</p>
+
+<h2>History — the boundary keeps moving</h2>
+
+<p><strong>The full-stack boundary has moved three times, and each move redefined what "full-stack" means:</strong></p>
+
+<ul>
+  <li><strong>Convergence (1995–2005, LAMP).</strong> PHP rendered the HTML <em>and</em> talked to MySQL — one language, one process, the boundary barely existed. "Full-stack developer" meant "knows PHP."</li>
+  <li><strong>Separation (2005–2015, AJAX → SPA).</strong> The browser became an application platform. Frontend and backend split, the API became the boundary, and the role declined as teams specialized — "full-stack" lost its meaning, then lost its practitioners.</li>
+  <li><strong>Reconvergence (2015–, React + Node → Next.js/RSC).</strong> JavaScript on both sides, then server components blur the line again. The boundary is now a <em>per-feature decision</em> — this data renders on the server, that click handler runs on the client, and the line moves feature by feature.</li>
+</ul>
+
+<p><strong>The lesson for this doc:</strong> the seam is not a fixed wall. It has drifted toward the browser, away from it, and is now drawn feature by feature. Full-stack thinking is the skill of drawing it correctly for the feature in front of you. (The frontend loop's own evolution is mapped in <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> §1c; the Next.js-specific line is <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> §1b.)</p>
+
+<h2>The full request journey — the frame everything hangs on</h2>
+
+<p>The single most important mental model in full-stack thinking: <strong>trace the full request journey.</strong> Every feature is a round trip, and bugs can live at any point in it:</p>
+
+<pre>User clicks button
+  → Browser: event handler fires
+    → Component: state update, optimistic UI
+      → Network: HTTP request sent
+        → Server: route matched, middleware runs
+          → Handler: business logic executes
+            → Database: query runs, transaction commits
+          → Handler: response shaped
+        → Network: response returned
+      → Component: state update with server response
+    → Browser: re-render, paint
+  → User sees result
+</pre>
+
+<p>Neither the frontend docs nor the backend docs trace the whole thing. <a href="./backend-engineering.html">Backend Engineering</a> stops at "the handler returns a response"; the frontend docs stop at "the component makes a fetch call." The full-stack discipline is <strong>tracing the whole round trip and knowing which layer to suspect first from a given symptom</strong>:</p>
+
+<table>
+  <thead><tr><th>Symptom</th><th>Where the bug might live</th><th>How to trace it</th></tr></thead>
+  <tbody>
+    <tr><td>User sees stale data</td><td>Client cache not invalidated</td><td>Check the cache invalidation strategy</td></tr>
+    <tr><td>User sees wrong data</td><td>API returns wrong shape, or DB query is wrong</td><td>Check API response, then the database query</td></tr>
+    <tr><td>Button click does nothing</td><td>Client event handler broken</td><td>Browser console, network tab</td></tr>
+    <tr><td>Slow page load</td><td>Server query slow OR client render slow</td><td>Server logs AND client performance</td></tr>
+    <tr><td>500 error</td><td>Server handler crashed</td><td>Server logs, stack trace</td></tr>
+    <tr><td>401 error</td><td>Token expired or invalid</td><td>Token expiry, refresh flow</td></tr>
+    <tr><td>Data saved but UI doesn't update</td><td>Optimistic update not reconciled</td><td>Client state-sync logic</td></tr>
+  </tbody>
+</table>
+
+<p>The skill to build: <strong>the symptom points at a layer; the trace confirms it.</strong> That's neither a frontend skill nor a backend skill — it's the skill of living at the seam.</p>
+
+<h2>Where does this belong? — the central question</h2>
+
+<p>Every piece of logic, every piece of state, every validation rule needs a home. Full-stack developers answer this more than any other question:</p>
+
+<table>
+  <thead><tr><th>Thing</th><th>Client?</th><th>Server?</th><th>Database?</th></tr></thead>
+  <tbody>
+    <tr><td>Form validation (syntax)</td><td>✅ Instant feedback</td><td>✅ Security</td><td>—</td></tr>
+    <tr><td>Form validation (business rules)</td><td>Optional (UX)</td><td>✅ Required</td><td>✅ Constraints</td></tr>
+    <tr><td>Authorization</td><td>—</td><td>✅ Required</td><td>—</td></tr>
+    <tr><td>Data transformation</td><td>Optional (cache)</td><td>✅ Canonical</td><td>—</td></tr>
+    <tr><td>Sorting / filtering</td><td>Small datasets</td><td>Large datasets</td><td>Indexes</td></tr>
+    <tr><td>Computed totals</td><td>Display cache</td><td>✅ Canonical</td><td>—</td></tr>
+    <tr><td>UI state (hover, focus, modal)</td><td>✅ Only</td><td>—</td><td>—</td></tr>
+    <tr><td>Domain state (cart, user)</td><td>Cache</td><td>✅ Canonical</td><td>✅ Source of truth</td></tr>
+    <tr><td>Configuration</td><td>Runtime env</td><td>✅ Canonical</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The rule:</strong> the server is the source of truth for domain state; the client is the source of truth for UI state; the database is the source of truth for persistent data; everything else is a cache. The server-side half of this ownership question — who writes what, in a system of services — is <a href="./system-design.html">System Design</a> §7 (data ownership, single-writer). This doc is the per-feature version of the same question.</p>
+
+<h2>State across the boundary — who owns what, and how the copies sync</h2>
+
+<p>The client-side state taxonomy (UI state, server data, cache, form state, URL state, derived state) is fully mapped in <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> §5a — including the rule that server data belongs in a query/cache layer, not a plain <code>useState</code>. This doc adds the part that doc stops short of: <strong>what happens at the boundary when a piece of data has two homes.</strong></p>
+
+<table>
+  <thead><tr><th>State type</th><th>Where it lives</th><th>Who owns it</th><th>Sync mechanism</th></tr></thead>
+  <tbody>
+    <tr><td>UI state (hover, focus, modal)</td><td>Component</td><td>Client only</td><td>None needed</td></tr>
+    <tr><td>Form state (draft input)</td><td>Component</td><td>Client only</td><td>Submit to server</td></tr>
+    <tr><td>Server data (profile, orders)</td><td>Database</td><td>Server</td><td>Fetch/cache on client</td></tr>
+    <tr><td>Cache (API responses)</td><td>Client memory</td><td>Client</td><td>Invalidation strategy</td></tr>
+    <tr><td>Session / auth</td><td>Token/cookie</td><td>Server issues, client stores</td><td>Token refresh</td></tr>
+    <tr><td>Real-time updates</td><td>Server pushes</td><td>Server</td><td>WebSocket / SSE / polling</td></tr>
+    <tr><td>Optimistic updates</td><td>Client</td><td>Client</td><td>Reconcile with server response</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The full-stack job for each piece of data:</strong> where is the source of truth, and how do the other copies stay in sync? Three sync mechanisms dominate, and choosing between them IS the seam decision:</p>
+
+<ul>
+  <li><strong>Optimistic</strong> — the client assumes success, updates instantly, reconciles when the server responds (or rolls back on error). Best when the server rarely rejects and latency matters.</li>
+  <li><strong>Refetch</strong> — the client waits for the server's answer, then re-renders. Simplest, always correct, slowest to show feedback.</li>
+  <li><strong>Invalidate</strong> — after a mutation, mark the cached copy stale so the next read refetches. The middle path: fast UI, correct data, more machinery (cache keys, tags).</li>
+</ul>
+
+<h2>The three shapes of data — same thing, three forms</h2>
+
+<p>The same data has three different shapes as it crosses the stack, and the transformations between them are where full-stack bugs live:</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>Shape</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Database</td><td>Normalized rows with foreign keys</td><td><code>orders</code>, <code>order_items</code>, <code>products</code></td></tr>
+    <tr><td>API</td><td>Denormalized JSON with nested objects</td><td><code>{ order: { id, items: [{ product: { name } }] } }</code></td></tr>
+    <tr><td>Component</td><td>Flat state optimized for rendering</td><td><code>{ orderItems: [{ productName, quantity, total }] }</code></td></tr>
+  </tbody>
+</table>
+
+<p>Each layer shapes the data for its own job: the database normalizes for <em>integrity</em> (one fact, one row, no duplication), the API denormalizes for <em>convenience</em> (one request returns the whole graph), the component flattens for <em>rendering</em> (what the template needs, pre-computed).</p>
+
+<p><strong>Who owns each transformation:</strong> the database → API shaping is the server's job (the handler builds the response shape — see <a href="./api-design.html">API Design</a>); the API → component shaping is where a query layer (React Query/SWR) or a selector normalizes nested JSON into flat state; the component → database shaping happens on write, when a form flattens back into a payload. A bug report that says "data looks wrong in the UI but the database is fine" is almost always one of these transformations doing the wrong thing — which is why tracing the journey (§2) starts at the symptom and walks the shapes.</p>
+
+<h2>Tracing and testing across the boundary</h2>
+
+<p>The test levels that cross the seam — integration, contract, and end-to-end — are already fully mapped in <a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> §2, including the rule to use the lowest level that produces trustworthy evidence. The full-stack-specific part is knowing which tests <em>you</em> own, because neither the frontend nor the backend team owns them alone:</p>
+
+<table>
+  <thead><tr><th>Test type</th><th>What it covers</th><th>Who owns it</th></tr></thead>
+  <tbody>
+    <tr><td>Unit tests (frontend)</td><td>Component logic, utilities</td><td>Frontend</td></tr>
+    <tr><td>Unit tests (backend)</td><td>Business logic, validators</td><td>Backend</td></tr>
+    <tr><td>Integration tests</td><td>API endpoint → database</td><td>Backend</td></tr>
+    <tr><td><strong>Contract tests</strong></td><td>API contract matches client expectations</td><td><strong>Full-stack</strong></td></tr>
+    <tr><td><strong>E2E tests</strong></td><td>Full flow: click → API → database → response → UI</td><td><strong>Full-stack</strong></td></tr>
+    <tr><td><strong>Performance tests</strong></td><td>Full-journey latency</td><td><strong>Full-stack</strong></td></tr>
+  </tbody>
+</table>
+
+<p><strong>The full-stack developer owns the tests that cross the boundary.</strong> Contract tests (provider/consumer agreement — see <a href="./api-design.html">API Design</a> and <a href="./software-testing-and-debugging.html">Software Testing</a>) catch the "frontend and backend evolved independently" failure; E2E tests catch the journey breaks; performance tests catch a one-side-optimization that made the other side worse.</p>
+
+<h2>The security seam — the client is untrusted</h2>
+
+<p>Security's full treatment lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (the IAM section for tokens/sessions/cookies) and <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> §10 for the frontend-adjacent parts. The full-stack rule that ties them together is short: <strong>the client is untrusted; the server is the enforcement point.</strong></p>
+
+<table>
+  <thead><tr><th>Concern</th><th>Client side</th><th>Server side</th></tr></thead>
+  <tbody>
+    <tr><td>Authentication</td><td>Store the token securely</td><td>Verify it, issue the session</td></tr>
+    <tr><td>Authorization</td><td>Hide UI the user can't access</td><td>Enforce access on EVERY request</td></tr>
+    <tr><td>Input validation</td><td>Instant UX feedback</td><td>Required security check</td></tr>
+    <tr><td>Secrets</td><td>Never in the client bundle</td><td>Environment variables, server-side</td></tr>
+  </tbody>
+</table>
+
+<p>The client hides for UX; the server enforces for security. Both are needed; neither is sufficient alone — anyone can call your API directly, so the client's UI hiding is decoration, and the server's validation is the actual gate.</p>
+
+<h2>Worked example — tracing one feature across the seam</h2>
+
+<pre>Feature: "Add to cart." One journey, five seam decisions.
+
+1 · Where does the data live?
+      cart contents = domain state → database (source of truth),
+      server-owned. Client keeps a cache for instant display.
+
+2 · Where does the validation live?
+      "is this product in stock?" = business rule → server +
+      database constraint (stock &gt; 0). Client only validates
+      the obvious (quantity ≥ 1) for instant feedback.
+
+3 · How does the UI update?
+      Optimistic: the client adds the item instantly, then
+      reconciles. If the server rejects (out of stock), roll
+      back and show the error. → the optimistic/invalidate
+      sync decision from §4.
+
+4 · How do I test it?
+      Contract test: the /cart POST response matches what the
+      client expects. E2E test: click → network → server →
+      database → response → badge updates.
+
+5 · Where does a bug at each layer show up?
+      "Badge didn't update"      → optimistic sync (§4)
+      "Item reappears on refresh" → server didn't persist (§1)
+      "Shows in stock, isn't"    → server validated stock on a
+                                   stale read (the database
+                                   constraint is the real gate)
+
+Tracing rule: the symptom names the layer, the journey walks
+it back. Same as the table in §2 — this feature is that table
+made concrete.
+</pre>
+
+<h2>Most common failure modes — the seam anti-patterns</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Leaky abstraction</td><td>Database column names appear in the component</td><td>The API shapes the data; the UI never sees the schema</td></tr>
+    <tr><td>Client as source of truth</td><td>Client state is the canonical data</td><td>Server is canonical; client holds a cache that can refresh</td></tr>
+    <tr><td>Server as UI-state store</td><td>Server stores "is modal open"</td><td>UI state lives in the component; server stores domain state</td></tr>
+    <tr><td>Validation only on client</td><td>Server trusts client input</td><td>Anyone can call the API directly — the server must validate</td></tr>
+    <tr><td>Validation only on server</td><td>User gets no instant feedback</td><td>Client validates for speed, server for safety — both</td></tr>
+    <tr><td>No contract between sides</td><td>Frontend and backend evolve independently</td><td>Contract tests in CI on both producer and consumer repos</td></tr>
+    <tr><td>God endpoint</td><td>One endpoint returns everything</td><td>Narrow endpoints with caching, pagination, and access control</td></tr>
+    <tr><td>Optimistic update never reconciled</td><td>UI shows a success the server rejected</td><td>Reconcile with the server response; roll back on error</td></tr>
+    <tr><td>Version mismatch</td><td>Frontend calls v2, backend still serves v1 — silently wrong fields</td><td>Version the API and contract-test against the live version (<a href="./api-design.html">API Design</a> §8g)</td></tr>
+    <tr><td>Wire-format mismatch</td><td>API sends <code>snake_case</code>, component reads <code>camelCase</code> — fields vanish at runtime</td><td>Standardize the wire contract; generate shared types from the schema (<a href="./api-design.html">API Design</a> §8)</td></tr>
+    <tr><td>Idempotency-key reuse</td><td>Retry reuses one key for a different intent; the server dedupes the wrong operation</td><td>One idempotency key per operation intent, fresh on retry (<a href="./api-design.html">API Design</a>, operation semantics)</td></tr>
+  </tbody>
+</table>
+
+<h2>Principles</h2>
+
+<table>
+  <thead><tr><th>Principle</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>The server is the source of truth for domain state</td><td>The client can refresh; the server can't be wrong twice</td></tr>
+    <tr><td>The client is the source of truth for UI state</td><td>Round trips for "is the modal open" are pure waste</td></tr>
+    <tr><td>The database is the source of truth for persistence</td><td>Constraints beat application code as the last line of defense</td></tr>
+    <tr><td>Everything else is a cache</td><td>Cache is the client copy of server truth — it needs an invalidation strategy</td></tr>
+    <tr><td>Validate at every layer</td><td>Client for speed, server for safety, database for integrity</td></tr>
+    <tr><td>Trace the full journey, not one side</td><td>The symptom names the layer; only the full trace confirms it</td></tr>
+    <tr><td>Own the tests that cross the boundary</td><td>Contract, E2E, and performance tests are nobody else's</td></tr>
+    <tr><td>The client is untrusted</td><td>Enforce on the server; the client only provides UX</td></tr>
+  </tbody>
+</table>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Print this. It is the entire doc in ten lines:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Full-stack thinking is decisions at the seam — not "knowing React AND Node."</td></tr>
+    <tr><td>2</td><td>Trace the full request journey: click → component → network → server → database → back.</td></tr>
+    <tr><td>3</td><td>Bugs can live at any point in the journey — the symptom names the layer, the trace confirms it.</td></tr>
+    <tr><td>4</td><td>Where does this belong? Server = domain state, client = UI state, DB = persistence, rest = cache.</td></tr>
+    <tr><td>5</td><td>Every data copy across the boundary needs a sync mechanism: optimistic, refetch, or invalidate.</td></tr>
+    <tr><td>6</td><td>Data has three shapes — normalized rows, denormalized JSON, flat component state — and the transformations are where bugs live.</td></tr>
+    <tr><td>7</td><td>Own the cross-boundary tests: contract, E2E, and performance.</td></tr>
+    <tr><td>8</td><td>The client is untrusted; the server is the enforcement point. Validate at every layer.</td></tr>
+    <tr><td>9</td><td>The client hides for UX; the server enforces for security. Both, never one.</td></tr>
+    <tr><td>10</td><td>When in doubt, trace one feature end to end — the journey answers the ownership questions.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2>Primary sources</h2>
+  <ol>
+    <li>Fowler, Martin — <a href="https://martinfowler.com/bliki/TwoHardThings.html">TwoHardThings</a> — cache invalidation named as the full-stack hard problem this doc's sync mechanisms (§4) exist to solve.</li>
+    <li>React Query documentation — <a href="https://tanstack.com/query/latest">TanStack Query</a> — the optimistic/invalidate/refetch patterns as implemented practice.</li>
+    <li>DDD references in <a href="./system-design.html">System Design</a> §7 — the data-ownership and bounded-context rules this doc's §3 depends on.</li>
+    <li>OWASP — <a href="https://owasp.org/www-community/controls/Input_Validation_Cheat_Sheet">Input Validation Cheat Sheet</a> — "validate on the server, always" as the enforcement rule behind §7.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2>Ask your teacher</h2>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take the 'add to cart' worked example and show me the same feature where the answer to 'where does this live?' is different — when would the cart move to client-only or database-only?"</li>
+    <li>"Walk me through a real full-stack bug: user sees stale data in the UI, the database is correct. Show the layers I check in order, and what the fix looks like at each."</li>
+    <li>"Compare optimistic, refetch, and invalidate for the same UI — what does each cost in code, correctness, and user perception?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Full-Stack Thinking — decisions at the seam</span>
+  <span>Frontend: <a href="./how-developers-think-frontend.html">How Developers Think</a> · Contract: <a href="./api-design.html">API Design</a> · Backend: <a href="./backend-engineering.html">Backend Engineering</a> · Architecture: <a href="./system-design.html">System Design</a> · Tests: <a href="./software-testing-and-debugging.html">Software Testing</a> · Security: <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

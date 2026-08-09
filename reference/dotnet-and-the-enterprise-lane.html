@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.NET &amp; the Enterprise Lane — reading literacy, not a C# course</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · .NET &amp; the Enterprise Lane — reading literacy, not a C# course</p>
+  <h1>.NET &amp; the Enterprise Lane</h1>
+  <p class="meta">Where C#/.NET lives in the market (enterprise, banking, government, offshoring hubs — Egypt, the Gulf, Eastern Europe), and the literacy you need to navigate it without becoming a .NET developer: the ASP.NET Core request loop mapped 1:1 onto Backend Engineering, a TypeScript→C# reading translation table, EF Core as the ORM you already understand, dependency injection's three lifetimes, the T-SQL differences from PostgreSQL, and a worked example that reads a real endpoint end to end. Read this when a job listing or a contract mentions .NET — to interview and integrate, not to retrain.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> This shelf teaches the JavaScript/TypeScript/React ecosystem in depth. .NET is the largest <em>other</em> backend world — and for a learner in Egypt (or similar markets), it is not exotic: enterprise job boards, banking, government, and EU/US offshoring run on it in volume. This doc is the intersection: enough to read C# code, map ASP.NET Core onto mental models you already own, and hold a .NET conversation — without breaking the JS core of the shelf:</p>
+  <pre>THE JS CORE (the shelf's depth)        THE .NET LANE (this doc — literacy)
+javascript-the-language.html           What it is: C#, ASP.NET Core, EF Core
+backend-engineering.html  ← the loop   How it maps: middleware → controller → service
+api-design.html           ← contracts  How it differs: DI lifetimes, records, LINQ
+system-design.html        ← boundaries When it matters: Egypt enterprise/offshoring
+sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL</pre>
+  <p>Neighbors and how they split the work:</p>
+  <ul>
+    <li><a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — owns the positioning table (when Node wins, when .NET wins, why). This doc adds the <em>reading literacy</em> on the .NET side of that table.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — owns the request loop, auth, caching, transactions. ASP.NET Core is that loop in a different costume; this doc maps section to section.</li>
+    <li><a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> — owns the query language. T-SQL (SQL Server) is a dialect; this doc lists only the differences.</li>
+    <li><a href="./api-design.html">API Design</a> — contracts are language-agnostic; ASP.NET Core just produces the same REST contracts with attributes.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists</h3>
+  <p><em>Because "skip .NET" is the wrong advice for a library with an Egyptian audience.</em> The shelf's mission is exploration, not a single path: the reader who wants enterprise/government/banking work — the dominant formal-economy backend market in Egypt, the Gulf, and much of Eastern Europe — will hit C#/.NET in job listings, interviews, and offshoring contracts. The honest position is neither "become a .NET developer" nor "ignore it": it is <strong>literacy</strong> — the shelf's mental models (request loop, contracts, transactions, ORMs, DI) transfer 1:1, and C# is readable in a weekend once TypeScript is home. This doc teaches the translation, not the language. One scope note: <strong>this is not a C# course</strong> — no syntax drills, no framework tutorials; the depth lives in Microsoft Learn and the ASP.NET docs, linked below.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read this after <a href="./backend-engineering.html">Backend Engineering</a> §1 (the loop) and <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> (the data layer) — this doc assumes both are warm. Cross-links:</p>
+<ul>
+  <li>Positioning — when each stack wins: <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (the .NET row of its positioning table).</li>
+  <li>The loop in depth: <a href="./backend-engineering.html">Backend Engineering</a> — every ASP.NET Core concept here maps to a section there.</li>
+  <li>The data layer: <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> — T-SQL is a dialect of the same language.</li>
+  <li>Contracts: <a href="./api-design.html">API Design</a> — what ASP.NET Core's <code>[ApiController]</code> attributes actually produce.</li>
+  <li>Career maps: <a href="./frontend-income-markets.html">Frontend Income Markets</a> §Local employment — where the Egyptian market sits.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If a job listing you actually want says "C#/.NET", or a client's API is ASP.NET — this is the bridge.</strong> Read the Definition (what literacy means), the request-loop mapping, and the reading table; the worked example is where it clicks.</p>
+
+<h2>Definition — the enterprise lane, and what literacy means</h2>
+
+<p><strong>.NET is Microsoft's application platform:</strong> the <strong>C#</strong> language, the <strong>CLR</strong> runtime (like V8 is Node's runtime), <strong>ASP.NET Core</strong> for web (the .NET equivalent of Express/Fastify/Next), <strong>EF Core</strong> for data access (an ORM, like Prisma/Drizzle), and <strong>SQL Server</strong> as its natural database. It is not a "language" in the way the shelf uses the word — it is a <em>stack</em>, and its market position is what matters more than its syntax:</p>
+
+<table>
+  <thead><tr><th>Market segment</th><th>Dominant backends</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Enterprise / banking / government (US, EU, Gulf, Egypt)</td><td><strong>C#/.NET</strong>, Java/Spring</td><td>Legacy systems, Microsoft enterprise contracts, compliance, long maintenance cycles</td></tr>
+    <tr><td>Startups / scale-ups</td><td>Node/TypeScript, Python, Go</td><td>Iteration speed, one language across the stack, hiring pool</td></tr>
+    <tr><td>Freelance / agency / small business</td><td>Node, PHP/WordPress, Python</td><td>Client budgets, CMS ecosystem, speed — the <a href="./wordpress-and-cms-internet.html">CMS internet</a></td></tr>
+    <tr><td>Offshoring / outsourcing hubs (Egypt, India, Eastern Europe)</td><td><strong>C#/.NET</strong>, Java, Node</td><td>EU/US enterprises offshore their enterprise systems — and those systems are .NET</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Literacy means three things, in this order:</strong> (1) you can <em>read</em> a C# codebase — follow an endpoint from controller to database; (2) you can <em>map</em> every concept onto mental models you already own — nothing here is new, only renamed; (3) you know <em>where the lane is</em> — when .NET appears in your professional life and what it signals. It does <em>not</em> mean writing production C# or chasing the ecosystem. If you later choose the lane deliberately, the shelf's backend/API/SQL docs are the curriculum; this doc is the map that makes them transferable.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+  <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./javascript-across-stacks.html">JavaScript Across Stacks</a></td><td>The competitive positioning table — .NET as a competitor lane, concurrency models, when each wins</td><td>There: the theory of the lanes. Here: how to <em>read</em> the .NET side when you land in it</td></tr>
+    <tr><td><a href="./backend-engineering.html">Backend Engineering</a></td><td>The request loop, middleware, auth, caching, transactions, statelessness</td><td>There: the loop itself. Here: the ASP.NET Core spelling of each concept</td></tr>
+    <tr><td><a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a></td><td>The query language and PostgreSQL</td><td>There: SQL itself. Here: T-SQL's handful of dialect differences and SQL Server's place in .NET shops</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a></td><td>Contract design, versioning, idempotency</td><td>There: the discipline. Here: the C# attributes that implement it</td></tr>
+    <tr><td><a href="./frontend-income-markets.html">Frontend Income Markets</a></td><td>Egypt employment context, job markets, rates</td><td>There: the career data. Here: the stack literacy that data refers to</td></tr>
+  </tbody>
+</table>
+
+<h2>The request loop, C# edition</h2>
+
+<p>The shelf's backend mental model — Request → Auth → Logic → Data → Response — is exactly what ASP.NET Core runs. Nothing here is new; everything is renamed:</p>
+
+<table>
+  <thead><tr><th>Backend Engineering concept (§)</th><th>ASP.NET Core spelling</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td>The middleware chain (§1, §1b)</td><td><code>UseAuthentication()</code>, <code>UseAuthorization()</code>, custom middleware classes</td><td>The pipeline: every request flows through the chain in order — same mental model as Express middleware</td></tr>
+    <tr><td>Routing a request to a handler (§1)</td><td><code>[ApiController]</code> + <code>[Route("api/shipments")]</code> + action methods</td><td>One class per resource; each method is an endpoint — like a router file with handler functions</td></tr>
+    <tr><td>Extracting parameters and validating (§1)</td><td>Model binding + <code>[FromBody]</code>, <code>[FromQuery]</code>, data annotations</td><td>Request bodies become typed objects automatically; validation runs on binding</td></tr>
+    <tr><td>The response contract (§1, and <a href="./api-design.html">API Design</a>)</td><td><code>ActionResult&lt;T&gt;</code>, <code>Problem()</code> (RFC 9457), status helpers</td><td><code>return Ok(dto)</code>, <code>NotFound()</code>, <code>Problem()</code> — the same statuses and envelopes your API-design doc prescribes</td></tr>
+    <tr><td>Authn vs authz (§1d)</td><td><code>[Authorize]</code> attributes + JWT bearer middleware</td><td>Attribute = permission gate; middleware = identity; the split is the same as Backend §1d</td></tr>
+    <tr><td>Business logic layer (§1)</td><td>Services (the "service layer" convention)</td><td>Controllers stay thin; services hold the request-loop logic — the same structure as your Node handlers</td></tr>
+    <tr><td>Statelessness &amp; serverless constraint (<a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a>)</td><td>Azure Functions, containerized ASP.NET Core</td><td>Same rules: state lives outside the process; cold starts are the same gamble</td></tr>
+  </tbody>
+</table>
+
+<p>Read any ASP.NET Core endpoint as: <em>middleware → controller → service → EF Core → SQL Server → response</em>. That is the entire bridge.</p>
+
+<h2>C# reading literacy — the TypeScript translation table</h2>
+
+<p>C# is not exotic if TypeScript is home — it is a sibling: both are statically-typed, class-first languages with async/await, generics, and modern nullability. The translation table covers what you will actually see while reading:</p>
+
+<table>
+  <thead><tr><th>TypeScript you know</th><th>C# you will read</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>interface User { id: number }</code></td><td><code>record User(int Id, string Name)</code> or <code>class</code> with properties</td><td>Records are typically immutable data carriers; PascalCase properties are the norm</td></tr>
+    <tr><td><code>async/await</code>, <code>Promise&lt;T&gt;</code></td><td><code>async Task&lt;T&gt;</code></td><td>Task ≈ Promise — same idea, different engine (see the async note below)</td></tr>
+    <tr><td><code>Array.map/filter/reduce</code></td><td>LINQ: <code>.Select(...)</code>, <code>.Where(...)</code>, <code>.Aggregate(...)</code></td><td>LINQ is SQL-flavored functional programming — your <a href="./sql-and-postgresql.html">SQL</a> intuition transfers directly</td></tr>
+    <tr><td><code>const x = ...</code> / <code>let y = ...</code></td><td><code>var</code> (type inferred), <code>readonly</code></td><td><code>var</code> is not dynamic typing — the type is inferred at compile time</td></tr>
+    <tr><td><code>null</code> / optional chaining <code>?.</code></td><td><code>null</code>, <code>?</code> nullable annotations, null-coalescing <code>??</code></td><td>Same habits: <code>??</code> is COALESCE, <code>?.</code> is optional chaining — the NULL rules from SQL apply to your code too</td></tr>
+    <tr><td><code>type</code> / generics <code>&lt;T&gt;</code></td><td>Generics <code>&lt;T&gt;</code>, interfaces, abstract classes</td><td>Same shape; heavier ceremony (more keywords) but nothing new conceptually</td></tr>
+    <tr><td>Dependency injection by hand</td><td><code>IServiceCollection</code>, constructor injection</td><td>The framework hands services to constructors — read it as "the framework does DI for you"</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Reading rule of thumb:</strong> when you meet an unknown C# idiom, ask "what is the TypeScript/JavaScript equivalent?" — there is one, and it is usually the same idea with a different word.</p>
+
+<p><strong>The one place "same word, different meaning" actually bites: <code>async</code>.</strong> JS runs on a single-threaded event loop; C# runs on a shared thread pool. The <code>await</code> you write looks identical, but the engine underneath is not — and the footgun differences show up the moment you read real service code:</p>
+
+<table>
+  <thead><tr><th>JavaScript / Node</th><th>C# / .NET</th></tr></thead>
+  <tbody>
+    <tr><td>Event loop: one thread interleaves I/O</td><td>Thread pool: a worker thread is borrowed while a Task runs</td></tr>
+    <tr><td><code>await</code> yields back to the event loop</td><td><code>await</code> returns the thread to the pool; work resumes on a pooled thread</td></tr>
+    <tr><td>No sync-over-async; blocking stalls the whole loop</td><td><code>.Result</code> / <code>.Wait()</code> blocks a pool thread — the classic deadlock in web apps</td></tr>
+    <tr><td><code>setTimeout</code> / <code>setInterval</code></td><td><code>Task.Delay</code> — same idea, only spelled differently</td></tr>
+  </tbody>
+</table>
+
+<p>Read <code>async Task</code> methods as: <em>the work can wait without blocking a thread</em>. And treat <code>.Result</code> as a red flag worth flagging out loud — it is the C# equivalent of a memory-leaking long-lived <code>setInterval</code>: it works until it doesn't.</p>
+
+<h2>Reading LINQ — the query pipeline at a glance</h2>
+
+<p>LINQ chains read like a fluent SQL query. When you meet one, translate it column by column with the shelf's <a href="./sql-and-postgresql.html">SQL</a>:</p>
+
+<table>
+  <thead><tr><th>LINQ you will read</th><th>SQL / JS translation</th></tr></thead>
+  <tbody>
+    <tr><td><code>.Where(predicate)</code></td><td><code>WHERE</code> / <code>Array.filter</code></td></tr>
+    <tr><td><code>.Select(x =&gt; ...)</code></td><td><code>SELECT</code> / <code>Array.map</code> — a projection</td></tr>
+    <tr><td><code>.OrderBy(...)</code> / <code>.ThenBy(...)</code></td><td><code>ORDER BY</code> / <code>sort</code> — multiple keys</td></tr>
+    <tr><td><code>.FirstOrDefault()</code> / <code>.SingleOrDefault()</code></td><td><code>LIMIT 1</code> — first row, or <code>null</code></td></tr>
+    <tr><td><code>.Any(predicate)</code></td><td><code>EXISTS</code> — "is there one?"</td></tr>
+    <tr><td><code>.Count()</code></td><td><code>COUNT(*)</code> / <code>length</code></td></tr>
+    <tr><td><code>.Include(...)</code> / <code>.ThenInclude(...)</code></td><td>eager <code>JOIN</code> in EF Core — pulling a related table up front</td></tr>
+    <tr><td><code>.ToList()</code> / <code>.AsNoTracking()</code></td><td>"run the query now" / "read-only — skip change tracking"</td></tr>
+  </tbody>
+</table>
+
+<h2>EF Core — the ORM you already understand</h2>
+
+<p><a href="./backend-engineering.html">Backend Engineering</a> §1e gives you the ORM-vs-raw-SQL decision; EF Core is a fully-featured instance of that decision. What you need to <em>read</em>:</p>
+
+<table>
+  <thead><tr><th>ORM concept (from Backend §1e / SQL doc)</th><th>EF Core spelling</th><th>What to watch for</th></tr></thead>
+  <tbody>
+    <tr><td>The schema mapping</td><td><code>DbContext</code> + <code>DbSet&lt;T&gt;</code> properties</td><td>Each DbSet is a table; the class is the row shape</td></tr>
+    <tr><td>Migrations</td><td><code>dotnet ef migrations add</code> / <code>database update</code></td><td>The <a href="./data-modeling-and-databases.html">data-modeling</a> migration rules apply unchanged</td></tr>
+    <tr><td>Querying</td><td>LINQ: <code>context.Shipments.Where(s =&gt; s.CustomerId == id)</code></td><td>LINQ-to-SQL translates to the query language you already know; the same WHERE/JOIN mental model applies</td></tr>
+    <tr><td>The N+1 trap</td><td>Lazy loading (default off) vs <code>.Include(...)</code></td><td>Un-included navigation properties = the N+1 problem from <a href="./sql-and-postgresql.html">SQL §JOINs</a>, wearing a LINQ hat</td></tr>
+    <tr><td>The raw escape hatch</td><td><code>FromSqlRaw</code> / <code>ExecuteSqlRaw</code></td><td>Same rules as raw SQL in Node: parameterize or get injected</td></tr>
+  </tbody>
+</table>
+
+<p>The one genuinely new-looking piece is <strong>change tracking</strong>: EF Core watches the objects you loaded and writes back only what changed — an ORM convenience that Node ORMs emulate to varying degrees. When you read <code>context.SaveChanges()</code>, that is the "write the transaction" moment.</p>
+
+<h2>Dependency injection &amp; the framework shape</h2>
+
+<p>ASP.NET Core is built around constructor injection: services register once, and the framework constructs everything for you. The three lifetimes map directly onto the shelf's statelessness discussion (<a href="./backend-engineering.html">Backend §7</a>, <a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a>):</p>
+
+<table>
+  <thead><tr><th>Lifetime</th><th>What it means</th><th>Shelf translation</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Singleton</strong></td><td>One instance for the process lifetime</td><td>Like a module-level constant — fine for stateless config, dangerous for state (the serverless in-memory-state rule)</td></tr>
+    <tr><td><strong>Scoped</strong></td><td>One instance per HTTP request</td><td>The request-scoped context — the natural lifetime for the DbContext and anything tied to one request</td></tr>
+    <tr><td><strong>Transient</strong></td><td>A fresh instance every injection</td><td>Cheap stateless helpers — like importing a pure function</td></tr>
+  </tbody>
+</table>
+
+<p>Reading any .NET service layer: follow the constructor. Whatever the class asks for, the framework provides — and the lifetime labels tell you whether shared state is a deliberate choice or an accident waiting to happen (a singleton holding per-request state is the .NET classic bug, the same class of bug as a module-level cache in a serverless function).</p>
+
+<h2>The .NET market map — where the lane actually is</h2>
+
+<p>For a learner in Egypt (or similar markets), the practical question is: when does .NET actually appear in your professional life?</p>
+
+<table>
+  <thead><tr><th>Where .NET appears</th><th>What it looks like</th><th>What it means for you</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Enterprise job listings</strong> (banking, government, ERP/CRM vendors, insurance)</td><td>"C#/.NET Developer", "ASP.NET Core + SQL Server", often with a Java/Spring alternative listed</td><td>The dominant formal-economy backend in Egypt and the Gulf — if you target these jobs, .NET is a second language, <em>after</em> your JS core is solid</td></tr>
+    <tr><td><strong>Offshoring / outsourcing contracts</strong> (EU and US vendors with Egyptian delivery teams)</td><td>You may be placed on a .NET codebase for a foreign enterprise client</td><td>Literacy is enough to contribute on the edges (frontend, tests, API integration); fluency is a separate decision</td></tr>
+    <tr><td><strong>Integration work</strong> (any client whose backend is .NET)</td><td>You consume their REST APIs — which ASP.NET Core produces</td><td>Your <a href="./api-design.html">API Design</a> knowledge is the whole skill; .NET is irrelevant beyond reading their docs</td></tr>
+    <tr><td><strong>Startups, freelance, agencies</strong></td><td>Node, Python, PHP/WordPress</td><td>The lanes this shelf mostly serves — .NET rarely appears</td></tr>
+  </tbody>
+</table>
+
+<p>The strategic line, from the shelf's own <a href="./javascript-across-stacks.html">positioning</a>: <strong>.NET wins where Microsoft enterprise contracts exist; Node wins where JavaScript teams exist.</strong> Neither claim is wrong; they describe different markets. If the enterprise market is the one you want, the shelf's backend/API/SQL docs are the transferable curriculum — the mental models move; only the syntax changes.</p>
+
+<h2>Decoding the version — what ".NET" means in a listing</h2>
+
+<p>A job listing that just says ".NET" is ambiguous, because the ecosystem has been through three names for the same product line. Reading the listing correctly is part of the literacy:</p>
+
+<table>
+  <thead><tr><th>What the listing says</th><th>What it actually is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.NET Framework 4.8</code> / "ASP.NET"</td><td>The Windows-only classic (2002–2019, frozen at 4.8). Old banks and government systems still run it — you will read it as legacy, not write it</td></tr>
+    <tr><td><code>.NET Core 2.x / 3.1</code></td><td>The cross-platform rewrite (2016–2020). Mostly a migration-era marker now</td></tr>
+    <tr><td><code>.NET 5 / 6 / 8</code></td><td>Modern .NET — Core renamed to drop the "Core". LTS is even-numbered (6, 8); 8 is current, 10 is the next even line</td></tr>
+    <tr><td>".NET" with no number</td><td>Ambiguous by definition — ask the number in the interview. "Which .NET?" is a real interview question, not a trick</td></tr>
+  </tbody>
+</table>
+
+<p>One rule of thumb: <strong>even number = Long-Term Support, odd number = latest features</strong>. If a codebase targets <code>net8.0</code>, it is the modern line — read it with this doc; if it says <code>net48</code>, expect legacy patterns and an older <code>ASP.NET</code> shape.</p>
+
+<h2>SQL Server — the T-SQL dialect</h2>
+
+<p>.NET shops default to SQL Server, and T-SQL is the <a href="./sql-and-postgresql.html">SQL</a> you know with a different accent. The reading differences, in one table:</p>
+
+<table>
+  <thead><tr><th>PostgreSQL (the shelf)</th><th>SQL Server / T-SQL</th></tr></thead>
+  <tbody>
+    <tr><td><code>LIMIT n OFFSET m</code></td><td><code>TOP n</code> (or <code>OFFSET ... FETCH NEXT n ROWS</code>)</td></tr>
+    <tr><td><code>now()</code>, <code>interval '7 days'</code></td><td><code>GETDATE()</code>, <code>DATEADD(day, -7, GETDATE())</code></td></tr>
+    <tr><td><code>bigserial</code> auto-increment</td><td><code>IDENTITY(1,1)</code></td></tr>
+    <tr><td><code>ON CONFLICT ... DO UPDATE</code></td><td><code>MERGE</code> (or <code>INSERT ... WHERE NOT EXISTS</code>); no direct UPSERT until recent versions</td></tr>
+    <tr><td><code>text[]</code> arrays, <code>JSONB</code></td><td>No arrays; <code>JSON</code> with weaker support — SQL Server's comfort zone is structured relational data</td></tr>
+    <tr><td><code>ILIKE</code>, <code>~</code> regex</td><td><code>LIKE</code> (case-insensitivity depends on collation), no native regex</td></tr>
+    <tr><td><code>pg_dump</code> / <code>psql</code></td><td><code>sqlcmd</code>, SSMS, <code>BACKUP DATABASE</code></td></tr>
+  </tbody>
+</table>
+
+<p>The shared 90% — SELECT anatomy, JOINs, GROUP BY, window functions (T-SQL supports them well), transactions — is exactly what <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> teaches. Read any T-SQL query as the same language with these six renames.</p>
+
+<h2>When NOT to pick .NET</h2>
+
+<p>Literacy is not advocacy. The lane map has a mirror side — the cases where .NET is the wrong tool, and where "why is this .NET?" is the correct reaction:</p>
+
+<ul>
+  <li><strong>Small business / client work:</strong> a WordPress site, a landing page, a small shop — the <a href="./wordpress-and-cms-internet.html">CMS internet</a> exists because enterprises over-buy. .NET is overhead, not capability.</li>
+  <li><strong>Startup iteration:</strong> one language across the stack, fast deploys, small teams — Node/TS wins on hiring pool and iteration speed.</li>
+  <li><strong>Team of one / freelance:</strong> the ecosystem weight (Visual Studio, Azure, solution files, project ceremony) is a tax a solo developer pays for nothing.</li>
+  <li><strong>Edge/serverless frontend work:</strong> Next.js, Vercel, Supabase — the shelf's <a href="./nextjs-deep-dive.html">Next.js</a> path — has no .NET chapter.</li>
+</ul>
+
+<p>The signal to look for: <strong>existing Microsoft enterprise contracts, compliance regimes, and ten-year maintenance horizons.</strong> That is where .NET earned its place — and where reading it pays.</p>
+
+<h2>Worked example — reading a .NET codebase</h2>
+
+<p>A real-shaped ASP.NET Core endpoint, read with the shelf's eyes. The endpoint: <code>GET /api/shipments/{id}</code> — the same shipment-tracking world as <a href="./sql-and-postgresql.html">SQL §Worked example</a>:</p>
+
+<pre>// 0. The entry point — Program.cs: the first file you open
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext&lt;AppDbContext&gt;(o =&gt;
+    o.UseSqlServer(builder.Configuration.GetConnectionString("Shipments")));
+builder.Services.AddScoped&lt;IShipmentService, ShipmentService&gt;();   // DI registration
+var app = builder.Build();
+app.UseAuthentication();   // middleware pipeline: runs in this order, wraps the request
+app.UseAuthorization();
+app.MapControllers();      // route attributes now work
+app.Run();
+
+// 1. The controller — thin, like a Node route handler with validation
+[ApiController]
+[Route("api/shipments")]
+public class ShipmentsController : ControllerBase
+{
+    private readonly IShipmentService _svc;          // ← DI hands the service in
+
+    public ShipmentsController(IShipmentService svc) =&gt; _svc = svc;
+
+    [HttpGet("{id:long}")]                            // GET /api/shipments/42
+    public async Task&lt;ActionResult&lt;ShipmentDto&gt;&gt; Get(long id)
+    {
+        var shipment = await _svc.GetByIdAsync(id);   // ← the request-loop logic lives here
+        return shipment is null ? NotFound() : Ok(shipment);
+    }
+}
+
+// 2. The service — the request loop, in the "service layer" convention
+public class ShipmentService : IShipmentService
+{
+    private readonly AppDbContext _db;                // ← EF Core's DbContext (scoped)
+
+    public async Task&lt;ShipmentDto?&gt; GetByIdAsync(long id) =&gt;
+        await _db.Shipments                          // a DbSet — the table
+            .Where(s =&gt; s.Id == id)                  // WHERE — LINQ translates to SQL
+            .Select(s =&gt; new ShipmentDto(s.Id, s.TrackingNumber, s.Status))
+            .SingleOrDefaultAsync();                 // one row, or null → NotFound
+}
+
+// 3. The DTO — the API contract (api-design: the response shape is a deliberate artifact)
+public record ShipmentDto(long Id, string TrackingNumber, string Status);</pre>
+
+<p><strong>Where to start reading — the first three files:</strong></p>
+
+<ul>
+  <li><code>Program.cs</code> — the entry point: DI registrations and the middleware pipeline, in the order they run.</li>
+  <li><code>appsettings.json</code> — configuration: the connection string, feature flags, and logging settings.</li>
+  <li><code>*.csproj</code> — the dependency manifest (the <code>package.json</code> of .NET); the <code>&lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;</code> line tells you which version of the story you are reading.</li>
+</ul>
+
+<p>Read end to end: <em>route binds → controller asks service → EF Core translates LINQ to the SQL you learned → SQL Server answers → DTO out.</em> Every concept in this file has a home in the shelf — <a href="./backend-engineering.html">Backend §1</a> (the loop), §1e (the ORM), <a href="./api-design.html">API Design</a> (the contract), <a href="./sql-and-postgresql.html">SQL</a> (the query underneath). That is the entire point of the doc: <strong>nothing here is new; it is all renamed.</strong></p>
+
+<h2>The literacy pitfalls — failure modes</h2>
+
+<table>
+  <thead><tr><th>Pitfall</th><th>What it is</th><th>The correct stance</th></tr></thead>
+  <tbody>
+    <tr><td>"C# is just Java"</td><td>Dismissing the lane on language snobbery</td><td>Judge by market position, not syntax — the lane map is the argument</td></tr>
+    <tr><td>Learning .NET before the JS core</td><td>Splitting a foundation that is still setting</td><td>Finish the JS/TS/React base; literacy first, fluency later, in that order</td></tr>
+    <tr><td>Treating literacy as fluency</td><td>Claiming .NET in an interview after one reading pass</td><td>Say what you have: "I can read C#; my backend depth is JS/TS" — honest framing wins</td></tr>
+    <tr><td>Hunting the ecosystem</td><td>Blazor, MAUI, XAML, Azure depth</td><td>None of it is needed to integrate; the request-loop map is the 20%</td></tr>
+    <tr><td>Porting habits verbatim</td><td>Bringing JS idioms that fight the framework</td><td>Read the framework's shape (DI, records, LINQ) and adapt — the mental models transfer, the idioms do not</td></tr>
+  </tbody>
+</table>
+
+<h2>Summary — the lane map</h2>
+
+<p>Print this. It is the whole doc in nine lines:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>.NET = C# + CLR + ASP.NET Core + EF Core + SQL Server: a stack, and its market position matters more than its syntax.</td></tr>
+    <tr><td>2</td><td>The lane: enterprise, banking, government, offshoring (Egypt, Gulf, Eastern Europe). Not startups, not freelance, not the CMS internet.</td></tr>
+    <tr><td>3</td><td>The loop is identical: middleware → controller → service → EF Core → SQL Server → response. Nothing new, only renamed.</td></tr>
+    <tr><td>4</td><td>TypeScript → C# is a translation, not a conversion: records, Task/async, LINQ, <code>??</code> — one table, no surprises.</td></tr>
+    <tr><td>5</td><td>EF Core is the ORM decision from Backend §1e; <code>.Include</code> is the N+1 trap wearing LINQ.</td></tr>
+    <tr><td>6</td><td>DI lifetimes: singleton = process, scoped = request, transient = fresh — the statelessness rules apply.</td></tr>
+    <tr><td>7</td><td>T-SQL is the SQL you know with six renames: TOP, GETDATE, IDENTITY, MERGE, no arrays, collations.</td></tr>
+    <tr><td>8</td><td>Do not pick .NET for small sites, startups, or solo work; do not dismiss it where enterprises run it.</td></tr>
+    <tr><td>9</td><td>Literacy before fluency: read code, map concepts, know the lane — then decide if you want the lane at all.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://learn.microsoft.com/en-us/aspnet/core/">Microsoft Learn — ASP.NET Core documentation</a> ·
+  <a href="https://learn.microsoft.com/en-us/dotnet/csharp/">Microsoft Learn — C# documentation</a> ·
+  <a href="https://learn.microsoft.com/en-us/ef/core/">Microsoft Learn — EF Core documentation</a> ·
+  <a href="https://learn.microsoft.com/en-us/sql/t-sql/">Microsoft Learn — T-SQL reference</a> ·
+  <a href="https://roadmap.sh/aspnet-core">roadmap.sh — ASP.NET Core roadmap</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a .NET codebase you've worked on — where were the middleware, the services, the EF Core queries, and what were the traps?"</li>
+    <li>"When have you seen a company choose .NET over Node — and when have you seen the reverse? What decided it?"</li>
+    <li>"If I wanted the Egyptian enterprise market, what is the honest path from where my JS/TS foundation is now to a .NET interview?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · .NET &amp; the Enterprise Lane — reading literacy, not a C# course</span>
+  <span>Positioning: <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> · The loop: <a href="./backend-engineering.html">Backend Engineering</a> · The data: <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> · Contracts: <a href="./api-design.html">API Design</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

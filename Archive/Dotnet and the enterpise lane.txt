@@ -1,0 +1,455 @@
+## Overall verdict
+
+This is a **well-conceived doc with a clear, honest scope**: reading literacy for the .NET enterprise lane, written for a JS/TS developer who might encounter C# in job listings, offshoring contracts, or integration work. The "not a C# course" framing is correct and the TypeScript→C# translation table is genuinely useful.
+
+However, compared to the other docs on the shelf, it is **structurally thin**. It lacks the history, evolution, mental models, principles, ecosystem, and migration path sections that give the other reference docs their depth. The worked example is good but stops short of showing the full request lifecycle. And the enterprise lane itself — the thing that makes .NET *matter* — is described in a table but never explained.
+
+The doc's strongest quality is its **honesty about scope**: it tells you exactly what literacy means, what to ignore, and when .NET is the wrong tool. That self-awareness is rare and valuable. The doc's weakest quality is that it **doesn't teach you how to actually open a .NET repo and trace a request end-to-end**, which is the one thing "reading literacy" must deliver.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Scope definition | Strong — honest about what literacy means |
+| TypeScript→C# translation table | Useful — covers the most common constructs |
+| Request loop mapping to Backend Engineering | Good — correct mappings |
+| EF Core section | Adequate — covers the key concepts |
+| DI lifetimes | Correct — the three lifetimes are right |
+| T-SQL dialect table | Thin — lists renames but not deeper differences |
+| Market map | Good — honest about where .NET appears |
+| "When NOT to pick .NET" | Good — rare and valuable honesty |
+| Worked example | Good but incomplete — stops before the full pipeline |
+| History / evolution | Missing |
+| Mental models | Missing |
+| Principles | Missing |
+| Ecosystem / tooling | Missing |
+| Migration paths | Missing |
+| Project structure / "what do I see when I open the repo" | Missing |
+| LINQ in depth | Missing |
+| async/await C# vs JS differences | Missing |
+| .NET versioning story | Missing |
+
+---
+
+# 1. What the doc does well
+
+## 1.1 The scope is honest and well-defined
+
+The doc says "reading literacy, not a C# course" and then defines literacy as three things:
+
+1. You can read a C# codebase — follow an endpoint from controller to database.
+2. You can map every concept onto mental models you already own.
+3. You know where the lane is — when .NET appears in your professional life.
+
+This is the right scope. It doesn't try to teach you to write C#. It teaches you to *recognize* C# patterns and *translate* them into concepts you already understand. That's a genuinely useful skill for the target audience.
+
+## 1.2 The TypeScript→C# translation table
+
+The table mapping TypeScript constructs to C# equivalents is the doc's most practical artifact:
+
+| TypeScript you know | C# you will read |
+|---|---|
+| `interface User { id: number }` | `record User(int Id, string Name)` |
+| `async/await`, `Promise<T>` | `async Task<T>` |
+| `Array.map/filter/reduce` | LINQ: `.Select(...)`, `.Where(...)`, `.Aggregate(...)` |
+| `const x = ...` / `let y = ...` | `var` (type inferred), `readonly` |
+| `null` / optional chaining `?.` | `null`, `?` nullable annotations, null-coalescing `??` |
+
+This is exactly what a JS/TS developer needs when they open a C# file for the first time. The table is correct and covers the most common constructs.
+
+## 1.3 The DI lifetimes table
+
+The three lifetimes (Singleton, Scoped, Transient) are correctly mapped to the shelf's statelessness discussion:
+
+| Lifetime | What it means | Shelf translation |
+|---|---|---|
+| Singleton | One instance for the process lifetime | Like a module-level constant — fine for stateless config, dangerous for state |
+| Scoped | One instance per HTTP request | The request-scoped context — the natural lifetime for DbContext |
+| Transient | A fresh instance every injection | Cheap stateless helpers |
+
+This is correct and the "shelf translation" column is the right approach — anchoring unfamiliar concepts to familiar ones.
+
+## 1.4 The "When NOT to pick .NET" section
+
+This is rare and valuable. Most docs about a technology are advocacy docs. This doc explicitly says:
+
+- Small business / client work → WordPress / CMS internet
+- Startup iteration → Node/TS wins on hiring pool and iteration speed
+- Team of one / freelance → the ecosystem weight is a tax
+- Edge/serverless frontend work → Next.js / Vercel path
+
+This honesty builds trust and prevents the doc from becoming a .NET sales pitch.
+
+## 1.5 The worked example
+
+The example showing a controller + service + EF Core query is good:
+
+```csharp
+[ApiController]
+[Route("api/shipments")]
+public class ShipmentsController : ControllerBase
+{
+    private readonly IShipmentService _svc;
+    public ShipmentsController(IShipmentService svc) => _svc = svc;
+
+    [HttpGet("{id:long}")]
+    public async Task<ActionResult<ShipmentDto>> Get(long id)
+    {
+        var shipment = await _svc.GetByIdAsync(id);
+        return shipment is null ? NotFound() : Ok(shipment);
+    }
+}
+```
+
+This correctly shows the DI constructor injection, the route attribute, the async return type, and the DTO pattern. It's the right level of detail for "reading literacy."
+
+---
+
+# 2. Structural gaps — missing shelf-standard sections
+
+## 2.1 Missing: History section
+
+Every other doc on the shelf has a history section. .NET has a rich and genuinely confusing history that the doc should clarify:
+
+| Year | Event | What shifted |
+|---|---|---|
+| 2000 | C# announced (Anders Hejlsberg, Microsoft) | "Java for Windows" — managed code, GC, type safety |
+| 2002 | .NET Framework 1.0 | Windows-only runtime. CLR + BCL. Enterprise adoption begins. |
+| 2004 | Mono project (Miguel de Icaza) | Open-source .NET for Linux. Proved cross-platform was possible. |
+| 2010 | NuGet package manager | .NET gets a package ecosystem (like npm for .NET) |
+| 2014 | Roslyn compiler open-sourced | C# compiler becomes open source. Community contributions begin. |
+| 2016 | .NET Core 1.0 | The big inversion: cross-platform, open-source, cloud-first. Breaks from .NET Framework. |
+| 2019 | .NET Core 3.0 | Windows Desktop support returns. WPF/WinForms on .NET Core. |
+| 2020 | .NET 5 | Unification: ".NET Core" renamed to ".NET". .NET Framework enters maintenance mode. |
+| 2021–present | .NET 6/7/8/9 | Annual releases. LTS on even numbers. Cloud-native, AOT, MAUI. |
+
+The key insight the doc should convey: **".NET" means different things depending on the era.** A job listing that says ".NET" might mean .NET Framework 4.8 (legacy Windows enterprise), .NET Core 3.1 (slightly less legacy), or .NET 8 (modern cross-platform). The doc should help the reader decode which one they're looking at.
+
+## 2.2 Missing: Evolution / constraint inversions
+
+The same pattern as other docs:
+
+| Inversion | Before | After | What changed |
+|---|---|---|---|
+| Windows-only → Cross-platform | .NET Framework (Windows only, proprietary) | .NET Core → .NET 5+ (Linux, macOS, Windows, open source) | Cloud computing made Windows-only a liability. Azure needed Linux. Microsoft open-sourced to survive. |
+| Monolith-friendly → Cloud-native | IIS + Windows Server + on-prem | Containers, Kubernetes, serverless (Azure Functions) | The deployment target changed. .NET adapted with minimal hosting, AOT, trimmed deployments. |
+| Proprietary → Open source | Microsoft-owned, closed development | .NET Foundation, open-source on GitHub, community governance | Developer trust required openness. The enterprise lane had to modernize to compete with Node/Go/Python. |
+| Verbose → Concise | Startup.cs, 50 lines of DI registration | Minimal hosting: `var app = builder.Build(); app.MapGet(...)` | Developer experience pressure from Node/Go. C# 10+ top-level statements. |
+
+## 2.3 Missing: Mental models section
+
+The doc jumps straight into the request loop mapping without establishing how to think about the .NET ecosystem. Add:
+
+| Mental model | When you use it | What it compresses |
+|---|---|---|
+| "The CLR is V8's enterprise cousin" | Understanding runtime behavior | Both are JIT-compiled managed runtimes with GC. CLR adds a stronger type system, structs (value types), and a richer BCL. |
+| "Everything is registered in DI" | Reading any ASP.NET Core app | The DI container is the composition root. Every service, every DbContext, every middleware is registered in Program.cs. Follow the registrations to understand the dependency graph. |
+| "The middleware pipeline is an onion, same as Express" | Tracing a request | `app.UseAuthentication()` → `app.UseAuthorization()` → `app.MapControllers()`. Same mental model as Express middleware, just with a different syntax. |
+| "EF Core is Prisma's verbose older sibling" | Reading data access code | Same ORM mental model: entities map to tables, DbContext is the session, LINQ queries translate to SQL. The difference is verbosity and explicitness. |
+| "The .csproj is the package.json" | Understanding project structure | Dependencies are NuGet packages. The .csproj file declares them. `dotnet restore` = `npm install`. |
+
+## 2.4 Missing: Principles section
+
+| Principle | Why it's constant |
+|---|---|
+| The contract is the interface, not the class | C# interfaces (`IShipmentService`) define the contract. Classes implement them. DI injects the interface. You read the interface to understand the contract, not the class. |
+| Configuration is external, code is internal | `appsettings.json` + environment variables. Same as 12-Factor. The code reads config; it doesn't hardcode it. |
+| The middleware pipeline is the request lifecycle | Every request flows through the same chain. The order of `app.Use*()` calls determines behavior. Read Program.cs first. |
+| DTOs at the boundary, entities inside | The API returns DTOs (records), not EF Core entities. Same principle as the shelf's "shape at the boundary" rule. |
+| Async all the way down | C# async/await is not optional in ASP.NET Core. Every I/O operation is async. Blocking calls deadlock the thread pool. |
+
+## 2.5 Missing: Ecosystem / tooling section
+
+| Category | Tools | Decision metric |
+|---|---|---|
+| IDE / Editor | Visual Studio (Windows), Rider (cross-platform), VS Code + C# Dev Kit | Rider for cross-platform; VS for Windows enterprise; VS Code for reading |
+| CLI | `dotnet` CLI (build, run, test, publish) | `dotnet build` = `npm run build`; `dotnet test` = `npm test` |
+| Package manager | NuGet | `dotnet add package` = `npm install`; `nuget.config` = `.npmrc` |
+| CI/CD | Azure DevOps, GitHub Actions, TeamCity | Azure DevOps for enterprise; GitHub Actions for modern teams |
+| Cloud | Azure (App Service, Functions, AKS, Cosmos DB) | .NET and Azure are deeply coupled; Azure is the default deployment target |
+| Testing | xUnit, NUnit, Moq, FluentAssertions | xUnit is the modern default; Moq for mocking; FluentAssertions for readable asserts |
+| ORM | EF Core, Dapper, NHibernate | EF Core for full ORM; Dapper for raw SQL with mapping; NHibernate is legacy |
+
+## 2.6 Missing: Migration paths
+
+| From → To | Trigger | Steps | Risks |
+|---|---|---|---|
+| .NET Framework → .NET 8 | End of support; cloud migration | 1) Assess with .NET Upgrade Assistant. 2) Port to .NET Standard libraries. 3) Migrate to .NET 8. 4) Update DI/hosting model. | WCF/WinForms dependencies; third-party library gaps |
+| .NET monolith → Microservices | Team scaling; deploy coordination | 1) Identify bounded contexts. 2) Extract highest-churn module. 3) API gateway. 4) Separate databases. | Distributed transactions; data consistency |
+| .NET → Node/TS (integration) | Polyglot team; frontend-driven backend | 1) Define API contract (OpenAPI). 2) Build BFF in Node. 3) .NET remains as backend service. 4) gRPC or REST between them. | Contract drift; two runtimes to maintain |
+| Integrating WITH .NET (from JS) | Client's backend is .NET; you build the frontend | 1) Read the .NET API's OpenAPI spec. 2) Generate TypeScript client. 3) Build React/Next.js frontend. 4) Deploy independently. | You don't control the backend; contract changes require coordination |
+
+---
+
+# 3. Content gaps — missing technical depth
+
+## 3.1 Missing: The .NET project structure
+
+When you open a .NET repo, what do you see? The doc should show this:
+
+```
+MyApp/
+├── MyApp.sln                    # Solution file (= monorepo root)
+├── src/
+│   ├── MyApp.Api/               # The web API project
+│   │   ├── MyApp.Api.csproj     # Project file (= package.json)
+│   │   ├── Program.cs           # Entry point (= index.js / server.js)
+│   │   ├── appsettings.json     # Configuration (= .env)
+│   │   ├── Controllers/         # API controllers (= routes/)
+│   │   ├── Services/            # Business logic (= services/)
+│   │   ├── Models/              # EF Core entities (= models/)
+│   │   ├── DTOs/                # API response shapes (= types/)
+│   │   └── Middleware/          # Custom middleware
+│   ├── MyApp.Core/              # Domain logic (no framework deps)
+│   └── MyApp.Infrastructure/    # Data access, external services
+└── tests/
+    └── MyApp.Tests/             # xUnit tests
+```
+
+The key insight: **Program.cs is the entry point.** In .NET 6+, it uses "minimal hosting":
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+// Register services in DI
+builder.Services.AddControllers();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+var app = builder.Build();
+
+// Middleware pipeline (order matters, same as Express)
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
+```
+
+This is the **first file you read** in any .NET repo. It tells you: what services are registered, what middleware is in the pipeline, what database is configured. It's the `.env` + `server.js` + `app.use()` chain all in one file.
+
+## 3.2 Missing: LINQ in depth
+
+The doc mentions LINQ in the translation table but doesn't explain it. LINQ is THE distinctive feature of C# that a JS developer needs to understand. It's SQL-flavored functional programming embedded in the language:
+
+```csharp
+// LINQ query syntax (SQL-like)
+var activeOrders = from o in dbContext.Orders
+                   where o.Status == "active"
+                   orderby o.CreatedAt descending
+                   select new { o.Id, o.Total, o.Customer.Name };
+
+// LINQ method syntax (fluent, more common)
+var activeOrders = dbContext.Orders
+    .Where(o => o.Status == "active")
+    .OrderByDescending(o => o.CreatedAt)
+    .Select(o => new { o.Id, o.Total, o.Customer.Name })
+    .ToList();
+```
+
+The mental model for a JS developer: **LINQ is `.filter().sort().map()` but it can also be a database query.** When you see `dbContext.Orders.Where(...)`, that's not filtering an in-memory array — it's building a SQL query. The `.ToList()` or `.ToListAsync()` at the end is what actually executes it. This is the same "lazy evaluation" concept as Prisma's query builder.
+
+Key LINQ methods a JS developer should recognize:
+
+| LINQ | JS equivalent | Note |
+|---|---|---|
+| `.Where(x => ...)` | `.filter(x => ...)` | Same |
+| `.Select(x => ...)` | `.map(x => ...)` | Same |
+| `.OrderBy(x => ...)` | `.sort((a,b) => ...)` | LINQ is stable; JS sort is not guaranteed stable |
+| `.FirstOrDefault()` | `.find()` or `[0]` | Returns `null` if empty (hence `FirstOrDefault`) |
+| `.Any(x => ...)` | `.some(x => ...)` | Same |
+| `.All(x => ...)` | `.every(x => ...)` | Same |
+| `.Count()` | `.length` | LINQ is a method, not a property |
+| `.ToList()` / `.ToListAsync()` | (no equivalent) | Materializes the query — executes it |
+| `.GroupBy(x => ...)` | `Object.groupBy()` / `Map` | Same concept |
+| `.Join(...)` | (no direct equivalent) | SQL-style join between two collections |
+
+## 3.3 Missing: async/await in C# vs JS — the critical difference
+
+The doc says "Task ≈ Promise" but this is dangerously incomplete. The key difference:
+
+| | JavaScript | C# |
+|---|---|---|
+| Concurrency model | Single-threaded event loop | Thread pool (multiple threads) |
+| `async` function runs on | The single event loop thread | A thread pool thread (or the synchronization context) |
+| `await` yields to | The microtask queue | The thread pool scheduler |
+| CPU-bound work | Blocks the event loop (bad) | Runs on a thread pool thread (fine) |
+| `Task.Delay(1000)` | `setTimeout` equivalent | Actually waits on a timer, doesn't block a thread |
+| Deadlock risk | None (single-threaded) | Real risk if you mix `.Result` / `.Wait()` with async |
+
+The mental model: **In JS, async is about not blocking the single thread. In C#, async is about not wasting a thread pool thread.** The syntax looks identical (`async`/`await`), but the underlying model is different. A JS developer reading C# async code should understand that `await` doesn't mean "yield to the event loop" — it means "release this thread pool thread back to the pool while I wait."
+
+This matters because:
+- In C#, you CAN do CPU-bound work inside an async method without blocking everything (it runs on a thread pool thread).
+- In JS, you CANNOT do CPU-bound work without blocking the event loop.
+- In C#, mixing `.Result` (blocking) with `async` can deadlock. In JS, there's no equivalent footgun.
+
+## 3.4 Missing: The .NET versioning story
+
+This is genuinely confusing and the doc should clarify it:
+
+| Name | Era | Status | What it means in a job listing |
+|---|---|---|---|
+| .NET Framework 4.8 | 2002–2019 | Maintenance mode (Windows only) | Legacy enterprise. WCF, WinForms, WPF. "We have a 15-year-old system." |
+| .NET Core 1.0–3.1 | 2016–2019 | End of life | Transitional. Cross-platform but pre-unification. |
+| .NET 5 | 2020 | End of life | The unification release. ".NET Core" renamed to ".NET". |
+| .NET 6 | 2021 | LTS (support until Nov 2024) | First LTS after unification. Still in production. |
+| .NET 7 | 2022 | End of life | STS (Standard Term Support). |
+| .NET 8 | 2023 | LTS (support until Nov 2026) | Current LTS. Most new enterprise projects target this. |
+| .NET 9 | 2024 | STS | Latest. Early adopters. |
+
+The rule: **If a job listing says ".NET" without a version, ask which one.** ".NET Framework" means legacy Windows enterprise. ".NET 8" means modern cross-platform. The difference is enormous.
+
+## 3.5 Missing: Azure as the deployment target
+
+.NET and Azure are deeply coupled. The doc doesn't mention Azure at all, but it's the default deployment target for enterprise .NET:
+
+| Azure service | .NET equivalent | Shelf equivalent |
+|---|---|---|
+| Azure App Service | Managed web hosting | Vercel / Render |
+| Azure Functions | Serverless functions | AWS Lambda / Vercel Edge Functions |
+| AKS (Azure Kubernetes Service) | Managed Kubernetes | EKS / GKE |
+| Azure SQL Database | Managed SQL Server | RDS / Neon |
+| Cosmos DB | Managed NoSQL | DynamoDB / MongoDB Atlas |
+| Azure DevOps | CI/CD + repos + boards | GitHub Actions + Jira |
+| Application Insights | Observability | Datadog / New Relic |
+
+The mental model: **Azure is to .NET what Vercel is to Next.js.** It's the path of least resistance. Enterprise .NET teams deploy to Azure because the integration is seamless. This doesn't mean you *must* use Azure, but it explains why the ecosystem is coupled.
+
+---
+
+# 4. The enterprise lane deserves more depth
+
+The doc describes the enterprise lane in a table but never explains what makes it *different*. This is the most important gap. The enterprise lane is not just ".NET but for big companies." It has structural differences:
+
+| Dimension | Startup / freelance lane | Enterprise lane |
+|---|---|---|
+| Deployment cadence | Daily / weekly | Monthly / quarterly (change control boards) |
+| Compliance | None / SOC 2 | PCI DSS, HIPAA, GDPR, SOX, FedRAMP |
+| Integration | REST APIs, webhooks | SOAP, WCF, mainframes, EDI, HL7 |
+| Procurement | Credit card | RFP, vendor evaluation, 6-month procurement cycle |
+| Team structure | 2–5 engineers, full-stack | 20–200 engineers, specialized roles (DBA, QA, release manager) |
+| Code review | 1 reviewer, merge in hours | 2–3 reviewers, architecture board approval, merge in days |
+| Testing | Unit + integration | Unit + integration + system + UAT + performance + security |
+| Documentation | README + inline comments | Confluence wikis, architecture decision records, runbooks, SOPs |
+| Support | On-call rotation | Tier 1/2/3 support, SLAs, escalation matrices |
+
+The doc should explain that **the enterprise lane's constraints are not technical — they're organizational.** The reason enterprise .NET codebases are verbose, heavily layered, and slow to change is not because C# forces it. It's because the organization requires audit trails, change control, and separation of duties. The technology serves the process, not the other way around.
+
+## 4.1 Missing: The "reading a .NET enterprise codebase" checklist
+
+The doc's worked example shows a single controller + service + EF Core query. But reading an enterprise .NET codebase requires a different strategy:
+
+| Step | What to look at | What it tells you |
+|---|---|---|
+| 1 | `Program.cs` / `Startup.cs` | Entry point, DI registrations, middleware pipeline |
+| 2 | `.csproj` file | Target framework (.NET 8? .NET Framework 4.8?), NuGet dependencies |
+| 3 | `appsettings.json` | Configuration, connection strings, feature flags |
+| 4 | `Controllers/` folder | API surface — what endpoints exist |
+| 5 | `Services/` folder | Business logic — what the controllers delegate to |
+| 6 | `Models/` or `Entities/` folder | EF Core entities — the database schema |
+| 7 | `DTOs/` or `ViewModels/` folder | API response shapes — what the client sees |
+| 8 | `Middleware/` folder | Custom request processing (auth, logging, error handling) |
+| 9 | `Migrations/` folder | Database schema history — what changed and when |
+| 10 | `tests/` folder | What's tested, what's not |
+
+The rule: **Start at Program.cs, follow the DI registrations to find the services, then follow the services to find the data access.** This is the same "trace the request" strategy as the Backend Engineering doc, just with .NET-specific file names.
+
+---
+
+# 5. Factual and precision issues
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| "Records = immutable data carriers" | Records CAN be mutable (they have `init` setters by default, but you can add `set`). The immutability is conventional, not enforced. | Say "Records are typically used as immutable data carriers" |
+| "Task ≈ Promise" | Incomplete — see §3.3 above. The concurrency models are fundamentally different. | Expand to explain the thread pool vs event loop difference |
+| "var is not dynamic typing" | Correct, but could add: `var` is compile-time type inference. The type is fixed at declaration. `dynamic` is the actual dynamic typing keyword (and is rarely used). | Add this clarification |
+| T-SQL: "No arrays; JSON with weaker support" | SQL Server 2016+ has JSON support, but it's true that it's weaker than PostgreSQL's JSONB. The "no arrays" claim is correct — T-SQL has no native array type. | Correct as stated, but could add "SQL Server 2016+ has JSON functions but no JSONB equivalent" |
+| "The CLR is V8's enterprise cousin" | Roughly correct but imprecise. CLR and V8 are both JIT-compiled managed runtimes, but CLR has a richer type system (structs, interfaces, generics with reified types), a different GC (generational, concurrent), and a different threading model. | Expand the comparison if adding a mental models section |
+| DI: "Scoped = one instance per HTTP request" | Correct for ASP.NET Core. But in other contexts (background services, Azure Functions), "scoped" means different things. | Add a note: "In ASP.NET Core, Scoped = per HTTP request. In other hosting models, the scope boundary differs." |
+| "SQL Server's comfort zone is structured relational data" | Fair characterization, but SQL Server also has JSON, spatial (geography/geometry), temporal tables, and in-memory OLTP. | Could add: "SQL Server's strength is structured relational data with strong tooling (SSMS). It has JSON/spatial/temporal features but they're not the primary use case." |
+
+---
+
+# 6. Suggested structural improvements
+
+## 6.1 Add a "How to use this doc" section
+
+Following the shelf's pattern:
+
+> Reading order: read this after [Backend Engineering](./backend-engineering.html) (so the request loop is warm) and alongside [SQL & PostgreSQL](./sql-and-postgresql.html) (so the data layer is warm). Cross-links:
+> - Positioning: [JavaScript Across Stacks](./javascript-across-stacks.html) — the .NET row of the competitive table.
+> - The loop: [Backend Engineering](./backend-engineering.html) — the request loop this doc maps to.
+> - The data: [SQL & PostgreSQL](./sql-and-postgresql.html) — T-SQL is a dialect of the same language.
+> - Contracts: [API Design](./api-design.html) — what ASP.NET Core's `[ApiController]` attributes produce.
+> - Career: [Frontend Income Markets](./frontend-income-markets.html) — where the enterprise lane appears.
+
+## 6.2 Expand the worked example
+
+The current example stops at the controller + service + EF Core query. Expand it to show:
+
+1. **Program.cs** — the entry point with DI registrations
+2. **The middleware pipeline** — `app.UseAuthentication()` → `app.UseAuthorization()` → `app.MapControllers()`
+3. **appsettings.json** — the connection string
+4. **The DbContext** — the EF Core session
+5. **The migration** — the database schema
+
+This gives the reader a complete "trace a request from HTTP to database" walkthrough, which is the core deliverable of "reading literacy."
+
+## 6.3 Add a "What this doc covers" summary
+
+Following the shelf's pattern:
+
+> You now have the full arc: why .NET exists (the enterprise lane), how to read a C# codebase (translation table + project structure + request tracing), how ASP.NET Core maps to the Backend Engineering request loop, how EF Core maps to the ORM mental model, how DI works, how T-SQL differs from PostgreSQL, and when .NET is the wrong tool. You can open a .NET repo, trace a request from controller to database, and understand what you're reading — without writing a line of C#.
+
+---
+
+# 7. Priority roadmap
+
+## Must add
+
+1. History section (.NET Framework → .NET Core → .NET 5+ unification)
+2. Evolution / constraint inversions (Windows-only → cross-platform, proprietary → open source)
+3. Mental models section (CLR as V8's cousin, DI as composition root, middleware as onion)
+4. The .NET project structure ("what do I see when I open the repo")
+5. LINQ in depth (the translation table is not enough)
+6. async/await C# vs JS differences (the thread pool vs event loop distinction)
+7. The .NET versioning story (Framework vs Core vs .NET 5+)
+8. Enterprise lane depth (what makes it structurally different)
+9. Expand the worked example to show the full request pipeline
+
+## Should add
+
+10. Principles section (interface as contract, config external, DTOs at boundary)
+11. Ecosystem / tooling section (Visual Studio, Rider, dotnet CLI, NuGet, Azure)
+12. Migration paths (Framework → .NET 8, integrating WITH .NET from JS)
+13. Azure as the deployment target
+14. The "reading a .NET enterprise codebase" checklist
+15. The "literacy test" — what you should be able to do after reading this doc
+
+## Nice to add
+
+16. C# type system in more depth (records, nullable reference types, pattern matching, generics)
+17. The middleware pipeline in detail (with code)
+18. The `appsettings.json` configuration model
+19. The `IQueryable` vs `IEnumerable` distinction (critical for EF Core performance)
+20. The `IOptions<T>` pattern for configuration
+
+---
+
+# 8. Bottom line
+
+This doc has a **clear, honest scope** and a **genuinely useful translation table**. The "reading literacy, not a C# course" framing is correct and the "When NOT to pick .NET" section is rare and valuable.
+
+But it is **structurally thin** compared to the other docs on the shelf. It lacks history, evolution, mental models, principles, ecosystem, and migration paths. The worked example is good but stops short of the full request pipeline. And the enterprise lane — the thing that makes .NET *matter* — is described but never explained.
+
+The highest-leverage improvements are:
+
+> History + versioning story, project structure, LINQ in depth, async/await C# vs JS, enterprise lane depth, and expanding the worked example to the full pipeline.
+
+## Final recommendation
+
+**Good draft with a clear scope, but needs structural depth to match the shelf's standard.**
+
+The doc's honesty about scope is its greatest strength. The gap is not "it tries to do too much" — it's "it doesn't go deep enough on the things it says it covers." The translation table is the right artifact; it just needs the surrounding context (history, mental models, project structure, full pipeline walkthrough) to make it genuinely useful for someone opening their first .NET repo.

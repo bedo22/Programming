@@ -324,6 +324,11 @@
       <td>System Design <em>defines</em> the component boundary and contract. Developer Loop <em>implements</em> inside it.</td>
     </tr>
     <tr>
+      <td><strong>Data Modeling</strong> (<a href="./data-modeling-and-databases.html">the vault</a>)</td>
+      <td>Data ownership, consistency models, schema evolution</td>
+      <td>System Design <em>decides which store and who owns it</em>; Data Modeling <em>designs the schema inside that choice</em> — keys, constraints, indexes, migrations. A system design without a schema is a diagram; a schema without system design is a table nobody partitioned.</td>
+    </tr>
+    <tr>
       <td><strong>API Design</strong> (<a href="./api-design.html">Contracts</a>)</td>
       <td>Service boundaries, data ownership, consistency, failure domains</td>
       <td>System Design <em>decides the decomposition</em>; API Design <em>materializes the boundaries</em> as contracts. A system design without contracts is a diagram; contracts without system design are leaky.</td>
@@ -723,6 +728,39 @@
 
 <p><strong>Drill everything.</strong> A backup that has never been restored is a hope, not a plan. Restore drills and failover drills are scheduled work, not incident-time work.</p>
 
+<h3>Database backup — the concrete layer</h3>
+
+<p>For the database specifically, the recovery story has three concrete levels (schema-design side in <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a>):</p>
+
+<table>
+  <thead><tr><th>Strategy</th><th>RPO / RTO</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><code>pg_dump</code> / logical dumps</td><td>Hours / hours</td><td>Small databases, cross-version or cross-engine migration — not a production recovery story</td></tr>
+    <tr><td>WAL archiving (continuous)</td><td>Minutes / minutes</td><td>Production default: full backups + archived write-ahead log enable point-in-time recovery</td></tr>
+    <tr><td>Physical backups (pgBackRest, WAL-G)</td><td>Minutes / minutes</td><td>Large databases; compressed, parallel, incremental; PITR out of the box</td></tr>
+    <tr><td>Streaming replication</td><td>Seconds / seconds</td><td>High availability — a standby is not a backup, but it buys the fastest RTO</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The rules that matter:</strong> back up the WAL continuously, not just nightly dumps (PITR is what turns "we lost the last hour" into "we lost nothing since last commit"); store backups off the database host; and test the restore path on a schedule — the drill is the plan's proof.</p>
+
+<h3>Incident response — runbooks, on-call, and the postmortem</h3>
+
+<p>Detection is designed (§6g); response is a <em>process</em>, and it must exist before the first alert fires. The loop:</p>
+
+<table>
+  <thead><tr><th>Phase</th><th>What happens</th><th>The discipline</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Detect</strong></td><td>An alert fires (SLO burn, error rate, queue lag)</td><td>Alerts page humans only when a human decision is needed; everything else is a dashboard</td></tr>
+    <tr><td><strong>Triage</strong></td><td>On-call answers, assesses severity, opens the incident</td><td>Severity before fixing: Sev1 (users down) vs. Sev2 (degraded) vs. Sev3 (cosmetic) decides who is woken up</td></tr>
+    <tr><td><strong>Respond</strong></td><td>The runbook drives: known failure → known steps; unknown → timeboxed investigation</td><td>A runbook is "if X, do Y" for every failure mode the team has seen before; write it while the memory is fresh</td></tr>
+    <tr><td><strong>Mitigate</strong></td><td>Restore users first — roll back, degrade, redirect — <em>then</em> fix root cause</td><td>Mitigation and diagnosis are separate jobs; one person does not do both</td></tr>
+    <tr><td><strong>Postmortem</strong></td><td>Timeline, root cause, contributing factors, action items with owners</td><td>Blameless by construction — the incident is a systems failure, not a person's; every postmortem produces at least one owned, scheduled action</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The rules that make it work:</strong> exactly one on-call at a time, with a written escalation path and a timebox before waking anyone else; incidents get a channel and a leader, and the leader's job is coordination, not coding; postmortems happen within days, cover the <em>timeline of facts</em> (logs, deploys, alerts — the observability layer provides the evidence), and the fix list is tracked like any other work — a postmortem without a scheduled action item is a diary entry, not a process.</p>
+
 <h3>Overload protection</h3>
 
 <ul>
@@ -798,7 +836,7 @@
 
 <h3>Data ownership — "who mutates what?"</h3>
 
-<p>Every piece of mutable state has <strong>exactly one owner</strong>. The owner is the only component that writes it. All other components read via API or subscribe to events.</p>
+<p>Every piece of mutable state has <strong>exactly one owner</strong>. The owner is the only component that writes it. All other components read via API or subscribe to events. This is the system-scale version of the per-feature "where does this belong?" decision — the <a href="./full-stack.html">Full-Stack Thinking</a> doc carries that one.</p>
 
 <table>
   <thead><tr><th>Pattern</th><th>Owner</th><th>Readers</th><th>Example</th></tr></thead>
@@ -821,7 +859,22 @@
   <li><strong>Internal boundary (module/function)</strong> — validate preconditions (Design by Contract). Fail fast inside the trust zone.</li>
 </ul>
 
-<p>The rule: <strong>validate at every boundary</strong>. The cost of a validation check is negligible; the cost of corrupted state propagating is not.</p>
+<p>The rule: <strong>validate at every boundary</strong>. The cost of a validation check is negligible; the cost of corrupted state propagating is not.
+
+<p>The per-feature method for finding those boundaries — drawing the data-flow diagram and running STRIDE against each crossing — lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (Threat modeling and Worked example). This section is the architecture's <em>where</em>; that doc is the <em>how to enumerate</em>.</p></p>
+
+<h3>Codebase architecture — the physical form of the boundaries</h3>
+
+<p>Every boundary above (bounded context, data ownership, failure domain) has a physical expression: the folder tree. If the code can't see the boundary, the boundary doesn't exist.</p>
+
+<ul>
+  <li><strong>Flat vs. tree.</strong> Flat (everything in one directory) works only for scripts and tiny projects — the moment a second developer, a test suite, or a config file arrives, flat breaks. The tree is not decoration: it's namespaces (imports resolve by path), tooling scopes (lint/test/build target a subtree), and ownership (a folder = a person or team's blast radius). The question isn't "flat or tree" — it's "what is each folder <em>for</em>?"</li>
+  <li><strong>Why <code>src/</code>.</strong> One code root keeps the build-visible code separated from config and tooling (<code>package.json</code>, <code>tsconfig</code>, <code>vite.config</code>, CI files) that lives at the root. It also gives import aliases and lint rules a single anchor ("everything under <code>src/</code> is app code"). Convention > configuration, and <code>src/</code> is the least controversial convention in the industry.</li>
+  <li><strong>Feature folders vs. layered folders.</strong> Layered (<code>controllers/</code>, <code>services/</code>, <code>repos/</code>) organizes by <em>technique</em>; feature folders (<code>checkout/</code>, <code>auth/</code>) organize by <em>business domain</em>. The modern default is feature-first: each feature folder owns its UI, logic, and tests (colocated), and layering emerges <em>inside</em> the feature when it earns it. Layered-at-the-top spreads one feature across five folders — the physical form of a violated bounded context. Colocation is the same principle at file scale: the test, style, and story live next to the code they describe, so deleting a feature deletes everything it owns.</li>
+  <li><strong>Framework-prescribed layouts</strong> are the cheapest decision: <code>app/</code> (Next.js file-based routing — see <a href="./nextjs-deep-dive.html">Next.js</a>), <code>src/</code> + <code>index.html</code> (Vite SPA), <code>src/app</code> + NgModules (Angular). Recognizing which layout a repo uses is one of the four <a href="./frontend-camps-survey.html">camp markers</a>.</li>
+  <li><strong>Monorepo layouts</strong> add one more level: <code>apps/</code> (shippable products) vs. <code>packages/</code> (shared libraries) — the repo-level packaging decision lives in <a href="./version-control-ci-cd-deployment.html">Version Control &amp; CI/CD</a>.</li>
+  <li><strong>The delivery bridge:</strong> each contract milestone (the <a href="./freelance-web-practice.html">freelance doc's</a> modules) should map to a feature folder — a vertical slice that is buildable, testable, and demo-able on its own. If milestones and folders disagree, one of them is lying; usually it's the folder tree.</li>
+</ul>
 
 <h3>Failure surface — what fails independently?</h3>
 

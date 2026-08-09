@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beyond the Browser — React Native, Electron, and the Platform Bridge</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Beyond the Browser — shipping installable software from a JS/React background</p>
+  <h1>Beyond the Browser — React Native, Electron, and the Platform Bridge</h1>
+  <p class="meta">For: the developer who knows web React and wants to know what happens when code leaves the browser — the decision, the bridges, and the platform constraints that don't exist on the web.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> surveys every host JS runs in — server, edge, embedded, mobile — and owns the mobile section's native-landscape tables. This doc is the installable-UI half of that story, told from a React developer's seat: the decision matrix, React Native's architecture, the desktop bridge, and the platform literacy you need to ship. It does NOT teach you Kotlin or Swift — that is a different career, and it is already mapped in the stacks doc's §4.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────────┐
+│   THE BROWSER (where you are)   ← HTML &amp; CSS, JS Language, React   │
+│   URLs · no install · instant deploy · same-origin sandbox         │
+└───────────────────────────────────────────────────────────────────┘
+                              │  "how far from the browser?"
+                              ▼
+┌───────────────────────────────────────────────────────────────────┐
+│   THIS DOC — the installable hosts, from a React dev's seat        │
+│   PWA → Capacitor → React Native → Electron/Tauri → Smart TV →     │
+│   Gaming (mini-games) — each is a BRIDGE between JS and a native   │
+│   platform, and each changes rendering, distribution, and security │
+└───────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────────┐
+│   JAVASCRIPT ACROSS STACKS   ← owns server (§3), embedded (§5),    │
+│   edge (§7), and the native landscape tables (§4) — link, don't    │
+│   duplicate.                                                       │
+└───────────────────────────────────────────────────────────────────┘
+   Web = the sandbox you know. Beyond the browser = the same language
+   with a different bridge, different distribution, different rules.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (the hosts map — this doc's upstream) · <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (React Native sits beside the meta-framework camp) · <a href="./react-2024-and-beyond.html">React 2024 &amp; Beyond</a> (the foundation now owns RN/Expo) · <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> (the Rhythm — the model that transfers) · <a href="./system-design.html">System Design</a> (push, offline sync, deep links as design concerns) · <a href="./glossary.html">Glossary</a></p>
+</blockquote>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read the Definition (the platform-bridge vocabulary — it reframes every section), then the outside-the-browser map to see the whole landscape and what this doc does and doesn't own, then the Decision Matrix. After that, read the sections for the platforms you actually care about — React Native and Electron get the deepest treatment; Smart TV and Gaming are full but compact sections. Cross-links:</p>
+<ul>
+  <li>The hosts survey (server/edge/embedded/mobile overview): <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>.</li>
+  <li>Where React Native sits among web frameworks: <a href="./frontend-camps-survey.html">Frontend Camps Survey</a>.</li>
+  <li>The transferable mental model (Model → View → Flow): <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a>.</li>
+  <li>Push, offline sync, deep links as architecture: <a href="./system-design.html">System Design</a>.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever asked "should this be an app?" or wondered how React Native and Electron actually work under the hood — this is the map.</strong> One spectrum, four bridges, and the constraints every installable platform shares.</p>
+
+<h2>Definition — the platform bridge problem</h2>
+
+<p>The browser is a sandbox with three specific models: a <strong>rendering model</strong> (DOM + CSS), a <strong>security model</strong> (same-origin, sandboxed), and a <strong>distribution model</strong> (URLs, no install). Every platform outside the browser changes at least one of these — and the tool that carries your JavaScript across the boundary is the <strong>bridge</strong>. The whole outside-the-browser world is a spectrum of how far from the browser you go, and what you trade:</p>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Web</th><th>React Native</th><th>Electron</th><th>Native</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Rendering</strong></td><td>DOM + CSS</td><td>Native UI components</td><td>DOM + CSS (Chromium)</td><td>Platform UI toolkit</td></tr>
+    <tr><td><strong>Distribution</strong></td><td>URL, no install</td><td>App Store / Play Store</td><td>Installer / auto-update</td><td>App Store / Play Store</td></tr>
+    <tr><td><strong>Security</strong></td><td>Same-origin, sandboxed</td><td>OS permissions</td><td>Node.js access + Chromium</td><td>OS permissions</td></tr>
+    <tr><td><strong>Update model</strong></td><td>Instant (deploy)</td><td>App-store review (days)</td><td>Instant (auto-update)</td><td>App-store review</td></tr>
+    <tr><td><strong>Offline</strong></td><td>Limited (Service Worker)</td><td>Full (native storage)</td><td>Full (local filesystem)</td><td>Full</td></tr>
+    <tr><td><strong>Hardware access</strong></td><td>Limited (Web APIs)</td><td>Full (native modules)</td><td>Full (Node.js)</td><td>Full</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The core vocabulary:</strong> a <strong>bridge</strong> is the mechanism that lets JS talk to a native platform. React Native bridges JS to native UI components; Electron bridges JS to Chromium plus Node; Capacitor bridges a web app to a native shell. Where the bridge is heavy (serialization, async, version churn), performance and correctness suffer — which is why each ecosystem's history is largely the history of making its bridge thinner.</p>
+
+<h2>The outside-the-browser map — what JavaScript runs on</h2>
+
+<p>JavaScript runs in far more places than phones and desktops. Before building anything, know the full map — and know that most of it is <em>already covered elsewhere on this shelf</em>, so this doc only owns the installable-UI hosts:</p>
+
+<table>
+  <thead><tr><th>Host</th><th>Real-world tech</th><th>Where it lives</th><th>This doc</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Server / backend</strong></td><td>Node.js, Deno, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §3/§3b · <a href="./backend-engineering.html">Backend Engineering</a></td><td>—</td></tr>
+    <tr><td><strong>Edge / serverless / cloud</strong></td><td>Cloudflare Workers, Vercel Edge, Deno Deploy, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §7</td><td>—</td></tr>
+    <tr><td><strong>Embedded / IoT</strong></td><td>Espruino, low.js, Johnny-Five, Moddable</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §5 (RAM-floor table)</td><td>—</td></tr>
+    <tr><td><strong>AI application layer</strong></td><td>Transformers.js, TensorFlow.js, Vercel AI SDK</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §6</td><td>—</td></tr>
+    <tr><td><strong>CLI / dev tools</strong></td><td>Claude Code, git, npm — anything with a <code>bin</code></td><td><a href="./terminal-applications.html">Terminal Applications</a> (the whole doc)</td><td>—</td></tr>
+    <tr><td><strong>Mobile</strong></td><td>React Native (Expo, bare), Capacitor, NativeScript</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §4 (overview)</td><td><strong>Deep dive (§4 here)</strong></td></tr>
+    <tr><td><strong>Desktop</strong></td><td>Electron, Tauri, Neutralino, Wails</td><td>nothing</td><td><strong>Deep dive (§6 here)</strong></td></tr>
+    <tr><td><strong>Smart TV</strong></td><td>Samsung Tizen, LG webOS</td><td>nothing</td><td><strong>Full section (§8 here)</strong></td></tr>
+    <tr><td><strong>Gaming</strong></td><td>Cocos Creator, LayaAir, Egret, WeChat/TikTok mini-games</td><td>nothing</td><td><strong>Full section (§9 here)</strong></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Duplication boundaries:</strong> the native-landscape tables (Kotlin/Compose, Swift/SwiftUI, Flutter) already live in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §4 — this doc links there instead of re-teaching them. The server, edge, embedded, and AI hosts are fully owned by the stacks doc — this doc only summarizes them in the map above. The CLIs host is a whole doc already.</p>
+
+<h2>The decision matrix — when to use what</h2>
+
+<p>Every platform decision reduces to one question: <strong>"Does the user need to INSTALL this, and does it need NATIVE capabilities?"</strong></p>
+
+<table>
+  <thead><tr><th>Your situation</th><th>Best choice</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Content site, marketing, blog, docs</td><td><strong>Web (Next.js/Astro)</strong></td><td>SEO, instant updates, no install friction</td></tr>
+    <tr><td>Internal tool, dashboard, admin panel</td><td><strong>Web (React SPA)</strong></td><td>No distribution needed, fast iteration</td></tr>
+    <tr><td>App that's 90% web content + 10% native features</td><td><strong>PWA or Capacitor</strong></td><td>Web code + native shell for the 10%</td></tr>
+    <tr><td>Consumer app needing native feel (camera, GPS, push, offline)</td><td><strong>React Native</strong></td><td>Native UI + JS developer velocity</td></tr>
+    <tr><td>Desktop app (VS Code, Slack, Discord, Figma)</td><td><strong>Electron</strong> (or Tauri)</td><td>Web UI + filesystem/system access</td></tr>
+    <tr><td>Living-room / 10-foot app, streaming, set-top UX</td><td><strong>Tizen / webOS</strong></td><td>The only way onto ~300M TVs; it's a web app anyway</td></tr>
+    <tr><td>Casual game targeting the biggest app store in China</td><td><strong>Mini-game (Cocos/Laya) or web engine</strong></td><td>DOM-less JS sandbox, instant play, social distribution</td></tr>
+    <tr><td>Performance-critical, platform-specific UX, large team</td><td><strong>Native (Kotlin/Swift)</strong></td><td>Maximum performance, platform fidelity</td></tr>
+    <tr><td>Game, AR/VR, heavy GPU</td><td><strong>Native or Unity/Unreal</strong></td><td>React Native/Electron can't compete</td></tr>
+    <tr><td>Prototype / MVP to validate an idea</td><td><strong>Web or Expo (React Native)</strong></td><td>Fastest path to users</td></tr>
+  </tbody>
+</table>
+
+<p>The four-way short version: <strong>no install, no native → web. Install + native + JS team → React Native. Install + desktop + JS team → Electron/Tauri. Install + maximum fidelity + native team → Kotlin/Swift.</strong> Everything else is a middle-ground variant of one of those.</p>
+
+<h2>React Native — the mobile bridge</h2>
+
+<h3>How your React code becomes a native app</h3>
+
+<p>React Native keeps your React mental model — components, props, state, hooks — but replaces what you render <em>into</em>. Web React renders DOM elements; React Native renders native iOS/Android views. The mechanism connecting the two has been the story of the framework's performance:</p>
+
+<pre>OLD ARCHITECTURE (pre-2022) — the bridge was the bottleneck:
+  JavaScript thread → JSON bridge (async, batched) → Native thread
+  (React)            (serialized messages)            (UIKit/Android views)
+      Every JS↔native call serialized to JSON and batched → frame drops
+      during animations. This was the famous "bridge problem."
+
+NEW ARCHITECTURE (2022+, default since 0.76):
+  JavaScript thread → JSI (JavaScript Interface) → Native thread
+  (React)             (direct C++ references,      (Fabric renderer,
+                       synchronous, no JSON)         TurboModules)
+      JS holds direct references to C++ objects. No serialization.
+      Synchronous calls. The architectural cousin of React's own move
+      from reconciliation to Fiber — remove the serialization layer.
+</pre>
+
+<p>The details you'll hear named: <strong>JSI</strong> (the direct-reference interface replacing the bridge), <strong>Fabric</strong> (the new renderer that commits UI on the native thread), and <strong>TurboModules</strong> (lazily-loaded native modules). For reading code and debugging, know the names; the architecture that matters is "synchronous, no JSON, direct references."</p>
+
+<h3>What transfers from your React knowledge — and what doesn't</h3>
+
+<table>
+  <thead><tr><th>Web React</th><th>React Native</th></tr></thead>
+  <tbody>
+    <tr><td>Renders to DOM (<code>&lt;div&gt;</code>, <code>&lt;span&gt;</code>)</td><td>Renders to native components (<code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, <code>&lt;Image&gt;</code>)</td></tr>
+    <tr><td>CSS for styling</td><td>StyleSheet (flexbox-based, no selectors, no cascade)</td></tr>
+    <tr><td>Browser handles navigation</td><td>You handle it (React Navigation, Expo Router)</td></tr>
+    <tr><td>Browser handles scroll</td><td><code>&lt;ScrollView&gt;</code>, <code>&lt;FlatList&gt;</code>, <code>&lt;SectionList&gt;</code></td></tr>
+    <tr><td><code>onClick</code>, <code>onChange</code></td><td><code>onPress</code>, <code>onLongPress</code>, gesture handlers</td></tr>
+    <tr><td>Service Worker for offline</td><td>AsyncStorage, SQLite, native filesystem</td></tr>
+    <tr><td>URL routing</td><td>Stack/Tab/Drawer navigation (no URLs by default)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>What transfers completely:</strong> components, props, state, hooks (<code>useState</code>, <code>useEffect</code>, <code>useRef</code>), context, reducers, composition, the re-render model, stale closures, dependency arrays. The <a href="./how-developers-think-frontend.html">Model → View → Flow rhythm</a> is identical — the platform around it changed. <strong>What disappears:</strong> DOM APIs (<code>document</code>, <code>window</code>), CSS, browser storage, and the assumption that "the browser renders my HTML." The OS renders native views now.</p>
+
+<h3>Expo vs bare workflow</h3>
+
+<table>
+  <thead><tr><th></th><th>Expo (managed)</th><th>Bare workflow</th></tr></thead>
+  <tbody>
+    <tr><td><strong>What it is</strong></td><td>Managed build service + dev client</td><td>You own the native project (Xcode/Android Studio)</td></tr>
+    <tr><td><strong>Native code access</strong></td><td>Via Expo modules / prebuild</td><td>Direct access to native code</td></tr>
+    <tr><td><strong>Build</strong></td><td>Expo Application Services (cloud)</td><td>Local (Xcode, Gradle)</td></tr>
+    <tr><td><strong>OTA updates</strong></td><td>Expo Updates (instant JS updates)</td><td>Manual or custom solution</td></tr>
+    <tr><td><strong>When to use</strong></td><td>90% of apps. Start here.</td><td>When you need custom native modules not available as Expo modules</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The lazy rule:</strong> start with Expo. Eject to bare only when Expo can't do what you need. Most apps never need to eject.</p>
+
+<h3>Navigation — the biggest web→mobile mental shift</h3>
+
+<pre>Web:    /home → /product/123 → /checkout        (URLs are state)
+Mobile: HomeStack → ProductScreen(id: 123) → CheckoutScreen
+        (the navigation STACK is state; there are no URLs by default)
+</pre>
+
+<ul>
+  <li><strong>Stack navigation</strong> — push/pop screens (a stack of cards).</li>
+  <li><strong>Tab navigation</strong> — bottom tabs, each with its own stack.</li>
+  <li><strong>Drawer navigation</strong> — side menu.</li>
+  <li><strong>Deep linking</strong> — mapping URLs to screens, for push notifications and external links.</li>
+</ul>
+
+<p>Libraries: React Navigation (community standard) and Expo Router (file-based, deliberately Next.js-like — <code>app/(tabs)/index.tsx</code> ↔ <code>app/page.tsx</code>). This is the single biggest re-learning cost for a web React developer, so budget for it.</p>
+
+<h3>Platform-specific code</h3>
+
+<pre>import { Platform } from "react-native";
+
+const shadow = Platform.select({
+  ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 2 } },
+  android: { elevation: 4 },
+});
+
+// button.ios.js      ← loaded on iOS only
+// button.android.js  ← loaded on Android only
+// button.js          ← fallback for everything else
+</pre>
+
+<h3>Native modules — when JS isn't enough</h3>
+
+<p>When you need hardware access (camera, Bluetooth, biometrics, NFC) or platform-specific APIs: <strong>Expo modules</strong> cover ~90% of cases and are maintained by the Expo team; <strong>community modules</strong> (<code>react-native-camera</code>, <code>react-native-maps</code>) cover more; <strong>custom native modules</strong> are where you write Kotlin/Swift and expose it to JS via JSI — the one place you need real native literacy. Everything else stays in TypeScript.</p>
+
+<h2>Android &amp; iOS platform literacy — the minimum to ship and debug</h2>
+
+<p>You don't become an Android developer. You learn what Android and iOS impose on an app, because those constraints shape every RN decision:</p>
+
+<table>
+  <thead><tr><th>Concept</th><th>What it means for your RN app</th></tr></thead>
+  <tbody>
+    <tr><td><strong>APK / AAB</strong></td><td>APK = direct install; AAB = Play Store format. Expo builds these for you.</td></tr>
+    <tr><td><strong>Permissions</strong></td><td>Camera, location, storage, notifications — user grants at runtime. Declared in <code>AndroidManifest.xml</code>, requested via RN APIs.</td></tr>
+    <tr><td><strong>Play Store review</strong></td><td>Usually 1–7 days. Unlike web deploys, you can't push instantly — plan releases.</td></tr>
+    <tr><td><strong>App signing</strong></td><td>You sign with a keystore. Lose the keystore = lose the ability to update. Back it up.</td></tr>
+    <tr><td><strong>Intents</strong></td><td>Android's inter-app communication: deep links, sharing, opening files. RN's <code>Linking</code> API handles most.</td></tr>
+    <tr><td><strong>Activity lifecycle</strong></td><td>Android can kill your app in the background. Don't assume JS is running. Use background tasks / push.</td></tr>
+    <tr><td><strong>Back button</strong></td><td>Android has a system back button. Your navigation must handle it. iOS doesn't have one.</td></tr>
+    <tr><td><strong>Fragmentation</strong></td><td>Thousands of device sizes, Android versions, manufacturers. Test on real devices, not just emulators.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>iOS, briefly:</strong> the IPA package, stricter App Store review (1–3 days, policy rejections; TestFlight gives you a closed-beta channel before that review), Apple's signing system (provisioning profiles &amp; certificates — Expo handles it), stricter background execution (push is the primary reach), the swipe-back gesture instead of a back button, and Apple's Human Interface Guidelines (tab bars at bottom, navigation bars at top). You should also know the build chain Expo abstracts: JS/TS → Metro bundler → native project → Gradle (Android) or Xcode (iOS) → store → review → install. EAS Build (Expo's cloud build) and Fastlane automate the Gradle/Xcode → store half of that chain — the full CI/CD story is <a href="./version-control-ci-cd-deployment.html">Version Control &amp; CI/CD</a> territory.</p>
+
+<p><strong>Accessibility is native, not optional.</strong> Web a11y semantics transfer, but the hooks differ: RN exposes <code>accessibilityLabel</code>, <code>accessibilityRole</code>, and <code>accessibilityState</code> on components, read by VoiceOver (iOS) and TalkBack (Android) — the native equivalents of aria labels and roles. Test on a real device with a screen reader, the same way you'd check the web with NVDA. <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> owns the design-side discipline; on TV, the a11y shape is remote-driven focus, which the Smart TV section covers.</p>
+
+<p><strong>Crash reporting is your other test suite.</strong> Errors on a phone arrive as two kinds: JS exceptions and native crashes. Sentry or Crashlytics catches both — upload the Metro <strong>source maps</strong> so JS errors surface as readable stack traces, and let the tool symbolicate the native crash report (iOS/Android) back to a function-and-line stack. Wire it in before launch; it's the difference between "users reported a bug" and a stack trace in your inbox.</p>
+
+<h2>Electron &amp; Tauri — the desktop bridge</h2>
+
+<h3>Architecture: two processes and a pipe between them</h3>
+
+<p>Electron is the desktop host for exactly one reason: it lets you ship a web app as a native desktop application, reusing all your React/CSS/browser knowledge. It does this by running Chromium (rendering) and Node.js (system access) in one app, split across two processes:</p>
+
+<pre>┌─────────────────────────────────────────────────────────────┐
+│                      Electron App                            │
+│                                                              │
+│  ┌──────────────────┐        IPC          ┌────────────────┐ │
+│  │   MAIN PROCESS   │  (ipcMain/ipcRenderer) │ RENDERER      │ │
+│  │     (Node.js)    │ ◄──────────────────► │   (Chromium)   │ │
+│  │                  │                      │                │ │
+│  │ • filesystem     │                      │ • your React   │ │
+│  │ • OS APIs        │                      │   app (DOM+CSS)│ │
+│  │ • menus / tray   │                      │ • sandboxed by  │ │
+│  │ • notifications  │                      │   default (12+) │ │
+│  └──────────────────┘                      └────────────────┘ │
+│   "owns the OS"         bridge = IPC calls    "owns the UI"    │
+└─────────────────────────────────────────────────────────────┘
+</pre>
+
+<p><strong>What transfers from web React: everything.</strong> Your React app runs in Chromium — DOM, CSS, browser APIs, all present. It's literally a browser tab with extra OS access layered on top. <strong>What's different:</strong> full filesystem access (via the main process), installer distribution (<code>.exe</code>/<code>.dmg</code>/<code>.AppImage</code>), auto-update via electron-updater, system tray + global shortcuts + native notifications, and a security model where <code>nodeIntegration</code> must be kept <em>off</em> in the renderer and OS access goes through IPC.</p>
+
+<h3>The Electron problem: bundle size</h3>
+
+<p>Electron ships Chromium (~150MB) + Node.js (~30MB) with every app. That's why VS Code installs at ~100MB and Slack at ~200MB. The alternatives exist because of this:</p>
+
+<table>
+  <thead><tr><th>Tool</th><th>Approach</th><th>Bundle size</th><th>Trade-off</th></tr></thead>
+  <tbody>
+    <tr><td>Electron</td><td>Chromium + Node.js</td><td>~150MB+</td><td>Full compatibility, huge ecosystem (VS Code, Slack, Discord, Figma)</td></tr>
+    <tr><td>Tauri</td><td>System WebView + Rust backend</td><td>~3–10MB</td><td>Much smaller, but the WebView varies by OS</td></tr>
+    <tr><td>Wails</td><td>System WebView + Go backend</td><td>~5–10MB</td><td>Go backend, smaller than Electron</td></tr>
+    <tr><td>Neutralino</td><td>System WebView + lightweight backend</td><td>~2–5MB</td><td>Even smaller, less mature</td></tr>
+    <tr><td>PWA</td><td>Browser-based, installable</td><td>0 (reuses existing browser)</td><td>Limited OS access</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The decision:</strong> Electron when you need maximum compatibility and ecosystem; Tauri when bundle size matters and you can tolerate WebView inconsistencies. Both give your React app a filesystem and a system tray.</p>
+
+<h2>PWA and Capacitor — the middle ground</h2>
+
+<p><strong>PWA (Progressive Web App)</strong> — your web app made installable, with no app store. Service Worker (offline + push), Web App Manifest (install prompt, icon, splash screen), and web APIs for camera/GPS (limited vs native). <strong>When it wins:</strong> content apps, e-commerce, internal tools — anywhere you want "installable" without store review. <strong>When it loses:</strong> heavy native integration, background processing, store discovery.</p>
+
+<p><strong>Capacitor (Ionic team)</strong> — your web app wrapped in a native shell. WebView renders your React app; native plugins provide camera, push, biometrics, filesystem; one codebase → iOS + Android + Web. <strong>When it wins:</strong> you already have a web app and need a mobile version with some native features (90% web, 10% native). <strong>When it loses:</strong> you need native-feeling UI — WebView rendering doesn't match native animation/gesture smoothness.</p>
+
+<p>The relationship: <strong>PWA gets you "installable" with zero shell; Capacitor gets you the native shell; React Native gets you native UI.</strong> Choose the thinnest bridge that satisfies the decision matrix.</p>
+
+<h2>Smart TV — Tizen &amp; webOS, the hidden ~300M screens</h2>
+
+<p>The biggest outside-the-browser market most developers never think about: every Samsung TV since 2015 runs Tizen, every LG TV runs webOS — together roughly 300M living-room screens — and <strong>both are web-app platforms</strong>. Your app is HTML, CSS, and JavaScript running inside a Chromium-derived engine the TV ships with. A team that can build a web frontend can build the shell of a TV app.</p>
+
+<p>But a TV is a constrained, purpose-built device, and the constraints are what make it its own platform:</p>
+
+<table>
+  <thead><tr><th>Reality</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Fixed Chromium per model year</strong></td><td>The web engine is set at manufacturing time and never upgraded. 2022 TVs ≈ Chromium 94; 2025 ≈ 120; 2026 ≈ 126. A web API shipped in Chrome 110 fails silently on a 2022 TV. Feature-detect, never version-sniff.</td></tr>
+    <tr><td><strong>Native media APIs</strong></td><td>Tizen's AVPlay controls the hardware media pipeline (DRM, subtitles, audio tracks, 4K) beyond the plain <code>&lt;video&gt;</code> element. webOS extends the HTML5 media path.</td></tr>
+    <tr><td><strong>DRM via EME</strong></td><td>PlayReady + Widevine through Encrypted Media Extensions — never Apple's FairPlay (no Apple devices here). DRM client is baked into each TV's firmware; you can't upgrade it in the field.</td></tr>
+    <tr><td><strong>Format reality</strong></td><td>webOS natively supports HLS; DASH is not officially supported. Package once into CMAF and serve both.</td></tr>
+    <tr><td><strong>Per-store certification</strong></td><td>Samsung TV Seller Office and LG's store each certify separately, per model group — launch < 5s, back-key navigation works, no blank screens. Plan multiple fix rounds.</td></tr>
+    <tr><td><strong>10-foot UX</strong></td><td>Remote-driven focus navigation, not pointer. webOS even pushes Enact — a React-based framework tuned for the living room.</td></tr>
+  </tbody>
+</table>
+
+<p>For a React developer: your skills transfer directly (it's a web app in a Chromium shell). The new literacy is the media pipeline (AVPlay/EME), DRM licensing, and the device-fragmentation tax of model years. This is a genuine career lane for streaming apps — and most developers have never heard of it.</p>
+
+<h2>Gaming — the JS lane outside the browser</h2>
+
+<p>Yes, JavaScript escaped into gaming — but the shape of it surprises most developers. The big console lane (Unity C#, Unreal C++) is not JS. The real JS lane has two parts:</p>
+
+<p><strong>1. The mini-game sandbox.</strong> WeChat and TikTok host games that are <em>not</em> web pages: a DOM-less JavaScript environment with a canvas + WebGL (increasingly WebGPU) context, plus the host's APIs for storage, audio, networking, and the social/payment layer. No <code>window</code>, no <code>document</code>. Your first package is capped at ~4MB (assets download separately). Engines compile to this target: Cocos Creator, LayaAir, Egret (TypeScript/JS), with Cocos the default because its engine runtime is pre-installed in the WeChat client and doesn't count against your 4MB. Unity games reach it only via a WebGL→mini-game transform (or Unity China's Tuanjie engine, which treats it as a native target).</p>
+
+<p><strong>2. Browser engines that stay in the browser — but the skills travel.</strong> Phaser, PixiJS, Three.js, Babylon.js run in a browser tab (WebGL/canvas) and are technically still <em>in</em> the browser. They matter here because a Three.js game is structurally close to a mini-game — the gap is the adapter layer and the 4MB budget, not the rendering.</p>
+
+<table>
+  <thead><tr><th>Lane</th><th>Language</th><th>Runs in</th><th>When to choose it</th></tr></thead>
+  <tbody>
+    <tr><td>Mini-game (Cocos/Laya/Egret)</td><td>TypeScript/JS</td><td>WeChat/TikTok sandbox, also native mobile</td><td>Casual games for the largest game storefronts, JS team</td></tr>
+    <tr><td>Web engine (Phaser/Pixi/Three)</td><td>JS</td><td>Browser tab</td><td>Instant-play games from a URL; skills transfer to mini-games</td></tr>
+    <tr><td>Unity / Unreal</td><td>C# / C++</td><td>Everything, via export/WASM</td><td>Performance-heavy, 3D, cross-platform — not a JS lane</td></tr>
+  </tbody>
+</table>
+
+<p><strong>When a React developer touches this:</strong> your component/state/loop discipline transfers to game UI and to the game loop (update → render), but a game is a different architecture than a web app — a persistent render loop instead of a render-per-state-change. Start with a browser engine; it's the least wasted motion, and the mini-game port is an adapter + a budget exercise.</p>
+
+<h2>Constraints that apply to every installable platform</h2>
+
+<p>Everything above — mobile, desktop, TV, games — hits the same walls that simply don't exist on the web. Design against this table:</p>
+
+<table>
+  <thead><tr><th>Constraint</th><th>Web</th><th>Mobile (RN)</th><th>Desktop (Electron)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Distribution</strong></td><td>Instant (deploy)</td><td>App-store review (days)</td><td>Installer / auto-update</td></tr>
+    <tr><td><strong>Update model</strong></td><td>Instant</td><td>App store (or OTA for JS-only changes)</td><td>Instant (auto-update)</td></tr>
+    <tr><td><strong>Offline</strong></td><td>Limited</td><td>Full</td><td>Full</td></tr>
+    <tr><td><strong>Push notifications</strong></td><td>Limited (web push)</td><td>Native push (APNs/FCM)</td><td>OS notifications</td></tr>
+    <tr><td><strong>Deep linking</strong></td><td>URLs</td><td><code>myapp://screen</code> + universal links</td><td><code>myapp://</code> protocol</td></tr>
+    <tr><td><strong>Permissions</strong></td><td>Browser prompts</td><td>OS permission prompts (runtime)</td><td>OS permission prompts</td></tr>
+    <tr><td><strong>Background execution</strong></td><td>Service Worker (limited)</td><td>Restricted by OS</td><td>Full (Node.js)</td></tr>
+    <tr><td><strong>Store policies</strong></td><td>None</td><td>Apple/Google (content, payments, privacy)</td><td>None (usually)</td></tr>
+    <tr><td><strong>Payment</strong></td><td>Any provider</td><td>Apple/Google IAP for digital goods (30% fee)</td><td>Any provider</td></tr>
+  </tbody>
+</table>
+
+<p>These are system-design concerns too — push, offline sync, and deep linking are architecture, not cosmetics, and <a href="./system-design.html">System Design</a> is where they get their full treatment.</p>
+
+<h2>The native landscape — link, don't duplicate</h2>
+
+<p>You need to <em>understand</em> the native platforms your bridges target, but you don't need to learn to build in them. <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §4 already carries the deep comparison tables for each native lane — Kotlin/Jetpack Compose (React Native compiles to native Android views; you write Kotlin only for custom native modules), Swift/SwiftUI (the iOS equivalent), and Dart/Flutter (Google's cross-platform alternative with its own renderer — you choose it for pixel-perfect cross-platform consistency, not native feel). If a native decision comes up, read that section; it is the authority, and this doc deliberately does not repeat it.</p>
+
+<h2>Worked example — a habit tracker, every way</h2>
+
+<pre>The same product, four installable approaches — and one to reject:
+
+1 · Web (PWA):  Next.js + Service Worker + manifest
+   Distribution: URL, installable            Choose for: internal
+   tool, quick validation, no native features needed.
+
+2 · React Native (Expo): Expo + Expo Router + expo-sqlite
+   Distribution: App Store + Play Store      Choose for: consumer
+   app, push, offline, native feel.
+
+3 · Capacitor:   existing React SPA + Capacitor shell
+   Distribution: App Store + Play Store      Choose for: already have
+   a web app, need mobile wrapper + push.
+
+4 · Electron:    React + Electron
+   Distribution: desktop installer           Choose for: desktop
+   tracker with system tray + notifications.
+
+5 · Native (Kotlin/Swift): full native rewrite
+   Rejected here — RN/Expo covers it; native adds cost without a
+   real limitation forcing it.
+
+Expo Router version:
+  habit-tracker/
+  ├── app/                    # file-based navigation (Next.js-style)
+  │   ├── _layout.tsx         # root layout (tab navigation)
+  │   ├── (tabs)/index.tsx    # home: today's habits
+  │   ├── (tabs)/history.tsx  # past completions
+  │   ├── (tabs)/settings.tsx
+  │   └── habit/[id].tsx      # detail screen
+  ├── components/             # HabitCard, StreakBadge, CheckButton
+  ├── store/habits.ts         # state (Zustand)
+  └── db/schema.ts            # expo-sqlite schema
+
+Web concept             →  React Native equivalent
+app/page.tsx            →  app/(tabs)/index.tsx
+&lt;div className="card"&gt; →  &lt;View style={styles.card}&gt;
+onClick                 →  onPress
+localStorage            →  expo-sqlite / AsyncStorage
+CSS display:flex        →  flexDirection:"row" (flexbox is default)
+Browser notification    →  expo-notifications (native push)
+history.pushState       →  router.push("/habit/123")
+</pre>
+
+<h2>Most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Treating RN like web</td><td>Using <code>&lt;div&gt;</code>, CSS selectors, <code>document.querySelector</code></td><td>Learn the native component vocabulary: <code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, <code>&lt;FlatList&gt;</code></td></tr>
+    <tr><td>Ignoring platform differences</td><td>Same UI on iOS/Android, ignoring conventions</td><td><code>Platform.select</code>; follow HIG (iOS) and Material (Android)</td></tr>
+    <tr><td>Not handling the back button</td><td>Android exits the app, losing navigation state</td><td>Configure React Navigation back behavior</td></tr>
+    <tr><td>Assuming JS is always running</td><td>Background tasks fail, timers don't fire</td><td>Native background tasks, push notifications</td></tr>
+    <tr><td>Emulator-only testing</td><td>Works on emulator, breaks on real device</td><td>Test on physical iOS and Android devices</td></tr>
+    <tr><td>Ignoring review times</td><td>Plans "instant deploy," discovers 3-day review</td><td>Plan release cycles; OTA for JS-only changes</td></tr>
+    <tr><td>Electron security misconfiguration</td><td><code>nodeIntegration: true</code> in the renderer</td><td>Keep renderer sandboxed; OS access via IPC</td></tr>
+    <tr><td>Native when RN suffices</td><td>6 months of Kotlin/Swift for an app RN builds in 6 weeks</td><td>Start with RN/Expo; go native only on a real limitation</td></tr>
+    <tr><td>Web when native is needed</td><td>PWA fighting browser limits for camera + push + offline</td><td>Use React Native or Capacitor</td></tr>
+    <tr><td>TV: sniffing the Chromium version</td><td>Fails silently on older model years</td><td>Feature-detect; test on the oldest supported model year</td></tr>
+    <tr><td>Gaming: assuming a browser DOM</td><td>Mini-game crashes — no <code>window</code>/<code>document</code></td><td>Use an engine's official mini-game adapter; respect the 4MB first-package cap</td></tr>
+  </tbody>
+</table>
+
+<h2>Principles</h2>
+
+<table>
+  <thead><tr><th>Principle</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Start with web unless you have a native reason</td><td>Zero install friction, instant updates, SEO</td></tr>
+    <tr><td>Start with Expo unless you have a bare-workflow reason</td><td>Expo handles 90% of native concerns; eject only when needed</td></tr>
+    <tr><td>The browser is not the OS</td><td>Permissions, background limits, app stores — design for them</td></tr>
+    <tr><td>Navigation is not routing</td><td>Mobile uses stacks/tabs/drawers; web uses URLs. Don't force one onto the other</td></tr>
+    <tr><td>Platform conventions matter</td><td>iOS swipe-back, Android back button, desktop tray — users expect them</td></tr>
+    <tr><td>Bundle size is a feature</td><td>Electron's ~150MB is a real cost; consider Tauri</td></tr>
+    <tr><td>The JS mental model transfers</td><td>React, hooks, state, effects — all identical. The platform around them changes</td></tr>
+    <tr><td>Every bridge has a history of thinning</td><td>RN's bridge→JSI, Electron's sandboxing — read the architecture, expect the churn</td></tr>
+  </tbody>
+</table>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Print this. It is the entire doc in ten lines:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>The browser is a sandbox (rendering, security, distribution). Every outside host is a bridge across one of those.</td></tr>
+    <tr><td>2</td><td>Ask: does the user need to INSTALL this, and does it need NATIVE capabilities? No/no → web.</td></tr>
+    <tr><td>3</td><td>Install + native + JS team → React Native (Expo first). Install + desktop + JS team → Electron/Tauri.</td></tr>
+    <tr><td>4</td><td>React transfers completely (components, hooks, the Rhythm). DOM, CSS, and URLs are what change.</td></tr>
+    <tr><td>5</td><td>RN's architecture is the story of the bridge thinning: JSON bridge → JSI/Fabric/TurboModules.</td></tr>
+    <tr><td>6</td><td>Navigation is not routing: stacks/tabs/drawers + deep linking replace URLs.</td></tr>
+    <tr><td>7</td><td>TV (Tizen/webOS) is a web-app platform on ~300M screens — fixed Chromium, AVPlay/EME, per-store certification.</td></tr>
+    <tr><td>8</td><td>Gaming's JS lane is the DOM-less mini-game sandbox + browser engines; the big console lane is not JS.</td></tr>
+    <tr><td>9</td><td>App stores, permissions, offline, push, deep links, and 30% IAP fees apply to every installable platform.</td></tr>
+    <tr><td>10</td><td>The native landscape lives in JavaScript Across Stacks §4 — link there, don't duplicate.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2>Primary sources</h2>
+  <ol>
+    <li>React Native documentation — <a href="https://reactnative.dev/architecture/landing-page">New Architecture</a> — JSI, Fabric, and TurboModules as the bridge replacement, the architecture this doc's §4 rests on.</li>
+    <li>Electron documentation — <a href="https://www.electronjs.org/docs/latest/tutorial/process-model">Process Model</a> — the main/renderer/IPC split and the security rules (sandbox, <code>nodeIntegration</code>).</li>
+    <li>Samsung Developer — <a href="https://developer.samsung.com/smarttv/develop/getting-started/creating-tv-applications.html">Creating TV Applications (Tizen)</a> — TV apps as web apps, fixed per-model-year Chromium, certification.</li>
+    <li>webOS TV Developer — <a href="https://webostv.developer.lge.com/">webOS TV development</a> — web-app model, Enact (React) framework, HLS support, Luna Service API.</li>
+    <li>WeChat Mini Game developer documentation — <a href="https://developers.weixin.qq.com/minigame/dev/guide/game-engine/engine-overview.html">engine adaptation overview</a> — the DOM-less mini-game sandbox, 4MB package rule, Cocos/Laya/Egret adapters.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2>Ask your teacher</h2>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through the React Native New Architecture from a real codebase — where exactly does JSI let JS touch a C++ object, and what breaks if I ignore it?"</li>
+    <li>"I have a Next.js app. Show me the actual steps to wrap it in Capacitor for iOS/Android, and which parts would need to become native modules."</li>
+    <li>"Take the habit-tracker worked example and push it onto Tizen — what changes for the 10-foot remote-driven UX, and what does certification actually check?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Beyond the Browser — React Native, Electron, and the Platform Bridge</span>
+  <span>Upstream: <a href="./javascript-across-stacks.html">JS Across Stacks</a> · Framework: <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> · Runtime: <a href="./react-2024-and-beyond.html">React 2024 &amp; Beyond</a> · Model: <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> · Design: <a href="./system-design.html">System Design</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

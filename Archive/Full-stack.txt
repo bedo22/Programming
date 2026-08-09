@@ -1,0 +1,335 @@
+## Overall verdict
+
+This is a **strong conceptual doc** that fills a genuine gap in the shelf: the space between frontend and backend. The "seam" framing is the right concept, and the full request journey is the right mental model. The "where does this belong" table and the three shapes of data are genuinely useful.
+
+However, the doc is **narrower than it needs to be**. It covers the happy path well but doesn't fully explore what makes the seam unique: versioning, serialization, latency, consistency, error propagation, real-time communication, file uploads, pagination, and the deployment seam. The worked example is good but focused on the happy path. The failure modes are good but miss the seam-specific failures (version mismatch, serialization mismatch, timezone mismatch, CORS misconfiguration, rate limiting, idempotency key reuse).
+
+The doc also lacks the structural sections that other docs on this shelf have: a history section, an explicit mental models table, an underlying theory section, and a proper intersection table.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| The "seam" concept | Strong — the right framing |
+| The full request journey | Strong — the right mental model |
+| "Where does this belong" table | Good — useful decision table |
+| State across the boundary | Good — covers the main state types |
+| Three shapes of data | Good — useful concept |
+| Tracing and testing | Good — covers the main test types |
+| Security seam | Good — covers the main security concerns |
+| Worked example | Good — but happy-path focused |
+| Failure modes | Good — but misses seam-specific failures |
+| History / evolution | Missing |
+| Mental models table | Missing (embedded in principles) |
+| Underlying theory | Missing |
+| Intersection table | Missing (just a diagram) |
+| Versioning seam | Missing |
+| Serialization seam | Missing |
+| Latency seam | Missing |
+| Real-time seam | Missing |
+| File upload seam | Missing |
+| Pagination seam | Missing |
+| Deployment seam | Missing |
+
+### Rough ratings
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 9 / 10 |
+| Conceptual completeness | 7 / 10 |
+| Practical completeness | 6 / 10 |
+| Shelf consistency | 6 / 10 |
+| Duplication control | 8 / 10 |
+
+---
+
+# 1. What the document does well
+
+## 1.1 The "seam" framing is the right concept
+
+The doc correctly identifies that full-stack thinking is not "knowing React AND Node" — it's knowing where the boundary is and what goes on each side. This is the right framing and the right insight.
+
+The diagram showing the frontend docs, the seam, and the backend docs is clear and useful. The "you are here" marker makes it obvious where this doc sits.
+
+## 1.2 The full request journey is the right mental model
+
+The request journey (user clicks → browser → component → network → server → handler → database → response → component → browser → user) is the right mental model. It's the thing that makes full-stack thinking different from either frontend or backend thinking alone.
+
+The key insight is that bugs can live at any point in the journey, and the symptom tells you which layer to suspect. This is the right mental model for debugging full-stack issues.
+
+## 1.3 The "where does this belong" table is genuinely useful
+
+The table covering validation, auth, sorting, computed totals, UI state, domain state, and configuration is genuinely useful. It answers the question "where does this belong?" for the most common cases.
+
+The key insight is that the server is the source of truth for domain state, the client is the source of truth for UI state, and the database is the source of truth for persistence. Everything else is a cache.
+
+## 1.4 The three shapes of data is a useful concept
+
+The three shapes (database rows, API JSON, component state) is a useful concept. It explains why the same data has different shapes at different layers, and why the transformations between them are where bugs hide.
+
+The key insight is that the database normalizes for integrity, the API denormalizes for convenience, and the component flattens for rendering. The transformations between them are where bugs hide.
+
+## 1.5 The worked example is good
+
+The "add to cart" example is good. It walks through the full request journey, the state decisions, the transaction, the cache invalidation, and the response shaping. It's a good example of how to apply the full-stack mental model to a real feature.
+
+---
+
+# 2. What's missing
+
+## 2.1 Missing: History / evolution section
+
+Most docs on this shelf have a history section. This doc jumps straight to definition. The full-stack concept has a history:
+
+| Period | Milestone | What shifted |
+|---|---|---|
+| 1995–2005 | LAMP stack (Linux, Apache, MySQL, PHP) | The first "full-stack" — one language (PHP) for both frontend and backend. The "full-stack developer" role emerges. |
+| 2005–2010 | AJAX + jQuery | Frontend and backend start to separate. The browser becomes a real application platform. |
+| 2010–2015 | SPA era (Angular, Backbone, Ember) | Frontend and backend fully separate. The API becomes the boundary. The "full-stack developer" role declines. |
+| 2015–2020 | React + Node.js | Frontend and backend start to converge again. React on the frontend, Node.js on the backend, JavaScript everywhere. |
+| 2020–present | Next.js + React Server Components | Frontend and backend converge further. React Server Components blur the boundary. The "full-stack developer" role returns. |
+
+The arc: the full-stack concept has gone through three phases: convergence (LAMP), separation (SPA), and reconvergence (Next.js/RSC). Each phase changed what "full-stack" means.
+
+## 2.2 Missing: Mental models table
+
+The doc has mental models embedded in the principles and summary, but it doesn't have an explicit mental models table like other docs on this shelf have.
+
+| Mental model | Core idea | When you reach for it | What it replaces |
+|---|---|---|---|
+| The full request journey | Every feature is a round trip: user → browser → component → network → server → handler → database → response → component → browser → user. Bugs can live at any point. | Debugging full-stack issues; understanding where a bug lives. | Thinking in terms of "frontend bugs" and "backend bugs" separately. |
+| The seam is where bugs hide | Most bugs are at the boundary, not in either side. The seam is where data transforms shape, trust changes, latency is introduced, consistency becomes eventual, errors are lost or transformed, versioning becomes critical. | Debugging full-stack issues; understanding why a bug is hard to find. | Thinking in terms of "the frontend is broken" or "the backend is broken" separately. |
+| The three shapes of data | The same data has three shapes: database rows (normalized), API JSON (denormalized), component state (flattened). The transformations between them are where bugs hide. | Understanding why a bug is hard to find; understanding why a transformation is wrong. | Thinking in terms of "the data is wrong" without understanding which shape is wrong. |
+| The seam is where trust changes | The client is untrusted; the server is trusted. The seam is where trust changes. Every crossing of the boundary needs validation. | Understanding why validation is needed at every layer; understanding why the client can't be trusted. | Thinking in terms of "the client is trusted" or "the server is trusted" without understanding the boundary. |
+| The seam is where latency lives | Network latency is a seam concern. The seam is where latency is introduced. Every crossing of the boundary adds latency. | Understanding why a feature is slow; understanding why a feature is fast. | Thinking in terms of "the frontend is slow" or "the backend is slow" separately. |
+| The seam is where consistency becomes eventual | Eventual consistency is a seam concern. The seam is where consistency becomes eventual. Every crossing of the boundary introduces eventual consistency. | Understanding why a feature is inconsistent; understanding why a feature is consistent. | Thinking in terms of "the data is consistent" or "the data is inconsistent" without understanding the boundary. |
+| The seam is where errors are lost | Errors can be lost or transformed at the boundary. The seam is where errors are lost or transformed. Every crossing of the boundary can lose or transform an error. | Understanding why an error is hard to find; understanding why an error is easy to find. | Thinking in terms of "the error is in the frontend" or "the error is in the backend" separately. |
+| The seam is where versioning matters | API versioning is a seam concern. The seam is where versioning matters. Every crossing of the boundary introduces versioning. | Understanding why a feature is broken; understanding why a feature is not broken. | Thinking in terms of "the API is broken" or "the API is not broken" without understanding the boundary. |
+
+## 2.3 Missing: Underlying theory section
+
+Most docs on this shelf have an underlying theory section. This doc doesn't have one. The full-stack concept rests on a handful of proven results:
+
+| Theory | Origin | What it forces in full-stack thinking |
+|---|---|---|
+| Client-server model | 1960s–70s | The client and server are separate processes. The boundary is the network. Every crossing of the boundary is a network call. |
+| Three-tier architecture | 1990s | The presentation tier, the business logic tier, and the data tier are separate. The boundaries are the API and the database. |
+| REST | Roy Fielding, 2000 | The API is a set of resources, operations, and representations. The boundary is the URL, the HTTP verb, and the response format. |
+| CAP theorem | Eric Brewer, 2000 | In a network partition, you must choose consistency or availability. The seam is where you make this choice. |
+| Eventual consistency | Werner Vogels, 2008 | In a distributed system, consistency is eventual. The seam is where consistency becomes eventual. |
+| Idempotency | HTTP spec | Every mutating request carries a client-generated key. The server deduplicates. The seam is where idempotency matters. |
+| Optimistic concurrency control | 1970s | Every write carries a version number. The server checks the version before writing. The seam is where optimistic concurrency control matters. |
+| Circuit breaker | Michael Nygard, 2007 | Every external call has a budget. The seam is where the circuit breaker matters. |
+
+## 2.4 Missing: Intersection table
+
+The doc has a "Where this fits" section but it's just a diagram, not a proper intersection table like other docs on this shelf have.
+
+| Practice | Shared DNA | Where they diverge |
+|---|---|---|
+| Frontend (The Rhythm) | Component shape, state management, data fetching, rendering, performance | The Rhythm builds the component; full-stack thinking decides where the component's data comes from and where it goes. |
+| Backend Engineering | Request lifecycle, middleware, auth, caching, transactions, state management | Backend Engineering builds the server; full-stack thinking decides where the server's data comes from and where it goes. |
+| API Design | Service boundaries, data ownership, consistency, failure domains | API Design decides the contract; full-stack thinking decides what goes on each side of the contract. |
+| System Design | Service boundaries, data ownership, consistency, failure domains | System Design decides the architecture; full-stack thinking decides what goes on each side of the architecture. |
+| Database Internals | Schema evolution, migrations, consistency, indexing | Database Internals decides the schema; full-stack thinking decides what goes on each side of the schema. |
+| UI/UX & Web Design | State visibility, error affordances, loading skeletons, progressive enhancement | UI/UX decides what the human sees; full-stack thinking decides what the machine exchanges. |
+| Version Control, CI/CD & Deployment | Pipelines, artifact types, release strategies, supply-chain integrity | CI/CD decides how to deploy; full-stack thinking decides what to deploy. |
+
+## 2.5 Missing: Versioning seam
+
+The doc doesn't cover the versioning seam. The versioning seam is where API versioning matters. Every crossing of the boundary introduces versioning.
+
+| Versioning strategy | What it does | When to use it |
+|---|---|---|
+| URL versioning | `/v1/users`, `/v2/users` | Public APIs with many consumers |
+| Header versioning | `Accept: application/vnd.api.v2+json` | Internal APIs with few consumers |
+| Query parameter versioning | `/users?version=2` | Legacy APIs |
+| Media type versioning | `Content-Type: application/vnd.api.v2+json` | REST APIs |
+| GraphQL schema versioning | Schema evolution rules | GraphQL APIs |
+
+The key insight: versioning is a seam concern. Every crossing of the boundary introduces versioning. The seam is where versioning matters.
+
+## 2.6 Missing: Serialization seam
+
+The doc doesn't cover the serialization seam. The serialization seam is where data transforms shape. Every crossing of the boundary transforms data.
+
+| Serialization format | What it does | When to use it |
+|---|---|---|
+| JSON | Human-readable, widely supported | Public APIs, web APIs |
+| Protobuf | Binary, compact, fast | Internal APIs, gRPC |
+| GraphQL | Query language, single endpoint | Complex queries, many clients |
+| MessagePack | Binary, compact, fast | Internal APIs, high throughput |
+| Avro | Binary, schema evolution | Data pipelines, Kafka |
+
+The key insight: serialization is a seam concern. Every crossing of the boundary transforms data. The seam is where serialization matters.
+
+## 2.7 Missing: Latency seam
+
+The doc doesn't cover the latency seam. The latency seam is where latency is introduced. Every crossing of the boundary introduces latency.
+
+| Latency source | What it does | How to reduce it |
+|---|---|---|
+| Network latency | Time for a request to travel from client to server | CDN, edge computing, connection pooling |
+| Server processing time | Time for the server to process a request | Caching, query optimization, connection pooling |
+| Database query time | Time for the database to execute a query | Indexes, query optimization, connection pooling |
+| Serialization time | Time to serialize/deserialize data | Binary formats, connection pooling |
+| Client rendering time | Time for the client to render the response | Code splitting, lazy loading, virtualization |
+
+The key insight: latency is a seam concern. Every crossing of the boundary introduces latency. The seam is where latency matters.
+
+## 2.8 Missing: Real-time seam
+
+The doc doesn't cover the real-time seam. The real-time seam is where real-time communication matters. Every crossing of the boundary can be real-time.
+
+| Real-time technology | What it does | When to use it |
+|---|---|---|
+| WebSockets | Bidirectional, persistent connection | Chat, real-time updates, collaborative editing |
+| Server-Sent Events (SSE) | Server-to-client, persistent connection | Notifications, real-time updates |
+| Polling | Client-to-server, periodic requests | Simple real-time updates, low frequency |
+| Long polling | Client-to-server, persistent request | Real-time updates, low frequency |
+| GraphQL subscriptions | GraphQL queries, persistent connection | Complex queries, real-time updates |
+
+The key insight: real-time is a seam concern. Every crossing of the boundary can be real-time. The seam is where real-time matters.
+
+## 2.9 Missing: File upload seam
+
+The doc doesn't cover the file upload seam. The file upload seam is where file uploads matter. Every crossing of the boundary can involve file uploads.
+
+| File upload strategy | What it does | When to use it |
+|---|---|---|
+| Multipart form data | Client sends file as part of a form | Small files, simple uploads |
+| Presigned URLs | Client uploads directly to storage | Large files, direct uploads |
+| Streaming | Client streams file to server | Large files, streaming uploads |
+| Chunked uploads | Client sends file in chunks | Large files, resumable uploads |
+
+The key insight: file uploads are a seam concern. Every crossing of the boundary can involve file uploads. The seam is where file uploads matter.
+
+## 2.10 Missing: Pagination seam
+
+The doc doesn't cover the pagination seam. The pagination seam is where pagination matters. Every crossing of the boundary can involve pagination.
+
+| Pagination strategy | What it does | When to use it |
+|---|---|---|
+| Offset pagination | `?offset=0&limit=10` | Simple pagination, small datasets |
+| Cursor pagination | `?cursor=abc123&limit=10` | Large datasets, stable ordering |
+| Keyset pagination | `?after_id=123&limit=10` | Large datasets, stable ordering |
+| Infinite scroll | Client loads more as user scrolls | Large datasets, continuous loading |
+| Load more button | Client loads more on button click | Large datasets, discrete loading |
+
+The key insight: pagination is a seam concern. Every crossing of the boundary can involve pagination. The seam is where pagination matters.
+
+## 2.11 Missing: Deployment seam
+
+The doc doesn't cover the deployment seam. The deployment seam is where deployment matters. Every crossing of the boundary can involve deployment.
+
+| Deployment strategy | What it does | When to use it |
+|---|---|---|
+| Monolith deployment | Deploy frontend and backend together | Small teams, simple deployments |
+| Separate deployments | Deploy frontend and backend separately | Large teams, complex deployments |
+| Blue-green deployment | Deploy new version alongside old version | Zero-downtime deployments |
+| Canary deployment | Deploy new version to a small percentage of users | Gradual rollouts |
+| Feature flags | Deploy code but hide it behind a flag | Gradual rollouts, A/B testing |
+
+The key insight: deployment is a seam concern. Every crossing of the boundary can involve deployment. The seam is where deployment matters.
+
+---
+
+# 3. Seam-specific failure modes
+
+The doc has good failure modes but misses the seam-specific failures:
+
+| Failure | What it looks like | Fix |
+|---|---|---|
+| Version mismatch | Frontend expects v2 API, backend serves v1 | Version the API; use API gateway for routing |
+| Serialization mismatch | Frontend expects snake_case, backend sends camelCase | Standardize serialization format; use code generation |
+| Timezone mismatch | Frontend sends UTC, backend expects local | Standardize timezone; use UTC everywhere |
+| Currency mismatch | Frontend sends USD, backend expects cents | Standardize currency format; use minor units |
+| Pagination mismatch | Frontend expects cursor, backend expects offset | Standardize pagination format; use API gateway |
+| Auth token expiry | Frontend doesn't refresh token | Implement token refresh; use refresh tokens |
+| CORS misconfiguration | Frontend can't reach backend | Configure CORS correctly; use API gateway |
+| Rate limiting | Frontend doesn't handle 429 | Implement rate limiting; use API gateway |
+| Idempotency key reuse | Frontend reuses key for different operations | Use unique idempotency keys per operation |
+| Optimistic update failure | Frontend shows success, backend fails | Implement rollback; use optimistic updates carefully |
+| Cache invalidation failure | Frontend shows stale data | Implement cache invalidation; use cache tags |
+| Transaction failure | Frontend shows success, backend fails | Implement rollback; use transactions carefully |
+| Middleware misorder | Frontend sends request, backend doesn't process it | Order middleware correctly; use API gateway |
+| Endpoint leaks internals | Frontend sees database schema | Shape response at boundary; use DTOs |
+| Queue job failure | Frontend shows success, backend fails | Implement retry; use idempotency keys |
+
+---
+
+# 4. Summary — the complete mental checklist
+
+Before you write your next endpoint, run this. If you can answer each row, you're ready to code; if not, sketch until you can.
+
+| Question | If you can't answer… |
+|---|---|
+| What does this request take in, and what shape must the response be? | Write the envelope first — that's Round 1 (Skeleton) |
+| What is the source of truth — which database rows? | Trace every value in the handler; anything that survives goes to a row |
+| Which of those values must survive two requests? | If it must → DB/token, not a variable |
+| Who may do this — authn done, authz per record? | Authn once in middleware; ownership checked per request |
+| Does this write more than one row that must move or not together? | Wrap it in a transaction |
+| Is any repeated read being slow? | Cache with an invalidation story — cache-aside |
+| Is any work the client doesn't watch finish still inline? | Queue it; make it retryable and idempotent |
+| Does the wire shape leak the entity or the schema? | Shape it at the boundary |
+| Is the API version compatible with the frontend version? | Version the API; use API gateway for routing |
+| Is the serialization format consistent? | Standardize serialization format; use code generation |
+| Is the timezone consistent? | Standardize timezone; use UTC everywhere |
+| Is the currency consistent? | Standardize currency format; use minor units |
+| Is the pagination format consistent? | Standardize pagination format; use API gateway |
+| Is the auth token refreshed before expiry? | Implement token refresh; use refresh tokens |
+| Is CORS configured correctly? | Configure CORS correctly; use API gateway |
+| Is rate limiting handled? | Implement rate limiting; use API gateway |
+| Is the idempotency key unique per operation? | Use unique idempotency keys per operation |
+
+---
+
+# 5. Priority roadmap
+
+## Must add
+
+1. History / evolution section
+2. Mental models table
+3. Underlying theory section
+4. Intersection table
+5. Versioning seam
+6. Serialization seam
+7. Latency seam
+8. Real-time seam
+9. File upload seam
+10. Pagination seam
+11. Deployment seam
+12. Seam-specific failure modes
+
+## Should add
+
+13. More detailed "where does this belong" table
+14. More detailed state sync mechanisms
+15. More detailed three shapes of data
+16. More detailed testing across the boundary
+17. More detailed security seam
+18. More detailed worked example (failure scenario, consistency scenario, versioning scenario)
+19. More detailed failure modes (version mismatch, serialization mismatch, timezone mismatch, currency mismatch, pagination mismatch, auth token expiry, CORS misconfiguration, rate limiting, idempotency key reuse)
+
+## Optional enrichment
+
+20. More detailed principles
+21. More detailed summary checklist
+22. More detailed primary sources
+23. More detailed "Ask your teacher" questions
+
+---
+
+# 6. Final recommendation
+
+This is a **strong conceptual doc** that fills a genuine gap in the shelf. The "seam" framing is the right concept, and the full request journey is the right mental model. The "where does this belong" table and the three shapes of data are genuinely useful.
+
+However, the doc is **narrower than it needs to be**. It covers the happy path well but doesn't fully explore what makes the seam unique: versioning, serialization, latency, consistency, error propagation, real-time communication, file uploads, pagination, and the deployment seam. The worked example is good but focused on the happy path. The failure modes are good but miss the seam-specific failures.
+
+The highest-leverage improvements are:
+
+> History / evolution section, mental models table, underlying theory section, intersection table, versioning seam, serialization seam, latency seam, real-time seam, file upload seam, pagination seam, deployment seam, and seam-specific failure modes.
+
+The doc's greatest strength is the "seam" concept and the full request journey. The doc's greatest weakness is that it doesn't fully explore what makes the seam unique. The seam is where bugs hide, where versioning matters, where latency lives, where consistency becomes eventual, where errors are lost, where trust changes, where serialization transforms data, where real-time communication matters, where file uploads matter, where pagination matters, and where deployment matters.
+
+The doc's greatest opportunity is to become the definitive guide to full-stack thinking. The seam is the most important concept in full-stack development, and this doc is the right place to explore it fully.

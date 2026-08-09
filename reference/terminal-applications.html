@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building CLIs & Terminal Applications</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Building CLIs — the terminal as a development platform</p>
+  <h1>Building CLIs &amp; Terminal Applications</h1>
+  <p class="meta">For: the developer who uses the terminal daily and wants to build <em>for</em> it — argument parsers, interactive prompts, spinners, and the AI-agent CLIs that are remaking the form.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> doc teaches you to <em>use</em> the terminal — navigate, pipe, SSH, debug. This doc teaches you to <em>build for</em> it. The difference is a platform boundary: no DOM, no browser APIs, TTY instead of pixels, streams instead of events. You know how to use the terminal and how to build web servers with Node; this is the missing middle — Node in a terminal process.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│   TERMINAL &amp; DEPLOYMENT SUBSTRATE   ← you USE the terminal    │
+│   (shell, pipes, SSH, docker, deployment literacy)            │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│   BUILDING CLIs (THIS DOC)        ← you BUILD for the terminal│
+│   entry → args → routing → streams → TTY → prompts → output   │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│   BACKEND ENGINEERING   ← you build SERVERS (Node, HTTP)      │
+│   JAVASCRIPT ACROSS STACKS   ← Node is one stack JS runs in   │
+└───────────────────────────────────────────────────────────────┘
+   Terminal = use it. CLI = build for it. Server = build the
+   network side. Three platforms, one runtime, distinct rules.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> (using the terminal — this doc's upstream) · <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (Node as one JS stack) · <a href="./backend-engineering.html">Backend Engineering</a> (servers — the sibling platform) · <a href="./open-source.html">Open Source</a> (how CLI projects get contributions — this doc feeds the CLI contribution case) · <a href="./glossary.html">Glossary</a></p>
+</blockquote>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read the Definition (what a CLI is and isn't — the vocabulary matters), then the Architecture section to see the shape every CLI shares, then the Terminal I/O section for the platform mechanics. The AI-agent CLIs section is the payoff if you use those tools daily. When a real CLI is in front of you, the Reading a CLI Codebase section is the map. Cross-links:</p>
+<ul>
+  <li>Using the terminal (the prerequisite): <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a>.</li>
+  <li>The runtime (Node, streams, event loop): <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §3b — how JS actually behaves on a server/CLI.</li>
+  <li>Servers (the sibling platform): <a href="./backend-engineering.html">Backend Engineering</a>.</li>
+  <li>Contributing to a CLI once you can read one: <a href="./open-source.html">Open Source</a>.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever wanted to build a tool to automate your own workflow — or wondered how Claude Code and Codex actually work — this is the map.</strong> One architecture, one platform model, and the specific mechanics of interactive and AI-agent forms.</p>
+
+<h2>Definition — what a CLI is, and what it is not</h2>
+
+<p>A <strong>command-line application</strong> is a program whose interface is the terminal: it reads arguments and standard input, writes to standard output and error, and exits with a status code. The family has a vocabulary worth getting exactly right:</p>
+
+<table>
+  <thead><tr><th>Term</th><th>What it is</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>CLI</strong></td><td>A program driven by arguments, flags, and stdin; runs a command and exits</td><td><code>git status</code>, <code>npm install</code></td></tr>
+    <tr><td><strong>TUI</strong></td><td>A full-screen interactive UI drawn in the terminal (keys, panels, redraws)</td><td><code>htop</code>, <code>lazygit</code></td></tr>
+    <tr><td><strong>REPL</strong></td><td>Read–Eval–Print Loop: a persistent interactive session</td><td><code>node</code> alone, a database shell, an agent CLI</td></tr>
+    <tr><td><strong>GUI</strong></td><td>Pixels and windows — the terminal is just a host</td><td>VS Code, any desktop app</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The terminal as a platform:</strong> a terminal process has three pipes (<code>stdin</code>, <code>stdout</code>, <code>stderr</code>), an environment, arguments, and a return code. When it's attached to a terminal, it also has a <strong>TTY</strong> — the device that delivers your keystrokes and understands escape codes for colors and cursor movement. Everything interactive in a terminal is a conversation with that TTY.</p>
+
+<p><strong>Why TypeScript/Node dominates modern CLIs:</strong> Node ships with <code>process.argv</code>, <code>process.stdin/stdout/stderr</code>, and the stream model built in; the npm ecosystem provides every convenience layer; and the tooling (tsup, esbuild) compiles to a single distributable file. The dominant AI-agent CLIs — Claude Code, Codex, Aider, Continue — are all built this way, which is why this doc is Node-centric.</p>
+
+<h2>History — from batch commands to agent loops</h2>
+
+<p>The CLI is older than the GUI and outlived it. Unix (1970s) established the shape — small tools, pipes, plain text — and the "do one thing well" philosophy that still governs CLI design. The GUI era pushed terminals to the margins, but developers kept them as the power tool. Two modern revolutions re-made the form: the <em>Node.js CLI ecosystem</em> (arg parsers, prompts, Ink) made building polished CLIs cheap, and the <em>AI-agent CLI</em> (2023–) turned the terminal into the interface for delegating work — a REPL that calls tools, streams tokens, and asks permission. The CLI didn't die; it became the platform for the newest kind of software.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+  <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a></td><td>Shell usage, pipes, processes, SSH, docker</td><td>There: <em>operating</em> the terminal. Here: <em>programming</em> for it. The substrate doc names the user-visible commands; this doc names the program that implements them.</td></tr>
+    <tr><td><a href="./javascript-across-stacks.html">JavaScript Across Stacks</a></td><td>Node as a stack — the event loop, streams, the runtime</td><td>There: <em>how the runtime behaves</em>. Here: <em>what you build with it</em> — the CLI shape on top of that runtime.</td></tr>
+    <tr><td><a href="./backend-engineering.html">Backend Engineering</a></td><td>HTTP servers, request lifecycle, background jobs</td><td>There: <em>servers</em>. Here: <em>terminal apps</em>. Same runtime, opposite interface — no request/response, no ports, a process that starts and exits.</td></tr>
+    <tr><td><a href="./open-source.html">Open Source</a></td><td>Licenses, contributing, the contributor journey</td><td>There: <em>participating in</em> any codebase. Here: <em>reading and building</em> the CLI kind. This doc is the technical lens; that doc is the social one.</td></tr>
+  </tbody>
+</table>
+
+<h2>Underlying theory — the three-pipe model</h2>
+
+<p>Every CLI is a transformation on three streams, and almost every design decision follows from that:</p>
+
+<ul>
+  <li><strong><code>stdin</code> is the input channel.</strong> Arguments and flags come from the command line; data can also be piped in. A well-built CLI reads data from either — "works with a file or a pipe" is a design property, not an accident.</li>
+  <li><strong><code>stdout</code> is the data channel.</strong> It is for <em>programmable output</em> — what another tool will consume. If a machine may parse it, keep it clean: plain text or JSON, no progress noise, no colors when piped.</li>
+  <li><strong><code>stderr</code> is the human channel.</strong> Errors, warnings, logs, progress. It is separate so that piping stdout stays clean — this is why "logs go to stderr" is a rule, not a style choice.</li>
+  <li><strong>The exit code is the contract.</strong> <code>0</code> means success; a non-zero code is the machine-readable error signal, the CLI's way of returning a boolean to its caller.</li>
+</ul>
+
+<p>The discipline follows directly: <strong>decide what's data (stdout) and what's narrative (stderr) before you write a line</strong>, and the CLI stays composable with everything else on the terminal.</p>
+
+<h2>Mental models — frames for thinking about terminal apps</h2>
+
+<table>
+  <thead><tr><th>Frame</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>"Three pipes, one exit code"</td><td>Every CLI is a stream transformation; the design follows from which stream carries what</td></tr>
+    <tr><td>"Programs compose"</td><td>Your CLI is a component in someone else's pipeline — never pollute stdout</td></tr>
+    <tr><td>"TTY or not"</td><td>Interactive features (colors, spinners, prompts) only exist when a TTY is present; detect it, don't assume it</td></tr>
+    <tr><td>"The terminal is a conversation"</td><td>TUIs and REPLs don't print a page — they draw, respond, and redraw</td></tr>
+    <tr><td>"Config is a ladder"</td><td>Flags override env vars override config files override defaults — each rung for a different audience</td></tr>
+    <tr><td>"Agent CLIs are REPLs with tools"</td><td>The newest form is a read–tool-call–stream loop; everything else in this doc still applies</td></tr>
+  </tbody>
+</table>
+
+<h2>Architecture — the shape every CLI shares</h2>
+
+<p>From a tiny script to Claude Code, the same skeleton appears:</p>
+
+<ol>
+  <li><strong>Entry point.</strong> A shebang line (<code>#!/usr/bin/env node</code>) plus a <code>bin</code> field in <code>package.json</code> maps a command name to a JS file. That file's only job is to call the router.</li>
+  <li><strong>Argument parsing.</strong> Commander, Yargs, oclif, or clipanion turn <code>process.argv</code> into structured options. This handles flags (<code>--format json</code>), positionals, and <code>--help</code> for free.</li>
+  <li><strong>Command routing.</strong> The parser dispatches to a subcommand handler — <code>git add</code> and <code>git commit</code> are different routes, not one program. Each handler receives the parsed options.</li>
+  <li><strong>Configuration.</strong> The config ladder: flags → env vars → config file → defaults. Read only as much as the command needs.</li>
+  <li><strong>Execution and output.</strong> The handler does its work, writes data to stdout, narrative to stderr, and returns an exit code. Errors are caught at the top level so the process exits cleanly with a non-zero code.</li>
+</ol>
+
+<pre>#!/usr/bin/env node
+// package.json "bin": { "todo": "./bin/todo.js" }
+import { Command } from "commander";
+const program = new Command();
+program
+  .name("todo")
+  .description("A tiny task list")
+  .argument("&lt;action&gt;", "add | list | done | delete")
+  .option("--json", "machine-readable output")
+  .action(async (action, opts) =&gt; {
+    try {
+      const result = await handle(action, opts);   // route
+      process.stdout.write(format(result, opts));  // data → stdout
+    } catch (err) {
+      process.stderr.write(String(err));           // narrative → stderr
+      process.exit(1);                              // failure code
+    }
+  });
+program.parse();
+</pre>
+
+<p><strong>Exit codes are a small vocabulary, not a boolean.</strong> You control <code>0</code> and <code>1</code>; the shell controls a few more your CLI can inherit or set:</p>
+
+<table>
+  <thead><tr><th>Code</th><th>Meaning</th><th>Who sets it</th></tr></thead>
+  <tbody>
+    <tr><td><code>0</code></td><td>Success</td><td>Your CLI, deliberately</td></tr>
+    <tr><td><code>1</code></td><td>General error</td><td>Your CLI — the default for "something failed"</td></tr>
+    <tr><td><code>2</code></td><td>Usage error (bad arguments)</td><td>Your arg parser (Commander does this)</td></tr>
+    <tr><td><code>126</code> / <code>127</code></td><td>Not executable / command not found</td><td>The shell, for subprocess spawns</td></tr>
+    <tr><td><code>128 + N</code></td><td>Killed by signal N</td><td>The OS, when a signal terminates the process</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Error messages follow the same pipe discipline as output:</strong> one line to <code>stderr</code> naming the failure and a "what to do next" hint ("<code>Error: no such file — run "todo add" first</code>"). Never write errors to <code>stdout</code>, and keep the one-liner stable — a script that checks "did it fail?" greps the exit code, but a human who hits an error wants the next action, not a stack trace.</p>
+
+<p>The pattern — entry → parse → route → config → act → output → exit — is the same for a one-file tool and a large CLI. Reading a real CLI means tracing this spine.</p>
+
+<h2>Terminal I/O — the mechanics of the platform</h2>
+
+<table>
+  <thead><tr><th>Topic</th><th>The mechanics</th><th>What it enables</th></tr></thead>
+  <tbody>
+    <tr><td>Streams</td><td><code>process.stdin/stdout/stderr</code> are Node streams; pipe with <code>.pipe()</code> or async iteration</td><td>Reading piped data, streaming output without buffering</td></tr>
+    <tr><td>TTY detection</td><td><code>process.stdout.isTTY</code> is true only when attached to a terminal</td><td>Show colors/spinners only interactively; emit plain output when piped</td></tr>
+    <tr><td>ANSI escape codes</td><td>Sequences like <code>\x1b[32m</code> (green), <code>\x1b[2K</code> (clear line)</td><td>Colors and cursor movement; libraries (chalk, picocolors) abstract them</td></tr>
+    <tr><td>Interactive prompts</td><td>Inquirer, prompts, @clack/prompts read keystrokes from the TTY and render a question UI</td><td>Guided flows — choose an option, confirm, multi-select</td></tr>
+    <tr><td>Spinners &amp; progress</td><td>ora, cli-progress animate frames on the same line</td><td>Long-running tasks report aliveness without flooding stdout</td></tr>
+    <tr><td>Ink</td><td>React for the terminal — components render to a TUI frame-by-frame</td><td>Full TUIs with the React model: state, reconciliation, key handling</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The one rule that ties them together:</strong> every interactive effect (color, spinner, prompt, TUI) works through the TTY and must be skipped or downgraded when <code>isTTY</code> is false. A CLI that hard-codes colors breaks pipelines and logs. The libraries above all handle this — which is why you use them instead of writing escape codes by hand.</p>
+
+<p><strong>Signals — the OS's way of interrupting you.</strong> Three matter for CLI authors: <code>SIGINT</code> (Ctrl+C — the user wants to stop), <code>SIGTERM</code> (kill/shutdown — the system wants to stop), and <code>SIGPIPE</code> (the reader of your output closed the pipe — downstream died, so stop writing). The first two are the graceful-shutdown hook: flush buffers, close files/connections, save state, then exit. The third is the one that silently kills naive tools — a CLI writing to a closed pipe gets a broken-pipe signal, and the professional behavior is to stop cleanly rather than crash noisily.</p>
+
+<pre>process.on("SIGINT", () =&gt; {
+  process.stderr.write("\nInterrupted — saving state...\n");
+  saveState();                 // flush, close, persist
+  process.exit(0);             // deliberate, not a crash
+});</pre>
+
+<p><strong>Shell integration — what your CLI owes its host.</strong> Two conventions separate a tool from a citizen: <em>completions</em> (let the shell suggest your flags and subcommands — Commander and oclif generate the completion script for bash/zsh/fish, so shipping <code>todo completion</code> costs nothing) and <em>pipe-friendly defaults</em> (when stdout isn't a TTY, output plain/JSON, not colored prose — the isTTY gate already covers this). The user-side half — tab completion, history, aliases — lives in <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a>; your job is the generation side.</p>
+
+<p><strong>The CLI-specific security surface.</strong> A CLI is only as safe as the way it spawns and stores: prefer <code>execFile</code>/<code>spawn</code> with an argument array over <code>exec</code> with string concatenation (never build a shell command from user input); never log env vars or secrets; and give config files that hold secrets <code>chmod 600</code> (read/write owner-only). The full threat model — what an attacker can actually reach through your tool — is <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>; these three habits are the CLI-shaped slice of it.</p>
+<h2>How AI-agent CLIs work — the REPL-with-tools form</h2>
+
+<p>Claude Code, Codex, Aider, and Continue share an architecture that extends the classic CLI shape with an agent loop. Every AI CLI is, underneath, a REPL where the "eval" step can call tools:</p>
+
+<pre>LOOP:
+  read   → get the user's next instruction (typed or streamed)
+  plan   → the model decides what to do, possibly calling tools
+  tool   → execute a tool call (read file, run command, edit code)
+  stream → stream the model's response tokens to the TTY
+  permit → ask the user before destructive or expensive actions
+  repeat → persist history, then loop
+</pre>
+
+<p>The five subsystems worth understanding (each is a place you could contribute):</p>
+
+<table>
+  <thead><tr><th>Subsystem</th><th>What it does</th><th>Where the complexity lives</th></tr></thead>
+  <tbody>
+    <tr><td>Tool calling</td><td>Structured function calls the model can request — the CLI's extension seam</td><td>Schema design, argument validation, error returns the model can understand</td></tr>
+    <tr><td>Permission system</td><td>Allow/deny/ask per tool call — the safety boundary</td><td>Policy defaults, allow-lists, and the "always ask" set</td></tr>
+    <tr><td>Streaming</td><td>Token-by-token rendering of the response to the TTY</td><td>SSE/stream plumbing, backpressure, cancellation</td></tr>
+    <tr><td>Context management</td><td>What the model can see — files read, codebase index, conversation history</td><td>Truncation, relevance, and cost control</td></tr>
+    <tr><td>Session persistence</td><td>History across runs — resume a conversation</td><td>Serialization, versioning of context format</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The permission boundary is the security surface.</strong> Everything a human wouldn't do blindly — delete files, install packages, run arbitrary commands, spend money — an agent must ask about. This is the most important architecture decision in the whole form, and the one most worth reading carefully in a real codebase. The implementation is a simple ladder: tools classified by risk, with the boundary drawn between "auto-allow" and "always ask."</p>
+
+<pre>// tool permission levels — where the ask/no-ask line is drawn
+const LEVELS = {
+  safe:    ["read_file", "list_files", "search"],     // auto-allow
+  write:   ["write_file", "create_file"],             // allow or confirm
+  risky:   ["delete_file", "run_command", "install"], // always ask
+};</pre>
+
+<h2>Publishing and distribution — getting your CLI into the world</h2>
+
+<table>
+  <thead><tr><th>Mechanism</th><th>How it works</th><th>When to use it</th></tr></thead>
+  <tbody>
+    <tr><td><code>npm publish</code></td><td>Package with a <code>bin</code> entry; installed globally or via <code>npx</code></td><td>Default for JS tools; <code>npx my-tool</code> runs it without a global install</td></tr>
+    <tr><td>Binary distribution</td><td>pkg, bun compile, deno compile bundle the runtime into a native executable</td><td>When the user shouldn't need Node, or for fast startup and single-file distribution</td></tr>
+    <tr><td>Cross-platform care</td><td>Path separators, line endings, shell quoting, and case rules differ per OS</td><td>Anything that spawns subprocesses or touches files — see the table below</td></tr>
+    <tr><td>Auto-update</td><td>Check a registry/feed and prompt to update, or use a tool like <code>update-notifier</code></td><td>Tools meant to run regularly, where stale versions are a support burden</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Concern</th><th>Unix</th><th>Windows</th><th>The habit</th></tr></thead>
+  <tbody>
+    <tr><td>Path separators</td><td><code>/</code></td><td><code>\</code></td><td><code>path.join()</code>, never string concatenation</td></tr>
+    <tr><td>Line endings</td><td><code>\n</code></td><td><code>\r\n</code></td><td><code>os.EOL</code> for newlines you write; normalize in tests</td></tr>
+    <tr><td>Shell for subprocesses</td><td><code>bash</code>, <code>zsh</code>, <code>fish</code></td><td><code>cmd.exe</code>, PowerShell</td><td>Pass argument arrays, never a shell string; quote differences vanish</td></tr>
+    <tr><td>Case sensitivity</td><td>Case-sensitive</td><td>Case-insensitive</td><td>Test on both; don't rely on case to distinguish files</td></tr>
+  </tbody>
+</table>
+
+<p>The publishing mechanics (npm lifecycle, versioning, registry) are the same as for any package — the versioning rules live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> §5b. The CLI-specific part is the <code>bin</code> mapping and the decision of npm vs. compiled binary.</p>
+
+<h2>Reading a CLI codebase — the contributor's lens</h2>
+
+<p>To read any CLI quickly, walk its spine: <code>bin/</code> (the entry) → <code>src/commands/</code> or the router (routing) → <code>src/utils</code>/<code>lib</code> (the real work) → tests. Concretely:</p>
+
+<ol>
+  <li><strong>Start at the <code>bin</code> field</strong> in <code>package.json</code> to find the entry file, then the arg-parser setup — that names every command and flag the tool supports.</li>
+  <li><strong>Trace one command end to end</strong> from its route handler through to output — this teaches you the project's output conventions (where stdout/stderr are written, how errors exit).</li>
+  <li><strong>Find the interaction points</strong> — TTY checks, prompts, spinner usage — to see where the tool is "interactive" and where it isn't.</li>
+  <li><strong>To add a command or flag:</strong> register it in the parser, write the handler, add a test. Follow the existing command's file as the template — the pattern is repeated, not invented.</li>
+  <li><strong>Tests are behavior-first:</strong> most CLI test suites run the binary (or its router) with fixture arguments and assert on stdout, exit code, and files written. Test the same way your feature will be used.</li>
+</ol>
+
+<p>For an AI-agent CLI, add the same walk but for the loop: find where the model's tool-call requests are dispatched, where the permission check sits, and where a new tool would be registered. The extension seam is usually small and well-named — tools are the feature, so they're kept easy to add. The full social process for turning a reading into a merged contribution is <a href="./open-source.html">Open Source</a>.</p>
+
+<h2>Worked example — a task-list CLI, from zero to published</h2>
+
+<pre>Goal: a "todo" CLI with add / list / done / delete, colored output,
+      then an interactive mode, then publish it.
+
+1 · Skeleton (parse + route + exit):
+     bin/todo.js with the Commander setup from the Architecture
+     section — a single <action> argument and handlers that return.
+
+2 · Add real behavior (data → stdout, narrative → stderr):
+     storage = a JSON file in ~/.todo.json
+     add "Buy milk"      → append, write file, "Added" to stderr
+     list                → print the items to stdout (clean, no color)
+     done 1              → mark item 1 done, write file
+     delete 1            → remove item 1
+     errors (missing file, bad id) → message to stderr, exit 1.
+
+3 · Add color, but TTY-gated:
+     list --json  → plain JSON on stdout (for pipelines)
+     list         → colored when process.stdout.isTTY, plain otherwise
+     (this is the "three pipes" principle in practice)
+
+4 · Add an interactive mode:
+     todo add         → an @clack/prompts text input instead of an arg
+     todo done        → a select prompt listing open items
+     still TTY-gated — a piped "done" keeps the argument path.
+
+5 · Add tests (behavior-first):
+     run the router with fixture args; assert stdout content and
+     exit code; use a temp HOME so the JSON file doesn't touch yours.
+
+6 · Publish:
+     npm publish → now "npx todo add Buy milk" works for anyone.
+     Cross-platform check: file path via path.join, not string concat.
+</pre>
+
+<p>The same skeleton, scaled up with a TUI (Ink) and an agent loop (tool calling + permissions), is Claude Code. The task-list CLI is not a toy version of that architecture — it is the same architecture at minimum size.</p>
+
+<h2>Most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Polluting stdout</td><td>Writing progress/logs to the data channel</td><td>Narrative goes to stderr; stdout stays clean and parseable</td></tr>
+    <tr><td>Colors in a pipeline</td><td>Assuming a TTY is always present</td><td>Gate on <code>isTTY</code> or use libraries that do</td></tr>
+    <tr><td>Burying errors</td><td>Swallowing exceptions, exiting 0 on failure</td><td>Top-level catch, message to stderr, non-zero exit code</td></tr>
+    <tr><td>Hard-coded paths</td><td><code>~/todo.json</code> or <code>path + "/" + name</code></td><td><code>os.homedir()</code>, <code>path.join</code>, respect <code>HOME</code></td></tr>
+    <tr><td>Buffering everything</td><td>Collecting all output in memory before printing</td><td>Stream as you go — stream stdout, read stdin incrementally</td></tr>
+    <tr><td>Interactive-only design</td><td>Features that assume a human is watching</td><td>Every interactive path has a non-interactive equivalent (flag or pipe)</td></tr>
+    <tr><td>Forgetting the exit code</td><td>Scripts that "work" but never signal failure</td><td>The exit code is the CLI's contract with its caller — set it deliberately</td></tr>
+  </tbody>
+</table>
+
+<h2>Ecosystem — the tooling catalog</h2>
+
+<table>
+  <thead><tr><th>Category</th><th>Libraries</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr><td>Arg parsing</td><td>Commander, Yargs, oclif, clipanion</td><td>Commander for most; oclif for large plugin-based CLIs; clipanion for TypeScript-first</td></tr>
+    <tr><td>Colors</td><td>chalk, picocolors, kleur</td><td>Smallest that does the job (picocolors is ~1KB)</td></tr>
+    <tr><td>Spinners / progress</td><td>ora, cli-spinners, cli-progress</td><td>ora for a single spinner; cli-progress for bars in bulk operations</td></tr>
+    <tr><td>Prompts</td><td>Inquirer, prompts, @clack/prompts</td><td>@clack for modern minimal prompts; Inquirer for maximal features</td></tr>
+    <tr><td>React for the terminal</td><td>Ink</td><td>When the interface is complex enough to deserve components</td></tr>
+    <tr><td>Bundling</td><td>tsup, esbuild, unbuild</td><td>Single-file output and fast builds for distribution</td></tr>
+    <tr><td>Testing</td><td>vitest, jest + spawn helpers</td><td>Behavior-first: run the router, assert on stdout and exit code</td></tr>
+  </tbody>
+</table>
+
+<h2>The future — the terminal as the agent interface</h2>
+
+<p>The AI-agent CLI made the terminal relevant again, and the trend compounds: agent loops are becoming the default way developers delegate work, and the CLI is the natural interface because it is scriptable, inspectable, and composable. Three shifts follow. First, <strong>the permission system becomes the product</strong> — as agents gain more power, the quality of the allow/ask/deny boundary is what users trust. Second, <strong>CLIs must be agent-readable</strong> — tools that output structured data (JSON on stdout, clean errors) are the ones agents and pipelines can use, which is the same discipline this doc has been teaching. Third, <strong>building one becomes more accessible</strong> — the same AI that made agent CLIs popular can scaffold a CLI from a prompt, which lowers the entry barrier and raises the bar: the craft is now in the architecture and the safety boundary, not the typing.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Print this. It is the entire doc in twelve lines:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Every CLI is three pipes + an exit code: data → stdout, narrative → stderr, 0 = success.</td></tr>
+    <tr><td>2</td><td>The architecture is always entry → parse → route → config → act → output → exit.</td></tr>
+    <tr><td>3</td><td>Exit codes are a vocabulary: 0 success, 1 general, 2 usage; errors go to stderr, never stdout.</td></tr>
+    <tr><td>4</td><td>Handle signals: SIGINT/SIGTERM flush and exit cleanly; SIGPIPE means stop writing, don't crash.</td></tr>
+    <tr><td>5</td><td>Interactive features live on the TTY — detect it (isTTY) and degrade gracefully without it.</td></tr>
+    <tr><td>6</td><td>Use libraries for colors, prompts, and spinners; never hand-write escape codes.</td></tr>
+    <tr><td>7</td><td>Config is a ladder: flags override env vars override config files override defaults.</td></tr>
+    <tr><td>8</td><td>Ship completions; treat the shell as your host, not an afterthought.</td></tr>
+    <tr><td>9</td><td>Security: execFile over exec, never log secrets, chmod 600 on configs that hold them.</td></tr>
+    <tr><td>10</td><td>Cross-platform: path.join, os.EOL, argument arrays not shell strings.</td></tr>
+    <tr><td>11</td><td>AI-agent CLIs are REPLs with tools: read → plan → tool-call → stream → permit → loop.</td></tr>
+    <tr><td>12</td><td>The permission boundary is the security surface of any agent CLI.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2>Primary sources</h2>
+  <ol>
+    <li>Raymond, Eric — <a href="http://www.catb.org/~esr/writings/taoup/">The Art of Unix Programming</a> — the "rule of silence" and the design philosophy this doc's three-pipe model descends from.</li>
+    <li>Node.js documentation — <a href="https://nodejs.org/api/process.html">process (argv, stdin/stdout/stderr, exit)</a> — the platform primitives every CLI is built on.</li>
+    <li>Node.js documentation — <a href="https://nodejs.org/api/stream.html">Streams</a> — the I/O model of the terminal.</li>
+    <li>Commander.js — <a href="https://github.com/tj/commander.js">documentation</a> — the dominant arg-parsing library, showing the parse → route pattern in practice.</li>
+    <li>Ink — <a href="https://github.com/vadimdemedes/ink">React for the terminal</a> — the TUI model on top of Node streams.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2>Ask your teacher</h2>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through the codebase of one AI-agent CLI (Claude Code or similar) from its bin entry to its tool-calling loop — where exactly is the permission boundary?"</li>
+    <li>"Take the task-list CLI in the worked example and show me what changes when we add a TUI with Ink, or an agent loop with tool calling."</li>
+    <li>"Which of my existing skills transfer to building a CLI, and what's the smallest real tool I should build first to prove the pattern?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Building CLIs — the terminal as a development platform</span>
+  <span>Upstream: <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> · Runtime: <a href="./javascript-across-stacks.html">JS Across Stacks</a> · Sibling: <a href="./backend-engineering.html">Backend Engineering</a> · Contribute: <a href="./open-source.html">Open Source</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

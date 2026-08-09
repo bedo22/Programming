@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Shapes — the recurring archetypes of web work</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Product Shapes — the triage layer over the whole shelf</p>
+  <h1>Product Shapes — the recurring archetypes of web work, and the decisions each one demands</h1>
+  <p class="meta">For: the developer who gets a project brief and needs to know — before writing code — what kind of product this is, what its dominant constraint is, and which shelf docs to lean on.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The shelf is organized by <em>discipline</em> — design, architecture, APIs, data, security, testing, deployment. But the work you actually see arrives as <em>product shapes</em>: dashboards, landing pages, SaaS apps, e-commerce stores, booking systems. This doc is the mapping between the two — read it before you start building, so you reach for the right discipline at the right time.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│   A PROJECT BRIEF ARRIVES: "a website I can edit myself,      │
+│   with a store" / "an internal tool for our ops team" /       │
+│   "a booking system for a clinic"                              │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│        SHAPE TRIAGE (THIS DOC)                                 │
+│   Which shape is this? What is the dominant constraint?        │
+│   What is the one decision that, if wrong, kills the project?  │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│        DISCIPLINE DOCS (THE HOW)                               │
+│   System Design · API Design · Payments · WordPress/CMS ·     │
+│   Data Modeling · Security · Testing · Freelance Web Practice  │
+└───────────────────────────────────────────────────────────────┘
+   The discipline docs teach you to build. This doc teaches you
+   to recognize what you're building before you start.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./freelance-web-practice.html">Freelance Web Practice</a> (the business of scoping, pricing, and delivering — this doc is the <em>technical</em> triage, that one is the <em>commercial</em> one) · <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (which stack fits which shape) · <a href="./product-strategy.html">Product Strategy</a> (when a shape becomes a product with unit economics) · <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> (the platform most client shapes actually ship on) · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (the money shapes) · <a href="./glossary.html">Glossary</a></p>
+</blockquote>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read the Definition (what a shape is and is not), then the taxonomy table to see all twelve shapes at once, then the selection guide — and when a real brief arrives, jump straight to that shape's link map. Read this doc <em>before</em> you scope or quote a project; the shape determines what the honest scope even is. Cross-links:</p>
+<ul>
+  <li>Upstream (what shapes you sell): <a href="./frontend-income-markets.html">Frontend Income Markets</a> §7 — the market view of the same archetypes, from "who pays" instead of "what's built".</li>
+  <li>Downstream (how a shape becomes a deliverable): <a href="./freelance-web-practice.html">Freelance Web Practice</a> — scoping, pricing, delivery, handoff.</li>
+  <li>Sibling (which discipline answers the shape's hard questions): <a href="./system-design.html">System Design</a>, <a href="./api-design.html">API Design</a>, <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>, <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a>.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever over-built a landing page into a full-stack app, or under-built a SaaS and missed tenant isolation — this is the map.</strong> One shape per project, one dominant constraint, one decision that matters most.</p>
+
+<h2>Definition — what a product shape is, and what it is not</h2>
+
+<p>A <strong>product shape</strong> is a recurring archetype of web work with its own dominant constraint — the one property that, if mishandled, sinks the project. A landing page is constrained by <em>load speed and conversion</em>; a dashboard by <em>data density and state</em>; a booking system by <em>time math</em>. The shape is not the discipline: a dashboard still needs APIs, data, and security, but those are the <em>how</em> — the shape tells you which <em>how</em> matters most and which failure kills you first.</p>
+
+<p>Two kinds of shape appear in the taxonomy below. <strong>Product archetypes</strong> (landing page, dashboard, SaaS, CRUD, e-commerce, content, booking, portfolio) answer <em>"what must exist?"</em> — they are the thing you build. <strong>Engagement shapes</strong> (API integration, CMS customization, migration, performance) answer <em>"what must be changed safely?"</em> — they are the job you are hired to do <em>to</em> an existing product. Different scoping questions, but the same triage machinery: name the constraint, name the death mode, route to the owning doc.</p>
+
+<p><strong>What a shape is not:</strong> it is not a technology choice (WordPress vs. Next.js is a camp decision, see <a href="./frontend-camps-survey.html">Frontend Camps</a>), not a business model (that's <a href="./product-strategy.html">Product Strategy</a>), and not a skill (that's the discipline docs). Shapes and skills overlap — a SaaS product is usually a dashboard under the hood — but the <em>dominant constraint differs</em>, so the triage differs.</p>
+
+<table>
+  <thead><tr><th>Safely ignore for now</th><th>Why</th><th>When it matters</th></tr></thead>
+  <tbody>
+    <tr><td>Shape taxonomy debates ("is this a CRUD app or a dashboard?")</td><td>The label matters less than the constraint</td><td>Two constraints genuinely compete (see the nesting table)</td></tr>
+    <tr><td>Stack-shopping per shape</td><td>Most shapes run fine on the same default stack; the camp doc decides</td><td>A constraint pushes you to a different camp</td></tr>
+    <tr><td>Every decision in every discipline doc</td><td>Each shape only stresses a few decisions</td><td>The shape's dominant constraint is genuinely hard</td></tr>
+  </tbody>
+</table>
+
+<h2>History — why work arrives as shapes, not disciplines</h2>
+
+<p>Disciplines are how the industry <em>organized knowledge</em>; shapes are how work <em>actually arrives</em>. The first web projects were marketing pages and catalogs — two shapes that are still the bulk of small-budget work. As the web industrialized, the shapes multiplied: dashboards arrived with internal tooling, SaaS arrived with subscription billing, booking systems arrived with scheduling services. Each new shape was a response to a business need, and each carries the constraint of the business it serves — a checkout must not double-charge, a booking must not double-book. The discipline docs abstracted the underlying skill; this doc keeps the business reality attached to it.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+  <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./freelance-web-practice.html">Freelance Web Practice</a></td><td>Scoping calls, pricing, contracts, handoff, scope creep</td><td>There: <em>how to run the engagement</em>. Here: <em>which shape you're engaged to build</em>. The scoping checklist here feeds their scoping call.</td></tr>
+    <tr><td><a href="./frontend-camps-survey.html">Frontend Camps Survey</a></td><td>Stack choice, rendering strategy, camp selection</td><td>There: <em>which technology</em>. Here: <em>which shape</em>. Shape first, then camp — the constraint selects the stack.</td></tr>
+    <tr><td><a href="./product-strategy.html">Product Strategy</a></td><td>Viability, pricing, CAC/LTV, unit economics</td><td>There: <em>is it a business</em>. Here: <em>is it a shape</em>. Shapes become products when the business questions appear.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a> / <a href="./api-design.html">API Design</a> / <a href="./data-modeling-and-databases.html">Data Modeling</a></td><td>The discipline knowledge each shape leans on</td><td>There: the full method. Here: one-line pointers to the section that answers each shape's constraint.</td></tr>
+    <tr><td><a href="./payments-and-commerce.html">Payments &amp; Commerce</a></td><td>Checkout, subscriptions, refunds, compliance</td><td>There: the mechanics. Here: which shapes are <em>money shapes</em> and route to it.</td></tr>
+    <tr><td><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a></td><td>The platform, editing surface, client editability</td><td>There: the platform itself. Here: which shapes are <em>client-editable shapes</em> and route to it.</td></tr>
+  </tbody>
+</table>
+
+<h2>Underlying theory — the constraint is the shape</h2>
+
+<p>Every shape has one property that fails <em>first</em> and fails <em>visibly</em>. That property is its dominant constraint, and it comes from the shape's business purpose, not its technology:</p>
+
+<ul>
+  <li><strong>The constraint determines the decision order.</strong> A dashboard's permission model matters before its chart library; a booking system's time handling matters before its UI. Get the constraint right and the rest of the decisions slot into the discipline docs.</li>
+  <li><strong>The constraint determines the failure mode.</strong> Each shape has a canonical way to die: slow landing page, stale dashboard, double-charged checkout, double-booked slot, lost migration, leaked tenant data. Name the death mode and you've named the constraint.</li>
+  <li><strong>Shapes nest.</strong> A SaaS is a CRUD app with multi-tenancy and billing; a storefront is a content site with a checkout; a booking system is a CRUD app with calendar logic. When shapes nest, the <em>outer</em> constraint dominates.</li>
+</ul>
+
+<h2>Mental models — frames for thinking about shapes</h2>
+
+<table>
+  <thead><tr><th>Frame</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>"One shape, one constraint"</td><td>Find the single property that kills the project; everything else follows from it</td></tr>
+    <tr><td>"The death mode"</td><td>For any shape, name how it dies — then verify the design prevents exactly that</td></tr>
+    <tr><td>"Shape first, stack second"</td><td>Never choose the stack before identifying the shape; the constraint selects the camp</td></tr>
+    <tr><td>"Triage, not encyclopedia"</td><td>Read the discipline docs <em>after</em> triage, only as deep as the shape demands</td></tr>
+    <tr><td>"The client's words are the brief"</td><td>"A website I can edit myself, with a store" maps to a CMS + payments shape — not to a custom React app</td></tr>
+  </tbody>
+</table>
+
+<h2>The shape taxonomy — twelve archetypes at a glance</h2>
+
+<p>Ordered roughly by frequency in freelance work. The identifying question is the client sentence that most often reveals the shape:</p>
+
+<table>
+  <thead><tr><th>Shape</th><th>Type</th><th>Dominant constraint</th><th>Identifying question</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Landing page / marketing site</strong></td><td>Product archetype</td><td>Load speed, SEO, conversion</td><td>"We need a page people find and act on"</td></tr>
+    <tr><td><strong>Dashboard / admin panel</strong></td><td>Product archetype</td><td>Data density, real-time state</td><td>"Our team needs to see and act on our data"</td></tr>
+    <tr><td><strong>SaaS product</strong></td><td>Product archetype</td><td>Multi-tenancy, billing, onboarding</td><td>"Customers sign up and pay per month"</td></tr>
+    <tr><td><strong>CRUD app / internal tool</strong></td><td>Product archetype</td><td>Forms, validation, permissions</td><td>"We need to enter and track records"</td></tr>
+    <tr><td><strong>E-commerce site</strong></td><td>Product archetype</td><td>Checkout reliability, payment security</td><td>"We want to sell things online"</td></tr>
+    <tr><td><strong>Content site / blog / docs</strong></td><td>Product archetype</td><td>Content model, SEO, readability</td><td>"We publish content people read"</td></tr>
+    <tr><td><strong>Booking / scheduling system</strong></td><td>Product archetype</td><td>Time zones, conflict detection</td><td>"People book appointments with us"</td></tr>
+    <tr><td><strong>Portfolio / personal site</strong></td><td>Product archetype</td><td>Design, simplicity, performance</td><td>"I need my own site"</td></tr>
+    <tr><td><strong>API integration / automation</strong></td><td>Engagement shape</td><td>Reliability, error handling, data mapping</td><td>"Connect our tools so they talk to each other"</td></tr>
+    <tr><td><strong>WordPress / CMS customization</strong></td><td>Engagement shape</td><td>Platform constraints, client editability</td><td>"A website I can edit myself"</td></tr>
+    <tr><td><strong>Migration / redesign</strong></td><td>Engagement shape</td><td>SEO preservation, data integrity, zero downtime</td><td>"Move our site / rebuild it without breaking it"</td></tr>
+    <tr><td><strong>Performance optimization</strong></td><td>Engagement shape</td><td>Core Web Vitals, measurable improvement</td><td>"Our site is slow — make it faster"</td></tr>
+  </tbody>
+</table>
+
+<h2>Shape selection guide — "the client says X, which shape is this?"</h2>
+
+<p>Most briefs arrive in the client's words, not the shape's name. Match the sentence to the shape:</p>
+
+<table>
+  <thead><tr><th>Client says</th><th>Shape</th><th>First question to ask back</th></tr></thead>
+  <tbody>
+    <tr><td>"A page to get signups"</td><td>Landing page</td><td>"What's the one action you want visitors to take?"</td></tr>
+    <tr><td>"A place for our team to track X"</td><td>Dashboard / internal tool</td><td>"Who sees what, and how fresh must the data be?"</td></tr>
+    <tr><td>"Customers pay us monthly"</td><td>SaaS</td><td>"How do you isolate one customer's data from another's?"</td></tr>
+    <tr><td>"Sell products online"</td><td>E-commerce</td><td>"Who holds the inventory, and what happens at checkout?"</td></tr>
+    <tr><td>"A blog / docs / articles"</td><td>Content site</td><td>"Who writes and edits the content?"</td></tr>
+    <tr><td>"People book with us"</td><td>Booking system</td><td>"What's the smallest unit of a bookable slot — and in whose time zone?"</td></tr>
+    <tr><td>"I can edit it myself"</td><td>WordPress / CMS</td><td>"What exactly do you need to edit — text, images, or the layout itself?"</td></tr>
+    <tr><td>"Move our site to something modern"</td><td>Migration / redesign</td><td>"What must not break — SEO, data, or uptime?"</td></tr>
+    <tr><td>"Make it faster"</td><td>Performance optimization</td><td>"What's the number that's slow — and how do we measure it today?"</td></tr>
+  </tbody>
+</table>
+
+<h3>When shapes nest — the outer constraint wins</h3>
+
+<table>
+  <thead><tr><th>Pairing</th><th>Dominant shape</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>SaaS + dashboard</td><td>SaaS</td><td>Tenant isolation and billing fail harder than chart prettiness</td></tr>
+    <tr><td>E-commerce + content</td><td>E-commerce</td><td>A broken checkout loses money; a slow blog post loses attention</td></tr>
+    <tr><td>Booking + payments</td><td>Booking</td><td>Time conflict is the harder math; the payment rides on a confirmed slot</td></tr>
+    <tr><td>CMS + store</td><td>CMS</td><td>Client editability is the constraint the client names first</td></tr>
+    <tr><td>Landing page + dashboard behind login</td><td>Both, separated</td><td>Different constraints, different pages — build as two shapes, not one</td></tr>
+    <tr><td>Marketplace + payments</td><td>Marketplace</td><td>Two-sided trust (buyer/seller) and payout flow dominate — payouts are a harder payment problem than checkout (<a href="./payments-and-commerce.html">Payments</a> §marketplaces)</td></tr>
+    <tr><td>Content + membership</td><td>Membership</td><td>Auth and payment gating dominate — a paywall leak is the death mode, not the article quality</td></tr>
+  </tbody>
+</table>
+
+<h3>Shape lifecycle — when a project changes shape</h3>
+
+<p>Projects are not frozen at triage. The same client, six months later, is asking for a different shape — and the scope and quote must change with it. The shape changed → the quote must change (see <a href="./freelance-web-practice.html">Freelance Web Practice</a> for the commercial side).</p>
+
+<table>
+  <thead><tr><th>Change</th><th>Trigger</th><th>Re-scope risk</th></tr></thead>
+  <tbody>
+    <tr><td>Landing page → SaaS</td><td>Accounts and state arrive ("can users log in and save?")</td><td>Multi-tenancy and billing appear from nowhere — the site wasn't scoped for them</td></tr>
+    <tr><td>Content site → e-commerce</td><td>The client decides to sell ("can we add a shop?")</td><td>Money math — checkout reliability, payment security — replaces attention math</td></tr>
+    <tr><td>Internal tool → SaaS</td><td>Other customers appear ("can our partners use it too?")</td><td>Tenant isolation and onboarding were skipped for a single team</td></tr>
+    <tr><td>CMS → headless</td><td>Editorial scale or performance outgrows the platform</td><td>Editing workflow and preview must be rebuilt on the new architecture</td></tr>
+    <tr><td>CRUD app → dashboard</td><td>Analytics and permissions centralize ("let's add reporting")</td><td>Aggregation, read-path performance, and role-based access were out of scope</td></tr>
+    <tr><td>→ Migration</td><td>Replatforming — the platform or stack is being replaced</td><td>Preservation (SEO, data, uptime) becomes the dominant constraint, not the new features</td></tr>
+  </tbody>
+</table>
+
+<h2>Per-shape link maps — the decisions each shape stresses</h2>
+
+<p>Each map names the 2–3 decisions that <em>actually differ by shape</em> and points to the discipline doc that owns the rest. The discipline docs teach the full method; these maps say which sections to read <em>for this shape</em>.</p>
+
+<h3>1. Landing page / marketing site</h3>
+<ul>
+  <li><strong>What differs:</strong> performance budget, SEO structure, analytics/conversion setup. The design serves one action.</li>
+  <li><strong>Owns the how:</strong> <a href="./html-and-css.html">HTML &amp; CSS</a> (rendering, Core Web Vitals, forms) · <a href="./ui-ux-web-design.html">UI/UX</a> (conversion design, accessibility) · <a href="./frontend-camps-survey.html">Camps</a> (Camp B HTML-first / Camp D SSG) · <a href="./product-strategy.html">Product Strategy</a> (what "conversion" means here).</li>
+  <li><strong>Death mode:</strong> slow load or untracked traffic — performance is the product, and it must be measurable.</li>
+</ul>
+
+<h3>2. Dashboard / admin panel</h3>
+<ul>
+  <li><strong>What differs:</strong> data-fetching strategy (poll vs. WebSocket vs. SSE), table virtualization, permission model, chart choice.</li>
+  <li><strong>Owns the how:</strong> <a href="./system-design.html">System Design</a> (data flow, caching) · <a href="./api-design.html">API Design</a> (pagination, filtering) · <a href="./ui-ux-web-design.html">UI/UX</a> (state visibility, data density) · <a href="./security-and-threat-modeling.html">Security</a> (role-based access) · <a href="./frontend-camps-survey.html">Camps</a> (Camp C SPA).</li>
+  <li><strong>Death mode:</strong> stale data or a slow table — every cell can be loading, empty, error, or stale, and the design must say which.</li>
+</ul>
+
+<h3>3. SaaS product</h3>
+<ul>
+  <li><strong>What differs:</strong> tenant isolation, auth provider, billing/subscription model, feature flags, onboarding.</li>
+  <li><strong>Owns the how:</strong> <a href="./data-modeling-and-databases.html">Data Modeling</a> (multi-tenancy) · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (subscriptions) · <a href="./backend-engineering.html">Backend Engineering</a> (auth, background jobs) · <a href="./api-design.html">API Design</a> (idempotency for billing) · <a href="./product-strategy.html">Product Strategy</a> (pricing, CAC/LTV).</li>
+  <li><strong>Death mode:</strong> tenant data leak or billing bug — technical decisions are downstream of the pricing decision.</li>
+</ul>
+
+<h3>4. CRUD app / internal tool</h3>
+<ul>
+  <li><strong>What differs:</strong> form design, validation timing, workflow states, role-based access, audit trail, bulk operations.</li>
+  <li><strong>Owns the how:</strong> <a href="./backend-engineering.html">Backend Engineering</a> (the CRUD loop, transactions) · <a href="./api-design.html">API Design</a> (resource contracts, error envelopes) · <a href="./ui-ux-web-design.html">UI/UX</a> (form design, error affordances) · <a href="./data-modeling-and-databases.html">Data Modeling</a> (schema, constraints, migrations).</li>
+  <li><strong>Death mode:</strong> the gap between "works in Postman" and "works in production" — validation and edge cases are where the complexity lives.</li>
+</ul>
+
+<h3>5. E-commerce site</h3>
+<ul>
+  <li><strong>What differs:</strong> platform vs. custom, payment integration, inventory, shipping, cart persistence, checkout SEO.</li>
+  <li><strong>Owns the how:</strong> <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (checkout, refunds, PCI, fraud) · <a href="./api-design.html">API Design</a> (idempotency) · <a href="./system-design.html">System Design</a> (inventory consistency) · <a href="./ui-ux-web-design.html">UI/UX</a> (checkout flow, trust).</li>
+  <li><strong>Death mode:</strong> a double-charge or a lost order — the tolerance for error is near zero.</li>
+</ul>
+
+<h3>6. Content site / blog / docs</h3>
+<ul>
+  <li><strong>What differs:</strong> content model, SEO structure, search, reading experience. The technology should disappear.</li>
+  <li><strong>Owns the how:</strong> <a href="./wordpress-and-cms-internet.html">WordPress &amp; CMS</a> (content modeling, editing) · <a href="./html-and-css.html">HTML &amp; CSS</a> (semantic HTML, typography, performance) · <a href="./ui-ux-web-design.html">UI/UX</a> (readability, navigation) · <a href="./frontend-camps-survey.html">Camps</a> (Camp A CMS / Camp B HTML-first).</li>
+  <li><strong>Death mode:</strong> an unmaintainable content model — the reader never notices the tech, and the editor can't edit.</li>
+</ul>
+<h3>7. Booking / scheduling system</h3>
+<ul>
+  <li><strong>What differs:</strong> time-zone handling, conflict detection, recurring bookings, buffers, reminders.</li>
+  <li><strong>Owns the how:</strong> <a href="./data-modeling-and-databases.html">Data Modeling</a> (the slot model, constraints) · <a href="./backend-engineering.html">Backend Engineering</a> (transactions, background jobs for reminders) · <a href="./api-design.html">API Design</a> (booking contracts, idempotency) · <a href="./system-design.html">System Design</a> (consistency).</li>
+  <li><strong>Death mode:</strong> a double-booked slot or a wrong time zone — the data model must be right before any UI.</li>
+</ul>
+
+<h3>8. Portfolio / personal site</h3>
+<ul>
+  <li><strong>What differs:</strong> design bar, simplicity, near-perfect performance. The smallest shape with the highest design ceiling.</li>
+  <li><strong>Owns the how:</strong> <a href="./html-and-css.html">HTML &amp; CSS</a> (platform, performance) · <a href="./ui-ux-web-design.html">UI/UX</a> (visual design, motion) · <a href="./frontend-camps-survey.html">Camps</a> (SSG / hand-coded HTML).</li>
+  <li><strong>Death mode:</strong> fast but generic — the design is the entire value proposition.</li>
+</ul>
+
+<h3>9. API integration / automation</h3>
+<ul>
+  <li><strong>What differs:</strong> error handling, retry/backoff, webhook verification, data mapping, rate-limit compliance, monitoring.</li>
+  <li><strong>Owns the how:</strong> <a href="./api-design.html">API Design</a> (contracts, error envelopes) · <a href="./backend-engineering.html">Backend Engineering</a> (background jobs, error handling) · <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (deployment, rollback) · <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a>.</li>
+  <li><strong>Death mode:</strong> the happy path is easy and the error paths are the entire product — it fails catastrophically at 3 AM.</li>
+</ul>
+
+<h3>10. WordPress / CMS customization</h3>
+<ul>
+  <li><strong>What differs:</strong> client editability is the primary requirement — the tech serves the content workflow, not the reverse.</li>
+  <li><strong>Owns the how:</strong> <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> — the whole doc: mechanics, content modeling, Gutenberg/headless, workflow, migration, ops, the "I can edit myself" reality.</li>
+  <li><strong>Death mode:</strong> a site the client can't edit — or one the client edits into breakage. Editability is a deliverable, not a feature.</li>
+</ul>
+
+<h3>11. Migration / redesign</h3>
+<ul>
+  <li><strong>What differs:</strong> migration strategy (big-bang vs. strangler fig), SEO preservation, data mapping, parallel-run testing, rollback.</li>
+  <li><strong>Owns the how:</strong> <a href="./system-design.html">System Design</a> §3b (migration paths) · <a href="./wordpress-and-cms-internet.html">WordPress &amp; CMS</a> (migration paths) · <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (deployment, rollback) · <a href="./api-design.html">API Design</a> (contract compatibility) · <a href="./data-modeling-and-databases.html">Data Modeling</a> (schema evolution).</li>
+  <li><strong>Death mode:</strong> SEO ranking drops overnight or data is lost — a successful migration is one nobody notices.</li>
+</ul>
+
+<h3>12. Performance optimization</h3>
+<ul>
+  <li><strong>What differs:</strong> what to measure (LCP, CLS, INP), what to optimize (images, JS, CSS, fonts, server), and knowing when to stop.</li>
+  <li><strong>Owns the how:</strong> <a href="./html-and-css.html">HTML &amp; CSS</a> §6j (Core Web Vitals ↔ platform knobs) · <a href="./system-design.html">System Design</a> (caching, CDN) · <a href="./ui-ux-web-design.html">UI/UX</a> (perceived performance).</li>
+  <li><strong>Death mode:</strong> endless optimization — the discipline is knowing when the improvement stops being worth the cost.</li>
+</ul>
+
+<h3>Shape implications — data, security, testing, metric</h3>
+
+<p>The same four questions per shape, answered in one cell each and routed to the owning doc. Read the full method there; here is only the pointer that differs by shape.</p>
+
+<table>
+  <thead><tr><th>Shape</th><th>Data model</th><th>Security focus</th><th>Testing focus</th><th>Primary success metric</th></tr></thead>
+  <tbody>
+    <tr><td>Landing page</td><td>None — content lives in the page (<a href="./data-modeling-and-databases.html">Data Modeling</a>: only if a CMS/form arrives)</td><td>Form input, third-party scripts (<a href="./security-and-threat-modeling.html">Security</a> §forms)</td><td>Rendering, forms, analytics events (<a href="./software-testing-and-debugging.html">Testing</a> §front-end)</td><td>Conversion rate, load time</td></tr>
+    <tr><td>Dashboard</td><td>Aggregated reads, denormalized views (<a href="./data-modeling-and-databases.html">Data Modeling</a> §read models)</td><td>Row-level access — "who sees what" (<a href="./security-and-threat-modeling.html">Security</a> §RBAC)</td><td>Table states: loading/empty/error/stale (<a href="./software-testing-and-debugging.html">Testing</a> §state)</td><td>Data freshness, task completion time</td></tr>
+    <tr><td>SaaS</td><td>Multi-tenancy — shared vs. isolated schema (<a href="./data-modeling-and-databases.html">Data Modeling</a> §tenancy)</td><td>Tenant isolation, auth, billing integrity (<a href="./security-and-threat-modeling.html">Security</a> §authz)</td><td>Tenant-scoped fixtures, billing idempotency (<a href="./software-testing-and-debugging.html">Testing</a> §integration)</td><td>Activation, retention, revenue per tenant</td></tr>
+    <tr><td>CRUD / internal tool</td><td>Entity schema, constraints, migrations (<a href="./data-modeling-and-databases.html">Data Modeling</a> §schema)</td><td>Validation at the boundary, role-based access (<a href="./security-and-threat-modeling.html">Security</a> §input)</td><td>Validation, workflow states, edge cases (<a href="./software-testing-and-debugging.html">Testing</a> §edge)</td><td>Records entered correctly, workflow throughput</td></tr>
+    <tr><td>E-commerce</td><td>Inventory, orders, cart consistency (<a href="./data-modeling-and-databases.html">Data Modeling</a> §transactions)</td><td>Payment security, PCI, fraud (<a href="./security-and-threat-modeling.html">Security</a> §payments / <a href="./payments-and-commerce.html">Payments</a>)</td><td>Checkout failure injection, idempotency, refunds (<a href="./software-testing-and-debugging.html">Testing</a> §money)</td><td>Order completion rate, zero double-charge</td></tr>
+    <tr><td>Content site</td><td>Content model, taxonomies, structured fields (<a href="./data-modeling-and-databases.html">Data Modeling</a> §content)</td><td>Editor access, injection in user content (<a href="./security-and-threat-modeling.html">Security</a> §injection)</td><td>Semantic HTML, SEO, reading flow (<a href="./software-testing-and-debugging.html">Testing</a> §SEO)</td><td>Readership, engagement, search visibility</td></tr>
+    <tr><td>Booking</td><td>Slot model — time zones, constraints, buffers (<a href="./data-modeling-and-databases.html">Data Modeling</a> §booking)</td><td>PII (patient/client data), auth on bookings (<a href="./security-and-threat-modeling.html">Security</a> §PII)</td><td>Conflict detection, double-booking race (<a href="./software-testing-and-debugging.html">Testing</a> §concurrency)</td><td>Booking completion, zero double-book</td></tr>
+    <tr><td>Portfolio</td><td>None — content in markup</td><td>Form/spam only, if contact form (<a href="./security-and-threat-modeling.html">Security</a> §forms)</td><td>Visual regression, performance budget (<a href="./software-testing-and-debugging.html">Testing</a> §visual)</td><td>Load speed, design quality, inquiries</td></tr>
+    <tr><td>API integration</td><td>Mapping foreign data models to yours (<a href="./data-modeling-and-databases.html">Data Modeling</a> §mapping)</td><td>Credential handling, webhook verification (<a href="./security-and-threat-modeling.html">Security</a> §webhooks)</td><td>Error paths, retries, rate limits (<a href="./software-testing-and-debugging.html">Testing</a> §integration)</td><td>Sync reliability, failed-job recovery</td></tr>
+    <tr><td>WordPress / CMS</td><td>Post types, fields, taxonomies (<a href="./data-modeling-and-databases.html">Data Modeling</a> §content)</td><td>Plugin/update hygiene, editor roles (<a href="./security-and-threat-modeling.html">Security</a> §platform)</td><td>Editing workflows, export/import (<a href="./software-testing-and-debugging.html">Testing</a> §CMS)</td><td>Client can edit without breakage</td></tr>
+    <tr><td>Migration</td><td>Schema mapping, data integrity checks (<a href="./data-modeling-and-databases.html">Data Modeling</a> §migration)</td><td>Credential rotation, rollback safety (<a href="./security-and-threat-modeling.html">Security</a> §rollback)</td><td>Parallel-run parity, SEO spot-checks (<a href="./software-testing-and-debugging.html">Testing</a> §parity)</td><td>Zero downtime, zero data loss, SEO preserved</td></tr>
+    <tr><td>Performance</td><td>Query/read-path tuning (<a href="./data-modeling-and-databases.html">Data Modeling</a> §indexes)</td><td>Minimal surface — CDN, caching config (<a href="./security-and-threat-modeling.html">Security</a> §infra)</td><td>Measured before/after, budget gates (<a href="./software-testing-and-debugging.html">Testing</a> §perf)</td><td>Core Web Vitals delta, measurable improvement</td></tr>
+  </tbody>
+</table>
+
+<h2>Principles — the shared constants across every shape</h2>
+
+<ul>
+  <li><strong>Identify the shape before the stack.</strong> Every wrong build starts with a missing triage.</li>
+  <li><strong>Name the death mode out loud.</strong> If you can't say how this shape dies, you haven't found its constraint.</li>
+  <li><strong>One dominant constraint per project.</strong> When two compete, the outer one wins (see the nesting table).</li>
+  <li><strong>Route to the owning doc.</strong> The discipline docs already answer the hard questions; the shape doc points to the right one.</li>
+  <li><strong>The client's words are the brief.</strong> "I can edit it myself" is a constraint, not a preference.</li>
+  <li><strong>Scope follows shape.</strong> An honest scope for a landing page is smaller than for a SaaS — quote accordingly (<a href="./freelance-web-practice.html">Freelance Web Practice</a> owns the arithmetic).</li>
+</ul>
+
+<h2>Worked example — one brief, triaged end to end</h2>
+
+<p>Brief: <em>"Our clinic needs a website where patients can book appointments, and I need to be able to update the content myself."</em></p>
+
+<pre>1 · Triage: which shape? "Patients book appointments" → booking shape.
+     "I need to update the content myself" → CMS/editability constraint.
+     Outer constraint wins: this is a BOOKING system the client must edit.
+
+2 · The death mode: a double-booked slot in the wrong time zone.
+     → The booking data model and conflict detection matter more
+       than the page design or the stack.
+
+3 · Which discipline docs answer the hard questions?
+     → WordPress &amp; the CMS Internet (the platform, client editability)
+     → Data Modeling (the slot model, time-zone handling, constraints)
+     → Backend Engineering (confirmation/reminder jobs)
+
+4 · The scope this shape demands:
+     → A bookable calendar (slots, buffers, time zones, conflict check)
+     → An editing surface the clinic can use without touching code
+     → A reminder path (email/SMS on booking and before the slot)
+     → Payments only if they said "and take a deposit" — they didn't.
+
+5 · What this shape does NOT demand:
+     → No tenant isolation (single clinic), no billing lifecycle,
+       no feature flags, no table virtualization. Skipping them is
+       correct, not lazy — they belong to other shapes.
+</pre>
+
+<p>The same brief mis-triaged as "a website with a form" would produce a site the clinic can't edit and a calendar that double-books. The shape isn't decoration — it is the scope.</p>
+
+<h3>Worked example — the shape that hides behind a smaller brief</h3>
+
+<pre>1 · Triage: "a bakery wants to sell cakes online + post weekly menus"
+     → e-commerce (money) + content (the menus) nest.
+     Money shape dominates: a lost order loses revenue; a stale
+     menu loses an occasional reader. This is a SHOP first.
+
+2 · The death mode: a lost order or double-charge at checkout.
+     → Payments reliability and inventory matter more than the
+       menu design or the cake photography.
+
+3 · Which discipline docs answer the hard questions?
+     → Payments &amp; Commerce (checkout, refunds, order flow)
+     → Data Modeling (inventory, order lines, stock consistency)
+     → System Design (cart persistence, checkout consistency)
+
+4 · The scope this shape demands:
+     → A checkout that cannot double-charge or lose an order
+     → Inventory that cannot oversell (or a clear "no stock" path)
+     → A content area for weekly menus — the CMS, not the shop,
+       owns that, and it's the small part
+     → Order notifications/confirmation so nothing is silent
+
+5 · What this shape does NOT demand:
+     → No accounts, no subscriptions, no tenant isolation.
+       A bakery sells cakes, not seats. Skipping SaaS machinery
+       is correct — it belongs to another shape.
+</pre>
+
+<p>Here the tempting mis-triage is to hear "weekly menus" and build a content site with a store bolted on. The money shape wins, and the scope follows: the shop is the product, the menus are the decoration.</p>
+
+<h2>Most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Over-engineering a landing page</td><td>Building a full-stack app for a static conversion page</td><td>Shape first: one action, performance budget, no auth, no DB</td></tr>
+    <tr><td>Under-engineering a SaaS</td><td>Skipping tenant isolation, billing, onboarding</td><td>The SaaS map: multi-tenancy and the subscription lifecycle before polish</td></tr>
+    <tr><td>Misidentifying a migration as a redesign</td><td>Rebuilding without the SEO/data/uptime constraints</td><td>Migration map: preservation is the constraint, not the new look</td></tr>
+    <tr><td>Treating a booking system as a CRUD app</td><td>Forms and records, but no conflict detection or time-zone handling</td><td>Booking map: the slot model and time math come first</td></tr>
+    <tr><td>Building a dashboard without a permission model</td><td>Data density handled, access ignored</td><td>Dashboard map: "who sees what" is a data-privacy decision</td></tr>
+    <tr><td>Giving a client a site they can't edit</td><td>Custom build where "I can edit it myself" was the constraint</td><td>CMS map: editability is a deliverable, choose the platform accordingly</td></tr>
+    <tr><td>Accepting a shape you didn't identify</td><td>Agreeing to a price before knowing the constraint</td><td>The scoping checklist — run it before the quote (<a href="./freelance-web-practice.html">Freelance Web Practice</a>)</td></tr>
+  </tbody>
+</table>
+
+<h2>The freelancer's scoping checklist — run before you quote</h2>
+
+<p>Five questions, answered from the brief before any code or any price:</p>
+
+<ol>
+  <li><strong>Which shape is this?</strong> Match the client's words to the taxonomy; if two shapes nest, name the outer one.</li>
+  <li><strong>What is the dominant constraint?</strong> The one property that, if wrong, kills the project.</li>
+  <li><strong>Which discipline docs answer the hard questions?</strong> Point the shape at its owning docs; read only as deep as the shape demands.</li>
+  <li><strong>What are the failure modes to watch for?</strong> Name the death mode and make the scope prevent exactly that.</li>
+  <li><strong>What is the client's ability to maintain this after handoff?</strong> "I can edit it myself" is a scope item, not a wish (<a href="./freelance-web-practice.html">Freelance Web Practice</a> owns the delivery).</li>
+</ol>
+
+<h2>Ecosystem — the shape-aware tooling catalog</h2>
+
+<p>The tools change faster than the shapes; here's what each <em>kind</em> is for, so a new tool slots into its row:</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Examples</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr><td>Site / static</td><td>Astro, Eleventy, plain HTML, Vercel/Netlify hosting</td><td>Landing page, content, portfolio shapes: build once, serve fast</td></tr>
+    <tr><td>Meta-framework / SPA</td><td>Next.js, SvelteKit, Remix</td><td>Dashboard, SaaS, custom CRUD: the app shapes need client state</td></tr>
+    <tr><td>CMS platform</td><td>WordPress, headless CMS, Sanity, Strapi</td><td>Client-editability shapes: the editing surface is the deliverable</td></tr>
+    <tr><td>Commerce</td><td>Shopify, WooCommerce, Stripe, Paddle</td><td>Money shapes: checkout reliability and payment compliance first</td></tr>
+    <tr><td>Auth &amp; identity</td><td>Auth0, Clerk, Supabase Auth</td><td>SaaS and internal-tool shapes: the permission model is a data decision</td></tr>
+    <tr><td>Scheduling</td><td>Cal.com, Calendly, custom slot models</td><td>Booking shape: time-zone-safe conflict detection, not feature count</td></tr>
+    <tr><td>Charts / tables</td><td>AG Grid, TanStack Table, Chart.js, Recharts</td><td>Dashboard shape: virtualization and staleness handling beat chart prettiness</td></tr>
+  </tbody>
+</table>
+
+<p>Every row maps to a shape above — the tool is the vehicle, the shape is the rule. When a new tool appears, ask which shape it serves and whether it improves that shape's dominant constraint; if neither, it's noise.</p>
+
+<h2>The future — AI changes which shapes appear, not the triage</h2>
+
+<p>AI erodes the <em>build</em> cost of the simple shapes fastest: landing pages, content sites, and simple CRUD apps can now be scaffolded by a model. The shapes don't disappear — but their <em>marginal</em> constraints get sharper. A landing page is no longer hard because it's hard to build; it's hard because conversion and speed are measurable, and the bar rises. The complex shapes (SaaS, booking, migration, performance) survive because their constraints — tenant isolation, time math, preservation, measurement — are exactly what AI is worst at. The triage discipline survives because the death modes don't change: a double-booking is a double-booking whether the calendar was hand-built or AI-generated. The premium shifts from <em>writing the code a shape needs</em> to <em>recognizing which shape the brief is and where the real risk sits</em> — which is the whole job of this doc.</p>
+
+<p>AI also introduces <strong>new emerging shapes</strong>, each with its own constraint and death mode:</p>
+<ul>
+  <li><strong>AI chat product</strong> — grounded responses and safety policy; death mode is confident hallucination the user trusts.</li>
+  <li><strong>AI agent product</strong> — tool permission boundaries and an audit trail of actions taken; death mode is an agent acting with authority it was never given.</li>
+  <li><strong>AI feature inside a SaaS</strong> — evaluation and trust: you can't ship what you can't score, and users will not trust a black box with their data (<a href="./data-modeling-and-databases.html">Data Modeling</a> §PII / <a href="./security-and-threat-modeling.html">Security</a>).</li>
+</ul>
+
+<p>AI doesn't remove shapes — it changes which ones are commodity. The building of the simple shapes cheapens; the constraints of every shape remain.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Print this. It is the entire doc in twelve lines, one per shape:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Landing page — performance is the product; one action, measurable traffic.</td></tr>
+    <tr><td>2</td><td>Dashboard — data density and state; every cell says loading/empty/error/stale, and permissions are a data decision.</td></tr>
+    <tr><td>3</td><td>SaaS — tenant isolation, billing, onboarding; technical decisions are downstream of the pricing decision.</td></tr>
+    <tr><td>4</td><td>CRUD / internal tool — validation and workflow states; the gap between Postman and production is the complexity.</td></tr>
+    <tr><td>5</td><td>E-commerce — checkout reliability; a double-charge or lost order is a direct revenue loss.</td></tr>
+    <tr><td>6</td><td>Content site — the technology disappears; the content model and SEO are the product.</td></tr>
+    <tr><td>7</td><td>Booking — time math is the hardest problem; the slot model must be right before any UI.</td></tr>
+    <tr><td>8</td><td>Portfolio — smallest shape, highest design bar; fast but generic is still failure.</td></tr>
+    <tr><td>9</td><td>API integration — the error paths are the product; it must survive 3 AM.</td></tr>
+    <tr><td>10</td><td>WordPress / CMS — editability is a deliverable; the client edits or it's broken.</td></tr>
+    <tr><td>11</td><td>Migration / redesign — preservation is the constraint; a success is one nobody notices.</td></tr>
+    <tr><td>12</td><td>Performance — never done; the discipline is knowing when to stop.</td></tr>
+  </tbody>
+</table>
+
+<p>And the triage that runs before all of them: <strong>name the shape, name the constraint, name the death mode, route to the owning doc, scope to the shape.</strong></p>
+
+<section class="cite">
+  <h2>Primary sources</h2>
+  <ol>
+    <li>The shelf itself — every discipline doc cited in the link maps above. This doc is a routing table over them, not a source of new knowledge.</li>
+    <li>Core Web Vitals — <a href="https://web.dev/articles/vitals">web.dev — Web Vitals</a>, the constraint that defines the performance shape.</li>
+    <li>Multi-tenant data isolation — <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/multitenant-saas">Microsoft Azure Architecture Center — multitenant SaaS patterns</a>, the constraint that defines the SaaS shape.</li>
+    <li>Strangler Fig / migration patterns — <a href="https://martinfowler.com/bliki/StranglerFigApplication.html">Martin Fowler — StranglerFigApplication</a>, the constraint that defines the migration shape.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2>Ask your teacher</h2>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take the last real project brief I got and walk me through your triage: shape, constraint, death mode, owning docs — before any code."</li>
+    <li>"Where do my current skills land? Which two shapes am I best prepared for, and which two should I deliberately avoid until I've read their owning docs?"</li>
+    <li>"Give me a real brief where the shape was misidentified — what did the over- or under-engineering look like, and what did it cost?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Product Shapes — the triage layer over the whole shelf</span>
+  <span>Business: <a href="./freelance-web-practice.html">Freelance Web Practice</a> · Stack: <a href="./frontend-camps-survey.html">Camps Survey</a> · Strategy: <a href="./product-strategy.html">Product Strategy</a> · Platforms: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

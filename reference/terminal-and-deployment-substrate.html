@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminal &amp; the Deployment Substrate — the plumbing under every doc</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Terminal &amp; Deployment — the substrate your code runs on</p>
+  <h1>Terminal &amp; the Deployment Substrate</h1>
+  <p class="meta">The invisible substrate under every other doc on this shelf: the terminal commands that unblock you (shell fundamentals, navigation, process management, environment variables, pipes, networking, permissions), the Docker mental model (images vs. containers, Dockerfiles, Compose, common ports, why a container is not a VM), Kubernetes literacy (Pods, Deployments, Services), and the three eras of cloud (IaaS, PaaS, Serverless) — each mapped to the shelf doc that owns its depth. Read this when a doc says "run this in your terminal", when your server won't start, or when you need to understand where your code actually runs.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> Every doc on this shelf assumes a terminal exists. <a href="./backend-engineering.html">Backend Engineering</a> says the server must be stateless; <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> ships container images; <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> scripts client operations with WP-CLI. None of them stops to teach the tool underneath. This doc is that stop — the plumbing layer, deliberately shallow:</p>
+  <pre>THE ENGINEERING CORE                 THE SUBSTRATE (this doc)
+system-design.html                   terminal-and-deployment-substrate.html  ← YOU ARE HERE
+api-design.html                           |— terminal survival kit (20% for 99%)
+backend-engineering.html                  |— Docker: images vs containers
+data-modeling-and-databases.html          |— Kubernetes: Pods/Deployments/Services
+security-and-threat-modeling.html         |— cloud: IaaS → PaaS → Serverless
+                                          |
+Depth stays in the core docs; this doc only maps to it:
+version-control-ci-cd-deployment.html (the artifact pipeline)
+backend-engineering.html (the statelessness contract)
+system-design.html (latency, edge, failure domains)</pre>
+  <p>Neighbors and how they split the work:</p>
+  <ul>
+    <li><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — owns the pipeline: builds, artifacts, release strategies, supply-chain integrity. This doc explains what the artifact <em>is</em> (a container) and the commands you use locally.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — owns the request loop and why serverless forces statelessness. This doc supplies the terminal skills to run and debug that server.</li>
+    <li><a href="./system-design.html">System Design</a> — owns latency, edge computing, failure domains, and when a platform is overkill. This doc supplies the three-era map of deployment targets.</li>
+    <li><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — owns threats and secrets. This doc supplies the hygiene mechanics (file permissions, the "never sudo a server" rule).</li>
+    <li><a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> — owns the history rows (Docker 2013, AWS 2006); this doc does not repeat them.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p><em>No other doc on the shelf teaches the terminal or what a container is.</em> The curriculum assumes you can run commands, read a log, and picture a deployment target — and never once shows you how. The study guides reviewed against this shelf claimed these topics were covered; the audit found the Docker mental model (image vs. container) and the entire terminal survival kit were absent. This doc closes that gap with the smallest possible surface: the ~20% of the terminal that solves 99% of web engineering problems, the one-paragraph mental models for Docker and Kubernetes, and the three-era cloud map. One scope note: <strong>this is not a sysadmin or DevOps course</strong> — the "safely ignore" table in the Definition is as important as the rest.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read this early — it is the plumbing for everything else. It pairs with <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> (the pipeline that consumes Docker images) and <a href="./backend-engineering.html">Backend Engineering</a> (the server you run with these commands). Cross-links:</p>
+<ul>
+  <li>Artifacts and promotion: <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a> — build-once-promote-many lives there; the container concept lives here.</li>
+  <li>Statelessness contract: <a href="./backend-engineering.html">Backend Engineering</a> — why serverless forbids in-memory state.</li>
+  <li>Latency and edge: <a href="./system-design.html">System Design</a> — the physics behind CDNs and edge compute.</li>
+  <li>Threats and secrets: <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — OS command injection, secret hygiene.</li>
+  <li>History: <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> — Docker 2013, AWS 2006, the inversions.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever googled "how to kill a process on port 3000", drawn a blank at "docker run", or nodded along when someone said "Pods and Services" — this is the map.</strong> Read the Definition (what this doc is and is not), then the Shell fundamentals and Survival kit, then Docker and Cloud. The Worked examples are where it comes together.</p>
+
+<h2>Definition — the substrate, and what it is not</h2>
+
+<p>The substrate is everything your code runs <em>on</em>: the operating system, the terminal that drives it, the container format that packages it, and the cloud eras that rent it. Web engineers do not administrate this layer; they <strong>operate it</strong> — enough to unblock themselves, run their code, and understand the deployment targets their systems design chooses.</p>
+
+<table>
+  <thead><tr><th>What this doc is</th><th>What this doc is not</th></tr></thead>
+  <tbody>
+    <tr><td>Terminal survival kit — the 20% that solves 99% of web engineering problems</td><td>Sysadmin curriculum: kernel compilation, OS patching, package management of servers</td></tr>
+    <tr><td>Mental models — image vs. container, Pods/Deployments/Services, three cloud eras</td><td>DevOps career track: Helm chart authoring, cluster administration, Terraform/Pulumi authoring, VPC subnetting</td></tr>
+    <tr><td>Hygiene rules — permissions, secrets on disk, "never sudo a web server"</td><td>Deep networking: BGP routing, iptables/ufw manual firewalling, container networking internals (Calico/Istio)</td></tr>
+    <tr><td>Debugging habits — logs before fixes, find the PID, kill it</td><td>Desktop Linux customization, window managers, Vim/Emacs mastery</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The boundary rule:</strong> if the task happens <em>while developing or shipping a web application</em>, it belongs to your literacy. If the task is <em>keeping infrastructure alive as a job</em>, it belongs to SREs and Platform Engineers — and the cloud does most of it for you anyway.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+  <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a></td><td>Pipelines, artifact types, release strategies, supply-chain integrity</td><td>There: the signed container image as the pipeline artifact. Here: what a container <em>is</em>, and the local commands (<code>docker ps</code>, <code>logs</code>, <code>exec</code>).</td></tr>
+    <tr><td><a href="./backend-engineering.html">Backend Engineering</a></td><td>The request loop, statelessness, caching, env-var configuration</td><td>There: why state must live in external stores. Here: the terminal mechanics (<code>export</code>, <code>source .env</code>, <code>lsof</code>/<code>kill</code>) to run and debug the loop.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a></td><td>Scaling, failure domains, latency budgets, edge, overkill warnings</td><td>There: whether to pick serverless or K8s, and when a platform is too complex. Here: the one-glance map of the three eras and the K8s primitives, so those decisions read as real things.</td></tr>
+    <tr><td><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a></td><td>Threats, STRIDE, secrets management, OS command injection</td><td>There: the threat model. Here: the mechanics — <code>chmod 600</code> on <code>.env</code>, SSH key hygiene, never running the app as root.</td></tr>
+    <tr><td><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a></td><td>WP-CLI operations on client sites</td><td>There: the WordPress-specific commands. Here: the terminal skills those commands presume.</td></tr>
+  </tbody>
+</table>
+
+<p>The order of dependence: you cannot use Git, npm, Docker, or WP-CLI without the terminal; you cannot reason about deployment without the cloud map; you cannot deploy without containers. Learn this layer once, shallowly, and every other doc stops assuming and starts referencing.</p>
+
+<h2>The terminal — the universal remote</h2>
+
+<p><strong>The terminal is the raw interface to every tool on this shelf.</strong> GUIs hide complexity behind buttons; the terminal exposes the underlying operations — and every tool the shelf teaches (Git, npm, Node, Docker, curl, WP-CLI) is designed terminal-first. When a GUI exists, it is a skin over the same command. What the terminal gives you that GUIs cannot:</p>
+
+<table>
+  <thead><tr><th>Capability</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Scriptability</strong></td><td>Anything you do once, you can chain and repeat — your CI pipeline is literally a sequence of terminal commands running in a Linux container</td></tr>
+    <tr><td><strong>Remote access</strong></td><td>The only way in when the machine is a server in another continent (<code>ssh</code>)</td></tr>
+    <tr><td><strong>Truth</strong></td><td>Logs, process lists, and file permissions show what <em>is</em>, not what a GUI decided to display</td></tr>
+    <tr><td><strong>Precision</strong></td><td>One command targets exactly one thing — a PID, a line in a file, a port — instead of clicking through menus</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Linux is the universal host.</strong> Whether you deploy to AWS, Vercel, a Raspberry Pi, or a container, the environment is almost always Linux. macOS is Unix underneath (very similar); Windows developers use WSL to emulate it. So the terminal habits you build locally transfer to production almost unchanged — which is exactly why "it worked in my terminal" is the closest thing to "it works in production" you will ever get.</p>
+
+<h2>Shell fundamentals — the environment you type into</h2>
+
+<p><strong>Terminal vs. shell vs. command line.</strong> The <em>terminal</em> is the window you look at (iTerm2, Windows Terminal, GNOME Terminal); the <em>shell</em> is the program inside it that interprets what you type (bash on most Linux, zsh on macOS since Catalina); the <em>command line</em> is the interface where you type. The distinction matters when you edit shell config: your aliases and PATH additions live in <code>~/.bashrc</code> on Linux and <code>~/.zshrc</code> on macOS — put them in the wrong file and nothing happens.</p>
+
+<p><strong>The two features that make the terminal faster than a GUI:</strong> <em>tab completion</em> — type <code>git ch</code> and press Tab to complete to <code>git checkout</code> (press Tab twice to list the options) — and <em>command history</em> — the ↑/↓ arrows walk through past commands, and <code>Ctrl+R</code> searches them. Without these the terminal feels slower than clicking; with them it is dramatically faster. Learn them before any command.</p>
+
+<p><strong>Paths.</strong> An <em>absolute</em> path starts at the root: <code>/home/you/projects/my-app</code>. A <em>relative</em> path starts from where you are: <code>./src/index.js</code> or <code>../shared/utils.js</code>. <code>~</code> is shorthand for your home directory, <code>.</code> is the current directory, <code>..</code> is the parent — which is why <code>cd projects</code> works from home but not from <code>/tmp</code>.</p>
+
+<p><strong>Redirection, wildcards, and chaining</strong> — the three operators that turn commands into scripts:</p>
+
+<pre>npm run build &gt; build.log 2&gt;&amp;1   # &gt; write output to a file (overwrite); 2&gt;&amp;1 folds errors in too
+echo "DB=..." &gt;&gt; .env          # &gt;&gt; append to a file instead of overwriting
+rm *.log                        # * matches any text: every .log file in this directory
+npm install &amp;&amp; npm run dev     # &amp;&amp; run the second only if the first succeeded
+npm test || echo "failed"       # || run the second only if the first failed
+cd src ; ls                      # ; run both, regardless of success</pre>
+
+<p><strong>Aliases and built-in help.</strong> <code>alias gs='git status'</code> defines a shortcut you will see in other people's configs. When you meet a command you don't know, the terminal documents itself: <code>man lsof</code> is the full manual, <code>lsof --help</code> the quick summary.</p>
+
+<h2>The survival kit — the 20% for 99%</h2>
+
+<p>Six small tables. These are not "nice to know" — they are the set that unblocks 99% of web engineering problems: moving around, finding what is running, configuring the environment, searching logs, testing endpoints, and not shooting yourself in the foot. Practice each until it is reflex; that is the entire curriculum.</p>
+
+<h3>A. Navigation &amp; file management — moving without a mouse</h3>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th><th>Shelf context</th></tr></thead>
+  <tbody>
+    <tr><td><code>pwd</code></td><td>Where am I?</td><td>The first thing to check before any destructive command</td></tr>
+    <tr><td><code>ls -la</code></td><td>List everything, including hidden files (<code>.env</code>, <code>.git</code>) with permissions</td><td>Secrets hygiene: <a href="./security-and-threat-modeling.html">Security</a></td></tr>
+    <tr><td><code>cd ..</code> / <code>cd ~</code></td><td>Up one level / home directory</td><td>Server navigation via SSH</td></tr>
+    <tr><td><code>mkdir</code>, <code>cp</code>, <code>mv</code></td><td>Create, copy, move</td><td>Trivial — but <code>mv</code> is also how you "rename" a file</td></tr>
+    <tr><td><code>rm -rf</code></td><td>Force-delete a directory tree</td><td>The most dangerous command in the kit — see Failure modes</td></tr>
+    <tr><td><code>cat</code> / <code>less</code></td><td>Print a file / page through a big one (logs)</td><td>Reading error logs is where every senior debug starts</td></tr>
+    <tr><td><code>head</code> / <code>tail -f</code></td><td>First lines / last lines, <code>-f</code> follows new output live</td><td>Live log reading — the single most common server debugging move</td></tr>
+    <tr><td><code>man</code> / <code>cmd --help</code></td><td>Built-in documentation for any command</td><td>See Shell fundamentals — the terminal documents itself</td></tr>
+  </tbody>
+</table>
+
+<h3>B. Process management — unblocking yourself</h3>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th><th>Shelf context</th></tr></thead>
+  <tbody>
+    <tr><td><code>lsof -i :3000</code></td><td>Which process is holding port 3000? (prints the PID)</td><td>The <code>EADDRINUSE</code> fix — see the Worked example</td></tr>
+    <tr><td><code>kill -9 &lt;PID&gt;</code></td><td>Force-kill that process</td><td>Ghost dev servers, hung jobs</td></tr>
+    <tr><td><code>ps aux | grep node</code></td><td>Find running Node processes</td><td>Is my server actually up?</td></tr>
+    <tr><td><code>top</code> / <code>htop</code></td><td>What is eating CPU/RAM?</td><td><a href="./backend-engineering.html">Backend Engineering</a> — performance debugging</td></tr>
+  </tbody>
+</table>
+
+<h3>C. The environment &amp; variables</h3>
+
+<p><a href="./backend-engineering.html">Backend Engineering</a> treats configuration as environment variables (<code>process.env.DATABASE_URL</code>). The terminal is where those live and get loaded:</p>
+
+<pre>export MY_VAR="secret"     # set for this session
+echo $MY_VAR               # print it — verify
+echo $PATH                 # the directories the shell searches for commands
+source .env                # load a .env file into the session (or use a dotenv loader)</pre>
+
+<table>
+  <thead><tr><th>Concept</th><th>What it does</th><th>Shelf context</th></tr></thead>
+  <tbody>
+    <tr><td><code>export</code></td><td>Make a variable visible to programs you launch</td><td>Config without config files — <a href="./backend-engineering.html">Backend §12-Factor</a></td></tr>
+    <tr><td><code>$PATH</code></td><td>The directories searched when you type a command</td><td>"command not found" = the tool isn't in PATH (or isn't installed)</td></tr>
+    <tr><td><code>which node</code></td><td>Where is this command installed?</td><td>The first thing to check when a version looks wrong</td></tr>
+    <tr><td><code>source .env</code></td><td>Load a dotenv file into the current session</td><td>Secrets stay out of Git — <a href="./version-control-ci-cd-deployment.html">CI/CD secrets section</a></td></tr>
+  </tbody>
+</table>
+
+<h3>D. Pipes &amp; searching — the superpower</h3>
+
+<p>The Unix philosophy: small tools that do one thing well, chained with <code>|</code>. Output of the left feeds input of the right:</p>
+
+<pre>cat server.log | grep "ERROR"    # only the error lines of a huge log
+history | grep docker            # that complex command you typed yesterday
+ps aux | grep node               # find processes without a GUI task manager</pre>
+
+<p>And for finding files rather than lines: <code>find . -name "*.env"</code> searches the tree from where you are, filtering by name — you know it exists, just not where.</p>
+
+<p>This one habit — <em>grep the log instead of scrolling it</em> — is the single biggest debugging upgrade on the shelf. It is exactly what <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> prescribes: evidence before hypothesis.</p>
+
+<h3>E. Networking &amp; remote access</h3>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th><th>Shelf context</th></tr></thead>
+  <tbody>
+    <tr><td><code>curl -I https://api.example.com</code></td><td>Fetch headers only — is the endpoint up, and what status does it return?</td><td><a href="./api-design.html">API Design</a> — testing contracts without Postman</td></tr>
+    <tr><td><code>curl -X POST -H "Content-Type: application/json" -d '{"id":1}' localhost:3000/api</code></td><td>Exercise an endpoint directly</td><td>The fastest way to test your own backend</td></tr>
+    <tr><td><code>ssh user@host</code></td><td>Log into a remote Linux server securely</td><td>Client servers — <a href="./freelance-web-practice.html">Freelance Web Practice</a></td></tr>
+    <tr><td><code>scp</code> / <code>rsync</code></td><td>Copy files to/from a remote machine</td><td>Deploying a static build, pulling a backup</td></tr>
+  </tbody>
+</table>
+
+<p><strong>SSH keys and the concept of "remote".</strong> <code>ssh user@host</code> opens a secure tunnel: the commands you type execute <em>on the server</em>, not your laptop — <code>ls</code> lists the server's files, and <code>exit</code> brings you back. Logging in with a password works but is weak and awkward; the standard is an <em>SSH key pair</em> — your <strong>private</strong> key stays on your laptop, your <strong>public</strong> key is installed on the server (or on GitHub, for <code>git push</code> over SSH). Once that is set up, logging in needs no password. Shortcuts live in <code>~/.ssh/config</code>, where you can define <code>ssh prod</code> to mean the full host, user, and port. The depth — key rotation, agent forwarding — belongs to <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>; here you need the model and the habit.</p>
+
+<h3>F. Permissions — the security baseline</h3>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th><th>Shelf context</th></tr></thead>
+  <tbody>
+    <tr><td><code>chmod +x script.sh</code></td><td>Make a script executable</td><td>Deploy scripts, CI helpers</td></tr>
+    <tr><td><code>chmod 600 .env</code></td><td>Secrets file readable only by you</td><td>Secrets hygiene — <a href="./security-and-threat-modeling.html">Security</a></td></tr>
+    <tr><td><code>sudo &lt;cmd&gt;</code></td><td>Run a command as root</td><td>Only for system-level installs; see the rule below</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The rule that saves servers:</strong> never run your Node/Python server with <code>sudo</code>. If the app is compromised, an attacker inherits root and owns the whole machine. Run as an unprivileged user; the process manager or platform does the privileged parts.</p>
+
+<h2>Docker — the deployment unit</h2>
+
+<p><strong>The mental model in one sentence:</strong> an <strong>image</strong> is the blueprint (a recipe: base OS + runtime + your code + config), built once and versioned; a <strong>container</strong> is a running process created from that image, started as many times as you like. You never "edit a running container" — you rebuild the image and start a new one. That one sentence is the entire mental model; everything else is tooling.</p>
+
+<table>
+  <thead><tr><th></th><th>Image</th><th>Container</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Kind</strong></td><td>The blueprint — built once</td><td>The live process — run many times</td></tr>
+    <tr><td><strong>Lifecycle</strong></td><td>Immutable, versioned (<code>v1.2.0</code>)</td><td>Ephemeral — dies and is replaced, never patched in place</td></tr>
+    <tr><td><strong>Analogy</strong></td><td>A recipe</td><td>A meal made from it</td></tr>
+  </tbody>
+</table>
+
+<p><strong>A container is not a VM.</strong> A VM emulates a whole computer — its own kernel, gigabytes, minutes to boot. A container is a packaged, isolated <em>process</em> sharing the host's Linux kernel (via cgroups and namespaces), starting in milliseconds and consuming only what the process needs. VMs virtualize hardware; containers virtualize the OS. This is why containers are the default deployment unit of the modern web, and why the CI/CD doc's artifact table lists <em>signed container images</em> as the modern choice.</p>
+
+<p><strong>Why it all exists — "it works on my machine".</strong> Your app depends on an exact Node version, specific OS libraries, and specific environment variables; your coworker's machine and the production server have different versions. The image freezes the winning combination — the same base OS, runtime, code, and config in every environment — so "it works on my machine" becomes "it works in this image", and the image is identical everywhere. That is the entire reason to containerize.</p>
+
+<p><strong>The Dockerfile — the recipe that builds an image.</strong> A Dockerfile is a step-by-step recipe; each line is a step, and the result is an image. You rarely write one from scratch, but you will read them constantly, so recognize the four instructions that do all the work:</p>
+
+<pre>FROM node:20-alpine        # the base image you build on top of
+WORKDIR /app               # the working directory inside the image
+COPY package*.json ./      # copy files from your machine into the image
+RUN npm ci                 # run a command during the build (install deps)
+COPY . .                   # copy the rest of the app
+CMD ["npm", "start"]       # the command that runs when the container starts</pre>
+
+<p><strong>Docker Compose — the recipe for your whole local environment.</strong> <code>docker-compose.yml</code> is a YAML file that describes several containers and how they connect — your app, a database, a cache — so one command brings up the entire stack. This is how you get local Postgres and Redis for development instead of installing them natively on your laptop:</p>
+
+<pre>services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: dev
+    ports:
+      - "5432:5432"          # host port : container port (see the ports table)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:</pre>
+
+<p><code>docker compose up</code> starts everything the file describes; <code>docker compose down</code> stops and removes it. When you clone a repo that has one of these files, you do not install a database by hand — you read the file to see what the project needs, then <code>docker compose up</code>. The mental model is the same as the Dockerfile: a declarative recipe you read and run, not a sequence you improvise.</p>
+
+<p><strong>Port mapping and volume mounts — the two flags you'll see everywhere.</strong> A container has its own network namespace: <code>-p 3000:3000</code> (or <code>ports:</code> in Compose) maps port 3000 on your machine to port 3000 inside the container — without it, your browser cannot reach the container's web server. A container's filesystem is ephemeral — everything written inside is lost when it stops — so <code>-v ./src:/app/src</code> (or <code>volumes:</code>) mounts a directory from your machine into the container, which is how you develop <em>inside</em> a container with your files live-synced.</p>
+
+<h3>Common ports — the numbers behind every service</h3>
+
+<p>A <em>port</em> is a number that identifies one service on a machine. One machine runs many services at once — the web server on 3000, the database on 5432, the cache on 6379 — and the OS routes traffic to the right one by the port number. When two services grab the same port you get <code>EADDRINUSE</code> (the ghost-port example below).</p>
+
+<table>
+  <thead><tr><th>Port</th><th>Service</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td>80</td><td>HTTP</td><td>Unencrypted web traffic</td></tr>
+    <tr><td>443</td><td>HTTPS</td><td>Encrypted web traffic</td></tr>
+    <tr><td>22</td><td>SSH</td><td>Remote login</td></tr>
+    <tr><td>3000</td><td>Dev server (convention)</td><td>React/Next.js/Express dev server</td></tr>
+    <tr><td>5432</td><td>PostgreSQL</td><td>Default Postgres port</td></tr>
+    <tr><td>3306</td><td>MySQL</td><td>Default MySQL port</td></tr>
+    <tr><td>6379</td><td>Redis</td><td>Default Redis port</td></tr>
+    <tr><td>27017</td><td>MongoDB</td><td>Default MongoDB port</td></tr>
+    <tr><td>8080</td><td>HTTP (alternate)</td><td>Common for proxied web servers</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The pipeline connection:</strong> your CI runs tests, builds the image, tags it, and pushes it to a registry; deployment strategies (rolling, blue-green, canary) are just "which version of the image is receiving traffic". You build <strong>once</strong> in CI and promote the exact same image through staging to production — never rebuild per environment. That's the build-once-promote-many rule, and its home is <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a>; this doc only names the concept so the pipeline reads as real.</p>
+
+<p><strong>Running your stack day to day:</strong> <code>docker compose up</code> for the local environment, and three debugging commands, memorized:</p>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>docker ps</code></td><td>What containers are running right now?</td></tr>
+    <tr><td><code>docker logs &lt;container_id&gt;</code></td><td>Read a container's output — your error log lives here</td></tr>
+    <tr><td><code>docker exec -it &lt;id&gt; /bin/sh</code></td><td>Open a shell inside the container to inspect its filesystem</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Safely ignore:</strong> multi-stage Dockerfiles tuned for legacy apps, image-layer micro-optimization, and container networking internals. If you can read a simple Dockerfile and run compose, you have the literacy this shelf requires.</p>
+
+<h2>Kubernetes — orchestration literacy</h2>
+
+<p>Kubernetes (K8s) is the "operating system of the data center": it takes container images and decides where they run, how many copies exist, and how traffic reaches them. You will almost certainly <strong>never administer a cluster</strong> — managed platforms and system-design warnings see to that — but the primitives appear constantly in job posts, platform docs, and architecture conversations. Three nouns are enough:</p>
+
+<table>
+  <thead><tr><th>Primitive</th><th>What it is</th><th>One-line mental model</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Pod</strong></td><td>The smallest deployable unit: one or a few containers that share a network identity</td><td>"A running container (or two tightly-coupled ones), with an IP"</td></tr>
+    <tr><td><strong>Deployment</strong></td><td>The declarative desired state: how many Pod replicas, which image version, how to roll updates</td><td>"I want 3 copies of image v1.2.0, and I want them swapped out without downtime"</td></tr>
+    <tr><td><strong>Service</strong></td><td>A stable name and load balancer in front of a set of Pods</td><td>"Pods die; this name keeps working regardless of which Pod answers"</td></tr>
+  </tbody>
+</table>
+
+<p>The connection between the three: a <strong>Deployment creates Pods</strong>, and a <strong>Service routes traffic to the healthy Pods</strong> behind it — that chain is the whole wiring. When a platform says "deploy a Deployment with a Service", you can now picture the thing: three ephemeral containers behind a stable address. That is the entire literacy bar. The moment someone proposes running Kubernetes <em>yourself</em>, remember the shelf's own warning — <a href="./system-design.html">System Design</a> lists "Kafka + Kubernetes + Istio for a 3-person CRUD team" as the canonical overkill. Cluster administration is a career, not a skill; you are licensed to nod and defer.</p>
+
+<h2>Cloud — the three eras of renting compute</h2>
+
+<p>Since AWS launched S3 and EC2 in 2006 (<a href="./cs-and-software-engineering.html">CS &amp; SE history</a>), compute has been rentable by the minute instead of bought as hardware. Three eras of that rent define every deployment target you will choose from — each rents one layer higher up the stack:</p>
+
+<table>
+  <thead><tr><th>Era</th><th>You rent</th><th>You manage</th><th>Examples</th><th>The constraint it imposes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>IaaS</strong><br>Infrastructure as a Service</td><td>Virtual machines</td><td>OS, runtime, and app</td><td>AWS EC2, DigitalOcean, Azure VMs</td><td>Full control, full ops burden — you are the admin</td></tr>
+    <tr><td><strong>PaaS / managed</strong><br>Platform as a Service</td><td>The runtime or the database</td><td>Just your app (and your schema)</td><td>Heroku, Vercel, Render, AWS RDS, Neon, Supabase</td><td>Push code, the platform runs it — configuration replaces administration</td></tr>
+    <tr><td><strong>Serverless / edge</strong><br>Execution as a Service</td><td>The execution itself</td><td>Only your function's logic</td><td>AWS Lambda, Cloudflare Workers, Vercel Edge Functions</td><td>Scales to zero when idle — and your code must tolerate it</td></tr>
+  </tbody>
+</table>
+
+<p><strong>How cloud constrains backend engineering:</strong> the serverless era forces the request loop to be <strong>stateless</strong>. The next request may hit a different, cold-started container — so sessions and caches cannot live in local memory. <a href="./backend-engineering.html">Backend Engineering</a> puts the contract exactly: "an in-memory cache is now a cold-start gamble. Statelessness stops being a choice and becomes the contract." State must live in an external database or cache (Redis). PaaS hides this from you; serverless enforces it on you; knowing the difference is what the eras map is for.</p>
+
+<p><strong>Edge &amp; data gravity:</strong> reading a database in us-east-1 from a user in Tokyo pays a physics penalty — the speed of light — which is why CDNs and edge compute push work to where the users are. The modern pattern moves compute <em>to the data</em>. The depth (latency budgets, consistency across edges, Durable Objects) belongs to <a href="./system-design.html">System Design</a>; this doc's job is just to make "edge" mean "closer to the user, because physics".</p>
+
+<h2>Where does your code run — one map</h2>
+
+<p>The terminal, Docker, and cloud sections are three views of the same ladder. Every environment below is a place your code runs, with a different way in, different common failure, and different debug reflex — learn the ladder so a "works locally" report always gets the follow-up: <em>where?</em></p>
+
+<table>
+  <thead><tr><th>Environment</th><th>Where it runs</th><th>How you get in</th><th>Common failure</th><th>Debug with</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Local dev</strong></td><td>Your laptop</td><td><code>npm run dev</code> + browser</td><td>Port conflict, missing <code>.env</code></td><td><code>lsof</code>/<code>kill</code>, <code>cat .env</code>, browser console</td></tr>
+    <tr><td><strong>Docker dev</strong></td><td>Containers on your laptop</td><td><code>docker compose up</code> + browser</td><td>Port mapping, dead database container</td><td><code>docker ps</code>, <code>docker logs</code>, <code>docker exec</code></td></tr>
+    <tr><td><strong>Staging</strong></td><td>Cloud server/container</td><td>Browser; SSH for the server</td><td>Wrong env vars, missing secrets</td><td>SSH + <code>tail -f</code> logs, <code>curl</code> the health endpoint</td></tr>
+    <tr><td><strong>Production</strong></td><td>Cloud server/container/CDN</td><td>Browser, monitoring dashboard</td><td>Everything above, plus traffic and scale</td><td>Logs, metrics, traces — the observability stack</td></tr>
+  </tbody>
+</table>
+
+<p>Notice the ladder's logic: every step up keeps the same code, the same <em>image</em>, but changes who runs it and how you see it. That is the whole relationship between this doc and <a href="./system-design.html">System Design</a> — you choose the rungs; this doc gives you the map.</p>
+
+<h2>Worked example — the ghost port</h2>
+
+<p>The most common local-development bug in existence: <code>EADDRINUSE</code>. You restart your server and the port is taken by a process you forgot about. The senior reflex, in four commands:</p>
+
+<pre>$ npm run dev
+Error: listen EADDRINUSE: address already in use :::3000
+
+$ lsof -i :3000
+COMMAND  PID   USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+node     4821  me     21u  IPv4 12345      0t0  TCP *:3000 (LISTEN)
+
+$ kill -9 4821
+
+$ npm run dev      # works</pre>
+
+<p>That is the whole pattern, and it generalizes to every debugging session on the shelf: <strong>read the error → find the evidence (log, process, port) → act on exactly what the evidence names → verify</strong>. The junior clicks around the IDE; the senior opens the terminal, tails the log, greps for the error, finds the PID, and kills it. This is the habit <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> formalizes — the terminal is just where the evidence lives.</p>
+
+<h2>Worked example — I just cloned a repo</h2>
+
+<p>The other daily ritual: a teammate hands you a repo URL and you need it running. The whole ladder in one session — reading files, env vars, and Docker Compose all at once:</p>
+
+<pre>$ git clone https://github.com/team/project.git
+$ cd project
+$ cat README.md            # setup instructions usually live here
+$ cat package.json         # check the Node version and the start script
+$ npm install
+$ cp .env.example .env     # create your env file from the template
+$ npm run dev
+Error: connect ECONNREFUSED 127.0.0.1:5432
+$ docker compose up -d     # the database (port 5432, see the ports table) isn't running
+$ npm run dev              # works</pre>
+
+<p>Same pattern, one rung down the ladder: the error names an address (<code>127.0.0.1:5432</code>), you read the repo's <code>docker-compose.yml</code> to see what should own that port, you start it, you verify. What <em>changed</em> between first and second try? Nothing in the code — only the environment the code runs in. That is the substrate.</p>
+
+<h2>The most common failure modes</h2>
+
+<table>
+  <thead><tr><th>Symptom</th><th>Cause</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><code>command not found</code></td><td>The tool isn't installed, or isn't in <code>$PATH</code></td><td><code>echo $PATH</code>; install via npm/system package manager; run the full path or <code>npx</code></td></tr>
+    <tr><td><code>permission denied</code></td><td>File mode or wrong user</td><td><code>chmod</code>/<code>chown</code>; check which user you are (<code>whoami</code>); use <code>sudo</code> only for system-level installs</td></tr>
+    <tr><td>Port already in use</td><td>A ghost process from an earlier run</td><td><code>lsof -i :PORT</code> then <code>kill</code> — the Worked example</td></tr>
+    <tr><td>Stuck in Vim</td><td>Unknown editor commands</td><td><code>Esc</code>, <code>i</code> to insert, <code>:wq</code> to save and quit — or just use <code>nano &lt;file&gt;</code>, the gentle editor, until you're comfortable. Then go back to VS Code; that is the whole Vim course</td></tr>
+    <tr><td>Editing production</td><td>No local/staging setup</td><td>Never. Develop locally, ship through the pipeline — <a href="./version-control-ci-cd-deployment.html">CI/CD</a> exists to make this unnecessary</td></tr>
+    <tr><td><code>sudo npm install</code> / <code>sudo node app.js</code></td><td>Running app commands as root</td><td>Never run the server as root; fix file permissions instead, and let the process manager or platform own privileges</td></tr>
+    <tr><td><code>rm -rf</code> in the wrong directory</td><td>There is no undo</td><td><code>pwd</code> before destructive commands; keep code in Git so the blast radius is one command, not your career</td></tr>
+    <tr><td>Rebuilding images per environment</td><td>Misunderstanding the artifact</td><td>Build once, tag, promote the same image — the Docker section and the CI/CD artifact table</td></tr>
+  </tbody>
+</table>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Print this. It is the entire doc in eleven lines:</p>
+
+<table>
+  <thead><tr><th>#</th><th>The line</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>The terminal is the raw interface; Linux is the universal host. ~20% of it solves 99% of problems.</td></tr>
+    <tr><td>2</td><td>Before anything destructive: <code>pwd</code>. Never <code>rm -rf</code> without knowing where you are.</td></tr>
+    <tr><td>3</td><td>Port stuck? <code>lsof -i :3000</code> → <code>kill -9 &lt;PID&gt;</code> → rerun.</td></tr>
+    <tr><td>4</td><td>Config lives in environment variables: <code>export</code>, <code>source .env</code>, and if a tool is missing, suspect <code>$PATH</code>.</td></tr>
+    <tr><td>5</td><td>Logs before fixes: <code>cat log | grep "ERROR"</code> beats scrolling every time.</td></tr>
+    <tr><td>6</td><td>Test endpoints with <code>curl</code>; reach remote machines with <code>ssh</code>/<code>scp</code>.</td></tr>
+    <tr><td>7</td><td>Never run your web server with <code>sudo</code>. <code>chmod 600</code> your secrets files.</td></tr>
+    <tr><td>8</td><td>An image is the blueprint built once; a container is the process run many times. A container is not a VM.</td></tr>
+    <tr><td>9</td><td>Pods run, Deployments declare, Services name. You read Kubernetes; you do not administer it.</td></tr>
+    <tr><td>10</td><td>Three cloud eras: IaaS rents machines, PaaS rents runtimes, Serverless rents execution — and serverless makes statelessness a contract.</td></tr>
+    <tr><td>11</td><td>Edge exists because physics: compute moves to the data when latency matters.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://docs.docker.com/get-started/">Docker — Get Started (images vs. containers)</a> ·
+  <a href="https://kubernetes.io/docs/concepts/">Kubernetes — Core Concepts (Pods, Deployments, Services)</a> ·
+  <a href="https://man7.org/linux/man-pages/">man7.org — Linux man pages (lsof, chmod, ssh…)</a> ·
+  <a href="https://tldr.inbrowser.app/">TLDR pages — practical command summaries</a> ·
+  <a href="https://aws.amazon.com/what-is-cloud-computing/">AWS — What is cloud computing?</a> ·
+  <a href="https://12factor.net/config">The Twelve-Factor App — config and statelessness</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through the last time a production outage was diagnosed from the terminal — what commands told you what was wrong, and in what order?"</li>
+    <li>"Show me the Dockerfile of a real project and explain each line — then tell me when you would NOT reach for Docker at all."</li>
+    <li>"If I deploy the same app to Heroku, Vercel Functions, and an EC2 box, what is different in my code, my config, and my debugging on each?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Terminal &amp; the Deployment Substrate — the plumbing under every doc</span>
+  <span>Landscape: <a href="./system-design.html">System Design</a> · Delivery: <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a> · Runtime: <a href="./backend-engineering.html">Backend Engineering</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

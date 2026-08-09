@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithms &amp; Data Structures — the toolkit</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference Shelf · The Real Web</p>
+  <h1>Algorithms &amp; Data Structures — the toolkit</h1>
+  <p class="meta">For: the developer who must solve problems at a keyboard, not just recognize them.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> <a href="./problem-solving.html">Problem-Solving</a> teaches <em>when</em> — Pólya's phases, paradigm selection, reading the signal. This doc teaches <em>what and how</em>: what a hash map is under the hood, how BFS actually runs, the binary search template that never off-by-ones. One shelf doc per question: Problem-Solving is the thinking; this is the toolkit the thinking reaches for.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│               THE THINKING (Problem-Solving)                   │
+│   understand → plan → execute → look back                     │
+│   paradigm selection: "which family does this problem call?"  │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│               THE TOOLKIT (this doc)                           │
+│   hash map, stack, queue, heap, trie, graph, tree             │
+│   BFS/DFS/Dijkstra/union-find, sort, binary search, DP        │
+│   ── what they are, how they work, the templates ──           │
+└───────────────────────────────────────────────────────────────┘
+   HackerRank doesn't test whether you recognize the problem;
+   it tests whether you can implement the solution, correctly,
+   the first time, in forty minutes.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./problem-solving.html">Problem-Solving</a> (when to use what — the companion doc) · <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> (complexity theory, the proof side) · <a href="./javascript-the-language.html">JavaScript: The Language</a> (the language the templates are written in) · <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> (indexes are B-trees; query plans are algorithm analysis) · <a href="./system-design.html">System Design</a> (the same structures at scale)</p>
+</blockquote>
+
+<section class="recap">
+  <p><strong>Why this doc exists separately.</strong> Everything else on the shelf assumes you can implement; Problem-Solving deliberately stops at <em>choosing</em> the technique. Between "use a hash map for counting" and "the count is correct on the first try, in O(n), handling the empty array" lies a body of templates, edge cases, and trade-offs — that body is this doc. It is a toolkit, not a textbook: every structure gets its what, its why, its when, and a working template. The theory behind complexity classes lives in CS &amp; Software Engineering; the pedagogy of recognition lives in Problem-Solving; the code lives here.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<ul>
+  <li><strong>To pass a HackerRank/LeetCode screen:</strong> read §2–§7 (structures + graph + recursion + sort/search), then drill the templates until they're typed from memory — the binary search template (§7), the BFS template (§6), the sliding-window template (§2). Then use the cheat sheet (§11) to practice <em>recognition</em>, which is the skill that decays first.</li>
+  <li><strong>To understand a production codebase:</strong> §2–§4 are the map — most real-world code is arrays, hash maps, and trees, used well. The patterns here (top-K, two pointers, sliding window) appear in real APIs more often than in interview problems.</li>
+  <li><strong>As reference:</strong> the failure-modes table (§13) is the checklist to run after solving anything — most lost marks are edge cases, not missing algorithms.</li>
+  <li><strong>The rule:</strong> implement first, optimize after. A correct O(n²) answer passes; a wrong O(n log n) answer doesn't. Brute force is a valid Phase 2 plan (Problem-Solving's rule, applied here).</li>
+</ul>
+
+<h2>Complexity — the quick review</h2>
+
+<p>The full theory lives in <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a>; the working version:</p>
+
+<table>
+<thead><tr><th>Class</th><th>Means</th><th>Practical rule of thumb</th></tr></thead>
+<tbody>
+<tr><td><strong>O(1)</strong></td><td>Constant — hash lookup, array index</td><td>Instant; the target for lookups</td></tr>
+<tr><td><strong>O(log n)</strong></td><td>Halving — binary search, balanced tree ops</td><td>n = 1 million → ~20 steps. The surprise: it's nearly free</td></tr>
+<tr><td><strong>O(n)</strong></td><td>Single pass</td><td>n = 1 million → 1M steps; fine</td></tr>
+<tr><td><strong>O(n log n)</strong></td><td>Sorting, divide-and-conquer</td><td>The default ceiling for "good" solutions</td></tr>
+<tr><td><strong>O(n²)</strong></td><td>Nested loops</td><td>n = 1,000 → 1M steps (ok); n = 100,000 → disaster</td></tr>
+<tr><td><strong>O(2ⁿ), O(n!)</strong></td><td>Exponential</td><td>Only for n ≤ 20 (brute-force search, permutations)</td></tr>
+</tbody>
+</table>
+
+<p><strong>Amortized analysis — the one idea that surprises:</strong> an operation that's sometimes expensive is measured <em>averaged over many calls</em>. Pushing onto a dynamic array is "O(1) amortized": most pushes are O(1), the occasional resize (doubling) is O(n), but doubling means each element is copied at most ~log n times — so the average is constant. When a solution "feels" O(n²) but passes, you're often looking at amortized behavior (e.g., a string built with <code>+=</code> in a loop, or two-pointer scans that each element enters once).</p>
+
+<p><strong>Space-time trade-off:</strong> almost every "fast" trick buys time with memory — hash maps cache results, DP tables store states, prefix sums precompute ranges. When a problem says "must be O(n)" and you're stuck, the question to ask is "what could I remember?"</p>
+
+<h3>Complexity in JavaScript — the operations that lie</h3>
+
+<table>
+<thead><tr><th>JS operation</th><th>Cost</th><th>The gotcha</th></tr></thead>
+<tbody>
+<tr><td><code>Map</code>/<code>Set</code> <code>get/set/has/delete/add</code></td><td>O(1) average</td><td>Real key semantics — this is the map; a plain object is not</td></tr>
+<tr><td><code>arr[i]</code>, <code>arr.push/pop</code></td><td>O(1)</td><td>Fast path of the 80% section — use the end of the array</td></tr>
+<tr><td><code>arr.shift()</code>/<code>unshift()</code></td><td>O(n)</td><td>Reindexes the whole array — use an index pointer (§6) or a real queue</td></tr>
+<tr><td><code>arr.sort()</code></td><td>O(n log n)</td><td>Stable since ES2019 — the default sort; implement quicksort only when the problem is sorting</td></tr>
+<tr><td><code>arr.indexOf/includes/splice</code></td><td>O(n)</td><td>Membership on an array is a scan — a <code>Set</code> makes it O(1)</td></tr>
+<tr><td><code>obj[key]</code></td><td>O(1), but…</td><td>String coercion (<code>obj[1]</code> ≡ <code>obj["1"]</code>) and prototype-key leakage — plain objects are not maps (§2)</td></tr>
+<tr><td><code>s += ch</code> in a loop</td><td>O(n²) total</td><td>Strings are immutable; each <code>+=</code> copies — build an array and <code>join()</code></td></tr>
+<tr><td><code>BigInt</code> arithmetic</td><td>Slower than <code>Number</code></td><td>Only above 2^53; mixing <code>BigInt</code> with <code>Number</code> throws</td></tr>
+</tbody>
+</table>
+
+<h2>Arrays, strings, and hashing — the 80%</h2>
+
+<p>Most interview problems — and most production code — are these three structures. Master this section and you can pass the majority of easy and many medium problems.</p>
+
+<h3>Hash maps and sets — how O(1) actually works</h3>
+
+<ul>
+  <li><strong>Internals:</strong> the key is hashed to a bucket; collisions are handled by chaining (a list per bucket) or open addressing. The O(1) claim depends on the load factor (keys ÷ buckets) staying low — that's why hash maps <em>resize</em> when they fill up.</li>
+  <li><strong>When O(1) degrades to O(n):</strong> adversarial keys that all hash to one bucket (a known attack — some languages randomize hashing), or — in JS — the classic trap of using an <em>object</em> as a map and getting prototype pollution or string-coerced keys (<code>obj[1]</code> and <code>obj["1"]</code> are the same key). Use <code>Map</code>/<code>Set</code> for real key semantics.</li>
+  <li><strong>The pattern that wins problems:</strong> "count occurrences" (frequency map), "have I seen this before?" (seen set), "complement lookup" (two-sum family: store <code>target - current</code> and check it next).</li>
+</ul>
+
+<h3>Two pointers — the template</h3>
+
+<pre><code>// sorted array: find the pair summing to target
+let lo = 0, hi = arr.length - 1;
+while (lo &lt; hi) {
+  const sum = arr[lo] + arr[hi];
+  if (sum === target) return [lo, hi];
+  sum &lt; target ? lo++ : hi--;
+}
+return null;</code></pre>
+
+<p><strong>When it applies:</strong> sorted arrays (pair sums, dedup, three-sum families), palindrome checks, "reverse in place". The invariant: pointers only move one direction, so total work is O(n) — each element is visited at most twice.</p>
+
+<h3>Sliding window — the template</h3>
+
+<pre><code>// longest substring with no repeating characters
+let seen = new Set(), left = 0, best = 0;
+for (let right = 0; right &lt; s.length; right++) {
+  while (seen.has(s[right])) seen.delete(s[left++]);
+  seen.add(s[right]);
+  best = Math.max(best, right - left + 1);
+}
+return best;</code></pre>
+
+<p><strong>When it applies:</strong> "longest/contiguous/subarray" phrases — max sum of k-length window, substring with at most k distinct, minimum window. The shape is always: expand right, shrink left while the constraint breaks, record the best. Amortized O(n): left and right each traverse once.</p>
+
+<h3>Prefix sums</h3>
+
+<p>Precompute <code>prefix[i] = sum of elements 0..i-1</code>, then any subarray sum is <code>prefix[j+1] - prefix[i]</code> in O(1). The upgrade pattern: "range sum queries" or "subarray sums equal to k" become a hash map of prefix counts — a classic "what could I remember?" move.</p>
+
+<h2>Stacks, queues, and linked lists — the shapes</h2>
+
+<h3>Stack — the monotonic-stack pattern</h3>
+
+<p>A stack is "next thing to undo", "matching pairs", and — the interview superpower — the <strong>monotonic stack</strong>: keep the stack increasing (or decreasing) by popping while the new element violates the order. That yields "next greater element" in O(n):</p>
+
+<pre><code>// next greater element for each position, -1 if none
+const out = new Array(nums.length).fill(-1), stack = [];
+for (let i = 0; i &lt; nums.length; i++) {
+  while (stack.length &amp;&amp; nums[stack[stack.length - 1]] &lt; nums[i])
+    out[stack.pop()] = nums[i];
+  stack.push(i);
+}
+return out;</code></pre>
+
+<p><strong>Classic stack problems:</strong> valid parentheses (push openers, pop on closer, check the top matches), expression evaluation (two stacks: values + operators), daily temperatures, largest rectangle in histogram.</p>
+
+<h3>Queue — BFS's partner</h3>
+
+<p>A queue is "first in, first out" — the shape of breadth-first traversal and of any "process in arrival order" problem. In JS, an array with <code>shift()</code> is O(n); for correctness-first solutions it's fine, for performance use an index pointer or a real queue.</p>
+
+<h3>Linked lists — rarely the answer, often the question</h3>
+
+<ul>
+  <li><strong>The honesty rule:</strong> in JS (and most high-level languages), arrays beat linked lists for nearly everything — cache locality, indexing, memory. Linked-list problems are asked because they test pointer discipline and recursion, not because production code uses them much.</li>
+  <li><strong>Core operations to have memorized:</strong> reversal (iterative: three pointers — prev, curr, next), cycle detection (Floyd's tortoise and hare: slow +1, fast +2, they meet iff a cycle exists), finding the middle (same hare technique), merging two sorted lists (dummy-head pattern).</li>
+  <li><strong>The dummy-head trick:</strong> start every insertion-heavy list algorithm with a <code>dummy</code> node before the head so the "empty list" and "insert at front" cases need no special handling. It removes a whole class of edge-case bugs.</li>
+</ul>
+
+<h3>Worked example — the LRU cache</h3>
+
+<p>The one linked-list problem that is <em>also</em> a real production structure: an LRU (least-recently-used) cache is a doubly linked list for order plus a hash map for O(1) lookup of each node. <code>get</code> and <code>put</code> must both be O(1) — the list gives O(1) remove-and-move-to-front, the map gives O(1) find — and evicting is "pop the tail". The dummy-head trick keeps the list operations edge-free:</p>
+
+<pre><code>class LRUCache {
+  constructor(cap) {
+    this.cap = cap;
+    this.map = new Map();            // key → node, for O(1) lookup
+    this.head = { key: null, prev: null, next: null };  // most recent
+    this.tail = { key: null, prev: null, next: null };  // least recent
+    this.head.next = this.tail; this.tail.prev = this.head;
+  }
+  _remove(node) { node.prev.next = node.next; node.next.prev = node.prev; }
+  _insert(node) {                    // splice right after the head (most recent)
+    node.prev = this.head; node.next = this.head.next;
+    this.head.next.prev = node; this.head.next = node;
+  }
+  get(key) {
+    const node = this.map.get(key);
+    if (!node) return -1;
+    this._remove(node); this._insert(node);   // touch → most recent
+    return node.value;
+  }
+  put(key, value) {
+    if (this.map.has(key)) this._remove(this.map.get(key));
+    const node = { key, value, prev: null, next: null };
+    this.map.set(key, node);
+    this._insert(node);
+    if (this.map.size > this.cap) {      // evict the tail
+      this.map.delete(this.tail.prev.key);
+      this._remove(this.tail.prev);
+    }
+  }
+}</code></pre>
+
+<p><strong>The takeaway:</strong> the hash map alone can't track recency, and the list alone can't find a node in O(1) — the pair is the whole point. Recognize "cache with a size limit" and you've recognized this shape.</p>
+
+<h2>Trees and heaps — the hierarchies</h2>
+
+<h3>Binary trees — traversals first</h3>
+
+<p>Traversals are the grammar of every tree problem; the four patterns, memorized:</p>
+
+<pre><code>// recursive in-order — the shape of all three
+function inorder(node, out = []) {
+  if (!node) return out;
+  inorder(node.left, out);
+  out.push(node.val);
+  inorder(node.right, out);
+  return out;
+}</code></pre>
+
+<ul>
+  <li><strong>Pre-order</strong> (node, left, right): copy/serialize a tree, expression prefix.</li>
+  <li><strong>In-order</strong> (left, node, right): a BST in in-order is <em>sorted</em> — the most reused fact in tree problems (validate BST by checking the in-order traversal is ascending).</li>
+  <li><strong>Post-order</strong> (left, right, node): delete/child-dependent work, expression evaluation — compute children first, then combine at the parent.</li>
+  <li><strong>Level-order (BFS)</strong> with a queue: "zigzag", "right side view", "min depth" — anything phrased per-level.</li>
+</ul>
+
+<p><strong>Iterative replacements:</strong> interviews often ban recursion's implicit stack for deep trees — in-order iteratively = a stack you push lefts onto and pop between right moves; pre-order = push right then left. The recursive version is the memory anchor; derive the iterative one from it under pressure.</p>
+
+<h3>BST and the balanced-tree fact</h3>
+
+<p>A BST's insert/search/delete are O(log n) <em>when balanced</em>. Unbalanced (sorted input, naive insert) they degrade to O(n) — a linked list in disguise. That's the whole reason AVL/Red-Black trees exist (self-balancing on every insert). In interviews: know that balanced BSTs give you ordered operations with O(log n) — and that <em>production code uses library structures instead</em>: JS's <code>Map</code>/<code>Set</code>, or a sorted array + binary search, which is O(n) to insert but O(log n) to search and is fine for small n.</p>
+
+<h3>Trie — prefix matching</h3>
+
+<p>A trie is a tree of characters: each node holds a map of child characters and a flag "a word ends here". Insert and search are O(word length).</p>
+
+<pre><code>class Trie {
+  constructor() { this.root = { children: {}, end: false }; }
+  insert(word) {
+    let node = this.root;
+    for (const ch of word) {
+      node.children[ch] ??= { children: {}, end: false };
+      node = node.children[ch];
+    }
+    node.end = true;
+  }
+  search(word) {
+    let node = this.root;
+    for (const ch of word) {
+      if (!node.children[ch]) return false;
+      node = node.children[ch];
+    }
+    return node.end;
+  }
+}</code></pre>
+
+<p><strong>When it wins:</strong> autocomplete (descend to the prefix, then enumerate the subtree), word-search on a board, "starts with" queries. The alternative — a hash map of every prefix — works but wastes memory; the trie shares prefixes structurally.</p>
+
+<h3>Heap / priority queue — the top-K pattern</h3>
+
+<p>A heap is a binary tree with one invariant: the parent is ≤ (min-heap) or ≥ (max-heap) its children. <code>push</code> and <code>pop</code> are O(log n), <code>peek</code> is O(1). That gives the two classic wins:</p>
+
+<ul>
+  <li><strong>Top-K:</strong> "k largest/smallest, k most frequent, k closest" — a min-heap of size k: push each element; when the heap exceeds k, pop the smallest. Result: the k largest, in O(n log k) — no full sort needed.</li>
+  <li><strong>Median maintenance:</strong> two heaps — a max-heap for the lower half, a min-heap for the upper half, rebalanced after each insert. Median = peek of the larger heap (or average of both peaks). O(log n) per insert.</li>
+  <li><strong>Merge k sorted lists:</strong> push each list's head, pop the smallest, push its successor — the standard "merge k things" shape.</li>
+</ul>
+
+<p>JS has no built-in heap — the interview move is to implement a small binary heap (~25 lines: <code>push</code>/<code>pop</code> with sift-up/sift-down) once, from memory, or use <code>Array.sort()</code> when n is small enough (sorting is often the lazier correct answer).</p>
+
+<pre><code>class MinHeap {
+  constructor() { this.a = []; }
+  size() { return this.a.length; }
+  peek() { return this.a[0]; }
+  push(v) {
+    this.a.push(v);
+    let i = this.a.length - 1;
+    while (i &gt; 0) {                 // sift-up: swap with parent
+      const p = (i - 1) &gt;&gt; 1;
+      if (this.a[p] &lt;= this.a[i]) break;
+      [this.a[p], this.a[i]] = [this.a[i], this.a[p]];
+      i = p;
+    }
+  }
+  pop() {
+    const top = this.a[0];
+    const last = this.a.pop();
+    if (this.a.length) {
+      this.a[0] = last;
+      let i = 0;
+      while (true) {                // sift-down: swap with smaller child
+        const l = 2 * i + 1, r = l + 1;
+        let m = i;
+        if (l &lt; this.a.length &amp;&amp; this.a[l] &lt; this.a[m]) m = l;
+        if (r &lt; this.a.length &amp;&amp; this.a[r] &lt; this.a[m]) m = r;
+        if (m === i) break;
+        [this.a[m], this.a[i]] = [this.a[i], this.a[m]];
+        i = m;
+      }
+    }
+    return top;
+  }
+}</code></pre>
+
+<p><strong>The two invariants to keep straight:</strong> sift-up on <code>push</code> (new element walks toward the root while it's smaller than its parent), sift-down on <code>pop</code> (the promoted last element walks toward the leaves while it's larger than a child). For a max-heap, flip the comparisons. For "k largest", push into a min-heap of size k — the root is the smallest of the current top-k, so it's the one to evict.</p>
+
+<h2>Recursion — the self-referential move</h2>
+
+<p>Every structure above is finite and concrete; recursion is the idea that a function can <em>be its own template</em> — a problem solved by solving a smaller version of the same problem. You've been using it since the tree traversals (§4): <code>inorder(node)</code> calls <code>inorder(node.left)</code>. A standalone treatment because it is the engine behind DFS (§6), divide-and-conquer (§7), and DP (§8), and because the two failure modes are common and cheap to fix.</p>
+
+<p><strong>The shape, always two parts:</strong> a <em>base case</em> that stops the recursion (smallest input, no further call), and a <em>recursive case</em> that calls itself on a strictly smaller input. If the recursive case ever fails to shrink toward the base case, you get infinite recursion → stack overflow. That's the whole discipline.</p>
+
+<pre><code>// power(x, n): multiply x by power(x, n-1) — smaller input, base case at n === 0
+function power(x, n) {
+  if (n === 0) return 1;              // base case
+  return x * power(x, n - 1);         // recursive case, strictly smaller
+}</code></pre>
+
+<p><strong>How to write one under pressure:</strong> 1) identify the <em>smallest</em> input and write its answer as the base case; 2) trust that the recursive call <em>works</em> for smaller inputs (the "leap of faith" — don't trace it); 3) ask "given the answer for a smaller instance, how do I build the answer for this one?" The last step is the same question DP asks — recursion with a cache is memoized DP, so a clean recursive solution is one memo away from a DP solution (§8).</p>
+
+<p><strong>When to abandon recursion:</strong> every call burns a stack frame; deep chains (a grid of 10,000 cells in DFS, a very long list) overflow the call stack — a recursion limit, not a logic error. Two escapes: make it <em>iterative</em> with an explicit stack (you control the memory), or use BFS (§6), which never recurses. Anything you can write recursively you can write with a stack you push onto — the stack <em>is</em> the recursion. Rule of thumb: recursion for tree depth (safe, O(log n)); explicit stack for graph depth (arbitrary).</p>
+
+<h3>Divide-and-conquer vs DP — the distinction that clarifies both</h3>
+
+<p>Both divide a problem into subproblems, solve them, and combine. The difference is what the subproblems overlap on:</p>
+
+<table>
+<thead><tr><th></th><th>Divide-and-conquer</th><th>DP</th></tr></thead>
+<tbody>
+<tr><td><strong>Subproblems</strong></td><td>Disjoint — each appears once (merge sort halves don't overlap)</td><td>Overlapping — the same subproblem recurs (fib(5) needs fib(3) twice)</td></tr>
+<tr><td><strong>Combination</strong></td><td>Combine independent results up the tree (merge two sorted halves)</td><td>Reuse the cached answer; no re-computation</td></tr>
+<tr><td><strong>Work shape</strong></td><td>Each level splits; total O(n log n)-ish</td><td>Each state computed once; total O(states · transition)</td></tr>
+<tr><td><strong>Classic</strong></td><td>Merge sort, quicksort, binary search, "count inversions"</td><td>Fibonacci, LCS, coin change, grid paths</td></tr>
+<tr><td><strong>The tell</strong></td><td>"Split in half, solve each, merge" — subproblems are independent</td><td>"Same subproblem asked again" — a recursion tree where nodes repeat</td></tr>
+</tbody>
+</table>
+
+<p><strong>The test that settles it:</strong> draw the recursion tree for your recurrence. If the same state appears in multiple branches, the naive recursion recomputes it — that's the DP signal (add a cache). If every state appears once, you have divide-and-conquer, and caching buys nothing.</p>
+
+<h2>Graphs — the model of connections</h2>
+
+<h3>Representation first</h3>
+
+<table>
+<thead><tr><th>Representation</th><th>Space</th><th>"Is u connected to v?"</th><th>Iterate u's neighbors</th><th>When</th></tr></thead>
+<tbody>
+<tr><td><strong>Adjacency list</strong> — <code>Map&lt;node, node[]&gt;</code></td><td>O(V + E)</td><td>O(degree) — scan the list</td><td>O(degree)</td><td>The default. BFS/DFS/Dijkstra all iterate neighbors constantly</td></tr>
+<tr><td><strong>Adjacency matrix</strong> — <code>bool[V][V]</code></td><td>O(V²)</td><td>O(1)</td><td>O(V) — scan the row</td><td>Dense graphs, or when "edge exists?" is the hot query</td></tr>
+<tr><td><strong>Edge list</strong> — <code>[u, v, weight][]</code></td><td>O(E)</td><td>O(E) — scan</td><td>—</td><td>Union-find / Kruskal-style algorithms that sort edges</td></tr>
+</tbody>
+</table>
+
+<p>Weighted vs unweighted changes nothing in the representation — weights live on the edges — but changes the algorithm: unweighted → BFS for shortest path; weighted → Dijkstra.</p>
+
+<h3>BFS — the template</h3>
+
+<pre><code>// shortest path (unweighted) from start; dist of -1 = unreachable
+function bfs(graph, start, n) {
+  const dist = new Array(n).fill(-1);
+  dist[start] = 0;
+  const queue = [start];
+  for (let qi = 0; qi &lt; queue.length; qi++) {   // index pointer = O(1) shift
+    const u = queue[qi];
+    for (const v of graph[u] ?? []) {
+      if (dist[v] === -1) { dist[v] = dist[u] + 1; queue.push(v); }
+    }
+  }
+  return dist;
+}</code></pre>
+
+<p><strong>The rules:</strong> first visit = shortest distance (that's what makes BFS the shortest-path algorithm on unweighted graphs); mark visited at <em>enqueue</em>, not dequeue, or you enqueue duplicates; the index-pointer queue avoids O(n) <code>shift()</code>. "Rotting oranges", "walls and gates", "nearest 0" — all the same shape with a multi-source start (enqueue all sources first).</p>
+
+<h3>DFS — recursive and iterative</h3>
+
+<pre><code>// connected components: every node gets its component id
+function components(graph, n) {
+  const comp = new Array(n).fill(-1);
+  let id = 0;
+  function dfs(u) {
+    for (const v of graph[u] ?? []) if (comp[v] === -1) { comp[v] = id; dfs(v); }
+  }
+  for (let u = 0; u &lt; n; u++) if (comp[u] === -1) { comp[u] = id; dfs(u); id++; }
+  return comp;
+}</code></pre>
+
+<p><strong>When DFS beats BFS:</strong> reachability, cycle detection (directed: three states — unvisited / in-progress / done — an edge to an in-progress node is a back edge), topological sort (see below), and anything recursive (grid flooding — "number of islands" is this loop with a flood-fill dfs). For deep grids, recursion can blow the call stack — the iterative version uses an explicit stack, and a visited set at push time.</p>
+
+<h3>Topological sort — DFS or Kahn's</h3>
+
+<p>Dependency ordering: "finish all prerequisites" or "course schedule". Kahn's algorithm: count in-degrees, enqueue zero-degree nodes, process, decrement neighbors; if the processed count &lt; V, there's a cycle. The DFS version is a post-order accumulation, reversed. Both are O(V + E) and both double as cycle detectors — the "can it even be done?" answer the problem is really asking.</p>
+
+<h3>Dijkstra — the weighted shortest path</h3>
+
+<p>BFS's weighted cousin: same "first settle = best" idea, but the queue becomes a priority queue keyed by <em>distance</em>, and you skip stale entries:</p>
+
+<pre><code>function dijkstra(graph, start, n) {
+  const dist = new Array(n).fill(Infinity); dist[start] = 0;
+  const pq = [[0, start]]; // binary heap of [dist, node]
+  while (pq.length) {
+    const [d, u] = heapPop(pq);
+    if (d &gt; dist[u]) continue;            // stale entry — skip
+    for (const [v, w] of graph[u] ?? []) {
+      if (d + w &lt; dist[v]) { dist[v] = d + w; heapPush(pq, [dist[v], v]); }
+    }
+  }
+  return dist;
+}</code></pre>
+
+<p><strong>The rule that matters:</strong> Dijkstra fails on negative edges (an already-settled node can be improved later) — that's Bellman-Ford's job. And "shortest path in a grid" is BFS only when all moves cost the same; a 0/1 grid can use a deque (0-cost moves push front).</p>
+
+<h3>Union-Find — connectivity without building the graph</h3>
+
+<pre><code>class UnionFind {
+  constructor(n) { this.parent = Array.from({length: n}, (_, i) => i); this.rank = new Array(n).fill(0); }
+  find(x) { while (this.parent[x] !== x) { this.parent[x] = this.parent[this.parent[x]]; x = this.parent[x]; } return x; }
+  union(a, b) {
+    const ra = this.find(a), rb = this.find(b);
+    if (ra === rb) return;
+    if (this.rank[ra] &lt; this.rank[rb]) [ra, rb] = [rb, ra];
+    this.parent[rb] = ra;
+    if (this.rank[ra] === this.rank[rb]) this.rank[ra]++;
+  }
+}</code></pre>
+
+<p><strong>Why it's the hidden winner:</strong> "number of connected components in a network", "friend circles", "accounts merge", Kruskal's MST — anything about connectivity that <em>grows</em> edge by edge. Path compression (the find loop shortcutting to the root) + union by rank make both operations near-O(1) amortized — faster than re-running BFS after every new edge.</p>
+<h2>Sorting and searching — the preprocessing moves</h2>
+
+<h3>The sort menu</h3>
+
+<table>
+<thead><tr><th>Sort</th><th>Worst</th><th>Stable?</th><th>When it's the answer</th></tr></thead>
+<tbody>
+<tr><td><strong>Merge sort</strong></td><td>O(n log n)</td><td>Yes</td><td>Stability required, linked lists (merge is natural on lists), the "count inversions" pattern</td></tr>
+<tr><td><strong>Quick sort</strong></td><td>O(n²) worst, O(n log n) average</td><td>No</td><td>The default in-place sort in most libraries (including V8's — JS's <code>sort()</code> is quicksort/timsort blend)</td></tr>
+<tr><td><strong>Heap sort</strong></td><td>O(n log n)</td><td>No</td><td>O(1) extra space; rarely chosen — same class, worse constant</td></tr>
+<tr><td><strong>Counting / radix</strong></td><td>O(n + k)</td><td>Depends</td><td>Integers in a small known range (sort 1M scores in 0..100) — beats comparison sorts</td></tr>
+</tbody>
+</table>
+
+<p><strong>The professional shortcut:</strong> in JS, use <code>arr.sort((a, b) =&gt; a - b)</code> and move on — implementing quicksort in an interview is only required when the problem <em>is</em> sorting. The interview-relevant skills are stability awareness (does order of equals matter?) and <em>sorting as preprocessing</em>: "k smallest", "merge intervals", "anagram groups" (sort each word) — a sort is often the lazy first move that turns a hard problem into a linear one.</p>
+
+<h3>Binary search — the template that never off-by-ones</h3>
+
+<pre><code>// first index where isGood(i) is true, else hi+1... pattern:
+let lo = 0, hi = arr.length;          // search space [lo, hi)
+while (lo &lt; hi) {
+  const mid = (lo + hi) &gt;&gt; 1;         // floor, no overflow in JS
+  if (isGood(mid)) hi = mid;          // good → keep mid
+  else lo = mid + 1;                  // bad → discard mid
+}
+return lo;                            // first good index</code></pre>
+
+<ul>
+  <li><strong>The invariant:</strong> the range <code>[lo, hi)</code> half-open, "first index where the predicate flips from false to true". Search for a value: <code>isGood = arr[mid] &gt;= target</code> — the answer is the first element ≥ target (which handles "target exists" and "insert position" in one).</li>
+  <li><strong>The variants</strong> (first/last occurrence, ceiling, rotation point) all reduce to choosing the predicate — never rewrite the loop body, change <code>isGood</code>.</li>
+  <li><strong>The hidden pattern:</strong> binary search works on any <em>monotonic predicate</em>, not just sorted arrays — "find the smallest capacity that can ship in d days", "find the kth smallest pair distance" — if the answer space is monotonic (can I afford X? yes → also yes for larger X), binary search the answer.</li>
+</ul>
+
+<h2>Dynamic programming — the state machine of optimization</h2>
+
+<p>DP is the hardest family because it looks like recursion and is actually <em>cached enumeration</em>. The framework, applied every time:</p>
+
+<ol>
+  <li><strong>Define the state</strong> — the minimal description of a subproblem: "dp[i] = max profit with i items", "dp[r][c] = paths to cell (r, c)". The state is the single most important decision; a wrong state means a wrong answer that looks right.</li>
+  <li><strong>Write the transition</strong> — how dp[i] is built from smaller states: "dp[i] = max(dp[i-1], dp[i-2] + v[i])". If you can't write the transition, you don't understand the recurrence yet — go back to state definition.</li>
+  <li><strong>Set the base cases</strong> — dp[0], dp[1], the empty grid row/col. Base cases are where most off-by-ones die.</li>
+  <li><strong>Choose memoization or tabulation</strong> — memo = recursion + a cache (write the brute-force recursion, add the cache, done — the laziest correct path); tabulation = build the table bottom-up, which avoids recursion and often needs less space.</li>
+</ol>
+
+<h3>The patterns (recognize the shape, adapt the state)</h3>
+
+<table>
+<thead><tr><th>Pattern</th><th>State shape</th><th>Canonical problems</th></tr></thead>
+<tbody>
+<tr><td><strong>1D sequence</strong></td><td>dp[i] from dp[i-1], dp[i-2]</td><td>Climbing stairs, house robber (dp[i] = max(skip, take)), coin change (dp[amount] = min coins)</td></tr>
+<tr><td><strong>2D grid</strong></td><td>dp[r][c] from dp[r-1][c] + dp[r][c-1]</td><td>Unique paths, min path sum, max square</td></tr>
+<tr><td><strong>Two sequences</strong></td><td>dp[i][j] over both prefixes</td><td>LCS, edit distance, wildcard matching — the "compare tails, advance one or both" family</td></tr>
+<tr><td><strong>Knapsack</strong></td><td>dp[i][w] = best with first i items and weight w</td><td>Subset sum, partition equal sum, 0/1 vs unbounded (loop direction changes!)</td></tr>
+<tr><td><strong>Interval</strong></td><td>dp[i][j] over subarray i..j</td><td>Matrix chain, burst balloons, longest palindromic substring</td></tr>
+<tr><td><strong>Bitmask</strong> (advanced)</td><td>dp[mask] over subsets</td><td>TSP, assignment problems — n ≤ 20 only</td></tr>
+</tbody>
+</table>
+
+<p><strong>The lazy order under time pressure:</strong> 1) brute-force recursion (correct, slow), 2) add a memo cache (now O(n · states)), 3) if memory is the constraint, convert to tabulation and compress the table (keep only the last row/column — most 1D and 2D DPs need only one or two rows). Steps 1–2 are often enough to pass.</p>
+
+<p><strong>A functional note (the FP edge):</strong> memoized DP is pure functions + a cache — the same "remember the answer" idea the <a href="./what-is-state-prequel.html">lambda calculus</a> gets by substitution. <code>reduce</code> is the tabulation loop in disguise: <code>states.reduce((acc, x) =&gt; transition(acc, x), base)</code> is a 1D DP with a single accumulator. The shelf's FP foundations (<a href="./what-is-state-prequel.html">What Is State</a>, <a href="./javascript-the-language.html">JavaScript: The Language</a>) are all the FP you need here — no monads required.</p>
+
+<h2>Greedy — the beautiful lie</h2>
+
+<p>Greedy: take the locally best move and hope it's globally optimal. When it works it's O(n) and elegant; when it doesn't it's wrong with a plausible-looking answer. <strong>The test is the exchange argument:</strong> "if an optimal solution differs from mine, I can swap my choice in without making it worse" — if you can't sketch that argument, greedy is a gamble, and DP is the safe answer.</p>
+
+<ul>
+  <li><strong>Interval scheduling</strong> — "max non-overlapping meetings": sort by end time, always take the earliest-ending compatible one. The canonical greedy and the exchange argument everyone learns first.</li>
+  <li><strong>Activity selection / jumps</strong> — "jump game": at each position, remember the furthest reach; greedy works because the reachable set only grows.</li>
+  <li><strong>Huffman coding</strong> — always merge the two smallest; optimal prefix codes fall out.</li>
+  <li><strong>The tell:</strong> problems phrased "minimize the number of X" or "maximize Y with these resources" where a simple ordering argument exists. When in doubt, DP.</li>
+</ul>
+
+<h2>Bit manipulation and math — the trick drawer</h2>
+
+<ul>
+  <li><strong>XOR properties:</strong> a ^ a = 0, a ^ 0 = a, XOR is commutative/associative → "the single number that appears once among pairs" is <code>arr.reduce((a, b) =&gt; a ^ b)</code>. XOR also swaps two variables and finds the two unique numbers (xor all, then split on a set bit).</li>
+  <li><strong>Bit tricks:</strong> <code>n &amp; (n - 1)</code> clears the lowest set bit (→ count bits by looping it), <code>n &amp; -n</code> isolates the lowest set bit (→ the split trick above), <code>x &gt;&gt; 1</code> is division by 2 (the binary-search mid).</li>
+  <li><strong>Masks:</strong> a bitmask is a set of small integers — "subsets of n items" = iterate 0..2ⁿ-1 and test <code>mask &amp; (1 &lt;&lt; i)</code>. Only for n ≤ 20.</li>
+  <li><strong>Math staples:</strong> GCD via Euclid (<code>while (b) [a, b] = [b, a % b]</code>), modular arithmetic (a mod m rules; modular exponentiation by repeated squaring), the sieve of Eratosthenes for primes up to n in O(n log log n), combinatorics (n choose k via Pascal's triangle / multiplicative formula).</li>
+</ul>
+
+<h2>Pattern recognition cheat sheet — signal → technique</h2>
+
+<p>The companion to <a href="./problem-solving.html">Problem-Solving</a> §7b's recognition tables — the operational version, signal first:</p>
+
+<table>
+<thead><tr><th>If the problem says…</th><th>Reach for…</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>"count / seen before / unique / complement"</td><td>Hash map or set</td><td>O(1) membership — the default first move</td></tr>
+<tr><td>"sorted + pair/triplet sum / palindrome in place"</td><td>Two pointers</td><td>O(n) on sorted input; each pointer moves once</td></tr>
+<tr><td>"longest / contiguous / subarray / substring"</td><td>Sliding window</td><td>The contiguous-window constraint, amortized O(n)</td></tr>
+<tr><td>"k largest / k most frequent / median of stream"</td><td>Heap (top-K, two heaps)</td><td>O(log k) per element, no full sort</td></tr>
+<tr><td>"matching / parentheses / undo / next greater"</td><td>Stack (monotonic)</td><td>LIFO structure matches nesting</td></tr>
+<tr><td>"shortest path / levels / nearest" (unweighted)</td><td>BFS</td><td>First visit = shortest distance</td></tr>
+<tr><td>"reachable / cycles / components / flood fill"</td><td>DFS</td><td>Explores everything; three-state trick finds cycles</td></tr>
+<tr><td>"shortest path" (weighted), "cheapest flight"</td><td>Dijkstra</td><td>Priority queue by distance, settle-once</td></tr>
+<tr><td>"connected components growing / edges added one by one"</td><td>Union-Find</td><td>Near-O(1) per union — beats re-running BFS</td></tr>
+<tr><td>"prerequisites / ordering / dependencies"</td><td>Topological sort</td><td>Kahn's or DFS post-order; doubles as cycle detection</td></tr>
+<tr><td>"sorted / find insert position / monotonic answer"</td><td>Binary search</td><td>Also for "minimize the max X" monotonic-predicate problems</td></tr>
+<tr><td>"minimize cost / maximize value / choose subsets"</td><td>DP or greedy</td><td>Greedy if an exchange argument holds, else DP — states, transition, base</td></tr>
+<tr><td>"prefix / words sharing prefixes / autocomplete"</td><td>Trie</td><td>Structural sharing beats storing every prefix</td></tr>
+<tr><td>"appears once / bit tricks / subsets of small n"</td><td>Bit manipulation</td><td>XOR identities; masks for n ≤ 20</td></tr>
+<tr><td>"range sum / range queries, point updates"</td><td>Prefix sums, then segment/Fenwick for updates</td><td>Prefix = O(1) queries; Fenwick = O(log n) updates</td></tr>
+</tbody>
+</table>
+
+<p><strong>Reading order reminder:</strong> never start coding before classifying. If the problem doesn't fit any row, brute force is a legitimate classification — implement it, then look for the "what could I remember?" upgrade (Problem-Solving's Phase 3 rule).</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>The doc in twelve lines:</p>
+
+<table>
+<thead><tr><th>#</th><th>The line</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Arrays, hash maps, and trees are 80% of real code — master §2 and the "what could I remember?" reflex.</td></tr>
+<tr><td>2</td><td>Hash map O(1) depends on the load factor; use <code>Map</code>/<code>Set</code>, never a plain object (§2).</td></tr>
+<tr><td>3</td><td>Two pointers, sliding window, prefix sums: the three array moves that make "longest / pair / range" linear (§2).</td></tr>
+<tr><td>4</td><td>Monotonic stack = "next greater" in O(n); the dummy-head trick kills a whole class of list bugs (§3).</td></tr>
+<tr><td>5</td><td>Traversals first; BFS = shortest path on unweighted graphs, three-state DFS = cycle detection (§4, §6).</td></tr>
+<tr><td>6</td><td>Union-find for connectivity, topological sort for ordering, Dijkstra for weighted shortest path (§6).</td></tr>
+<tr><td>7</td><td>Binary search is a monotonic-predicate engine, not a sorted-array trick — half-open range, first-good-index (§7).</td></tr>
+<tr><td>8</td><td>Sorting is preprocessing: "k smallest", "merge intervals", "anagram groups" all become linear after one sort (§7).</td></tr>
+<tr><td>9</td><td>DP = cached enumeration: state, transition, base — then memoize before you tabulate (§8).</td></tr>
+<tr><td>10</td><td>Greedy without an exchange argument is a gamble; when in doubt, DP (§9).</td></tr>
+<tr><td>11</td><td>Classify before coding — the cheat sheet maps signal to technique; brute force is a valid fallback classification (§11).</td></tr>
+<tr><td>12</td><td>Run the failure-modes table after every solution: edges at size ≤ 2, all-negative inputs, overflow, mutation while iterating (§13).</td></tr>
+</tbody>
+</table>
+
+<h2>Failure modes — the edge-case checklist</h2>
+
+<p>The checklist to run after any solution, before you call it done. Most lost marks are here, not in missing algorithms:</p>
+
+<table>
+<thead><tr><th>Symptom</th><th>Cause</th><th>The fix</th></tr></thead>
+<tbody>
+<tr><td>Off-by-one on binary search / loop bounds</td><td>Misremembered the invariant, or wrote <code>&lt;=</code> vs <code>&lt;</code> by habit</td><td>Half-open range <code>[lo, hi)</code> + "first good index" predicate (§7) — never rewrite the loop, only <code>isGood</code></td></tr>
+<tr><td>Empty input, single element, or array length 1 crashes</td><td>The edge cases weren't run as test cases</td><td>Run the input-size axis first: <code>[]</code>, <code>[1]</code>, length 2 — most bugs live at size ≤ 2</td></tr>
+<tr><td>All-negative input breaks a "max" / "sum" solution</td><td>Initialized the answer to 0 or skipped negatives</td><td>Initialize <code>best = -Infinity</code>; for max-subarray, Kadane handles negatives only if you compare against the element, not 0</td></tr>
+<tr><td><code>obj[1]</code> and <code>obj["1"]</code> collide / prototype keys leak in</td><td>Using a plain object as a map</td><td><code>Map</code>/<code>Set</code> for real key semantics (§2) — never a plain object for lookups</td></tr>
+<tr><td>Timeout on what should be O(n)</td><td><code>shift()</code> in a loop, string <code>+=</code> in a loop, or a <code>sort()</code> inside the loop</td><td>Index-pointer queue instead of <code>shift()</code>, array + <code>join()</code> instead of <code>+=</code>, hoist the sort (§3, §7)</td></tr>
+<tr><td>Recursion stack overflow (BFS/DFS on a big graph)</td><td>Deep recursive DFS on a long chain</td><td>Explicit stack, or BFS with a queue — iterative traversal is O(n) space-safe (§6)</td></tr>
+<tr><td>"Feels right but wrong" greedy</td><td>No exchange argument (§9)</td><td>When in doubt, DP — greedy without the argument is a gamble</td></tr>
+<tr><td>Duplicate work on overlapping subproblems</td><td>Recursive brute force without memoization</td><td>Memoized recursion first (§8) — cache it before optimizing anything else</td></tr>
+<tr><td>Mutation bugs — deleting/updating while iterating</td><td>Modifying the array inside a <code>for</code> loop shifts indices</td><td>Iterate backward, or collect and apply after; or <code>filter()</code> which is safe</td></tr>
+<tr><td>Integer overflow / precision (money, large n)</td><td>JS numbers are IEEE doubles; sums can lose precision</td><td>Work in cents/integer units; use <code>BigInt</code> when > 2^53; compare with epsilon</td></tr>
+</tbody>
+</table>
+
+<p>Run this table, then the failure-modes table in <a href="./problem-solving.html">Problem-Solving</a> — the two checklists cover the code and the thinking, in that order.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.cs.cornell.edu/home/kleinber/tgps/algorithm-design.html">Kleinberg &amp; Tardos — Algorithm Design (the trade-off framework)</a> ·
+  <a href="https://www.manning.com/books/algorithmic-thinking">Algorithmic Thinking (working templates, not theory)</a> ·
+  <a href="https://bigocheatsheet.com/">Big-O Cheat Sheet (the lookup table behind §1)</a> ·
+  <a href="https://www.hackerrank.com/">HackerRank (the screen this doc trains for)</a> ·
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">MDN — Map/Set (the real-key semantics)</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take the last real bug you fixed — which structure was it misusing, and what did the correct structure make obvious?"</li>
+    <li>"Show me your binary search template and the off-by-one that made you switch to half-open ranges — where do <em>you</em> still slip?"</li>
+    <li>"Which pattern on the cheat sheet did you reach for wrong first, in real work — and what signal would have pointed you right sooner?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Algorithms &amp; Data Structures — the toolkit the thinking reaches for</span>
+  <span>Thinking: <a href="./problem-solving.html">Problem-Solving</a> · Proof: <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> · Code: <a href="./javascript-the-language.html">JavaScript: The Language</a> · At scale: <a href="./system-design.html">System Design</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

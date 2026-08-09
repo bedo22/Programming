@@ -243,9 +243,70 @@ function handle(r: Result): number {
   </tbody>
 </table>
 
+<h2>3b. The Node runtime — how JS actually behaves on a server</h2>
+
+<p>§3 positioned Node against other backend languages; this subsection is about the <em>runtime itself</em> — the mechanisms that make server-side JS behave the way it does. Frameworks come and go, but these mechanics are the constants.</p>
+
+<h3>3b.1 The server event loop — phases, and the microtask rule</h3>
+<p>The browser and Node share the same event loop family, but the server has no render frame forcing the loop to yield between callbacks — a blocked loop blocks <em>every</em> request. The loop runs in phases in fixed order: <strong>timers</strong> (setTimeout/setInterval) → <strong>pending</strong> (deferred I/O callbacks) → <strong>poll</strong> (wait for I/O, run most callbacks) → <strong>check</strong> (setImmediate) → <strong>close</strong> (closed handles). Between every phase — and after every callback — the <em>microtask queue</em> drains first: <code>queueMicrotask</code>, and every <code>Promise.then</code> continuation.</p>
+
+<pre><code class="language-js">setImmediate(() =&gt; console.log("check phase"));
+setTimeout(() =&gt; console.log("timer phase"), 0);
+Promise.resolve().then(() =&gt; console.log("microtask"));
+
+// actual order: microtask → timer phase → check phase
+// microtasks always jump the queue once the current callback yields
+</code></pre>
+
+<p><strong>The rule that matters for server code:</strong> a <code>Promise</code> continuation — even one you did not write — runs between any two user callbacks. So per-request state must never rely on "next thing in my file runs next"; scheduling is interleaved. This is why a long-running CPU loop (<code>for (;;) {}</code>) starves not just your request but the entire process.</p>
+
+<h3>3b.2 Streams — bounded memory is the whole point</h3>
+<p>A stream is a collection that is processed a piece at a time, so memory stays bounded regardless of the total size. <code>fs.createReadStream</code>, HTTP requests/responses, and gzip are all streams. Why it matters on a server: the naive approach — "read the whole body into a string/array, then send" — caps you at RAM and makes every request cost proportional to its full payload. The professional approach pipes: <code>readable.pipe(writable)</code>, where <em>backpressure</em> pauses the source when the sink is slow, so a 2 GB download and a 2 KB response use the same bounded memory.</p>
+
+<pre><code class="language-js">// bounded memory: stream file → HTTP response, backpressure managed by pipe
+const src = createReadStream(REPORT_FILE);
+src.pipe(res);
+</code></pre>
+
+<p><strong>The anti-pattern to unlearn:</strong> "buffer the whole thing, then write." If you reach for <code>readFileSync</code>/<code>resp.arrayBuffer()</code> to process a payload you will never search backward, you are discarding the free constant-memory guarantee streams exist to give.</p>
+
+<h3>3b.3 V8 and libuv — the pair under the hood</h3>
+
+<p>Node is <em>V8</em> (JS engine: parse → JIT-compiled code via TurboFan/Ignition, garbage-collected heaps) plus <em>libuv</em> (the C library that provides the event loop, the timer phases, and a small OS thread pool for blocking work like <code>fs</code>, DNS, and crypto). The mental model that explains nearly every "why did Node do this?" </p>
+<ul>
+  <li><strong>Async I/O does not use threads.</strong> The default case: a syscall is started, the loop parks, and the callback fires when the result is ready.</li>
+  <li><strong>Blocking work still uses threads.</strong> <code>fs</code>/crypto/DNS run on a default pool of <code>os.cpus().length</code> (≥4) threads. Exhaust it and requests start queuing.</li>
+  <li><strong>CPU-bound pure JS (parsing, hashing loops, JSON of huge objects, image encoders) skips libuv entirely</strong> — it just runs on the main thread and blocks the loop, full stop.</li>
+</ul>
+
+<p><strong>The escape hatch is <code>worker_threads</code></strong> — a second V8 isolate with its own heap and event loop, communicating by message passing (not shared memory with data races). Spawn one per heavy CPU task. Two hard notes: each worker carries its own ~30–60 MB V8 overhead, and workers do not share process-in-memory state — anything both sides need is copied or external.</p>
+
+<h3>3b.4 Node vs Deno vs Bun — one positioning table</h3>
+
+<p>Three runtimes, same V8 family, three different bets on the same constraint history. Each is a layer of the other's answer:</p>
+
+<table>
+  <thead><tr><th>Dimension</th><th>Node.js</th><th>Deno</th><th>Bun</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bet</strong></td><td>The incumbent — years of ecosystem, npm as center of gravity</td><td>Web-standard interfaces + secure-by-default permissions + native TypeScript</td><td>Speed + all-in-one tooling (bundler, test runner, package manager)</td></tr>
+    <tr><td><strong>Engine</strong></td><td>V8</td><td>V8 (JSC experimental)</td><td>JavaScriptCore (WebKit)</td></tr>
+    <tr><td><strong>Modules</strong></td><td>CommonJS (default) → ESM shippable</td><td>ESM only</td><td>ESM + CommonJS interop</td></tr>
+    <tr><td><strong>Permissions</strong></td><td>Everything by default — you opt in to safety yourself</td><td>Permission flag per capability (net, fs, env)</td><td>Node-style: unrestricted by default</td></tr>
+    <tr><td><strong>TypeScript</strong></td><td>Compiled by the ecosystem (tsc/tsx)</td><td>Native — erased before execution</td><td>Native — erased at runtime</td></tr>
+    <tr><td><strong>When it wins</strong></td><td>You want npm's shelf, and the team's muscle memory</td><td>Safety-first, standards-dogmatic services, TS-first teams</td><td>Cold-start-sensitive SSR, scripting, dev-loop speed</td></tr>
+    <tr><td><strong>The theory</strong></td><td>—</td><td>Deno's bet = Node's decisions were historical, not principled; the web-standard set is the saner default. "The ecosystem won for the wrong reason, so rebuild the runtime around standards and safety."</td><td>Bun's bet is that throughput and a single shipping binary beat npm's long tail — for a subset of work it is enough.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Reality check for tool choice:</strong> the runtimes are not interchangeable in practice — group APIs, npm plugin ecosystems, and host support still lean Node. Bun is the speed story; Deno is the safety-and-standards story. The migration cost runs through the module-system difference, not the language.</p>
+
+<blockquote class="callout">
+  <p><strong>The fence-line:</strong> <em>this</em> section is about how JS behaves on the server — loop phases, streams, V8/libuv, and the three runtimes. <em>What you build with it</em> — middleware chains, authentication vs. authorization, ORMs vs. raw SQL, queues, caching, transactions, and the Skeleton → Deepen → Polish loop — lives in the <a href="./backend-engineering.html">Backend Engineering</a> reference.</p>
+</blockquote>
+
 <h2>4. The Mobile Perspective</h2>
 
-<p><strong>What mobile uses of JS:</strong> React Native (Expo, bare), Capacitor/Ionic (WebView + native plugins), NativeScript. JS runs on a JS engine (Hermes on Android, JavaScriptCore on iOS) bridged to native modules. UI is native (React Native) or WebView (Capacitor).</p>
+<p><strong>What mobile uses of JS:</strong> React Native (Expo, bare), Capacitor/Ionic (WebView + native plugins), NativeScript. JS runs on a JS engine (Hermes on Android, JavaScriptCore on iOS) bridged to native modules. UI is native (React Native) or WebView (Capacitor). For the installable-hosts deep dive — the decision matrix, React Native's architecture, Electron/Tauri, Smart TV, gaming — see <a href="./beyond-the-browser.html">Beyond the Browser</a>. This section keeps the language-level comparison; that doc owns the shipping story.</p>
 
 <p><strong>What doesn't fit:</strong> native performance (bridge overhead, JSI helps but doesn't eliminate), native UI primitives (you're reimplementing platform conventions), App Store review (WebView apps face scrutiny), the talent pool that knows Swift/Kotlin from university.</p>
 

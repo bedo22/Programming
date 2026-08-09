@@ -1,0 +1,495 @@
+## Overall verdict
+
+This is a **strong, well-positioned doc** that correctly fills the mindset-and-threat-model layer of the shelf. It owns the adversarial thinking discipline and correctly delegates implementation mechanics to neighbors. The CIA triad framing, STRIDE taxonomy, trust boundary methodology, and the "discipline of saying no" positioning are all well-executed.
+
+However, there are significant completeness gaps in several areas that a security reference should cover, even if at the mindset level. The doc is excellent at **threat modeling as a thinking discipline** but thinner on **security as an operational discipline** — incident response, risk management methodology, compliance, secure coding principles, and the actual process of running a threat modeling session.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Core thesis (CIA triad, adversarial thinking) | Very strong |
+| STRIDE and trust boundaries | Strong |
+| Mental models | Strong |
+| Intersection with neighbors | Well-drawn |
+| IAM section | Good but could go deeper on authorization models |
+| Cryptography section | Good principles, thin on implementation guidance |
+| OWASP taxonomy | Good framing as "classes" |
+| AI-era attack surface | Good, appropriately provisional |
+| Threat modeling process (step-by-step) | Missing |
+| Risk management methodology | Missing |
+| Incident response | Missing |
+| Secure coding principles | Missing |
+| Compliance and standards | Missing |
+| Worked examples | Only one; needs more |
+| Security metrics | Missing |
+| Supply chain security depth | Thin |
+
+I would rate it approximately:
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 9 / 10 |
+| Conceptual completeness | 7 / 10 |
+| Practical completeness | 6.5 / 10 |
+| Shelf consistency | 8 / 10 |
+| Duplication control | 8.5 / 10 |
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The CIA triad framing is the right foundation
+
+The doc correctly positions security as the preservation of three properties — Confidentiality, Integrity, Availability — and frames every design choice as a trade-off between them. The statement "Security work is the explicit, recorded answer to 'which leg does this system bet on, and what did we give the adversary instead?'" is excellent and captures the engineering mindset.
+
+## 1.2 The "wraps every other layer" positioning is correct
+
+The doc correctly positions security as the only discipline that wraps every other layer on the shelf. The diagram showing security encompassing API Design, Backend, Data Modeling, System Design, CI/CD, and Frontend is accurate and well-drawn.
+
+## 1.3 STRIDE and trust boundaries are well-explained
+
+The STRIDE taxonomy is correctly presented as a checklist that makes threat enumeration complete instead of vibes-based. The trust boundary methodology — "draw the data-flow diagram first, mark every boundary, run STRIDE on each arrow" — is the right process and is well-articulated.
+
+## 1.4 The mental models section is strong
+
+The six mental models (defense in depth, least privilege, human as weakest link, don't roll your own crypto, fail safe, security as cost center) are all correct and well-framed. The "fail safe, not fail open" model is particularly important and well-stated.
+
+## 1.5 The worked example (file upload endpoint) is good
+
+The file upload example correctly demonstrates the threat modeling process: draw the data flow, mark boundaries, run STRIDE on each arrow, identify controls. It's a good pedagogical example.
+
+## 1.6 The AI-era attack surface section is appropriately provisional
+
+The doc correctly notes that AI security is the youngest domain and treats best practices as provisional. The coverage of prompt injection, data exfiltration, model poisoning, and agent tool abuse is well-framed.
+
+---
+
+# 2. Duplication boundaries
+
+The doc correctly delegates mechanics to neighbors. Here's a summary of the boundaries and where they could be tightened:
+
+| Topic | This doc owns | Neighbor owns |
+|---|---|---|
+| Adversarial thinking, threat modeling | ✅ Mindset, STRIDE, trust boundaries | — |
+| Authentication mechanics | Theory of identity | API Design (OAuth flows, JWT, token mechanics) |
+| Authorization checks | Broken access control as a class | Backend Engineering (IDOR prevention, ownership checks) |
+| Injection prevention | Injection as a trust assumption violation | Backend Engineering (parameterized queries, ORM bypass risks) |
+| Supply chain security | Supply-chain threat model | CI/CD (SBOM, SLSA, secret scanning, dependency scanning) |
+| Browser security | XSS/CSRF as trust boundary violations | API Design (CSP, SameSite cookies, CSRF tokens) |
+| Multi-tenancy | Tenant isolation failure modes | Data Modeling (RLS, schema design) |
+| Service-to-service auth | mTLS as a control | System Design (trust boundaries, network segmentation) |
+
+**One area of overlap to tighten:** The doc mentions IDOR in both the "Broken access control" OWASP class and the IAM section. This is fine since they're different angles (attack class vs. authorization model), but the cross-reference could be clearer.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important additions needed.
+
+## 3.1 Missing: Threat modeling process (step-by-step methodology)
+
+The doc explains STRIDE and trust boundaries but doesn't provide a step-by-step methodology for actually running a threat modeling session. This is a significant gap.
+
+Add a section:
+
+> **Running a threat model — the process**
+
+| Step | What you do | Output |
+|---|---|---|
+| 1. Define scope | What system/feature are we modeling? What's in scope? | Scope statement, system boundary |
+| 2. Draw the data-flow diagram | Every actor, store, process, and data arrow. Mark trust boundaries. | DFD with boundaries |
+| 3. Enumerate threats | Run STRIDE on each arrow and each store. | Threat list with STRIDE categories |
+| 4. Prioritize threats | Score by likelihood × impact. Use DREAD, STRIDE-per-element, or attack trees. | Prioritized threat register |
+| 5. Identify mitigations | For each threat: control, accept, transfer, or avoid. | Mitigation plan |
+| 6. Validate | Verify mitigations are implemented and effective. | Test results, pen test findings |
+| 7. Document and review | Record decisions. Schedule re-review when the system changes. | Threat model document, review cadence |
+
+Mention alternative methodologies briefly:
+- **PASTA** (Process for Attack Simulation and Threat Analysis) — risk-centric, 7 stages
+- **TRIKE** — risk-management focused
+- **Attack trees** — decompose a goal into sub-attacks (AND/OR nodes)
+- **Microsoft Threat Modeling Tool** — STRIDE-based, free tool
+
+## 3.2 Missing: Risk management methodology
+
+The doc mentions "security is risk management" in the mental models but doesn't provide a risk management framework.
+
+Add a section:
+
+> **Risk management — the decision framework**
+
+| Step | What you do |
+|---|---|
+| Identify assets | What data, systems, and capabilities must be protected? |
+| Identify threats | What could go wrong? (STRIDE, threat intelligence, past incidents) |
+| Assess likelihood | How probable is each threat? (historical data, industry reports) |
+| Assess impact | What's the cost if it happens? (financial, reputational, legal, operational) |
+| Calculate risk | Risk = Likelihood × Impact |
+| Decide treatment | Mitigate (add controls), Accept (document the risk), Transfer (insurance, vendor), Avoid (don't build it) |
+| Monitor and review | Risks change. Re-assess on system changes, new threats, or incidents. |
+
+Add a risk register template:
+
+| Threat | Asset | Likelihood | Impact | Risk score | Treatment | Owner | Review date |
+|---|---|---|---|---|---|---|---|
+| SQL injection | User database | Medium | High | High | Parameterized queries + WAF | Backend lead | Q3 |
+| Credential stuffing | Auth service | High | Medium | High | Rate limiting + MFA | Security team | Q2 |
+
+## 3.3 Missing: Incident response methodology
+
+The doc mentions "incident response runbook" in the infrastructure section but doesn't cover incident response as a discipline.
+
+Add a section:
+
+> **Incident response — when the threat model fails**
+
+| Phase | What happens | Key activities |
+|---|---|---|
+| Preparation | Before the incident | Runbooks, contact lists, tooling, tabletop exercises |
+| Detection | Something is wrong | Alerts, anomaly detection, user reports, threat intelligence |
+| Containment | Stop the bleeding | Isolate affected systems, block attacker access, preserve evidence |
+| Eradication | Remove the threat | Patch vulnerability, remove malware, rotate credentials |
+| Recovery | Restore normal operations | Restore from backup, verify integrity, monitor for recurrence |
+| Lessons learned | Prevent recurrence | Post-incident review, update threat model, improve controls |
+
+Key principles:
+- **Time-box containment.** Don't spend 48 hours investigating while the attacker is still inside. Contain first, investigate second.
+- **Preserve evidence.** Don't reboot, don't delete logs, don't "fix" before documenting.
+- **Communicate.** Internal stakeholders, legal, customers, regulators — the communication plan is part of the runbook.
+- **Blameless post-mortem.** The goal is to improve the system, not to find someone to blame.
+
+## 3.4 Missing: Secure coding principles
+
+The doc correctly delegates implementation mechanics to neighbors, but it should own the **principles** of secure coding, even if the specifics live elsewhere.
+
+Add a section:
+
+> **Secure coding principles — the developer's security contract**
+
+| Principle | What it means | Where the mechanics live |
+|---|---|---|
+| Validate all input | Every crossing of a trust boundary re-validates. Assume the other side is hostile. | Backend Engineering §1e, API Design §8h |
+| Parameterize all queries | Never concatenate user input into SQL/NoShell commands. | Backend Engineering §1e |
+| Encode all output | Escape user data before rendering in HTML, JS, URLs, or SQL. | Frontend camps, API Design §8h |
+| Use least privilege | Every service, function, and query gets minimum permissions. | System Design §5d, IAM section |
+| Fail safe | Unknown input, missing header, expired token → deny, log, close. | This doc (mental models) |
+| Don't trust the client | Client-side validation is UX, not security. Server validates everything. | Backend Engineering §1d |
+| Use managed crypto | Never implement crypto. Use audited libraries and managed KMS. | This doc (cryptography section) |
+| Log security events | Authentication failures, authorization denials, input validation failures. | System Design §6f, CI/CD observability |
+| Keep dependencies updated | Known vulnerabilities in dependencies are the most common attack vector. | CI/CD (dependency scanning) |
+| Handle errors safely | Don't leak stack traces, internal paths, or database schemas in error messages. | API Design (error envelopes) |
+
+## 3.5 Missing: Compliance and standards
+
+The doc mentions NIST CSF in primary sources but doesn't cover compliance as a discipline.
+
+Add a section:
+
+> **Compliance — when security becomes auditable**
+
+| Standard | What it covers | When it applies |
+|---|---|---|
+| SOC 2 Type II | Security, availability, processing integrity, confidentiality, privacy | SaaS companies selling to enterprises |
+| ISO 27001 | Information security management system (ISMS) | Organizations wanting formal security governance |
+| PCI DSS | Payment card data protection | Any system handling credit card numbers |
+| HIPAA | Protected health information (PHI) | Healthcare systems in the US |
+| GDPR | Personal data protection for EU residents | Any system processing EU personal data |
+| NIST CSF | Identify, Protect, Detect, Respond, Recover | US federal and critical infrastructure |
+| FedRAMP | Cloud service security for US government | Cloud providers serving government |
+
+Key principle: Compliance is not security. Compliance is the minimum bar that regulators require. Security is the discipline of protecting assets beyond the minimum. A system can be compliant and still vulnerable.
+
+## 3.6 Missing: Security metrics
+
+The doc doesn't cover how to measure security posture.
+
+Add a section:
+
+> **Security metrics — measuring what matters**
+
+| Metric | What it measures | Target |
+|---|---|---|
+| Mean time to detect (MTTD) | How long before you notice a breach | < 24 hours (industry avg is ~200 days) |
+| Mean time to respond (MTTR) | How long to contain and eradicate | < 4 hours for critical |
+| Vulnerability density | Open vulnerabilities per system/component | Trending down |
+| Patch SLA | % of critical patches applied within 7 days | > 95% |
+| Phishing click rate | % of employees who click test phishing emails | < 5% |
+| MFA coverage | % of accounts with MFA enabled | 100% for privileged, > 95% for all |
+| Security training completion | % of engineers completing annual security training | 100% |
+| Threat model coverage | % of new features with a threat model | 100% for high-risk |
+| Pen test findings | Open findings from last pen test, by severity | Zero critical/high |
+| Dependency vulnerability age | Days since a known CVE was published vs. patched | < 7 days for critical |
+
+## 3.7 Missing: Supply chain security depth
+
+The doc mentions Log4Shell and links to CI/CD for supply chain, but the threat model perspective on supply chain could be deeper.
+
+Add to the existing section or create a new one:
+
+> **Supply chain threat model**
+
+| Attack vector | What it targets | Controls |
+|---|---|---|
+| Malicious package | Developer installs a typosquatted or hijacked package | Package verification, lockfiles, dependency review |
+| Compromised dependency | A legitimate dependency is hijacked (Log4Shell) | SBOM, vulnerability scanning, automated patching |
+| Build system compromise | Attacker injects code during build | SLSA, signed builds, reproducible builds |
+| CI/CD pipeline compromise | Attacker modifies pipeline to inject backdoor | Pipeline-as-code review, least-privilege CI, secret scanning |
+| Update mechanism compromise | Attacker hijacks auto-update (SolarWinds) | Code signing, update verification, canary deployments |
+
+## 3.8 Missing: Authorization models in depth
+
+The doc mentions RBAC, ABAC, and ReBAC but doesn't explain them or when to use each.
+
+Expand the IAM section:
+
+| Model | How it works | When to use | Limitations |
+|---|---|---|---|
+| RBAC (Role-Based) | Users get roles; roles get permissions | Simple orgs, clear job functions | Coarse-grained; role explosion in complex systems |
+| ABAC (Attribute-Based) | Policies evaluate attributes (user, resource, environment) | Fine-grained, dynamic permissions | Complex to write and audit policies |
+| ReBAC (Relationship-Based) | Permissions derive from relationships (owner, member, viewer) | Social/collaborative systems (Google Docs, GitHub) | Graph queries can be expensive |
+| Capability-Based | Unforgeable tokens grant specific access | Decentralized systems, API keys | Hard to revoke; token management |
+| Policy Engines | External engine evaluates policies (OPA, Cedar, Casbin) | Microservices, consistent policy enforcement | Adds a dependency; policy language learning curve |
+
+## 3.9 Missing: Browser security threat model
+
+The doc mentions XSS and CSRF via neighbors but doesn't own the browser security threat model.
+
+Add a section:
+
+> **Browser security — the client-side trust boundary**
+
+| Threat | What it exploits | Controls |
+|---|---|---|
+| XSS (Cross-Site Scripting) | Unescaped user input rendered as HTML/JS | Output encoding, CSP, HttpOnly cookies |
+| CSRF (Cross-Site Request Forgery) | Authenticated browser makes unintended requests | SameSite cookies, CSRF tokens, Origin header checks |
+| Clickjacking | Invisible iframe overlays trick user into clicking | X-Frame-Options, CSP frame-ancestors |
+| Open redirect | Unvalidated redirect URL used for phishing | Allowlist redirect targets |
+| CORS misconfiguration | Overly permissive cross-origin access | Explicit allowlist, no wildcard with credentials |
+| Insecure storage | Sensitive data in localStorage/sessionStorage | HttpOnly cookies for tokens; avoid sensitive data in client storage |
+
+## 3.10 Missing: Container and cloud security
+
+The doc mentions mTLS and network segmentation but doesn't cover container/cloud-specific security.
+
+Add a section:
+
+> **Container and cloud security**
+
+| Layer | Threat | Controls |
+|---|---|---|
+| Image | Vulnerable base image, malicious layer | Image scanning (Trivy, Grype), minimal base images, signed images |
+| Runtime | Container escape, privilege escalation | Read-only filesystem, non-root user, seccomp/AppArmor, runtime scanning |
+| Orchestration | Misconfigured RBAC, exposed dashboard | Least-privilege service accounts, network policies, pod security standards |
+| Cloud IAM | Overly permissive roles, leaked credentials | Least-privilege IAM, short-lived credentials, CloudTrail/audit logging |
+| Secrets | Hardcoded secrets in images/config | Secrets manager, runtime injection, secret scanning |
+| Network | Lateral movement between services | Network policies, service mesh, micro-segmentation |
+
+---
+
+# 4. Medium-priority improvements
+
+## 4.1 Add a second worked example
+
+The file upload example is good, but a second example would strengthen the doc. Good candidates:
+- **Authentication endpoint** (login flow): STRIDE on credential submission, session creation, token issuance
+- **Payment processing**: STRIDE on payment API, card data handling, idempotency
+- **Multi-tenant API**: STRIDE on tenant isolation, data leakage, privilege escalation
+
+## 4.2 Expand the cryptography section
+
+The current section covers hashing, encryption, and signing well. Add:
+- **Key derivation**: Argon2, PBKDF2, scrypt — when to use each
+- **TLS configuration**: TLS 1.3, cipher suites, certificate management, HSTS
+- **Certificate management**: Let's Encrypt, auto-renewal, certificate pinning
+- **Key rotation**: How often, how to automate, what to do with old keys
+
+## 4.3 Add security testing methodology
+
+The ecosystem table lists SAST, DAST, SCA tools but doesn't explain when to use each.
+
+Add:
+
+| Testing type | When to use | What it finds |
+|---|---|---|
+| SAST (Static Application Security Testing) | Every PR, in CI | Code patterns: injection, hardcoded secrets, insecure crypto |
+| DAST (Dynamic Application Security Testing) | Staging, pre-production | Runtime vulnerabilities: XSS, CSRF, auth bypass |
+| SCA (Software Composition Analysis) | Every PR, in CI | Known vulnerabilities in dependencies |
+| Penetration testing | Quarterly or before major release | Business logic flaws, chained attacks, social engineering |
+| Red team exercise | Annually | Full adversarial simulation, including physical and social |
+| Fuzz testing | Parsers, file formats, network protocols | Crashes, memory corruption, unexpected behavior |
+
+## 4.4 Add security architecture patterns
+
+The doc mentions zero trust in the history section but doesn't cover security architecture patterns.
+
+Add:
+
+| Pattern | What it does | When to use |
+|---|---|---|
+| Zero Trust / BeyondCorp | No implicit trust based on network location; verify every request | Cloud, remote work, microservices |
+| Service mesh (Istio, Linkerd) | mTLS between services, traffic policies, observability | Microservices with many service-to-service calls |
+| API gateway as security boundary | Auth, rate limiting, WAF, request validation at the edge | Public APIs, multi-tenant systems |
+| Bastion host / jump server | Controlled access to internal networks | Legacy systems, regulatory requirements |
+| Vault / secrets manager | Centralized secret storage with rotation and audit | Any system with secrets (all of them) |
+
+## 4.5 Add vulnerability disclosure and bug bounty
+
+The doc doesn't cover how organizations handle external vulnerability reports.
+
+Add a section:
+
+> **Vulnerability disclosure — when outsiders find your bugs**
+
+| Approach | What it is | When to use |
+|---|---|---|
+| Coordinated disclosure | Researcher reports privately; vendor fixes; public disclosure after fix | Default for most organizations |
+| Bug bounty | Pay researchers for valid findings | Organizations with public attack surface |
+| VDP (Vulnerability Disclosure Policy) | Public policy stating how to report vulnerabilities | Every organization with a public presence |
+| Responsible disclosure | Researcher gives vendor time to fix before publishing | Industry norm; often used interchangeably with coordinated |
+
+Key principle: Make it easy for researchers to report vulnerabilities. A clear VDP, a security@ email, and a Hall of Fame page are the minimum bar.
+
+## 4.6 Add security awareness and culture
+
+The doc mentions "human is the weakest link" but doesn't cover security culture.
+
+Add a section:
+
+> **Security culture — the human layer**
+
+| Practice | What it does |
+|---|---|
+| Security training | Annual training for all engineers; role-specific training for high-risk roles |
+| Phishing simulations | Test and improve employee awareness |
+| Security champions | Embedded security advocates in each team |
+| Threat modeling in design review | Make threat modeling a standard part of design reviews |
+| Blameless incident review | Learn from incidents without punishing individuals |
+| Secure coding guidelines | Published, reviewed, and enforced coding standards |
+
+---
+
+# 5. Factual and precision notes
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| STRIDE attribution | "STRIDE (Kohnfelder & Garg, Microsoft)" | Correct. Consider adding the year (2003) and the paper title ("The Threats to Our Products"). |
+| CIA triad | Well-stated | No change needed. |
+| OWASP Top 10 | Referenced correctly | Consider noting that the Top 10 is a awareness document, not a comprehensive list. |
+| Argon2 for passwords | Correct | Consider mentioning OWASP Password Storage Cheat Sheet as the authoritative reference. |
+| AES-GCM for encryption | Correct | Consider noting that AES-GCM requires unique nonces per key; nonce reuse is catastrophic. |
+| OAuth 2.1 | Referenced correctly | Note that OAuth 2.1 is still a draft as of 2024; the doc should note this. |
+| Log4Shell CVE | Correct (CVE-2021-44228) | No change needed. |
+| SLSA | Referenced correctly | No change needed. |
+| Post-quantum cryptography | "Migration to post-quantum algorithms is on every KMS roadmap" | Correct direction. Consider noting NIST's selected algorithms (CRYSTALS-Kyber, CRYSTALS-Dilithium). |
+| SPIFFE/SPIRE | Mentioned in future section | Correct. Consider adding a brief explanation of what SPIFFE is (workload identity framework). |
+| Passkeys/WebAuthn | Mentioned in future section | Correct. Consider noting that passkeys are phishing-resistant by design. |
+
+---
+
+# 6. Structural improvements
+
+## 6.1 Add a "Threat modeling process" section
+
+This is the most important structural addition. The doc explains STRIDE and trust boundaries but doesn't provide a step-by-step methodology for running a threat model. See §3.1 above.
+
+## 6.2 Add a "Risk management" section
+
+The doc mentions risk in mental models but doesn't provide a risk management framework. See §3.2 above.
+
+## 6.3 Add an "Incident response" section
+
+The doc mentions incident response in passing but doesn't cover it as a discipline. See §3.3 above.
+
+## 6.4 Add a "Secure coding principles" section
+
+The doc correctly delegates mechanics but should own the principles. See §3.4 above.
+
+## 6.5 Add a "Compliance" section
+
+The doc mentions NIST CSF but doesn't cover compliance. See §3.5 above.
+
+## 6.6 Add a "Security metrics" section
+
+The doc doesn't cover how to measure security posture. See §3.6 above.
+
+## 6.7 Expand the worked example or add a second one
+
+The file upload example is good but one example is thin. See §4.1 above.
+
+---
+
+# 7. Ecosystem section improvements
+
+The current ecosystem table is good but could be expanded:
+
+| Category | Tools | Decision metric |
+|---|---|---|
+| Secrets management | Vault, AWS Secrets Manager, Doppler, 1Password CLI | Add: rotation automation, audit logging, dynamic credentials |
+| Key management (KMS) | AWS KMS, GCP KMS, Azure Key Vault | Add: HSM-backed keys, automatic rotation, cross-region replication |
+| Identity providers | Okta, Auth0, Cognito, Keycloak | Add: MFA support, SSO, SCIM provisioning, passkey support |
+| Container security | Trivy, Grype, Falco, Aqua, Sysdig | Add: image scanning, runtime protection, compliance checking |
+| Cloud security posture | Wiz, Prisma Cloud, AWS Security Hub, Azure Defender | Add: misconfiguration detection, compliance monitoring |
+| SIEM / SOAR | Splunk, Sentinel, Chronicle, Elastic Security | Add: log aggregation, alert correlation, automated response |
+| Vulnerability management | Tenable, Qualys, Rapid7, Nessus | Add: asset discovery, vulnerability scanning, patch management |
+
+---
+
+# 8. Summary of recommended additions
+
+## Must add (high priority)
+
+1. **Threat modeling process** — step-by-step methodology
+2. **Risk management methodology** — risk register, treatment decisions
+3. **Incident response** — phases, principles, runbook structure
+4. **Secure coding principles** — developer's security contract
+5. **Compliance and standards** — SOC 2, ISO 27001, PCI DSS, GDPR
+6. **Security metrics** — MTTD, MTTR, vulnerability density, MFA coverage
+7. **Supply chain security depth** — threat model, not just mention
+8. **Authorization models** — RBAC, ABAC, ReBAC, capability-based, policy engines
+
+## Should add (medium priority)
+
+9. **Second worked example** — auth endpoint, payment, or multi-tenant API
+10. **Browser security threat model** — XSS, CSRF, clickjacking, CORS
+11. **Container and cloud security** — image, runtime, orchestration, IAM
+12. **Security testing methodology** — SAST, DAST, SCA, pen test, red team
+13. **Security architecture patterns** — zero trust, service mesh, API gateway
+14. **Vulnerability disclosure** — coordinated disclosure, bug bounty, VDP
+15. **Security culture** — training, phishing simulations, security champions
+
+## Nice to add (lower priority)
+
+16. **Mobile security** — app signing, certificate pinning, secure storage
+17. **Data protection and privacy** — GDPR, data classification, PII handling
+18. **Cryptographic implementation details** — key derivation, TLS config, cert management
+19. **Security awareness metrics** — phishing click rate, training completion
+20. **Threat intelligence** — how to consume and apply threat intel
+
+---
+
+# 9. Bottom line
+
+This doc is a **strong foundation** for the security discipline on the shelf. It correctly owns the adversarial thinking layer and delegates mechanics to neighbors. The CIA triad, STRIDE, trust boundaries, and mental models are all well-executed.
+
+However, it needs significant expansion to cover security as an **operational discipline**, not just a thinking discipline. The biggest gaps are:
+
+1. **Threat modeling process** (how to actually run a threat model)
+2. **Risk management** (how to prioritize and treat risks)
+3. **Incident response** (what to do when the threat model fails)
+4. **Secure coding principles** (the developer's contract)
+5. **Compliance** (when security becomes auditable)
+6. **Security metrics** (how to measure posture)
+
+The doc's greatest strength is its positioning: "Security is the discipline of saying no." This is correct and powerful. The additions above don't change that positioning — they make the "saying no" actionable, measurable, and operational.
+
+## Final recommendation
+
+**Strong draft, but needs expansion before being treated as a complete security reference.**
+
+The highest-leverage improvements are:
+
+> Threat modeling process, risk management, incident response, secure coding principles, compliance, and security metrics.
+
+The doc's core thesis is correct. The additions make it complete.

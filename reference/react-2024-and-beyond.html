@@ -130,6 +130,8 @@
 
 <p>Default to server components for data display; push client down to the interactive leaves. Move a component to client only when it needs state, effects, an event handler, a browser API, or context.</p>
 
+<p><strong>Rendering strategy is an accessibility decision.</strong> SSR and RSC give screen readers content immediately (the HTML is in the first response); a client-only SPA gives assistive tech nothing until hydration finishes. But the client boundary is also where focus management can break — a hydrated Client Component that moves or restores focus poorly is an accessibility regression no audit will catch without a screen reader. Treat this as a seam owned jointly by <a href="./ui-ux-web-design.html">UI/UX</a> (the a11y discipline) and <a href="./html-and-css.html">HTML &amp; CSS</a> (the platform controls), not as a rendering-only detail.</p>
+
 <pre><code>Server page
   → server data fetching (async server component)
   → server layout

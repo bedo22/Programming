@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WordPress &amp; the CMS Internet — the ecosystem that runs most of the web</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · WordPress &amp; CMS — the ecosystem that runs most of the web</p>
+  <h1>WordPress &amp; the CMS Internet</h1>
+  <p class="meta">How the other 60% of the web actually works: why WordPress won (the plugin and theme economies), how it works under the hood (PHP, MySQL, the Loop, hooks, template hierarchy), the modern stack (Gutenberg blocks, the REST API, WPGraphQL, headless WordPress as a content API for React), the managed and no-code landscape (Shopify, Webflow, Wix, Squarespace, Bubble, headless CMSes), a when-to-choose-what decision matrix, migration paths, and the freelancer's reality — clients who want "a website I can edit myself". Read this alongside <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (which places WordPress in Camp A) and <a href="./freelance-web-practice.html">Freelance Web Practice</a> (which delivers these projects).</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The rest of this shelf teaches the product-engineering world: greenfield apps, custom frameworks, teams. This doc covers the world most web work actually happens in — the CMS internet. It is not a competitor to the engineering docs; it is the other half of the map:</p>
+  <pre>CUSTOM ENGINEERING WORLD            THE CMS INTERNET
+(product companies, teams)      (clients, solo devs, content teams)
+system-design.html              wordpress-and-cms-internet.html  ← YOU ARE HERE
+api-design.html                        |— WordPress (43% of all sites)
+backend-engineering.html               |— managed: Shopify/Webflow/Wix
+data-modeling-and-databases.html       |— no-code: Bubble + headless CMSes
+security-and-threat-modeling.html      |— static: Hugo/Jekyll/Astro/11ty
+                                       |
+Both worlds meet in:
+frontend-camps-survey.html   (the landscape, Camp A owns the CMS view)
+freelance-web-practice.html  (delivering this world for clients)</pre>
+  <p>Neighbors and how they split the work:</p>
+  <ul>
+    <li><a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — owns the JS-learner's map of all six camps; WordPress appears as Camp A (classic server-rendered). This doc is the deep dive on that camp plus the managed/no-code world around it.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — the request loop that WordPress runs on; when WordPress goes headless, this doc's patterns (auth, caching, CRUD) apply to the WordPress backend too.</li>
+    <li><a href="./api-design.html">API Design</a> — WP-REST and WPGraphQL are contracts; the endpoint-design rules there apply directly to them.</li>
+    <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — custom post types and taxonomies are a content schema; the relational thinking transfers.</li>
+    <li><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — WordPress is the most-targeted CMS; every plugin is a dependency with a supply-chain risk (the Log4Shell lesson, CMS edition).</li>
+    <li><a href="./freelance-web-practice.html">Freelance Web Practice</a> — how these platforms get scoped, delivered, and maintained for clients; and <a href="./income-stream-landscape.html">Income Stream Landscape</a> / <a href="./frontend-income-markets.html">Frontend Income Markets</a> for the business side.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p><em>Frontend Camps Survey</em> classifies WordPress as "Camp A — CMS and classic server-rendered apps" in a few paragraphs. But the ecosystem behind that classification runs more websites than every other platform combined. Most engineering curricula skip it entirely — "it's legacy PHP" — while most paid web work (freelance, agencies, client sites, content marketing sites) happens inside it. This doc is the middle ground: rigorous enough for an engineer (how the Loop works, why the database is shaped that way, when headless is the right call), practical enough for a freelancer (how to choose, how to maintain, what clients actually need). The gap it fills: nobody on the shelf explained why WordPress won, how it works, and when — despite its reputation — it is still the right tool. One scope note: <strong>this is not a WordPress tutorial</strong> — it is the strategic and architectural guide; step-by-step building is what the linked docs, the Codex, and the plugin docs are for.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read this after <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (so you've seen where WordPress sits in the landscape) and after <a href="./backend-engineering.html">Backend Engineering</a> §1 (so you understand the request loop WordPress runs on). Freelancers should read it together with <a href="./freelance-web-practice.html">Freelance Web Practice</a>. Cross-links:</p>
+<ul>
+  <li>Camp A of <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — the classification; this doc is the depth.</li>
+  <li>Loop mechanics: <a href="./backend-engineering.html">Backend Engineering</a> — PHP is just another server runtime; auth, caching, and CRUD patterns transfer.</li>
+  <li>Contracts: <a href="./api-design.html">API Design</a> — WP-REST/WPGraphQL endpoints follow the same rules.</li>
+  <li>Schema: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — custom post types are schema design in a content-shaped form.</li>
+  <li>Risk: <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — the plugin ecosystem is a supply chain.</li>
+  <li>Delivery: <a href="./freelance-web-practice.html">Freelance Web Practice</a> — scoping, handoff, maintenance. Reference: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>If you've ever dismissed WordPress as "not real development", lost a client to Wix, or inherited a plugin mess you had to untangle — this is the map.</strong> Read the Definition and History first (why the ecosystem is shaped this way), then How WordPress works, then the decision matrix when a choice matters.</p>
+
+<h2>Definition — what the CMS internet is, and what it is not</h2>
+
+<p>The CMS internet is the ecosystem of platforms whose core job is <strong>managing content for non-developers</strong>. A Content Management System (CMS) separates two surfaces that custom development fuses: the <strong>editing surface</strong> (what the site owner uses — the admin dashboard) and the <strong>rendering surface</strong> (what visitors see — the theme or frontend). That separation is the entire product.</p>
+
+<p>It is <em>not</em> "old web technology" — WordPress is continuously developed, Gutenberg is a modern block editor, and headless WordPress serves React frontends. It is <em>not</em> a single product — the word covers WordPress (self-hosted and hosted), managed builders (Shopify, Webflow, Wix, Squarespace), no-code platforms (Bubble, Retool), headless CMSes (Contentful, Sanity, Strapi), and static site generators (Hugo, Jekyll, Astro, 11ty). And it is <em>not</em> "not engineering" — a 200k-visit WordPress site with 40 plugins is a performance, security, and dependency problem that takes real engineering discipline. The discipline is just aimed at a different target: <strong>the content survives the code; the code is replaceable</strong>.</p>
+
+<p><strong>The market reality (why this doc exists):</strong></p>
+
+<table>
+<thead><tr><th>Platform type</th><th>Share of all websites (2026)</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td><strong>WordPress</strong></td><td>~43% (W3Techs, approximate)</td><td>Self-hosted wordpress.org, hosted wordpress.com, WooCommerce stores</td></tr>
+<tr><td>Other CMS / builders</td><td>~10–15%</td><td>Shopify, Wix, Squarespace, Webflow, Drupal, Joomla</td></tr>
+<tr><td>Custom frameworks</td><td>~10–15%</td><td>React/Next.js, Vue/Nuxt, Angular, Svelte (this shelf's main world)</td></tr>
+<tr><td>Static sites</td><td>~5%</td><td>Hugo, Jekyll, Astro, 11ty</td></tr>
+<tr><td>No-code / low-code</td><td>~5%</td><td>Bubble, Retool, Glide — apps, not just sites</td></tr>
+<tr><td>Legacy / bespoke / unknown</td><td>The remainder</td><td>Older frameworks, intranets, abandoned sites</td></tr>
+</tbody>
+</table>
+
+<p>WordPress alone outnumbers every custom-framework site combined roughly 3-to-1. An engineer who can't navigate this ecosystem is professionally illiterate in the world where most web money moves.</p>
+
+<h2>History — why WordPress won</h2>
+
+<p>The CMS internet emerged through the same constraint inversions as every discipline on this shelf — each inversion pushed power from the developer to the site owner:</p>
+
+<table>
+<thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+<tbody>
+<tr><td><strong>Hand-written → Generated</strong> (1990s)</td><td>Static HTML pages edited by hand with FTP; every site update was a webmaster task</td><td>Dynamic pages generated from a database at request time (CGI scripts, then PHP/MySQL)</td><td>Content became data, not files. The database became the site</td></tr>
+<tr><td><strong>Blog → Platform</strong> (WordPress 2003)</td><td>WordPress was one blog engine among many (Movable Type, b2/cafelog)</td><td>Plugins (2004) and themes (2005) turned it into a platform — the <em>ecosystem</em> became the product</td><td>Any developer could extend it; any user could reskin it. The long tail of web work found a home</td></tr>
+<tr><td><strong>Single-author → Multi-role</strong> (roles early; CPTs in WP 3.0, 2010)</td><td>A site was one blog; one admin wrote everything</td><td>Admin/editor/author/subscriber roles (which predate 3.0) and custom post types (3.0) turned WordPress into a general CMS for any content shape</td><td>The admin became a product feature. Content teams, not just bloggers, could run the site</td></tr>
+<tr><td><strong>Page builder → Block editor</strong> (Gutenberg, 2018)</td><td>Page builders (Elementor, Divi) as third-party hacks; shortcodes for layout</td><td>Gutenberg: blocks as the native content unit, reusable, structured (JSON in the database)</td><td>Layout moved into the editing surface officially — the platform absorbed its ecosystem's best idea</td></tr>
+<tr><td><strong>Monolith → Headless</strong> (2015–present)</td><td>WordPress renders HTML; frontend and backend inseparably coupled</td><td>WP-REST API (2015), WPGraphQL (2018): WordPress as a pure content API feeding React/Next.js frontends</td><td>WordPress survives the SPA revolution by becoming a backend service — the content stays, the rendering leaves</td></tr>
+<tr><td><strong>Human-built → AI-assisted</strong> (2023–present)</td><td>Site builders require manual setup: themes, plugins, content entry</td><td>AI site builders (Wix ADI, Elementor AI, AI WordPress builders) generate sites and even content from prompts</td><td>The editing surface is being automated out of the loop for the simplest cases — the CMS becomes a content store with a bot on top</td></tr>
+</tbody>
+</table>
+
+<p><strong>Why WordPress specifically won:</strong> timing (it arrived as PHP hosting became cheap and universal), an open license with no licensing fees, a plugin system with an API simple enough for solo developers, a theme system that let any designer reskin it, and a community that turned every problem into a Stack Overflow answer. Its competitors had some of these; none had all of them. The pattern is the same one this shelf documents everywhere else: <strong>the winning system is the one that makes the common case cheap for the least-skilled participant</strong>, not the one that is technically best.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+<thead><tr><th>Neighbor doc</th><th>What belongs here</th><th>What belongs next door</th></tr></thead>
+<tbody>
+<tr><td>Frontend Camps Survey</td><td>WordPress/CMS ecosystem in depth: mechanics, platform landscape, decisions</td><td>The six-camp map, the JS learner's lens on who owns first paint (Camp A)</td></tr>
+<tr><td>Backend Engineering</td><td>WordPress as a runtime: the Loop, hooks, wpdb, caching layers, WP-CLI</td><td>The generic request loop, authn/authz mechanics, transactions, connection pooling (§1–§7)</td></tr>
+<tr><td>API Design</td><td>WP-REST/WPGraphQL as content contracts; headless architecture decisions</td><td>Contract design, versioning, rate limits, idempotency — the rules are universal</td></tr>
+<tr><td>Data Modeling &amp; Databases</td><td>Custom post types, taxonomies, meta as a content schema; when CPTs suffice</td><td>Normalization, indexing, migrations, EXPLAIN — the underlying craft</td></tr>
+<tr><td>Security &amp; Threat Modeling</td><td>WordPress's specific attack surface: plugin supply chain, patching discipline, hardcoded credentials in configs</td><td>Threat modeling, OWASP classes, crypto, IAM — the general discipline</td></tr>
+<tr><td>Freelance Web Practice</td><td>Which platform for which client (the decision matrix)</td><td>Scoping conversations, quoting, handoff, maintenance contracts</td></tr>
+<tr><td>Product Strategy</td><td>Platform economics: why open source won, plugin economies</td><td>Viability analysis, roadmaps, OKRs — the generic discipline</td></tr>
+</tbody>
+</table>
+
+<p><strong>Key rule:</strong> if the topic is "how the CMS internet works and which platform to pick", it belongs here. If it is "how the underlying engine works generically" (requests, contracts, schemas, threats), it belongs next door and is linked, not re-taught.</p>
+
+<h2>Underlying theory — the invariants of the CMS world</h2>
+
+<table>
+<thead><tr><th>Invariant</th><th>What it means</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Content is data, not files</td><td>Pages, posts, and media live in a database, rendered per request</td><td>Editing doesn't require deploying; the database is the site and must be backed up like one</td></tr>
+<tr><td>The editing surface is the product</td><td>Clients judge the platform by the admin dashboard, not the code</td><td>A technically better platform with a harder editor loses to one the client can use</td></tr>
+<tr><td>Separation of content from rendering</td><td>What is stored (structured blocks, meta) ≠ how it is displayed (theme/template)</td><td>Rebranding or replatforming doesn't touch content — this is why headless works</td></tr>
+<tr><td>The ecosystem is the product</td><td>Plugins and themes are the platform's real feature set</td><td>Every plugin is a dependency with a security and maintenance cost (see <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>)</td></tr>
+<tr><td>Extensibility by hook, not by fork</td><td>WordPress lets plugins hook into every stage without touching core (actions/filters)</td><td>The platform survives because upgrades don't break custom code — the same principle as <a href="./api-design.html">API Design</a>'s contract rules</td></tr>
+<tr><td>The reader and the editor are different users</td><td>Performance for visitors, usability for editors, safety for admins</td><td>Optimization is judged on both surfaces; the admin's slow page is a product bug</td></tr>
+</tbody>
+</table>
+
+<h2>Mental models — frames for thinking about the CMS world</h2>
+
+<table>
+<thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
+<tbody>
+<tr><td>WordPress is a CMS framework, not a blogging tool</td><td>What can this hold?</td><td>Custom post types + taxonomies + roles make it a general content platform; "it's just blogs" is a decade out of date</td></tr>
+<tr><td>The plugin ecosystem is the product, not the core</td><td>Where does the real value come from?</td><td>WordPress core is deliberately small; the 60,000+ plugins are where features live — and where the risk lives too</td></tr>
+<tr><td>Headless WordPress = WordPress as a content API</td><td>Who renders?</td><td>The frontend (React, Astro, plain HTML) renders; WordPress stores, edits, and serves JSON. Best of both worlds when a team exists to run the frontend</td></tr>
+<tr><td>No-code trades flexibility for self-service</td><td>Who owns the site after delivery?</td><td>Wix/Webflow/Shopify give the client full editing control and the developer less control — the trade is deliberate, price it accordingly</td></tr>
+<tr><td>Every plugin is a dependency</td><td>What happens when it breaks?</td><td>Pin versions, scan for vulnerabilities, budget for updates — the supply-chain mindset from <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>, applied to PHP</td></tr>
+<tr><td>The admin is a product requirement</td><td>Can the client use it?</td><td>If the client can't edit confidently, they will call you forever — training and editing UX are deliverables, not afterthoughts (see <a href="./freelance-web-practice.html">Freelance Web Practice</a>)</td></tr>
+<tr><td>Content outlives the platform</td><td>What must survive replatforming?</td><td>Design content structure (CPTs, taxonomies, fields) to be exportable; lock-in is a pricing decision someone else made for you</td></tr>
+</tbody>
+</table>
+
+<h2>How WordPress works — the mechanics</h2>
+
+<p>Enough to navigate and debug, not to write a theme from scratch (the <a href="https://developer.wordpress.org/">WordPress Developer Handbook</a> is the reference). The runtime in one line: <strong>PHP on the request path, MySQL/MariaDB behind it, accessed through the <code>wpdb</code> object</strong> — every query the Loop runs is a SQL statement against the <code>wp_</code>-prefixed tables, so the language and the schema conventions from <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL §MySQL/MariaDB</a> apply directly.</p>
+
+<h3>The request lifecycle</h3>
+
+<p>Every WordPress request runs through <code>index.php</code> → the core bootstrap, then a decision tree centered on <strong>the Loop</strong>:</p>
+
+<pre>Request hits /some/page/
+   → index.php boots WordPress (loads wp-config, DB, plugins, theme)
+   → the query is parsed from the URL (permalinks → query vars)
+   → the main query fetches matching posts from the database
+   → THE LOOP: while (have_posts()) { the_post(); render the template; }
+   → the template hierarchy picks which theme file renders:
+       single post → single.php → falls back to index.php
+       page        → page.php
+       category    → category-&lt;slug&gt;.php → archive.php → index.php</pre>
+
+<p>The two big ideas:</p>
+<ul>
+  <li><strong>Template hierarchy</strong> — WordPress chooses the most specific template file that exists, falling back down the chain. Adding a <code>single-product.php</code> file to a theme changes how product posts render without touching any other page. This is the theme's "routing" — and it is why theme files are the render layer.</li>
+  <li><strong>The Loop</strong> — a while-loop over a query result. <code>the_title()</code>, <code>the_content()</code>, <code>the_permalink()</code> print fields of the current post and advance. Every page template is, at heart, "run the query, loop the results, print fields."</li>
+</ul>
+
+<h3>The content model — custom post types, taxonomies, meta</h3>
+
+<p>WordPress's database is a general-purpose content store. The default <code>wp_posts</code> table holds posts, pages, attachments, and navigation — everything is a "post type." The content schema is declared in PHP:</p>
+
+<pre>register_post_type('product', [
+  'public'      =&gt; true,
+  'supports'    =&gt; ['title', 'editor', 'thumbnail'],
+  'has_archive' =&gt; true,
+]);
+
+register_taxonomy('brand', 'product', ['hierarchical' =&gt; true]);</pre>
+
+<ul>
+  <li><strong>Custom post types (CPTs)</strong> — declare new content shapes (products, testimonials, jobs, events) the way a schema declares tables. Each gets its own URL structure, templates, and admin menu.</li>
+  <li><strong>Taxonomies</strong> — the classification system: hierarchical categories vs. flat tags, attachable to any post type. The CMS equivalent of normalized lookup tables.</li>
+  <li><strong>Meta</strong> — key-value fields attached to posts (<code>wp_postmeta</code>). The CMS equivalent of JSONB: powerful, unconstrained, and query-awkward. Plugins like ACF (Advanced Custom Fields) give meta a structured admin UI — the CMS version of "schema in code."</li>
+  <li><strong>wp_options</strong> — site-wide settings; <strong>wp_users / wp_usermeta</strong> — users and their meta; <strong>roles and capabilities</strong> — admin, editor, author, contributor, subscriber, each a bundle of capabilities that plugins can extend.</li>
+</ul>
+
+<h3>Extensibility — hooks, themes, plugins</h3>
+
+<table>
+<thead><tr><th>Concept</th><th>What it is</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td><strong>Actions</strong></td><td>Hooks where code runs at a lifecycle moment: <code>add_action('wp_footer', fn)</code></td><td>Plugins inject behavior without modifying core — upgrades don't clobber custom code</td></tr>
+<tr><td><strong>Filters</strong></td><td>Hooks that transform values: <code>add_filter('the_content', fn)</code></td><td>The same principle as middleware; content is filtered per render</td></tr>
+<tr><td><strong>Themes</strong></td><td>The render layer: template files, styles, <code>functions.php</code> (theme hooks)</td><td>Swappable without touching content — the separation of content from rendering in practice</td></tr>
+<tr><td><strong>Plugins</strong></td><td>Packaged PHP that hooks into core: features, integrations, security, SEO</td><td>The feature store of the platform — and its dependency graph (see Failure modes)</td></tr>
+<tr><td><strong>Child themes</strong></td><td>A theme that inherits and overrides a parent</td><td>Customize without losing updatability — never edit a parent theme directly</td></tr>
+</tbody>
+</table>
+
+<h3>Caching layers — why WordPress is slow and what makes it fast</h3>
+
+<p>By default, WordPress runs PHP and queries the database on every request — on shared hosting that is slow. The fix is the same cache ladder <a href="./system-design.html">System Design</a> describes, in WordPress's clothes:</p>
+
+<table>
+<thead><tr><th>Layer</th><th>WordPress form</th><th>What it fixes</th></tr></thead>
+<tbody>
+<tr><td>Page cache</td><td>Full-page HTML served from disk/memcached (WP Super Cache, WP Rocket, hosting-side cache)</td><td>Anonymous traffic never touches PHP/MySQL — the single biggest win</td></tr>
+<tr><td>Object cache</td><td>Transients and the object cache API backed by Redis/Memcached</td><td>Expensive queries and computed values survive across requests</td></tr>
+<tr><td>Query level</td><td>Indexed meta queries, <code>WP_Query</code> discipline, no N+1 on custom loops</td><td>The <a href="./data-modeling-and-databases.html">Data Modeling</a> craft applied to CPTs</td></tr>
+<tr><td>CDN</td><td>Cloudflare etc. caching static assets and even HTML</td><td>Latency and bandwidth off the origin</td></tr>
+</tbody>
+</table>
+
+<p><strong>The rule:</strong> a slow WordPress site is almost never "WordPress is slow" — it is missing its cache layers, running 40 plugins on shared hosting, or querying meta unindexed. Same diagnosis loop as everywhere else on this shelf.</p>
+
+<h2>Content modeling — blocks vs ACF vs CPTs vs meta</h2>
+
+<p>WordPress gives you four ways to hold content, and choosing between them is the schema decision of this world — the <a href="./data-modeling-and-databases.html">Data Modeling</a> craft, CMS edition. The decision table:</p>
+
+<table>
+<thead><tr><th>Need</th><th>Best default</th></tr></thead>
+<tbody>
+<tr><td>Editorial content with layout flexibility (blog posts, landing sections)</td><td><strong>Blocks / Gutenberg</strong> — the modern content primitive</td></tr>
+<tr><td>Structured fields on a CPT (service: duration, price, icon)</td><td><strong>ACF / Meta Box / Pods</strong> — field groups as code (ACF JSON)</td></tr>
+<tr><td>Repeated content type (services, testimonials, bookings)</td><td><strong>Custom post type</strong></td></tr>
+<tr><td>Classification, filtering, grouping</td><td><strong>Taxonomy</strong> (categories, tags, custom)</td></tr>
+<tr><td>Site-wide settings (contact details, socials, toggles)</td><td><strong>Options page / <code>wp_options</code></strong></td></tr>
+<tr><td>Reusable layout chunks (CTAs, feature grids)</td><td><strong>Block patterns / template parts</strong></td></tr>
+<tr><td>Global design settings</td><td><strong>theme.json</strong> — design tokens for the block editor</td></tr>
+<tr><td>Complex relational data, queried heavily and central to the product</td><td><strong>Custom tables or an external service</strong> — beyond what meta should carry</td></tr>
+</tbody>
+</table>
+
+<p><strong>The warning:</strong> post meta is flexible but not relationally strong — heavy meta queries (the "meta-query-itis" failure mode) are how WordPress sites get slow. If the data is queried often and is central to the product (booking slots, inventory, memberships), post meta is the wrong home: custom tables or a separate service earn their complexity exactly where queries outgrow <code>wp_postmeta</code>.</p>
+
+<h2>Modern WordPress — Gutenberg, REST, and headless</h2>
+
+<h3>Gutenberg and the block standard</h3>
+
+<p>Gutenberg (WordPress 5.0, 2018) replaced the classic editor with <strong>blocks</strong>: every content unit — paragraph, image, gallery, embed, custom component — is a block stored as structured JSON. Consequences:</p>
+<ul>
+  <li><strong>Layout is content.</strong> Blocks persist the editor's decisions in the database, so themes can render block markup or re-render it entirely (React block renderers exist).</li>
+  <li><strong>Block themes (FSE stable in WP 5.9, 2022)</strong> moved even theme design into the editor (Full Site Editing): templates, header/footer, and styles become blocks the client can edit. The editing surface is eating the theme layer.</li>
+  <li><strong>The block standard is escaping WordPress</strong> — Gutenberg's serialization format became the basis of the wider "blocks everywhere" movement; other CMSes adopted block-style editing.</li>
+</ul>
+
+<h3>Headless WordPress — the content API</h3>
+
+<p>Two official ways to use WordPress as a backend:</p>
+<ul>
+  <li><strong>WP-REST API</strong> (since 4.7, 2016) — JSON endpoints for every post type, taxonomy, user, and setting: <code>/wp-json/wp/v2/posts</code>, <code>/wp-json/wp/v2/types</code>. Authentication for writes: application passwords, OAuth, JWT plugins.</li>
+  <li><strong>WPGraphQL</strong> — a GraphQL layer over the same content model: one endpoint, typed queries, no over-fetching. The natural partner for a React/Next.js frontend.</li>
+</ul>
+
+<pre>// Next.js frontend, headless WordPress:
+const posts = await fetch(
+  'https://site.example/wp-json/wp/v2/posts?per_page=10'
+).then(r =&gt; r.json());</pre>
+
+<p><strong>When headless wins:</strong> a team exists to own the frontend; the content must power multiple surfaces (site + app + newsletter); the frontend needs interactivity WordPress theming fights. <strong>When it loses:</strong> no team for the frontend (the classic theme + Gutenberg was already a content management system with zero custom code), preview workflows get harder (drafts are harder to preview outside the Loop), and the ecosystem (page builders, SEO plugins) assumes the theme renders. <strong>The lazy rule: classic WordPress for the 95% of sites that are content-shaped; headless only when a frontend team and a real reason exist.</strong></p>
+
+<h3>Headless limitations — the hidden costs</h3>
+
+<p>The same lazy rule, made concrete. Every row below is a WordPress feature that assumes the theme renders — headless means re-owning it:</p>
+
+<table>
+<thead><tr><th>Feature</th><th>Why headless breaks it</th></tr></thead>
+<tbody>
+<tr><td><strong>Preview workflow</strong></td><td>Draft preview inside the editor assumes the theme's rendering; outside WordPress it needs a custom preview route — the thing everyone underestimates</td></tr>
+<tr><td><strong>SEO plugins</strong></td><td>Yoast/Rank Math generate meta and structured data from the rendered page; headless needs the SEO logic moved into the frontend or a headless-SEO layer</td></tr>
+<tr><td><strong>Page builders</strong></td><td>Elementor/Divi render in PHP — they do not work headless at all</td></tr>
+<tr><td><strong>Menus and widgets</strong></td><td>Navigation is stored, not rendered — needs custom mapping or GraphQL modeling</td></tr>
+<tr><td><strong>Forms</strong></td><td>Form plugins handle submission, validation, spam, and storage on the server side — headless needs a separate form/API strategy</td></tr>
+<tr><td><strong>Auth</strong></td><td>Authenticated or editor-facing flows need their own frontend design</td></tr>
+<tr><td><strong>Search</strong></td><td>Native WP search is query-based; headless usually wants a search service</td></tr>
+<tr><td><strong>Plugin assumptions</strong></td><td>Many plugins output HTML directly — anything that does is dead weight in a headless setup</td></tr>
+</tbody>
+</table>
+
+<p><strong>The trade, stated plainly:</strong> headless trades editing simplicity and plugin compatibility for frontend freedom. It is not automatically better — it is the deliberate purchase of a frontend team's flexibility at the price of the ecosystem's free features.</p>
+
+<h2>The managed and no-code landscape</h2>
+
+<p>WordPress is the biggest CMS, but the managed platforms own whole segments of the web — especially where the client edits everything:</p>
+
+<table>
+<thead><tr><th>Platform</th><th>What it is</th><th>Who it's for</th><th>The trade</th></tr></thead>
+<tbody>
+<tr><td><strong>Shopify</strong></td><td>Managed commerce platform: storefront, checkout, payments, subscriptions, apps</td><td>Anyone selling physical or digital products without wanting to run infrastructure</td><td>You get checkout and payments solved; you lose layout freedom and pay transaction + app fees. The lazy commerce default (see <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>)</td></tr>
+<tr><td><strong>Webflow</strong></td><td>Design-first builder: real CSS control, CMS collections, interactions</td><td>Designers building marketing sites who want clean output</td><td>Closest to "hand-coded" among builders; per-site plans can get expensive at scale and complex sites fight the tool</td></tr>
+<tr><td><strong>Wix / Squarespace</strong></td><td>Drag-and-drop simplicity, all-in-one hosting</td><td>Small businesses who will never touch code</td><td>Fastest to a decent site; weakest escape hatches — lock-in is the business model</td></tr>
+<tr><td><strong>Bubble / Glide / Retool</strong></td><td>No-code application platforms: databases, workflows, auth, UI</td><td>Internal tools, MVPs, apps — not just marketing sites</td><td>Real logic without code; performance and portability caps appear at scale</td></tr>
+<tr><td><strong>Headless CMS (Contentful, Sanity, Strapi, DatoCMS)</strong></td><td>Editing + content API only; no rendering at all</td><td>Teams with a frontend that renders everywhere</td><td>Maximum freedom, maximum ownership: you build the preview, the rendering, the hosting</td></tr>
+<tr><td><strong>Static generators (Hugo, Jekyll, Astro, 11ty)</strong></td><td>Markdown/templates compiled to HTML at build time</td><td>Developers; content fits in Git; speed and security by construction</td><td>No dynamic logic, no client editing (unless paired with a headless CMS or Decap/Netlify CMS)</td></tr>
+</tbody>
+</table>
+
+<p><strong>The through-line:</strong> every platform is a position on the same two axes — <em>who edits</em> and <em>who renders</em>. WordPress, Shopify, and Wix push editing to the client and rendering to the platform. Headless CMS + custom frontend pulls both back to the developer. The decision matrix below is just these two axes made concrete.</p>
+
+<h3>Other traditional CMS platforms</h3>
+
+<p>WordPress is the default, not the only option — worth knowing the alternatives by name, because clients will ask:</p>
+
+<table>
+<thead><tr><th>Platform</th><th>Best for</th><th>The trade</th></tr></thead>
+<tbody>
+<tr><td><strong>Drupal</strong></td><td>Complex enterprise content models, granular permissions, government</td><td>Steeper learning curve; smaller talent pool</td></tr>
+<tr><td><strong>Joomla</strong></td><td>Legacy sites, some community use</td><td>Less momentum than WordPress</td></tr>
+<tr><td><strong>Craft CMS</strong></td><td>Structured content, design-led sites</td><td>Paid licensing; smaller ecosystem</td></tr>
+<tr><td><strong>Ghost</strong></td><td>Publishing and newsletters</td><td>Narrower scope than a full CMS</td></tr>
+<tr><td><strong>Statamic</strong></td><td>Flat-file/Laravel sites</td><td>Developer-oriented</td></tr>
+<tr><td><strong>Kirby</strong></td><td>Lightweight flat-file sites</td><td>Smaller ecosystem</td></tr>
+<tr><td><strong>Contentful / Sanity / Strapi</strong></td><td>Headless content teams (see the headless section)</td><td>Requires a frontend team</td></tr>
+</tbody>
+</table>
+
+<p><strong>The rule:</strong> WordPress usually wins on talent availability, plugin ecosystem, and client familiarity — pick something else when its specific strengths (permissions, structured content, flat-file simplicity) are the actual requirement.</p>
+
+<h3>E-commerce platforms — the comparison</h3>
+
+<table>
+<thead><tr><th>Platform</th><th>Best for</th><th>The trade</th></tr></thead>
+<tbody>
+<tr><td><strong>Shopify</strong></td><td>Product-first businesses — no WordPress dependency</td><td>Less layout/control freedom; app and transaction fees</td></tr>
+<tr><td><strong>WooCommerce</strong></td><td>WordPress-native stores; content + commerce in one admin</td><td>More maintenance; PCI/security responsibility stays yours (see <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>)</td></tr>
+<tr><td><strong>BigCommerce</strong></td><td>Mid-market hosted commerce</td><td>Smaller ecosystem than Shopify</td></tr>
+<tr><td><strong>Magento / Adobe Commerce</strong></td><td>Large, complex catalogs</td><td>Heavy operational burden</td></tr>
+<tr><td><strong>Headless commerce (Storefront API, Medusa, Saleor)</strong></td><td>Custom storefronts, developer-owned commerce APIs</td><td>Requires an engineering team; most build responsibility</td></tr>
+</tbody>
+</table>
+
+<p><strong>The decision rule:</strong> if the store <em>is</em> the product, Shopify is the lazy default — checkout, PCI, and subscriptions solved. If the site is content-first and the store is secondary, WooCommerce keeps the client in one admin. Custom storefronts are the engineer's choice and the client's risk — same math as the headless trade.</p>
+
+<h2>WordPress development workflow — code vs. content</h2>
+
+<p>How an engineer actually develops and deploys WordPress professionally. The one idea that makes it all coherent: <strong>code and content have different lifecycles</strong> — code is versioned and deployed; content is migrated, imported, or synced deliberately. Treating the database like code is a common source of pain.</p>
+
+<table>
+<thead><tr><th>Concern</th><th>Professional practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Local development</strong></td><td>Local by Flywheel, wp-env, Docker, or Bedrock — a local copy, not production-as-workspace</td></tr>
+<tr><td><strong>Version control</strong></td><td>Theme/plugin code in Git; the database never in Git; uploads handled deliberately (external storage or synced assets)</td></tr>
+<tr><td><strong>Configuration</strong></td><td>Environment-aware <code>wp-config.php</code> (local/staging/prod values); no secrets in the repo — the security doc's rule, WordPress edition</td></tr>
+<tr><td><strong>Content model as code</strong></td><td>ACF field groups as JSON (acf-json), CPT and taxonomy registration in code — the schema is versionable, not click-built</td></tr>
+<tr><td><strong>Blocks</strong></td><td><code>block.json</code> metadata, <code>@wordpress/scripts</code> build tooling, <code>theme.json</code> for design tokens</td></tr>
+<tr><td><strong>Database changes</strong></td><td>Scripted updates or migrations where needed — never hand-edits on production</td></tr>
+<tr><td><strong>Deployment</strong></td><td>Local → staging → production; build and deploy theme/plugins; sync or import content deliberately (WP-CLI <code>wp import</code>, <code>search-replace</code> for URLs between environments)</td></tr>
+<tr><td><strong>CLI</strong></td><td>WP-CLI for imports, search-replace, updates, cache flushes — scripted operations instead of dashboard clicking (the terminal survival kit these commands presume: <a href="./terminal-and-deployment-substrate.html">Terminal &amp; the Deployment Substrate</a>)</td></tr>
+</tbody>
+</table>
+
+<p><strong>WordPress engineering standards</strong> — the discipline rows engineers must hold even when the client never sees them:</p>
+<ul>
+  <li><strong>Escape output</strong> (<code>esc_html</code>, <code>esc_url</code>) and <strong>sanitize input</strong> (<code>sanitize_text_field</code>) — the security contract from <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>, executed in PHP.</li>
+  <li><strong>Nonces on forms and actions</strong> and <strong>capability checks before every action</strong> — CSRF and authorization, WordPress edition.</li>
+  <li><strong>Prefix functions and hooks</strong> with your project's prefix; <strong>enqueue assets</strong> properly instead of hardcoding <code>&lt;script&gt;</code> tags — collisions and breakage are how theme/plugin code rots.</li>
+  <li><strong>Use the WP APIs</strong> (<code>WP_Query</code>, the options API) instead of direct <code>$wpdb</code> queries where the API covers it — you inherit caching, sanitization, and compatibility.</li>
+</ul>
+
+<p><strong>Testing WordPress:</strong> sites are commonly treated as untestable, but critical flows — checkout, forms, login, search, redirects — can and should be tested: PHP lint and WordPress Coding Standards (PHP_CodeSniffer) in CI; unit tests for custom plugin/theme logic; end-to-end tests (Playwright/Cypress) for the critical client flows; and migration tests (export/import and search-replace scripts run against staging before they touch production).</p>
+
+<h2>When to choose what — the decision matrix</h2>
+
+<table>
+<thead><tr><th>Client / project</th><th>Default choice</th><th>Why</th><th>Reconsider when</th></tr></thead>
+<tbody>
+<tr><td>Small business site, client must edit</td><td><strong>WordPress</strong> (block theme + ACF, or Elementor) or Webflow</td><td>Mature editor, themes/plugins cover every feature, hosting cheap, freelancers everywhere</td><td>Client edits nothing and wants design-perfect → static/Astro or Webflow</td></tr>
+<tr><td>Online store</td><td><strong>Shopify</strong> (or WooCommerce on WordPress if the client already has WordPress)</td><td>Checkout, payments, inventory, apps solved; PCI handled</td><td>Custom storefront requirements → headless Shopify (Storefront API) or WooCommerce</td></tr>
+<tr><td>Membership / booking / directory app</td><td><strong>WordPress + plugins</strong> (WooCommerce Memberships, Amelia, ACF + CPTs) or Bubble for logic-heavy MVPs</td><td>70% of the feature exists as plugins; CRUD and auth come free (see <a href="./backend-engineering.html">Backend Engineering — the CRUD section</a>)</td><td>Custom auth/roles/payments logic at scale → custom build (this shelf's main path)</td></tr>
+<tr><td>Marketing site with a content team + dev team</td><td><strong>Headless WordPress or headless CMS</strong> + React/Astro frontend</td><td>Editors get the editor; devs get the stack; content feeds multiple surfaces</td><td>No dev team to maintain the frontend → classic WordPress</td></tr>
+<tr><td>Portfolio / personal site, dev-owner</td><td><strong>Static (Astro, Hugo)</strong> or plain HTML/CSS</td><td>Free hosting, instant, no maintenance surface</td><td>Needs blogging-by-non-dev → WordPress.com or Astro + headless CMS</td></tr>
+<tr><td>Internal tool / prototype</td><td><strong>Bubble / Retool / Glide</strong></td><td>Days, not months; the app IS the tool</td><td>Production scale, compliance, or team ownership → real stack</td></tr>
+<tr><td>Client with zero budget</td><td><strong>Wix / WordPress.com free</strong></td><td>Free until revenue exists; upgrade path later</td><td>Professional deliverable expected → price honesty, not free platforms</td></tr>
+</tbody>
+</table>
+
+<p><strong>The two questions that decide everything:</strong> (1) <em>Who edits the content?</em> If it's the client, the editing surface is the product — choose by admin quality. (2) <em>What must the site do besides display content?</em> Content-only → CMS/static. Commerce → Shopify/WooCommerce. App logic (users, permissions, payments, custom flows) → WordPress-with-plugins, no-code, or custom — in that order of laziness.</p>
+
+<h3>When WordPress is the wrong choice</h3>
+
+<p>WordPress is excellent for content-shaped sites and plugin-extensible CRUD. It becomes the wrong tool when the product is <em>an application first and a website second</em>:</p>
+<ul>
+  <li>The product is a SaaS application with complex user workflows and business logic</li>
+  <li>Strict multi-tenant isolation is required (tenant data in <code>wp_options</code>/meta is a leak waiting to happen — see <a href="./data-modeling-and-databases.html">Data Modeling — tenant isolation</a>)</li>
+  <li>Complex permissions and audit guarantees beyond roles/capabilities</li>
+  <li>High-scale custom search or recommendations are core features</li>
+  <li>The team needs strong testing/CI-CD culture and strict deployment control</li>
+  <li>The checkout or product flow is highly custom and performance-critical</li>
+  <li>Compliance requires unusual control/audit guarantees (see <a href="./security-and-threat-modeling.html">Security — compliance</a>)</li>
+</ul>
+
+<p>In those cases the plugin economy stops paying for itself: the 70% that "exists as a plugin" starts fighting you, and the <a href="./backend-engineering.html">Backend Engineering</a> path — this shelf's main path — is the honest answer.</p>
+
+<h2>Migration paths</h2>
+
+<table>
+<thead><tr><th>Path</th><th>When it makes sense</th><th>The mechanics</th></tr></thead>
+<tbody>
+<tr><td>Static site → WordPress</td><td>The client needs to edit content themselves</td><td>Rebuild content model as CPTs; import HTML/markdown; choose theme; redirect URLs 1:1 (permalinks are a contract — see <a href="./api-design.html">API Design</a> on URL stability)</td></tr>
+<tr><td>WordPress → headless</td><td>New frontend, same content; multi-surface publishing</td><td>Keep WordPress as the API (WP-REST/WPGraphQL), build the frontend, map the preview workflow early — it's the thing everyone underestimates</td></tr>
+<tr><td>WordPress → static (Astro/Hugo)</td><td>Speed, security, cost; content team disappears or content fits in Git</td><td>Export content (WP-CLI <code>wp export</code>, or pull via REST), template it, keep permalink structure, script the rebuild</td></tr>
+<tr><td>Custom site → Shopify/WooCommerce</td><td>Maintenance costs exceed store revenue; checkout is the bottleneck</td><td>Migrate products (CSV/API), map URLs, set up payment + tax + shipping in the platform, retire the old store behind redirects</td></tr>
+<tr><td>WordPress ↔ Wix/Squarespace</td><td>The editing surface is the reason</td><td>Content export/import, URL mapping, and an honest conversation about what lock-in costs</td></tr>
+</tbody>
+</table>
+
+<p><strong>The universal rule of migrations:</strong> content is the asset, URLs are a contract, everything else is disposable. Plan the export before you plan the design (see <a href="./data-modeling-and-databases.html">Data Modeling</a> — the vault outlives the API).</p>
+
+<p><strong>The mechanics that bite:</strong> URL changes must use the proper search-replace (WP-CLI <code>wp search-replace --recurse-objects</code>) — a naive SQL find-replace corrupts serialized data, the classic migration disaster. Media files move separately (copy the uploads directory, or external storage/CDN). And after any migration, test the real things: forms, redirects, media, menus, plugins — a migration is not done when the pages load, it's done when the workflows work.</p>
+
+<h2>Security, performance &amp; maintenance — the ops playbook</h2>
+
+<p>The mindset layer lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (threat models, STRIDE, the risk register); here is the WordPress-specific operational baseline that keeps a client site alive and fast:</p>
+
+<h3>Security baseline</h3>
+
+<table>
+<thead><tr><th>Area</th><th>Baseline practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Updates</strong></td><td>Core, theme, and plugin updates on a fixed schedule (never test on production first — staging, then deploy)</td></tr>
+<tr><td><strong>PHP version</strong></td><td>Run supported PHP, not end-of-life versions — most "WordPress hacked" stories start with an unpatched server</td></tr>
+<tr><td><strong>Accounts</strong></td><td>Unique admin passwords, no shared accounts, 2FA required for admins/editors, least privilege per role — the client gets only what they need</td></tr>
+<tr><td><strong>Login surface</strong></td><td>Limit login attempts; disable plugin/theme file editing in production; disable XML-RPC when unused</td></tr>
+<tr><td><strong>REST API</strong></td><td>Audit permission callbacks on custom endpoints — the "REST leakage" failure mode is exposed private data</td></tr>
+<tr><td><strong>Backups</strong></td><td>Off-site backups with <em>tested restores</em> — an untested backup is a hope</td></tr>
+<tr><td><strong>Malware</strong></td><td>Periodic scan and file-integrity monitoring; never install nulled/pirated premium plugins — a common malware vector</td></tr>
+<tr><td><strong>wp-config</strong></td><td>Unique salts, secure keys, environment-aware credentials, debug output off in production</td></tr>
+</tbody>
+</table>
+
+<h3>Maintenance cadence</h3>
+
+<table>
+<thead><tr><th>Cadence</th><th>Task</th></tr></thead>
+<tbody>
+<tr><td><strong>Weekly</strong></td><td>Check updates, backups, uptime</td></tr>
+<tr><td><strong>Monthly</strong></td><td>Plugin audit (still needed? still maintained?), security scan, performance check</td></tr>
+<tr><td><strong>Quarterly</strong></td><td>Restore test, dependency audit, content/model review</td></tr>
+<tr><td><strong>Yearly</strong></td><td>Hosting review, PHP upgrade plan, replatform check — the honest "should we still be here?" question</td></tr>
+</tbody>
+</table>
+
+<p>The retainer structure that makes this a product — updates on a schedule, backup verification, a monthly change allowance — is priced and delivered in <a href="./freelance-web-practice.html">Freelance Web Practice</a>; this table is the work it pays for.</p>
+
+<h3>Performance playbook</h3>
+
+<table>
+<thead><tr><th>Layer</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Hosting</strong></td><td>Managed WordPress hosting or a right-sized VPS — not an overloaded shared box</td></tr>
+<tr><td><strong>PHP</strong></td><td>Latest supported PHP version (often the cheapest speedup available)</td></tr>
+<tr><td><strong>Page cache</strong></td><td>Full-page caching for anonymous traffic — the single biggest win</td></tr>
+<tr><td><strong>Object cache</strong></td><td>Redis/Memcached for transients and object queries</td></tr>
+<tr><td><strong>CDN</strong></td><td>Static assets, optionally HTML caching</td></tr>
+<tr><td><strong>Images</strong></td><td>WebP/AVIF, responsive sizes, lazy loading, dimensions set — images are most sites' real weight</td></tr>
+<tr><td><strong>Database hygiene</strong></td><td>Clean revisions, transients, spam, and autoloaded options — bloat in <code>wp_options</code> slows every request</td></tr>
+<tr><td><strong>Plugins/theme</strong></td><td>Remove unused plugins; avoid heavy multipurpose ones; prefer block themes or lightweight themes</td></tr>
+<tr><td><strong>Measurement</strong></td><td>Query Monitor for the actual bottleneck, Lighthouse/Core Web Vitals for the user experience, server logs</td></tr>
+</tbody>
+</table>
+
+<p><strong>The WooCommerce caveat:</strong> cart, checkout, and account pages must be excluded from aggressive page caching — they are session-dependent. Caching a logged-in or cart page is a real-world bug that loses orders (see <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> for the money side of that mistake).</p>
+
+<h3>Plugin and theme evaluation checklist</h3>
+
+<p>"Every plugin is a dependency" said it; here is how you audit one:</p>
+
+<table>
+<thead><tr><th>Criterion</th><th>The question</th></tr></thead>
+<tbody>
+<tr><td><strong>Active installs</strong></td><td>Is it widely used? (Not proof of quality — proof of a community to notice problems)</td></tr>
+<tr><td><strong>Last updated</strong></td><td>Is it actively maintained, in months not years?</td></tr>
+<tr><td><strong>Compatibility</strong></td><td>Does it support the current WordPress <em>and</em> PHP versions?</td></tr>
+<tr><td><strong>Security history</strong></td><td>Has it had known vulnerabilities — and were they fixed promptly? (wpscan/vuln databases are the check)</td></tr>
+<tr><td><strong>Support quality</strong></td><td>Are support threads answered? Is the changelog transparent?</td></tr>
+<tr><td><strong>Reviews</strong></td><td>What do users actually complain about — performance, breakage, abandonment?</td></tr>
+<tr><td><strong>License/cost</strong></td><td>Is the paid license sustainable for the client, year over year?</td></tr>
+<tr><td><strong>Alternatives</strong></td><td>Can core blocks, a CPT, or less code do the job? (The best plugin is the one you do not need)</td></tr>
+<tr><td><strong>Lock-in</strong></td><td>Does it store data in a proprietary format you'd have to rebuild to escape?</td></tr>
+<tr><td><strong>Performance impact</strong></td><td>Does it load assets on every page, or only where needed?</td></tr>
+</tbody>
+</table>
+
+<h2>The freelancer's reality — "a website I can edit myself"</h2>
+
+<p>This is the single most common web request on earth, and it deserves its own section because it is a <em>requirements sentence</em>, not a platform question. It decomposes into:</p>
+<ul>
+  <li>"I want to change text and images without calling you" → WordPress editor / Webflow / Wix. Training + a one-page "how to edit" guide is part of the deliverable.</li>
+  <li>"I want to add pages" → a content model (CPTs) and a menu system the client can operate. The template hierarchy does the rest.</li>
+  <li>"I want to sell things" → WooCommerce on their WordPress, or Shopify — decided by whether they already have WordPress and whether the store is the point of the site.</li>
+  <li>"I want a members area / bookings / a directory" → WordPress + plugins first (this is the CRUD pattern from <a href="./backend-engineering.html">Backend Engineering</a>, pre-built). Custom only when a plugin gap is proven.</li>
+</ul>
+
+<p>Two disciplines separate freelancers who succeed here from those who drown:</p>
+<ul>
+  <li><strong>Editing is a deliverable.</strong> Budget time to configure the admin (ACF field groups, role restrictions, block patterns), write the client guide, and record a 10-minute walkthrough video. An unconfigured admin = a client who calls you for every text change = a retainer you didn't price (see <a href="./freelance-web-practice.html">Freelance Web Practice</a>).</li>
+  <li><strong>Maintenance is a product.</strong> WordPress requires updates (core, themes, plugins) forever, and that is a recurring service with a price, not a favor. The operational side — the security baseline and maintenance cadence — is the ops playbook above; the pricing is in <a href="./freelance-web-practice.html">Freelance Web Practice</a>.</li>
+</ul>
+
+<h2>Client requirements — multilingual, SEO, accessibility, legal</h2>
+
+<p>Four requirement families that appear in most client projects. None is a plugin you bolt on at the end — each shapes the content model and the build from the start:</p>
+
+<h3>Multilingual</h3>
+
+<table>
+<thead><tr><th>Approach</th><th>Tools</th><th>Considerations</th></tr></thead>
+<tbody>
+<tr><td><strong>Plugin-based translation</strong></td><td>WPML, Polylang, TranslatePress</td><td>Easy to start; gets complex with CPTs and ACF fields — decide the field strategy early</td></tr>
+<tr><td><strong>Separate site per language</strong></td><td>Multiple installs</td><td>Simple isolation; more maintenance, duplicated content</td></tr>
+<tr><td><strong>Headless i18n</strong></td><td>Locale fields in the CMS, frontend routing</td><td>More control, more engineering — the headless trade, language edition</td></tr>
+<tr><td><strong>Auto-translation</strong></td><td>AI/machine translation</td><td>Needs human review; SEO and brand-voice risk</td></tr>
+</tbody>
+</table>
+
+<p><strong>Multilingual is not a feature you add at the end.</strong> It affects URLs, navigation, SEO, forms, and the editorial workflow from day one.</p>
+
+<h3>SEO baseline</h3>
+
+<table>
+<thead><tr><th>Area</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Permalinks</strong></td><td>Clean, stable, human-readable URLs — a schema decision, not a setting</td></tr>
+<tr><td><strong>Content model</strong></td><td>CPTs and taxonomies used deliberately — structure is what SEO plugins can't fix</td></tr>
+<tr><td><strong>Meta &amp; schema</strong></td><td>Title/description via a SEO plugin (Yoast/Rank Math) or structured fields; schema for articles, products, local business</td></tr>
+<tr><td><strong>Sitemap &amp; redirects</strong></td><td>Sitemap generated and submitted; old URLs preserved during migrations (URLs are a contract)</td></tr>
+<tr><td><strong>Canonical</strong></td><td>Avoid duplicate-content issues</td></tr>
+<tr><td><strong>Performance</strong></td><td>Fast pages and good Core Web Vitals — the performance playbook above is an SEO feature</td></tr>
+<tr><td><strong>Search Console</strong></td><td>Monitor indexing and query performance</td></tr>
+</tbody>
+</table>
+
+<p><strong>The rule:</strong> SEO plugins help, but they do not replace good content structure — permalinks, CPTs, taxonomies, and redirects are schema-level SEO decisions.</p>
+
+<h3>SEO how-to — from checklist to done</h3>
+
+<p>The baseline says <em>what</em> matters; this is <em>how</em> to actually do each item for a small client site. Three layers: technical, local, CMS config.</p>
+
+<h4>Technical — the page-level plumbing</h4>
+
+<ul>
+  <li><strong>Title &amp; meta description:</strong> every page gets a unique title (≈60 chars, keyword near the front, brand at the end) and a description (≈155 chars, a benefit sentence, not a keyword list). If you don't write them, the search engine writes its own — and it will pick the least flattering line.</li>
+  <li><strong>Open Graph &amp; Twitter cards:</strong> social shares read <code>og:title</code>, <code>og:description</code>, <code>og:image</code>. A shared link without an image is a text-only scar; set the default share image once (1200×630) and the SEO plugin applies it.</li>
+  <li><strong>Canonical:</strong> one URL per page, declared in <code>&lt;link rel="canonical"&gt;</code>. Prevents pagination, tracking params, and http/https duplicates from splitting ranking signal.</li>
+  <li><strong>Sitemap &amp; robots:</strong> submit the XML sitemap in Search Console; <code>robots.txt</code> should allow everything you want indexed and block only the admin, staging, and internal search results (<code>Disallow: /wp-admin/</code>, staging host).</li>
+  <li><strong>JSON-LD schema:</strong> one structured-data block per page type — <code>Article</code>, <code>Product</code>, <code>LocalBusiness</code>, <code>FAQPage</code>. Schema is how the search engine learns the page is a dentist's booking page and not an article about dentists; the SEO plugin generates it from the content model.</li>
+</ul>
+
+<h4>Local — the client whose customers are nearby</h4>
+
+<ul>
+  <li><strong>Google Business Profile (GBP):</strong> the free listing that puts the client in the map pack. Claim it, verify it, and fill every field — category, hours, phone, photos, and a link to the booking page. This is the single highest-ROI step for a local business site.</li>
+  <li><strong>NAP consistency:</strong> name, address, phone identical everywhere — site, GBP, directories, footer. Inconsistencies tell the search engine the business may be unreliable; the site footer and the Contact page are where drift starts.</li>
+  <li><strong>Location pages:</strong> one page per service area ("Dentist in Springfield") with real local content — not one page of the same paragraph repeated with the town swapped. Service areas get their own page only when there's actual local substance to write.</li>
+  <li><strong>Reviews:</strong> a live review-generation loop (ask after the appointment, link in the confirmation email), and the review schema marked up. Reviews are both ranking signal and the conversion copy — the freelancer sets up the loop, the client runs it.</li>
+  <li><strong>The local schema</strong> (<code>LocalBusiness</code> JSON-LD with geo, hours, phone) makes the map-pack placement explicit instead of inferred.</li>
+</ul>
+
+<h4>CMS config — making it stick after handoff</h4>
+
+<ul>
+  <li><strong>One SEO plugin, configured, not just installed:</strong> Yoast or Rank Math — choose once, set the site-wide defaults (title templates, social profiles, sitemap on, schema on), and turn on the per-page metabox so the client edits titles per post.</li>
+  <li><strong>Permalinks set at launch:</strong> choose the structure in week one; changing it later means redirects and re-ranking. Post name is the default right answer for content sites.</li>
+  <li><strong>Migration redirects:</strong> when the site moves hosts, domains, or permalink structures, map every old URL to its new one (301) <em>before</em> launch, submit the new sitemap, and verify in Search Console that the old pages stopped 404ing.</li>
+  <li><strong>The handoff line:</strong> SEO stops being a project and becomes a habit — the client edits titles per post, answers reviews, and adds content on the schedule. Set that up; don't leave it as "installed the plugin, good luck."</li>
+</ul>
+
+<p><strong>The professional order:</strong> content structure first (permalinks, CPTs — the baseline), then the page-level technical layer, then local, then the plugin config. The plugin is the last step, not the first; it publishes what the structure and content already decided.</p>
+
+<h3>Accessibility baseline</h3>
+
+<table>
+<thead><tr><th>Area</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Theme</strong></td><td>Choose an accessible theme or a block theme; test the theme's keyboard behavior before falling in love with it</td></tr>
+<tr><td><strong>Content</strong></td><td>Logical heading hierarchy; alt text for informative images, empty alt for decorative ones</td></tr>
+<tr><td><strong>Forms &amp; controls</strong></td><td>Labels, clear error messages, keyboard access; contrast meets WCAG for text and UI</td></tr>
+<tr><td><strong>Blocks &amp; plugins</strong></td><td>Prefer native blocks over custom interactive widgets; avoid sliders/carousels that trap keyboard users</td></tr>
+<tr><td><strong>Testing</strong></td><td>Manual keyboard test plus an automated scan (the <a href="./ui-ux-web-design.html">UI/UX doc's</a> accessibility craft, applied to client sites)</td></tr>
+</tbody>
+</table>
+
+<p><strong>Accessibility is not only a plugin problem</strong> — it is a theme, content, and editorial-workflow problem, which is why it belongs in the build, not the fix list.</p>
+
+<h3>Legal and compliance</h3>
+
+<table>
+<thead><tr><th>Requirement</th><th>When it matters</th></tr></thead>
+<tbody>
+<tr><td><strong>Privacy policy</strong></td><td>Almost always</td></tr>
+<tr><td><strong>Cookie consent</strong></td><td>Analytics/marketing cookies, GDPR exposure</td></tr>
+<tr><td><strong>Terms of service</strong></td><td>E-commerce, memberships, accounts</td></tr>
+<tr><td><strong>Accessibility statement</strong></td><td>Public-sector work or accessibility requirements</td></tr>
+<tr><td><strong>PCI compliance</strong></td><td>Online payments, especially WooCommerce — scope and mechanics in <a href="./payments-and-commerce.html">Payments &amp; Commerce</a></td></tr>
+<tr><td><strong>Data retention &amp; consent</strong></td><td>Forms, accounts, orders, newsletters — storage and consent checkboxes</td></tr>
+</tbody>
+</table>
+
+<p><strong>The developer's role:</strong> legal text is usually not yours to author — but implementing it correctly is: consent checkboxes, analytics loading only after consent, form storage decisions, and payment security. "The lawyer writes it, you wire it" is the boundary.</p>
+
+<h2>Worked example — "a website I can edit myself, with bookings"</h2>
+
+<p>A local clinic wants a site with services, a blog, and an online booking form. Walk through the decision, the build, and the handoff:</p>
+
+<p><strong>Step 1 — the discovery questions (who edits, what must it do):</strong></p>
+<ul>
+  <li>Who edits? The receptionist — no code, no hosting knowledge. → The admin must be the product.</li>
+  <li>What must it do? Display services, a blog (the doctor writes posts), and bookings. → Content + one app feature.</li>
+  <li>What's the budget? Small. → No custom build. No headless. No SaaS stacking.</li>
+</ul>
+
+<p><strong>Step 2 — the platform decision:</strong></p>
+
+<table>
+<thead><tr><th>Option</th><th>Why it loses here</th></tr></thead>
+<tbody>
+<tr><td>Custom React/Next.js build</td><td>Costs 10x; the client's only interaction with it would be a custom admin you'd have to build and maintain — you'd be rebuilding WordPress badly</td></tr>
+<tr><td>Headless WordPress + Next.js</td><td>No team to run the frontend; the classic theme already gives the editor preview, SEO plugins, and form plugins for free</td></tr>
+<tr><td>Wix/Squarespace</td><td>Workable — but the client already asked for "WordPress-like", wants to keep options open, and you want theme/plugin depth and no per-seat lock-in</td></tr>
+<tr><td><strong>WordPress + block theme + 3 plugins</strong></td><td><strong>Wins:</strong> editor the receptionist can learn, bookings via a form plugin, blog via CPTs, cheap hosting, maintenance = your retainer product</td></tr>
+</tbody>
+</table>
+
+<p><strong>Step 3 — the build (the discipline, not the click-path):</strong></p>
+<ul>
+  <li><strong>Content model first:</strong> CPTs for <code>services</code> (with ACF fields: duration, price, icon) and standard posts for the blog; a taxonomy for service categories. The schema is decided before the theme is touched — the same "facts before features" rule as <a href="./data-modeling-and-databases.html">Data Modeling</a>.</li>
+  <li><strong>Template hierarchy:</strong> <code>single-service.php</code>, <code>archive-service.php</code>, styled via the block theme's template editor so the client can tweak headers/footers without you.</li>
+  <li><strong>Bookings:</strong> a form plugin (or a simple WP-REST + email integration) writing to a CPT <code>booking</code> — admin-only, with a status field. That is CRUD with roles: receptionist creates/updates, visitors never see the table. The <a href="./backend-engineering.html">Backend Engineering</a> ownership-check rule, plugin edition.</li>
+  <li><strong>Security baseline:</strong> HTTPS, an update schedule (the retainer), a backup plugin with off-site copies, <code>wp-config.php</code> hardened (no debug output, DB credentials not in the repo), login limited and brute-force protected. The <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> checklist, applied to a CMS.</li>
+  <li><strong>Cache:</strong> page cache on (the biggest win), CDN for assets. The site is fast before it launches, not after a complaint.</li>
+</ul>
+
+<p><strong>Step 4 — the handoff (editing is a deliverable):</strong></p>
+<ul>
+  <li>Receptionist role created; the ACF fields and booking workflow tested in a training session.</li>
+  <li>A two-page "How to edit your site" guide: change a service, write a post, check a booking.</li>
+  <li>A 10-minute walkthrough recording saved where the client can rewatch it.</li>
+  <li>The maintenance retainer quoted before launch: updates, backups verification, uptime, content changes on request. Maintenance is a product, priced like one.</li>
+</ul>
+
+<p><strong>The lesson:</strong> the "correct" engineering answer (custom build) was the wrong business answer. The platform choice was decided by two questions — who edits, and what must it do — and the engineering discipline (content model, security baseline, cache, handoff) was applied <em>inside</em> the platform. That combination is the professional's edge over both the template-store freelancer and the framework purist.</p>
+
+<h2>Most common failure modes</h2>
+
+<table>
+<thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><strong>Plugin bloat</strong></td><td>40+ plugins doing what 4 do; conflicts, slowness, a security surface the size of a mall</td><td>One job per plugin; audit every plugin as a dependency — vendor, update cadence, last commit, alternatives</td></tr>
+<tr><td><strong>Update roulette</strong></td><td>"I updated and the site broke" — core/theme/plugin updates breaking each other or custom code</td><td>Staging site, update in batches, backups before every update, a maintenance window — and a retainer that makes it your job, not the client's panic</td></tr>
+<tr><td><strong>Theme hacking</strong></td><td>Customizations edited directly into the parent theme — lost on every theme update</td><td>Child themes (or a block theme's template editor); never edit a parent theme</td></tr>
+<tr><td><strong>Meta-query-itis</strong></td><td>Slow custom loops filtering <code>wp_postmeta</code> — the CMS version of unindexed queries</td><td>Store queryable data as real fields/taxonomies where possible; index what you must query; measure with the query monitor plugin</td></tr>
+<tr><td><strong>Neglected patching</strong></td><td>Known CVEs in plugins months old; the site is the most-targeted CMS on the internet, so unpatched = breached eventually</td><td>Update schedule + security plugin + vulnerability scanning in the maintenance retainer (see <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>)</td></tr>
+<tr><td><strong>Shared-hosting suffocation</strong></td><td>Traffic spike → PHP processes starve → site down; the classic "WordPress is slow" myth born</td><td>Right-size hosting (managed WordPress hosting), page cache, CDN — then re-measure</td></tr>
+<tr><td><strong>Content lock-in</strong></td><td>Content trapped in page-builder blobs or proprietary fields; replatforming = rebuild</td><td>Keep content structured (CPTs, taxonomies, blocks); treat every platform choice as a future migration with a plan</td></tr>
+<tr><td><strong>Client-edit chaos</strong></td><td>Client "fixes" the site and breaks the layout; calls you angry</td><td>Roles and capabilities (lock down what they can touch), block patterns, training, and a written editing guide — editing is a deliverable</td></tr>
+<tr><td><strong>Headless for its own sake</strong></td><td>Next.js + WordPress with no team for either, preview broken, SEO plugins useless, two deployments to maintain</td><td>The lazy rule: classic WordPress unless a frontend team and a multi-surface need exist</td></tr>
+<tr><td><strong>Nulled plugins</strong></td><td>Pirated premium plugins — the most common malware vector in the CMS world; the "free premium plugin" is a backdoor with a nice logo</td><td>Never install them; licensed or open-source alternatives only</td></tr>
+<tr><td><strong>Production editing</strong></td><td>Edits and updates made directly on the live site; one bad click takes the site down</td><td>Staging environment + a deployment process; the client never edits production structure</td></tr>
+<tr><td><strong>Untested backups</strong></td><td>A backup exists on the server — until restore day, when it turns out to be empty, corrupt, or on the same disk as the fire</td><td>Off-site backups and a quarterly restore test (the maintenance cadence)</td></tr>
+<tr><td><strong>REST leakage</strong></td><td>Custom endpoints exposing private data because permission callbacks were skipped</td><td>Audit every endpoint's permission callbacks; test with an unauthenticated request</td></tr>
+<tr><td><strong>Autoloaded-options bloat</strong></td><td>Everything in <code>wp_options</code> is loaded on every request; sloppy plugins autoload junk and every page pays for it</td><td>Clean autoloaded options; keep site settings lean</td></tr>
+<tr><td><strong>Shared admin accounts</strong></td><td>"admin/admin" shared by everyone — no audit trail, no least privilege, one credential owns the site</td><td>Individual accounts with 2FA and role-based permissions</td></tr>
+<tr><td><strong>Cache misconfiguration</strong></td><td>Logged-in users or cart/checkout pages served from cache — broken sessions, lost orders</td><td>Exclude WooCommerce cart/checkout/account and any session-dependent pages (the performance playbook)</td></tr>
+</tbody>
+</table>
+
+<h2>Ecosystem — tooling catalog with decision metrics</h2>
+
+<table>
+<thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
+<tbody>
+<tr><td>Managed WordPress hosting</td><td>Kinsta, WP Engine, Cloudways, SiteGround, Pressable</td><td>Managed updates and security, staging environments, object cache included — worth the premium for client sites you maintain</td></tr>
+<tr><td>Page builders / editors</td><td>Gutenberg (core), Elementor, Divi, Beaver Builder</td><td>Gutenberg first (native, blocks are the standard); builders for clients who need visual page design without you — but each is a lock-in decision</td></tr>
+<tr><td>Content-model plugins</td><td>ACF (Advanced Custom Fields), Meta Box, Pods</td><td>ACF is the default for structured fields; keep field groups as code (acf-json) so they're versionable</td></tr>
+<tr><td>Caching / performance</td><td>WP Rocket, WP Super Cache, LiteSpeed Cache, Perfmatters, Query Monitor (debug)</td><td>Page cache + asset optimization; Query Monitor to find the actual bottleneck before buying speed plugins</td></tr>
+<tr><td>Security</td><td>Wordfence, iThemes Security, Solid Security, Cloudflare (WAF), updraftplus backups</td><td>Patching discipline beats any plugin; scanner + login protection + backups off-site, then the retainer schedule</td></tr>
+<tr><td>SEO</td><td>Yoast, Rank Math, AIOSEO</td><td>One SEO plugin, configured; the plugins matter less than clean content structure (CPTs + permalinks)</td></tr>
+<tr><td>Commerce</td><td>WooCommerce, Easy Digital Downloads</td><td>WooCommerce when the store lives inside WordPress; Shopify when commerce is the product (see <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>)</td></tr>
+<tr><td>Headless plumbing</td><td>WP-REST API, WPGraphQL, Faust.js, Frontity</td><td>WPGraphQL + your framework of choice; Faust for the opinionated Next.js path</td></tr>
+<tr><td>Operations</td><td>WP-CLI, wp-cron alternatives, staging tools</td><td>WP-CLI for scripted updates/imports — the CMS version of infrastructure as code</td></tr>
+<tr><td>Local development</td><td>Local by Flywheel, wp-env, Docker, Lando</td><td>Reproducible local environments before anything touches staging (see the development workflow)</td></tr>
+<tr><td>Boilerplates / standards</td><td>Bedrock (Roots), WP-CLI scaffold</td><td>Environment-aware config, composer-managed dependencies, sane defaults — for engineer-owned projects</td></tr>
+</tbody>
+</table>
+
+<h2>The future — where the CMS internet is going</h2>
+
+<table>
+<thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
+<tbody>
+<tr><td>Blocks as the standard</td><td>Block-based editing (Gutenberg's model) becomes the shared vocabulary across CMSes — content becomes structured data everywhere, which is what makes migrations and headless both easier</td></tr>
+<tr><td>Headless maturation</td><td>Preview workflows, SEO, and multi-surface publishing get first-class tooling — headless stops being a niche and becomes a supported mode, lowering the team requirement</td></tr>
+<tr><td>AI site builders</td><td>Prompt-to-site tools (Wix ADI, Elementor AI, WordPress AI builders) eat the low end — the platform decision shifts from "who builds" to "who edits and who owns the content". The practical caveat: AI-generated sites and plugin recommendations need the same review any dependency gets — AI suggestions can be generic, abandoned, or incompatible, and judgment (content model, security, maintenance, client training) is what the tools do not replace</td></tr>
+<tr><td>WordPress Playground</td><td>WordPress runs in the browser via WebAssembly — demos, testing, and even client sandboxes without hosting; the whole stack becomes reproducible</td></tr>
+<tr><td>Composable stacks</td><td>"Best tool per job" (headless CMS + commerce API + search API) replaces "one platform for everything" — the CMS internet fragments into the same service architecture the engineering docs describe</td></tr>
+<tr><td>Content as data, again</td><td>Structured content (blocks, schemas) enables the same AI + multi-surface reuse that made databases valuable — the content's structure is its value, and the platform is a container</td></tr>
+</tbody>
+</table>
+
+<p>The direction is not "WordPress dies" — it is <em>the editing surface becomes a commodity, and the content's structure becomes the asset</em>. The skill of the next decade is designing content that outlives whichever platform renders it.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Before you pick a platform, configure an admin, or accept a client project, run this:</p>
+
+<table>
+<thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
+<tbody>
+<tr><td>Who edits the content — and how capable are they?</td><td>The editing surface is the product; choose the platform by admin quality, not code quality</td></tr>
+<tr><td>What must the site do besides display content?</td><td>Content → CMS/static. Commerce → Shopify/WooCommerce. App logic → plugins, no-code, or custom — in that order</td></tr>
+<tr><td>What is the content model (CPTs, taxonomies, fields)?</td><td>Sketch it before the theme; the schema outlives the design (the Data Modeling rule)</td></tr>
+<tr><td>What is the dependency graph (plugins/themes), and who maintains it?</td><td>Every plugin is a dependency: audit, pin, scan, and schedule updates</td></tr>
+<tr><td>What is the security baseline, and when does it get updated?</td><td>HTTPS, backups off-site, login hardening, update schedule — a product, not a favor</td></tr>
+<tr><td>How does the site stay fast, and how will we know when it isn't?</td><td>Page cache, object cache, CDN, and a measurement habit — "WordPress is slow" is a config diagnosis, not a verdict</td></tr>
+<tr><td>Who edits after launch, and how were they trained?</td><td>Roles configured, editing guide written, walkthrough recorded — editing is a deliverable</td></tr>
+<tr><td>What happens when the platform dies or the client wants out?</td><td>Content structured for export, URLs mapped, migration path sketched — lock-in is a price someone chose</td></tr>
+</tbody>
+</table>
+
+<p>Print this table. Put it on your wall. Run it before every platform decision and every client build. The first rows are "know who owns the site"; the last row is "know how it ends." That's the entire method.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://w3techs.com/technologies/overview/content_management">W3Techs — CMS usage statistics</a> ·
+  <a href="https://developer.wordpress.org/">WordPress Developer Handbook</a> ·
+  <a href="https://developer.wordpress.org/block-editor/">Gutenberg Block Editor Handbook</a> ·
+  <a href="https://developer.wordpress.org/rest-api/">WP-REST API Handbook</a> ·
+  <a href="https://www.wpgraphql.com/">WPGraphQL</a> ·
+  <a href="https://wordpress.org/plugins/advanced-custom-fields/">ACF — Advanced Custom Fields</a> ·
+  <a href="https://www.shopify.com/">Shopify</a> ·
+  <a href="https://webflow.com/">Webflow</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a WordPress site you inherited that was a disaster — what was the plugin/theme/config mess, and what did the fix actually involve?"</li>
+    <li>"When did you choose WordPress over a custom build — and when did you regret NOT choosing it? What questions would have decided it earlier?"</li>
+    <li>"Take a real client request ('a website I can edit myself, with a store') and walk me through your platform decision and your quote structure."</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · WordPress &amp; the CMS Internet — the ecosystem that runs most of the web</span>
+  <span>Landscape: <a href="./frontend-camps-survey.html">Camps Survey</a> · Delivery: <a href="./freelance-web-practice.html">Freelance Web Practice</a> · Money: <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> · Business: <a href="./frontend-income-markets.html">Income Markets</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

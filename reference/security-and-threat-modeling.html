@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security &amp; Threat Modeling — the discipline of saying no</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Security — adversarial thinking, trust boundaries, and saying no</p>
+  <h1>Security &amp; Threat Modeling</h1>
+  <p class="meta">How to think like an attacker: the CIA triad, the STRIDE threat model, trust boundaries and data-flow mapping, defense in depth and least privilege, identity and access management (authn vs. authz, RBAC/ABAC, OAuth 2.1 and OIDC theory), cryptography (hashing vs. encryption, KMS, key rotation), the OWASP Top 10 attack taxonomy, the AI-era attack surface, and the security checklist to gate every design and PR review — with a worked STRIDE walkthrough of a file-upload endpoint. Read this alongside <a href="./system-design.html">System Design</a> (trust boundaries and blast radius), <a href="./api-design.html">API Design</a> (token mechanics), and <a href="./backend-engineering.html">Backend Engineering</a> (authorization checks in the request loop).</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> Security is the only discipline on the shelf that wraps <em>every other layer</em> — every doc teaches a system that an adversary can read, break, or steal:</p>
+  <pre>          THE ADVERSARY (out here, uninvited)
+   __________________|____________________
+  |          SECURITY &amp; THREAT MODELING     |
+  |  (the discipline of saying no, across   |
+  |   every layer below)                    |
+  |   +---------------------------------+   |
+  |   | API DESIGN      — the contract  |   |
+  |   | BACKEND         — the request   |   |
+  |   | DATA MODELING   — the vault     |   |
+  |   | SYSTEM DESIGN   — the fleet     |   |
+  |   | CI/CD           — the pipeline  |   |
+  |   | FRONTEND        — the browser   |   |
+  |   +---------------------------------+   |
+  +----------------------------------------+</pre>
+  <p>Neighbors and where the <em>mechanics</em> live (this doc owns the mindset, not the plumbing):</p>
+  <ul>
+    <li><a href="./api-design.html">API Design</a> — how the identity exchange works on the wire: OAuth grants, JWT vs. opaque tokens, token expiry and refresh, rate limiting, idempotency (§8h, §10).</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — authorization checks in the request loop (IDOR, §1d), SQL injection and ORM bypass risks (§1e), session vs. stateless identity (§7).</li>
+    <li><a href="./system-design.html">System Design</a> — trust boundaries and blast radius as architecture (§5d), mTLS between services, network blind spots.</li>
+    <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — Row-Level Security and tenant isolation as schema decisions (Multi-tenancy section).</li>
+    <li><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — supply-chain integrity, SBOMs, secret scanning, least-privilege pipelines (Pipeline security section).</li>
+    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p><em>API Design</em> teaches how to issue a JWT. <em>Backend Engineering</em> teaches how to check ownership before returning a record. <em>System Design</em> teaches where to put a trust boundary. But nobody on the shelf teaches the <em>discipline itself</em>: how to enumerate the ways a system can be attacked (STRIDE), how to decide what must be protected and how much that protection costs, and how to say no when the answer matters more than shipping. Security is not a checklist of HTTP headers or ORM settings — it is <strong>adversarial thinking plus risk management</strong>, and it has its own history (the perimeter dissolved), its own mental models (defense in depth, least privilege), and its own failure modes (security theater, rolling your own crypto). That is the gap this doc fills: everything else on the shelf assumes a well-intentioned user; this doc assumes an adversary with a plan.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read this after <a href="./system-design.html">System Design</a> §5d (so you've seen trust boundaries drawn) and after <a href="./backend-engineering.html">Backend Engineering</a> §1d (so you've seen authorization checks). Most readers come back when a feature needs a design review, a dependency gets compromised, or a "quick endpoint" needs hardening. Cross-links:</p>
+<ul>
+  <li>Wraps <a href="./api-design.html">API Design</a> — the identity exchange is its mechanics, the threat model is here.</li>
+  <li>Wraps <a href="./backend-engineering.html">Backend Engineering</a> — every handler is an attack surface; §1d/§1e are where the checks execute.</li>
+  <li>Wraps <a href="./system-design.html">System Design</a> — trust boundaries and blast radius are the architecture side of this doc's mindset.</li>
+  <li>Wraps <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — RLS and tenant isolation are the vault's enforcement.</li>
+  <li>Wraps <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — the supply chain is an attack surface; the pipeline is where scans live.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+</ul>
+
+<p><strong>If you've ever shipped an endpoint that turned out to let anyone read someone else's data, committed a secret, or trusted input from the internet — this is the map.</strong> Read the Definition and Mental models first, then Threat modeling (the core skill), then the OWASP section. Come back to IAM and Cryptography when you design auth for real.</p>
+
+<h2>Definition — security as the CIA triad</h2>
+
+<p>Security is not "adding encryption." It is the preservation of three properties, together, for as long as the system exists — the <strong>CIA triad</strong>:</p>
+
+<table>
+<thead><tr><th>Property</th><th>The question</th><th>What a failure looks like</th></tr></thead>
+<tbody>
+<tr><td><strong>Confidentiality</strong></td><td>Can unauthorized actors <em>read</em> this?</td><td>A leaked database dump, an IDOR that returns another user's invoice, secrets in a public repo</td></tr>
+<tr><td><strong>Integrity</strong></td><td>Can unauthorized actors <em>alter</em> this?</td><td>An attacker rewriting a price, tampering with a JWT claim, poisoning a training dataset</td></tr>
+<tr><td><strong>Availability</strong></td><td>Can authorized actors access this <em>when needed</em>?</td><td>A DDoS taking the site down, ransomware encrypting the database, a dependency outage taking everything with it</td></tr>
+</tbody>
+</table>
+
+<p>The triad is a <em>trade-off engine</em>, not a slogan: every design choice trades one leg against another, and every leg has a cost. Stronger confidentiality (encrypt everything, verify everyone) costs availability (more failure points, slower requests). Perfect integrity (immutable append-only everything) costs availability and storage. <strong>Security work is the explicit, recorded answer to "which leg does this system bet on, and what did we give the adversary instead?"</strong> — the same posture this shelf takes toward CAP (see <a href="./system-design.html">System Design §6c</a>) and consistency (see <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a>). The availability leg is where security meets reliability: an attacker's cheapest move is often to make the system unusable, which is why denial-of-service shows up in the threat model below and why SRE work is security work.</p>
+
+<h2>History — the constraint inversions</h2>
+
+<p>Security evolved through the same pattern of constraint inversions as every discipline on this shelf — each one forced by the previous model breaking:</p>
+
+<table>
+<thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+<tbody>
+<tr><td><strong>Castle → Zero Trust</strong></td><td>"Trust everything inside the corporate firewall."</td><td>"Never trust, always verify" — mTLS, identity-aware proxies, per-request authorization</td><td>The perimeter dissolved: cloud, remote work, mobile, third-party APIs. The network stopped being a trust boundary (see <a href="./system-design.html">System Design §5d</a>)</td></tr>
+<tr><td><strong>Monolith → Supply Chain</strong></td><td>"We wrote all the code."</td><td>"90% of our code is open-source dependencies."</td><td><strong>Log4Shell (2021)</strong> proved the biggest risk is the code you <em>didn't</em> write: a one-line property in a logging library, exploitable from the internet, patched in tens of thousands of systems for months. The wake-up call that made SBOMs and SLSA mainstream (see <a href="./version-control-ci-cd-deployment.html">CI/CD — Pipeline security</a>)</td></tr>
+<tr><td><strong>Gatekeeper → Shift-Left</strong></td><td>Security audits at the end of the SDLC — a review gate before release</td><td>SAST, secret scanning, dependency checks, and threat modeling in the IDE and PR — before code merges</td><td>Fixing a flaw in production costs ~100x more than fixing it in design; the gate moved from the end of the process to every step of it</td></tr>
+<tr><td><strong>Passwords → Federated Identity</strong></td><td>Every app stores its own hashed passwords, its own session logic, its own lockout rules</td><td>OIDC/SAML, Passkeys, WebAuthn, identity as a service (Okta, Auth0)</td><td>Identity became a specialized, audited service — not an app feature. Most apps should <em>buy</em> auth, not write it</td></tr>
+</tbody>
+</table>
+
+<p>The pattern: each inversion moved trust away from a place it could be <em>assumed</em> (the network, the codebase, the end of the pipeline, the app itself) to a place it must be <em>proven</em> — and pushed the proof earlier in the process. The constant: <strong>adversarial thinking is the skill; the tools just moved where it happens.</strong></p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<p>This doc deliberately owns <em>none</em> of the mechanics. Its entire job is the mindset, the threat model, and the gate — everything mechanical lives next door and is linked, not re-taught:</p>
+
+<table>
+<thead><tr><th>Topic</th><th>Owner doc</th><th>What this doc does</th></tr></thead>
+<tbody>
+<tr><td>How to write an <code>Authorization</code> header, OAuth grants, token expiry</td><td><a href="./api-design.html">API Design</a> (§8h, §10)</td><td>The theory of identity: bearer tokens, JWT claims, revocation strategy</td></tr>
+<tr><td>How to parameterize a SQL query, ORM bypass risks</td><td><a href="./backend-engineering.html">Backend Engineering</a> (§1e)</td><td>The injection attack itself: what it exploits, why parameterization defeats it</td></tr>
+<tr><td>Authorization checks in the request loop (IDOR)</td><td><a href="./backend-engineering.html">Backend Engineering</a> (§1d)</td><td>Broken access control as a class of attack; why "logged in" ≠ "allowed"</td></tr>
+<tr><td>How to configure a CI/CD secret scanner, SBOM, SLSA</td><td><a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a> (Pipeline security)</td><td>The supply-chain threat model: what is actually at risk when a dependency is compromised</td></tr>
+<tr><td>How to design a multi-tenant database</td><td><a href="./data-modeling-and-databases.html">Data Modeling</a> (Multi-tenancy)</td><td>Tenant isolation failure modes and Row-Level Security as a control</td></tr>
+<tr><td>Trust boundaries as architecture, mTLS, blast radius</td><td><a href="./system-design.html">System Design</a> (§5d)</td><td>Threat modeling a new feature: STRIDE and trust-boundary mapping</td></tr>
+<tr><td>Browser-side contracts (CSP, cookies, CSRF)</td><td><a href="./api-design.html">API Design</a> (§8h)</td><td>Why the browser is a hostile environment: XSS and CSRF as classes</td></tr>
+</tbody>
+</table>
+
+<p><strong>Key rule:</strong> if the topic is "how does the attacker think, what is at risk, and what do we say no to" — it belongs here. If the topic is "what is the exact header, query, or pipeline step" — it belongs next door. This doc references; it never re-teaches.</p>
+
+<h2>Underlying theory — threat modeling</h2>
+
+<p>Threat modeling is the core skill of the discipline: <strong>enumerating, before you build, the ways an adversary can abuse what you're building</strong> — then choosing which ones to defend against. It has three parts.</p>
+
+<h3>The STRIDE taxonomy</h3>
+
+<p>STRIDE (Kohnfelder &amp; Garg, Microsoft, 2003 — "The Threats to Our Products") is the checklist that makes threat enumeration complete instead of vibes-based. For every element of the system (each endpoint, each store, each boundary), ask all six:</p>
+
+<table>
+<thead><tr><th>Letter</th><th>Threat</th><th>What it attacks</th><th>Canonical example</th></tr></thead>
+<tbody>
+<tr><td><strong>S</strong></td><td><strong>Spoofing</strong></td><td>Authentication — "who are you?"</td><td>Forging a JWT, replaying a stolen session cookie, a phishing page that passes as the real login</td></tr>
+<tr><td><strong>T</strong></td><td><strong>Tampering</strong></td><td>Integrity — "can this be changed?"</td><td>Modifying a signed claim, altering a row mid-request, swapping a file in an upload</td></tr>
+<tr><td><strong>R</strong></td><td><strong>Repudiation</strong></td><td>Non-repudiation — "who did this, and can they deny it?"</td><td>No audit log: an admin deletes data and the system cannot say who or when</td></tr>
+<tr><td><strong>I</strong></td><td><strong>Information disclosure</strong></td><td>Confidentiality — "can this be read?"</td><td>IDOR returning another user's record, verbose stack traces, secrets in error messages</td></tr>
+<tr><td><strong>D</strong></td><td><strong>Denial of service</strong></td><td>Availability — "can it be used when needed?"</td><td>Flooding a login endpoint, unbounded query parameters, a cache-busting loop that empties the store</td></tr>
+<tr><td><strong>E</strong></td><td><strong>Elevation of privilege</strong></td><td>Authorization — "can a low-privilege actor become a high-privilege one?"</td><td>A regular user hitting an admin-only endpoint, an SSRF letting an internal service read cloud metadata</td></tr>
+</tbody>
+</table>
+
+<h3>Trust boundaries and data-flow mapping</h3>
+
+<p>A <strong>trust boundary</strong> is any line where data passes from a context the code does not control into a context it does (or from one privilege level to another). The browser is outside the boundary. The network is outside it. The client SDK is outside it. Every crossing is where validation must happen — <em>and where an attacker operates</em>.</p>
+
+<p>The discipline: <strong>draw the data-flow diagram first</strong> — every actor (user, cron job, other service, admin tool), every store, every process, and every arrow of data between them. Then mark every boundary. Then run STRIDE on each arrow. The drawing is the threat model's skeleton; STRIDE is its muscle. A feature with no diagram has no threat model, and a feature with no threat model ships bugs on purpose. (The architecture-side treatment of where boundaries go, and how blast radius contains a breach, is <a href="./system-design.html">System Design §5d</a>; this is the per-feature method.)</p>
+
+<h2>Running a threat model — the process</h2>
+
+<p>STRIDE and trust boundaries are the vocabulary; this is the session. The output of a threat model is not "we looked at it" — it is a written register of threats, priorities, and decisions, reviewed when the system changes:</p>
+
+<table>
+<thead><tr><th>Step</th><th>What you do</th><th>Output</th></tr></thead>
+<tbody>
+<tr><td><strong>1. Define scope</strong></td><td>What system or feature are we modeling? What's in, what's out (third-party services, internal tools, future plans)?</td><td>Scope statement, system boundary</td></tr>
+<tr><td><strong>2. Draw the data-flow diagram</strong></td><td>Every actor, process, store, and data arrow; mark every trust boundary</td><td>DFD with boundaries</td></tr>
+<tr><td><strong>3. Enumerate threats</strong></td><td>Run STRIDE on each arrow and each store. No boundary gets a free pass</td><td>Threat list, categorized</td></tr>
+<tr><td><strong>4. Prioritize</strong></td><td>Score by likelihood × impact (or DREAD: Damage, Reproducibility, Exploitability, Affected users, Discoverability); attack trees for the complex goals</td><td>Prioritized threat register</td></tr>
+<tr><td><strong>5. Choose treatment</strong></td><td>Per threat: mitigate (add a control), accept (documented residual risk — see the risk section), transfer (vendor, insurance), or avoid (don't build it)</td><td>Mitigation plan with owners</td></tr>
+<tr><td><strong>6. Validate</strong></td><td>Verify the controls actually hold: code review against the register, tests for the listed attacks, scanners (SAST in CI, DAST against staging, SCA on dependencies — see the ecosystem section)</td><td>Test results, scan findings</td></tr>
+<tr><td><strong>7. Document and review</strong></td><td>Record the threats, decisions, and owners; re-run the model when the system changes — a threat model is a living document, not a launch artifact</td><td>Threat model document, review cadence</td></tr>
+</tbody>
+</table>
+
+<p>This is the classic method (Microsoft's STRIDE-based practice). Alternatives exist and are worth knowing by name: <strong>PASTA</strong> (a 7-stage risk-centric process), <strong>TRIKE</strong> (risk-management-focused, with a requirements model), and <strong>attack trees</strong> (decompose an attacker's goal into AND/OR sub-attacks — good for single high-stakes goals like "steal the database"). Tools (the Microsoft Threat Modeling Tool, OWASP Threat Dragon) automate the drawing and the STRIDE prompts, but the discipline is the session, not the tool — a diagram nobody reasoned over is decoration.</p>
+
+<h2>Risk management — the decision framework</h2>
+
+<p>"Security is risk management" is the thesis; this is the machinery. A risk is a <em>threat with a likelihood and an impact</em>, and every security decision is a treatment choice made on that math:</p>
+
+<table>
+<thead><tr><th>Step</th><th>What you do</th></tr></thead>
+<tbody>
+<tr><td><strong>Identify assets</strong></td><td>What data, systems, and capabilities must be protected? (The CIA triad asks each one: read, change, or stop it?)</td></tr>
+<tr><td><strong>Identify threats</strong></td><td>What could go wrong? STRIDE, threat intelligence, past incidents, the OWASP classes</td></tr>
+<tr><td><strong>Assess likelihood</strong></td><td>How probable is each threat? Historical data, industry reports, exposure ("this endpoint is public" raises everything)</td></tr>
+<tr><td><strong>Assess impact</strong></td><td>What does it cost if it happens? Financial, reputational, legal, operational — measured in real units</td></tr>
+<tr><td><strong>Calculate risk</strong></td><td>Risk = Likelihood × Impact — the same arithmetic as the prioritization step of a threat model</td></tr>
+<tr><td><strong>Decide treatment</strong></td><td><strong>Mitigate</strong> (add controls) · <strong>Accept</strong> (document the risk with an owner — the disciplined version of "it's fine") · <strong>Transfer</strong> (insurance, a vendor's SLA, a managed provider) · <strong>Avoid</strong> (don't build the thing)</td></tr>
+<tr><td><strong>Monitor and review</strong></td><td>Risks change: re-assess on system changes, new threats, and after incidents — the register is a living document</td></tr>
+</tbody>
+</table>
+
+<p><strong>The risk register</strong> — one row per accepted-or-mitigated risk, kept where the team can see it:</p>
+
+<table>
+<thead><tr><th>Threat</th><th>Asset</th><th>Likelihood</th><th>Impact</th><th>Risk</th><th>Treatment</th><th>Owner</th><th>Review</th></tr></thead>
+<tbody>
+<tr><td>SQL injection</td><td>User database</td><td>Medium</td><td>High</td><td>High</td><td>Parameterized queries (Backend §1e) + scanner in CI</td><td>Backend lead</td><td>Quarterly</td></tr>
+<tr><td>Credential stuffing</td><td>Auth service</td><td>High</td><td>Medium</td><td>High</td><td>Rate limiting + MFA + breach monitoring</td><td>Security owner</td><td>Quarterly</td></tr>
+<tr><td>Dependency compromise</td><td>Production deps</td><td>Medium</td><td>High</td><td>High</td><td>SCA scanning, pinning, blast-radius review (checklist row 7)</td><td>Platform lead</td><td>Monthly</td></tr>
+<tr><td>Leaked secrets</td><td>Deploy pipeline</td><td>Low</td><td>Critical</td><td>High</td><td>Secret scanning, managed secrets, rotation</td><td>Platform lead</td><td>Monthly</td></tr>
+</tbody>
+</table>
+
+<p><strong>Measuring posture — the metrics that matter:</strong> the register lives or dies on a few numbers you can actually move: <strong>vulnerability density</strong> (open findings per component — trend it down), <strong>patch SLA</strong> (% of critical patches applied within 7 days — the Log4Shell lesson), <strong>threat-model coverage</strong> (% of new features with a register entry), and <strong>pen-test findings by severity</strong> (zero critical/high at launch). Detection-and-response measurement — <strong>MTTD/MTTR</strong>, how fast you notice and contain a breach — is the observability domain and lives in <a href="./system-design.html">System Design §6f</a> (SLOs, on-call, incident response); security consumes those numbers but doesn't own that machinery.</p>
+
+<h2>Mental models — frames for thinking about security</h2>
+
+<table>
+<thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
+<tbody>
+<tr><td>Defense in depth</td><td>If this control fails, what else catches it?</td><td>No single control is perfect. WAF fails → gateway validates. Gateway fails → app validates. App fails → DB constraints reject. Layered controls are the difference between "breached" and "a firewall log entry"</td></tr>
+<tr><td>Least privilege</td><td>What is the minimum this could be granted?</td><td>Every service, user, and function gets exactly the permissions it needs and nothing more — the DB user can't drop tables, the cron role can't read PII, the frontend can't reach the admin API. A breach inherits the grant's scope</td></tr>
+<tr><td>The human is the weakest link</td><td>Where does a technical control get a human bypass?</td><td>Phishing, password reuse, misconfigured S3 buckets, "temporarily" opened firewalls — more breaches start in humans than in zero-days. Controls must assume a tired person with a deadline on the other end</td></tr>
+<tr><td>Don't roll your own crypto</td><td>What has this algorithm survived?</td><td>Cryptography is math that punishes arrogance. XOR, base64, and hand-rolled hashes are not encryption. Use audited libraries (Argon2, AES-GCM via your language's crypto module) and managed KMS for keys</td></tr>
+<tr><td>Fail safe, not fail open</td><td>What does this do with garbage?</td><td>Developers test that the system <em>works</em>; security tests that it <em>fails safely</em>. Unknown input, missing header, expired token → deny, log, close — never default to "probably fine, let it through"</td></tr>
+<tr><td>Security is a cost center with a business case</td><td>What are we betting against?</td><td>Perfection is unaffordable; the discipline is risk <em>management</em>. Threat model → decide what's worth defending → measure whether the controls hold — then say no to the rest</td></tr>
+</tbody>
+</table>
+
+<h2>Identity &amp; Access Management (IAM)</h2>
+
+<p>IAM is the discipline of answering two different questions that are constantly confused:</p>
+
+<ul>
+  <li><strong>Authentication — "Who are you?"</strong> Proving identity: passwords (hashed — see the cryptography section), MFA, passkeys/WebAuthn, biometrics, device attestation. The login gate.</li>
+  <li><strong>Authorization — "What can you do?"</strong> Deciding permission: RBAC (roles), ABAC (attributes/policy), ReBAC (relationships). The per-request check. The mechanics of the check live in <a href="./backend-engineering.html">Backend Engineering §1d</a> — and the most common backend breach is a <em>missing</em> authorization check, not a broken login (IDOR).</li>
+</ul>
+
+<p>Three decisions dominate real systems:</p>
+
+<table>
+<thead><tr><th>Decision</th><th>The options</th><th>The rule</th></tr></thead>
+<tbody>
+<tr><td><strong>Session vs. token</strong></td><td>Server-side session (revocable instantly, stateful) vs. stateless token (JWT, scales trivially, hard to revoke)</td><td>Choose by revocation needs — if "log this user out now" matters, you need server-side state. See <a href="./backend-engineering.html">Backend Engineering §7</a> and <a href="./api-design.html">API Design §10</a></td></tr>
+<tr><td><strong>Who owns identity?</strong></td><td>In-house auth vs. an identity provider (OIDC/SAML with Okta, Auth0, Cognito) vs. passkeys</td><td>Default to buying it — identity is an audited specialized service, not an app feature. Write auth only when the business case is explicit</td></tr>
+<tr><td><strong>Authorization model</strong></td><td>RBAC / ABAC / ReBAC / capability / policy engine — see the five-model table below</td><td>RBAC for most; finer-grained models when permissions genuinely vary per resource. Whatever the model, the check must be a scope + ownership check per request — token possession is not authorization (<a href="./api-design.html">API Design §8h</a>)</td></tr>
+</tbody>
+</table>
+
+<p>The five authorization models, and when each earns its complexity:</p>
+
+<table>
+<thead><tr><th>Model</th><th>How it works</th><th>When to use</th><th>Limitation</th></tr></thead>
+<tbody>
+<tr><td><strong>RBAC (Role-Based)</strong></td><td>Users get roles; roles get permissions</td><td>Simple orgs and apps with clear job functions — the default</td><td>Coarse-grained; role explosion as exceptions multiply ("admin plus a few extras")</td></tr>
+<tr><td><strong>ABAC (Attribute-Based)</strong></td><td>Policies evaluate attributes of user, resource, and environment ("user.department == resource.owner.department AND time < 18:00")</td><td>Fine-grained, dynamic permissions — orgs with many conditional rules</td><td>Policies get complex to write, test, and audit</td></tr>
+<tr><td><strong>ReBAC (Relationship-Based)</strong></td><td>Permissions derive from relationships — owner, member, viewer, shared-with (Google Docs, GitHub)</td><td>Collaborative/social systems where access is about connections</td><td>Relationship graphs need care and indexing (who-can-see-this can be an expensive query)</td></tr>
+<tr><td><strong>Capability-based</strong></td><td>Unforgeable tokens (API keys, signed capabilities) grant specific access directly</td><td>Service-to-service, decentralized systems, scoped API keys</td><td>Revocation is hard; tokens must be managed, scoped, and rotated</td></tr>
+<tr><td><strong>Policy engines (OPA, Cedar, Casbin)</strong></td><td>An external engine evaluates policies against a request, consistently across services</td><td>Microservices needing one policy language and central audit</td><td>A new dependency and a policy-language learning curve</td></tr>
+</tbody>
+</table>
+
+<p>The same failure seen from the attack side is <strong>broken access control</strong> (OWASP A01) — and its most common form is <strong>IDOR</strong>: a valid user reaching a resource that isn't theirs because an ownership check was missing. The attack class is the OWASP section's job; the prevention lives in <a href="./backend-engineering.html">Backend Engineering §1d</a> (the ownership check in the request loop) and <a href="./backend-engineering.html">§7b</a> (the CRUD check per resource). Cross-reference both when you design an authorization model: the model you choose decides <em>how</em> you express the check; the per-request ownership check decides whether the model is <em>enforced</em>.</p>
+
+<p>The wire-level mechanics — OAuth 2.1 flows, OIDC claims, JWT vs. opaque tokens, refresh boundaries, mTLS and SPIFFE for service-to-service — are <a href="./api-design.html">API Design's</a> job (§8h, §10). What belongs here: the mental model that <strong>authentication is a gate and authorization is a per-request decision, and the two must never be merged into "has a valid token"</strong>.</p>
+
+<h2>Cryptography &amp; data protection</h2>
+
+<p>Cryptography is the tool for confidentiality, integrity, and non-repudiation — and the three jobs use <em>different</em> primitives that are constantly swapped for each other:</p>
+
+<table>
+<thead><tr><th>Primitive</th><th>Job</th><th>Correct choice</th><th>Common abuse</th></tr></thead>
+<tbody>
+<tr><td><strong>Hashing</strong></td><td>Verify a secret without storing it (passwords)</td><td><strong>Argon2</strong> (or bcrypt) — slow, salted, memory-hard, designed for exactly this</td><td>MD5/SHA-1/SHA-256 for passwords — fast hashes are <em>easy</em> for attackers to brute-force, which is the opposite of what a password hash wants</td></tr>
+<tr><td><strong>Encryption</strong></td><td>Hide data from readers</td><td><strong>AES-GCM</strong> for data at rest (authenticated — tampering is detected; one unique nonce per key per message — nonce reuse is catastrophic), TLS 1.3 for data in transit</td><td>Base64 ("obfuscation with a decoder ring"), XOR, custom ciphers, or writing the key next to the data</td></tr>
+<tr><td><strong>Signing</strong></td><td>Prove who wrote something and that it wasn't altered</td><td>Ed25519/RSA signatures; JWTs are signed, never encrypted, so <em>don't put secrets in an unencrypted payload</em> (<a href="./api-design.html">API Design §8h</a>)</td><td>Using encryption when signing was needed (or vice versa) — a signed-but-readable token is expected; an encrypted-but-unauthenticated blob is attackable</td></tr>
+</tbody>
+</table>
+
+<p><strong>Key management is the discipline that makes crypto real:</strong></p>
+<ul>
+  <li><strong>Keys live in a KMS</strong> (AWS KMS, GCP KMS, Azure Key Vault, or Vault), never in code, never in the repo, never in an env file committed by accident. The KMS stores the key; the app asks it to encrypt/decrypt. The key never touches the app's memory in usable form.</li>
+  <li><strong>Rotation is a schedule, not an incident.</strong> "If a key leaks" is not the only reason to rotate — old keys should expire by policy so a leaked key has a shelf life. Automate it; manual rotation is forgotten rotation.</li>
+  <li><strong>Encrypt at rest for the data that needs it</strong> — PII, payment data, credentials. Encryption at rest is the last line of defense when the disk, the backup, or the database dump walks off.</li>
+  <li><strong>Secrets (API keys, DB passwords) get a secrets manager and a rotation story</strong> — and the <em>pipeline</em> side of secret hygiene (scanning, least-privilege injection) lives in <a href="./version-control-ci-cd-deployment.html">CI/CD — Secrets and configuration</a>.</li>
+</ul>
+
+<h2>Application security: the OWASP taxonomy</h2>
+
+<p>OWASP's Top 10 is the shared vocabulary of application attacks — an <em>awareness document</em>, not an exhaustive catalog, so treat it as a checklist to start from, never a completeness proof. The point here is not the list — it is the <em>classes</em>: each row is a way of thinking about what the app trusts. The mechanics of each live next door; the class itself lives here.</p>
+
+<table>
+<thead><tr><th>Attack class</th><th>The trust assumption it exploits</th><th>Mechanics owner</th></tr></thead>
+<tbody>
+<tr><td><strong>Injection</strong> (SQL, NoSQL, OS, template)</td><td>"User input is data, not code." An injection feeds attacker text into a parser that executes it</td><td><a href="./backend-engineering.html">Backend Engineering §1e</a> — parameterized queries; ORMs help but bypasses exist (raw queries, dynamic table names, aggregates)</td></tr>
+<tr><td><strong>Broken access control</strong> (IDOR, missing checks)</td><td>"The endpoint checks ownership." The most common class — an authenticated request that fetches a record by ID without asking whose it is</td><td><a href="./backend-engineering.html">Backend Engineering §1d</a> — ownership check per resource, at the handler</td></tr>
+<tr><td><strong>XSS</strong> (Cross-Site Scripting)</td><td>"The browser treats my output as data." Reflected/stored attacker content executes as script in another user's session</td><td>The browser contract — escaping, CSP, sanitization; see <a href="./api-design.html">API Design §8h</a> and the frontend docs</td></tr>
+<tr><td><strong>CSRF</strong> (Cross-Site Request Forgery)</td><td>"The cookie proves the browser, and the browser is the user." A malicious page rides the victim's authenticated cookies to make state-changing requests</td><td><a href="./api-design.html">API Design §8h</a> — CSRF tokens, SameSite cookies, double-submit</td></tr>
+<tr><td><strong>SSRF</strong> (Server-Side Request Forgery)</td><td>"The server only fetches things it intends to." Attacker-controlled URLs make the server reach internal addresses — including cloud metadata endpoints that mint credentials</td><td>Server-side URL validation at every fetch boundary; network egress rules (see <a href="./system-design.html">System Design</a>)</td></tr>
+<tr><td><strong>Security misconfiguration</strong></td><td>"The default config is safe." Default creds, verbose errors, open debug endpoints, exposed admin UIs, misconfigured storage buckets</td><td>Configuration review in the PR gate; the checklist at the end of this doc</td></tr>
+</tbody>
+</table>
+
+<p><strong>The unifying insight: every class is a violated trust assumption about input, output, identity, or state.</strong> The threat-modeling habit (STRIDE each endpoint) is what surfaces the class before it ships.</p>
+
+<h2>Infrastructure &amp; network security</h2>
+
+<p>The fleet-level controls that make a breach survivable:</p>
+
+<table>
+<thead><tr><th>Control</th><th>What it does</th><th>Where it breaks</th></tr></thead>
+<tbody>
+<tr><td><strong>mTLS between services</strong></td><td>Every service proves its identity to every other — mutual certificates, not just one side</td><td>Key rotation, cert sprawl, a mesh that adds latency (see <a href="./system-design.html">System Design §5d</a>)</td></tr>
+<tr><td><strong>WAF / API gateway</strong></td><td>The edge validates traffic before the app sees it: rate limits, blocking patterns, header inspection</td><td>It is a filter, not a security model — the app must still validate everything (defense in depth)</td></tr>
+<tr><td><strong>Network segmentation</strong></td><td>Compromised segment ≠ compromised fleet: the DB subnet unreachable from the public one, the admin plane separate</td><td>Flat networks where a single pod/VM grants lateral movement; over-segmentation that makes operations impossible</td></tr>
+<tr><td><strong>Secrets management in the fleet</strong></td><td>Dynamic, short-lived credentials injected at runtime, not baked into images</td><td>Hardcoded creds in images/CI; long-lived keys with no rotation story</td></tr>
+<tr><td><strong>Monitoring &amp; response</strong></td><td>Detect the breach early and contain it — anomaly detection, alerting, and an incident response runbook</td><td>Detection with no response plan; alerts nobody is on-call for (see <a href="./system-design.html">System Design §6f</a>)</td></tr>
+</tbody>
+</table>
+
+<p><strong>Rule:</strong> the network is no longer a trust boundary (zero trust) — but it is still a <em>containment</em> tool. Assume any single service can be compromised, and design so that compromise doesn't become the whole company.</p>
+
+<h3>The supply chain as an attack surface</h3>
+
+<p>Your dependency graph is a fleet of code you didn't write and don't fully control — the threat-model view (the mechanics — SBOMs, SLSA, secret scanning — are <a href="./version-control-ci-cd-deployment.html">CI/CD's</a> job):</p>
+
+<table>
+<thead><tr><th>Attack vector</th><th>What it targets</th><th>Controls</th></tr></thead>
+<tbody>
+<tr><td><strong>Malicious package</strong></td><td>Developer installs a typosquatted or hijacked package (same name, one typo off)</td><td>Lockfiles, package verification, dependency review before adoption</td></tr>
+<tr><td><strong>Compromised dependency</strong></td><td>A legitimate dependency is hijacked — Log4Shell (CVE-2021-44228) made every unpatched Java server an attack surface</td><td>SBOM, vulnerability scanning in CI, automated patching, the patch SLA from the risk register</td></tr>
+<tr><td><strong>Build-system compromise</strong></td><td>Attacker injects code during the build — the artifacts themselves are altered</td><td>SLSA levels, signed builds, reproducible builds, protected build environments</td></tr>
+<tr><td><strong>CI/CD pipeline compromise</strong></td><td>Attacker modifies the pipeline to inject a backdoor into every future release</td><td>Pipeline-as-code review, least-privilege CI, secret scanning, protected branches</td></tr>
+<tr><td><strong>Update-mechanism compromise</strong></td><td>Attacker hijacks the auto-update path — SolarWinds shipped a signed backdoor to thousands of customers</td><td>Code signing, update verification, staged/canary rollouts</td></tr>
+</tbody>
+</table>
+
+<p>Same shape as the rest of this doc: assume the trusted thing can be hostile, verify at the boundary, and keep the blast radius small enough that one bad dependency is an incident, not a company-ending event.</p>
+
+<h2>The AI-era attack surface</h2>
+
+<p>LLMs and agents changed the attack surface in two ways: they added new vulnerability classes, and they made existing ones easier. This is the youngest domain — treat its "best practices" as provisional and keep the threat-modeling habit on top of them.</p>
+
+<table>
+<thead><tr><th>Attack</th><th>What it is</th><th>First-line defense</th></tr></thead>
+<tbody>
+<tr><td><strong>Prompt injection</strong></td><td>Instructions smuggled into untrusted content (a web page the model reads, an email it summarizes, a user's document) that hijack the model's behavior</td><td>Treat model input as untrusted data: separate instruction from content, sandbox the model's tools, and never let model output flow into privileged actions unvalidated</td></tr>
+<tr><td><strong>Data exfiltration via the model</strong></td><td>The model as a side channel — private context leaking through responses, embeddings, or the model's tools (a malicious prompt that gets the agent to fetch and return a secret)</td><td>Least privilege on the model's tools and context; no secrets in the prompt; output validation before anything leaves the trust boundary</td></tr>
+<tr><td><strong>Model/data poisoning</strong></td><td>Training or RAG data corrupted so the model behaves maliciously for chosen inputs</td><td>Validate the provenance of training and retrieval data; treat retrieval sources as untrusted</td></tr>
+<tr><td><strong>Agent tool abuse</strong></td><td>An agent with tools (read files, run commands, send email) is an attack surface — a hijacked prompt becomes a hijacked account</td><td>Tool-scoped authorization, human-in-the-loop for privileged actions, audit logs of every tool call (repudiation, remember STRIDE)</td></tr>
+<tr><td><strong>Generated code as supply-chain risk</strong></td><td>AI-generated patches are new dependencies and new code — the same supply-chain risk as any dependency, minus the review habit</td><td>No "review" checkbox — human review applies to AI code like any other; scanners run on it the same way (see <a href="./version-control-ci-cd-deployment.html">CI/CD — Pipeline security</a>)</td></tr>
+</tbody>
+</table>
+
+<p>Where the AI-agent lifecycle itself — design, tools, evaluation, failure modes — is owned: <a href="./software-development-process.html">Software Development Process §9d</a> (the Agent Development Lifecycle). This doc owns what an adversary does to it.</p>
+
+<h2>Compliance — when security becomes auditable</h2>
+
+<p>Compliance is what happens when security requirements are written into law, contracts, or industry rules. The mindset content is simple — the rest is your organization's compliance program — but a security reference must know the vocabulary, because clients and employers will use it as a requirement:</p>
+
+<table>
+<thead><tr><th>Standard</th><th>What it covers</th><th>When it applies</th></tr></thead>
+<tbody>
+<tr><td><strong>SOC 2 Type II</strong></td><td>Controls over security, availability, processing integrity, confidentiality, privacy (the TSC)</td><td>SaaS companies selling to enterprises — the audit buyers ask for</td></tr>
+<tr><td><strong>ISO 27001</strong></td><td>An information security management system (ISMS) — governance, policy, process</td><td>Organizations wanting formal, auditable security governance</td></tr>
+<tr><td><strong>PCI DSS</strong></td><td>Card data protection — 12 requirements, scoped by how you touch card data</td><td>Any system handling card numbers; the mechanics and the scope design live in <a href="./payments-and-commerce.html">Payments &amp; Commerce</a></td></tr>
+<tr><td><strong>HIPAA</strong></td><td>Protected health information (PHI)</td><td>US healthcare systems and their vendors</td></tr>
+<tr><td><strong>GDPR</strong></td><td>Personal data of EU residents — consent, rights, breach notification</td><td>Any system processing EU personal data, wherever it runs</td></tr>
+<tr><td><strong>NIST CSF</strong></td><td>The five functions: Identify, Protect, Detect, Respond, Recover</td><td>US federal and critical infrastructure — and a useful self-assessment structure for everyone</td></tr>
+<tr><td><strong>FedRAMP</strong></td><td>Security authorization for cloud services</td><td>Cloud providers serving US government</td></tr>
+</tbody>
+</table>
+
+<p><strong>The principle: compliance is not security.</strong> Compliance is the minimum bar a regulator or contract requires; security is protecting assets beyond that bar. A system can be fully compliant and still vulnerable (the standards are checklists of controls, not proofs of safety) — and a system can be secure and non-compliant (an unpatchable legacy box behind a firewall). Treat compliance as a floor the business chooses for market reasons, then do the threat modeling on top of it. For the freelancer tier this matters once: the moment a client asks about PCI or GDPR, the question "what are we actually required to do, and where is the seam?" is answered by <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> and by this doc's checklist — not by fear.</p>
+
+<h2>Principles — the shared constants</h2>
+
+<table>
+<thead><tr><th>Principle</th><th>The rule of thumb</th></tr></thead>
+<tbody>
+<tr><td>Think like the attacker</td><td>For every feature, ask "how would I break this?" before "how does it work?" — STRIDE makes it systematic</td></tr>
+<tr><td>Validate at every trust boundary</td><td>Every crossing of the boundary re-validates; assume the other side is hostile</td></tr>
+<tr><td>Fail safe</td><td>Unknown input, missing header, expired token → deny, log, close. Never fail open</td></tr>
+<tr><td>Least privilege everywhere</td><td>Minimum grant per user, service, role, tool — a breach inherits the grant's scope</td></tr>
+<tr><td>Layered controls</td><td>Defense in depth: no single control is the security model; every layer catches the last layer's failure</td></tr>
+<tr><td>Never roll your own crypto or auth</td><td>Audited libraries, managed identity, managed KMS — writing either from scratch is the slowest way to be breached</td></tr>
+<tr><td>Security is risk management</td><td>Threat model, decide what to defend, measure whether it holds — then say no to the rest</td></tr>
+</tbody>
+</table>
+
+<p><strong>The developer's security contract</strong> — the principles, mapped to where each one's mechanics actually execute on the shelf. If you only keep one table from this doc, keep this one:</p>
+
+<table>
+<thead><tr><th>Principle</th><th>What it means in code</th><th>Where the mechanics live</th></tr></thead>
+<tbody>
+<tr><td><strong>Validate all input</strong></td><td>Every crossing of a trust boundary re-validates; assume the other side is hostile — including types you didn't think of as input (headers, files, webhooks, model output)</td><td><a href="./backend-engineering.html">Backend Engineering §1e</a>, <a href="./api-design.html">API Design §8h</a></td></tr>
+<tr><td><strong>Parameterize all queries</strong></td><td>Never concatenate user input into SQL or shell commands</td><td><a href="./backend-engineering.html">Backend Engineering §1e</a></td></tr>
+<tr><td><strong>Encode all output</strong></td><td>Escape user data before rendering it in HTML, JS, URLs, or SQL</td><td><a href="./api-design.html">API Design §8h</a> (the browser contract)</td></tr>
+<tr><td><strong>Use least privilege</strong></td><td>Every user, service, function, and query gets minimum permissions</td><td><a href="./system-design.html">System Design §5d</a>, this doc's IAM section</td></tr>
+<tr><td><strong>Fail safe</strong></td><td>Unknown input, missing header, expired token → deny, log, close — never fail open</td><td>This doc's mental models</td></tr>
+<tr><td><strong>Don't trust the client</strong></td><td>Client-side validation is UX, not security; the server validates everything</td><td><a href="./backend-engineering.html">Backend Engineering §1d</a></td></tr>
+<tr><td><strong>Use managed crypto</strong></td><td>Audited libraries and managed KMS; never implement algorithms</td><td>This doc's cryptography section</td></tr>
+<tr><td><strong>Handle errors safely</strong></td><td>No stack traces, internal paths, or schema details in error messages</td><td><a href="./api-design.html">API Design</a> (error envelopes)</td></tr>
+<tr><td><strong>Log security events</strong></td><td>Auth failures, authorization denials, validation failures — the repudiation (R) threat, handled</td><td><a href="./system-design.html">System Design §6f</a> (observability), this doc's checklist</td></tr>
+<tr><td><strong>Keep dependencies updated</strong></td><td>Known CVEs in dependencies are the most common attack vector</td><td><a href="./version-control-ci-cd-deployment.html">CI/CD — Pipeline security</a> (SCA, SBOM)</td></tr>
+</tbody>
+</table>
+
+<h2>Worked example — threat-modeling a file-upload endpoint</h2>
+
+<p>A classic feature with a surprisingly large attack surface. The discipline: draw the data flow, mark the boundaries, then run STRIDE against each arrow.</p>
+
+<p><strong>Step 1 — the data-flow diagram with trust boundaries:</strong></p>
+
+<pre>       [Browser: untrusted]                     [Internet: untrusted]
+              |  POST /uploads (multipart)              |
+              ▼                                        ▼
+        ┌─────────────┐   validated file  ┌────────────────────┐
+        │  API server │ ─────────────────► │  Object storage    │
+        └─────────────┘      upload to     └────────────────────┘
+              │  metadata row                          │
+              ▼                                        │
+        ┌─────────────┐        thumbnail worker ◄──────┘ (fetches + reprocesses)
+        │  Database   │
+        └─────────────┘
+
+   Boundaries: ① browser→API  ② API→storage  ③ storage→worker  ④ worker→DB</pre>
+
+<p><strong>Step 2 — STRIDE on each boundary, with the decision:</strong></p>
+
+<table>
+<thead><tr><th>Threat (per boundary)</th><th>Realistic?</th><th>Control (defense in depth)</th></tr></thead>
+<tbody>
+<tr><td>Spoofing ①: an attacker uploads as another user</td><td>Yes — the obvious one</td><td>Authenticate the request; authorize ownership of the target resource before the bytes land</td></tr>
+<tr><td>Tampering ①: the file is not what it claims</td><td>Yes — the classic</td><td>Validate <em>server-side</em> (never trust the client's MIME type): magic bytes, size limit, extension policy; store with a server-generated name; antivirus scan if the type demands it</td></tr>
+<tr><td>Tampering ③→④: an executable that the worker runs</td><td>Yes — the sneaky one</td><td>Thumbnail worker runs in a sandbox with no network egress (SSRF-free), timeouts, and a memory limit; never execute or eval the payload</td></tr>
+<tr><td>Information disclosure ①: another user's file readable by ID</td><td>Yes — IDOR again</td><td>Opaque object keys, ownership check on <em>read</em> too — not just on write (see <a href="./backend-engineering.html">Backend Engineering §1d</a>)</td></tr>
+<tr><td>Denial of service ①: 10GB uploads, concurrent floods, zip bombs</td><td>Yes — cheap for the attacker</td><td>Size limits, quotas, rate limits, decompression limits (zip bombs expand past their size), queue the worker work</td></tr>
+<tr><td>Elevation of privilege ②: upload storage key with full bucket access</td><td>Yes — a config mistake</td><td>Least privilege on the storage credentials: scoped, short-lived, write-only-to-one-prefix; rotation story (KMS section)</td></tr>
+<tr><td>Repudiation: "I never uploaded that"</td><td>Partial — cheap to cover</td><td>Audit log: who uploaded what, when, from where — the R in STRIDE is a database row, not a wish</td></tr>
+</tbody>
+</table>
+
+<p><strong>Step 3 — the decisions that cost nothing:</strong> read-side authorization, server-side validation, opaque keys, quota limits, audit logging. <strong>The decisions that cost something:</strong> sandboxing the worker, malware scanning, signed URLs for direct-to-storage uploads (see <a href="./api-design.html">API Design</a> for the presigned-URL pattern). Threat modeling is what makes the second list explicit — before the incident makes it urgent.</p>
+
+<h2>The security checklist — the gate</h2>
+
+<p>Run this at design time and at PR review. If a row can't be answered, the change isn't ready — this is the shift-left inversion in practice:</p>
+
+<table>
+<thead><tr><th>Check</th><th>If you can't answer…</th></tr></thead>
+<tbody>
+<tr><td>Have we drawn the trust boundaries and validated data at every crossing?</td><td>Draw the data-flow diagram first — no diagram, no threat model, no merge</td></tr>
+<tr><td>What does STRIDE say about each boundary?</td><td>Run the six threats per arrow; a boundary with no threats is a boundary you haven't looked at</td></tr>
+<tr><td>Is every state-changing endpoint protected against CSRF, and does it honor idempotency keys?</td><td>See <a href="./api-design.html">API Design §8h</a> for the browser contract</td></tr>
+<tr><td>Is PII/PHI encrypted at rest and masked in logs?</td><td>Name the PII fields, the KMS keys, and the log-redaction rule — explicitly</td></tr>
+<tr><td>Does least privilege apply to the DB user, the IAM role, and the tool grants?</td><td>Write the exact grant set the change needs; anything wider is the breach's scope</td></tr>
+<tr><td>Is input validated at the boundary — including types we didn't think of as input?</td><td>Enumerate every source: query params, headers, body, files, URLs, webhooks, model output</td></tr>
+<tr><td>If a dependency is compromised tomorrow, what is our blast radius?</td><td>Pin the dependency versions, run the scanner, write the response step in the runbook</td></tr>
+<tr><td>What does the audit log record, and who can tamper with it?</td><td>The R in STRIDE — log to something the app can't rewrite</td></tr>
+<tr><td>What do we say no to, and who approved the no?</td><td>Security is risk management — the residual risk needs an owner, not silence</td></tr>
+</tbody>
+</table>
+
+<h2>Most common failure modes</h2>
+
+<table>
+<thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><strong>Security theater</strong></td><td>Compliance checkboxes ("we have a firewall", "we use HTTPS") that don't mitigate the threats the app actually faces</td><td>Threat model per feature; a control with no threat behind it is decoration</td></tr>
+<tr><td><strong>Rolling your own crypto (or auth)</strong></td><td>Base64 as "encryption", custom hash for passwords, homegrown JWT logic</td><td>Argon2 for passwords, AES-GCM via the language's crypto module, managed KMS, managed identity (OIDC/PKI)</td></tr>
+<tr><td><strong>Happy-path bias</strong></td><td>Tests prove the feature works; nobody tested the garbage input, the missing header, the expired token</td><td>Fail-safe testing: fuzz, negative tests, and the security checklist as a review gate</td></tr>
+<tr><td><strong>Over-trusting the internal network</strong></td><td>Microservices without auth "because they're inside the VPC" — one compromised pod becomes the whole fleet</td><td>Zero trust: identity and authorization per request even between services (mTLS, workload identity)</td></tr>
+<tr><td><strong>Secrets in git</strong></td><td>The classic <code>.env</code> commit that lives in the <code>.git</code> history forever — rotating doesn't erase it</td><td>Secrets manager + rotation from day one; secret scanning in CI (see <a href="./version-control-ci-cd-deployment.html">CI/CD — Secrets and configuration</a>); assume any history-committed secret is burned</td></tr>
+<tr><td><strong>Authorization checked once, at login</strong></td><td>"Logged in" treated as "allowed to do everything" — one token, no per-request scope or ownership checks</td><td>Authn and authz separated: scope + ownership check per request (<a href="./backend-engineering.html">Backend Engineering §1d</a>)</td></tr>
+<tr><td><strong>Logging the sensitive stuff</strong></td><td>Full request bodies, tokens, or PII in logs — the breach becomes the log aggregator</td><td>Log-redaction policy; masked fields; the log system treated as a trust boundary too</td></tr>
+</tbody>
+</table>
+
+<h2>Ecosystem — tooling catalog with decision metrics</h2>
+
+<table>
+<thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
+<tbody>
+<tr><td>Static analysis (SAST)</td><td>Semgrep, Snyk Code, CodeQL, SonarQube</td><td>Runs in the PR, low false-positive noise, covers the language's common classes (injection, IDOR patterns)</td></tr>
+<tr><td>Dependency scanning (SCA)</td><td>Dependabot, Renovate, Snyk, Trivy, OSV-Scanner</td><td>Same-day coverage for actively-exploited CVEs; SBOM generation; locked versions (see <a href="./version-control-ci-cd-deployment.html">CI/CD</a>)</td></tr>
+<tr><td>Secret scanning</td><td>gitleaks, trufflehog, GitHub secret scanning</td><td>Runs in the PR gate <em>and</em> on history; blocks pushes, not just reports</td></tr>
+<tr><td>Dynamic testing (DAST)</td><td>OWASP ZAP, Burp Suite</td><td>Post-deploy probing of the live app; run against staging, wired into the release gate</td></tr>
+<tr><td>Threat modeling</td><td>OWASP Threat Dragon, Microsoft Threat Modeling Tool, Threatspec</td><td>Drawing the data-flow diagram + STRIDE per feature; the tool is notation, the drawing is the discipline</td></tr>
+<tr><td>Secrets management</td><td>Vault, AWS Secrets Manager, Doppler, 1Password CLI</td><td>Dynamic/short-lived credentials; injection at runtime, not bake time; rotation automation</td></tr>
+<tr><td>Key management (KMS)</td><td>AWS KMS, GCP KMS, Azure Key Vault</td><td>Keys never in app memory; automatic rotation; audit of every use</td></tr>
+<tr><td>Identity providers</td><td>Okta, Auth0, Cognito, Keycloak (self-hosted)</td><td>Default to buying identity; Keycloak when self-hosting is a hard requirement</td></tr>
+<tr><td>Browser contracts</td><td>CSP headers, <code>SameSite</code> cookies, HSTS, Content-Security-Policy tools</td><td>The browser-side half of defense in depth — owned by <a href="./api-design.html">API Design §8h</a></td></tr>
+</tbody>
+</table>
+
+<h2>The future — where security is going</h2>
+
+<table>
+<thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
+<tbody>
+<tr><td>Passkeys / WebAuthn</td><td>Passwords (and their breach-and-reuse economy) finally have a replacement that is easier <em>and</em> safer — phishing-resistant by construction</td></tr>
+<tr><td>OAuth 2.1 and token hygiene</td><td>Implicit and password grants die; short-lived tokens, refresh rotation, and a JWT without footguns (PASETO) become the defaults (still a draft — treat it as the direction, not the final text; see <a href="./api-design.html">API Design §10</a>)</td></tr>
+<tr><td>Workload identity (SPIFFE/SPIRE)</td><td>Service-to-service auth stops being bespoke — every workload gets a machine identity (a SPIFFE ID, provisioned and rotated automatically by SPIRE)</td></tr>
+<tr><td>AI security as a discipline</td><td>Prompt injection, agent tool abuse, and model poisoning get frameworks, scanners, and audit standards — the youngest domain on this shelf growing up fast</td></tr>
+<tr><td>Supply-chain hardening (SLSA, SBOMs)</td><td>After Log4Shell, provenance becomes a requirement: builds attest who built what from what, and deployments check it (see <a href="./version-control-ci-cd-deployment.html">CI/CD — Pipeline security</a>)</td></tr>
+<tr><td>Post-quantum cryptography</td><td>Long-lived data encrypted today may be decrypted tomorrow — migration to the NIST-selected post-quantum algorithms (CRYSTALS-Kyber for encryption, CRYSTALS-Dilithium for signatures) is on every KMS roadmap</td></tr>
+</tbody>
+</table>
+
+<p>The direction is not "more controls" — it is <em>fewer trust assumptions, proven at more points, earlier in the process</em>, with the residual risk owned by a human who can say no.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Before you merge anything, run this. If you can answer each row, the change has a threat model; if not, sketch until it does.</p>
+
+<table>
+<thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
+<tbody>
+<tr><td>Where are the trust boundaries, and what crosses them?</td><td>Draw the data-flow diagram — every arrow is an attack surface</td></tr>
+<tr><td>What did STRIDE say about each boundary?</td><td>Run the six threats per arrow until each has a decision: control, accept, or documented no</td></tr>
+<tr><td>Which CIA leg is this feature betting on?</td><td>State it explicitly — confidentiality, integrity, or availability, and what was traded</td></tr>
+<tr><td>Who can do what, and who checks it?</td><td>Authn and authz separated; per-request scope + ownership checks</td></tr>
+<tr><td>What is encrypted, hashed, signed — and with what, and who holds the keys?</td><td>Argon2/AES-GCM via audited libraries; KMS; rotation on a schedule</td></tr>
+<tr><td>What happens to garbage input?</td><td>Fail-safe: deny, log, close — with the log somewhere the app can't rewrite</td></tr>
+<tr><td>What is the blast radius if the worst realistic thing happens?</td><td>Least privilege plus containment; and the incident response step is written down (see <a href="./system-design.html">System Design §6f</a>)</td></tr>
+<tr><td>What are we saying no to — and who owns the risk?</td><td>Residual risk needs a named owner; unowned risk is where breaches live</td></tr>
+</tbody>
+</table>
+
+<p>Print this table. Put it on your wall. Run it before every design and every merge. The first rows are "know what the adversary can touch"; the last row is "know what you decided to risk." That's the entire method.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://en.wikipedia.org/wiki/STRIDE_(security)">STRIDE threat model (Kohnfelder &amp; Garg, Microsoft, 2003)</a> ·
+  <a href="https://owasp.org/Top10/">OWASP Top 10</a> ·
+  <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP — Password Storage Cheat Sheet (Argon2/bcrypt)</a> ·
+  <a href="https://www.rfc-editor.org/rfc/rfc8446">RFC 8446 — TLS 1.3</a> ·
+  <a href="https://oauth.net/2.1/">OAuth 2.1</a> ·
+  <a href="https://en.wikipedia.org/wiki/Log4Shell">Log4Shell (CVE-2021-44228)</a> ·
+  <a href="https://slsa.dev/">SLSA — Supply-chain Levels for Software Artifacts</a> ·
+  <a href="https://www.nist.gov/cyberframework">NIST Cybersecurity Framework</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a real incident you responded to — where was the trust boundary the attacker crossed, what should the threat model have caught, and what did the postmortem change?"</li>
+    <li>"Take the feature we just designed and threat-model it with me — draw the data flow, mark the boundaries, and tell me which STRIDE threats you'd actually defend against and why."</li>
+    <li>"What is the worst security mistake you've seen that wasn't a technical one — a process, a culture, or a 'temporary' decision that became permanent?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Security &amp; Threat Modeling — the discipline of saying no</span>
+  <span>Wraps: <a href="./api-design.html">API Design</a> · <a href="./backend-engineering.html">Backend Engineering</a> · <a href="./system-design.html">System Design</a> · <a href="./data-modeling-and-databases.html">Data Modeling</a> · <a href="./version-control-ci-cd-deployment.html">CI/CD</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

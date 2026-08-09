@@ -870,6 +870,16 @@
         itself is part of the software supply chain, so it should also check and
         protect:
       </p>
+      <p>
+        The threat model behind this list — why the supply chain became the
+        attack surface (Log4Shell), and what blast radius actually means when a
+        dependency is compromised — lives in
+        <a href="./security-and-threat-modeling.html"
+          >Security &amp; Threat Modeling</a
+        >
+        (History and AI-era sections). This section is the <em>mechanics</em>;
+        that doc is the <em>why</em>.
+      </p>
       <ul>
         <li>
           <strong>Lockfiles and pinned dependencies</strong> — keep dependency
@@ -1179,7 +1189,8 @@
             <td>Signed container image</td>
             <td>
               Image built once, promoted across environments; orchestration
-              handles rollout.
+              handles rollout. What a container <em>is</em> (image vs. running
+              process) — <a href="./terminal-and-deployment-substrate.html">Terminal &amp; the Deployment Substrate</a>.
             </td>
           </tr>
           <tr>

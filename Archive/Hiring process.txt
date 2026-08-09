@@ -1,0 +1,814 @@
+Ignoring display artifacts and reviewing substance only.
+
+## Overall verdict
+
+This is a **strong, practical doc**. It correctly treats hiring as a **funnel and risk-assessment process**, not as a mysterious ritual. The framing — “answer the risk, not the costume” — is excellent, and the remote/async interview section is especially valuable for your context.
+
+The doc is strongest on:
+
+- the end-to-end funnel from application to onboarding,
+- HR/behavioral questions decoded as risk pricing,
+- remote/async interview mechanics,
+- the worked example,
+- failure modes,
+- the final checklist.
+
+However, for completeness, it needs more depth in several areas:
+
+1. interview formats and what each evaluates,
+2. resume/ATS/portfolio mechanics,
+3. technical screen tactics,
+4. take-home and pair-programming interviews,
+5. behavioral story preparation,
+6. frontend-specific interview content,
+7. offer evaluation and negotiation mechanics,
+8. onboarding/probation plan,
+9. AI-era hiring,
+10. employer red flags,
+11. preparation plan,
+12. ecosystem/tooling.
+
+So: **strong draft, but not yet complete as a full hiring reference**.
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The funnel framing is correct
+
+The doc correctly defines hiring as a filtering funnel:
+
+| Stage | Filter |
+|---|---|
+| Resume | fit by signal |
+| Screening | sanity, expectations, communication |
+| Technical screen | can you code and think in real time? |
+| HR/behavioral | risk, self-awareness, teamwork |
+| System design | architectural judgment |
+| Offer | compensation alignment |
+| Onboarding | retention |
+
+This is the right mental model. It prevents the common mistake of giving a technical answer in an HR round or a personality answer in a technical round.
+
+Keep this.
+
+---
+
+## 1.2 The HR risk model is excellent
+
+The idea that HR questions price three risks:
+
+1. Will you break the system?
+2. Will you crash under load?
+3. Will you leave early?
+
+is very strong.
+
+The “answer the risk, not the costume” rule is one of the best lines in the doc. It makes questions like “where do you see yourself in five years?” legible without sounding cynical.
+
+---
+
+## 1.3 The remote/async section is valuable
+
+This section is especially important for your situation:
+
+- time-zone math,
+- recorded rounds,
+- English clarity over speed,
+- work authorization,
+- written reasoning.
+
+This is not generic interview advice. It is directly relevant to global remote hiring.
+
+Keep and expand it.
+
+---
+
+## 1.4 The worked example is useful
+
+The Amina example shows the whole funnel end-to-end:
+
+- resume,
+- screening,
+- live coding,
+- async round,
+- behavioral,
+- system design,
+- panel,
+- offer,
+- first 90 days.
+
+This makes the doc concrete.
+
+---
+
+# 2. Duplication boundaries
+
+The doc already handles boundaries well, but they should be kept strict.
+
+| Topic | Owner | What this doc should do |
+|---|---|---|
+| Market rates, positioning, where jobs appear | Frontend Income Markets | Link; do not teach salary numbers in depth |
+| Client scoping and contracts | Freelance Web Practice | Mention only as parallel skill |
+| Problem-solving method | Problem-Solving | Link; this doc owns behavior during the interview |
+| System design discipline | System Design | Link; this doc owns how to perform the round |
+| Security/risk thinking | Security & Threat Modeling | Borrow the risk lens only |
+| Technical content: JS, React, CSS | Technical docs | Link; this doc should not teach content |
+| Employee hiring funnel | This doc | Own fully |
+
+The main risk is drifting into teaching technical interview content. This doc should stay focused on **process, behavior, evidence, negotiation, and onboarding**, while linking to the technical docs for content mastery.
+
+---
+
+# 3. High-priority completeness gaps
+
+## 3.1 Missing: history/evolution section
+
+Most shelf docs have a history/constraint-inversion section. Hiring has one too.
+
+Add:
+
+| Era | Hiring model | What changed |
+|---|---|---|
+| Local/classifieds | Jobs through local ads, referrals, newspapers | Geography constrained hiring |
+| Online job boards | Monster, Indeed, LinkedIn | Global visibility; volume increased |
+| ATS era | Resume parsing, keyword filtering | Resumes became machine-read first |
+| Skills-based screening | HackerRank, LeetCode, take-homes | Proof of skill over credentials |
+| Remote/global hiring | Remote-first companies, async interviews | Time zones, written communication, global competition |
+| AI-assisted hiring | AI resume screening, AI interviews, AI coding screens | Volume and automation increase; human judgment shifts to evaluation |
+
+This gives the doc the same evolutionary depth as the rest of the shelf.
+
+---
+
+## 3.2 Missing: interview format taxonomy
+
+The doc covers several stages, but it should give a unified map of interview formats.
+
+Add:
+
+| Format | What it evaluates | How to behave |
+|---|---|---|
+| Recruiter screen | Basic fit, salary range, availability, communication | Be clear, honest, concise |
+| Hiring manager screen | Team fit, experience relevance, motivation | Show understanding of the role and product |
+| Live coding | Problem-solving, communication, code quality | Think out loud, clarify, start simple |
+| Pair programming | Collaboration, receptiveness, debugging | Treat interviewer as teammate |
+| Take-home | Code quality, product sense, time management | Follow instructions, write README, test |
+| Code review exercise | Review skill, empathy, attention to detail | Find bugs, suggest improvements kindly |
+| System design | Architecture, trade-offs, communication | Clarify, estimate, design iteratively |
+| Behavioral | Risk, self-awareness, teamwork | Use STAR, answer the risk |
+| Panel/culture | Cross-team fit, values | Answer each interviewer’s axis |
+| Offer call | Compensation alignment | Negotiate range, total comp, timeline |
+
+This table would make the doc much more complete.
+
+---
+
+## 3.3 Missing: resume/ATS/portfolio depth
+
+The resume section is good but needs more practical detail.
+
+### Resume bullets
+
+Add a formula:
+
+> Action verb + what you did + measurable impact + tools/context.
+
+Examples:
+
+| Weak | Strong |
+|---|---|
+| Built a website | Built a client website with WordPress and custom theme, reducing page load time by 35% |
+| Used React | Built a React dashboard with filtering and pagination, improving task completion time for 20 internal users |
+| Fixed bugs | Fixed checkout validation bug, reducing failed submissions by 12% |
+
+For juniors with limited work experience, projects can count:
+
+> Built a task manager with React and localStorage, implementing optimistic UI, empty states, and keyboard navigation.
+
+### ATS guidance
+
+Add:
+
+- standard headings: Experience, Projects, Skills, Education,
+- plain text where possible,
+- avoid tables/images that parse badly,
+- tailor keywords honestly,
+- include links: GitHub, portfolio, live demos,
+- quantify outcomes where possible.
+
+### Portfolio guidance
+
+Since the shelf is frontend-focused, add a hiring-specific portfolio section:
+
+| Portfolio element | What it proves |
+|---|---|
+| Live demo | You can ship something real |
+| GitHub repo | You can organize code |
+| README | You can explain the project |
+| Case study | You can describe problem → decisions → outcome |
+| Tests | You care about correctness |
+| Deploy pipeline | You understand delivery |
+
+A good project case study structure:
+
+1. Problem
+2. Constraints
+3. Approach
+4. Key decisions
+5. Outcome
+6. What you would improve
+
+This is highly relevant for frontend hiring.
+
+---
+
+## 3.4 Missing: technical screen tactics
+
+The doc says “think out loud, plan before code, correctness first,” which is correct, but it should expand into a concrete playbook.
+
+Add:
+
+### Live coding playbook
+
+1. **Clarify the problem**
+   - What is the input?
+   - What is the output?
+   - What are edge cases?
+   - What constraints matter?
+
+2. **Restate it**
+   - “So the goal is to return the first non-repeating character, case-sensitive, and return null if none exists?”
+
+3. **Start brute force**
+   - A correct O(n²) solution beats a broken O(n) solution.
+
+4. **Explain complexity**
+   - “This is O(n²) because of the nested loop. I can improve it with a hash map to O(n).”
+
+5. **Implement**
+   - Keep it readable.
+   - Name variables clearly.
+   - Avoid premature optimization.
+
+6. **Test**
+   - Empty input
+   - Single element
+   - Duplicates
+   - Large input
+   - Invalid input
+
+7. **If stuck**
+   - Say what you are considering.
+   - Try a concrete example.
+   - Simplify.
+   - Ask whether your direction is reasonable.
+
+This is directly aligned with Problem-Solving but stays interview-specific.
+
+---
+
+## 3.5 Missing: take-home guidance
+
+The doc mentions take-homes briefly but needs more.
+
+Add:
+
+| Aspect | What to do |
+|---|---|
+| Read the prompt fully | Identify required features and evaluation criteria |
+| Timebox | Respect the stated time; if none, ask |
+| README | Explain how to run, decisions, and next steps |
+| Tests | Add a few meaningful tests |
+| Commit history | Small, clear commits |
+| Polish | Do not over-polish at the expense of correctness |
+| Presentation | Be ready to explain trade-offs in a follow-up |
+
+Also add a warning:
+
+> A reasonable take-home is 2–5 hours. A large unpaid project is a red flag unless it is paid, optional, or clearly portfolio-worthy.
+
+This is important for juniors and freelancers.
+
+---
+
+## 3.6 Missing: pair programming and code review interviews
+
+These are common and not covered.
+
+### Pair programming
+
+Add:
+
+| What they evaluate | How to show it |
+|---|---|
+| Collaboration | Ask questions, share thinking |
+| Receptiveness | Accept hints gracefully |
+| Debugging | Read errors, form hypotheses |
+| Communication | Explain what you are doing |
+| Calmness | Slow down when stuck |
+
+### Code review interview
+
+Add:
+
+| What to look for | Example comment style |
+|---|---|
+| Correctness | “This may fail when the array is empty.” |
+| Edge cases | “What happens if the user submits twice?” |
+| Readability | “Could we name this to clarify intent?” |
+| Performance | “This lookup inside the loop may become slow.” |
+| Security | “This input should be validated before use.” |
+| Empathy | Avoid harsh or sarcastic comments |
+
+This is especially relevant for frontend roles.
+
+---
+
+## 3.7 Missing: behavioral story bank
+
+The doc gives answer shapes, but candidates need preparation method.
+
+Add:
+
+Prepare 6–8 STAR stories covering:
+
+| Category | Example prompt |
+|---|---|
+| Conflict | “Tell me about a disagreement with a teammate.” |
+| Failure | “Tell me about a time something broke.” |
+| Ambiguity | “Tell me about working without clear requirements.” |
+| Deadline pressure | “Tell me about a tight deadline.” |
+| Customer/user impact | “Tell me about improving something for a user.” |
+| Learning | “Tell me about learning a new technology quickly.” |
+| Leadership/initiative | “Tell me about taking ownership without being asked.” |
+| Feedback | “Tell me about receiving difficult feedback.” |
+
+STAR structure:
+
+1. Situation — context in one sentence.
+2. Task — your responsibility.
+3. Action — what you specifically did.
+4. Result — measurable outcome or lesson.
+
+For juniors, stories can come from:
+
+- projects,
+- coursework,
+- freelance work,
+- open source,
+- hackathons,
+- volunteering.
+
+This would make the behavioral section much more actionable.
+
+---
+
+## 3.8 Missing: frontend-specific interview map
+
+Since the shelf is frontend-focused, this doc should include a frontend interview map.
+
+Add:
+
+| Topic | What interviewers often test |
+|---|---|
+| JavaScript fundamentals | scope, closures, this, arrays, objects, async |
+| DOM/browser | events, rendering basics, fetch, storage |
+| CSS | layout, responsiveness, specificity, accessibility |
+| React | components, state, effects, props, hooks rules |
+| State management | local state vs shared state, derived state |
+| API integration | loading, error, empty states |
+| Accessibility | labels, keyboard, focus, contrast |
+| Performance | unnecessary re-renders, lazy loading, images |
+| Testing | basic component or utility tests |
+| Code quality | naming, structure, readability |
+
+This connects directly to the shelf’s technical docs without teaching them.
+
+---
+
+## 3.9 Missing: frontend system design
+
+The system design section references backend-style system design, but frontend interviews often have a different version.
+
+Add:
+
+### Frontend system design topics
+
+| Area | Example question |
+|---|---|
+| Component architecture | Design an image gallery / search box / dashboard |
+| State management | Where does state live? Local vs global? |
+| Data fetching | Loading, caching, pagination, error handling |
+| Performance | Lazy loading, virtualization, memoization |
+| Accessibility | Keyboard, focus, ARIA, contrast |
+| Responsiveness | Mobile, tablet, desktop |
+| Error handling | API failure, empty state, retry |
+| Security | XSS, input validation, sensitive data |
+
+This should link to System Design but remain interview-specific.
+
+---
+
+## 3.10 Missing: offer evaluation framework
+
+The offer section says “compare total compensation,” but it should give a framework.
+
+Add:
+
+| Component | Questions |
+|---|---|
+| Base salary | Is it market-aligned? |
+| Bonus | How often? How reliable? |
+| Equity | Vesting? Cliff? Valuation? Liquidity? |
+| Benefits | Health, insurance, retirement |
+| PTO | Days, sick leave, holidays |
+| Remote policy | Fully remote, hybrid, equipment budget |
+| Growth | Mentorship, promotion path, learning budget |
+| Team | Manager quality, team stability |
+| Product | Do users need it? Is it growing? |
+| Stability | Funding, revenue, runway |
+
+For juniors, growth and mentorship may outweigh a small salary difference. For seniors, compensation and scope may dominate.
+
+---
+
+## 3.11 Missing: negotiation scripts
+
+The doc gives principles but not language.
+
+Add example scripts:
+
+### Salary range
+
+> Based on my research and the responsibilities of the role, I’m looking for a range around X to Y. I’m flexible depending on the full package.
+
+### Counter offer
+
+> Thank you for the offer. I’m excited about the role. Based on the market and my experience, I was expecting a base closer to X. Is there flexibility there?
+
+### Multiple offers
+
+> I’m in final stages with another company and expect an answer by [date]. I’m very interested in this role. Can we align on timeline?
+
+### Need time
+
+> Thank you. Can I have [2–3 business days] to review the full package and get back to you?
+
+This would make the section much more practical.
+
+---
+
+## 3.12 Missing: onboarding/probation plan
+
+The doc mentions the first 90 days but should expand.
+
+Add:
+
+| Phase | Goal | Actions |
+|---|---|---|
+| First week | Setup and orientation | Environment setup, meet team, understand product |
+| First month | Small contribution | Ship small fix, learn codebase, ask questions |
+| First 90 days | Trust and direction | Own small feature, clarify expectations, build relationships |
+| Probation | Prove reliability | Deliver consistently, communicate early, ask for feedback |
+
+Add questions to ask manager:
+
+- What would success look like after 30/60/90 days?
+- What is the biggest team priority right now?
+- How is feedback usually given?
+- What does good communication look like here?
+
+This would strengthen the ending of the funnel.
+
+---
+
+## 3.13 Missing: AI-era hiring
+
+The doc needs a future/AI section.
+
+Add:
+
+| Signal | What it changes |
+|---|---|
+| AI resume screening | Resumes must be clear, parseable, and evidence-based |
+| AI coding screens | AI may assist or evaluate; disclosure policies matter |
+| AI-assisted take-homes | Companies may ask about AI usage; honesty matters |
+| AI interviews | Recorded/automated interviews require clear narration |
+| Human premium | Judgment, communication, debugging, and evaluation become more valuable |
+| Portfolio importance | Proof of real work matters more when AI can generate code |
+
+Also add:
+
+> If a company asks whether you used AI, answer honestly according to their policy. The evaluation skill — explaining, verifying, and improving code — becomes more important than memorization.
+
+This aligns with the shelf’s AI-era theme.
+
+---
+
+## 3.14 Missing: employer red flags
+
+The doc covers candidate failure modes, but candidates also need to evaluate employers.
+
+Add:
+
+| Red flag | What it may mean |
+|---|---|
+| Vague role description | Unclear expectations |
+| Interviewers unprepared | Poor management or chaos |
+| No technical questions for a technical role | Weak engineering process |
+| Pressure to accept immediately | Low leverage or high churn |
+| Refusal to give salary range | Possible lowballing |
+| Negative talk about past employees | Blame culture |
+| Unrealistic take-home | Disrespect for candidate time |
+| No onboarding plan | Sink-or-swim culture |
+| High turnover | Systemic problem |
+| Ghosting after final round | Poor communication culture |
+
+This supports the “two-way interview” idea.
+
+---
+
+## 3.15 Missing: preparation plan
+
+The doc should give a preparation schedule.
+
+Add:
+
+### 4-week plan
+
+| Time | Focus |
+|---|---|
+| Week 1 | Resume, portfolio, story bank, company list |
+| Week 2 | Technical fundamentals, live coding practice |
+| Week 3 | System design/frontend system design, mock interviews |
+| Week 4 | Behavioral practice, company research, negotiation prep |
+
+### Daily/weekly habits
+
+- one coding problem with explanation out loud,
+- one STAR story written/refined,
+- one company researched,
+- one mock interview or peer review,
+- review failures and patterns.
+
+This would make the doc much more actionable.
+
+---
+
+## 3.16 Missing: ecosystem/tooling section
+
+Most shelf docs have an ecosystem/tooling catalog. Add one:
+
+| Category | Tools | Decision metric |
+|---|---|---|
+| Job discovery | LinkedIn, Wellfound, Otta, We Work Remotely, local boards | Signal quality, remote availability, response rate |
+| Salary research | levels.fyi, Glassdoor, Payscale, local peer data | Market alignment |
+| Interview practice | Pramp, interviewing.io, LeetCode mock, peer mocks | Realistic pressure, feedback quality |
+| Portfolio hosting | GitHub Pages, Vercel, Netlify | Live demos, speed, professionalism |
+| Resume tools | Plain markdown/PDF, ATS-friendly templates | Parseability |
+| Interview notes | Notion, Obsidian, spreadsheet | Tracking applications and feedback |
+| AI prep | ChatGPT/Claude for mock questions, but not for cheating | Practice and review, not deception |
+
+---
+
+# 4. Medium-priority improvements
+
+## 4.1 Expand recruiter communication
+
+Add:
+
+- reply within 24–48 hours,
+- keep answers short,
+- confirm time zone in writing,
+- state availability clearly,
+- ask about process timeline,
+- follow up once after the stated timeline.
+
+---
+
+## 4.2 Expand thank-you/follow-up
+
+Add:
+
+| When | What to send |
+|---|---|
+| After interview | Short thank-you, one specific point discussed |
+| After silence past timeline | One polite follow-up |
+| After rejection | Ask for one actionable piece of feedback |
+| After offer | Ask for time to review in writing |
+
+Example follow-up:
+
+> Hi [name], just following up on the [role] process. You mentioned updates around [date]. Is there any update on next steps?
+
+---
+
+## 4.3 Expand handling rejection
+
+Add:
+
+- one rejection is noise,
+- three rejections at the same stage indicate a pattern,
+- track stage of rejection,
+- ask for feedback but do not argue,
+- adjust resume/portfolio/interview technique based on pattern.
+
+Add a tracking table:
+
+| Company | Stage rejected | Feedback | Pattern? |
+|---|---|---|---|
+| Company A | Resume | No response | Resume/portfolio issue? |
+| Company B | Technical | Struggled with explanation | Practice thinking out loud |
+| Company C | Behavioral | Too vague | Improve STAR stories |
+
+---
+
+## 4.4 Expand company research
+
+Add:
+
+| Research area | Where to look |
+|---|---|
+| Product | Website, app, reviews |
+| Tech stack | Job post, engineering blog, GitHub |
+| Culture | Careers page, LinkedIn, employee reviews |
+| Interview process | Glassdoor, Blind, recruiter |
+| Interviewers | LinkedIn, GitHub, talks |
+| Company health | Funding, news, layoffs, product growth |
+
+Good questions depend on this research.
+
+---
+
+## 4.5 Add mental game section
+
+Add:
+
+| Challenge | Technique |
+|---|---|
+| Anxiety | Practice under realistic conditions; breathe; slow down |
+| Blank mind | Restate problem, use example, simplify |
+| Imposter syndrome | Evidence list: projects, skills, outcomes |
+| Fear of failure | Treat interviews as data collection |
+| Overthinking | Start brute force, communicate, iterate |
+
+This is especially useful for juniors.
+
+---
+
+## 4.6 Add interview environment checklist
+
+For remote interviews:
+
+| Item | Check |
+|---|---|
+| Camera | Eye-level, clear |
+| Microphone | No echo, audible |
+| Internet | Stable; backup hotspot if possible |
+| Lighting | Face visible |
+| Background | Clean or blurred |
+| IDE/editor | Ready, clean, readable font |
+| Browser | Closed unrelated tabs |
+| Time zone | Confirmed in writing |
+| Backup plan | Phone hotspot, alternative device |
+
+This belongs in the remote section.
+
+---
+
+## 4.7 Add junior-specific guidance
+
+Since the shelf’s mission includes HackerRank JS Basic and reading JS/React at work, add junior-focused advice:
+
+| Challenge | What to do |
+|---|---|
+| No work experience | Use projects, freelance, open source, coursework |
+| Weak portfolio | Build 2–3 case studies with README and live demo |
+| Fear of technical questions | Practice explaining simple problems out loud |
+| Unsure of salary | Use range, ask for budget, research market |
+| No referrals | Apply thoughtfully, follow up, build public work |
+
+---
+
+## 4.8 Add company-type differences
+
+Add:
+
+| Company type | Typical process | What they value |
+|---|---|---|
+| Startup | Fast, practical, take-home/app exercise | Shipping, ownership, versatility |
+| Enterprise | Structured, multiple rounds, behavioral | Stability, process, communication |
+| Agency | Portfolio, speed, client communication | Delivery, adaptability |
+| Remote product company | Async screens, take-home, system design | Written communication, autonomy |
+| FAANG/big tech | LeetCode, system design, behavioral | Algorithms, scale, structured answers |
+
+This helps candidates adapt preparation.
+
+---
+
+# 5. Factual/precision/source issues
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| Resume section | “Recruiters spend seconds” | True as heuristic, but soften or cite if used strongly |
+| STAR | Correct | Keep |
+| One-page resume | Good heuristic | Add: exceptions for 10+ years, academic, or detailed enterprise roles |
+| Primary sources | “Wikipedia — the funnel as a filter” linked to Ashby’s law seems mismatched | Replace with hiring funnel or recruitment pipeline source |
+| Primary sources | Too thin for such a broad doc | Add sources on STAR, behavioral interviews, salary negotiation, remote interviewing |
+| Offer section | “Signed offer letter is the contract” | Good; add that local labor law and written contract terms matter |
+| Counter-offer | Classic advice is okay | Add nuance: counter can work if the only issue was compensation and trust remains |
+| Work authorization | Good | Expand for contractor vs employee in remote global work |
+
+---
+
+# 6. Structural improvements
+
+## 6.1 Proposed outline
+
+A more complete structure:
+
+1. Definition — hiring funnel
+2. History/evolution of hiring
+3. Intersection with neighbors
+4. Mental models
+5. Resume & application
+6. Portfolio & proof of work
+7. Recruiter/screening call
+8. Technical interview formats
+   - live coding
+   - pair programming
+   - take-home
+   - code review
+   - frontend practical
+   - system design
+9. HR/behavioral interview
+10. Panel/culture/reference
+11. Presentation and remote logistics
+12. Questions to ask them
+13. Employer red flags
+14. Offer evaluation
+15. Negotiation
+16. Multiple offers/counter-offers/rejection
+17. Onboarding and probation
+18. AI-era hiring
+19. Preparation plan
+20. Failure modes
+21. Ecosystem/tooling
+22. Summary checklist
+
+---
+
+# 7. Priority roadmap
+
+## Must add
+
+1. Interview format taxonomy.
+2. Resume/ATS/portfolio depth.
+3. Technical screen playbook.
+4. Take-home guidance.
+5. Pair programming/code review interviews.
+6. Behavioral story bank.
+7. Frontend-specific interview map.
+8. Offer evaluation framework.
+9. Negotiation scripts.
+10. Onboarding/probation plan.
+11. AI-era hiring.
+12. Employer red flags.
+
+## Should add
+
+13. Preparation plan.
+14. Company research checklist.
+15. Follow-up/thank-you mechanics.
+16. Handling rejection tracking.
+17. Remote environment checklist.
+18. Junior-specific guidance.
+19. Company-type differences.
+20. Ecosystem/tooling catalog.
+
+## Optional enrichment
+
+21. History of hiring.
+22. Mental game section.
+23. Frontend system design deep dive.
+24. Compensation components for startups/global remote.
+25. Legal/contract basics: notice period, non-compete, IP, contractor status.
+
+---
+
+# 8. Bottom line
+
+This is a **strong doc** with an excellent core framing: hiring is a funnel, and interviews are risk assessments. The behavioral risk model and remote/async sections are especially valuable.
+
+But to become a complete hiring reference, it needs more practical depth in:
+
+> interview formats, resume/ATS/portfolio mechanics, technical screen tactics, take-homes, behavioral story preparation, frontend-specific interviews, offer evaluation, negotiation scripts, onboarding, AI-era hiring, and employer red flags.
+
+## Final recommendation
+
+**Strong draft, publishable as a process guide, but not yet complete as a full hiring reference.**
+
+The highest-leverage improvements are:
+
+> interview format taxonomy, technical screen playbook, take-home/ pair/code-review guidance, behavioral story bank, frontend interview map, offer/negotiation framework, and AI-era hiring.

@@ -12,7 +12,7 @@
 <header class="lesson-head">
   <p class="kicker">Reference · Interface engineering — the layer between services and clients</p>
   <h1>API Design — How Contracts Make Systems Speak Without Speaking</h1>
-  <p class="meta">The discipline of defining contracts that services and clients can evolve independently around. Sibling docs: <a href="./system-design.html">System Design</a> (the architectural layer upstream), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop downstream), <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering layer that consumes the contract).</p>
+  <p class="meta">The discipline of defining contracts that services and clients can evolve independently around. Sibling docs: <a href="./system-design.html">System Design</a> (the architectural layer upstream), <a href="./backend-engineering.html">Backend Engineering</a> (the server implementation layer behind the contract), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the frontend implementation loop downstream), <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering layer that consumes the contract).</p>
 </header>
 
 <section class="recap">
@@ -250,6 +250,11 @@
       <td><strong>UI/UX & Web Design</strong></td>
       <td>State visibility, error affordances, loading skeletons, progressive enhancement</td>
       <td>UI/UX decides <em>what the human sees</em>; API design decides <em>what the machine exchanges</em>. The best UX is a contract that makes the right UI trivial to build.</td>
+    </tr>
+    <tr>
+      <td><strong>Data Modeling</strong> (<a href="./data-modeling-and-databases.html">the vault</a>)</td>
+      <td>Resource model, schema evolution, migrations, consistency</td>
+      <td>The API resource model is the schema's public projection. A bad schema ruins a good contract: the contract promises a shape, the vault must hold it. Rename a column, break the API (§10).</td>
     </tr>
     <tr>
       <td><strong>Database Internals</strong></td>
@@ -709,6 +714,8 @@ Location: /v1/reports/jobs/job_123</code></pre>
   <li>Do not treat JWT possession as authorization — <em>check scopes and resource ownership</em>.</li>
   <li>Scopes: <code>shipments:read</code>, <code>shipments:write</code>, <code>webhooks:manage</code>, <code>reports:read</code>.</li>
 </ul>
+
+<p>The discipline behind these mechanics — why bearer tokens exist, when a JWT is the wrong tool, how to threat-model the exchange, and the OWASP classes this contract is exposed to — lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (IAM and Application security sections). This section is the <em>how</em>; that doc is the <em>when and why</em>.</p>
 
 <h3>Browser constraints</h3>
 

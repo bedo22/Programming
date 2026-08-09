@@ -633,7 +633,10 @@
         multiple segments in one layout;
         <strong>intercepting routes</strong> show a modal/overlay while the URL
         still points at the real page. Know they exist as vocabulary — you'll
-        meet them by name before you meet them in code.
+        meet them by name before you meet them in code. The general question
+        of what a folder tree is <em>for</em> (feature folders, colocation,
+        monorepo layouts) lives in
+        <a href="./system-design.html">System Design</a> §Codebase architecture.
       </p>
 
       <h2>4. Server Components vs Client Components</h2>
@@ -1386,7 +1389,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
           <tr>
             <td>Data / ORM</td>
             <td>Drizzle, Prisma, Supabase, Neon, Turso</td>
-            <td>The "db" your Server Components await (§5.2)</td>
+            <td>The "db" your Server Components await (§5.2). Supabase is a hosted PostgreSQL — the query language and the <code>ON CONFLICT</code>/RLS/LISTEN-NOTIFY patterns in <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> apply to it directly</td>
           </tr>
           <tr>
             <td>Auth</td>

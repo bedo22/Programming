@@ -1,0 +1,559 @@
+## Overall verdict
+
+This is a **solid, well-structured document** that fills a genuine gap in the shelf: the terminal as a development platform, not just a tool you use. The three-pipe model, the architecture spine, and the AI-agent CLI section are particularly strong. The worked example is practical and the failure modes table is useful.
+
+However, the document has several completeness gaps, particularly around **error handling conventions**, **signal handling**, **shell integration**, **testing CLI applications**, **security considerations**, and **the relationship between CLIs and web development workflows**. The AI-agent CLI section is good but could be expanded with more specific patterns. The worked example is solid but could demonstrate more real-world patterns.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Definition and vocabulary | Strong |
+| History | Good |
+| Three-pipe model (theory) | Strong |
+| Mental models | Good, could be expanded |
+| Architecture spine | Strong |
+| Terminal I/O mechanics | Good |
+| AI-agent CLIs | Good, could be expanded |
+| Publishing and distribution | Good |
+| Reading a CLI codebase | Strong |
+| Worked example | Good, could be expanded |
+| Failure modes | Good |
+| Error handling conventions | Missing |
+| Signal handling | Missing |
+| Shell integration | Missing |
+| Testing CLI apps | Missing |
+| Security considerations | Missing |
+| Cross-platform considerations | Thin |
+
+---
+
+# 1. What the document does well
+
+## 1.1 The three-pipe model is the right foundation
+
+The core insight — every CLI is a transformation on three streams (`stdin`, `stdout`, `stderr`) plus an exit code — is exactly the right mental model. The distinction between `stdout` (data channel, machine-readable) and `stderr` (human channel, narrative) is the single most important design decision in CLI design, and the document nails it.
+
+The exit code as "the CLI's contract with its caller" is also correct. This is what makes CLIs composable in shell scripts and CI pipelines.
+
+## 1.2 The architecture spine is practical
+
+The `entry → parse → route → config → act → output → exit` spine is the right shape. It's general enough to apply to any CLI (from a one-file script to Claude Code) and specific enough to be actionable. The code example with Commander is well-chosen.
+
+## 1.3 The AI-agent CLI section is timely and accurate
+
+The "REPL-with-tools" framing is correct. The five subsystems (tool calling, permission system, streaming, context management, session persistence) are the right decomposition. The insight that "the permission boundary is the security surface" is the key architectural insight for agent CLIs.
+
+## 1.4 The "reading a CLI codebase" section is the most practical
+
+The walk-the-spine approach (bin → router → handlers → tests) is exactly how you'd actually read a CLI codebase. The tip about testing by running the router with fixture args and asserting on stdout and exit code is the right testing philosophy.
+
+## 1.5 The worked example is well-structured
+
+The task-list CLI example demonstrates the architecture spine in action, from skeleton to interactive mode to publishing. The progression from argument-based to interactive prompts is a good teaching arc.
+
+---
+
+# 2. Missing sections and topics
+
+## 2.1 Error handling conventions (missing entirely)
+
+The worked example shows `stderr` + `exit(1)`, but there's no dedicated section on error handling in CLIs. This is a significant gap because error handling is one of the most important aspects of CLI design.
+
+**What to add:**
+
+**Error classification:**
+
+| Error type | Exit code | Example | User action |
+|---|---|---|---|
+| Success | `0` | Command completed normally | None |
+| General error | `1` | Something went wrong | Check stderr, fix input |
+| Usage error | `2` | Invalid arguments | Fix command syntax |
+| Permission denied | `126` | File not executable | Check permissions |
+| Command not found | `127` | Binary not in PATH | Check installation |
+| Fatal signal | `128 + N` | Killed by signal N | Check signal source |
+
+**Error message design for terminals:**
+
+- One-line summary to `stderr` for machine parsing.
+- Multi-line details to `stderr` for human reading.
+- Never put error messages on `stdout` (breaks pipes).
+- Include a "what to do next" hint in the error message.
+- Use color for errors (red) but degrade gracefully when piped.
+
+**Exit code conventions:**
+
+```bash
+# Good: specific exit codes
+exit 0    # success
+exit 1    # general error
+exit 2    # usage error (wrong arguments)
+exit 3    # config error
+exit 4    # network error
+exit 5    # permission denied
+
+# Bad: everything is exit 1
+exit 1    # what went wrong? no idea
+```
+
+---
+
+## 2.2 Signal handling (missing entirely)
+
+Signal handling is crucial for CLI apps, especially long-running ones. The document doesn't mention it at all.
+
+**What to add:**
+
+| Signal | When it fires | What to do |
+|---|---|---|
+| `SIGINT` (Ctrl+C) | User wants to stop | Clean up, flush output, exit gracefully |
+| `SIGTERM` | System wants to stop (kill, shutdown) | Same as SIGINT |
+| `SIGHUP` | Terminal disconnected | Reload config or exit |
+| `SIGPIPE` | Writing to a closed pipe | Handle gracefully, don't crash |
+
+**In Node.js:**
+
+```javascript
+process.on('SIGINT', () => {
+  console.error('\nInterrupted. Cleaning up...');
+  // flush buffers, close connections, save state
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  // graceful shutdown
+  process.exit(0);
+});
+```
+
+**Why this matters:** A CLI that doesn't handle `SIGINT` leaves temp files, open connections, and corrupted state. A CLI that handles it well feels professional.
+
+---
+
+## 2.3 Shell integration (missing entirely)
+
+The document mentions pipes but doesn't cover shell integration patterns. This is important because CLIs live inside shells.
+
+**What to add:**
+
+**Shell completions:**
+
+```bash
+# Bash completion for the todo CLI
+_todo_completions() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  if [[ "$cur" == -* ]]; then
+    COMPREPLY=($(compgen -W "--json --help" -- "$cur"))
+  else
+    COMPREPLY=($(compgen -W "add list done delete" -- "$cur"))
+  fi
+}
+complete -F _todo_completions todo
+```
+
+**Pipe-friendly output design:**
+
+```javascript
+// Good: detect TTY, adjust output
+if (process.stdout.isTTY) {
+  console.log(chalk.green('✓ Added "Buy milk"'));
+} else {
+  console.log(JSON.stringify({ action: 'add', item: 'Buy milk' }));
+}
+```
+
+**Shell aliases and functions:**
+
+```bash
+# .bashrc / .zshrc
+alias tl='todo list'
+alias ta='todo add'
+alias td='todo done'
+```
+
+---
+
+## 2.4 Testing CLI applications (missing entirely)
+
+The "reading a CLI codebase" section mentions testing but doesn't cover how to test CLI apps. This is a significant gap.
+
+**What to add:**
+
+**Testing strategies:**
+
+| Test type | What to test | How |
+|---|---|---|
+| Unit tests | Individual command handlers | Import handler, call with fixture args, assert output |
+| Integration tests | Full CLI invocation | Spawn subprocess, capture stdout/stderr/exit code |
+| Snapshot tests | Output format stability | Snapshot stdout, compare across runs |
+| E2E tests | Real file system operations | Use temp directories, verify file state |
+
+**Example integration test:**
+
+```javascript
+import { execFileSync } from 'child_process';
+
+test('todo add writes to file', () => {
+  const result = execFileSync('node', ['bin/todo.js', 'add', 'Buy milk'], {
+    env: { ...process.env, HOME: tmpDir },
+    encoding: 'utf8',
+  });
+  expect(result).toContain('Added');
+  expect(fs.readFileSync(path.join(tmpDir, '.todo.json'), 'utf8'))
+    .toContain('Buy milk');
+});
+```
+
+**Testing philosophy:** Test the contract (stdout, stderr, exit code, file side effects), not the implementation. This is the same philosophy as the "reading a CLI codebase" section.
+
+---
+
+## 2.5 Security considerations (missing entirely)
+
+CLIs have unique security concerns that the document doesn't cover.
+
+**What to add:**
+
+| Concern | Risk | Mitigation |
+|---|---|---|
+| Command injection | User input passed to `exec()` | Use `execFile()` with argument array, never string concatenation |
+| Path traversal | User input used in file paths | Validate and sanitize paths, use `path.resolve()` |
+| Secrets in env vars | Secrets leaked in logs or error messages | Never log env vars, use secret managers |
+| File permissions | Config files readable by all users | Set `chmod 600` on config files with secrets |
+| Argument parsing | Malformed arguments cause crashes | Validate all arguments, fail gracefully |
+
+**Command injection example:**
+
+```javascript
+// Bad: command injection
+exec(`rm -rf ${userInput}`);
+
+// Good: safe argument passing
+execFile('rm', ['-rf', userInput]);
+```
+
+---
+
+## 3.6 Cross-platform considerations (thin)
+
+The publishing section mentions cross-platform care briefly, but it could be expanded.
+
+**What to add:**
+
+| Concern | Windows | Unix | Mitigation |
+|---|---|---|---|
+| Path separators | `\` | `/` | Use `path.join()`, `path.sep` |
+| Line endings | `\r\n` | `\n` | Use `os.EOL`, normalize in tests |
+| Shell differences | `cmd.exe`, PowerShell | `bash`, `zsh`, `fish` | Test on both, use cross-platform tools |
+| File permissions | ACLs | `chmod` | Use `fs.chmod()` with octal notation |
+| Case sensitivity | Case-insensitive | Case-sensitive | Test on both, use consistent casing |
+
+---
+
+# 3. Expansions to existing sections
+
+## 3.1 Expand the mental models section
+
+The current mental models table is good but could be expanded with more specific examples of how to reason about terminal apps vs web apps.
+
+**Add:**
+
+| Frame | What it does | Web equivalent |
+|---|---|---|
+| "Three pipes, one exit code" | Every CLI is a stream transformation | HTTP request/response |
+| "Programs compose" | Your CLI is a component in someone else's pipeline | Microservice in a service mesh |
+| "TTY or not" | Interactive features only exist when a TTY is present | Browser vs headless mode |
+| "The terminal is a conversation" | TUIs draw, respond, and redraw | React component lifecycle |
+| "Config is a ladder" | Flags override env vars override config files | Environment variables override defaults |
+| "Agent CLIs are REPLs with tools" | The newest form is a read–tool-call–stream loop | Chat interface with function calling |
+
+**Key difference from web:** In web development, the browser is the runtime and the DOM is the output. In CLI development, the terminal is the runtime and the pipes are the output. This means:
+- No event loop for user interaction (except TUIs).
+- No DOM to manipulate (only text output).
+- No CSS to style (only ANSI codes).
+- No browser APIs (only Node.js APIs).
+
+---
+
+## 3.2 Expand the architecture section
+
+The architecture spine is good but could be expanded with more detail on each stage.
+
+**Add to the architecture section:**
+
+**Entry point patterns:**
+
+```javascript
+// Pattern 1: Shebang + bin field (most common)
+#!/usr/bin/env node
+// package.json: { "bin": { "todo": "./bin/todo.js" } }
+
+// Pattern 2: Programmatic API + CLI wrapper
+// lib/index.js exports functions
+// bin/todo.js is a thin wrapper that calls lib/index.js
+```
+
+**Command routing patterns:**
+
+```javascript
+// Pattern 1: Flat routing (simple CLIs)
+program.command('add <item>').action(addHandler);
+program.command('list').action(listHandler);
+
+// Pattern 2: Nested routing (complex CLIs)
+program.command('config')
+  .command('get <key>').action(configGetHandler)
+  .command('set <key> <value>').action(configSetHandler);
+```
+
+**Config file formats:**
+
+| Format | Pros | Cons | Use when |
+|---|---|---|---|
+| JSON | Universal, parseable by any language | No comments, verbose | Config shared across languages |
+| TOML | Human-readable, supports comments | Less universal | Rust ecosystem, CLI tools |
+| YAML | Human-readable, supports comments | Indentation-sensitive, complex | Kubernetes, CI/CD |
+| INI | Simple, human-readable | Limited structure | Legacy tools, simple config |
+| JS/TS | Full language power | Requires runtime | Node.js tools, complex config |
+
+---
+
+## 3.3 Expand the Terminal I/O section
+
+The Terminal I/O table is good but could be expanded with more detail on each topic.
+
+**Add to the Terminal I/O section:**
+
+**ANSI escape codes in more detail:**
+
+```javascript
+// Colors
+console.log('\x1b[32mGreen text\x1b[0m');
+console.log('\x1b[31mRed text\x1b[0m');
+console.log('\x1b[1mBold text\x1b[0m');
+
+// Cursor movement
+console.log('\x1b[2K'); // Clear line
+console.log('\x1b[A');  // Move up
+console.log('\x1b[B');  // Move down
+
+// Always check isTTY before using ANSI codes
+if (process.stdout.isTTY) {
+  console.log('\x1b[32m✓ Success\x1b[0m');
+} else {
+  console.log('Success');
+}
+```
+
+**Interactive prompts in more detail:**
+
+```javascript
+import { select, confirm, text } from '@clack/prompts';
+
+const action = await select({
+  message: 'What do you want to do?',
+  options: [
+    { value: 'add', label: 'Add a task' },
+    { value: 'list', label: 'List tasks' },
+    { value: 'done', label: 'Mark task done' },
+  ],
+});
+
+const item = await text({ message: 'What task?' });
+const confirmed = await confirm({ message: `Add "${item}"?` });
+```
+
+---
+
+## 3.4 Expand the AI-agent CLI section
+
+The AI-agent CLI section is good but could be expanded with more specific patterns.
+
+**Add to the AI-agent CLI section:**
+
+**Tool schema design:**
+
+```javascript
+// Tool schema (JSON Schema)
+const toolSchema = {
+  name: 'read_file',
+  description: 'Read the contents of a file',
+  parameters: {
+    type: 'object',
+    properties: {
+      path: { type: 'string', description: 'Path to the file' },
+    },
+    required: ['path'],
+  },
+};
+```
+
+**Permission model patterns:**
+
+```javascript
+// Permission levels
+const PERMISSIONS = {
+  read: ['read_file', 'list_files', 'search'],
+  write: ['write_file', 'delete_file', 'create_file'],
+  execute: ['run_command', 'install_package'],
+  dangerous: ['delete_all', 'format_disk'],
+};
+
+// Permission check
+function checkPermission(tool, level) {
+  if (PERMISSIONS[level].includes(tool)) return true;
+  if (level === 'dangerous') return askUser(tool); // human-in-the-loop
+  return false;
+}
+```
+
+**Context management patterns:**
+
+```javascript
+// Context window management
+const MAX_CONTEXT_TOKENS = 100000;
+
+function manageContext(messages) {
+  let tokens = countTokens(messages);
+  while (tokens > MAX_CONTEXT_TOKENS) {
+    // Remove oldest messages, keep system prompt
+    messages.splice(1, 1);
+    tokens = countTokens(messages);
+  }
+  return messages;
+}
+```
+
+---
+
+## 3.5 Expand the worked example
+
+The worked example is good but could demonstrate more real-world patterns.
+
+**Add to the worked example:**
+
+**Error handling:**
+
+```javascript
+// Step 7: Add error handling
+try {
+  const result = await handle(action, opts);
+  process.stdout.write(format(result, opts));
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    process.stderr.write('Error: No todo file found. Run "todo add" first.\n');
+    process.exit(1);
+  } else if (err.code === 'EINVAL') {
+    process.stderr.write(`Error: ${err.message}\n`);
+    process.exit(2);
+  } else {
+    process.stderr.write(`Error: ${err.message}\n`);
+    process.exit(1);
+  }
+}
+```
+
+**Config file support:**
+
+```javascript
+// Step 8: Add config file support
+const CONFIG_PATH = path.join(os.homedir(), '.todorc.json');
+
+function loadConfig() {
+  try {
+    return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+  } catch {
+    return { storage: path.join(os.homedir(), '.todo.json') };
+  }
+}
+```
+
+**Shell completions:**
+
+```javascript
+// Step 9: Add shell completions
+program.command('completions')
+  .description('Generate shell completions')
+  .action(() => {
+    const script = `
+_todo_completions() {
+  local cur="\${COMP_WORDS[COMP_CWORD]}"
+  if [[ "$cur" == -* ]]; then
+    COMPREPLY=($(compgen -W "--json --help" -- "$cur"))
+  else
+    COMPREPLY=($(compgen -W "add list done delete" -- "$cur"))
+  fi
+}
+complete -F _todo_completions todo
+    `;
+    process.stdout.write(script);
+  });
+```
+
+**Testing the CLI:**
+
+```javascript
+// Step 10: Add tests
+import { execFileSync } from 'child_process';
+
+test('todo add writes to file', () => {
+  const result = execFileSync('node', ['bin/todo.js', 'add', 'Buy milk'], {
+    env: { ...process.env, HOME: tmpDir },
+    encoding: 'utf8',
+  });
+  expect(result).toContain('Added');
+});
+```
+
+---
+
+# 4. Factual and precision notes
+
+| Claim | Assessment |
+|---|---|
+| "The dominant AI-agent CLIs — Claude Code, Codex, Aider, Continue — are all built this way" | Accurate as of the knowledge cutoff. |
+| "Node ships with `process.argv`, `process.stdin/stdout/stderr`, and the stream model built in" | Accurate. |
+| "The terminal is the raw interface to every tool on this shelf" | Accurate. |
+| "Linux is the universal host" | Accurate for production, though development environments vary. |
+| "An image is the blueprint built once; a container is the process run many times" | Accurate, though this is more relevant to the deployment substrate doc. |
+| "The dominant AI-agent CLIs — Claude Code, Codex, Aider, Continue — are all built this way, which is why this doc is Node-centric" | Accurate reasoning. |
+
+---
+
+# 5. Summary — the complete mental checklist
+
+The current checklist is good but could be expanded.
+
+**Add:**
+
+| # | The line |
+|---|---|
+| 12 | Handle signals (`SIGINT`, `SIGTERM`) for graceful shutdown. |
+| 13 | Use specific exit codes (`0`, `1`, `2`, `126`, `127`, `128+N`). |
+| 14 | Never put error messages on `stdout` (breaks pipes). |
+| 15 | Validate all arguments and file paths (prevent command injection, path traversal). |
+| 16 | Set `chmod 600` on config files with secrets. |
+| 17 | Test the contract (stdout, stderr, exit code, file side effects), not the implementation. |
+| 18 | Use `path.join()` and `os.EOL` for cross-platform compatibility. |
+| 19 | Check `isTTY` before using ANSI codes or interactive prompts. |
+| 20 | For agent CLIs, the permission boundary is the security surface. |
+
+---
+
+# 6. Final assessment
+
+This is a **solid, well-structured document** that fills a genuine gap in the shelf. The three-pipe model, the architecture spine, and the AI-agent CLI section are particularly strong. The worked example is practical and the failure modes table is useful.
+
+The main gaps are:
+- Error handling conventions (missing entirely).
+- Signal handling (missing entirely).
+- Shell integration (missing entirely).
+- Testing CLI applications (missing entirely).
+- Security considerations (missing entirely).
+- Cross-platform considerations (thin).
+
+The AI-agent CLI section is good but could be expanded with more specific patterns. The worked example is solid but could demonstrate more real-world patterns.
+
+**Overall assessment:** This is a strong document that fills a genuine gap. With the additions above, it would be a comprehensive reference for building CLI applications. The document is already 80% there; the remaining 20% is the error handling, signal handling, shell integration, testing, and security sections.
+
+**Final rating: 7.5/10** — solid foundation, needs expansion in error handling, signal handling, shell integration, testing, and security.

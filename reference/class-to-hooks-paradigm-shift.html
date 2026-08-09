@@ -223,7 +223,7 @@ import { signal } from '@preact/signals';
 
 const count = signal(0);                 <span class="comment-line">// cell in the JS heap; not scoped to a component</span>
 function Counter() {
-  return <button onClick={() => count.value++}>{count.value}</button>;
+  return &lt;button onClick={() =&gt; count.value++}&gt;{count.value}&lt;/button&gt;;
 }</code></pre>
 
 <p>When <code>count.value</code> changes, only the bindings that read it update — not the whole component function re-running. Conceptually this is closer to MVC's "model with change notifications" than to React's "function of state." React did not adopt signals (see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>), but Angular <em>did</em> — see <a href="./angular-evolution.html">Angular's evolution: the class, the rewrite, and the signal</a> for the framework that adopted signals to replace zone.js. Reading code in the signals world (Preact, Solid, Vue, Svelte runes, Angular 17+) you should recognize: this is a different answer to the same question. State is a <em>graph node</em>, not a slot.</p>
@@ -300,9 +300,27 @@ function Counter() {
 
 <p>The pattern: each era inherits the previous era's limitations and solves one of them, but introduces a new kind of complexity. Era 4 is notable because it <em>removes</em> complexity (deps arrays, manual memoization) without changing the mental model — the first era that simplifies rather than adds.</p>
 
+<h2>3b. The version markers — which React are you reading?</h2>
+
+<p>Section 3 told the eras as a timeline; this is the <em>version</em> layer you apply when you open an unfamiliar file. Era tells you the mental model (§4–§6); version tells you which API calls to expect. Most of the surface below appears in §§6–12 and in the companion doc <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>; this map is the index.</p>
+
+<table>
+  <thead><tr><th>Version</th><th>Landed</th><th>Meaningful change</th><th>Recognizer in a file</th></tr></thead>
+  <tbody>
+    <tr><td><strong>16.8</strong></td><td>Feb 2019</td><td>Hooks ship — functions become first-class (§6)</td><td><code>useState</code> / <code>useEffect</code> patterns</td></tr>
+    <tr><td><strong>17</strong></td><td>Oct 2020</td><td>Mostly internal; the new root API takes shape</td><td>Still <code>ReactDOM.render</code> in most files</td></tr>
+    <tr><td><strong>18</strong></td><td>Mar 2022</td><td>Concurrent rendering by default; automatic batching; <code>useTransition</code>, <code>useDeferredValue</code>, <code>useId</code>; Strict Mode double-invokes effects in dev</td><td><code>createRoot</code>; effects verifying their own cleanup</td></tr>
+    <tr><td><strong>18.3</strong></td><td>2023</td><td><code>use</code> hook; React Compiler open-sourced</td><td><code>use(</code> inside a component</td></tr>
+    <tr><td><strong>19</strong></td><td>Dec 2024</td><td>Ref as prop; document metadata; Actions: <code>&lt;form action={fn}&gt;</code>, <code>useActionState</code>, <code>useOptimistic</code>, <code>useFormStatus</code>; RSC stable</td><td><code>&lt;form action=</code> or <code>useActionState</code></td></tr>
+    <tr><td><strong>19.2</strong></td><td>Oct 2025</td><td><code>useEffectEvent</code>, <code>&lt;Activity /&gt;</code>; the documented deps-array fixes</td><td><code>useEffectEvent</code> — the §7 problem solved at the API level</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The version heuristic for reading files:</strong> <code>ReactDOM.render(</code> → pre-18; <code>createRoot</code> → 18+; <code>use</code> in a component → 18.3+; <code>action</code> on a <code>&lt;form&gt;</code> or <code>useActionState</code> → 19; <code>useEffectEvent</code> / <code>&lt;Activity /&gt;</code> → 19.2. Each recognizer vaults you into the right chapter when a file's era isn't obvious from its shape.</p>
+
 <h2>4. Era 1 — Class components, the original model</h2>
 
-<p>React shipped in 2013 with one component model: classes. A class component is an object with a <code>render()</code> method, mutable <code>this.state</code>, and lifecycle methods that fire at specific points in the component's existence.</p>
+<p>React shipped in 2013 with one component model: <code>React.createClass()</code>, a factory returning an object with a <code>render()</code> method, mutable <code>this.state</code>, and lifecycle methods that fire at specific points in the component's existence. The familiar ES6 <code>class Foo extends React.Component</code> syntax arrived later (0.13, 2015) as a thin wrapper over the same instance model. A class component is that object — <code>this</code> is the instance; here is the canonical shape:</p>
 
 <pre><code>class Counter extends React.Component {
   constructor(props) {
@@ -328,7 +346,7 @@ function Counter() {
   }
 
   render() {
-    return <button onClick={this.handleClick}>{this.state.count}</button>;
+    return &lt;button onClick={this.handleClick}&gt;{this.state.count}&lt;/button&gt;;
   }
 }</code></pre>
 
@@ -391,7 +409,7 @@ const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
 <p>In 2015 React added function components — a simpler way to write components that had no state and no side effects:</p>
 
 <pre><code>function Greeting({ name }) {
-  return <h1>Hello, {name}</h1>;
+  return &lt;h1&gt;Hello, {name}&lt;/h1&gt;;
 }</code></pre>
 
 <p>Cleaner than the class version for presentational components. But function components were <strong>limited by design</strong> — they couldn't:</p>
@@ -447,13 +465,13 @@ const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
 
   useEffect(() => {                          <span class="comment-line">// synchronize something with the outside world</span>
     document.title = `Count: ${count}`;
-    return () => console.log("cleanup");     <span class="comment-line">// optional cleanup
+    return () => console.log("cleanup");     <span class="comment-line">// optional cleanup</span>
   }, [count]);                               <span class="comment-line">// only re-run when count changes</span>
 
-  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
+  return &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;{count}&lt;/button&gt;;
 }</code></pre>
 
-<p>The function is called <em>on every render</em>. Each call creates fresh local variables (fresh boxes — see the <a href="./re-render-box-model.html">re-render box model reference</a>). <code>useState</code> asks React to remember a value across calls. <code>useEffect</code> schedules side-effect work after the DOM has been painted. No <code>this</code>, no <code>bind</code>, no constructor, no <code>super()</code>.</p>
+<p>The function is called <em>on every render</em>. Each call creates fresh local variables (fresh boxes — the per-render storage model from §9, below). <code>useState</code> asks React to remember a value across calls. <code>useEffect</code> schedules side-effect work after the browser has painted (so the user isn't blocked — <code>useLayoutEffect</code> is the "run before paint" variant, for measuring and DOM mutation; see §6b). No <code>this</code>, no <code>bind</code>, no constructor, no <code>super()</code>.</p>
 
 <h3>Why hooks solve the three problems</h3>
 
@@ -475,12 +493,12 @@ function useFriendStatus(friendID) {
 <span class="comment-line">// Two unrelated components can both use it — no nesting</span>
 function FriendListItem({ friend }) {
   const isOnline = useFriendStatus(friend.id);
-  return <li>{friend.name} {isOnline ? "🟢" : "⚪"}</li>;
+  return &lt;li&gt;{friend.name} {isOnline ? "🟢" : "⚪"}&lt;/li&gt;;
 }
 
 function ChatHeader({ friend }) {
   const isOnline = useFriendStatus(friend.id);
-  return <span>{isOnline ? "online" : "offline"}</span>;
+  return &lt;span&gt;{isOnline ? "online" : "offline"}&lt;/span&gt;;
 }</code></pre>
 
 <p>No layers of wrappers. Each component that needs the logic just calls the hook. The state is private to each caller — two components calling <code>useFriendStatus</code> get independent state.</p>
@@ -510,7 +528,7 @@ function ChatHeader({ friend }) {
     return () => clearInterval(id);
   }, []);
 
-  return <MessageList messages={messages} />;
+  return &lt;MessageList messages={messages} /&gt;;
 }</code></pre>
 
 <p>Three concerns, three effects. Each is self-contained: setup right next to cleanup. To understand "how does this component fetch data?" you read one effect, not three lifecycle methods.</p>
@@ -527,14 +545,14 @@ function ChatHeader({ friend }) {
 function ProfilePage({ user }) {
   const showMessage = () => alert("Followed " + user);
   const handleClick = () => setTimeout(showMessage, 3000);
-  return <button onClick={handleClick}>Follow</button>;
+  return &lt;button onClick={handleClick}&gt;Follow&lt;/button&gt;;
 }
 
 <span class="bad">// Class version — reads latest this.props, not the clicked props</span>
 class ProfilePage extends React.Component {
   showMessage = () => alert("Followed " + this.props.user);
   handleClick = () => setTimeout(this.showMessage, 3000);
-  render() { return <button onClick={this.handleClick}>Follow</button>; }
+  render() { return &lt;button onClick={this.handleClick}&gt;Follow&lt;/button&gt;; }
 }</code></pre>
 
 <p>If you click Follow on Dan's profile, then navigate to Sophie's profile before 3 seconds pass:</p>
@@ -549,6 +567,33 @@ class ProfilePage extends React.Component {
   <p><strong>This is the deepest reason for the shift.</strong> Closures over captured values are <em>correct by default</em> in React's model (UI is a function of state — each render is a snapshot). <code>this</code> in classes is a mutable escape hatch from that model. It causes the bugs React spent five years watching users hit. Hooks embrace the closure model instead of fighting it.</p>
 </blockquote>
 
+<h2>6b. The modern hooks catalog</h2>
+
+<p>Everything below is a hook you will read in real code. The mental model is always the same: <strong>a hook is a function that asks React for a capability</strong> — the capability lives in React's per-component fiber node, and the component is just a description of which capabilities it wants, in call order (§8). All the names below are variations on that one idea.</p>
+
+<table>
+  <thead><tr><th>Hook</th><th>What it asks for</th><th>Re-render on change?</th><th>Class-era equivalent</th></tr></thead>
+  <tbody>
+    <tr><td><code>useState</code></td><td>A value + a setter, stored in React's slot by call order</td><td>Setter call</td><td><code>this.state</code> + <code>this.setState</code></td></tr>
+    <tr><td><code>useReducer</code></td><td>State updated by a reducer <code>(state, action) → nextState</code></td><td>Dispatch call</td><td><code>setState</code> with an object / Redux-style reducers</td></tr>
+    <tr><td><code>useContext</code></td><td>The nearest <code>Context.Provider</code> value</td><td>Provider value's identity changes</td><td><code>contextTypes</code> / <code>&lt;Consumer&gt;</code></td></tr>
+    <tr><td><code>useRef</code></td><td>A mutable box that <em>does not</em> trigger re-render; same object every render</td><td>No</td><td>Instance field (<code>this.timerID</code>)</td></tr>
+    <tr><td><code>useEffect</code></td><td>A side effect after paint, keyed to a dependency array (§7)</td><td>No (fires after render)</td><td>Lifecycle methods mapped to deps (§14)</td></tr>
+    <tr><td><code>useLayoutEffect</code></td><td>An effect that runs <em>before</em> the browser repaints (measure, then mutate)</td><td>No</td><td><code>componentDidMount/Update</code> semantics</td></tr>
+    <tr><td><code>useMemo</code></td><td>A cached derived value, recomputed only when deps change (§10b)</td><td>No — skips re-compute, not re-render</td><td>Manual derived value inside <code>render()</code></td></tr>
+    <tr><td><code>useCallback</code></td><td>A stable function identity across renders</td><td>No</td><td>Bound-method identity games</td></tr>
+    <tr><td><code>useId</code></td><td>A stable unique ID that survives SSR/hydration</td><td>No</td><td>Hand-rolled ids (collision-prone)</td></tr>
+    <tr><td><code>useTransition</code></td><td>Mark an update as low-priority; get an <code>isPending</code> flag</td><td>Yes (pending flag flips)</td><td>—</td></tr>
+    <tr><td><code>useDeferredValue</code></td><td>A copy of a value that can lag the latest, for expensive lists</td><td>Yes (deferred copy)</td><td>—</td></tr>
+    <tr><td><code>useSyncExternalStore</code></td><td>Subscribe to external stores (localStorage, many stores)</td><td>On store change</td><td>Manual subscribe + forced re-render</td></tr>
+    <tr><td><code>useActionState</code> <em>(19)</em></td><td>Form-action state: previous state + action + <code>pending</code></td><td>On action settle</td><td>—</td></tr>
+    <tr><td><code>useOptimistic</code> <em>(19)</em></td><td>Render a "hoped-for" value; React rolls back on settle</td><td>On settle</td><td>—</td></tr>
+    <tr><td><code>use</code> <em>(18.3+/19)</em></td><td>Read-and-suspend on a promise or context <em>inside</em> render</td><td>Suspends until resolved</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Reading rule:</strong> every <code>use</code>-prefixed call is either (a) asking React for a capability, or (b) <code>use</code> itself, reading a promise. There is no other way to be "stateful" in a function component. A custom hook — a function whose name starts with <code>use</code> — is sugar over some of the above; read what it calls.</p>
+
 <h2>7. The stale-closure "problem" — and why it isn't one</h2>
 
 <p>Once people started using hooks, a new complaint appeared: <em>the stale-closure bug</em>. An effect captures a state value at render time; by the time the effect runs, the value might be old. Example:</p>
@@ -561,7 +606,7 @@ class ProfilePage extends React.Component {
     return () => clearInterval(id);
   }, []);   <span class="bad">// empty deps — effect runs once, captures count === 0 forever</span>
 
-  return <h1>{count}</h1>;
+  return &lt;h1&gt;{count}&lt;/h1&gt;;
 }</code></pre>
 
 <p>This counts to 1 and stops. The interval was set up once, with <code>count === 0</code> captured. Every tick calls <code>setCount(0 + 1)</code> — always 1. The closure is "stale" because it keeps reading the render-0 box forever.</p>
@@ -584,6 +629,49 @@ useEffect(() => {
 
 <p>The lesson: <strong>closures capture values; that's a feature, not a bug.</strong> The stale-closure bugs happen when you lie to React about which values the effect reads. The <code>exhaustive-deps</code> lint rule catches this automatically. Fix the deps (or restructure to avoid them) — don't go back to <code>this</code>.</p>
 
+<h2>7b. Effects vs event handlers — two places that "do something", opposite rules</h2>
+
+<p>Two places in a component can run code. They feel similar because both are callbacks React invokes, but their rules are opposites — and knowing which one you're reading tells you most of what you can assume next.</p>
+
+<table>
+  <thead><tr><th></th><th>Event handler</th><th>Effect</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Trigger</strong></td><td>A user/realtime event arrived (click, keystroke, subscription message)</td><td>React finished a render+commit, or a dependency changed</td></tr>
+    <tr><td><strong>Runs when</strong></td><td>Once, at the moment the event fires</td><td>After the browser paints, and again whenever the deps change</td></tr>
+    <tr><td><strong>Reads</strong></td><td>The state from <em>that</em> render's closure — fresh snapshots</td><td>The state from the render that scheduled it</td></tr>
+    <tr><td><strong>Writes</strong></td><td>Anything the user asked for — free rein</td><td>Sync-only territory; <code>setState</code> here re-runs the effect and can loop</td></tr>
+  </tbody>
+</table>
+
+<p>The shortcut question for an unknown function: <strong>"was this called by a user event, or by React finishing a render?"</strong> Event handlers read fresh values and may <code>setState</code> freely. Effects read the closure from the render that scheduled them and re-run only when their dependency array says to — so a "stale" read there is a missing dep (§7, §10), and an unconditional <code>setState</code> there is a feedback loop.</p>
+
+<h2>7c. Data fetching patterns — where the data comes from</h2>
+
+<p>Fetching is the most common real-world <code>useEffect</code> use — and the one the React team most often steers away from. Reading code at work, you'll see five shapes; recognize the trade before judging the pattern:</p>
+
+<table>
+  <thead><tr><th>Approach</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td>Framework/router data loading</td><td>Next.js, React Router, Remix, Astro — declarative loaders owned by the framework</td></tr>
+    <tr><td>React Server Components</td><td>Server-owned data; no client fetch needed at all (companion doc <a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>)</td></tr>
+    <tr><td>Query library (TanStack Query, SWR, Apollo)</td><td>Client cache, retries, background refetching</td></tr>
+    <tr><td><code>use</code> + Suspense (§9d)</td><td>Promise-based rendering where supported</td></tr>
+    <tr><td><code>useEffect</code> + manual state</td><td>Simple client-only cases — with care</td></tr>
+  </tbody>
+</table>
+
+<p>If you must use <code>useEffect</code>, the shape has five mandatory parts: <strong>loading/error/data state, a race/ignore guard, an abort or ignore flag, cleanup on unmount, and honest deps.</strong> The canonical form:</p>
+
+<pre><code>useEffect(() =&gt; {
+  let ignore = false;
+  fetchUser(id).then(data =&gt; {
+    if (!ignore) setUser(data);   <span class="comment-line">// drop out-of-order responses</span>
+  });
+  return () =&gt; { ignore = true; };  <span class="comment-line">// cleanup: flag the unmount / dep change</span>
+}, [id]);</code></pre>
+
+<p>The reading rule: a fetch inside <code>useEffect</code> is not wrong by default — but it is often not the best tool. The framework/query-library shapes own caching, retries, and cancelation for you; the effect shape makes you re-implement all three by hand.</p>
+
 <h2>8. The rules of hooks — and where the design came from</h2>
 
 <p>Hooks have two rules (enforced by a linter):</p>
@@ -599,7 +687,7 @@ useEffect(() => {
 <h2>9. The storage models — three places state can live in React</h2>
 
 <blockquote class="callout">
-  <p>For the full treatment with diagrams, see the <a href="./re-render-box-model.html">re-render box model reference</a>. This is a summary.</p>
+  <p>This is the box model summarized. The three storage rows below — state, ref, local variables — are what "which box does this callback see?" collapses to.</p>
 </blockquote>
 
 <p>React has three storage models, each answering "where does this value live between renders?":</p>
@@ -615,6 +703,75 @@ useEffect(() => {
 
 <p>In classes there were effectively two places: <code>this.state</code> (state) and instance fields (<code>this.something</code> = refs). Hooks split these cleanly: <code>useState</code> for trigger-render state, <code>useRef</code> for doesn't-trigger mutable boxes, function-body <code>let</code> for throwaway scratch.</p>
 
+<h2>9b. Strict Mode and batching — two "extra renders" that are the engine working</h2>
+
+<p>Two behaviors look like render-count glitches but are the engine doing its job:</p>
+
+<p><strong>Strict Mode (development only).</strong> React renders every component <em>twice</em>, and mounts each effect, runs it, unmounts it (running cleanup), and remounts it — on purpose. It is a correctness scanner: it surfaces renders that have side effects, and effects whose setup has no matching cleanup. In production nothing double-runs.</p>
+
+<pre><code>&lt;React.StrictMode&gt;
+  &lt;App /&gt;
+&lt;/React.StrictMode&gt;</code></pre>
+
+<p>Your <em>first</em> instinct when you double-debug a double render: is this Strict Mode? If yes, the scanner is finding something real — either your effect's setup must return a cleanup that mirrors it, or the "setup" belongs in an event handler instead of an effect.</p>
+
+<p><strong>Batching (automatic since 18).</strong> Multiple <code>setState</code> calls inside one event handler collapse into a single re-render. The updater form is how updates compose within one batch:</p>
+
+<pre><code><span class="comment-line">// These three updates become ONE re-render (batched); final value is +3</span>
+function onClick() {
+  setCount(c =&gt; c + 1);
+  setCount(c =&gt; c + 1);
+  setCount(c =&gt; c + 1);
+}</code></pre>
+
+<p>The updater form <code>c =&gt; c + 1</code> reads the latest value instead of a captured snapshot, so batched updates compose instead of clobbering each other. In pre-18 code you'll sometimes see <code>flushSync</code> or a <code>this.state.count</code> read inside a handler to grab the latest — the old workaround for unbatched updates.</p>
+
+<h2>9c. Reconciliation, keys, and component identity</h2>
+
+<p>When a render produces new output, React reconciles it with the old output — deciding "which DOM nodes change." It does not compare every node by value; it does a keyed diff:</p>
+
+<ul>
+  <li><strong>Same position + same <em>type</em>:</strong> React keeps the DOM node and updates it in place, recursing into children.</li>
+  <li><strong>Same position, different <em>type</em>:</strong> React discards the old subtree and mounts a new one — your state resets on purpose.</li>
+  <li><strong>Keyed lists:</strong> items in a list are matched by <code>key</code> first; a stable unique key lets React move items without re-creating the others.</li>
+</ul>
+
+<pre><code><span class="bad">// Lying identity: the array index is not identity — reorder and the wrong node keeps state</span>
+&lt;ul&gt;{items.map((it, i) =&gt; &lt;li key={i}&gt;{it}&lt;/li&gt;)}&lt;/ul&gt;
+
+<span class="good">// Real identity: a stable id from the data</span>
+&lt;ul&gt;{items.map(it =&gt; &lt;li key={it.id}&gt;{it.name}&lt;/li&gt;)}&lt;/ul&gt;</code></pre>
+
+<p>The identity sentence to keep: <em>a node keeps its state when its identity stays; it loses state when its type or key changes.</em> When a list "remembers" the wrong item's scroll, input, or checkbox, the bug is identity — and the fix is almost always its <code>key</code>.</p>
+
+<h2>9d. Suspense and use — declarative waiting, and reading resources in render</h2>
+
+<p>Suspense answers a question the previous sections never asked: <em>what does the UI show while a component's data isn't ready?</em> It is the last piece of the modern reading surface.</p>
+
+<pre><code>&lt;Suspense fallback={&lt;Spinner /&gt;}&gt;
+  &lt;ProfilePage userId={id} /&gt;   <span class="comment-line">// suspends until its promise resolves</span>
+&lt;/Suspense&gt;</code></pre>
+
+<p>While something inside the boundary <em>suspends</em>, React keeps "whatever was already shown" and shows the <code>fallback</code> instead — it does not unmount the whole tree. The promise-based hook <code>use</code> is what makes a component able to suspend during render:</p>
+
+<pre><code>function ProfilePage({ userId }) {
+  const profile = use(fetchProfile(userId));  <span class="comment-line">// suspends here until resolved</span>
+  return &lt;h1&gt;{profile.name}&lt;/h1&gt;;
+}</code></pre>
+
+<p><strong>Mental model:</strong> a promise becomes a render-time dependency, like props. A component is a function of <code>(props, promise)</code> → UI, and the suspense boundary is where the UI decides "I'll show a placeholder while this branch waits." Errors are <em>not</em> Suspense's job — a sibling error boundary handles those. Where you put the boundary decides what stays visible during a slow fetch inside it.</p>
+
+<p><strong>Transitions (React 18 concurrency):</strong> React 18 can prepare updates without committing them all at once. <code>useTransition</code> marks a state update as non-urgent — the UI stays responsive to input while a heavy update (a big list filter) is being prepared:</p>
+
+<pre><code>const [isPending, startTransition] = useTransition();
+startTransition(() =&gt; setSearchResults(results));  <span class="comment-line">// non-urgent; input stays snappy</span></code></pre>
+
+<p>And <code>useDeferredValue</code> keeps a copy of a value that may lag the latest, so expensive rendering of a derived list can proceed from the last good value:</p>
+
+<pre><code>const deferredQuery = useDeferredValue(query);</code></pre>
+
+<p>Reading rule for concurrent-era code: <em>concurrent React is not parallel rendering.</em> It means React can prepare and prioritize updates more flexibly — urgent input reactions first, deferred heavy work after. <code>isPending</code>/<code>startTransition</code> and <code>deferredValue</code> are the visible watermark of that era.</p>
+
 <h2>10. The classic bugs — and which storage model fixes each</h2>
 
 <p>Four bug shapes recur at work — each maps to a storage-model mismatch. (Lesson 2 covered the closure mechanics; this is the map.)</p>
@@ -628,6 +785,125 @@ useEffect(() => {
      <tr><td>Wrong render identity</td><td>Two renders compare unequal even though they "look" the same</td><td>Passing a fresh inline object/function as a prop — reference inequality on every render</td><td>Hoist the value out of the component, or wrap with <code>useMemo</code> / <code>useCallback</code>, or accept it as the cost of readable code (the React Compiler, see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>, removes this concern)</td></tr>
   </tbody>
 </table>
+
+<h2>10b. Derived state — compute during render, don't store</h2>
+
+<pre><code><span class="bad">// Don't — a derived value stored as state: two sources of truth that must stay in sync</span>
+const [fullName, setFullName] = useState('');
+useEffect(() =&gt; setFullName(first + ' ' + last), [first, last]);
+
+<span class="good">// Do — compute it during render; it's derived from state you already own</span>
+const fullName = first + ' ' + last;</code></pre>
+
+<p>The rule of thumb: <strong>if a value can be computed from state/props you already have, it isn't separate state.</strong> Storing it creates a second source of truth you have to keep in sync — and syncing copies is where the classic bugs (§10) live. The copy goes stale, the sync code grows, and neither value is the single source of truth anymore.</p>
+
+<p>Derived values are recomputed each render. If a computation ever gets expensive, keep it stable <em>without</em> adding state: hoist it to a module constant, memoize with <code>useMemo</code>, or let the React Compiler decide (§12). Don't reach for state to cache a computation.</p>
+
+<h2>10c. Context — the mental model for shared state</h2>
+
+<p>State shared by several components is normally passed top-down by props. When the passing distance gets long — the classic "prop drilling" — React gives you <code>Context</code>: a value provided near the top and read anywhere below, skipping every intermediate props layer.</p>
+
+<pre><code><span class="good">// Provide once near the top</span>
+const ThemeCtx = createContext('light');
+&lt;ThemeCtx.Provider value="dark"&gt;
+  &lt;ComponentTree /&gt;
+&lt;/ThemeCtx.Provider&gt;
+
+<span class="good">// Read anywhere below, no drilling</span>
+const theme = useContext(ThemeCtx);</code></pre>
+
+<p><strong>The mental model:</strong> context is <em>invisible props</em> — a parallel channel to the prop tree through which a value can reach any depth. Everything under a provider can read it without each intermediate component mentioning it.</p>
+
+<table>
+  <thead><tr><th></th><th>Props</th><th><strong>Context</strong></th></tr></thead>
+  <tbody>
+    <tr><td>How far does it travel?</td><td>One child per prop</td><td>Any depth; the whole subtree below the provider</td></tr>
+    <tr><td>Is it visible in the source?</td><td>Yes, in JSX</td><td>No — the channel is invisible</td></tr>
+    <tr><td>Who can read it?</td><td>The single child you passed it to</td><td>Every consumer under the <code>.Provider</code></td></tr>
+    <tr><td>Debugging / re-render cost</td><td>Plumbing is explicit</td><td>Every consumer re-renders when the provider value's identity changes</td></tr>
+  </tbody>
+</table>
+
+<p>Rule: props for passing data; context for genuinely global data (theme, locale, auth). The hidden cost is re-render churn — if the provider's <code>value</code> is a fresh object each render, every consumer re-renders each render. Keep the value's identity stable (memoize it) or split providers.</p>
+
+<h2>10d. Forms and Actions — submission becomes a first-class shape</h2>
+
+<p>Older forms are controlled or uncontrolled; React 19 broke new ground by making the <em>submission</em> itself a React concept.</p>
+
+<p><strong>Controlled</strong> — the input's value is state, updated by <code>onChange</code>:</p>
+
+<pre><code>const [name, setName] = useState("");
+&lt;input value={name} onChange={e =&gt; setName(e.target.value)} /&gt;</code></pre>
+
+<p><strong>Uncontrolled</strong> — the DOM owns the value; a ref reads it on submit:</p>
+
+<pre><code>const inputRef = useRef(null);
+&lt;input ref={inputRef} defaultValue="" /&gt;</code></pre>
+
+<p><strong>React 19 Actions</strong> — the form takes an <code>action</code> function, and pending/result state rides along automatically:</p>
+
+<pre><code>&lt;form action={updateProfile}&gt;
+  &lt;input name="name" /&gt;
+  &lt;button type="submit" disabled={pending}&gt;Save&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+<ul>
+  <li><code>useActionState(action, initial)</code> — pairs the action with "last result + pending flag" so the UI can show previous state/errors.</li>
+  <li><code>useFormStatus</code> — a <em>child</em> of the form reads "is my form pending?" without prop drilling.</li>
+  <li><code>useOptimistic</code> — render a "hoped-for" value immediately; React rolls back to the server-authoritative value on settle.</li>
+</ul>
+
+<p>Reading old forms, translate <code>onSubmit={handle}</code> + <code>event.preventDefault()</code> as the React 16/17 way; <code>action</code> + the three hooks as the 19 way. Both mean "respond when the user submits" — the modern one keeps pending/result attached to the action instead of hand-managed.</p>
+
+<h2>10e. State design — where state should live</h2>
+
+<p>Most state bugs are <em>placement</em> bugs, not logic bugs. The rule: <strong>as close to use as possible, as high as sharing requires</strong> — and don't lift until a second consumer appears.</p>
+
+<table>
+  <thead><tr><th>Situation</th><th>State belongs in…</th></tr></thead>
+  <tbody>
+    <tr><td>Used by one component</td><td>That component's <code>useState</code></td></tr>
+    <tr><td>Parent + one child</td><td>The parent, passed as props (simplest case of lifting)</td></tr>
+    <tr><td>Many distant components</td><td>Context (§10c) or a state library</td></tr>
+    <tr><td>Server-owned data</td><td>Server component, framework cache, or query library (§7c)</td></tr>
+    <tr><td>Shareable/bookmarkable</td><td>URL/search params</td></tr>
+    <tr><td>Temporary UI (hover, open/close)</td><td>Local state or a ref</td></tr>
+    <tr><td>Complex coordinated transitions</td><td><code>useReducer</code> — named actions instead of scattered setters</td></tr>
+  </tbody>
+</table>
+
+<p><strong><code>useReducer</code></strong> is not only for big apps — it's for when transitions deserve explicit, testable, named actions:</p>
+
+<pre><code>const [state, dispatch] = useReducer(reducer, initialState);</code></pre>
+
+<p>Use <code>useState</code> when updates are independent and local; use <code>useReducer</code> when changes are transitions over several related fields that benefit from being a state machine. The reducer is just a pure <code>(state, action) → nextState</code> function — testable without a render.</p>
+
+<p>Close the loop: state up, data down. Two components need the same value? The nearest common parent owns it and passes it to both. One more consumer appears? <em>Then</em> context or a library, not before.</p>
+
+<h2>10f. Refs in depth and memoization — the remaining manual doors</h2>
+
+<p><strong>Refs</strong> are the last OOP-style instance field in a functional model — a mutable box that survives renders without triggering them. Three real uses:</p>
+
+<ul>
+  <li><strong>DOM access</strong> — focus, scroll, measurement: <code>const el = useRef(null); &lt;div ref={el} /&gt;</code>, read <code>el.current</code> in an effect or handler.</li>
+  <li><strong>Stable non-render bookkeeping</strong> — timer ids, previous values.</li>
+  <li><strong>The "latest value" escape hatch</strong> — a ref updated every render, read by a stable effect/interval that would otherwise see a stale closure (§7).</li>
+</ul>
+
+<p>Callback refs (<code>ref={(n) =&gt; …}</code>) attach with cleanup; in React 19, function components can receive <code>ref</code> as a prop directly, reducing <code>forwardRef</code>. The dividing line: <strong>if changing the value should re-render the UI, it's state; if it's imperative access or non-rendering bookkeeping, it's a ref.</strong></p>
+
+<p><strong>Memoization</strong> (<code>useMemo</code>, <code>useCallback</code>, <code>React.memo</code>) — the manual cache layer:</p>
+
+<table>
+  <thead><tr><th>Tool</th><th>What it caches</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><code>useMemo</code></td><td>A computed value</td><td>Expensive derivation with stable deps (§10b)</td></tr>
+    <tr><td><code>useCallback</code></td><td>A function identity</td><td>Passing callbacks that memoized children compare by identity</td></tr>
+    <tr><td><code>React.memo</code></td><td>A component's render</td><td>A child re-renders often with the same props</td></tr>
+  </tbody>
+</table>
+
+<p>Memoization is not free — it adds dependency tracking, memory, and bug surface. The React Compiler (§12) automates it: in new code you may see none of these by hand. But old code still has them, and an <em>incorrect</em> one still hides bugs — reading them requires the same identity thinking as §9c.</p>
 
 <h2>11. Why not just use functional programming without hooks?</h2>
 
@@ -669,6 +945,122 @@ useEffect(() => {
   <p><strong>No — don't invest in mastering them.</strong> You won't write new class components in 2025. Spend that time on hooks (useState, useEffect, useRef, useMemo, useCallback, useContext) and on the closure mental model (the re-render box model). That's what you'll write.</p>
 </blockquote>
 
+<h2>13b. Reading at work — the era-recognition checklist</h2>
+
+<p>The whole doc is a set of recognition skills. When you open a React file, answer <em>"which era / version is this?"</em> first — everything else follows from the answer.</p>
+
+<table>
+  <thead><tr><th>What you'll see in the file</th><th>Reading emphasis</th></tr></thead>
+  <tbody>
+    <tr><td><code>class Foo extends React.Component</code> or <code>React.createClass</code></td><td>Instance era: <code>this.state</code> / <code>this.props</code>, lifecycle methods, <code>bind</code> (§4, §14)</td></tr>
+    <tr><td><code>function Foo(...)</code> alone, no hooks</td><td>Presenter function: props in, JSX out, no state (second-class function component, §5)</td></tr>
+    <tr><td><code>useState</code> / <code>useEffect</code> / <code>useMemo</code>…</td><td>Hooks era: a function asking React for capabilities by call order (§6, §6b)</td></tr>
+    <tr><td><code>createRoot</code>, <code>useTransition</code>, <code>startTransition</code></td><td>18+ era: concurrency, automatic batching, streaming (§3b)</td></tr>
+    <tr><td><code>useActionState</code>, <code>&lt;form action=…&gt;</code>, <code>useOptimistic</code></td><td>19 form/action era (§3b; companion doc <a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>)</td></tr>
+    <tr><td><code>use</code>, <code>&lt;Suspense&gt;</code> around a promise read</td><td>Data-dependent rendering (companion doc)</td></tr>
+  </tbody>
+</table>
+
+<h3>The class → function migration recipe</h3>
+<ol>
+  <li><code>class Foo extends React.Component</code> → <code>function Foo(props)</code>.</li>
+  <li><code>this.state.xyz</code> → <code>const [xyz, setXyz] = useState(initial)</code>; <code>this.setState({…})</code> → <code>setXyz(prev =&gt; …)</code> calls with the updater shape.</li>
+  <li><code>this.props.foo</code> → <code>props.foo</code> (or destructure in the parameter list).</li>
+  <li>Instance fields (timers, ids) → <code>useRef</code> (§9).</li>
+  <li>Lifecycle → effects via the §14 table: <code>componentDidMount</code> → effect with <code>[]</code>; <code>componentDidUpdate</code> → effect with a deps array; unmount cleanup → the effect's returned cleanup.</li>
+  <li>Delete the boilerplate: no <code>constructor</code>, <code>super(props)</code>, <code>bind</code>; methods become closures in the body.</li>
+  <li>Final check: no <code>this</code> left. A hook-able function has none.</li>
+</ol>
+
+<h3>Reading, not rewriting</h3>
+<ul>
+  <li>Start by classifying the era — then only that era's rules apply.</li>
+  <li>Don't "fix" old code you're only reading. Recognition beats refactoring on a codebase you don't own.</li>
+  <li>A warning from React (missing deps, hook order, setState in render) maps to a specific section of this doc — look it up.</li>
+</ul>
+
+<h2>13c. Legacy patterns — the old code you'll read</h2>
+
+<p>Older codebases use patterns that predate hooks. Recognize the wrapper, and map it to its function-era replacement:</p>
+
+<table>
+  <thead><tr><th>Legacy pattern</th><th>What it was for</th><th>Modern replacement</th></tr></thead>
+  <tbody>
+    <tr><td><code>React.createClass</code></td><td>Pre-ES6 class factory (2013-era)</td><td>Function component, or an ES6 class</td></tr>
+    <tr><td>Autobinding methods</td><td><code>createClass</code> bound methods automatically</td><td>Bind / arrow fields / hooks closures</td></tr>
+    <tr><td>Mixins</td><td>Shared logic objects</td><td>Custom hooks</td></tr>
+    <tr><td>HOCs (higher-order components)</td><td>Reuse stateful logic by wrapping</td><td>Custom hooks (§1, wrapper hell)</td></tr>
+    <tr><td>Render props</td><td>Child-as-function composition</td><td>Custom hooks, plain composition</td></tr>
+    <tr><td><code>PropTypes</code></td><td>Runtime prop checking</td><td>TypeScript</td></tr>
+    <tr><td><code>defaultProps</code></td><td>Default prop values</td><td>Default parameters in the function signature</td></tr>
+    <tr><td><code>PureComponent</code></td><td>Shallow prop/state comparison</td><td><code>React.memo</code></td></tr>
+    <tr><td>Legacy context (<code>childContextTypes</code>)</td><td>Old subtree context</td><td>Modern Context / <code>useContext</code> (§10c)</td></tr>
+    <tr><td><code>componentWillMount</code> / <code>UNSAFE_*</code></td><td>Deprecated lifecycle phases</td><td>Effects, derived render, hooks (§14)</td></tr>
+  </tbody>
+</table>
+
+<p>The string thread: <em>every legacy pattern was a workaround for "functions can't hold state yet."</em> Reading old files is recognizing the wrapper — and knowing what the hooks-era version actually is.</p>
+
+<h2>13d. Failure modes — when modern React "just doesn't work"</h2>
+
+<p>Most real-world React failures resolve to one of these — each with a tell and a first move:</p>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Effect as event handler</td><td>Logic runs on mount/update when it should run on user action</td><td>Move into the handler (§7b)</td></tr>
+    <tr><td>Derived state stored in state</td><td>Two sources of truth drift</td><td>Compute during render (§10b)</td></tr>
+    <tr><td>Syncing props into state (anti-pattern)</td><td>Component ignores later prop changes</td><td>Use props directly, or reset with a <code>key</code> (§9.3)</td></tr>
+    <tr><td>Missing effect cleanup</td><td>Subscriptions/timers leak; updates after unmount</td><td>Return the mirror cleanup (§6, §7)</td></tr>
+    <tr><td>Dishonest dependency array</td><td>Stale closures or infinite loops</td><td>Fix deps, or remove the dep with an updater</td></tr>
+    <tr><td>Object/array identity churn</td><td>Memoization fails; effects re-run every render</td><td>Stabilize the value (hoist/memo) (§10f)</td></tr>
+    <tr><td>Missing keys / index-as-key on reorderable lists</td><td>State follows the wrong item</td><td>Stable IDs as <code>key</code> (§9c)</td></tr>
+    <tr><td>Context value recreated every render</td><td>Every consumer re-renders always</td><td>Memoize the value / split providers (§10c)</td></tr>
+    <tr><td>Premature memoization</td><td>Complexity without a measured win</td><td>Measure, or let the compiler decide (§12)</td></tr>
+    <tr><td>Hook called conditionally</td><td>Hook order breaks; "Rendered fewer hooks"</td><td>Move hooks to the top level (§8)</td></tr>
+    <tr><td>Browser API read during render</td><td>SSR/hydration mismatch</td><td>Move into an effect (§13f)</td></tr>
+    <tr><td>Fetch without race protection</td><td>Old response overwrites the new one</td><td>Ignore/AbortController flag (§7c)</td></tr>
+    <tr><td>Updating state during render</td><td>Wrong render or a loop</td><td>Derive it, or do it in an event/effect</td></tr>
+  </tbody>
+</table>
+
+<h2>13e. Principles — the invariants every pattern obeys</h2>
+
+<table>
+  <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>UI is a function of state</td><td>Renders describe the view from current state (§2)</td></tr>
+    <tr><td>Each render is a snapshot</td><td>Props and state are captured per render; closures over them are correct</td></tr>
+    <tr><td>State is owned</td><td>Every piece of state has one component owner</td></tr>
+    <tr><td>Props flow down, events flow up</td><td>One-way data flow</td></tr>
+    <tr><td>Render stays pure</td><td>No side effects, no mutation while describing the UI</td></tr>
+    <tr><td>Effects synchronize; handlers respond</td><td>The two "do something" places have opposite rules (§7b)</td></tr>
+    <tr><td>Derived values are computed, not stored</td><td>Don't duplicate truth (§10b)</td></tr>
+    <tr><td>Keys define identity</td><td>Keys preserve or reset state (§9c)</td></tr>
+    <tr><td>Refs are for non-rendering storage</td><td>Never ref for UI-trigger-able values (§10f)</td></tr>
+    <tr><td>The compiler automates memoization, not correctness</td><td>Rules of React still matter (§12)</td></tr>
+  </tbody>
+</table>
+
+<h2>13f. Hydration — server HTML meets client state</h2>
+
+<p><strong>SSR</strong> renders the same component tree to HTML on the server. The client receives that HTML <em>plus</em> the JavaScript payload; it does not re-render from scratch — it <em>reuses</em> the server HTML, attaches events and state to it, and only then do server- and client-rendered trees stay in sync. That attachment step is <strong>hydration</strong>.</p>
+
+<p>Consequences at work:</p>
+<ul>
+  <li><strong>First render must be deterministic.</strong> If the client's first render differs from the server's HTML, React throws/skips — and the mismatch is ours.</li>
+  <li><strong>Don't read browser- or time-dependent values during first render:</strong></li>
+</ul>
+
+<pre><code><span class="bad">// Bad — window doesn't exist on the server; value can't match</span>
+const [width, setWidth] = useState(window.innerWidth);
+
+<span class="good">// Good — safe initial value; measure after mount</span>
+const [width, setWidth] = useState(0);
+useEffect(() =&gt; { setWidth(window.innerWidth); }, []);</code></pre>
+
+<p>Reading rule for hydration-era files: keep the first render identical between processes; move anything browser-specific into effects. This is the client half of the split-process model from the companion doc (<a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>).</p>
+
 <h2>14. The lifecycle-to-hooks translation table</h2>
 
 <p>When refactoring a class component to a function component (or reading an old one), here's how the lifecycle biography maps to effects:</p>
@@ -691,7 +1083,7 @@ useEffect(() => {
 
 <h2>15. The current state — and what you'll write</h2>
 
-<p>As of 2025, modern React is function components + hooks + (optionally) the React Compiler. The dominant mental model:</p>
+<p>As of 2026, modern React is function components + hooks + (optionally) the React Compiler. The dominant mental model:</p>
 <ul>
   <li>Components are functions called once per render; each call has its own local boxes for state and props.</li>
   <li><code>useState</code> asks React to remember a value across calls; <code>useEffect</code> synchronizes external state with render values.</li>
@@ -712,7 +1104,7 @@ useEffect(() => {
   <li><a href="https://overreacted.io/how-are-function-components-different-from-classes/">How are function components different from classes?</a> — the capture-vs-mutate insight.</li>
   <li><a href="https://overreacted.io/a-complete-guide-to-useeffect/">A Complete Guide to useEffect</a> — the deep dive on effects, deps arrays, stale closures, and the synchronization mental model.</li>
   <li><a href="https://overreacted.io/why-isnt-x-a-hook/">Why Isn't X a Hook?</a> — what was rejected and why (composition + debugging).</li>
-  <li><a href="./re-render-box-model.html">Re-render Box Model (this workspace)</a> — the per-render box model that hooks rely on.</li>
+  <li>The re-render box model in this doc itself — §7 (stale closures), §9 (storage models), §10 (the four bug shapes it explains).</li>
 </ol>
 
 <section class="win">

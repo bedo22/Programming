@@ -1,0 +1,1051 @@
+Ignoring display artifacts and reviewing substance only.
+
+## Overall verdict
+
+This is a **strong and genuinely useful doc**. It fills a real gap in the shelf: the rest of the shelf teaches custom product engineering, but most paid web work lives in the CMS internet. The doc correctly treats WordPress not as “legacy PHP” but as a serious ecosystem with its own architecture, economics, failure modes, and client realities.
+
+Its strongest parts:
+
+- The positioning: “the other 60% of the web.”
+- The explanation of why WordPress won.
+- The mechanics: request lifecycle, template hierarchy, the Loop, CPTs, taxonomies, hooks.
+- The headless WordPress section.
+- The managed/no-code landscape.
+- The decision matrix.
+- The freelancer reality: “a website I can edit myself.”
+- The worked example.
+- The failure modes.
+
+However, for completeness, it still needs more depth in several practical areas:
+
+1. WordPress security and maintenance playbook.
+2. Performance playbook.
+3. Plugin/theme evaluation criteria.
+4. WordPress development workflow for engineers.
+5. Content modeling decisions: blocks vs ACF vs CPTs vs meta.
+6. Headless decision tree and limitations.
+7. Migration mechanics.
+8. Multilingual, SEO, accessibility, and legal requirements.
+9. E-commerce comparison.
+10. Other CMS alternatives beyond WordPress.
+11. Testing/CI for WordPress.
+12. Cost and lock-in analysis.
+13. Missing referenced docs: `payments-and-commerce.html`, `freelance-web-practice.html`, `income-stream-landscape.html`.
+
+So: **excellent foundation, but not yet complete as a practical CMS engineering reference**.
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The positioning is excellent
+
+The framing:
+
+> The rest of this shelf teaches the product-engineering world. This doc covers the world most web work actually happens in — the CMS internet.
+
+is exactly right.
+
+It avoids two common mistakes:
+
+- dismissing WordPress as “not real engineering,”
+- treating WordPress as the only valid way to build websites.
+
+Keep this framing. It is one of the doc’s best assets.
+
+---
+
+## 1.2 The “why WordPress won” section is strong
+
+The explanation is good:
+
+- timing,
+- cheap PHP hosting,
+- open license,
+- plugin system,
+- theme system,
+- community support.
+
+The deeper insight is also correct:
+
+> The winning system is the one that makes the common case cheap for the least-skilled participant, not the one that is technically best.
+
+This is a shelf-level insight and should be preserved.
+
+---
+
+## 1.3 The mechanics section is well chosen
+
+The doc covers just enough WordPress internals:
+
+- request lifecycle,
+- template hierarchy,
+- the Loop,
+- custom post types,
+- taxonomies,
+- meta,
+- roles,
+- hooks,
+- themes,
+- plugins,
+- caching.
+
+This is the right level for an engineer reading the doc.
+
+---
+
+## 1.4 The headless WordPress section is valuable
+
+The distinction between:
+
+- classic WordPress,
+- WP-REST,
+- WPGraphQL,
+- headless WordPress as content API,
+
+is useful and well placed.
+
+The lazy rule is also correct:
+
+> Classic WordPress for the 95% of sites that are content-shaped; headless only when a frontend team and a real reason exist.
+
+Keep this. It prevents unnecessary complexity.
+
+---
+
+## 1.5 The freelancer reality section is one of the best parts
+
+The sentence:
+
+> “A website I can edit myself” is a requirements sentence, not a platform question.
+
+is excellent.
+
+This section correctly translates a common client request into platform decisions:
+
+- text/image editing,
+- adding pages,
+- selling things,
+- bookings,
+- membership,
+- directory.
+
+This is one of the most practical parts of the doc.
+
+---
+
+# 2. Duplication and boundary review
+
+The doc mostly handles duplication well.
+
+## Current boundaries
+
+| Neighbor | This doc owns | Neighbor owns |
+|---|---|---|
+| Frontend Camps Survey | CMS/WordPress depth | overall camp map |
+| Backend Engineering | WordPress runtime specifics | generic request loop, auth, caching, CRUD |
+| API Design | WP-REST/WPGraphQL specifics | universal contract rules |
+| Data Modeling | CPT/taxonomy/meta as content schema | normalization, indexing, migrations |
+| Security | WordPress attack surface and patching discipline | threat modeling, OWASP, crypto |
+| Freelance Web Practice | platform choice and CMS delivery realities | scoping, quoting, contracts, client management |
+| Payments & Commerce | WooCommerce/Shopify platform choice | payment mechanics, checkout, subscriptions |
+
+These boundaries are good.
+
+## Important issue: missing referenced docs
+
+The doc references:
+
+- `payments-and-commerce.html`
+- `freelance-web-practice.html`
+- `income-stream-landscape.html`
+
+These are not currently in the provided shelf.
+
+You have two options:
+
+1. **Keep the links and create those docs later.**
+2. **Temporarily remove or soften the links until the docs exist.**
+
+If those docs are planned, the references are excellent. If they are not planned, the links will create dead ends.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important additions.
+
+---
+
+## 3.1 Add a WordPress security and maintenance playbook
+
+The doc mentions security briefly, but WordPress deserves a dedicated operational section because security is one of its biggest real-world concerns.
+
+Add:
+
+> **WordPress security and maintenance playbook**
+
+| Area | Baseline practice |
+|---|---|
+| Updates | Core, theme, and plugin updates on a fixed schedule |
+| PHP version | Run supported PHP, not end-of-life PHP |
+| Passwords | Unique admin passwords, no shared accounts |
+| 2FA | Required for admins/editors |
+| Login hardening | Limit login attempts, rename/disable unnecessary login surfaces |
+| File editing | Disable plugin/theme file editor in production |
+| XML-RPC | Disable if unused |
+| REST API | Audit permission callbacks; do not expose private data |
+| Backups | Off-site backups, tested restores |
+| Staging | Never test updates on production first |
+| Malware scanning | Periodic scan and file integrity monitoring |
+| Nulled plugins/themes | Never use; they are a common malware vector |
+| Roles | Least privilege; client gets only what they need |
+| wp-config | Salts, secure keys, environment-aware credentials |
+
+Add a maintenance cadence:
+
+| Cadence | Task |
+|---|---|
+| Weekly | Check updates, backups, uptime |
+| Monthly | Plugin audit, security scan, performance check |
+| Quarterly | Restore test, dependency audit, content/model review |
+| Yearly | Hosting review, PHP upgrade plan, replatform check |
+
+This would make the doc much more complete for real client work.
+
+---
+
+## 3.2 Add a performance playbook
+
+The doc mentions caching, but it should give a clearer performance checklist.
+
+Add:
+
+> **WordPress performance playbook**
+
+| Layer | Practice |
+|---|---|
+| Hosting | Use managed WordPress or right-sized VPS; avoid overloaded shared hosting |
+| PHP | Use latest supported PHP |
+| Page cache | Full-page caching for anonymous traffic |
+| Object cache | Redis/Memcached for transients and object queries |
+| CDN | Static assets and optionally HTML caching |
+| Images | WebP/AVIF, responsive images, lazy loading, dimensions set |
+| Database | Clean revisions, transients, spam, autoloaded options |
+| Plugins | Remove unused plugins; avoid heavy multipurpose plugins |
+| Theme | Avoid bloated themes; prefer block theme or lightweight theme |
+| Measurement | Query Monitor, Lighthouse, Core Web Vitals, server logs |
+
+Add WooCommerce-specific note:
+
+> WooCommerce pages such as cart, checkout, and account should usually be excluded from aggressive page caching. Cache configuration must respect authenticated and session-dependent pages.
+
+This is a common real-world mistake.
+
+---
+
+## 3.3 Add plugin and theme evaluation criteria
+
+The doc says “every plugin is a dependency,” but it should explain how to evaluate plugins.
+
+Add:
+
+> **Plugin/theme evaluation checklist**
+
+| Criterion | Question |
+|---|---|
+| Active installs | Is it widely used? |
+| Last updated | Is it actively maintained? |
+| WordPress compatibility | Does it support the current WP version? |
+| PHP compatibility | Does it support the current PHP version? |
+| Support quality | Are support threads answered? |
+| Changelog | Is development transparent? |
+| Security history | Has it had known vulnerabilities? |
+| Reviews | What do users complain about? |
+| License/cost | Is the paid license sustainable for the client? |
+| Alternatives | Can this be done with core blocks or less code? |
+| Lock-in | Does it store data in a proprietary format? |
+| Performance impact | Does it load assets everywhere? |
+
+Add:
+
+> The best plugin is the one you do not need. Prefer core blocks, custom post types, and small custom code over large multipurpose plugins when the requirement is simple.
+
+---
+
+## 3.4 Add a WordPress development workflow section
+
+The doc explains how WordPress works, but not how an engineer should develop and deploy WordPress professionally.
+
+Add:
+
+> **WordPress development workflow**
+
+| Concern | Professional practice |
+|---|---|
+| Local development | Local by Flywheel, wp-env, Docker, or Bedrock |
+| Version control | Theme/plugin code in Git; database not in Git |
+| Configuration | Environment-specific `wp-config` values; no secrets in repo |
+| Content model | ACF JSON or custom post type definitions in code |
+| Blocks | `block.json`, `@wordpress/scripts`, theme.json |
+| Database changes | Migrations or scripted updates where needed |
+| Deployment | Build/deploy theme and plugins; sync content carefully |
+| Environments | Local → staging → production |
+| CLI | WP-CLI for imports, search-replace, updates, cache flush |
+
+Add:
+
+> WordPress content and code have different lifecycles. Code should be versioned and deployed. Content should be migrated, imported, or synced deliberately. Treating the database like code is a common source of pain.
+
+---
+
+## 3.5 Add content modeling decision guidance
+
+The doc covers CPTs, taxonomies, and meta, but it should help readers choose between content modeling tools.
+
+Add:
+
+> **Content modeling choices in WordPress**
+
+| Need | Best default |
+|---|---|
+| Editorial content with layout flexibility | Blocks / Gutenberg |
+| Structured fields for a CPT | ACF / Meta Box / Pods |
+| Repeated content type | Custom post type |
+| Classification | Taxonomy |
+| Site-wide settings | Options page / `wp_options` |
+| Reusable layout chunks | Block patterns / template parts |
+| Global design settings | theme.json |
+| Complex relational data | Custom tables or external service |
+
+Add warning:
+
+> Post meta is flexible but not relationally strong. Heavy meta queries can become slow. If the data is central to the product and queried often, consider custom tables or a separate service.
+
+This is important for engineers who try to make WordPress do too much.
+
+---
+
+## 3.6 Add a headless decision tree
+
+The headless section is good, but it should be more decision-oriented.
+
+Add:
+
+> **When to use headless WordPress**
+
+Use headless WordPress when:
+
+- there is a frontend team,
+- the content powers multiple surfaces,
+- the frontend needs custom interactivity,
+- the stack is React/Next/Astro/Svelte,
+- performance and DX matter,
+- editorial workflow can be adapted.
+
+Do not use headless WordPress when:
+
+- there is no frontend team,
+- the site is mostly content pages,
+- the client needs simple editing and preview,
+- budget is small,
+- SEO plugins and page builders are expected to work normally,
+- the site needs many WordPress plugins that assume theme rendering.
+
+Add:
+
+> Headless WordPress is not automatically better. It trades editing simplicity and plugin compatibility for frontend freedom. The trade must be deliberate.
+
+---
+
+## 3.7 Add headless limitations
+
+The doc should list the common hidden costs of headless WordPress.
+
+Add:
+
+| Limitation | Why it matters |
+|---|---|
+| Preview workflow | Draft preview outside WordPress is harder |
+| SEO plugins | Yoast/Rank Math assume theme rendering |
+| Page builders | Most builders do not work headless |
+| Menus/widgets | Need custom mapping or GraphQL modeling |
+| Forms | Need separate form/API strategy |
+| Auth | Editorial/authenticated flows need design |
+| Search | Native WP search may need replacement |
+| Plugin assumptions | Many plugins output HTML directly |
+
+This would make the headless section much more realistic.
+
+---
+
+## 3.8 Add migration mechanics
+
+The migration paths section is good conceptually, but it needs practical mechanics.
+
+Add:
+
+> **WordPress migration mechanics**
+
+| Task | Tools / concerns |
+|---|---|
+| Export content | WP-CLI `wp export`, WP All Export, REST API |
+| Import content | WP-CLI `wp import`, WP All Import |
+| Database move | SQL dump + WP-CLI `search-replace` |
+| URL changes | Serialized data requires proper search-replace |
+| Media files | Copy uploads directory or use external storage/CDN |
+| Redirects | Map old URLs to new URLs; preserve SEO |
+| Permalinks | Keep URL structure if possible |
+| Testing | Check forms, redirects, media, menus, plugins |
+
+Add:
+
+> The two rules of CMS migration: content is the asset, URLs are a contract. Everything else can be rebuilt.
+
+This aligns with the doc’s existing principle and makes it actionable.
+
+---
+
+## 3.9 Add multilingual requirements
+
+Multilingual sites are extremely common in client work, but the doc does not cover them.
+
+Add:
+
+> **Multilingual WordPress**
+
+| Approach | Tools | Considerations |
+|---|---|---|
+| Plugin-based translation | WPML, Polylang, TranslatePress | Easy to start; can become complex with CPTs/ACF |
+| Separate site per language | Multiple WordPress installs | Simple isolation; more maintenance |
+| Headless i18n | Locale fields in CMS, frontend routing | More control; more engineering |
+| Auto-translation | AI/machine translation | Needs human review; SEO risk |
+
+Add:
+
+> Multilingual is not a feature you add at the end. It affects content model, URLs, navigation, SEO, forms, and editorial workflow.
+
+---
+
+## 3.10 Add SEO requirements
+
+SEO is one of the main reasons clients choose WordPress. The doc should cover it more explicitly.
+
+Add:
+
+> **WordPress SEO baseline**
+
+| Area | Practice |
+|---|---|
+| Permalinks | Clean, stable, human-readable URLs |
+| Content model | Use CPTs and taxonomies deliberately |
+| Meta | Title/description via SEO plugin or structured fields |
+| Schema | Articles, products, local business, breadcrumbs |
+| Sitemap | Generated and submitted |
+| Redirects | Preserve old URLs during migration |
+| Canonical | Avoid duplicate content issues |
+| Performance | Fast pages and good Core Web Vitals |
+| Search Console | Monitor indexing and query performance |
+
+Add:
+
+> SEO plugins help, but they do not replace good content structure. Permalinks, CPTs, taxonomies, and redirects are schema-level SEO decisions.
+
+---
+
+## 3.11 Add accessibility requirements
+
+The doc should include accessibility because client sites must increasingly meet accessibility expectations.
+
+Add:
+
+> **WordPress accessibility baseline**
+
+| Area | Practice |
+|---|---|
+| Theme | Choose accessible theme or block theme |
+| Headings | Logical heading hierarchy |
+| Images | Alt text for informative images; empty alt for decorative |
+| Forms | Labels, error messages, keyboard access |
+| Contrast | Text and UI controls meet contrast requirements |
+| Keyboard | All interactive elements reachable and operable |
+| Blocks | Use native blocks before custom interactive widgets |
+| Plugins | Avoid sliders/carousels that trap keyboard users |
+| Testing | Manual keyboard test plus automated scan |
+
+Add:
+
+> Accessibility in WordPress is not only a plugin problem. It is a theme, content, and editorial workflow problem.
+
+---
+
+## 3.12 Add legal/compliance requirements
+
+Client sites often need basic legal compliance.
+
+Add:
+
+> **Common legal/compliance requirements**
+
+| Requirement | When it matters |
+|---|---|
+| Privacy policy | Almost always |
+| Cookie consent | Analytics/marketing cookies, GDPR |
+| Terms of service | E-commerce, membership, accounts |
+| Accessibility statement | Public-sector or accessibility requirements |
+| PCI compliance | Online payments, especially WooCommerce |
+| Data retention | Forms, accounts, orders |
+| Consent for newsletters | Email marketing |
+
+Add:
+
+> Legal compliance is not usually the developer’s responsibility to author, but it is often the developer’s responsibility to implement correctly: consent checkboxes, analytics loading, form storage, and payment security.
+
+---
+
+## 3.13 Add e-commerce comparison
+
+The doc mentions WooCommerce and Shopify, but it should give a clearer comparison.
+
+Add:
+
+> **E-commerce platform choices**
+
+| Platform | Best for | Trade-off |
+|---|---|---|
+| Shopify | Product-first businesses, no WordPress dependency | Less layout/control freedom; app costs |
+| WooCommerce | WordPress-native stores, content + commerce | More maintenance; PCI/security responsibility |
+| BigCommerce | Mid-market hosted commerce | Less ecosystem than Shopify |
+| Magento/Adobe Commerce | Large/complex catalogs | Heavy operational burden |
+| Headless commerce | Custom storefronts | Requires engineering team |
+| Medusa/Saleor | Developer-owned commerce APIs | More build responsibility |
+
+Add decision rule:
+
+> If the store is the product, Shopify is usually the lazy default. If the site is content-first and the store is secondary, WooCommerce is often the better fit.
+
+---
+
+## 3.14 Add other CMS alternatives
+
+The doc focuses on WordPress, but it should briefly cover other traditional CMS platforms.
+
+Add:
+
+> **Other CMS platforms**
+
+| Platform | Best for | Trade-off |
+|---|---|---|
+| Drupal | Complex enterprise content models, permissions, government | Steeper learning curve; smaller talent pool |
+| Joomla | Legacy sites, some community use | Less momentum |
+| Craft CMS | Structured content, design-led sites | Paid licensing; smaller ecosystem |
+| Ghost | Publishing/newsletters | Narrower CMS scope |
+| Statamic | Flat-file/Laravel sites | Developer-oriented |
+| Kirby | Lightweight flat-file sites | Smaller ecosystem |
+| Contentful/Sanity/Strapi | Headless content teams | Requires frontend team |
+
+Add:
+
+> WordPress is not always right, but it is usually the default because of talent availability, plugin ecosystem, and client familiarity.
+
+---
+
+## 3.15 Add testing and CI for WordPress
+
+The doc should cover how to test WordPress projects.
+
+Add:
+
+> **Testing WordPress projects**
+
+| Test type | Use |
+|---|---|
+| PHP lint / standards | WordPress Coding Standards, PHP_CodeSniffer |
+| Unit tests | Custom plugin/theme logic |
+| Integration tests | WP-CLI, database-backed behavior |
+| E2E tests | Playwright/Cypress for critical flows |
+| Visual regression | Theme/block UI changes |
+| Content model checks | Required fields, CPT registration, capabilities |
+| Migration tests | Import/export and search-replace scripts |
+
+Add:
+
+> WordPress sites are often treated as untestable, but critical flows — checkout, forms, login, search, redirects — can and should be tested.
+
+---
+
+## 3.16 Add cost and lock-in analysis
+
+The doc should help freelancers understand ongoing costs.
+
+Add:
+
+> **Cost model for CMS projects**
+
+| Cost | Examples |
+|---|---|
+| Hosting | Shared, managed WordPress, VPS, cloud |
+| Theme | Premium theme or custom theme |
+| Plugins | ACF Pro, WP Rocket, form plugins, SEO plugins |
+| Commerce | Payment gateway fees, WooCommerce extensions |
+| Development | Setup, content model, design, integrations |
+| Training | Client handoff, documentation, videos |
+| Maintenance | Updates, backups, monitoring, support |
+| Licenses | Annual renewals for premium plugins |
+
+Add:
+
+> A WordPress project is not a one-time build. Premium plugins, hosting, and maintenance create recurring costs. Quote the recurring cost explicitly.
+
+---
+
+# 4. Medium-priority improvements
+
+## 4.1 Expand WordPress database overview
+
+The doc mentions `wp_posts`, `wp_postmeta`, `wp_options`, `wp_users`, but it could include a fuller map.
+
+Add:
+
+| Table | Purpose |
+|---|---|
+| `wp_posts` | Posts, pages, CPT entries, revisions, attachments |
+| `wp_postmeta` | Key-value metadata for posts |
+| `wp_users` | Users |
+| `wp_usermeta` | User metadata |
+| `wp_terms` | Categories/tags/taxonomy terms |
+| `wp_term_taxonomy` | Term-taxonomy relationships |
+| `wp_term_relationships` | Post-term relationships |
+| `wp_options` | Site settings, widgets, autoloaded data |
+| `wp_comments` | Comments |
+
+Add:
+
+> Most WordPress performance and migration issues involve `wp_postmeta`, `wp_options`, and serialized data. Treat those tables with care.
+
+---
+
+## 4.2 Add WordPress coding standards
+
+For engineering completeness, add a short section:
+
+> **WordPress engineering standards**
+
+| Practice | Why |
+|---|---|
+| Escape output | Prevent XSS |
+| Sanitize input | Prevent bad data |
+| Validate data | Ensure expected shape/type |
+| Use nonces | Protect forms/actions from CSRF |
+| Check permissions | Prevent unauthorized actions |
+| Enqueue assets | Avoid hardcoding scripts/styles |
+| Prefix functions/hooks | Avoid collisions |
+| Avoid direct DB writes | Use WP APIs where possible |
+
+Add:
+
+> WordPress hooks are powerful, but unsafe escaping, missing permission checks, and direct SQL are common sources of vulnerabilities.
+
+---
+
+## 4.3 Add block development section
+
+Modern WordPress development increasingly involves blocks.
+
+Add:
+
+> **Block development**
+
+| Concept | Meaning |
+|---|---|
+| `block.json` | Block registration metadata |
+| `@wordpress/scripts` | Build tooling for blocks |
+| `theme.json` | Theme-level design tokens and settings |
+| Block patterns | Reusable block arrangements |
+| Template parts | Reusable theme areas |
+| Custom block | React-based editor component + PHP render |
+
+Add:
+
+> Gutenberg blocks are the modern WordPress component model. They are not just an editor feature; they are the future content/layout primitive.
+
+---
+
+## 4.4 Add editorial workflow section
+
+Client sites need editorial governance.
+
+Add:
+
+| Workflow concern | WordPress mechanism |
+|---|---|
+| Draft/review/publish | Post statuses |
+| Roles | Administrator, editor, author, contributor |
+| Editorial notes | Plugins/custom fields |
+| Scheduled publishing | Cron/scheduling |
+| Content ownership | Roles + CPT capabilities |
+| Revisions | Built-in revisions |
+| Content guidelines | Block patterns, template parts, documentation |
+
+Add:
+
+> The admin is not just a database UI. It is the client’s product. Editorial workflow is part of the deliverable.
+
+---
+
+## 4.5 Add form/spam section
+
+Forms are common client requirements.
+
+Add:
+
+| Need | Options |
+|---|---|
+| Simple contact form | WPForms Lite, Fluent Forms, Contact Form 7 |
+| Advanced forms | Gravity Forms, WPForms Pro, Fluent Forms Pro |
+| Spam protection | Akismet, honeypot, Turnstile, reCAPTCHA |
+| GDPR consent | Consent checkbox, privacy notice |
+| Storage | Database entry, email, CRM integration |
+
+Add:
+
+> Every client site eventually becomes a form site. Forms need spam protection, validation, consent, and reliable delivery.
+
+---
+
+## 4.6 Add analytics/measurement section
+
+Add:
+
+| Need | Tool |
+|---|---|
+| Traffic/behavior | GA4, Plausible, Fathom |
+| Search performance | Google Search Console |
+| Uptime | UptimeRobot, Better Stack |
+| Performance | Query Monitor, Lighthouse, Core Web Vitals |
+| Error tracking | Sentry, log monitoring |
+| SEO | Yoast/Rank Math + Search Console |
+
+Add:
+
+> A launched site without measurement is a guess. At minimum, the client should know traffic, search visibility, uptime, and conversions.
+
+---
+
+## 4.7 Add local development tools to ecosystem
+
+Add to ecosystem table:
+
+| Category | Tools |
+|---|---|
+| Local WordPress | Local by Flywheel, wp-env, Docker, Lando |
+| WordPress boilerplates | Bedrock, Roots Trellis/Sage |
+| CLI | WP-CLI |
+| Content model | ACF, Meta Box, Pods |
+| Forms | WPForms, Gravity Forms, Fluent Forms |
+| SEO | Yoast, Rank Math |
+| Security | Wordfence, Solid Security, Cloudflare |
+| Performance | WP Rocket, LiteSpeed Cache, Perfmatters, Query Monitor |
+
+---
+
+## 4.8 Add AI-era practical limitations
+
+The future section is good, but it should warn about AI site builder limitations.
+
+Add:
+
+| AI capability | Limitation |
+|---|---|
+| Prompt-to-site | Often generic; needs content strategy |
+| AI content | Needs fact-checking, brand voice, SEO review |
+| AI design | May ignore accessibility and usability |
+| AI plugin recommendations | May suggest abandoned or incompatible plugins |
+| AI migrations | Risky without URL/content model review |
+
+Add:
+
+> AI lowers the cost of generating a site, but it increases the value of judgment: content model, platform choice, security, maintenance, and client training.
+
+---
+
+# 5. Factual and precision notes
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| Market share table | “~43%” and other percentages | Label as approximate and cite W3Techs or similar |
+| WordPress history | Plugins 2004, themes 2005 | Generally fine, but verify exact release history if making strong claims |
+| WP 3.0 | Roles and CPTs | Custom post types were introduced around WP 3.0; roles existed earlier. Phrase carefully |
+| Gutenberg | “2018” | Correct for WP 5.0; block themes/FSE stabilized later, around WP 5.9/2022 |
+| Block themes | “2021+” | Could say “WP 5.9, 2022” for Full Site Editing stability |
+| WP REST API | “since 4.7, 2016” | Correct |
+| WPGraphQL | “2018” | Correct enough; verify if needed |
+| Shopify | “transaction + app fees” | Correct but varies by plan/payment method |
+| Webflow | “per-site plans pricey” | Subjective; soften to “can become expensive at scale” |
+| Bubble | “performance/portability caps” | Correct, but phrase as common limitation, not absolute |
+| WordPress Playground | Correct | Good addition |
+| “Classic WordPress for 95%” | Heuristic | Label as rule of thumb |
+
+---
+
+# 6. Structural improvements
+
+## 6.1 Add a scope statement
+
+Add near the top:
+
+> This doc is not a WordPress tutorial. It is a strategic and architectural guide to the CMS internet: how WordPress works, how the managed/no-code landscape fits around it, when to choose each platform, and how to deliver CMS projects professionally.
+
+This prevents readers from expecting step-by-step WordPress training.
+
+---
+
+## 6.2 Add a CMS selection framework before the decision matrix
+
+Before the matrix, add:
+
+> Every CMS decision should be evaluated along these axes:
+>
+> - who edits the content?
+> - what must the site do besides display content?
+> - what is the content model?
+> - what is the budget?
+> - who maintains it?
+> - how much lock-in is acceptable?
+> - what is the performance/security burden?
+> - does the team have the skills?
+
+Then the decision matrix becomes more meaningful.
+
+---
+
+## 6.3 Expand the decision matrix
+
+Add columns:
+
+| Client/project | Default choice | Why | Lock-in risk | Maintenance burden | Reconsider when |
+|---|---|---|---|---|---|
+
+This would make the matrix more practical.
+
+---
+
+## 6.4 Add a “When WordPress is the wrong choice” section
+
+This is important.
+
+Add:
+
+> WordPress is not the right tool when:
+>
+> - the product is a SaaS application,
+> - there are complex user workflows,
+> - there are strict multi-tenant requirements,
+> - the system needs complex permissions and business logic,
+> - high-scale custom search or recommendations are required,
+> - the team needs strong testing/CI/CD culture,
+> - the checkout/product flow is highly custom,
+> - compliance requires unusual audit/control guarantees.
+
+Add:
+
+> WordPress is excellent for content-shaped sites and plugin-extensible CRUD. It becomes the wrong tool when the product is an application first and a website second.
+
+---
+
+## 6.5 Add a client handoff checklist
+
+Even if Freelance Web Practice owns the business side, this doc should include CMS-specific handoff items.
+
+Add:
+
+> **CMS handoff checklist**
+
+| Deliverable | Why |
+|---|---|
+| Admin roles configured | Least privilege |
+| Unused plugins/themes removed | Security/performance |
+| Content model documented | Future maintainability |
+| Editing guide written | Client independence |
+| Training video recorded | Reduces support calls |
+| Backup/restore tested | Disaster readiness |
+| Update schedule agreed | Maintenance product |
+| Hosting credentials transferred | Ownership |
+| Analytics installed | Measurement |
+| SEO basics checked | Visibility |
+| Forms tested | Lead reliability |
+| Legal pages implemented | Compliance |
+
+---
+
+## 6.6 Add a maintenance product section
+
+The doc mentions maintenance as a retainer, but it should define the product.
+
+Add:
+
+> **Maintenance as a product**
+
+| Component | Description |
+|---|---|
+| Updates | Core/theme/plugin updates |
+| Backups | Scheduled, off-site, tested |
+| Monitoring | Uptime, errors, performance |
+| Security | Scans, vulnerability checks, hardening |
+| Support | Small content changes, troubleshooting |
+| Reporting | Monthly summary of updates, backups, traffic, issues |
+| Improvement | Quarterly recommendations |
+
+Add:
+
+> Maintenance is not “fixing things when they break.” It is a recurring product that keeps the site secure, fast, and editable.
+
+---
+
+# 7. Failure modes to add
+
+The current failure modes are good. Add these:
+
+| Failure | Symptom | Fix |
+|---|---|---|
+| Nulled plugins | Pirated premium plugins installed | Never use; replace with licensed/open-source alternatives |
+| Production editing | Edits made directly on live site | Staging environment + deployment process |
+| Untested backups | Backup exists but restore fails | Quarterly restore test |
+| Page builder lock-in | Content stored as builder blobs | Prefer blocks/CPTs/structured content where possible |
+| Plugin-based business logic | Critical workflow depends on abandoned plugin | Custom code or platform change |
+| Shared admin accounts | No audit trail; security risk | Individual accounts with least privilege |
+| REST API leakage | Private data exposed | Audit permissions callbacks |
+| Autoloaded options bloat | Slow requests; large options table | Clean autoloaded options |
+| Bad migration search-replace | Broken URLs/serialized data | Use WP-CLI search-replace properly |
+| Cache misconfiguration | Logged-in/cart pages cached | Exclude dynamic WooCommerce/admin pages |
+| Too many page builders | Builder + blocks + custom code conflict | Choose one primary editing model |
+| No content model | Client edits break layout | Use patterns, templates, roles, documentation |
+
+---
+
+# 8. Suggested final outline
+
+If you reorganize the doc, this structure would be stronger:
+
+1. **Definition and scope**
+2. **Market reality**
+3. **Why WordPress won**
+4. **How WordPress works**
+   - request lifecycle
+   - template hierarchy
+   - the Loop
+   - content model
+   - hooks/themes/plugins
+   - database overview
+   - caching
+5. **Modern WordPress**
+   - Gutenberg
+   - block themes
+   - REST
+   - WPGraphQL
+   - headless
+6. **WordPress development workflow**
+   - local dev
+   - Git
+   - WP-CLI
+   - config
+   - environments
+   - deployment
+7. **Content modeling**
+   - blocks vs ACF vs CPTs vs meta
+   - editorial workflow
+   - patterns/template parts
+8. **The managed and no-code landscape**
+9. **Other CMS platforms**
+10. **E-commerce choices**
+11. **When to choose what**
+    - selection criteria
+    - decision matrix
+    - when WordPress is wrong
+12. **Migration paths and mechanics**
+13. **Security, performance, and maintenance**
+    - security playbook
+    - performance playbook
+    - maintenance product
+14. **Client requirements**
+    - multilingual
+    - SEO
+    - accessibility
+    - legal/compliance
+    - forms/analytics
+15. **The freelancer’s reality**
+16. **Worked example**
+17. **Failure modes**
+18. **Ecosystem/tooling**
+19. **Future**
+20. **Summary checklist**
+
+---
+
+# 9. Priority roadmap
+
+## Must add
+
+1. WordPress security and maintenance playbook.
+2. Performance playbook.
+3. Plugin/theme evaluation checklist.
+4. WordPress development workflow.
+5. Content modeling decision table.
+6. Headless decision tree and limitations.
+7. Migration mechanics.
+8. When WordPress is the wrong choice.
+9. Client handoff checklist.
+10. Missing referenced docs or link cleanup.
+
+## Should add
+
+11. Multilingual section.
+12. SEO baseline.
+13. Accessibility baseline.
+14. Legal/compliance baseline.
+15. E-commerce comparison.
+16. Other CMS alternatives.
+17. Testing/CI for WordPress.
+18. Cost and lock-in analysis.
+19. Maintenance product definition.
+20. WordPress database overview.
+
+## Nice to have
+
+21. Block development section.
+22. WordPress coding standards.
+23. Editorial workflow section.
+24. Forms/spam section.
+25. Analytics/measurement section.
+26. AI builder limitations.
+27. Local dev tools in ecosystem.
+28. WooCommerce caching caveats.
+29. REST API permission audit checklist.
+30. Multisite section.
+
+---
+
+# 10. Bottom line
+
+This is a **very strong doc** and one of the most strategically important additions to the shelf. It correctly maps the CMS internet, explains why WordPress matters, and connects the platform to freelance reality.
+
+But to become complete, it needs to move from **orientation** to **operational reference**:
+
+- security,
+- performance,
+- maintenance,
+- development workflow,
+- content modeling,
+- migration mechanics,
+- client requirements,
+- platform comparison,
+- testing,
+- cost/lock-in.
+
+## Final recommendation
+
+**Strong draft, publishable as an orientation doc, but not yet complete as a practical CMS engineering reference.**
+
+The highest-leverage improvements are:
+
+> security/maintenance playbook, performance playbook, plugin evaluation, development workflow, content modeling decisions, headless limitations, migration mechanics, and client handoff checklist.

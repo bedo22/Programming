@@ -1,0 +1,605 @@
+## Overall verdict
+
+This is a **solid, well-structured doc** that covers the open source ecosystem comprehensively. The license taxonomy, governance models, contributor journey, and business models sections are well-executed. The "review attention as currency" mental model is particularly sharp.
+
+However, the doc has significant gaps in the **practical "how" layer**. It tells you what open source is and what the journey looks like, but doesn't teach the skills you need to actually walk the journey: finding a project, reading an unfamiliar codebase, setting up a dev environment, writing a good issue, understanding license compatibility, or evaluating project health. These are the skills that separate "I want to contribute" from "I made my first PR."
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Definition and theory | Strong |
+| History and constraint inversions | Strong |
+| License taxonomy | Strong |
+| Governance models | Strong |
+| Contributor journey (conceptual) | Strong |
+| Code review from both sides | Strong |
+| Maintaining and burnout | Strong |
+| Business models | Strong |
+| Practical "how to find a project" | Missing |
+| Reading an unfamiliar codebase | Missing |
+| Setting up a dev environment | Missing |
+| Writing a good issue | Missing |
+| License compatibility | Missing |
+| Project health evaluation | Missing |
+| Legal risks | Missing |
+| Open source security (supply chain) | Thin |
+
+### Ratings
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 9 / 10 |
+| Conceptual completeness | 8.5 / 10 |
+| Practical completeness | 6.5 / 10 |
+| Shelf consistency | 8.5 / 10 |
+| Duplication control | 9 / 10 |
+
+---
+
+# 1. What the document does well
+
+## 1.1 The definition section is precise
+
+The four-way distinction (open source, free software, no license, public domain) is exactly right. The "no license = all rights reserved" trap is the most common misunderstanding and the doc calls it out directly. The "free of charge ≠ free software" distinction is also correct and important.
+
+## 1.2 The constraint inversion pattern is consistent
+
+The five inversions (trade secret → open source, single maintainer → community, code → community, voluntary → funded, human-written → AI-assisted) follow the same pattern as every other doc on the shelf. This consistency is a strength.
+
+## 1.3 The license taxonomy is well-structured
+
+The two families (permissive, copyleft) with four subtypes (permissive, strong copyleft, weak copyleft, network copyleft) are correctly organized. The "what it means for you as a contributor" and "what it means for you as a consumer" columns are practical. The AGPL "SAAS loophole" explanation is correct and important.
+
+## 1.4 The "review attention as currency" mental model is sharp
+
+This is the best mental model in the doc. It explains why:
+- Small PRs get reviewed faster than large ones
+- Well-written PR descriptions get reviewed faster than vague ones
+- Contributors who help review others' PRs get their own reviewed faster
+- Maintainers who don't review eventually lose contributors
+
+This is the economic model of open source, and the doc names it correctly.
+
+## 1.5 The business models section is practical
+
+The five models (open core, hosted/SaaS, support, sponsorship, dual licensing) with "how it works" explanations are correct. The "the code is free; the work around it is not" framing is the right insight.
+
+---
+
+# 2. High-priority completeness gaps
+
+## 2.1 Missing: How to find a project to contribute to
+
+The contributor journey starts at "Find the project" but doesn't teach HOW. This is the biggest practical gap.
+
+Add a section:
+
+### Finding your first project
+
+| Signal | What it tells you | Where to look |
+|---|---|---|
+| `good first issue` label | Maintainer explicitly welcomes newcomers | GitHub issue search: `label:"good first issue"` |
+| `help wanted` label | Maintainer needs help but the issue may be harder | GitHub issue search: `label:"help wanted"` |
+| Active commit history | Project is alive, not abandoned | GitHub: commits in the last 30 days |
+| Issue response time | Maintainer is responsive | Check recent issues: are they answered within a week? |
+| CONTRIBUTING.md exists | Project has onboarding for contributors | Repo root or `.github/` directory |
+| CI is green | The project has quality gates | GitHub Actions / CI badge |
+| README is clear | The project cares about documentation | Can you understand what it does in 2 minutes? |
+| Contributor count > 5 | Not a single-maintainer bottleneck risk | GitHub contributors page |
+| License is clear | You know what you're contributing under | LICENSE file in repo root |
+
+### Red flags to avoid
+
+| Red flag | Why it matters |
+|---|---|
+| No commits in 6+ months | Project may be abandoned; your PR will never be reviewed |
+| No CONTRIBUTING.md | No onboarding; you'll have to figure everything out yourself |
+| Issues never answered | Maintainer is unresponsive; your PR will sit forever |
+| CI is red | Quality gates are broken; your PR will be hard to land |
+| Hostile tone in issues | Community norms are toxic; your experience will be bad |
+| Single maintainer with 100+ open issues | Bottleneck risk; your PR may never be reviewed |
+
+### Matching your skills to projects
+
+| Your skill | Look for projects that need… |
+|---|---|
+| Documentation | Docs labels, typo fixes, README improvements |
+| Testing | Test coverage labels, missing test issues |
+| Bug fixing | Bug labels, reproduction steps needed |
+| Feature building | Feature request labels, RFC processes |
+| Translation | i18n labels, locale files |
+| Design | Design labels, UI mockups needed |
+
+The key insight: **your first PR should be small, well-defined, and explicitly welcomed.** A `good first issue` with clear reproduction steps is better than a vague feature request.
+
+## 2.2 Missing: Reading an unfamiliar open source codebase
+
+The doc says "Read the conventions before writing code" but doesn't teach HOW to read an unfamiliar codebase. This is a skill in itself.
+
+Add a section:
+
+### Reading an open source codebase (the 30-minute method)
+
+| Step | Time | What to look at | What you learn |
+|---|---|---|---|
+| 1. Read the README | 5 min | What does it do? Who uses it? What problem does it solve? | The project's purpose and audience |
+| 2. Read CONTRIBUTING.md | 5 min | How to set up, run tests, submit PRs, code style | The contribution workflow and norms |
+| 3. Read the directory structure | 5 min | What are the top-level directories? What does each contain? | The architecture at a glance |
+| 4. Read the entry point | 5 min | `main`, `index`, `app` — where does execution start? | The control flow entry point |
+| 5. Find the issue you want to fix | 5 min | Read the issue, the linked code, the test that fails | The specific code you'll touch |
+
+### The "follow the data" technique
+
+Once you've found the issue, trace the data flow:
+
+1. **Where does the input enter?** (API endpoint, CLI flag, config file)
+2. **Where does it get transformed?** (functions, classes, middleware)
+3. **Where does the output go?** (response, file, database)
+4. **Where is the bug?** (the step where the data goes wrong)
+
+This is the same "trace the data" technique from [Backend Engineering](./backend-engineering.html) and [Testing & Debugging](./software-testing-and-debugging.html). The difference is that you're reading someone else's code for the first time.
+
+### What to skip on first read
+
+| Skip | Why |
+|---|---|
+| Generated code (build artifacts, compiled output) | It's not the source of truth |
+| Test fixtures (unless they're the bug) | They're test data, not production logic |
+| Vendor/dependency code | It's someone else's problem |
+| Config files (unless they're the bug) | They're environment-specific |
+| Documentation (unless it's wrong) | Read the code, not the docs, when they disagree |
+
+## 2.3 Missing: Setting up a dev environment
+
+Contributing to open source requires setting up someone else's project locally. This is often the hardest part for newcomers.
+
+Add a section:
+
+### Setting up an open source project locally
+
+| Step | What to do | Common pitfalls |
+|---|---|---|
+| 1. Fork the repo | Click "Fork" on GitHub | Don't clone the original; fork first |
+| 2. Clone your fork | `git clone https://github.com/YOUR-USERNAME/project` | Don't clone the original repo |
+| 3. Add upstream remote | `git remote add upstream https://github.com/ORIGINAL/project` | You need this to sync with the original |
+| 4. Install dependencies | `npm install` / `pip install -e .` / `cargo build` | Read CONTRIBUTING.md for the exact command |
+| 5. Run the tests | `npm test` / `pytest` / `cargo test` | If tests fail before your change, report it as an issue first |
+| 6. Run the linter | `npm run lint` / `ruff check .` / `cargo clippy` | Fix lint errors before your change, not after |
+| 7. Create a branch | `git checkout -b fix/issue-123` | Don't work on `main`; create a feature branch |
+
+### The "it works on my machine" problem
+
+Open source projects run on many environments. If the tests pass on your machine but fail in CI:
+
+1. Check the CI logs for the specific failure
+2. Check if it's an environment issue (OS, Node version, dependency version)
+3. Check if it's a timing issue (flaky test)
+4. If you can't reproduce it locally, say so in the PR
+
+## 2.4 Missing: Writing a good issue
+
+The contributor journey mentions claiming an issue but doesn't teach how to write a good bug report or feature request.
+
+Add a section:
+
+### Writing a good bug report
+
+| Section | What to include | Why it matters |
+|---|---|---|
+| Title | One sentence: what's broken and where | Maintainer triages by title |
+| Description | What you expected vs what happened | Maintainer needs the gap |
+| Reproduction steps | Exact steps to trigger the bug | Maintainer needs to reproduce it |
+| Environment | OS, version, browser, dependency versions | Many bugs are environment-specific |
+| Error message | The exact error, including stack trace | Maintainer needs the specific failure |
+| Screenshots/logs | If applicable | Visual evidence speeds diagnosis |
+| Minimal reproduction | The smallest code that triggers the bug | Maintainer can debug without your full setup |
+
+### The minimal reproduction principle
+
+The single most valuable thing you can include in a bug report is a **minimal reproduction**: the smallest piece of code that triggers the bug. This lets the maintainer debug without setting up your entire environment.
+
+| Bad | Good |
+|---|---|
+| "The app crashes when I click the button" | "Here's a 10-line code snippet that crashes when `handleClick` is called with a null argument" |
+| "The API returns 500" | "Here's the exact request body that triggers the 500, and the stack trace from the server logs" |
+
+### Writing a good feature request
+
+| Section | What to include | Why it matters |
+|---|---|---|
+| Problem statement | What problem does this solve? | Maintainer needs the "why" |
+| Current workaround | How do people solve this today? | Shows the pain is real |
+| Proposed solution | What should the API/behavior look like? | Gives the maintainer a starting point |
+| Alternatives considered | What other approaches did you consider? | Shows you've thought about trade-offs |
+| Breaking changes | Does this break existing behavior? | Maintainer needs to assess impact |
+
+## 2.5 Missing: License compatibility
+
+When can you combine code from different licenses? This is a common question the doc doesn't answer.
+
+Add a section:
+
+### License compatibility matrix
+
+| You're using… | You can combine with… | You cannot combine with… |
+|---|---|---|
+| MIT | MIT, BSD, Apache, GPL, AGPL | Nothing (MIT is compatible with everything) |
+| Apache 2.0 | MIT, BSD, Apache, GPL 3.0+ | GPL 2.0 (patent clause conflict) |
+| GPL 3.0 | MIT, BSD, Apache, GPL 3.0, AGPL | GPL 2.0-only (incompatible) |
+| AGPL | MIT, BSD, Apache, GPL 3.0, AGPL | Anything you don't want to open-source |
+| Proprietary | MIT, BSD, Apache | GPL, AGPL (copyleft would infect your code) |
+
+### The copyleft infection rule
+
+The key rule: **if you combine GPL code with your code, the combined work must be GPL.** This is the "copyleft infection" that makes GPL incompatible with proprietary software.
+
+| Scenario | Result |
+|---|---|
+| You use an MIT library in your proprietary app | Fine. MIT is permissive. |
+| You use a GPL library in your proprietary app | Your app must become GPL. This is usually unacceptable. |
+| You use an AGPL library in your SaaS | Your SaaS must offer source to users. This is usually unacceptable. |
+| You use an LGPL library in your proprietary app | Fine. LGPL allows linking without infection. |
+
+### The practical rule
+
+**Read the license before you depend on it.** If you're building proprietary software, avoid GPL and AGPL dependencies. If you're building open source, MIT and Apache are the safest choices for maximum compatibility.
+
+## 2.6 Missing: Evaluating project health
+
+How do you know if a project is worth contributing to? How do you know if it will still be alive in a year?
+
+Add a section:
+
+### Project health signals
+
+| Signal | Healthy | Unhealthy | What it tells you |
+|---|---|---|---|
+| Commit frequency | Weekly+ | Monthly or less | Is the project actively developed? |
+| Issue response time | < 1 week | > 1 month | Is the maintainer responsive? |
+| PR merge rate | > 50% | < 20% | Are contributions actually landing? |
+| Contributor count | > 5 | 1-2 | Is there a bus factor risk? |
+| Release frequency | Regular | Irregular or none | Is the project shipping? |
+| CI status | Green | Red or none | Are quality gates enforced? |
+| Dependency freshness | Up to date | Years out of date | Is the project maintaining dependencies? |
+| Documentation | Clear and current | Missing or stale | Does the project care about onboarding? |
+
+### The bus factor
+
+The **bus factor** is the number of contributors who would need to be hit by a bus before the project becomes unmaintainable. A bus factor of 1 means a single maintainer holds all the knowledge. If they leave, the project dies.
+
+| Bus factor | Risk | What to do |
+|---|---|---|
+| 1 | Critical: one person holds all knowledge | Contribute to build redundancy, or avoid the project |
+| 2-3 | Moderate: a few people hold knowledge | Contribute to build redundancy |
+| 4+ | Low: knowledge is distributed | Safe to depend on |
+
+## 2.7 Missing: Legal risks
+
+What happens if you accidentally include proprietary code in an open source contribution? What about patents? Trademarks?
+
+Add a section:
+
+### Legal risks in open source contributions
+
+| Risk | What it means | How to avoid it |
+|---|---|---|
+| Proprietary code in your PR | You copied code from a proprietary source | Only contribute code you wrote or have rights to |
+| Patent infringement | Your code implements a patented technique | Check for known patents; avoid novel techniques without legal review |
+| Trademark issues | You use a project's name/logo without permission | Follow the project's trademark policy |
+| CLA vs DCO | The project requires you to sign a contributor agreement | Read the CLA/DCO before contributing |
+| License violation | You combine incompatible licenses | Check the compatibility matrix above |
+
+### The "I wrote it at work" problem
+
+If you wrote the code as part of your job, your employer may own the copyright. Check your employment contract before contributing code you wrote at work.
+
+| Scenario | Who owns the code? | Can you contribute it? |
+|---|---|---|
+| You wrote it on personal time, personal equipment | You | Yes |
+| You wrote it at work, on work equipment | Your employer | Check your contract; usually no |
+| You wrote it at work, but it's unrelated to your job | Depends on contract | Check your contract; varies by jurisdiction |
+
+## 2.8 Missing: Open source security (supply chain)
+
+The [Security & Threat Modeling](./security-and-threat-modeling.html) doc covers supply chain security, but open-source-specific security deserves mention here.
+
+Add a section:
+
+### Open source supply chain risks
+
+| Risk | What it means | Example |
+|---|---|---|
+| Dependency confusion | Attacker publishes a package with the same name as your internal package | `lodash` vs `lodash-internal` |
+| Typosquatting | Attacker publishes a package with a misspelled name | `lodash` vs `l0dash` |
+| Malicious maintainer | A maintainer account is compromised | The `event-stream` incident (2018) |
+| Vulnerable dependency | A dependency has a known vulnerability | Log4Shell (2021) |
+| Abandoned dependency | A dependency is no longer maintained | You inherit the maintenance burden |
+
+### The dependency audit habit
+
+Before adding a new dependency:
+
+1. Check the maintainer (who are they? how active?)
+2. Check the download count (is it widely used?)
+3. Check the issue tracker (are issues responded to?)
+4. Check the license (is it compatible with your project?)
+5. Check for known vulnerabilities (`npm audit`, `pip audit`, `cargo audit`)
+
+---
+
+# 3. Medium-priority improvements
+
+## 3.1 Expand the "Contributing to AI-agent CLIs" section
+
+The current section is thin. Expand it with:
+
+- **Where the extension points are** (tools, providers, prompts) — already covered
+- **How to test agent behavior** — already covered briefly
+- **How to read an AI-agent codebase** — the architecture is different from a typical CLI
+- **The eval problem** — how do you know if your agent change is an improvement?
+- **The prompt engineering problem** — how do you write prompts that work across models?
+
+## 3.2 Expand the "Maintaining a project" section
+
+The current section covers triage, releases, burnout, and handoff. Add:
+
+- **Setting up CI/CD for your project** — the [CI/CD](./version-control-ci-cd-deployment.html) doc covers this, but open-source-specific CI setup deserves mention
+- **Managing breaking changes** — how to deprecate without breaking consumers
+- **Managing the community** — how to handle toxic contributors, how to say no to feature requests
+- **Funding your project** — GitHub Sponsors, Open Collective, Patreon, corporate sponsorship
+
+## 3.3 Add a "Forking etiquette" section
+
+When is it appropriate to fork? What happens when you fork?
+
+| Scenario | Appropriate? | Why |
+|---|---|---|
+| You want to contribute a fix | Fork, branch, PR | Standard workflow |
+| You want to customize for your use case | Fork and maintain your fork | Your fork is your responsibility |
+| You disagree with the project's direction | Fork and maintain your fork | Forking is a statement; be prepared to maintain it |
+| You want to rename/rebrand the project | Don't fork; trademark issues | Trademark law protects project names |
+
+## 3.4 Add a "Documentation as contribution" section
+
+Documentation is a contribution, but the doc doesn't emphasize this enough.
+
+| Contribution type | Difficulty | Impact |
+|---|---|---|
+| Typo fix | Trivial | Low but appreciated |
+| README improvement | Low | High: first thing newcomers see |
+| API documentation | Medium | High: developers depend on it |
+| Tutorial/guide | Medium-High | Very high: onboarding depends on it |
+| Architecture docs | High | Very high: maintainers depend on it |
+
+The insight: **documentation contributions are the easiest way to start contributing to open source.** They require no code changes, no test setup, and no maintainer review of logic. They're also the most appreciated because everyone benefits.
+
+## 3.5 Add a "Monorepo vs polyrepo in open source" section
+
+Many large open source projects are monorepos. The doc doesn't address this.
+
+| Approach | Examples | Pros | Cons |
+|---|---|---|---|
+| Monorepo | React, Babel, Kubernetes | Single PR can change multiple packages; atomic changes | Large repo; slow CI; complex tooling |
+| Polyrepo | Most npm packages | Small, focused repos; independent releases | Cross-repo changes require multiple PRs |
+
+## 3.6 Add an "Open source in enterprise" section
+
+How do enterprises consume and contribute to open source?
+
+| Aspect | What it means |
+|---|---|
+| Dependency management | Enterprises maintain a list of approved dependencies |
+| License compliance | Legal reviews every dependency's license |
+| Vulnerability management | Enterprises track CVEs in dependencies |
+| Contributing back | Enterprises contribute fixes upstream to avoid maintaining forks |
+| Inner source | Enterprises use open source practices internally |
+
+## 3.7 Add a "Measuring open source health" section
+
+How do you measure if a project is healthy? How do you measure if your contribution is valuable?
+
+| Metric | What it measures | How to measure it |
+|---|---|---|
+| Time to first review | How quickly PRs get reviewed | Median time from PR open to first review |
+| PR merge rate | What percentage of PRs land | Merged PRs / Total PRs |
+| Issue response time | How quickly issues get responses | Median time from issue open to first response |
+| Contributor retention | Do contributors come back? | % of contributors who make >1 PR |
+| Bus factor | Knowledge distribution | Number of contributors who touched >50% of files |
+
+## 3.8 Add a "Versioning in open source" section
+
+SemVer in the context of open source libraries.
+
+| Version change | What it means | Example |
+|---|---|---|
+| MAJOR (1.0.0 → 2.0.0) | Breaking change | API signature changed |
+| MINOR (1.0.0 → 1.1.0) | New feature, backward compatible | New optional parameter added |
+| PATCH (1.0.0 → 1.0.1) | Bug fix, backward compatible | Bug fixed without API change |
+
+The insight: **breaking changes in a public library are expensive.** Every consumer must migrate. This is why open source maintainers are conservative about breaking changes.
+
+## 3.9 Add a "Community norms" section
+
+Each community has different norms. How do you read a community before contributing?
+
+| Signal | What it tells you |
+|---|---|
+| Issue tone | Is the community welcoming or hostile? |
+| PR review style | Are reviews constructive or nitpicky? |
+| CONTRIBUTING.md quality | Does the project care about onboarding? |
+| Code of conduct | Is there one? Is it enforced? |
+| Maintainer responsiveness | Do they respond to issues and PRs? |
+
+## 3.10 Add a "Forking" section
+
+When is it appropriate to fork? What's the etiquette?
+
+| Scenario | Appropriate? | Etiquette |
+|---|---|---|
+| Contributing a fix | Yes | Fork, branch, PR |
+| Customizing for your use case | Yes | Fork and maintain your fork |
+| Disagreeing with direction | Yes, but be prepared to maintain | Fork and maintain, or don't fork |
+| Renaming/rebranding | No | Trademark issues |
+
+---
+
+# 4. Structural improvements
+
+## 4.1 Reorder the sections
+
+The current order is:
+1. Definition
+2. History
+3. Evolution
+4. Intersection
+5. Theory
+6. Mental models
+7. Licenses
+8. Governance
+9. Contributor journey
+10. Code review
+11. Maintaining
+12. Business models
+13. AI-agent CLIs
+14. Principles
+15. Worked example
+16. Failure modes
+17. Ecosystem
+18. Future
+19. Summary
+
+A better order would be:
+1. Definition
+2. History
+3. Evolution
+4. Intersection
+5. Theory
+6. Mental models
+7. Licenses
+8. Governance
+9. **Finding a project** (new)
+10. **Reading a codebase** (new)
+11. **Setting up a dev environment** (new)
+12. **Writing a good issue** (new)
+13. Contributor journey (expanded)
+14. Code review
+15. **License compatibility** (new)
+16. Maintaining
+17. Business models
+18. **Project health** (new)
+19. **Legal risks** (new)
+20. **Supply chain security** (new)
+21. AI-agent CLIs
+22. Principles
+23. Worked example
+24. Failure modes
+25. Ecosystem
+26. Future
+27. Summary
+
+## 4.2 Add a "Practical skills" section
+
+The doc is strong on theory but weak on practical skills. Add a section that collects all the practical skills:
+
+- Finding a project
+- Reading a codebase
+- Setting up a dev environment
+- Writing a good issue
+- Writing a good PR
+- Handling review feedback
+- License compatibility
+- Legal risks
+
+## 4.3 Add a "Checklist" for each practical skill
+
+Each practical skill should have a checklist:
+
+### Finding a project checklist
+- [ ] Does it have `good first issue` labels?
+- [ ] Is the commit history active (weekly+)?
+- [ ] Are issues responded to within a week?
+- [ ] Does CONTRIBUTING.md exist?
+- [ ] Is CI green?
+- [ ] Is the license clear?
+
+### Reading a codebase checklist
+- [ ] Read the README
+- [ ] Read CONTRIBUTING.md
+- [ ] Read the directory structure
+- [ ] Read the entry point
+- [ ] Find the issue you want to fix
+
+### Setting up checklist
+- [ ] Fork the repo
+- [ ] Clone your fork
+- [ ] Add upstream remote
+- [ ] Install dependencies
+- [ ] Run the tests
+- [ ] Run the linter
+- [ ] Create a branch
+
+---
+
+# 5. Factual notes
+
+| Claim | Assessment |
+|---|---|
+| GNU 1983 | Correct |
+| Linux GPL 1991 | Correct |
+| Cathedral and Bazaar 1997 | Correct (presented 1997, published 1999) |
+| OSI 1998 | Correct |
+| Mozilla 1998 | Correct |
+| Open source definition 10 criteria | Correct |
+| Linus's Law | Correct |
+| BDFL examples | Correct |
+| Apache meritocracy | Correct |
+| React Foundation 2026 | Consistent with React 2024 doc |
+| AGPL "SAAS loophole" | Correct |
+| Apache 2.0 patent grant | Correct |
+| GPL 2.0 vs GPL 3.0 incompatibility | Correct |
+| Event-stream incident 2018 | Correct |
+| Log4Shell 2021 | Correct |
+
+---
+
+# 6. Summary of improvements
+
+## Must add (practical skills)
+
+1. **Finding a project** — signals, red flags, skill matching
+2. **Reading a codebase** — the 30-minute method, follow the data, what to skip
+3. **Setting up a dev environment** — fork, clone, upstream, install, test, lint, branch
+4. **Writing a good issue** — bug report structure, minimal reproduction, feature request structure
+5. **License compatibility** — compatibility matrix, copyleft infection rule, practical rule
+6. **Project health** — health signals, bus factor
+7. **Legal risks** — proprietary code, patents, trademarks, CLA vs DCO, "I wrote it at work"
+8. **Supply chain security** — dependency confusion, typosquatting, malicious maintainer, dependency audit
+
+## Should add (expand existing)
+
+9. **Expand AI-agent CLIs** — reading an AI-agent codebase, the eval problem, prompt engineering
+10. **Expand maintaining** — CI/CD setup, breaking changes, community management, funding
+11. **Forking etiquette** — when to fork, fork maintenance
+12. **Documentation as contribution** — documentation is the easiest contribution
+13. **Monorepo vs polyrepo** — open source monorepos
+14. **Open source in enterprise** — dependency management, license compliance, contributing back
+15. **Versioning in open source** — SemVer, breaking changes
+
+## Nice to have
+
+16. **Community norms** — reading a community before contributing
+17. **Measuring open source health** — metrics
+18. **Open source and the job market** — how contributions affect career
+
+---
+
+# 7. Bottom line
+
+This doc is **strong on theory and weak on practice**. It tells you what open source is, how it works, and what the journey looks like. But it doesn't teach you the skills you need to actually walk the journey: finding a project, reading a codebase, setting up a dev environment, writing a good issue, understanding license compatibility, or evaluating project health.
+
+The fix is to add a **practical skills layer** that collects all the "how to" skills in one place. This would make the doc not just a reference but a **field manual** — something you can use the day you decide to make your first PR.
+
+The highest-leverage improvements are:
+
+> Finding a project, reading a codebase, setting up a dev environment, writing a good issue, license compatibility, project health, legal risks, and supply chain security.

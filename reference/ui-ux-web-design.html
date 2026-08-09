@@ -188,6 +188,21 @@
   </tbody>
 </table>
 
+<p>The same history, read as <em>frontend value</em>: the bar rose every era — nothing was replaced, everything stacked:</p>
+
+<table>
+  <thead><tr><th>Era</th><th>"Does it work?" meant…</th><th>Frontend value was…</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1995–2005</strong></td><td>Does it render at all?</td><td>Making HTML/CSS work</td></tr>
+    <tr><td><strong>2005–2010</strong></td><td>Does it render across browsers?</td><td>Cross-browser compatibility</td></tr>
+    <tr><td><strong>2010–2015</strong></td><td>Does it render across devices?</td><td>Responsiveness (Marcotte coined RWD in 2010)</td></tr>
+    <tr><td><strong>2015–2020</strong></td><td>Does it work as an application?</td><td>State management + API integration (React/Redux era)</td></tr>
+    <tr><td><strong>2020–now</strong></td><td>Does it work performantly, accessibly, responsively, as an app, with good DX?</td><td>All of the above simultaneously</td></tr>
+  </tbody>
+</table>
+
+<p>Accessibility and responsiveness didn't lose value when state management and API integration arrived — they became <strong>table stakes</strong>: expected, not differentiating. The 2020–now row is the whole shelf's job description; this doc owns the a11y, responsiveness, and cognitive-load columns of it.</p>
+
 <p>The pattern repeats: when the dominant constraint changes (reproduction → human limits → screen space → network → touch → team scale → performance → accessibility → AI), the old method's ergonomics become friction and a new method absorbs the constraint.</p>
 
 ---
@@ -363,6 +378,8 @@
 </table>
 
 <p><strong>Anti-pattern:</strong> High-fidelity mockups without state matrix. A static Figma frame is a screenshot, not a specification. The spec is the state matrix + interaction model + accessibility annotations. If you can't answer "what does this look like when loading/error/empty/focused?" for every component, you don't have a design — you have a picture.</p>
+
+<p><strong>The legal floor is real.</strong> WCAG AA is not just a quality bar — it is increasingly a <em>legal</em> one: the ADA (US) applies to public-facing sites, Section 508 (US federal), and the European Accessibility Act (EAA, enforceable 2025) extends to most EU-facing commercial products. "Accessibility as default, not checklist" is the professional stance because the alternative is a lawsuit for the client — not just an unhappy user. The platform mechanics live in <a href="./html-and-css.html">HTML &amp; CSS</a>; this doc owns the design discipline that makes them a floor, not a retrofit.</p>
 
 ---
 

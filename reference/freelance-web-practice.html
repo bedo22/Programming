@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freelance Web Practice — the craft of client work</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference Shelf · The Real Web</p>
+  <h1>Freelance Web Practice — the craft of client work</h1>
+  <p class="meta">For: the developer who wants to get paid to build the other 60% of the web — and stay sane doing it.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The engineering docs teach you to build; this one teaches you to build <em>for someone</em> — scope, price, contract, deliver, maintain, hand off. The skills here decide whether freelancing is a career or a sequence of favors.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│            WHAT THE SHELF KNOWS HOW TO DO                      │
+│   HTML/CSS/JS → React → backend → APIs → data → security      │
+│   → CMS internet → payments                                    │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│         WHAT FREELANCING ACTUALLY REQUIRES                     │
+│   scoping → pricing → contracts → delivery → maintenance →    │
+│   client comms → handoff → finding the next client             │
+│   ── half of it has nothing to do with code ──                │
+└───────────────────────────────────────────────────────────────┘
+   The web's actual professional tier: small businesses with
+   small budgets, built on WordPress, maintained for years.
+   Most developers are taught the top of the pyramid and
+   starve at the bottom of it.
+</pre>
+  <p><strong>Neighbors on the shelf:</strong> <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> (the platform most client work runs on) · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (e-commerce builds and getting paid) · <a href="./backend-engineering.html">Backend Engineering</a> (custom builds) · <a href="./income-stream-landscape.html">Income Streams</a> and <a href="./frontend-income-markets.html">Income Markets</a> (the <em>business</em> side: positioning, rates, finding clients — this doc owns the <em>delivery</em> side) · <a href="./frontend-camps-survey.html">Camps Survey</a> (how freelancing fits the JS-learner path)</p>
+</blockquote>
+
+<section class="recap">
+  <p><strong>Why this doc exists separately.</strong> The income docs answer "where does the money come from and how do I position?" This doc answers "what actually happens on a client project, from first call to final invoice?" — the part no bootcamp teaches: scoping conversations, quoting honestly, writing a contract, running the build, handling the handoff, and building the retainer that turns one-off projects into a business. The business docs assume delivery works; this is what makes it work.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<ul>
+  <li><strong>Before your first client project:</strong> read the Scoping, Pricing, and Contract sections — they're the difference between a project and a disaster.</li>
+  <li><strong>During a build:</strong> the Delivery process and the Working example are the workflow reference.</li>
+  <li><strong>After launch:</strong> Handoff, Maintenance, and Getting paid are the professional's edge — this is where freelancing becomes a business.</li>
+  <li><strong>When something goes wrong:</strong> the Failure modes table is your diagnostic, and the <em>root-cause rule</em> applies: most project failures trace back to the scoping call, not the code.</li>
+</ul>
+
+<h2>Definition — what freelance web work actually is</h2>
+
+<p><strong>Freelance web work is selling a business outcome to a non-technical buyer, delivered with engineering discipline.</strong> The client does not buy HTML, React, or "a website" — they buy "customers can find me", "I can take bookings", "I look professional online". The web professional's job is to translate outcome into scope, scope into price, price into contract, and contract into a delivered, maintained, working site.</p>
+
+<p><strong>The market reality (the Camps Survey's view, delivered):</strong></p>
+<table>
+<thead><tr><th>Tier</th><th>The client</th><th>The product</th><th>Who wins here</th></tr></thead>
+<tbody>
+<tr><td><strong>The pyramid base — the other 60%</strong></td><td>Local businesses, clinics, gyms, restaurants, real estate, service providers — no dev team, no designer, small budget</td><td>WordPress sites, booking forms, small stores, landing pages — "a website I can edit myself"</td><td>The all-rounder: WordPress + CSS + a form plugin + SEO basics + reliable delivery (see <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a>)</td></tr>
+<tr><td><strong>The middle</strong></td><td>Startups, funded companies, growing businesses</td><td>Custom builds: React/Next.js frontends, headless CMS, integrations, e-commerce</td><td>The specialist with product instincts — you're hired for a bounded piece</td></tr>
+<tr><td><strong>The top</strong></td><td>Enterprises and agencies</td><td>Subcontracting, specialized engineering, long engagements</td><td>Reliability and niche depth; you sell availability, not discovery</td></tr>
+</tbody>
+</table>
+
+<p><strong>The honest positioning:</strong> every tier is a legitimate business; the "glamorous" tier is not automatically the profitable one. The base tier pays smaller per project but has endless demand, low competition, and recurring maintenance — and it is where a single freelancer builds a stable business fastest. The middle pays better per project but requires a portfolio, product sense, and tolerance for scope monsters. Choose by temperament and runway, not by status.</p>
+
+<h2>History — how freelancing changed</h2>
+
+<table>
+<thead><tr><th>Era</th><th>How work was found</th><th>The inversion</th><th>What it means today</th></tr></thead>
+<tbody>
+<tr><td><strong>The webmaster era (1995–2005)</strong></td><td>Local reputation; you were the only one who could</td><td>→ Everyone can have a website, but only you can build one</td><td>The template of "the web guy" — the role never died, it moved to WordPress</td></tr>
+<tr><td><strong>The platforms (2005–2015)</strong></td><td>Elance, oDesk, Freelancer — race to the bottom on price</td><td>→ Global competition, commoditized cheap work</td><td>The lesson: price-competition is a trap; positioning beats bidding (see <a href="./frontend-income-markets.html">Income Markets</a>)</td></tr>
+<tr><td><strong>The wave (2015–2020)</strong></td><td>Startup boom — "learn to code" → React freelancers</td><td>→ Frameworks commoditized too; the market flooded with junior "full-stack" devs</td><td>Specialization + business skills became the differentiator, not framework knowledge</td></tr>
+<tr><td><strong>The platforms era 2 (2020s)</strong></td><td>Upwork, Fiverr, Toptal — matching but still price-weighted</td><td>→ AI site builders eat the bottom; "build me a website" is now "build me a website <em>and run it</em>"</td><td>Delivery + maintenance is the defensible product; the build is the entry point, the retainer is the business</td></tr>
+</tbody>
+</table>
+
+<p><strong>The pattern:</strong> every wave commoditized the previous era's build work and moved value up the stack — from coding to frameworks to <em>outcomes and ongoing ownership</em>. The freelancer who treats the build as the product is selling the most commoditized thing; the one who sells the maintained outcome owns the relationship.</p>
+
+<h2>Intersection with neighbors — the duplication boundaries</h2>
+
+<table>
+<thead><tr><th>Topic</th><th>Where it lives</th><th>This doc's boundary</th></tr></thead>
+<tbody>
+<tr><td>Positioning, rates, finding clients, niche</td><td>Frontend Income Markets + Income Streams</td><td>That's the business strategy; here we assume the client exists and focus on the project</td></tr>
+<tr><td>Platform choices (WordPress, Shopify, custom)</td><td>WordPress &amp; the CMS Internet</td><td>Decision logic lives there; the scoping conversation and the quote live here</td></tr>
+<tr><td>Payment rails, getting paid, invoicing</td><td>Payments &amp; Commerce</td><td>Rails and merchant mechanics there; payment terms and the money conversation with clients here</td></tr>
+<tr><td>Security hardening of client sites</td><td>Security &amp; Threat Modeling + WordPress doc</td><td>The retainer's update schedule and backups are the delivery obligation; the hardening techniques are theirs</td></tr>
+<tr><td>Custom backend/app work</td><td>Backend Engineering</td><td>The build process here wraps their content: the loop, the CRUD, the webhooks are all theirs</td></tr>
+</tbody>
+</table>
+
+<h2>Underlying theory — the invariants of client work</h2>
+
+<ol>
+  <li><strong>The client buys the outcome, not the artifact.</strong> Every conversation, quote, and milestone must translate code into their world: "you'll be able to edit your services page" beats "I'll build a custom post type."</li>
+  <li><strong>Scope is negotiated before it is executed.</strong> Every feature added after the contract is a scope change — which is fine, <em>if it changes the price</em>. The rule is not "no changes"; it's "changes have prices."</li>
+  <li><strong>The contract is the relationship's memory.</strong> When the project goes sideways (it will), the contract — not goodwill, not chat history — decides what happens. Written scope, payment schedule, and change policy are kindness, not paperwork.</li>
+  <li><strong>Delivery is a promise with a schedule.</strong> Milestones, deliverables, and a launch date are commitments. The professional's reputation is built on the boring reliability of "it works, it's on time, it's documented" — not on cleverness.</li>
+  <li><strong>The handoff is the product.</strong> A site the client can't edit without you is a liability, not a deliverable. Editing guides, training, and an admin the client can actually use are part of the build — the WordPress doc's "editing is a deliverable" rule.</li>
+  <li><strong>Maintenance is the business.</strong> The build is the entry ticket; the retainer is the recurring revenue that makes freelancing a business instead of a series of projects. Any project that ends at launch is a project that ends.</li>
+  <li><strong>Money terms are set before work starts.</strong> Deposit, milestones, payment schedule, late fees — set in writing before a line of code. The invoice conversation is the one conversation freelancers dread and the one that decides whether this is a career.</li>
+</ol>
+
+<h2>Mental models — frames for thinking about client work</h2>
+
+<ul>
+  <li><strong>The translation layer.</strong> You are the interface between business-speak and engineering-speak. "I want it to pop" → "hero section with a strong headline and a clear CTA". The entire scoping call is translation; when you can restate their outcome back to them in their own words, you're ready to quote.</li>
+  <li><strong>The two clocks.</strong> There's the clock you bill by (hours) and the clock the client experiences (calendar days). Protect both: estimate honestly, then manage the calendar with milestones. A project that's "90% done" for three months is a failed project even if the code is fine.</li>
+  <li><strong>Scope as a contract, changes as amendments.</strong> The scope document is not a wish list; it's a boundary. "Can you also…?" is answered with "Yes — that's a change; here's what it adds." Friendly, professional, and written.</li>
+  <li><strong>The retainer as the relationship.</strong> A maintenance plan converts the client from a transaction into a subscription: updates, backups, small changes, availability. Both sides win — they get a site that stays alive, you get predictable income.</li>
+  <li><strong>The review cycle as the risk zone.</strong> Most project delays are feedback loops, not coding: revisions that arrive late, contradict each other, or never come. The fix is structural: one point of contact, written feedback, a revision limit in the contract, and deadlines on feedback ("revisions must arrive within 10 days or the milestone stands").</li>
+  <li><strong>The launch is the middle, not the end.</strong> The moment the site goes live is when the real relationship starts: monitoring, fixes, the retainer pitch, the referral ask. Professionals plan the post-launch month as carefully as the build.</li>
+</ul>
+<h2>The scoping call — where projects are won or lost</h2>
+
+<p>Before any quote, there is a conversation. Its job is not to sell; it's to <em>extract the outcome and the constraints</em>. The agenda, every time:</p>
+
+<ul>
+  <li><strong>What's the business?</strong> Who are their customers, and what does a successful site mean for them? (New customers? Bookings? Credibility?)</li>
+  <li><strong>What must the site do?</strong> List the features in business terms: "edit my services", "take bookings", "sell products", "blog". Keep asking "and then what?" until you hit the real scope.</li>
+  <li><strong>Who edits it?</strong> The single most important question — it decides the platform (the <a href="./wordpress-and-cms-internet.html">WordPress doc's</a> rule: the admin is the product). Receptionist? Marketing person? Nobody?</li>
+  <li><strong>What already exists?</strong> Old site? Domain? Hosting? Email? Brand assets? What must be migrated?</li>
+  <li><strong>What's the deadline and why?</strong> A launch date tied to a real event (new season, grand opening) is a constraint that prices itself.</li>
+  <li><strong>What's the budget?</strong> Ask it directly, early, and without apology. Their answer shapes everything — and "I don't know" is an answer that gets you the scoping power.</li>
+  <li><strong>Who decides?</strong> One decision-maker. A project with three stakeholders and no single approver is a project with three revision loops.</li>
+  <li><strong>What does failure look like?</strong> "If the site launches but nobody books appointments, what will you blame me for?" It uncovers the hidden expectations ("I expect you to do my SEO and marketing") that would otherwise surface as post-launch rage.</li>
+</ul>
+
+<h3>Red flags even the deposit won't filter</h3>
+
+<ul>
+  <li><strong>The scoping-call tells:</strong> "my nephew tried to build it but…", "we'll pay you out of the profits", "I need this by Friday" (with no budget attached), or being treated like an order-taker instead of an expert. None of these is automatically fatal — but each one is a negotiation to have <em>before</em> signing, not after.</li>
+  <li><strong>The kill fee (in the contract, not the mood):</strong> the termination clause (below) is your exit ramp — written notice, work done to date paid, deliverables handed over. A client who becomes abusive, endlessly stalls feedback, or won't pay gets the professional version of "no": you keep the deposit for work done, hand over the assets, and walk away with the reputation intact. Firing a bad client early is cheaper than finishing for one.</li>
+</ul>
+
+<p><strong>The deliverable of the scoping call is not the sale — it's the scope document.</strong> A written proposal that restates their outcome, lists what's included (and what's not), states the platform, the timeline, the price, and the change policy. The proposal is the contract's first draft, and a client who can't agree with a written proposal was never going to agree with a contract.</p>
+
+<h3>The three documents — brief, SRS, proposal</h3>
+
+<p>Client projects run on three documents, and each has a different author and job:</p>
+<ul>
+  <li><strong>The brief</strong> — the client's one-page wish: "we're a clinic, we want patients to find us and book online." It's theirs, it's short, and it's almost never complete. Your first job in the scoping call is extracting the details the brief left out.</li>
+  <li><strong>The SRS (Software Requirements Specification)</strong> — yours, and the doc that writes down the agreed project in detail: numbered functional requirements ("the site must display services with prices; the booking form must send to the receptionist's email; admin must edit services without code"), each testable, each an acceptance criterion. For small sites the SRS is the proposal's scope list; for bigger projects it's its own document that the contract references. Every line you wrote down and the client signed is a change-order shield later.</li>
+  <li><strong>The proposal</strong> — yours, the commercial wrapper: outcome, platform rationale, timeline, price, milestones, change policy. The SRS says <em>what</em>; the proposal says <em>what it costs and when it ships</em>; the contract says <em>what happens if either side breaks the deal</em>.</li>
+</ul>
+
+<p><strong>Modules = milestones with teeth.</strong> "We deliver in modules" is how clients describe phased delivery: each module (content pages → booking → payments, say) is scoped, built, demoed, and <em>tested against its acceptance criteria</em> before the next starts — and each maps to a milestone payment. The code side of the bargain is a vertical slice: the module is a feature folder in your codebase, independently buildable and testable (the <a href="./system-design.html">System Design</a> doc's codebase-architecture rule). Contract modules, code slices, and milestone payments are one structure seen from three sides — agree on all three in the proposal, and "surprises" stop being a thing.</p>
+
+<h2>Pricing — the honest arithmetic</h2>
+
+<p>Three pricing models, and when each wins:</p>
+
+<table>
+<thead><tr><th>Model</th><th>How it works</th><th>Wins when</th><th>The trap</th></tr></thead>
+<tbody>
+<tr><td><strong>Fixed-price project</strong></td><td>Quote the whole thing: scope × your rate + buffer, paid in milestones (typically 30–50% deposit, then milestones, then final on launch)</td><td>Well-scoped, bounded work (the WordPress tier is ideal) — client gets certainty, you get a deposit</td><td>Scope creep eats you — but the change policy (below) and the buffer make it safe. The buffer is not optional: multiply your estimate by 1.5–2× for fixed quotes</td></tr>
+<tr><td><strong>Hourly</strong></td><td>Time × rate, capped or open</td><td>Maintenance, ongoing work, genuinely unbounded exploration</td><td>You're selling your hours, not the outcome; it rewards slowness and punishes speed — a specialist who works fast earns less per project</td></tr>
+<tr><td><strong>Value-based / retainer</strong></td><td>Priced by the business value (a booking site that brings 10 customers/month is worth its return), or a monthly fee for ongoing care</td><td>Outcome-selling, recurring relationships — the freelancer's upgrade path</td><td>Requires confidence and measurement; you must be able to say what your work returns</td></tr>
+</tbody>
+</table>
+
+<p><strong>The rate arithmetic (the honest version):</strong> an hourly rate is not "what I'm worth" — it's (target annual income + overhead) ÷ billable hours. If you need $60k/year and can realistically bill 1,000 hours (the rest is admin, sales, learning, downtime), the rate is ~$60–70/hr — before you consider positioning (see <a href="./frontend-income-markets.html">Income Markets</a> for the positioning side). Most freelancers underpriced because they did this arithmetic with hope instead of division.</p>
+
+<p><strong>The quote structure that protects everyone:</strong></p>
+<ul>
+  <li>Deposit (30–50%) before work starts — it funds the project and filters unserious clients.</li>
+  <li>Milestone payments tied to deliverables the client can see (design approval, staging launch, final launch).</li>
+  <li>Final payment on launch — and the site's keys are the final deliverable, so the leverage is honest both ways.</li>
+  <li>A change policy in the quote: included revisions (say 2 rounds), then additional work billed at your rate. Written, always.</li>
+</ul>
+
+<h2>The contract — the relationship's memory</h2>
+
+<p>A contract is not legal armor; it's a shared memory of what was agreed. A one-page client-friendly agreement (no legalese) covering:</p>
+<ul>
+  <li><strong>Scope:</strong> the exact deliverables list (the proposal's list, verbatim) and an explicit "out of scope" list — "design changes beyond the included revisions; content writing; SEO beyond on-page basics".</li>
+  <li><strong>Price and schedule:</strong> the amounts, the milestone map, payment terms ("due within 14 days", late fees), and what happens on non-payment (pause work — it's in the contract, so it's not a confrontation).</li>
+  <li><strong>Timeline and revisions:</strong> the launch date, feedback deadlines, the revision limit, and the rule that feedback gaps extend the schedule.</li>
+  <li><strong>Ownership:</strong> they own the site when it's paid for; you retain the right to show it in your portfolio; content and assets they supply are theirs to license to you for the build.</li>
+  <li><strong>Licensing and third-party costs:</strong> the premium theme, plugin licenses, stock photos, and commercial fonts are <em>their</em> purchases — on their card, or line-itemed in the quote and renewed via the retainer. Never buy licenses on your own card: the renewal reminder (and the $60 shock) belongs to the client.</li>
+  <li><strong>Indemnification:</strong> a clause that you're not liable for copyright infringement on content they supply and insist on using — stolen images, trademarked text, a logo from "some guy on Fiverr". Their assets, their responsibility; you flag it in writing and move on.</li>
+  <li><strong>Maintenance and warranty:</strong> a defined warranty window after launch (bug fixes, say 30 days) — and what maintenance costs after it (the retainer). A warranty without an end date is a career.</li>
+  <li><strong>Termination:</strong> either side can end it with written notice; work done to date is paid; deliverables up to the termination point are handed over.</li>
+</ul>
+
+<p>Plain language, one page, signed before work. Templates exist everywhere; the discipline is <em>using</em> one. The client who balks at a simple agreement is the client who would have been a problem anyway — the filter is working.</p>
+
+<h2>Delivery — running the build like a professional</h2>
+
+<p>The build itself is the engineering docs' content, wrapped in project discipline:</p>
+<ul>
+  <li><strong>Milestones the client can see.</strong> Design/layout approval → content in → staging site → launch. Each milestone is a demo moment: "here's your site, look how far it's come." Clients judge progress by visible artifacts, not by commit counts.</li>
+  <li><strong>Staging is the honest workspace.</strong> The client reviews on a staging URL (with a login), never in production. When they break something during a review, the staging site absorbs the lesson — that's its job.</li>
+  <li><strong>One point of contact, written feedback.</strong> Collect revisions in one channel; summarize them into a list you both can see. Vague feedback ("make it pop") gets a clarifying question, not a guess. (The <a href="./security-and-threat-modeling.html">docs'</a> rule of "trust boundaries" applies socially too: the feedback channel is a boundary — protect it.)</li>
+  <li><strong>Launch = checklist, not vibes.</strong> Domain/DNS switched, HTTPS on, redirects mapped, backups verified, analytics installed, forms tested, SEO basics in (titles, meta, sitemap), the <a href="./security-and-threat-modeling.html">security baseline</a> set (updates, backups, login hardening), the <a href="./wordpress-and-cms-internet.html">WordPress</a> cache on, and a rollback plan ("if DNS or the new site fails, we flip back — 15 minutes").</li>
+  <li><strong>Post-launch week.</strong> Monitor uptime and forms, fix the small things that surface, deliver the editing guide, and have the maintenance conversation while the site is fresh and they're happy.</li>
+</ul>
+
+<h2>Content and communication — the two silent killers</h2>
+
+<p>Neither shows up in the contract, and both decide whether the project finishes on time. The code is rarely the delay; content and feedback channels are.</p>
+
+<h3>The content bottleneck — gathering the assets</h3>
+
+<ul>
+  <li><strong>The content-first rule:</strong> don't build the final theme against phantom content. Lock the core copy (at minimum homepage + services) before the design phase closes — building layouts for placeholder text guarantees a redesign round when the real content arrives.</li>
+  <li><strong>Don't ask the client to "write the copy."</strong> They won't, and they'll feel guilty about it, and the project stalls. Give them a structured questionnaire (services, prices, hours, contact details, photos available) or interview them and draft the copy yourself — light copy-editing is already in the proposal's scope, and it's the cheapest delay-remover in the business.</li>
+  <li><strong>The placeholder penalty, in the contract:</strong> if content arrives late, the launch date shifts day-for-day, and staging proceeds with lorem ipsum and stock placeholders. Final content insertion after launch is a billed maintenance task. This is not punishment — it's how the "two clocks" stay honest when the client owns one of them.</li>
+  <li><strong>Assets and copyright:</strong> who provides the photos? "Just grab them from Google" is the moment to intervene — commercial-use photos (client's own, paid stock, or a licensed photographer) are the client's cost, and the contract's indemnification clause (below) covers what they supply anyway.</li>
+</ul>
+
+<h3>Communication boundaries — protecting the other clock</h3>
+
+<ul>
+  <li><strong>One source of truth.</strong> Feedback, revisions, approvals, and questions happen in one shared place (the proposal doc, a Notion page, one email thread). "If it's not in the tool, it doesn't exist" — and it's the rule that keeps a WhatsApp thread from becoming the project's memory.</li>
+  <li><strong>The "quick question" trap.</strong> "Can you just change this one color?" at 9 PM is a change, and answering it sets a precedent for the next fifty. The professional answer is a schedule: "I handle site changes in my admin blocks on Tuesdays and Thursdays — I've added this to the list." Small requests get batched; batched work gets billed (against the retainer, or as a change).</li>
+  <li><strong>Office hours.</strong> State your working hours in the onboarding/proposal doc — when you reply, when you don't, and what counts as urgent (site down = urgent; color change = Tuesday). Boundaries stated upfront are read as professionalism; boundaries invented mid-project are read as coldness.</li>
+</ul>
+
+<h2>The handoff — editing is a deliverable</h2>
+
+<ul>
+  <li><strong>Roles set up for the people who'll actually edit</strong> — receptionist gets content permissions, not admin; the owner gets admin. (The <a href="./wordpress-and-cms-internet.html">WordPress doc's</a> roles-and-capabilities rule, applied.)</li>
+  <li><strong>A two-page editing guide</strong> written in their language: "How to change your services", "How to write a blog post", "How to check bookings". Screenshots. No jargon. It's part of the quote, and it's the deliverable that makes you look like a professional instead of a vendor.</li>
+  <li><strong>A 10-minute walkthrough recording</strong> saved to a link they can rewatch — the guide, demonstrated.</li>
+  <li><strong>The "when things break" one-pager.</strong> Clients break things in the first 48 hours after launch by "fixing" them. A one-page protocol: 1) don't panic, 2) check this box (is the change visible on the staging site?), 3) email me with a screenshot. And the boundary it sits on: bugs in my code, fixed free in the warranty window; layout broken by a plugin <em>they</em> installed — billed at retainer rate. Written, so the second category doesn't become the first.</li>
+  <li><strong>Access handover:</strong> hosting, domain, email, and the staging site documented in one password-managed share or a simple handover doc — never spread across chat history.</li>
+  <li><strong>The maintenance conversation, already priced.</strong> "Updates, backups, and small changes — X/month." The <a href="./wordpress-and-cms-internet.html">WordPress doc's</a> retainer structure: updates on a schedule, backup verification, uptime checks, a monthly content-change allowance. A client who declines now calls you in a panic in six months — and that call is the most expensive form of both your time and theirs.</li>
+</ul>
+
+<h2>Getting paid — the money conversation</h2>
+
+<p>Rails and mechanics are in <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>; the professional posture is here:</p>
+<ul>
+  <li><strong>Terms in the contract, deposits upfront.</strong> The deposit is the first test of the relationship: a client who delays the deposit will delay the invoice. It's not mean — it's how serious businesses work.</li>
+  <li><strong>Invoice at milestones, not at the end.</strong> Milestone invoices are small and obvious; the final invoice is the only one that can surprise anyone. Itemize what was paid for — "design approval", "staging", "launch".</li>
+  <li><strong>Late payments get a process, not anger.</strong> Friendly reminder at day 15, firmer at 30, work pauses per the contract at 45 (the contract's pause clause makes this a rule, not a fight). Most late payments are forgetfulness, not malice — the process catches both.</li>
+  <li><strong>Get paid internationally without eating the fees.</strong> Wise or Payoneer for cross-border clients; invoicing in the client's currency; the FX cost priced into the quote if you're eating it. (See <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>'s payouts row.)</li>
+  <li><strong>Chargebacks on your own invoices:</strong> client disputes the invoice via their card. Your defense is the paper trail — contract, milestones, delivery proof, the handoff doc — and the deposit structure, which limits exposure. (The <a href="./payments-and-commerce.html">dispute</a> rules apply to you too.)</li>
+  <li><strong>The housekeeping:</strong> a separate business account (all client payments in, a "salary" to your personal account out), a tax set-aside per your jurisdiction's rules (the percentage is an accountant's answer, not a blog post's), and expenses tracked from day one. Mixing money with your personal account is how freelancers discover taxes exist.</li>
+</ul>
+
+<h2>Marketing and reporting — "nobody visits" to "40 inquiries"</h2>
+
+<p>The site is a means; the outcome is visits that turn into inquiries. This is the layer that moves a clinic from "we have a website" to "we have a website that brings in patients" — and it's the layer that makes the retainer stick. Two halves: marketing yourself (getting your own clients) and conversion &amp; reporting (making your client's site work).</p>
+
+<h3>Marketing yourself — the freelancer is the first site you sell</h3>
+
+<ul>
+  <li><strong>Your portfolio is a case study, not a gallery.</strong> Each entry answers four questions in the client's language: what outcome did they buy (before/after), what problem made it hard, what did you build, what result is measurable (bookings up, load time down, inquiries per month). A gallery of screenshots with no outcome is a wallpaper store; three case studies with numbers are a sales argument.</li>
+  <li><strong>Niche positioning beats "I build websites."</strong> "I build WordPress sites for clinics and small medical practices" is findable and referable — prospects recognize themselves. Generalists compete on price; a niche competes on relevance, and referrals compound inside one industry (a dentist refers the orthodontist). Pick the niche by where your local market and your temperament intersect, not by status.</li>
+  <li><strong>Pricing-as-positioning:</strong> the quote is marketing too. A clear, professional proposal with a deposit and a retainer structure signals a business; a nervous "how much do you charge?" discounts itself. You're not cheap because you're new — you're cheap because you asked to be.</li>
+  <li><strong>The referral engine is the deliverable, deployed.</strong> The worked example ends on it: the open house happens, neighbors ask who built it, the delivered outcome sells. Ask for the referral at the moment of maximum trust — the handoff, not the pitch. A one-line ask ("if anyone asks, I'd love the intro") outperforms a brochure.</li>
+</ul>
+
+<h3>Conversion &amp; reporting — making the client's site work</h3>
+
+<ul>
+  <li><strong>The scoping question that changes everything: "what's the conversion goal?"</strong> A clinic's answer is "book an appointment" — so the booking button is the page's hero, not "Learn more." Every page gets a job: this one answers, that one converts, that one trusts. Ask it in the scoping call; it reframes the whole build from decoration to funnel.</li>
+  <li><strong>Landing-page anatomy (the three moves):</strong> one page, one goal, one next step. Headline states the outcome, the form is above the fold with the fewest possible fields (name + phone beats a nine-field torture test), and the trust row (reviews, guarantee, credentials) sits between the ask and the button. The <a href="./ui-ux-web-design.html">UI/UX</a> doc's friction rules apply directly: every extra field is a leak.</li>
+  <li><strong>Tracking installed at launch, not after.</strong> Search Console (indexing), Analytics (where visitors come from and what they do), and — if the client runs paid ads — conversion tracking pixels so the ad budget reports against real bookings, not vanity clicks. <strong>The ads boundary:</strong> install the tracking and interpret the data; do not run campaigns or manage spend — that's a separate retainer with a separate skill, and the honest freelancer says so. (Partner or decline.)</li>
+  <li><strong>The monthly report is a retainer deliverable.</strong> One page, the client's numbers, their language: inquiries this month vs last, where they came from (Google, the map pack, a referral), which pages drove them, and what you changed. It converts "you send me invoices for nothing" into "you're the person who made my phone ring." It's also your early-warning system: when the numbers stall, it's a conversation, not a surprise.</li>
+  <li><strong>Copy is part of the deliverable.</strong> The <a href="./wordpress-and-cms-internet.html">WordPress doc's</a> content bottleneck is where sites die; the same principle applies to conversion copy — headlines and CTAs written for the visitor's language ("Book your appointment online" beats "Our services"). Light copy-editing is in scope; full content strategy is a separate engagement.</li>
+</ul>
+
+<h2>Worked example — the clinic site, end to end</h2>
+
+<p>The <a href="./wordpress-and-cms-internet.html">WordPress doc's</a> worked example built the clinic site; here's the same project as a <em>business</em>:</p>
+
+<p><strong>Step 1 — the scoping call.</strong> The clinic's receptionist and the doctor attend. Outcome extracted: "patients should find us on Google, see our services, book appointments, and edit their own info." Editor identified: the receptionist, non-technical. Budget: modest but real. Decision-maker: the doctor (and the receptionist is the daily approver). Deadline: before their annual open house — a real date.</p>
+
+<p><strong>Step 2 — the proposal.</strong> One page: their outcome in their words; what's included (WordPress site, services pages, blog, booking form, on-page SEO, editing guide, training session); what's excluded (logo design, content writing beyond light copy-editing, ongoing changes after launch — that's the retainer); the platform rationale in one line ("so you can edit everything yourself — that's the point"); timeline to the open house; price with the deposit/milestone structure; the change policy. Signed, deposit paid.</p>
+
+<p><strong>Step 3 — the build, with visible milestones.</strong> Week 1: staging site with the design approved. Week 2: content in, booking form live on staging, tested with the receptionist's real flow. Week 3: SEO, performance, security baseline (updates, backups, login hardening), the editing guide written, the walkthrough recorded. Open-house week: DNS switched at a quiet time, launch checklist run, rollback plan ready, forms test-booked.</p>
+
+<p><strong>Step 4 — the handoff that made the business.</strong> Training session with the receptionist (she edits the services page herself during it — the moment that proves the deliverable). Guide + recording delivered. Then the maintenance conversation, already in the proposal's price range: "X/month for updates, backups, uptime monitoring, and one small change a month." She takes it — because the site works, they trust you, and the alternative (finding another freelancer) costs more than the retainer.</p>
+
+<p><strong>Step 5 — the referral engine.</strong> The open house happens; the clinic's neighboring businesses ask who built the site. You didn't sell at the handoff; the delivered outcome sold. The retainer paid for the month; the referral is the quarter.</p>
+
+<p><strong>The lesson:</strong> nothing in that sequence was heroic engineering. It was translation (outcome → scope), discipline (scope → price → contract → milestones), and ownership (handoff → retainer → referral). The engineering docs made the site work; <em>this</em> is what made it a business.</p>
+<h2>Most common failure modes</h2>
+
+<table>
+<thead><tr><th>Failure</th><th>Symptom</th><th>Root cause (usually upstream)</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><strong>Scope creep</strong></td><td>Project grows without price growing; months of free work</td><td>Scope never written, or written vaguely</td><td>Written scope + explicit exclusions + a change policy with prices</td></tr>
+<tr><td><strong>No deposit</strong></td><td>Client vanishes, work unpaid</td><td>Fear of asking; terms never set</td><td>30–50% deposit in the contract, before work — it filters clients and funds the project</td></tr>
+<tr><td><strong>Feedback loops</strong></td><td>Revisions arrive late and contradictory; launch slips by weeks</td><td>No feedback deadlines, multiple approvers</td><td>One approver, written feedback, revision limits, "feedback by date X or the milestone stands"</td></tr>
+<tr><td><strong>Underpriced quotes</strong></td><td>You earn less than minimum wage on a "big win"</td><td>Estimate without a buffer; rate without the arithmetic</td><td>Estimate × 1.5–2 for fixed quotes; rate = target income ÷ real billable hours</td></tr>
+<tr><td><strong>The client-cannot-edit trap</strong></td><td>Every text change is a support ticket to you — forever, for free</td><td>Admin never configured; editing never taught</td><td>The handoff is the product: roles, guide, training, then the retainer prices the ongoing changes</td></tr>
+<tr><td><strong>Launch chaos</strong></td><td>DNS broken at midnight, forms dead, site down for a day</td><td>No launch checklist, no rollback plan</td><td>Checklist + staging + rollback in the plan; launch at a quiet time, never a Friday evening</td></tr>
+<tr><td><strong>No warranty boundary</strong></td><td>"It broke" six months later = free work forever</td><td>Warranty never defined</td><td>Defined warranty window, maintenance priced after it</td></tr>
+<tr><td><strong>Neglected security</strong></td><td>Client's WordPress site hacked; your reputation pays</td><td>Launch without updates/backups/hardening</td><td>The security baseline is a launch requirement, and the retainer keeps it current (see <a href="./wordpress-and-cms-internet.html">WordPress doc</a>)</td></tr>
+<tr><td><strong>All builds, no business</strong></td><td>Each project starts at zero: new client, new proposal, new risk</td><td>No retainers, no referrals asked</td><td>The retainer is the business; ask for referrals at the handoff, when they're happiest</td></tr>
+<tr><td><strong>Over-engineering client sites</strong></td><td>Next.js + headless + microservices for a bakery; nobody can maintain it but you, and even you dread it</td><td>Engineering vanity; platform chosen for the resume, not the client</td><td>The <a href="./wordpress-and-cms-internet.html">decision matrix</a>: who edits, what must it do — then the boring stack that fits</td></tr>
+<tr><td><strong>The content hostage situation</strong></td><td>Build is 90% done; launch slips four months waiting for the "About" page</td><td>No content strategy, no penalty for delay</td><td>Content-first workflow + the placeholder penalty in the contract: late content shifts the launch day-for-day, insertion is billed</td></tr>
+<tr><td><strong>The "quick text" scope creep</strong></td><td>"Add a popup" texts at 9 PM, done free, five hours a week gone</td><td>No communication boundary or change order</td><td>All requests through the one channel; micro-tasks batched into admin blocks and billed (retainer or change)</td></tr>
+<tr><td><strong>The licensing trap</strong></td><td>Client's site breaks when a premium theme license expires — and the renewal is "your problem"</td><td>Freelancer bought the license on their own card</td><td>Client buys all licenses on their card, or they're line-itemed in the quote and renewed via retainer</td></tr>
+</tbody>
+</table>
+
+<h2>Ecosystem — the freelancer's tooling stack</h2>
+
+<table>
+<thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
+<tbody>
+<tr><td><strong>Hosting</strong></td><td>Managed WordPress hosts (Kinsta, WP Engine, Cloudways, SiteGround), Vercel/Netlify for custom, shared hosts (only for the cheapest tier)</td><td>Managed security/staging/caching beats raw boxes for client sites — your time is the cost you're optimizing</td></tr>
+<tr><td><strong>Contract &amp; proposals</strong></td><td>Bonsai, HoneyBook, Dubsado, And Co (Wave), or a plain template</td><td>One tool that generates proposal → contract → invoice in one flow beats five apps and a folder of templates</td></tr>
+<tr><td><strong>Invoicing &amp; payments</strong></td><td>Stripe Invoicing, Wave, Bonsai, QuickBooks — Wise/Payoneer for cross-border</td><td>Milestone invoices with clear payment links; the recipient's convenience decides the FX choice</td></tr>
+<tr><td><strong>Project comms</strong></td><td>Notion/Google Docs (shared scope &amp; feedback), a single chat channel, Loom (walkthroughs)</td><td>One shared place for scope/feedback that both sides can see — written > spoken, always</td></tr>
+<tr><td><strong>Client-site ops</strong></td><td>UptimeRobot (uptime), a backups plugin + off-site copies, a maintenance log, WP-CLI for updates</td><td>The retainer's deliverables: monitoring, backup verification, and a schedule you can show the client</td></tr>
+<tr><td><strong>Getting found</strong></td><td>Portfolio site (built on WordPress — eat your own food), Google Business presence, referrals, local SEO</td><td>Local trust beats global marketplaces; referrals from delivered outcomes are the cheapest acquisition (see <a href="./income-stream-landscape.html">Income Streams</a>)</td></tr>
+</tbody>
+</table>
+
+<h2>The future — where freelance web work is going</h2>
+
+<table>
+<thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
+<tbody>
+<tr><td><strong>AI site builders</strong></td><td>Prompt-to-site eats the static "make me a website" tier — the commodity work shrinks. What survives: outcomes that need ownership (maintenance, integrations, editing for real humans), which is exactly the retainer business</td></tr>
+<tr><td><strong>Composable stacks</strong></td><td>Clients piece together SaaS (booking, payments, email) themselves — the freelancer becomes the integrator and the person who makes it all work together, which is more valuable, not less</td></tr>
+<tr><td><strong>Local market shift</strong></td><td>Small businesses still need someone local who shows up, explains things in their language, and keeps the site alive — trust is the moat AI can't cross</td></tr>
+<tr><td><strong>Ownership economy</strong></td><td>Maintenance, monitoring, and "small changes monthly" become the default product shape; the build is the customer acquisition cost</td></tr>
+</tbody>
+</table>
+
+<p>The direction: <em>the build commodity-izes; the relationship doesn't.</em> The freelancer of the near future sells delivery-plus-ownership to clients who need a human — which is most of them.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<table>
+<thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
+<tbody>
+<tr><td>What outcome is the client buying?</td><td>Go back to the scoping call — the site is a means, not the product</td></tr>
+<tr><td>Who edits it, and can they?</td><td>Choose the platform by the editor; the handoff is a deliverable</td></tr>
+<tr><td>Is the scope written, with exclusions and a change policy?</td><td>Write it before the quote — the proposal is the contract's first draft</td></tr>
+<tr><td>Does the price include the buffer?</td><td>Fixed quotes are estimate × 1.5–2, minimum</td></tr>
+<tr><td>Is the deposit in the contract, before work?</td><td>No deposit, no project — it filters and funds</td></tr>
+<tr><td>Are milestones visible to the client?</td><td>Clients judge by artifacts: design → staging → launch, each a demo moment</td></tr>
+<tr><td>Is the launch checklist written?</td><td>DNS, HTTPS, backups, forms, SEO, rollback — a checklist, not vibes</td></tr>
+<tr><td>Is the maintenance offer priced and made?</td><td>The retainer is the business; the build is the entry ticket</td></tr>
+<tr><td>Is content delivery on a deadline with a penalty?</td><td>Late content shifts the launch day-for-day — written, before the build starts</td></tr>
+<tr><td>Is there one channel for requests, and a schedule for changes?</td><td>"If it's not in the tool, it doesn't exist"; small requests batch into billed admin blocks</td></tr>
+<tr><td>Am I getting paid on terms I set?</td><td>Milestone invoices, late-payment process, the contract's pause clause — set before work</td></tr>
+</tbody>
+</table>
+
+<p>Print this table. It is the difference between "I build websites" and "I run a web business." The engineering docs make the sites; this table makes the career.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://www.bonsai.co/">Bonsai (proposals, contracts, invoicing)</a> ·
+  <a href="https://www.honeybook.com/">HoneyBook</a> ·
+  <a href="https://wise.com/">Wise</a> ·
+  <a href="https://www.payoneer.com/">Payoneer</a> ·
+  <a href="https://stripe.com/invoicing">Stripe Invoicing</a> ·
+  <a href="https://www.uptimerobot.com/">UptimeRobot</a> ·
+  <a href="https://wordpress.org/documentation/article/roles-and-capabilities/">WordPress roles &amp; capabilities</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a client project that went badly — what did the scoping call miss, and what would have caught it?"</li>
+    <li>"Show me your actual proposal and contract structure for a small client site — what do you always include, what did you learn to add?"</li>
+    <li>"How do you run the maintenance conversation — when do you bring it up, what does it cost, and how do clients actually respond?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Freelance Web Practice — the craft of client work</span>
+  <span>Delivery: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> · Business: <a href="./income-stream-landscape.html">Income Streams</a> · <a href="./frontend-income-markets.html">Income Markets</a> · Path: <a href="./frontend-camps-survey.html">Camps Survey</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

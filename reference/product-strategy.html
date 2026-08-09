@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Strategy — Business Viability, Product Decisions, and Outcome-Driven Investment</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · The business-decision layer — should we solve this, why now, and what outcome proves it worked?</p>
+  <h1>Product Strategy</h1>
+  <p class="meta">What product strategy is (choosing which problems deserve investment), how it differs from design thinking and product management, the Three Lenses of desirability/feasibility/viability, how strategy evolved from feature delivery to outcome management, the mental models that govern prioritization, the artifacts that carry strategic decisions, and how AI shifts the premium from generating options to selecting them. Read this before committing engineering capacity to a product opportunity.</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> This doc is the <em>business-decision layer</em> — the missing layer above Design Thinking:</p>
+  <ul>
+    <li><strong>This doc</strong> — <em>Product Strategy</em>: is this problem worth solving, is it viable, and in what order should we invest?</li>
+    <li><a href="./design-thinking.html">Design Thinking</a> — <em>problem framing</em>: what is the user's problem, and is it real?</li>
+    <li><a href="./problem-solving.html">Problem-Solving</a> — <em>solution method</em>: how do we solve the validated problem?</li>
+    <li><a href="./system-design.html">System Design</a> — <em>architecture</em>: how does the solution fit together at scale?</li>
+    <li><a href="./software-development-process.html">The Process</a> — <em>team organization</em>: how does a team navigate project-scale phases?</li>
+    <li><a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> — <em>experience</em>: how does the solution work for people?</li>
+    <li><a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a> — <em>delivery</em>: how is the solution shipped safely?</li>
+  </ul>
+  <p>Strategy selects the opportunity; the rest of the shelf executes it. Without this layer, teams ship well-built features that move no business metric.</p>
+</blockquote>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone, but most useful alongside <a href="./design-thinking.html">Design Thinking</a> (upstream) and <a href="./software-development-process.html">Software Development Process</a> (downstream). Cross-links:</p>
+<ul>
+  <li>Upstream: <a href="./design-thinking.html">Design Thinking</a> — user empathy, problem framing, and prototyping.</li>
+  <li>Downstream: <a href="./problem-solving.html">Problem-Solving</a> — turning the selected opportunity into a solution.</li>
+  <li>Process: <a href="./software-development-process.html">Software Development Process</a> — team topology, sprints, and Agile ceremonies.</li>
+  <li>Technical: <a href="./system-design.html">System Design</a> — feasibility, architecture, and build-vs-buy constraints.</li>
+  <li>Experience: <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> — interaction design, accessibility, and state visibility.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+</ul>
+<p><strong>If you've ever wondered why a well-engineered feature failed to move the needle, how to decide between building and buying, or how to prioritize when every stakeholder insists their request is urgent, this doc answers that.</strong> Read §1 (Definition and Three Lenses) first, then §1c–§1f for the mental models, then §3 (business viability, and its §3b pricing and §3c moat subsections) and §4 (prioritization, plus §4b portfolios) for the economics, §5 for roadmapping and §5b distribution, §6a for the deprecation record, then §9–§10 for measurement, failure modes, and the tooling catalog.</p>
+
+<h2>1. Definition — the Three Lenses</h2>
+
+<p><strong>Product strategy</strong> is the disciplined process of deciding which problems to solve, for whom, in what order, and with what resources — based on evidence that the solution will be desirable to users, feasible to build, and viable for the business. It is not a plan for shipping features; it is a framework for allocating scarce resources to the highest-value opportunities under uncertainty.</p>
+
+<p>The Three Lenses (<a href="https://www.ideou.com/pages/design-thinking">IDEO's Design Thinking framework</a>, adapted):</p>
+
+<table>
+  <thead><tr><th>Lens</th><th>Question</th><th>Owner / Doc</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Desirability</strong> — User</td><td>Do people want this? Does it solve a real, painful problem?</td><td><a href="./design-thinking.html">Design Thinking</a> — empathy, framing, prototyping.</td></tr>
+    <tr><td><strong>Feasibility</strong> — Technology</td><td>Can we build it with our constraints? Does the architecture support it?</td><td><a href="./system-design.html">System Design</a> — decomposition, ownership, contracts.</td></tr>
+    <tr><td><strong>Viability</strong> — Business</td><td>Will it generate sustainable value? Does it fit our strategy, economics, and market timing?</td><td><strong>This doc</strong> — unit economics, CAC/LTV, margins, market timing, opportunity cost.</td></tr>
+  </tbody>
+</table>
+
+<p>Most engineering documentation ignores Viability. This doc owns it. A solution can be desirable and feasible but still a strategic mistake: too expensive to acquire customers, too low-margin to sustain, too early for the market, or too far from the company's core strategy.</p>
+
+<h3>What this doc is NOT</h3>
+<ul>
+  <li><strong>Not a PM career guide.</strong> This is not about becoming a product manager; it is about making product-strategy decisions well, whether you are a founder, an engineer, or a PM.</li>
+  <li><strong>Not a process manual.</strong> Team topology, sprints, and Agile ceremonies belong to <a href="./software-development-process.html">Software Development Process</a>.</li>
+  <li><strong>Not a user research manual.</strong> Empathy, problem framing, and prototyping belong to <a href="./design-thinking.html">Design Thinking</a>.</li>
+  <li><strong>Not a technical architecture guide.</strong> Feasibility, decomposition, and contracts belong to <a href="./system-design.html">System Design</a>.</li>
+</ul>
+
+<h2>1b. History — from project delivery to outcome management</h2>
+
+<p>Product strategy evolved as the constraint shifted from "can we build it?" to "should we build it, and in what order?":</p>
+
+<table>
+  <thead><tr><th>Era</th><th>Event / era</th><th>What it contributed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1950s–70s</strong></td><td>Project management dominates</td><td>Success meant delivering on time, on budget, to spec. The question was execution, not selection. Product decisions were made by executives or clients and handed down as requirements.</td></tr>
+    <tr><td><strong>1980s</strong></td><td>Product management emerges in tech</td><td>Companies like Microsoft and Apple began assigning individuals to own product direction, not just project delivery. The role combined business, technology, and user understanding.</td></tr>
+    <tr><td><strong>1990s</strong></td><td>Agile and iterative delivery</td><td>The Agile Manifesto (2001) shifted focus from fixed plans to responding to change. But early Agile often optimized for velocity (shipping fast) without asking whether the right things were being shipped.</td></tr>
+    <tr><td><strong>2000s</strong></td><td>Lean Startup and customer development</td><td>Eric Ries and Steve Blank formalized the build-measure-learn loop: treat product development as a series of hypotheses to test, not a plan to execute. The unit of progress became validated learning, not shipped features (<a href="https://en.wikipedia.org/wiki/Lean_startup">Wikipedia</a>).</td></tr>
+    <tr><td><strong>2010s</strong></td><td>Outcome roadmaps and empowered teams</td><td>Marty Cagan and the SVPG popularized the shift from feature roadmaps to outcome roadmaps, and from stakeholder-driven requirements to empowered product teams that discover solutions (<a href="https://www.svpg.com">SVPG</a>). OKRs (Objectives and Key Results) became the standard for aligning teams around measurable outcomes (<a href="https://en.wikipedia.org/wiki/OKR">Wikipedia</a>).</td></tr>
+    <tr><td><strong>2020s</strong></td><td>Product-led growth and continuous discovery</td><td>Product-led growth made the product itself the primary driver of acquisition and retention. Continuous discovery (Teresa Torres) made user research an ongoing team habit, not a phase (<a href="https://www.producttalk.org">Product Talk</a>).</td></tr>
+    <tr><td><strong>2022–present</strong></td><td>AI-era strategy</td><td>When the cost of generating software drops toward zero, the bottleneck shifts entirely to knowing what is worth building and evaluating whether it worked. Strategy — opportunity selection, evaluation, and taste — becomes the premium skill.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The recurring theme:</strong> the constraint keeps moving upstream. First it was "can we deliver on time?" Then "can we build the right thing?" Now it is "can we choose the right thing to build, and prove it worked?"</p>
+
+<h2>1c. Evolution — the constraint inversions</h2>
+
+<table>
+  <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Project → Product</strong></td><td>Deliver features on time and on budget</td><td>Move business metrics and user outcomes</td><td>Success is no longer "did we ship?" but "did shipping change the metric we care about?"</td></tr>
+    <tr><td><strong>Output → Outcome</strong></td><td>Roadmaps list features and dates: "We will ship X by Q3"</td><td>Roadmaps list outcomes and bets: "We will reduce churn by 5% in Q3"</td><td>The plan is a hypothesis, not a promise. The team commits to learning, not just to shipping.</td></tr>
+    <tr><td><strong>Feature factory → Empowered trio</strong></td><td>Stakeholders hand down requirements; PM writes specs; eng builds</td><td>PM, designer, and tech lead discover solutions together as a single decision-making unit</td><td>The people closest to the user, the business, and the technology make the call — not the highest-paid person's opinion.</td></tr>
+    <tr><td><strong>Fixed plan → Learning loop</strong></td><td>The roadmap is a contract; deviation is failure</td><td>The roadmap is a portfolio of bets; learning is progress</td><td>Strategy becomes adaptive. You update the plan when evidence changes, not just when the calendar does.</td></tr>
+    <tr><td><strong>Scarce code → Abundant generation</strong></td><td>Engineering capacity is the bottleneck; every feature is expensive</td><td>AI can generate code and options rapidly; evaluation and selection are the bottleneck</td><td>The premium skill shifts from writing code to knowing what is worth building and whether it worked.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The meta-pattern:</strong> strategy keeps moving earlier in the decision chain and later in the feedback chain. The best teams decide less by authority and more by evidence, and they learn faster than the market changes.</p>
+
+<h2>1d. Intersection with neighbors — the decision boundary</h2>
+
+<table>
+  <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./design-thinking.html">Design Thinking</a></td><td>Validates that a problem is real and painful. This doc decides whether solving it is strategically worth the investment.</td><td>The viability lens: unit economics, market timing, strategic fit, and opportunity cost.</td></tr>
+    <tr><td><a href="./problem-solving.html">Problem-Solving</a></td><td>Provides the method for solving the selected problem. This doc provides the criteria for selecting it.</td><td>The "should we?" filter before the "how do we?" method.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a></td><td>Assesses technical feasibility and architecture. This doc assesses business feasibility and strategic fit.</td><td>The build-vs-buy decision and the technical constraints that shape it.</td></tr>
+    <tr><td><a href="./software-development-process.html">Software Development Process</a></td><td>Organizes the team's delivery process. This doc decides what the team should deliver.</td><td>The outcome targets, priorities, and strategic context that make the process purposeful.</td></tr>
+    <tr><td><a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a></td><td>Designs the user experience. This doc defines which user problems are worth designing for.</td><td>The strategic priority that determines which experiences get built first.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The boundary rule:</strong> if the question is "what is the user's problem?", start in Design Thinking. If the question is "should the business solve this problem, and in what order?", that is this doc. If the question is "how do we build and ship it?", that is the rest of the shelf.</p>
+
+<h2>1e. Underlying theory — strategy as choice under uncertainty</h2>
+
+<p>Product strategy is a decision system under uncertainty. Four ideas underpin it:</p>
+
+<ul>
+  <li><strong>Expected value</strong> — every product bet has a probability of success and a payoff if it succeeds. Strategy compares bets by expected value, not by enthusiasm.</li>
+  <li><strong>Cost of delay</strong> — the cost of not doing something now. A feature that saves $1M/year loses $83K for every month it is delayed. Cost of delay makes "later" expensive (<a href="https://en.wikipedia.org/wiki/Cost_of_delay">Wikipedia</a>).</li>
+  <li><strong>Opportunity cost</strong> — choosing to build A means not building B. The true cost of a feature is the value of the best alternative you gave up.</li>
+  <li><strong>Risk-adjusted return</strong> — a high-payoff bet with low confidence may be worse than a moderate-payoff bet with high confidence. Strategy balances the portfolio.</li>
+  <li><strong>Assumption mapping</strong> — before investing, classify your assumptions as Desirability / Feasibility / Viability against Known vs Unknown. The killers are the Unknown-and-high-impact ones: test those <em>first</em> (prototype, painted door, concierge test) before writing production code.</li>
+</ul>
+
+<p>These are not financial abstractions; they are the math of resource allocation. Every sprint, every hire, every API integration is an investment decision. The question is whether you are making it deliberately or by default.</p>
+
+<h2>1f. Mental models — how senior strategists think</h2>
+
+<ul>
+  <li><strong>Outcomes over outputs.</strong> Shipping 10 features is an output. Increasing retention by 2% is an outcome. The first is activity; the second is progress. Measure the second.</li>
+  <li><strong>The product trio.</strong> PM (business/strategy), designer (user/usability), and tech lead (feasibility/architecture) as a single decision-making unit. No handoffs, no "I just build what they tell me."</li>
+  <li><strong>Strategy is what you will not do.</strong> A strategy that says yes to everything is not a strategy. The most important decisions are the ones that close doors.</li>
+  <li><strong>Cost of delay (WSJF).</strong> Weighted Shortest Job First: prioritize by cost of delay divided by job size. The feature that costs the most per week of delay and takes the least time wins.</li>
+  <li><strong>Build vs. buy vs. partner.</strong> Engineer it (differentiation, control, cost), buy it (speed, proven solution, vendor risk), or integrate via API (fastest, least control). The strategic question is: does this capability differentiate us?</li>
+  <li><strong>The roadmap is a portfolio of bets.</strong> Each item is a hypothesis with a confidence level, an expected payoff, and a cost. The roadmap is not a promise; it is a plan for learning.</li>
+</ul>
+
+<h2>2. Product discovery &amp; opportunity selection</h2>
+
+<p>Discovery is not just user research; it is the intersection of user evidence, business evidence, and technical evidence. The process:</p>
+
+<ol>
+  <li><strong>Start with a validated problem</strong> (from <a href="./design-thinking.html">Design Thinking</a>): real, painful, and frequent enough to matter.</li>
+  <li><strong>Assess market opportunity</strong>: how many users have this problem? How much would they pay? Is the market growing or shrinking?</li>
+  <li><strong>Assess strategic fit</strong>: does this align with our core strategy, capabilities, and brand? Does it open a new market or strengthen an existing one?</li>
+  <li><strong>Assess technical feasibility</strong> (with <a href="./system-design.html">System Design</a>): can we build it? What are the constraints? What is the build-vs-buy calculus?</li>
+  <li><strong>Score the opportunity</strong>: use a framework (§4) to compare it against other opportunities. The goal is not precision; it is comparability.</li>
+</ol>
+
+<p>The output of discovery is not a PRD; it is a decision: pursue, pivot, or kill. A good discovery process kills bad ideas early, when they are cheap.</p>
+
+<h2>3. Business viability &amp; product economics</h2>
+
+<p>Viability asks: will this generate sustainable value? The key metrics:</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>What it measures</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td><strong>CAC</strong> (Customer Acquisition Cost)</td><td>Total sales and marketing cost divided by new customers acquired</td><td>If CAC exceeds customer lifetime value, the business model is broken.</td></tr>
+    <tr><td><strong>LTV</strong> (Customer Lifetime Value)</td><td>Revenue per customer multiplied by gross margin multiplied by expected lifespan</td><td>The maximum you can spend to acquire a customer. LTV/CAC &gt; 3 is a common heuristic.</td></tr>
+    <tr><td><strong>Gross margin</strong></td><td>Revenue minus cost of goods sold, as a percentage</td><td>Software margins are typically 70–90%. Low-margin products need high volume to survive.</td></tr>
+    <tr><td><strong>Retention / churn</strong></td><td>Percentage of customers who stay (or leave) per period</td><td>Retention is the compound interest of product strategy. A 5% monthly churn rate means you lose half your customers every year.</td></tr>
+    <tr><td><strong>Payback period</strong></td><td>Months to recover CAC from gross margin</td><td>Determines how much capital you need to grow. Short payback = self-funding growth.</td></tr>
+    <tr><td><strong>TAM/SAM/SOM</strong></td><td>Total addressable market, serviceable available market, serviceable obtainable market</td><td>Estimates of market size. Use them as directional guides, not precise forecasts.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The false-precision trap:</strong> early-stage metrics are estimates. A spreadsheet that says LTV = $1,247.32 is fiction. Use ranges, state your assumptions, and update them as you learn. The goal is not accuracy; it is directional correctness.</p>
+
+<p><strong>A model-specific caveat:</strong> the "LTV/CAC &gt; 3" heuristic assumes a subscription model with recurring revenue. For usage-based pricing or marketplaces, watch the <strong>payback period</strong> instead — the months needed to recover CAC from gross margin. A marketplace with a 2-month payback can spend aggressively; a subscription with LTV/CAC of 5 but a 24-month payback still needs heavy upfront capital.</p>
+
+<h2>3b. Value capture — pricing and packaging</h2>
+
+<p>Unit economics tell you <em>whether</em> a model can work; pricing tells you <em>how</em> it captures value. Pricing is the exchange rate of value — it dictates the entire shape of the product (who it serves, how it sells, what it must prove). The strategic options:</p>
+
+<table>
+  <thead><tr><th>Model</th><th>How it works</th><th>Strategic implication</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Subscription (SaaS)</strong></td><td>Flat recurring fee (per seat or per tier)</td><td>Predictable revenue; optimize for retention and seat expansion. LTV/CAC &gt; 3 is the relevant heuristic.</td></tr>
+    <tr><td><strong>Usage-based</strong></td><td>Pay for what you consume (API calls, compute, seats used)</td><td>Aligns cost with value; lower barrier to entry; revenue is volatile and grows with usage.</td></tr>
+    <tr><td><strong>Freemium</strong></td><td>Free tier to acquire, paid tier to monetize</td><td>The product is the marketing; requires massive top-of-funnel volume and a free→paid conversion funnel.</td></tr>
+    <tr><td><strong>Transactional</strong></td><td>Take rate on GMV or per-transaction fee</td><td>Requires high volume; aligns the platform's success with the user's success.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The strategic question is not "what can we charge?"</strong> It is "which capture mechanism makes the product <em>better</em>?" Usage-based pricing can lower the entry barrier but makes revenue unpredictable and pushes you to optimize for consumption. Freemium turns the product into a sales engine but demands conversion discipline. Packing is part of positioning: the tiers you offer say what you believe different types of users are worth.</p>
+
+<h2>3c. Competitive strategy and moats</h2>
+
+<p>TAM/SAM/SOM described opportunity size, but it ignored competition. A product without a moat is a feature waiting to be copied by an incumbent. Strategy must identify which moat the investment is building:</p>
+
+<table>
+  <thead><tr><th>Moat type</th><th>What it is</th><th>Software example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Network effects</strong></td><td>Value increases as more users join</td><td>Slack, Figma, marketplaces</td></tr>
+    <tr><td><strong>Switching costs</strong></td><td>Pain of leaving (data, workflow, integrations)</td><td>Salesforce, AWS, ERP systems</td></tr>
+    <tr><td><strong>Economies of scale</strong></td><td>Unit costs drop as volume grows</td><td>Cloud infrastructure, payment processing</td></tr>
+    <tr><td><strong>Proprietary data / tech</strong></td><td>Unique assets competitors can't easily copy</td><td>Google's search graph, specialized AI models</td></tr>
+    <tr><td><strong>Brand / community</strong></td><td>Trust and identity that lower CAC</td><td>Apple, Stripe, developer communities</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>Moat question to add to every product decision:</strong> if a well-funded incumbent copied this today, what stops them from taking the market? The answer — network effects, data, switching costs, brand — is the actual strategy. If there is no answer, the "strategy" is a feature waiting to be commoditized.</p>
+</blockquote>
+
+<h2>4. Prioritization &amp; investment allocation</h2>
+
+<p>Prioritization is the daily work of strategy. The frameworks:</p>
+
+<table>
+  <thead><tr><th>Framework</th><th>Formula</th><th>When it earns its keep</th><th>Limitation</th></tr></thead>
+  <tbody>
+    <tr><td><strong>RICE</strong></td><td>(Reach × Impact × Confidence) / Effort</td><td>Comparing many features with different scales and confidence levels</td><td>Reach and Impact are subjective; Confidence is often overstated</td></tr>
+    <tr><td><strong>ICE</strong></td><td>(Impact × Confidence × Ease) / 3</td><td>Quick, lightweight prioritization when you lack data</td><td>All three factors are subjective; no time dimension</td></tr>
+    <tr><td><strong>WSJF</strong> (Weighted Shortest Job First)</td><td>Cost of Delay / Job Size</td><td>When time is the constraint and delay has a measurable cost</td><td>Requires estimating cost of delay, which is hard for exploratory work</td></tr>
+    <tr><td><strong>Kano model</strong></td><td>Classify features as basic, performance, or delighters</td><td>Understanding which features are table stakes vs. differentiators</td><td>Does not prioritize within categories</td></tr>
+    <tr><td><strong>MoSCoW</strong></td><td>Must have, Should have, Could have, Won't have</td><td>Scope negotiation with stakeholders</td><td>Not a scoring system; "Must" is often abused</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The senior move:</strong> use frameworks to structure the conversation, not to replace judgment. The framework makes assumptions explicit; the team debates the assumptions, not the score. And always ask: what is the cost of delay? A "medium" priority feature that loses $50K/month is not medium.</p>
+
+<p><strong>When cost of delay is unquantifiable:</strong> if delay can't be priced in dollars (exploratory work), don't abandon WSJF — switch to relative scoring (1–10) comparing each candidate against the others in the portfolio. The ordering still captures "this matters more than that," which is all the framework needs.</p>
+
+<h2>4b. Portfolio strategy and the Three Horizons</h2>
+
+<p>Prioritization picks the next bet; portfolio strategy balances <em>all</em> the bets a business runs at maturity levels.</p>
+
+<table>
+  <thead><tr><th>Horizon</th><th>Focus</th><th>Metric of success</th><th>Investment profile</th></tr></thead>
+  <tbody>
+    <tr><td><strong>H1: Core</strong></td><td>Optimize and defend existing cash cows</td><td>Retention, margin, efficiency</td><td>High confidence, incremental innovation</td></tr>
+    <tr><td><strong>H2: Emerging</strong></td><td>Scale proven new products into mainstream</td><td>Growth rate, market share</td><td>Medium confidence, scaling execution</td></tr>
+    <tr><td><strong>H3: Transformative</strong></td><td>Explore entirely new markets/models</td><td>Validated learning, option value</td><td>Low confidence, high failure rate, R&amp;D</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The portfolio insight:</strong> strategy isn't just picking the next feature — it's balancing the portfolio so the company survives today (H1) while inventing tomorrow (H3). A portfolio that funds only H1 dies with its market; one that funds only H3 never ships. The killer of H3 is stealth: it dies quietly because nobody defends small exploratory bets against the urgent demands of H1.</p>
+</blockquote>
+
+<h2>5. Strategic roadmapping — Now / Next / Later</h2>
+
+<p>The strategic roadmap communicates direction, not dates. The Now/Next/Later framework (<a href="https://www.prodpad.com/blog/now-next-later-roadmap/">ProdPad</a>):</p>
+
+<table>
+  <thead><tr><th>Horizon</th><th>What it contains</th><th>Confidence level</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Now</strong></td><td>What we are actively building or about to build. High confidence, clear scope, committed resources.</td><td>High — we know the problem, the solution, and the outcome target.</td></tr>
+    <tr><td><strong>Next</strong></td><td>What we plan to build after Now. Medium confidence, scope is directional, resources are allocated but not committed.</td><td>Medium — we know the problem and the outcome, but the solution is still being discovered.</td></tr>
+    <tr><td><strong>Later</strong></td><td>What we might build eventually. Low confidence, exploratory, no committed resources.</td><td>Low — these are bets we are watching, not promises we are making.</td></tr>
+  </tbody>
+</table>
+
+<p>The alternative — a Gantt chart with dates for every feature — is roadmap theater: it looks precise but is fiction. Markets change, users surprise you, and technical constraints emerge. The Now/Next/Later roadmap says: "We are confident about Now, we are planning Next, and we are watching Later." That is honest.</p>
+
+<p><strong>Outcome roadmaps vs. feature roadmaps:</strong> a feature roadmap says "We will ship X by Q3." An outcome roadmap says "We will reduce churn by 5% in Q3, and we believe X is the best way to get there." The outcome roadmap is more honest because it admits the solution is a hypothesis, not a certainty.</p>
+
+<p><strong>Fence the "Later" column:</strong> "Later" should be framed explicitly as <em>options we are monitoring, not commitments we are making.</em> Sales teams will happily sell a "Later" feature to close a deal today; without an explicit "not a commitment" framing, the roadmap leaks — and the team is forced to build whatever the loudest customer bought.</p>
+
+<h2>5b. Distribution and go-to-market</h2>
+
+<p>A great product with no distribution strategy fails. Which motion you choose shapes the product itself — its UX, its pricing, and what it must prove on day one:</p>
+
+<table>
+  <thead><tr><th>GTM motion</th><th>Who it's for</th><th>Strategic constraint</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Product-led (PLG)</strong></td><td>Low ACV, high volume, intuitive UX</td><td>The product must sell itself; requires massive top-of-funnel</td></tr>
+    <tr><td><strong>Sales-led (enterprise)</strong></td><td>High ACV, complex compliance/integration</td><td>CAC is high; requires sales engineering and long cycles</td></tr>
+    <tr><td><strong>Channel / partner</strong></td><td>Reaching fragmented markets via resellers</td><td>You share margin and lose the direct user relationship</td></tr>
+    <tr><td><strong>Community / content</strong></td><td>Developer tools, open source</td><td>Slow compounding; requires authentic engagement</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The GTM question is a strategy question, not a marketing one:</strong> can the product reach its users without a sales force? If yes, PLG and freemium dominate. If no, the cost of sales is a fixed cost baked into the unit economics — and the CAC/LTV math in §3 must absorb it.</p>
+
+<h2>6. The artifacts of strategy</h2>
+
+<p>Strategy lives in documents, but the documents are not the strategy — they are the record of decisions. The key artifacts:</p>
+
+<table>
+  <thead><tr><th>Artifact</th><th>What it is</th><th>What it is NOT</th></tr></thead>
+  <tbody>
+    <tr><td><strong>One-page product strategy</strong></td><td>A single page that states: target user, problem, outcome target, strategic fit, key bets, and what we will not do.</td><td>A 40-page business plan. If it does not fit on one page, it is not clear enough.</td></tr>
+    <tr><td><strong>PRD (Product Requirements Document)</strong></td><td>A strategic contract: problem, target audience, success metrics, scope, out-of-scope, and key risks. Not a technical spec.</td><td>A feature checklist or a UI mockup. The PRD answers "why and for whom," not "how."</td></tr>
+    <tr><td><strong>OKRs (Objectives and Key Results)</strong></td><td>Objectives are qualitative goals ("Improve onboarding"); Key Results are measurable outcomes ("Increase activation from 40% to 60%").</td><td>KPIs (Key Performance Indicators) — health metrics you monitor, not goals you chase. OKRs are for change; KPIs are for stability.</td></tr>
+    <tr><td><strong>Business case</strong></td><td>The economic argument: market size, revenue model, cost, margin, and payback period.</td><td>A spreadsheet that justifies a decision already made. A good business case can kill a bad idea.</td></tr>
+    <tr><td><strong>Decision record</strong></td><td>A short document that records a strategic decision, the alternatives considered, the evidence, and the rationale.</td><td>A meeting note. Decision records are for decisions that close doors.</td></tr>
+    <tr><td><strong>Stakeholder map</strong></td><td>A map of who is affected, who has influence, and who needs to be consulted or informed.</td><td>An org chart. Stakeholder maps are about power and interest, not reporting lines.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The test of a good artifact:</strong> can someone who was not in the room read it and understand what was decided, why, and what happens next? If not, the artifact is a ritual, not a tool.</p>
+
+<h3>6a. The deprecation record — killing is strategy too</h3>
+
+<p>"Strategy is what you will not do" covers <em>features</em> — but killing an <em>existing</em> product is the hardest strategic act, because the hard call is rarely made. The Zombie Product — kept alive because nobody wants the meeting — drains capacity from H1/H2 priorities (§4b).</p>
+
+<p>The fix is a <strong>Deprecation Record</strong>, analogous to an ADR (see <a href="./system-design.html">System Design</a>):</p>
+
+<table>
+  <thead><tr><th>Deprecation Record question</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Why is maintenance cost now higher than the value delivered?</td><td>Forces the economic comparison instead of sentiment</td></tr>
+    <tr><td>What evidence would keep it alive?</td><td>Makes the kill reversible in principle and evidence-based</td></tr>
+    <tr><td>What is the migration path for users?</td><td>Protects the trust asset that survives the removal</td></tr>
+    <tr><td>What is the communication plan?</td><td>Controls the announcement, not death-by-surprise</td></tr>
+  </tbody>
+</table>
+
+<h2>7. Stakeholders &amp; decision governance</h2>
+
+<p>Strategy fails when decision rights are unclear. The governance questions:</p>
+
+<ul>
+  <li><strong>Who decides?</strong> The product trio (PM, designer, tech lead) decides within their domain. Escalation happens when the decision exceeds their authority or affects other teams.</li>
+  <li><strong>Who is consulted?</strong> Sales, support, legal, finance, and engineering are consulted on decisions that affect them. Consultation is not veto power.</li>
+  <li><strong>Who is informed?</strong> The broader team and leadership are informed after the decision, not before.</li>
+  <li><strong>What evidence is required?</strong> The team agrees on the evidence standard before the decision: user research, market data, technical spike, or business case.</li>
+</ul>
+
+<p><strong>The HIPPO problem:</strong> the Highest Paid Person's Opinion overrides data. The fix is not to ignore leadership; it is to make the evidence standard explicit. If the HIPPO wants to override the data, they must state their evidence or accept the risk explicitly.</p>
+
+<h2>8. Build vs. buy vs. partner — the strategic matrix</h2>
+
+<p>Every capability can be built, bought, or accessed via partnership/API. The decision matrix:</p>
+
+<table>
+  <thead><tr><th>Option</th><th>When it wins</th><th>Risks</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Build</strong></td><td>The capability differentiates you, you have the expertise, and the long-term cost is lower.</td><td>Opportunity cost, maintenance burden, slower time to market.</td><td>Your core recommendation engine, your unique workflow.</td></tr>
+    <tr><td><strong>Buy</strong></td><td>The capability is table stakes, a proven solution exists, and speed matters.</td><td>Vendor lock-in, integration cost, recurring fees, less control.</td><td>Payment processing (Stripe), email (SendGrid), analytics (Mixpanel).</td></tr>
+    <tr><td><strong>Partner / API</strong></td><td>The capability is adjacent to your core, a partner has the expertise, and integration is cleaner than building.</td><td>Dependency on partner roadmap, data sharing, less differentiation.</td><td>Maps (Google Maps), identity (Auth0), search (Algolia).</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The strategic question:</strong> does this capability differentiate us? If yes, build it. If no, buy or partner. The worst outcome is building a commodity that a vendor already sells better and cheaper.</p>
+
+<h2>9. Measurement &amp; product analytics</h2>
+
+<p>Strategy without measurement is opinion. The measurement stack:</p>
+
+<ul>
+  <li><strong>Input metrics</strong> — what the team does: features shipped, experiments run, users interviewed. These are outputs, not outcomes.</li>
+  <li><strong>Outcome metrics</strong> — what changed for the user and the business: activation, retention, engagement, revenue, NPS. These are the results.</li>
+  <li><strong>Guardrail metrics</strong> — what must not get worse: performance, error rate, support tickets, churn. A feature that improves engagement but doubles error rate is a net loss.</li>
+  <li><strong>Leading indicators</strong> — metrics that predict future outcomes: onboarding completion, time-to-first-value, feature adoption.</li>
+  <li><strong>Lagging indicators</strong> — metrics that confirm past outcomes: retention, revenue, NPS. You cannot manage lagging indicators directly; you manage the leading indicators that drive them.</li>
+</ul>
+
+<p><strong>Vanity metrics vs. actionable metrics:</strong> page views, downloads, and registered users are vanity metrics — they go up and to the right but do not tell you what to do. Activation rate, retention cohorts, and revenue per user are actionable metrics — they tell you what is working and what to fix.</p>
+
+<p><strong>The North Star metric:</strong> the single metric that best captures the core value delivered to the customer — the metric you would choose if you could only watch one. Airbnb's "Nights Booked," Facebook's "10 friends in 7 days." Every team metric should trace back to it; if a metric doesn't influence the North Star, it's decoration.</p>
+
+<p><strong>AARRR and HEART</strong> — two shelf-standard frameworks for organizing metrics so you don't track random numbers:</p>
+
+<table>
+  <thead><tr><th>Framework</th><th>Acronym</th><th>When to use it</th></tr></thead>
+  <tbody>
+    <tr><td><strong>AARRR (Pirate Metrics)</strong></td><td>Acquisition, Activation, Retention, Revenue, Referral</td><td>PLG / growth products — the user's journey through the funnel</td></tr>
+    <tr><td><strong>HEART (Google)</strong></td><td>Happiness, Engagement, Adoption, Retention, Task Success</td><td>UX-heavy internal and enterprise tools</td></tr>
+  </tbody>
+</table>
+
+<h2>9a. Worked example — from opportunity to outcome</h2>
+
+<pre>
+Opportunity: users abandon the onboarding flow at step 3 (payment setup)
+
+Design Thinking: user interviews reveal the payment form is confusing and asks for too much information too early
+
+Product Strategy lens:
+  Viability: 30% of signups abandon at payment. Recovering 10% = +$50K MRR. High confidence.
+  Feasibility: the form can be simplified; no new infrastructure needed. 2-week build.
+  Desirability: validated — users want to pay but the form is the barrier.
+
+Decision: pursue. Priority: high (cost of delay = $50K/month).
+
+PRD:
+  Problem: 30% abandonment at payment setup
+  Target audience: new signups
+  Success metric: reduce abandonment from 30% to 20% (outcome, not output)
+  Scope: simplify form, defer optional fields, add progress indicator
+  Out of scope: new payment methods, pricing changes
+
+Build vs. buy: build (core flow, differentiating, no vendor solves this better)
+
+Roadmap: Now — this sprint. Next — onboarding email sequence. Later — pricing page redesign.
+
+Measurement:
+  Leading: form completion rate, time-to-complete
+  Lagging: 7-day activation rate, MRR from new signups
+  Guardrail: payment error rate, support tickets
+
+Result: abandonment drops to 22%. Outcome achieved. Next bet: onboarding email sequence.
+</pre>
+
+<p>The point is not the specific numbers; it is the discipline. Every step has a decision, a metric, and a feedback loop. Nothing is shipped without a hypothesis about the outcome it will move.</p>
+
+<h2>9b. Failure modes — the traps</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>Why it happens</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The HIPPO effect</strong></td><td>The Highest Paid Person's Opinion overrides data and user evidence.</td><td>Make the evidence standard explicit. If the HIPPO overrides, they state their evidence or accept the risk explicitly.</td></tr>
+    <tr><td><strong>Vanity metrics</strong></td><td>Optimizing for page views or downloads instead of activation or retention.</td><td>Define the outcome metric before building. Ask: "If this metric doubles, does the business improve?"</td></tr>
+    <tr><td><strong>The feature factory</strong></td><td>Measuring team success by velocity or story points instead of business impact.</td><td>Tie team goals to outcome metrics (OKRs), not output metrics (velocity).</td></tr>
+    <tr><td><strong>Local maximum</strong></td><td>Iterating on a dying product instead of pivoting.</td><td>Regularly ask: "If we were starting today, would we build this?" If the answer is no, consider a pivot.</td></tr>
+    <tr><td><strong>Roadmap theater</strong></td><td>A Gantt chart that looks precise but is fiction.</td><td>Use Now/Next/Later. Commit to outcomes, not dates.</td></tr>
+    <tr><td><strong>Framework worship</strong></td><td>Using RICE or WSJF scores as absolute truth instead of conversation starters.</td><td>Use frameworks to structure debate, not to replace judgment.</td></tr>
+    <tr><td><strong>False-precision economics</strong></td><td>A spreadsheet that says LTV = $1,247.32 based on three customers.</td><td>Use ranges, state assumptions, and update as you learn.</td></tr>
+    <tr><td><strong>Strategy by consensus</strong></td><td>Every stakeholder gets a veto, so nothing is decided.</td><td>Clarify decision rights. Consultation is not veto power.</td></tr>
+    <tr><td><strong>The Zombie Product</strong></td><td>A product kept alive because nobody wants the meeting where it dies — silently draining capacity from H1/H2 bets (§4b).</td><td>Write the Deprecation Record (§6a): maintenance cost vs. value delivered, evidence that would keep it alive, migration path, communication plan.</td></tr>
+  </tbody>
+</table>
+
+<h2>9c. The AI-era shift — strategy becomes the premium skill</h2>
+
+<p>AI changes product strategy in two fundamental ways:</p>
+
+<ul>
+  <li><strong>The cost of generating options drops toward zero.</strong> AI can generate code, designs, copy, and even product ideas rapidly. The bottleneck is no longer "can we build it?" but "which of these 50 options is worth building?"</li>
+  <li><strong>Evaluation becomes the scarce skill.</strong> When AI generates the artifact, the human must judge: is this the right thing? Does it solve the real problem? Does it move the metric? The premium skill is taste, judgment, and strategic clarity.</li>
+</ul>
+
+<p>The AI-era product strategist asks: "What can AI generate, and what must a human decide?" AI generates options; humans decide which options are worth pursuing. AI generates code; humans decide whether the code solves the right problem. AI generates metrics; humans decide which metrics matter.</p>
+
+<h2>9d. The complete mental checklist</h2>
+
+<p>If you remember only one image, remember this: <strong>product strategy is the discipline of choosing what to build, in what order, and knowing whether it worked.</strong></p>
+
+<table>
+  <thead><tr><th>Question to ask</th><th>Check</th></tr></thead>
+  <tbody>
+    <tr><td>Do I know the problem, the user, and the evidence that it is real?</td><td>Validated by Design Thinking, not assumed.</td></tr>
+    <tr><td>Is this viable? Do the economics work?</td><td>CAC &lt; LTV, margins are sustainable, market timing is right.</td></tr>
+    <tr><td>Is this the highest-value use of our resources right now?</td><td>Compared against alternatives using a prioritization framework and cost of delay.</td></tr>
+    <tr><td>Do I know what outcome would prove this worked?</td><td>A measurable outcome metric, not just "ship the feature."</td></tr>
+    <tr><td>Have I considered build vs. buy vs. partner?</td><td>The decision is deliberate, not default.</td></tr>
+    <tr><td>Are the decision rights clear?</td><td>Who decides, who is consulted, who is informed — before the decision, not after.</td></tr>
+    <tr><td>Am I measuring outcomes, not outputs?</td><td>Retention, activation, revenue — not velocity or story points.</td></tr>
+    <tr><td>Would I fund this again if I saw the results?</td><td>The strategy is a learning loop, not a one-time bet.</td></tr>
+  </tbody>
+</table>
+
+<p>The maturity test is not "do we have a roadmap?" It is "do we know why we are building this, what outcome it should move, and what evidence would change our mind?"</p>
+
+<h2>10. Product strategy — tooling catalog with decision metrics</h2>
+
+<p>Strategy is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, using the same format as System Design's <a href="./system-design.html">tooling catalog</a> (§13 there):</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Product analytics</strong></td>
+      <td>Amplitude, Mixpanel, Pendo, PostHog, Heap</td>
+      <td>Signal chaos → clean funnels, cohorts, and North Star visibility</td>
+      <td>Data quality: % events instrumented per plan; Activation rate; Retention cohorts; Time to insight</td>
+    </tr>
+    <tr>
+      <td><strong>Roadmap &amp; portfolio</strong></td>
+      <td>ProdPad, Aha!, Productboard, Notion/Jira per team</td>
+      <td>Priorities → outcome-linked, Now/Next/Later roadmap</td>
+      <td>Outcome tracking: % roadmap items with a North Star link; Commit reliability; Idea-to-decision latency</td>
+    </tr>
+    <tr>
+      <td><strong>Voice of customer (VoC)</strong></td>
+      <td>UserTesting, Typeform, Hotjar, Canny, Delighted</td>
+      <td>Uncertainty about need → validated direction</td>
+      <td>Provenance: % decisions with customer evidence; Feedback velocity; Discovery cadence</td>
+    </tr>
+    <tr>
+      <td><strong>Financial modeling</strong></td>
+      <td>Spreadsheets (Causal, Pigment), Unit Economics playbooks</td>
+      <td>Strategy bet → quantified LTV/CAC, payback, or human judgement</td>
+      <td>Model structure: % of model inputs sourced; Sensitivity analysis; Assumption freshness</td>
+    </tr>
+    <tr>
+      <td><strong>Experimentation</strong></td>
+      <td>LaunchDarkly, Optimizely, Google Analytics Experiments, Split</td>
+      <td>Uncertainty → validated outcome via test</td>
+      <td>Experiment velocity; Statistical confidence policy; Lift verification; Rollout hygiene</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The anti-tooling clause:</strong> before adopting a tool, ask whether it makes a <em>strategic decision</em> visible, testable, and reversible. If it only produces charts nobody reads, it's decoration — the §9 measurement frameworks already punish that.</p>
+</blockquote>
+
+<section class="cite">
+  <strong>Primary sources</strong>
+  <a href="https://www.svpg.com">Cagan, M. — Silicon Valley Product Group. Empowered product teams and outcome roadmaps.</a> ·
+  <a href="https://www.producttalk.org">Torres, T. — Product Talk. Continuous discovery habits.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Lean_startup">Lean Startup — build-measure-learn loop.</a> ·
+  <a href="https://en.wikipedia.org/wiki/OKR">OKR — Objectives and Key Results.</a> ·
+  <a href="https://en.wikipedia.org/wiki/Cost_of_delay">Cost of Delay — the economics of prioritization.</a> ·
+  <a href="https://www.prodpad.com/blog/now-next-later-roadmap/">Now/Next/Later roadmap framework.</a> ·
+  <a href="https://www.ideou.com/pages/design-thinking">IDEO — Design Thinking and the Three Lenses.</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take one product idea I'm working on and help me evaluate it through the Three Lenses — is it desirable, feasible, and viable?"</li>
+    <li>"Help me write a one-page product strategy for my project: target user, problem, outcome target, key bets, and what I will not do."</li>
+    <li>"For one feature I'm building, walk me through the build-vs-buy-vs-partner decision and help me justify it."</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Product Strategy — Business Viability, Product Decisions, and Outcome-Driven Investment</span>
+  <span>Upstream: <a href="./design-thinking.html">Design Thinking</a> · Process: <a href="./software-development-process.html">Software Development Process</a> · Technical: <a href="./system-design.html">System Design</a> · Experience: <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> · Delivery: <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Modeling &amp; Databases — the vault behind the contract</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · Data modeling — the vault behind the contract</p>
+  <h1>Data Modeling &amp; Databases</h1>
+  <p class="meta">How to design the schema itself: keys, constraints, and normalization (1NF–3NF), indexing strategies (B-Tree, Hash, GIN, partial, composite), reading <code>EXPLAIN ANALYZE</code>, safe schema evolution with expand–contract migrations, CAP applied to actual schema design, read models and event-sourcing schemas, and the ORM vs. query-builder vs. raw-SQL decision — with a worked shipment-tracking schema. Read this after <a href="./system-design.html">System Design</a> (which database) and before or alongside <a href="./api-design.html">API Design</a> (the contract that exposes it).</p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>Where this fits.</strong> The shelf's backend stack is a layer diagram with a missing middle. This doc is the middle — the vault that sits between the macro architecture and the request loop:</p>
+  <pre>SYSTEM DESIGN          (macro: services, data ownership, which store)   → system-design.html
+        |
+DATA MODELING          (micro: how the schema itself is designed)       → YOU ARE HERE
+     /      \
+API DESIGN              BACKEND ENGINEERING
+(the contract —          (the loop that reads and writes the vault —
+ what the wire says)      one request, one query, one transaction)
+api-design.html          backend-engineering.html</pre>
+  <p>Neighbors and what each produces:</p>
+  <ul>
+    <li><a href="./system-design.html">System Design</a> — decides <em>which</em> database (Postgres vs. Redis vs. Kafka) and owns data across services. This doc designs the tables <em>inside</em> that choice.</li>
+    <li><a href="./api-design.html">API Design</a> — the contract at the edge; the resource model on the wire. This doc is the same model as durable rows. API Design is the contract; Data Modeling is the vault.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — the request loop that lives against the vault: data access (ORM vs. raw SQL, §1e), transactions and concurrency (§5). This doc is the design work <em>before</em> the loop touches a row.</li>
+    <li><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — schema changes are deployments; migrations ship through the same pipeline as code.</li>
+    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">Why this doc exists separately</h3>
+  <p><em>System Design</em> tells the reader which database to choose. <em>API Design</em> tells the reader how to expose the data. But nobody on the shelf teaches the reader how to actually design the schema — the normalization, the keys, the indexes, the migration path. That is this doc's gap. And it is arguably the most important skill in backend work: a bad data model ruins a perfectly designed API and a perfectly architected system. The lineage it stands on is the relational model, Codd's 1970 paper that turned data storage from a navigational chore into a declarative discipline.</p>
+</section>
+
+<h2>How to use this doc</h2>
+
+<p>Reading order: read this after you've seen <a href="./system-design.html">System Design</a> (so you know why the store was chosen) and after <a href="./backend-engineering.html">Backend Engineering</a> §1e–§5 (so you know what the loop needs from the vault). Most readers come back to it when a query is slow, a migration is scary, or a schema is being born. Cross-links:</p>
+<ul>
+  <li>Sibling to <a href="./api-design.html">API Design</a> — the contract exposes the vault; rename a column and you break the contract.</li>
+  <li>Downstream from <a href="./system-design.html">System Design</a> — data ownership and store choice set the sandbox this doc designs in.</li>
+  <li>Upstream to <a href="./backend-engineering.html">Backend Engineering</a> — the request loop consumes the schema; transactions and ORM usage are its side of the boundary.</li>
+  <li>Container: <a href="./software-development-process.html">Software Development Process</a> — the project-scale loop this design work runs inside.</li>
+  <li>Deployment: <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — migrations ride the same pipeline as code.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+</ul>
+
+<p><strong>If you've ever had a schema that worked in dev and died in production — a query that slowed to seconds at 100k rows, or a "quick" column add that took the API down — this is the map.</strong> Read the Definition and Mental models first, then Relational modeling (the tables), then Worked example. Come back to Indexing and EXPLAIN ANALYZE when you ship something real.</p>
+
+<h2>Definition — what data modeling is and what it is not</h2>
+
+<p>Data modeling is the discipline of turning facts, relationships, and access patterns into <em>durable structures with enforced rules</em>. It is the answer to three questions asked together: What must survive? What must stay consistent? How will it be read back?</p>
+
+<p>It is <em>not</em> ORM mastery — an ORM is a tool for talking to a schema, not a substitute for designing one. It is <em>not</em> database administration — backups, replication, and capacity are operations. It is <em>not</em> "which database should I pick" — that is System Design's decision, and it only sets the sandbox. And it is <em>not</em> drawing boxes in a diagram tool — the diagram is notation, the design is the decision about keys, constraints, and access paths. A data model is judged by what it <em>enforces</em> and how it <em>performs under the queries the app actually issues</em>.</p>
+
+<h2>History — from navigational to relational and back</h2>
+
+<p>Data modeling evolved through the same constraint inversions that shaped every discipline on this shelf:</p>
+
+<table>
+<thead><tr><th>Inversion</th><th>Before</th><th>After</th></tr></thead>
+<tbody>
+<tr><td><strong>Navigational → Declarative</strong> (Codd, 1970)</td><td>Hierarchical/network databases (IMS, CODASYL); you wrote code to walk pointers between records</td><td>The relational model: state in tables, relationships declared, queried by set logic, not by traversal. <em>What</em> you want, not <em>how</em> to walk to it</td></tr>
+<tr><td><strong>Rows → Objects</strong> (Hibernate 2001, ActiveRecord in Rails 2004)</td><td>SQL by hand; object-relational mismatch was a manual chore</td><td>ORMs map tables to classes; schema lifecycle moves into the ORM. Speed for CRUD, leaks for anything the model doesn't fit</td></tr>
+<tr><td><strong>Schema → Schema-optional</strong> (MongoDB 2009, DynamoDB 2012)</td><td>One relational schema for everything</td><td>Document and key-value stores drop rigid schemas for flexibility and scale-out; the schema returns as the application's hidden debt</td></tr>
+<tr><td><strong>Diagrams → Migrations-as-code</strong> (Flyway 2010, Prisma Migrate, Drizzle-kit)</td><td>Schema changes applied by hand in a console</td><td>Every schema change is a versioned, reviewable, CI-gated migration file</td></tr>
+<tr><td><strong>Purist → Pragmatic</strong> (Postgres JSONB 2014 in 9.4, SQLite everywhere, pgvector)</td><td>Strict relational purism or full schemaless</td><td>Hybrid stores: constraints where they matter, JSONB blobs where they don't, vectors as first-class citizens</td></tr>
+</tbody>
+</table>
+
+<p>The pattern: every inversion pushed modeling toward <em>declaring intent and letting the engine enforce it</em>, then circled back to add flexibility where enforcement costs more than it saves. The vault is designed, not assembled — but it is designed for the queries, not for the theory.</p>
+
+<h2>Intersection with neighbors</h2>
+
+<table>
+<thead><tr><th>Neighbor doc</th><th>What belongs here</th><th>What belongs next door</th></tr></thead>
+<tbody>
+<tr><td>System Design</td><td>Table shapes, keys, constraints, indexes, migration design within one store</td><td>Which store, partitioning, replication, consistency across services, failure domains (§6c)</td></tr>
+<tr><td>API Design</td><td>The resource model as tables; why the schema must not leak through the wire</td><td>The contract spec, OpenAPI, versioning policy, schema-evolution compatibility matrix</td></tr>
+<tr><td>Backend Engineering</td><td>The schema the loop reads and writes; migration execution day-to-day</td><td>The request loop, ORM call patterns, transaction boundaries in handlers (§1e, §5)</td></tr>
+<tr><td>Version Control, CI/CD &amp; Deployment</td><td>Forward-only migration files, expand–contract phases</td><td>Deploy strategies, canaries, rollback limits, environment parity</td></tr>
+<tr><td>Software Testing &amp; Debugging</td><td>Constraint violations as test assertions, migration tests</td><td>Unit tests, integration tests, property tests</td></tr>
+</tbody>
+</table>
+
+<p><strong>Key rule:</strong> if the topic is "how a fact becomes a row with enforced rules", it belongs here. If it is "how the service owns data across the fleet" or "what the wire says", it belongs next door. The vault is the middle layer — designed here, consumed by the loop, exposed by the contract, chosen by the architecture.</p>
+
+<p><strong>Where the operational concerns live</strong> — this doc deliberately stops at the schema; the running system is owned next door:</p>
+<ul>
+  <li>Partitioning, capacity planning, store choice, replication → <a href="./system-design.html">System Design</a> (§6b–§6c); monitoring → its observability section (§6g); backup and point-in-time recovery → its reliability section (§6f).</li>
+  <li>N+1, transaction boundaries, lock contention, connection pooling → <a href="./backend-engineering.html">Backend Engineering</a> (§1e, §5).</li>
+  <li>Deploy-time migration risk, rollback limits → <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a>.</li>
+</ul>
+
+<h2>Underlying theory — the invariants to trust</h2>
+
+<table>
+<thead><tr><th>Invariant</th><th>What it means</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Relational model (Codd)</td><td>State lives in tables; relationships are declared by keys; queries are set operations</td><td>Enables joins, constraints, transactions — the engine enforces what the model claims</td></tr>
+<tr><td>Keys and constraints</td><td>A primary key is a <em>semantic claim</em>: "this identifies one thing, exactly once"</td><td>Uniqueness enforced at the engine, not hoped for in the app</td></tr>
+<tr><td>Normalization theory</td><td>Split state until no fact is stored twice (dependency analysis: 1NF→3NF)</td><td>Removes update anomalies; the write path stays consistent by construction</td></tr>
+<tr><td>Index structures</td><td>B-Tree: ordered, O(log n) equality and range; Hash: O(1) equality; GIN: inverted, multi-value containment</td><td>The index <em>is</em> the read path — query speed is decided at schema time</td></tr>
+<tr><td>Query planner &amp; cost model</td><td>The engine estimates every access path (seq scan, index scan, join order) and picks the cheapest</td><td>Bad statistics or missing indexes = the planner's estimate is the only bug you can read</td></tr>
+<tr><td>ACID</td><td>Atomic, Consistent, Isolated, Durable</td><td>Multi-row writes move together; the schema's constraints are the consistency half (see <a href="./backend-engineering.html">Backend Engineering §5</a>)</td></tr>
+<tr><td>CAP — applied per structure</td><td>Consistency vs. availability is chosen per table/column, not per database</td><td>Denormalization, read replicas, and event logs are schema-level CAP decisions (see the CAP section)</td></tr>
+</tbody>
+</table>
+
+<h2>Mental models — frames for thinking about the vault</h2>
+
+<table>
+<thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
+<tbody>
+<tr><td>The vault outlives the API</td><td>What survives a rewrite?</td><td>The schema is the longest-lived artifact; version 6 of the API still reads version 1's rows</td></tr>
+<tr><td>Schema is the contract with the future</td><td>What am I promising?</td><td>Every column, constraint, and key is a promise the system will be held to</td></tr>
+<tr><td>Rows are facts; relationships are truth</td><td>What is real?</td><td>A row stores one fact; joins reconstruct truth from facts</td></tr>
+<tr><td>Model for access paths</td><td>How is this read back?</td><td>Design for the queries the app actually issues — the UI's shape is a hint, not the model</td></tr>
+<tr><td>Normalize for writes, denormalize for reads</td><td>Which path pays?</td><td>Write-heavy: keep facts single-sourced. Read-heavy: copy with a documented invalidation story</td></tr>
+<tr><td>The index is the read path</td><td>Where does the query go?</td><td>No index = the engine walks the whole table; every WHERE/JOIN/ORDER BY wants a decision</td></tr>
+<tr><td>Every migration is a deployment</td><td>Can this ship alone?</td><td>Schema changes go through the same review, CI, and rollback discipline as code</td></tr>
+</tbody>
+</table>
+
+<h2>Relational modeling — keys, constraints, and normalization (1NF–3NF)</h2>
+
+<p>Normalization is the discipline of removing <em>redundant storage</em> by analyzing what a table's facts <em>depend on</em>. Each normal form removes one class of update anomaly: store a fact once, change it once, and it is true everywhere.</p>
+
+<h3>First normal form (1NF)</h3>
+<p>Columns hold atomic values — no repeated groups, no lists in a cell. If a shipment can have multiple tracking events, "events" is not a column; it is a table.</p>
+
+<table>
+<thead><tr><th>Non-normalized</th><th>1NF violation</th></tr></thead>
+<tbody>
+<tr><td><code>shipments(id, status, events)</code> where events is "delivered@10:02;out_for_delivery@09:15"</td><td>Parsing a string to learn the history — every query re-splits the fact</td></tr>
+<tr><td><code>customers(id, name, phone1, phone2, phone3)</code></td><td>Adding a fourth phone is a schema change</td></tr>
+</tbody>
+</table>
+
+<p>Fix: each repeated value becomes its own row in a child table, joined by the parent's key.</p>
+
+<h3>Second normal form (2NF)</h3>
+<p>Every non-key column must depend on the <em>whole</em> primary key. Violations appear when the key is composite: a column that depends on only part of the key will be repeated for every combination that shares that part.</p>
+
+<table>
+<thead><tr><th>Violation</th><th>Why</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><code>shipment_items(shipment_id, item_id, item_name, quantity)</code></td><td><code>item_name</code> depends only on <code>item_id</code>, not on the pair</td><td>Split: <code>items(item_id, item_name)</code>; keep the join row with just the pair and quantity</td></tr>
+</tbody>
+</table>
+
+<h3>Third normal form (3NF)</h3>
+<p>Every non-key column depends on the key <em>directly</em>, not through another non-key column. Otherwise the transitive dependency stores the same fact repeatedly and updates drift.</p>
+
+<table>
+<thead><tr><th>Violation</th><th>Why</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><code>shipments(id, address_id, city, country)</code></td><td><code>city</code> depends on <code>address_id</code>, not on the shipment</td><td>Move city/country into <code>addresses</code>; the shipment references the address by key</td></tr>
+</tbody>
+</table>
+
+<h3>The normalization pitfalls — where the theory stops being free</h3>
+
+<table>
+<thead><tr><th>Pitfall</th><th>What it costs</th><th>The counter-rule</th></tr></thead>
+<tbody>
+<tr><td>Over-normalization</td><td>Every read becomes a 5-table join; the join count is the tax on each query</td><td>Stop at 3NF unless a read path proves it needs more; prove it with EXPLAIN</td></tr>
+<tr><td>Natural keys as primary keys</td><td>Email changes, phone numbers change, product codes get reused</td><td>Surrogate key (autoincrement/UUID) as PK, natural keys as <code>UNIQUE</code> columns</td></tr>
+<tr><td>Denormalization without a story</td><td>Copied data drifts silently — the duplicate is wrong and nobody notices</td><td>Denormalize only for a measured read path, with the invalidation rule written in the migration</td></tr>
+<tr><td>Nullable-everything</td><td>"Maybe" columns mean every consumer re-implements the fallback</td><td><code>NOT NULL</code> is the default claim; NULL is a deliberate decision with a meaning</td></tr>
+<tr><td>EAV (entity-attribute-value) tables</td><td>"Flexible" key-value rows make every query a pivot problem</td><td>Only for genuinely heterogeneous attributes; prefer JSONB columns for sparse-but-known shapes</td></tr>
+</tbody>
+</table>
+
+<h3>BCNF and when to stop normalizing</h3>
+
+<p><strong>Boyce-Codd Normal Form</strong> tightens 3NF: every determinant must be a candidate key. In practice, 3NF covers the overwhelming majority of real schemas; BCNF matters only with overlapping candidate keys (two natural keys that cross). The pragmatic rule: <strong>stop at 3NF unless a specific anomaly proves it needs more</strong>. The cost of normalization is join complexity — if a read path needs five joins for a simple result, that schema is over-normalized for that path. Denormalize for a <em>measured</em> read, and document the invalidation story in the migration.</p>
+
+<h2>Relationship patterns — cardinality and keys</h2>
+
+<p>Relationships are the join between tables — and each cardinality has a canonical shape:</p>
+
+<table>
+<thead><tr><th>Relationship</th><th>Pattern</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><strong>One-to-one</strong></td><td>FK with <code>UNIQUE</code>, or shared primary key</td><td><code>users</code> → <code>user_profiles</code> (rarely-needed fields kept apart)</td></tr>
+<tr><td><strong>One-to-many</strong></td><td>FK on the "many" side</td><td><code>customers</code> → <code>shipments</code></td></tr>
+<tr><td><strong>Many-to-many</strong></td><td>Junction table with composite primary key</td><td><code>shipments</code> ↔ <code>items</code> via <code>shipment_items</code></td></tr>
+<tr><td><strong>Self-referential</strong></td><td>FK pointing at the same table</td><td><code>employees.manager_id</code> → <code>employees.id</code> (or <code>categories.parent_id</code> for a tree)</td></tr>
+<tr><td><strong>Polymorphic</strong></td><td><em>Avoid</em> — a single <code>commentable_type</code> + <code>commentable_id</code> pair can't hold a real FK</td><td>"comments on posts <em>or</em> photos" modeled as one column pair</td></tr>
+</tbody>
+</table>
+
+<p><strong>The many-to-many rule:</strong> the junction table is a first-class entity — composite primary key of both FKs, its own timestamps, and its own attributes (<code>quantity</code>, <code>role</code>, <code>enrolled_at</code>). Treating it as an afterthought is how "items" columns and comma-splitting creep in.</p>
+
+<p><strong>Why polymorphic associations are a smell:</strong> the <code>commentable_id</code> can't be a foreign key — there's no single parent table — so the engine enforces nothing. Orphaned comments, dangling IDs, and join conditions that must guess the type are the result. Alternatives: separate FK columns per parent with a <code>CHECK</code> guaranteeing exactly one is set, or separate junction tables. The schema is allowed to repeat a shape to keep enforcement.</p>
+
+<h2>Data types — choosing column types</h2>
+
+<p>The type is the schema's smallest unit of correctness: it enforces domain rules, decides storage and index behavior, and outlives every query. Choose the most specific type that fits the fact.</p>
+
+<table>
+<thead><tr><th>Domain concept</th><th>Recommended type</th><th>Why</th><th>Anti-pattern</th></tr></thead>
+<tbody>
+<tr><td>Money</td><td><code>NUMERIC</code> or integer minor units</td><td>Exact arithmetic; no binary floating-point drift</td><td><code>FLOAT</code> / <code>DOUBLE PRECISION</code> (0.1 + 0.2 ≠ 0.3)</td></tr>
+<tr><td>Timestamps</td><td><code>TIMESTAMPTZ</code></td><td>Timezone-aware; stores UTC, renders local</td><td><code>TIMESTAMP</code> without timezone — 9am in which timezone?</td></tr>
+<tr><td>Dates</td><td><code>DATE</code></td><td>Date without a time of day</td><td>Storing dates as strings (no ordering, no arithmetic)</td></tr>
+<tr><td>Booleans</td><td><code>BOOLEAN</code></td><td>Native semantics</td><td><code>SMALLINT</code> 0/1 with app-level mapping</td></tr>
+<tr><td>Identity (internal)</td><td><code>BIGSERIAL</code> / <code>BIGINT</code> + sequence</td><td>8 bytes, sequential, cache-friendly</td><td>Natural keys as PK (emails change)</td></tr>
+<tr><td>Identity (public/distributed)</td><td><code>UUID</code></td><td>16 bytes, generated anywhere, opaque</td><td><code>VARCHAR(36)</code> — storage and index costs with no benefit</td></tr>
+<tr><td>Enums (stable)</td><td>Native <code>ENUM</code></td><td>Type safety enforced by the engine</td><td><code>VARCHAR</code> + app-level validation that drifts</td></tr>
+<tr><td>Enums (evolving)</td><td>Reference table</td><td>Adding a value is an INSERT, not a migration/lock</td><td><code>ENUM</code> for values that change (statuses that grow)</td></tr>
+<tr><td>Short text</td><td><code>TEXT</code> (Postgres: no penalty vs <code>VARCHAR(n)</code>)</td><td>No arbitrary limit to hit</td><td><code>CHAR(n)</code> — blank-padded fixed length</td></tr>
+<tr><td>Variable payloads</td><td><code>JSONB</code></td><td>Binary, queryable, GIN-indexable</td><td><code>JSON</code> text storage — slower queries, no index path</td></tr>
+<tr><td>IP addresses</td><td><code>INET</code></td><td>Native type; supports containment and range queries</td><td><code>VARCHAR</code> — no CIDR matching</td></tr>
+</tbody>
+</table>
+
+<p><strong>BIGSERIAL vs. UUID — the decision rule:</strong> autoincrement for internal identity (compact, sequential, friendly to B-Tree index locality, natural for joins); UUID when identifiers are generated outside the database (distributed writers) or exposed publicly (no count/order leakage, no enumeration). For UUIDs on hot tables, prefer a time-ordered variant (UUIDv7) — random UUIDs fragment clustered indexes. Public-facing identity never means "send the internal id" — it means a separate opaque identifier, shaped at the boundary (see <a href="./backend-engineering.html">Backend Engineering §1b</a>).</p>
+
+<h2>Constraints — the enforcement toolkit</h2>
+
+<p>The database enforces what the app merely hopes. Each constraint is a cheap, permanent invariant — write the claim in DDL, and every future writer (including the ones you forgot) obeys it.</p>
+
+<table>
+<thead><tr><th>Constraint</th><th>What it enforces</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>NOT NULL</code></td><td>The column always has a value</td><td><code>name TEXT NOT NULL</code> — "unknown" and "absent" are different; be deliberate about which is allowed</td></tr>
+<tr><td><code>UNIQUE</code></td><td>No duplicate values</td><td><code>email TEXT UNIQUE</code> — natural identifiers and idempotency keys live here</td></tr>
+<tr><td><code>PRIMARY KEY</code></td><td>Unique + NOT NULL — identifies the row</td><td><code>id BIGSERIAL PRIMARY KEY</code></td></tr>
+<tr><td><code>FOREIGN KEY</code></td><td>Referential integrity — the value exists in the parent</td><td><code>customer_id BIGINT REFERENCES customers(id)</code></td></tr>
+<tr><td><code>CHECK</code></td><td>Arbitrary boolean claim about a row</td><td><code>CHECK (quantity &gt; 0)</code>, <code>CHECK (end_time &gt; start_time)</code></td></tr>
+<tr><td><code>EXCLUSION</code></td><td>No two rows satisfy a condition simultaneously</td><td>Prevent overlapping time ranges (<code>EXCLUDE USING gist (room WITH =, during WITH &amp;&amp;)</code>)</td></tr>
+<tr><td><code>DEFERRABLE</code></td><td>Constraint checked at transaction end, not per statement</td><td>Circular FKs — insert both sides, then verify once</td></tr>
+</tbody>
+</table>
+
+<p><strong>Every foreign key should state its <code>ON DELETE</code> behavior explicitly</strong> — the default (<code>NO ACTION</code>) is rarely what you want:</p>
+<ul>
+  <li><code>ON DELETE CASCADE</code> — strong ownership: delete the parent, children go too (<code>shipment_events</code> under <code>shipments</code>).</li>
+  <li><code>ON DELETE SET NULL</code> — optional reference: the child survives without the parent.</li>
+  <li><code>ON DELETE RESTRICT</code> — weak reference: refuse to delete a parent that still has children (an audit record's subject).</li>
+</ul>
+<p>And index every FK column — the FK is the default join path, and unindexed FKs make deletes and joins scan.</p>
+
+<h2>Indexing strategies — the read path</h2>
+
+<p>The query planner will use an index only if it estimates it's cheaper than walking the table. The index <em>is</em> the read path: designing the schema includes designing which paths exist.</p>
+
+<table>
+<thead><tr><th>Index type</th><th>Best for</th><th>Cost / notes</th></tr></thead>
+<tbody>
+<tr><td><strong>B-Tree</strong> (default)</td><td>Equality, range (<code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code>), <code>ORDER BY</code>, joins, unique/PK constraints, prefix <code>LIKE 'foo%'</code></td><td>O(log n) lookups; ordered — returns sorted output for free</td></tr>
+<tr><td><strong>Hash</strong></td><td>Equality only (<code>=</code>)</td><td>O(1) point lookups; useless for ranges or ordering. Durable since Postgres 10 — before that, crashes could corrupt them</td></tr>
+<tr><td><strong>GIN</strong> (inverted)</td><td>Multi-value containment: arrays, JSONB containment, full-text search vectors</td><td>One entry per component value; heavier to maintain on writes</td></tr>
+<tr><td><strong>Composite</strong></td><td>Filters combining several columns</td><td>Leftmost-prefix rule: <code>(a, b, c)</code> serves <code>a</code>, <code>a+b</code>, <code>a+b+c</code> — not <code>b</code> alone</td></tr>
+<tr><td><strong>Partial</strong></td><td>Hot subset: <code>WHERE status = 'active'</code> on a table with millions of stale rows</td><td>Index only the rows queries touch — tiny index, same speed</td></tr>
+<tr><td><strong>Covering</strong> (index-only scan)</td><td>Queries that only need the indexed columns</td><td>Engine never visits the table at all — fastest read; widen with <code>INCLUDE</code></td></tr>
+</tbody>
+</table>
+
+<p><strong>The decision rule:</strong> index what the actual queries use — columns in <code>WHERE</code>, <code>JOIN</code> keys (foreign keys are the most commonly forgotten indexes), and <code>ORDER BY</code> — then verify with EXPLAIN. Every index taxes writes and storage; the lazy discipline is: add an index when a real query proves it needs one, not preemptively for hypothetical ones. For the full treatment: <a href="https://use-the-index-luke.com/">Use The Index, Luke</a>.</p>
+
+<p><strong>Pagination:</strong> avoid <code>OFFSET</code> — it scans and discards every skipped row (<code>OFFSET 10000</code> pays for 10,020 rows to return 20). Keyset pagination uses the index directly:</p>
+<pre>-- Bad: OFFSET  — cost grows with page depth
+SELECT * FROM shipment_events ORDER BY id LIMIT 20 OFFSET 10000;
+
+-- Good: keyset — the index jumps straight to the page
+SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;</pre>
+
+<h2>Reading EXPLAIN ANALYZE — the tuning loop</h2>
+
+<p>The query planner picks the cheapest estimated plan. When a query is slow, the plan tells you <em>why</em> — and the gap between <em>estimated</em> and <em>actual</em> tells you whether the problem is the schema or the statistics. The loop:</p>
+
+<pre>1. EXPLAIN (ANALYZE, BUFFERS) your_slow_query;
+2. Find the node where most execution time is spent.
+3. Compare estimated rows vs. actual rows (node by node).
+4. Fix what the gap points at (missing index, stale stats, bad join order).
+5. Re-run. The plan is the ground truth; everything else is opinion.</pre>
+
+<p>What to look for:</p>
+
+<table>
+<thead><tr><th>Signal</th><th>What it means</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td>Seq Scan on a large table with high actual time, filter removing many rows</td><td>The query qualifies rows but the engine has no cheaper path</td><td>Missing index — add it, re-run</td></tr>
+<tr><td>Estimated rows off from actual by ~10× at the lowest node</td><td>Stale statistics or correlated columns; the bad estimate cascades into every join above it</td><td>Run <code>ANALYZE</code> after bulk loads; re-check</td></tr>
+<tr><td>Nested Loop with high <code>loops=N</code></td><td>The inner node runs once per outer row — time multiplies by loops</td><td>Multiply times by loops before comparing; index the inner join key</td></tr>
+<tr><td>High <code>shared read</code> vs. <code>shared hit</code> on a hot query</td><td>Working set misses the buffer cache; disk-bound</td><td>Index to shrink the read set, or the cache story belongs to System Design</td></tr>
+<tr><td>Actual ≪ estimated rows</td><td>Planner overestimated selectivity — built a big hash/sort for a tiny result</td><td>Stale stats or skewed data; re-analyze, consider extended stats</td></tr>
+</tbody>
+</table>
+
+<p>The cost numbers are planner units, not milliseconds — compare nodes inside <em>one</em> plan, never across queries. <code>ANALYZE</code> executes the query, so never run it on production writes during peak load (see the <a href="https://www.postgresql.org/docs/current/using-explain.html">PostgreSQL EXPLAIN documentation</a>).</p>
+
+<h2>Schema evolution — migrations as design decisions</h2>
+
+<p>A schema change is a deployment with an extra hazard: the data already exists and old code is still running against it. The safe pattern is <em>expand and contract</em> (a.k.a. parallel change) — the same discipline <a href="./api-design.html">API Design</a> uses for contracts, applied to rows.</p>
+
+<table>
+<thead><tr><th>Phase</th><th>What you ship</th><th>Rollback</th></tr></thead>
+<tbody>
+<tr><td><strong>Expand</strong></td><td>Add the new column/table (nullable or defaulted); new writes go to both old and new structures; reads still use the old</td><td>Safe — drop the addition, no data touched</td></tr>
+<tr><td><strong>Migrate</strong></td><td>Backfill existing rows in the background; write both structures; verify parity on a subset before cutting over</td><td>Safe — old structure still authoritative</td></tr>
+<tr><td><strong>Contract</strong></td><td>Reads switch to the new structure; once no writes touch the old, drop it</td><td>Hard — after this point, rollback needs a reverse migration</td></tr>
+</tbody>
+</table>
+
+<p>The discipline around the pattern:</p>
+<ul>
+  <li><strong>Forward-only migrations.</strong> Every change is a numbered, reviewable, CI-gated file. Never edit a migration that has been applied anywhere — write a new one that fixes the damage.</li>
+  <li><strong>Expand-contract for breaking changes</strong> (changing cardinality, splitting a table, renaming a column) — each phase deploys independently and the system stays up the whole time.</li>
+  <li><strong>Online tools</strong> for the heavy cases: <code>pgroll</code> (Postgres, reversible, expand–contract built in) and <code>gh-ost</code> (MySQL) run large table changes without locking the table.</li>
+  <li><strong>Deploy is a sibling concern</strong> — the pipeline, canaries, and rollback limits live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a>.</li>
+  <li><strong>Backfill in batches.</strong> Updating millions of rows in one statement locks the table for its whole run. Process in bounded batches (<code>WHERE id &gt; last AND id &lt;= last + batch</code>) so locks are short and the system stays up.</li>
+  <li><strong>Test the rollback path.</strong> Every migration must be reversible until the contract phase — and "reversible" means tested, not imagined. If you can't roll back, you're not ready to deploy.</li>
+</ul>
+
+<p>Reads that feed writes must sit in the same transaction — and the migration file is where such consistency decisions get documented, not the changelog.</p>
+
+<h2>CAP applied to schema design</h2>
+
+<p>CAP is usually discussed at the infrastructure level (see <a href="./system-design.html">System Design §6c</a>): which store, which consistency model. But the choice is <em>made in the schema</em>. The vault is not uniformly consistent — you decide per structure how fresh a read may be and what a write must atomically move.</p>
+
+<table>
+<thead><tr><th>Schema decision</th><th>What it trades</th><th>When it wins</th></tr></thead>
+<tbody>
+<tr><td><strong>Denormalized copy</strong> (e.g. <code>orders.total</code> alongside order lines)</td><td>Consistency of the copy vs. read speed without a join</td><td>Hot read path; the copy is recomputed by the same transaction that writes the source</td></tr>
+<tr><td><strong>Read replica for reporting</strong></td><td>Freshness (replica lag) vs. isolation of heavy queries</td><td>Analytics queries that must not compete with the write path</td></tr>
+<tr><td><strong>Append-only event log</strong> instead of mutable state</td><td>Immutable facts (audit-perfect, replayable) vs. "current state" convenience</td><td>Ledgers, audit trails, anything where history is the product</td></tr>
+<tr><td><strong>Idempotency keys</strong> (a <code>UNIQUE</code> column for client-generated operation IDs)</td><td>Extra column and constraint cost vs. safe retries</td><td>Payment-adjacent writes; the constraint <em>enforces</em> what middleware hopes</td></tr>
+<tr><td><strong>Soft deletes</strong> (<code>deleted_at</code>)</td><td>Rows accumulate; every query must filter, every FK can point at a ghost</td><td>Recovery and audit needs outweigh the query tax — make the filter a partial-index ally</td></tr>
+</tbody>
+</table>
+
+<p><strong>Key rule:</strong> state the consistency choice per table in the migration file. "This column is eventually consistent, refreshed by job X" is a design decision that must be written down where the schema change lives — otherwise the next engineer inherits a mystery.</p>
+
+<h2>Isolation levels — the transaction knob</h2>
+
+<p>ACID's <em>I</em> is a dial, not a switch: each isolation level permits a different class of concurrency anomaly, and the schema is where the choice is made per transaction. (The transaction itself — what moves together in the handler — lives in <a href="./backend-engineering.html">Backend Engineering §5</a>; this is the consistency side.)</p>
+
+<table>
+<thead><tr><th>Isolation level</th><th>What it prevents</th><th>What it allows</th><th>When to use</th></tr></thead>
+<tbody>
+<tr><td><code>READ UNCOMMITTED</code></td><td>Nothing</td><td>Dirty reads, non-repeatable reads, phantoms</td><td>Almost never; Postgres doesn't even implement it as specified</td></tr>
+<tr><td><code>READ COMMITTED</code> (Postgres default)</td><td>Dirty reads</td><td>Non-repeatable reads, phantoms</td><td>Most applications — the correct default</td></tr>
+<tr><td><code>REPEATABLE READ</code></td><td>Dirty + non-repeatable reads</td><td>Phantoms</td><td>Reporting and financial calculations that need one consistent snapshot</td></tr>
+<tr><td><code>SERIALIZABLE</code></td><td>All anomalies</td><td>None — but transactions may abort and need a retry</td><td>Strict consistency where anomalies are unacceptable and aborts are handled</td></tr>
+</tbody>
+</table>
+
+<p><strong>The key insight:</strong> isolation is a per-transaction decision, not a per-database one. Run <code>READ COMMITTED</code> for everyday traffic and escalate <code>SERIALIZABLE</code> for the specific transactions that must not interleave. And design the schema to make the common case cheap: short transactions, indexed lookups, and constraints that fail fast instead of waiting on locks.</p>
+
+<h2>Beyond the relational default — read models and event sourcing</h2>
+
+<p>Not every fact belongs in a normalized table. Two patterns recur when the access paths stop fitting:</p>
+
+<h3>Read models</h3>
+<p>A projection table shaped exactly like a hot query — denormalized on purpose, rebuilt from source facts. The source of truth stays normalized (write path); the read model serves the UI (read path). The rebuild is the invalidation story: batch, on-event, or via a queue. The write is a second write — commit to it in the migration, don't let it drift.</p>
+
+<h3>Event sourcing — schema as an append-only log</h3>
+<p>Instead of "current state" rows that get overwritten, store the <em>facts</em>: <code>shipment_events(shipment_id, happened_at, type, payload)</code> — immutable, ordered, replayable. Current state is a <em>projection</em> over the log, computed on read or maintained as a read model. The trade-off table:</p>
+
+<table>
+<thead><tr><th>Dimension</th><th>State tables</th><th>Event sourcing schema</th></tr></thead>
+<tbody>
+<tr><td>History</td><td>Only what you explicitly stored (audit tables)</td><td>Everything, by construction — the log is the truth</td></tr>
+<tr><td>Write path</td><td>UPDATE in place; transactions keep consistency</td><td>Append-only INSERT — no overwrite, no lost updates, no locking</td></tr>
+<tr><td>Read path</td><td>Direct, indexed, fast</td><td>Needs a projection (read model) or replay — the read path is your responsibility</td></tr>
+<tr><td>Versioning</td><td>Schema evolves by migration</td><td>Events never change — new event types coexist; you never rewrite history</td></tr>
+<tr><td>Cost</td><td>Bounded by table size</td><td>Log grows forever; compaction is an operational concern</td></tr>
+</tbody>
+</table>
+
+<p><strong>When JSONB beats tables:</strong> sparse, varied, or shape-changing payloads (webhook payloads, feature-flag config, event payloads) — a <code>jsonb</code> column with a <code>CHECK</code> constraint is a schema with a softer enforcement. The rule: enforce structurally what must never be wrong; let JSONB hold what varies. For the storage-and-streaming side of this — document vs. key-value vs. wide-column vs. graph stores, and when to leave the relational model entirely — see <a href="./system-design.html">System Design §6c</a> (data architecture) and §6e (event and queue reliability). The lazy rule for stores: don't add one unless the relational model has a proven, measured limitation; every extra store is another synchronization problem.</p>
+
+<h2>Views and materialized views — shaping reads without duplicating writes</h2>
+
+<table>
+<thead><tr><th>Type</th><th>What it is</th><th>When to use</th></tr></thead>
+<tbody>
+<tr><td><strong>View</strong></td><td>A saved query — computed on every access, no storage</td><td>Hide complex joins from app code; give a stable interface over a changing schema; grant access to a view instead of the table</td></tr>
+<tr><td><strong>Materialized view</strong></td><td>A saved query <em>result</em> — stored on disk</td><td>Expensive aggregations and denormalized read models that don't need real-time freshness — the schema-level cousin of the read model</td></tr>
+</tbody>
+</table>
+
+<p>Views are free (they are just named queries) — use them liberally as the read-side interface. Materialized views are caches: they must be refreshed (<code>REFRESH MATERIALIZED VIEW</code>) on a schedule or after source writes, and the freshness trade-off is exactly the invalidation story this doc keeps asking for — write it down next to the view definition.</p>
+
+<h2>Multi-tenancy — sharing the vault safely</h2>
+
+<p>When one deployment serves many customers (tenants), the isolation choice is a schema decision:</p>
+
+<table>
+<thead><tr><th>Pattern</th><th>How it works</th><th>Isolation</th><th>Cost</th><th>When to use</th></tr></thead>
+<tbody>
+<tr><td><strong>Separate database per tenant</strong></td><td>Each tenant gets its own database</td><td>Strong</td><td>High — connection and migration overhead per tenant</td><td>Strict isolation, regulatory demands, few large tenants</td></tr>
+<tr><td><strong>Separate schema per tenant</strong></td><td>Own schema in a shared database</td><td>Medium</td><td>Medium — one migration run per tenant schema</td><td>Moderate isolation with a manageable tenant count</td></tr>
+<tr><td><strong>Shared schema with <code>tenant_id</code></strong></td><td>All tenants share tables; rows carry a tenant key</td><td>Weak unless enforced</td><td>Low — cheapest at scale</td><td>Many tenants, cost-sensitive — the common default</td></tr>
+</tbody>
+</table>
+
+<p><strong>The shared-schema pattern requires database-level enforcement.</strong> Every table carries <code>tenant_id</code>, and every query must filter by it — but never trust application code to remember. Postgres Row-Level Security makes the engine the enforcer:</p>
+
+<pre>ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON shipments
+  USING (tenant_id = current_setting('app.tenant_id')::BIGINT);</pre>
+
+<p>The tenant key belongs in the primary key of every tenant-scoped table (so the partition or index structure follows it), and the <code>tenant_id</code> filter must reach the engine even through ORMs — a missed filter is a data leak, not a bug.</p>
+
+<p>Tenant isolation is a security control, not just a schema decision: the threat model it defends against, and the other layers that must hold when the schema's enforcement fails, live in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (Infrastructure section and the security checklist).</p>
+
+<h2>Schema in code — ORMs, query builders, raw SQL</h2>
+
+<p>How the schema is declared and accessed is a tooling decision — the schema itself is the design. The decision table (the runtime side lives in <a href="./backend-engineering.html">Backend Engineering §1e</a>):</p>
+
+<table>
+<thead><tr><th>Tool</th><th>Declares</th><th>Wins when</th><th>Costs when</th></tr></thead>
+<tbody>
+<tr><td><strong>ORM</strong> (Prisma, ActiveRecord, Hibernate, SQLAlchemy)</td><td>Schema + access in one language model; migrations usually owned by the tool</td><td>Single-table CRUD, small teams, rapid iteration</td><td>N+1 queries, leaks surface, complex queries fight the abstraction</td></tr>
+<tr><td><strong>Query builder</strong> (Knex, Drizzle)</td><td>Schema in code (Drizzle-kit migrations), SQL in composable builders</td><td>Control without string-typing; complex but structured queries</td><td>Still a layer to learn; you write the joins yourself</td></tr>
+<tr><td><strong>Raw SQL + migration tool</strong> (Flyway, Liquibase, dbmate)</td><td>Schema as SQL files, versioned and forward-only</td><td>Anything where the query is the product; team owns SQL deeply</td><td>Boilerplate; discipline required (every change hand-written)</td></tr>
+</tbody>
+</table>
+
+<p>The lazy rule: start with the tool that makes the schema <em>versioned and reviewable</em> (that is non-negotiable), and pick ORM-vs-builder-vs-raw by how much of your workload is one-table CRUD. Whatever you choose, the schema is designed in this doc's terms first — tools then translate it.</p>
+
+<h2>Principles — the shared constants</h2>
+
+<table>
+<thead><tr><th>Principle</th><th>The rule of thumb</th></tr></thead>
+<tbody>
+<tr><td>Model facts before features</td><td>Design what must survive; features come and go, facts remain</td></tr>
+<tr><td>Keys are semantic claims</td><td>A primary key says "one thing, exactly once" — enforce it at the engine</td></tr>
+<tr><td>Every schema change is a migration</td><td>Versioned, forward-only, CI-gated; never edit an applied migration</td></tr>
+<tr><td>Index to the access path</td><td>WHERE, JOIN, ORDER BY — index after a real query proves the need; verify with EXPLAIN</td></tr>
+<tr><td>Normalize unless the read path pays</td><td>3NF by default; denormalize for a measured read, with the invalidation story written down</td></tr>
+<tr><td>Consistency is per structure</td><td>State per table/column how fresh a read may be; CAP is a schema decision, not a poster</td></tr>
+<tr><td>The vault outlives the API</td><td>Design the schema as if every future API version will read these rows</td></tr>
+</tbody>
+</table>
+
+<h2>Worked example — "Design the schema for a shipment tracking system"</h2>
+
+<p><a href="./api-design.html">API Design's worked example</a> designs the public tracking API; this is its vault — the schema that example's endpoints read. Start from the facts, not the UI:</p>
+
+<p><strong>Facts to survive:</strong> a customer places a shipment; a shipment has addresses, an ordered list of status events, and items; the API must answer "what is the status of shipment X" and "what happened, when".</p>
+
+<p><strong>Normalized core (3NF) — as forward-only migration files:</strong></p>
+
+<pre>-- 001_create_customers.sql
+CREATE TABLE customers (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 002_create_addresses.sql
+CREATE TABLE addresses (
+  id BIGSERIAL PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  line1 TEXT NOT NULL,
+  city TEXT NOT NULL,
+  country TEXT NOT NULL
+);
+CREATE INDEX idx_addresses_customer_id ON addresses(customer_id);   -- FK = join path
+
+-- 003_create_shipments.sql
+CREATE TABLE shipments (
+  id BIGSERIAL PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(id),
+  origin_address_id BIGINT NOT NULL REFERENCES addresses(id),
+  dest_address_id BIGINT NOT NULL REFERENCES addresses(id),
+  carrier TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'created' CHECK (status IN
+    ('created','picked_up','in_transit','out_for_delivery','delivered','exception','returned')),
+  tracking_number TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_shipments_customer_id ON shipments(customer_id);
+CREATE INDEX idx_shipments_status_active ON shipments(status)
+  WHERE status IN ('in_transit','out_for_delivery');                -- partial: hot subset
+
+-- 004_create_items_and_events.sql
+CREATE TABLE items (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  weight_grams INT NOT NULL CHECK (weight_grams &gt; 0)
+);
+CREATE TABLE shipment_events (
+  id BIGSERIAL PRIMARY KEY,
+  shipment_id BIGINT NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+  happened_at TIMESTAMPTZ NOT NULL,
+  type TEXT NOT NULL,
+  payload JSONB
+);
+CREATE INDEX idx_shipment_events_shipment_id_happened_at
+  ON shipment_events(shipment_id, happened_at DESC);                -- timeline read path
+
+-- 005_create_shipment_items.sql
+CREATE TABLE shipment_items (
+  shipment_id BIGINT NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+  item_id BIGINT NOT NULL REFERENCES items(id),
+  quantity INT NOT NULL CHECK (quantity &gt; 0),
+  PRIMARY KEY (shipment_id, item_id)                                -- junction: composite PK
+);</pre>
+
+<p><strong>Decision log:</strong> <code>tracking_number</code> is a natural key the business knows — it gets a <code>UNIQUE</code> constraint, not the PK (customers can exist without shipments yet; the surrogate keeps every FK stable). <code>shipment_events</code> is an append-only log: history is a product requirement here, so events are never updated — that is the event-sourcing pattern applied where it pays.</p>
+
+<p><strong>Access paths → indexes:</strong></p>
+<ul>
+  <li>"Status of shipment X" → <code>shipments.tracking_number</code> already unique-indexed; <code>status</code> gets a <strong>partial index</strong> (<code>WHERE status IN ('in_transit','out_for_delivery')</code>) — the active set is a hot subset.</li>
+  <li>"Events for shipment X, newest first" → <code>shipment_events(shipment_id, happened_at DESC)</code> composite; the FK index is the join path.</li>
+  <li>"Customer's shipments" → <code>shipments(customer_id, created_at)</code> composite.</li>
+  <li>Timeline queries filtering by status + date → <code>(status, happened_at)</code> once the partial index stops matching.</li>
+</ul>
+
+<p><strong>The tuning loop in action</strong> — "recent events for a hot shipment":</p>
+
+<pre>EXPLAIN (ANALYZE, BUFFERS)
+SELECT type, happened_at, payload FROM shipment_events
+WHERE shipment_id = $1 ORDER BY happened_at DESC LIMIT 20;
+
+ Index Scan using shipment_events_shipment_id_happened_at_idx
+   (actual time=0.05..0.08 rows=20 loops=1)
+   Buffers: shared hit=3                       ← cached, no disk read
+</pre>
+
+<p>Without the composite index, the same query is a Seq Scan over the whole events table — rows=all, filter removed thousands. The index turned a table walk into a 0.05ms point read.</p>
+
+<p><strong>Schema evolution — adding a delivery window:</strong> the API needs <code>delivery_window</code> on shipments. Expand-contract: <code>ALTER TABLE shipments ADD COLUMN delivery_window jsonb;</code> (nullable, additive — safe alone) → backfill from carrier responses in the background → app reads it once populated → no contract phase needed because the column is a pure addition. One migration file, one deploy, the system stayed up.</p>
+
+<p><strong>The same schema in code</strong> — the Prisma declaration is the translation of the migration files, not a second design (see the Schema in code section). The queries that read and write this schema — the JOINs, the UPSERT for webhook retries, the keyset pagination for the event timeline — are the worked example in <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL §Worked example</a>, which turns this design into actual SQL:</p>
+
+<pre>model Shipment {
+  id              Int             @id @default(autoincrement())
+  customerId      Int
+  customer        Customer        @relation(fields: [customerId], references: [id])
+  originAddressId Int
+  originAddress   Address         @relation("origin", fields: [originAddressId], references: [id])
+  destAddressId   Int
+  destAddress     Address         @relation("dest", fields: [destAddressId], references: [id])
+  carrier         String
+  status          ShipmentStatus  @default(created)
+  trackingNumber  String          @unique
+  events          ShipmentEvent[]
+  items           ShipmentItem[]
+  createdAt       DateTime        @default(now())
+}
+
+enum ShipmentStatus {
+  created
+  picked_up
+  in_transit
+  out_for_delivery
+  delivered
+  exception
+  returned
+}</pre>
+
+<h2>Most common failure modes</h2>
+
+<table>
+<thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td><strong>No migrations — schema by hand</strong></td><td>Prod and dev schemas drift; nobody can rebuild the database</td><td>Forward-only migration files, CI-gated, from day one (§Schema evolution)</td></tr>
+<tr><td><strong>Premature denormalization</strong></td><td>Copied columns go stale; reports and app disagree</td><td>Normalize first; denormalize for a measured read path with a written invalidation story</td></tr>
+<tr><td><strong>Foreign keys without indexes</strong></td><td>Joins and deletes suddenly slow at scale — FK columns are ignored by the optimizer until indexed</td><td>Index every FK column; it is the default join path</td></tr>
+<tr><td><strong>Money as FLOAT</strong></td><td>Rounding errors in invoices; 0.1 + 0.2 ≠ 0.3</td><td>Integer minor units or <code>NUMERIC</code> — never binary floats</td></tr>
+<tr><td><strong>Enum-itis</strong></td><td>Adding a status value is a migration, sometimes a table lock</td><td>Enums for tiny stable sets; reference tables when values evolve</td></tr>
+<tr><td><strong>Nullable-forever</strong></td><td>Columns added nullable "just in case" become permanently unconstrained</td><td>Plan the backfill in the same migration; contract the null away</td></tr>
+<tr><td><strong>JSONB-everything</strong></td><td>Schema-less means query-less: every filter is a scan or a lateral</td><td>JSONB for varied payloads; structural columns for anything queried</td></tr>
+<tr><td><strong>God table</strong></td><td>One table with 50+ columns consumed by every service — a shared variable in the database</td><td>Decompose by domain; let each bounded context own its rows (see <a href="./system-design.html">System Design §6c</a>)</td></tr>
+<tr><td><strong>Polymorphic associations</strong></td><td><code>commentable_type</code> + <code>commentable_id</code> — no FK, orphaned references, type-guessing joins</td><td>Separate FK columns per parent with a CHECK, or junction tables (§Relationship patterns)</td></tr>
+<tr><td><strong>Stored derived state</strong></td><td><code>total_price</code> stored beside line items drifts out of sync</td><td>Compute on read; if stored, recompute in the same transaction as the source — and document it</td></tr>
+<tr><td><strong>Over-indexing</strong></td><td>Write latency climbs, storage bloat, planner confusion</td><td>Index for measured access paths; monitor index usage and drop the unused</td></tr>
+<tr><td><strong>UUID as clustered PK on a hot table</strong></td><td>Random insert order fragments the B-Tree; page splits dominate</td><td>Autoincrement or time-ordered UUIDv7 for hot tables; plain UUID fine for cold ones</td></tr>
+<tr><td><strong>TEXT for everything</strong></td><td>No type safety, no constraints, no useful index behavior</td><td>Most specific type that fits — NUMERIC, TIMESTAMPTZ, INET, JSONB (§Data types)</td></tr>
+<tr><td><strong>Breaking changes shipped as one deploy</strong></td><td>Renaming a column takes the API down — old code still reads the old name</td><td>Expand–contract; each phase ships and verifies alone</td></tr>
+<tr><td><strong>Schema leaking into the API</strong></td><td>Rename a column, break the public contract</td><td>Shape at the boundary — see <a href="./api-design.html">API Design</a> and <a href="./backend-engineering.html">Backend Engineering §1b</a></td></tr>
+</tbody>
+</table>
+
+<h2>Ecosystem — tooling catalog with decision metrics</h2>
+
+<table>
+<thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
+<tbody>
+<tr><td>Relational engines</td><td>PostgreSQL, MySQL, SQLite, SQL Server</td><td>Postgres = default for anything non-trivial (JSONB, pgroll, extensions); SQLite for embedded, local, and low-traffic production; MySQL when the fleet already runs it</td></tr>
+<tr><td>Migration tools</td><td>Flyway, Liquibase, dbmate, Prisma Migrate, Drizzle-kit, Alembic (Python), pgroll</td><td>Forward-only, reviewable, reversible where possible; pgroll for zero-lock Postgres changes</td></tr>
+<tr><td>ORMs / builders</td><td>Prisma, Drizzle, Knex, ActiveRecord, Hibernate, SQLAlchemy</td><td>One-table CRUD share of the workload; N+1 discipline; migration ownership</td></tr>
+<tr><td>Schema design / diagrams</td><td>dbdiagram.io, pgModeler, DrawSQL</td><td>The diagram is notation — the migration file is the design artifact of record</td></tr>
+<tr><td>Query analysis</td><td><code>EXPLAIN (ANALYZE, BUFFERS)</code>, pganalyze, depesz visualizer, pg_stat_statements</td><td>Find the biggest node, compare estimates to actuals, fix the gap</td></tr>
+<tr><td>Schema diff / drift detection</td><td>pgdiff, migra, skeema</td><td>Generate migration from diff; CI-drift check: prod schema vs migration history</td></tr>
+<tr><td>Profiling</td><td>pg_stat_statements, pgBadger</td><td>Slowest queries, index usage, lock waits — the evidence for the next schema decision</td></tr>
+<tr><td>Specialized indexes</td><td>pgvector (embeddings), PostGIS (spatial, GiST), full-text (GIN)</td><td>Only when the query operators demand them — see the index-type table</td></tr>
+</tbody>
+</table>
+
+<h2>The future — where data modeling is going</h2>
+
+<table>
+<thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
+<tbody>
+<tr><td>AI-assisted migrations</td><td>Diffing schema to schema, generating and reviewing migrations — the design decisions stay human, the boilerplate leaves</td></tr>
+<tr><td>Schema drift detection</td><td>CI now compares prod schema to migration history — drift becomes a failing check, not a Friday discovery</td></tr>
+<tr><td>Vectors in the vault</td><td>Embeddings as first-class columns (pgvector); similarity joins alongside relational ones</td></tr>
+<tr><td>Streaming databases</td><td>Materialize/risingwave-style systems treat the query as the storage — read models become continuous, not rebuilt</td></tr>
+<tr><td>Serverless SQLite</td><td>Local-first apps with real relational schemas; the vault shrinks to the device and syncs</td></tr>
+<tr><td>Constraints on soft data</td><td>JSONB grows up — CHECK constraints and generated columns let "schemaless" columns carry real rules</td></tr>
+</tbody>
+</table>
+
+<p>The direction is not "less schema" or "more schema" — it is <em>schema where it must be enforced, softer where it must vary</em>, with the choice made explicitly and recorded in the migration.</p>
+
+<h2>Summary — the complete mental checklist</h2>
+
+<p>Before you create a table, run this. If you can answer each row, you're ready to write the migration; if not, sketch until you can.</p>
+
+<table>
+<thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
+<tbody>
+<tr><td>What facts must survive — and which are derived?</td><td>List the nouns of the domain; derived values (totals, counts) are not facts</td></tr>
+<tr><td>What is the key, and what does it claim?</td><td>Decide the surrogate PK; put natural identifiers in UNIQUE constraints</td></tr>
+<tr><td>Which non-key column depends on what?</td><td>Run the 3NF dependency check — every column depends on the key, fully and directly</td></tr>
+<tr><td>What does each real query need indexed?</td><td>Map WHERE/JOIN/ORDER BY to index types; verify with EXPLAIN</td></tr>
+<tr><td>Is this read a join away, and does the plan show it?</td><td>Run the tuning loop before adding the column, not after the incident</td></tr>
+<tr><td>How does this change ship — and roll back?</td><td>Write the expand–contract phases as migration files</td></tr>
+<tr><td>How fresh may this read be?</td><td>State the consistency choice in the migration (replica, denormalized copy, event log)</td></tr>
+<tr><td>Which tool declares this schema?</td><td>Pick ORM / builder / raw SQL by workload shape — versioned and reviewable is non-negotiable</td></tr>
+<tr><td>Does anything leak from the vault through the API?</td><td>Shape at the boundary; the column name is not the contract</td></tr>
+</tbody>
+</table>
+
+<p>Print this table. Put it on your wall. Run it before every table you create. The first rows are "know what is true"; the last rows are "know who reads it." That's the entire method.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>Primary sources →</strong>
+  <a href="https://cacm.acm.org/research/a-relational-model-of-data-for-large-shared-data-banks-2/">Codd — A Relational Model of Data for Large Shared Data Banks (CACM, 1970)</a> ·
+  <a href="https://martinfowler.com/bliki/ParallelChange.html">Fowler/Sato — Parallel Change (expand and contract, 2014)</a> ·
+  <a href="https://www.postgresql.org/docs/current/using-explain.html">PostgreSQL — Using EXPLAIN</a> ·
+  <a href="https://www.postgresql.org/docs/current/indexes-types.html">PostgreSQL — Index Types (B-Tree, Hash, GIN, GiST, BRIN)</a> ·
+  <a href="https://use-the-index-luke.com/">Winand — Use The Index, Luke</a> ·
+  <a href="https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/">Kleppmann — Designing Data-Intensive Applications (O'Reilly, 2017)</a>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Walk me through a table you designed that you later regretted — what was the fact you modeled wrong, and what did the fix migration look like?"</li>
+    <li>"Show me an EXPLAIN ANALYZE where the estimates were off by an order of magnitude — what did you learn about your schema from the gap?"</li>
+    <li>"For a schema change you'd call breaking (say, splitting one table into two), walk me through the expand, migrate, and contract phases — what deploys at each step?"</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span>Reference · Data Modeling &amp; Databases — the vault behind the contract</span>
+  <span>Upstream: <a href="./system-design.html">System Design</a> · Contract: <a href="./api-design.html">API Design</a> · Loop: <a href="./backend-engineering.html">Backend Engineering</a> · Deploy: <a href="./version-control-ci-cd-deployment.html">CI/CD</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>

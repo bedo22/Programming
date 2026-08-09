@@ -20,6 +20,43 @@
   <p>Terms are grouped by the discipline that <em>owns</em> them (the doc where they're defined in depth). Click a term to jump to its owning section. Terms that appear in multiple disciplines have multiple entries.</p>
 </section>
 
+<h2>Shelf map — the complete curriculum at a glance</h2>
+
+<p>The shelf is a seven-layer Staff-Level curriculum. Each layer answers one question; each doc is one discipline. Every doc's "Intersection with neighbors" section says where its boundaries lie; this is the one-glance view.</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>Doc</th><th>What it owns</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2"><strong>Strategy &amp; Discovery</strong><br><em>The why</em></td><td><a href="./product-strategy.html">Product Strategy</a></td><td>Business value, roadmaps, OKRs</td></tr>
+    <tr><td><a href="./design-thinking.html">Design Thinking</a></td><td>User empathy, problem framing, desirability/feasibility/viability</td></tr>
+    <tr><td rowspan="4"><strong>Architecture &amp; Contracts</strong><br><em>The macro</em></td><td><a href="./system-design.html">System Design</a></td><td>Services, scaling, failure domains, consistency, trust boundaries</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a></td><td>Contracts, boundaries, versioning, auth mechanics, token exchange</td></tr>
+    <tr><td><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a></td><td>Schemas, keys, constraints, indexes, migrations, tenant isolation</td></tr>
+    <tr><td><a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a></td><td>The query language: SELECT/JOIN/GROUP BY, window functions, UPSERT, EXPLAIN</td></tr>
+    <tr><td rowspan="2"><strong>Process &amp; Delivery</strong><br><em>How we work</em></td><td><a href="./software-development-process.html">Software Development Process</a></td><td>SDLC, Agile/Scrum/Kanban, team topology, the Agent Development Lifecycle</td></tr>
+    <tr><td><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a></td><td>Git, pipelines, release strategies, supply-chain integrity</td></tr>
+    <tr><td rowspan="2"><strong>Quality &amp; Evidence</strong><br><em>The proof</em></td><td><a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a></td><td>Evidence, TDD, test pyramids, debugging discipline</td></tr>
+    <tr><td><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a></td><td>Adversarial thinking, STRIDE, IAM, cryptography, OWASP, the review gate</td></tr>
+    <tr><td rowspan="3"><strong>Implementation</strong><br><em>The micro</em></td><td><a href="./how-developers-think-frontend.html">How Developers Think: Frontend</a></td><td>The Rhythm — Model → View → Flow, Skeleton → Deepen → Polish</td></tr>
+    <tr><td><a href="./backend-engineering.html">Backend Engineering</a></td><td>The request loop — Request → Auth → Logic → Data → Response</td></tr>
+    <tr><td><a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a></td><td>State visibility, accessibility, interaction, habitability</td></tr>
+    <tr><td rowspan="6"><strong>The Substrate</strong><br><em>The tools</em></td><td><a href="./html-and-css.html">HTML &amp; CSS</a></td><td>The rendering engine: cascade, layout, accessibility tree</td></tr>
+    <tr><td><a href="./javascript-the-language.html">JavaScript: The Language</a></td><td>Closures, async, prototypes, the runtime model</td></tr>
+    <tr><td><a href="./javascript-across-stacks.html">JavaScript Across Stacks</a></td><td>Browser vs. Node vs. Edge, the event loop, host environments</td></tr>
+    <tr><td><a href="./nextjs-deep-dive.html">React &amp; Next.js</a></td><td>Component models, rendering strategies, framework layers (plus <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>, <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a>, <a href="./what-is-state-prequel.html">what is state</a>, <a href="./angular-evolution.html">Angular's evolution</a>)</td></tr>
+    <tr><td><a href="./terminal-and-deployment-substrate.html">Terminal &amp; the Deployment Substrate</a></td><td>The survival kit, Docker mental model, Kubernetes literacy, the three cloud eras</td></tr>
+    <tr><td><a href="./dotnet-and-the-enterprise-lane.html">.NET &amp; the Enterprise Lane</a></td><td>Reading literacy for C#/ASP.NET Core/EF Core — the enterprise and offshoring market</td></tr>
+    <tr><td rowspan="3"><strong>The Foundation</strong><br><em>The umbrella</em></td><td><a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a></td><td>Big O, trade-offs, quality attributes, history</td></tr>
+    <tr><td><a href="./problem-solving.html">Problem-Solving</a></td><td>Pólya, heuristics, metacognition, algorithm design paradigms</td></tr>
+    <tr><td><a href="./algorithms-and-data-structures.html">Algorithms &amp; Data Structures</a></td><td>The toolkit — structures, templates, complexity practice, the recognition cheat sheet</td></tr>
+    <tr><td rowspan="3"><strong>The Freelance Web</strong><br><em>The other 60%</em></td><td><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a></td><td>The CMS ecosystem, the platform decision, how WordPress works</td></tr>
+    <tr><td><a href="./payments-and-commerce.html">Payments &amp; Commerce</a></td><td>Money movement, PSPs, webhooks, PCI, subscriptions, disputes</td></tr>
+    <tr><td><a href="./freelance-web-practice.html">Freelance Web Practice</a></td><td>Scoping, pricing, contracts, delivery, handoff, the maintenance retainer</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Deliberate absences:</strong> Observability &amp; Operations has no doc — it is distributed by design: logs/metrics/traces/SLOs live in <a href="./system-design.html">System Design</a> (observability and reliability sections) and <a href="./backend-engineering.html">Backend Engineering</a> (the observability section); incident response and backup/recovery live in System Design's reliability section. <strong>CRUD &amp; Auth-in-practice have no separate doc of their own</strong> — they are folded into <a href="./backend-engineering.html">Backend Engineering</a> (the CRUD section and the auth-in-practice section) because their theory lives there and their clients (payment webhooks, CMS admins, freelance builds) route through it. The business-of-frontend docs (<a href="./frontend-camps-survey.html">Frontend camps survey</a>, <a href="./frontend-income-markets.html">Frontend income markets</a>, <a href="./income-stream-landscape.html">Income stream landscape</a>) sit outside the curriculum layers — they are career surveys, not disciplines. This glossary is the shared vocabulary across all of them.</p>
+
 <h2>Design Thinking (owner: <a href="./design-thinking.html">design-thinking.html</a>)</h2>
 
 <table>
@@ -107,6 +144,11 @@
       <td><dfn>Failure Domain</dfn></td>
       <td>A box drawn around a component: if this box loses power, what else stops? If deployed with a bug, what's the blast radius? If its DB corrupts, what data is lost? Good design minimizes blast radius.</td>
       <td>System Design §7, §10</td>
+    </tr>
+    <tr>
+      <td><dfn>Codebase Architecture</dfn></td>
+      <td>The physical form of the boundaries: the folder tree. Feature folders vs. layered folders, colocation, why <code>src/</code>. If the code can't see the boundary, the boundary doesn't exist — and delivery modules should map to feature folders (vertical slices).</td>
+      <td>System Design §7; Freelance Web Practice §Scoping</td>
     </tr>
     <tr>
       <td><dfn>Idempotency Key</dfn></td>
@@ -513,6 +555,65 @@
 </table>
 
 
+<h2>Algorithms &amp; Data Structures (owner: <a href="./algorithms-and-data-structures.html">algorithms-and-data-structures.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Hash Map</dfn></td>
+      <td>A key→value store with O(1) average lookup. The key is hashed to a bucket; collisions are handled by chaining or open addressing, and the load factor (keys ÷ buckets) drives resizing. Use <code>Map</code>/<code>Set</code>, never a plain object, for real key semantics. Owns the count/seen/complement patterns.</td>
+      <td>Algorithms §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Two Pointers</dfn></td>
+      <td>Left/right pointers moving one direction each over a sorted (or palindromic) input. O(n) because each element is visited at most twice. Pair sums, dedup, in-place reversal, three-sum.</td>
+      <td>Algorithms §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Sliding Window</dfn></td>
+      <td>Expand right, shrink left while a constraint breaks, record the best. Amortized O(n). The pattern behind "longest substring with no repeats", "max sum of k-length window", "minimum window".</td>
+      <td>Algorithms §2</td>
+    </tr>
+    <tr>
+      <td><dfn>Monotonic Stack</dfn></td>
+      <td>A stack kept ordered by popping while the new element violates the order. Yields "next greater element" in O(n) — the superpower pattern for a whole family of stack problems.</td>
+      <td>Algorithms §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Trie</dfn></td>
+      <td>A tree of shared prefixes; each node is a character, words share their prefixes structurally. O(length) lookups for prefix operations — autocomplete, word break, prefix counts. Structural sharing beats storing every prefix.</td>
+      <td>Algorithms §4</td>
+    </tr>
+    <tr>
+      <td><dfn>Union-Find</dfn></td>
+      <td>A near-O(1) connectivity data structure: <code>find</code> walks to a root, <code>union</code> links roots (with path compression and union by rank). Beats re-running BFS when edges arrive one by one — connected components, cycle detection, Kruskal's MST.</td>
+      <td>Algorithms §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Topological Sort</dfn></td>
+      <td>Ordering a DAG's nodes so every edge points forward — Kahn's algorithm or DFS post-order; doubles as cycle detection. The "prerequisites / dependencies / ordering" pattern.</td>
+      <td>Algorithms §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Binary Search</dfn></td>
+      <td>Halving a search space via a monotonic predicate, not just sorted arrays: "first index where isGood(i) is true" over half-open range <code>[lo, hi)</code>. The template that never off-by-ones; also answers "minimize the max X" monotonic problems.</td>
+      <td>Algorithms §6</td>
+    </tr>
+    <tr>
+      <td><dfn>Dynamic Programming</dfn></td>
+      <td>Cached enumeration of overlapping subproblems: define state, write the transition, set base cases, then memoize (or tabulate). The "minimize cost / maximize value / choose subsets" pattern. Memoized recursion first is the lazy correct path.</td>
+      <td>Algorithms §7</td>
+    </tr>
+    <tr>
+      <td><dfn>Exchange Argument</dfn></td>
+      <td>The proof a greedy choice is safe: "if an optimal solution differs from mine, I can swap my choice in without making it worse." Without that argument, greedy is a gamble and DP is the safe answer.</td>
+      <td>Algorithms §8</td>
+    </tr>
+  </tbody>
+</table>
+
+
 <h2>Computer Science &amp; Software Engineering</h2>
 
 <table>
@@ -620,6 +721,29 @@
   </tbody>
 </table>
 
+<h2>Security &amp; Threat Modeling (owner: <a href="./security-and-threat-modeling.html">security-and-threat-modeling.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Risk Register</dfn></td>
+      <td>The live table of threats × assets × likelihood × impact × treatment × owner — the machinery that makes "security is risk management" an operating discipline instead of a slogan. Rows change: re-assess on system changes, new threats, and incidents.</td>
+      <td>Security &amp; Threat Modeling §Risk management</td>
+    </tr>
+    <tr>
+      <td><dfn>Compliance</dfn></td>
+      <td>What happens when security requirements become auditable — law, contract, or industry rules (SOC 2, ISO 27001, PCI DSS, HIPAA, GDPR, NIST CSF, FedRAMP). Compliance is not security: it is the floor a regulator requires; security is protecting assets beyond the floor.</td>
+      <td>Security &amp; Threat Modeling §Compliance; Payments &amp; Commerce §PCI DSS</td>
+    </tr>
+    <tr>
+      <td><dfn>SAST / DAST / SCA</dfn></td>
+      <td>The three scanner classes: Static Application Security Testing (code patterns in CI), Dynamic Application Security Testing (runtime vulnerabilities against staging), Software Composition Analysis (known CVEs in dependencies). Together they validate a threat model's mitigations — they find classes of bugs, not business logic.</td>
+      <td>Security &amp; Threat Modeling §Process step 6, §Ecosystem</td>
+    </tr>
+  </tbody>
+</table>
+
 
 <h2>Cross-Cutting Terms (appear in multiple disciplines)</h2>
 
@@ -649,7 +773,7 @@
     <tr>
       <td><dfn>Trust Boundary</dfn></td>
       <td>System Design</td>
-      <td>System Design §7; API Design §4; HTML & CSS §4</td>
+      <td>System Design §7; API Design §4; HTML & CSS §4; Security &amp; Threat Modeling §Threat modeling</td>
     </tr>
     <tr>
       <td><dfn>Constraint Inversion</dfn></td>
@@ -664,9 +788,235 @@
   </tbody>
 </table>
 
+<h2>WordPress &amp; the CMS Internet (owner: <a href="./wordpress-and-cms-internet.html">wordpress-and-cms-internet.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>CMS (Content Management System)</dfn></td>
+      <td>A system whose core product is editing content: database-backed content model (post types, taxonomies, fields) plus a web admin. WordPress runs roughly 43% of the web (W3Techs).</td>
+      <td>WordPress &amp; the CMS Internet §Definition</td>
+    </tr>
+    <tr>
+      <td><dfn>Post Type (CPT)</dfn></td>
+      <td>A content kind in WordPress — posts, pages, or custom types (services, bookings, products). The content model's schema: CPTs + taxonomies + meta fields, registered in code.</td>
+      <td>WordPress &amp; the CMS Internet §How WordPress works</td>
+    </tr>
+    <tr>
+      <td><dfn>Theme vs. Plugin</dfn></td>
+      <td>The theme owns presentation (templates, styles); the plugin owns behavior and features. "Every plugin is a dependency" — audit, pin, and patch them on a schedule.</td>
+      <td>WordPress &amp; the CMS Internet §How WordPress works</td>
+    </tr>
+    <tr>
+      <td><dfn>Headless CMS</dfn></td>
+      <td>The CMS's content model exposed as an API (WP-REST, WPGraphQL) with a separate frontend (Next.js). Wins only when a frontend team and multi-surface needs exist — otherwise classic WordPress is the lazy correct answer.</td>
+      <td>WordPress &amp; the CMS Internet §Modern WordPress</td>
+    </tr>
+    <tr>
+      <td><dfn>Gutenberg / Blocks</dfn></td>
+      <td>The block-based editor (2018) — content as composable blocks, making content structured data and the editing surface a commodity.</td>
+      <td>WordPress &amp; the CMS Internet §Modern WordPress</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Payments &amp; Commerce (owner: <a href="./payments-and-commerce.html">payments-and-commerce.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Authorization / Capture / Settlement</dfn></td>
+      <td>The three legs of a card payment: auth = hold on the card, capture = the money is requested, settlement = it lands in your account days later. Every payment is a promise until settlement.</td>
+      <td>Payments &amp; Commerce §Definition, §How payments work</td>
+    </tr>
+    <tr>
+      <td><dfn>PSP (Payment Service Provider)</dfn></td>
+      <td>Stripe, Adyen, PayPal, Square — the API that compresses the institution stack (acquirer, gateway, network certifications) into one integration. The fee is the price of not building a bank.</td>
+      <td>Payments &amp; Commerce §Definition</td>
+    </tr>
+    <tr>
+      <td><dfn>Idempotency Key</dfn></td>
+      <td>Money edition: a per-logical-operation key on charges — same key = same charge, forever. The guard against double charges on retry.</td>
+      <td>Payments &amp; Commerce §Integration patterns; Backend Engineering §5</td>
+    </tr>
+    <tr>
+      <td><dfn>Webhook as Source of Truth</dfn></td>
+      <td>Payment outcomes (paid, failed, disputed) arrive as provider webhooks; the synchronous API response is only optimism. Verify signatures, dedupe by event id, record transitions.</td>
+      <td>Payments &amp; Commerce §Integration patterns</td>
+    </tr>
+    <tr>
+      <td><dfn>Chargeback (Dispute)</dfn></td>
+      <td>The customer's bank pulls money back plus a fee while evidence is reviewed. The default way money returns in card systems — design for the reversal.</td>
+      <td>Payments &amp; Commerce §Refunds &amp; disputes, §Fraud</td>
+    </tr>
+    <tr>
+      <td><dfn>PCI DSS</dfn></td>
+      <td>The card-industry security standard. Scope is a design choice: hosted checkout = tiny scope; storing PANs = full audit program. Tokenization everywhere.</td>
+      <td>Payments &amp; Commerce §PCI DSS; Security &amp; Threat Modeling</td>
+    </tr>
+    <tr>
+      <td><dfn>3D Secure (3DS)</dfn></td>
+      <td>Customer authenticates with their issuing bank during checkout (challenge or silent). The liability shift is the point: with 3DS the bank owns fraud chargebacks, without it the merchant does. PSD2/SCA mandates it in the EU.</td>
+      <td>Payments &amp; Commerce §Fraud, §Integration patterns</td>
+    </tr>
+    <tr>
+      <td><dfn>Merchant of Record (MoR)</dfn></td>
+      <td>Paddle, Lemon Squeezy, FastSpring — the legal seller of the product: owns tax calculation/remittance, refunds, chargebacks, PCI. Higher fee (5%+ vs. ~2.9%) for the whole compliance surface.</td>
+      <td>Payments &amp; Commerce §Ecosystem</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Freelance Web Practice (owner: <a href="./freelance-web-practice.html">freelance-web-practice.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>The Outcome Translation</dfn></td>
+      <td>The client buys a business outcome ("customers find me", "I can edit my site"), not code. Every conversation, quote, and milestone translates features back into their world.</td>
+      <td>Freelance Web Practice §Definition, §Scoping</td>
+    </tr>
+    <tr>
+      <td><dfn>Scope Creep / Change Policy</dfn></td>
+      <td>Features added after the contract. The rule is not "no changes" — it's "changes have prices": a written scope, explicit exclusions, and a change policy in the proposal.</td>
+      <td>Freelance Web Practice §Pricing, §Contract, §Failure modes</td>
+    </tr>
+    <tr>
+      <td><dfn>Deposit &amp; Milestones</dfn></td>
+      <td>30–50% deposit before work + milestone payments tied to visible deliverables (design → staging → launch). Sets terms before work; filters unserious clients; funds the project.</td>
+      <td>Freelance Web Practice §Pricing, §Getting paid</td>
+    </tr>
+    <tr>
+      <td><dfn>The Retainer</dfn></td>
+      <td>The maintenance plan — updates, backups, monitoring, small changes, monthly. The build is the entry ticket; the retainer is the business. Any project that ends at launch is a project that ends.</td>
+      <td>Freelance Web Practice §Definition, §Handoff; WordPress &amp; the CMS Internet §Worked example</td>
+    </tr>
+    <tr>
+      <td><dfn>Handoff as Deliverable</dfn></td>
+      <td>Roles configured for real editors, a plain-language editing guide, a walkthrough recording, access documented. A site the client can't edit without you is a liability, not a deliverable.</td>
+      <td>Freelance Web Practice §Handoff; WordPress &amp; the CMS Internet §Worked example</td>
+    </tr>
+    <tr>
+      <td><dfn>Kill Fee</dfn></td>
+      <td>The termination clause, exercised professionally: written notice, work done to date paid, deliverables handed over. Keep the deposit for work done and walk away — firing a bad client early is cheaper than finishing for one.</td>
+      <td>Freelance Web Practice §Scoping (red flags), §Contract</td>
+    </tr>
+    <tr>
+      <td><dfn>Project Brief</dfn></td>
+      <td>The client's one-page wish: "we're a clinic, we want patients to find us and book online." Theirs, short, almost never complete — the scoping call's job is extracting what the brief left out.</td>
+      <td>Freelance Web Practice §Scoping (the three documents)</td>
+    </tr>
+    <tr>
+      <td><dfn>SRS (Software Requirements Specification)</dfn></td>
+      <td>The doc that writes down the agreed project in detail: numbered, testable functional requirements that double as acceptance criteria. The contract references it; every signed line is a change-order shield. The proposal says what it costs; the SRS says what it is.</td>
+      <td>Freelance Web Practice §Scoping (the three documents)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Hiring Process &amp; Interviews (owner: <a href="./hiring-process-and-interviews.html">hiring-process-and-interviews.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Behavioral interview</dfn></td>
+      <td>The round that prices you as a hiring risk (will you break the system, crash under load, or leave early) rather than testing technical content. Questions like "where do you see yourself in five years" and "what's your biggest weakness" are risk checks wearing costumes — answer the risk, with a STAR example.</td>
+      <td>Hiring Process &amp; Interviews §The HR &amp; behavioral interview; Frontend Income Markets §Caveats (interview skill as a rate driver)</td>
+    </tr>
+    <tr>
+      <td><dfn>STAR</dfn></td>
+      <td>The answer shape for behavioral questions: Situation, Task, Action, Result — a ~30-second story with a concrete outcome. An answer without an example is a claim; a STAR answer is evidence.</td>
+      <td>Hiring Process &amp; Interviews §The HR &amp; behavioral interview; the behavioral translation table</td>
+    </tr>
+    <tr>
+      <td><dfn>Take-home / whiteboard</dfn></td>
+      <td>The two technical-screen formats. A take-home is a timed coding exercise judged on "does it run, is it clean, could I review it"; a whiteboard (including live video coding) is judged on thinking out loud, planning before coding, and correctness before optimization. Both are <em>samples</em> of the discipline, not the discipline itself.</td>
+      <td>Hiring Process &amp; Interviews §The screening call &amp; technical screen, §System design round; Problem-Solving §Pólya's four phases; System Design §The interview samples the discipline</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Terminal &amp; the Deployment Substrate (owner: <a href="./terminal-and-deployment-substrate.html">terminal-and-deployment-substrate.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>Container</dfn></td>
+      <td>A packaged, isolated <em>process</em> sharing the host's Linux kernel (cgroups + namespaces) — not a VM, which emulates a whole computer. Created by running an immutable <strong>image</strong> (the blueprint) as many times as you like.</td>
+      <td>Terminal &amp; the Deployment Substrate §Docker; Version Control, CI/CD &amp; Deployment §Artifacts</td>
+    </tr>
+    <tr>
+      <td><dfn>Pod / Deployment / Service</dfn></td>
+      <td>The three Kubernetes primitives: a <strong>Pod</strong> is a running container (or a few) with an IP; a <strong>Deployment</strong> declares the desired state (replicas, image version, rolling updates); a <strong>Service</strong> is the stable name and load balancer in front of the Pods.</td>
+      <td>Terminal &amp; the Deployment Substrate §Kubernetes; System Design §When platforms are overkill</td>
+    </tr>
+    <tr>
+      <td><dfn>Serverless</dfn></td>
+      <td>The third cloud era (after IaaS and PaaS): renting execution itself. Scales to zero when idle — which makes statelessness a contract: no in-memory sessions or caches, because the next request may hit a cold-started container.</td>
+      <td>Terminal &amp; the Deployment Substrate §Cloud; Backend Engineering §Serverless; System Design §Architecture eras</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>SQL &amp; PostgreSQL (owner: <a href="./sql-and-postgresql.html">sql-and-postgresql.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>JOIN</dfn></td>
+      <td>The pairing rule that recombines relational tables: INNER keeps matches only, LEFT keeps all left rows with NULLs for the unmatched. The N+1 fix, and the reason foreign keys need indexes.</td>
+      <td>SQL &amp; PostgreSQL §JOINs; Backend Engineering §1e (N+1); Data Modeling &amp; Databases §Indexing</td>
+    </tr>
+    <tr>
+      <td><dfn>CTE</dfn> (Common Table Expression)</td>
+      <td>A named intermediate result via <code>WITH</code> — reads top-down like a pipeline; <code>WITH RECURSIVE</code> walks trees and hierarchies.</td>
+      <td>SQL &amp; PostgreSQL §Subqueries and CTEs</td>
+    </tr>
+    <tr>
+      <td><dfn>Window Function</dfn></td>
+      <td>An aggregate-style value computed <em>without</em> collapsing rows (<code>ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)</code>). Top-N per group, running totals, LAG/LEAD deltas.</td>
+      <td>SQL &amp; PostgreSQL §Window functions</td>
+    </tr>
+    <tr>
+      <td><dfn>UPSERT</dfn></td>
+      <td>Insert that survives a duplicate: PostgreSQL <code>ON CONFLICT</code>, MySQL <code>ON DUPLICATE KEY</code>. The database side of API idempotency keys.</td>
+      <td>SQL &amp; PostgreSQL §Writing data; API Design §Idempotency</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>.NET &amp; the Enterprise Lane (owner: <a href="./dotnet-and-the-enterprise-lane.html">dotnet-and-the-enterprise-lane.html</a>)</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th><th>Where it appears</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><dfn>ASP.NET Core</dfn></td>
+      <td>Microsoft's web framework: middleware chain → controller → service → EF Core → SQL Server. The Backend Engineering request loop in a different costume — read, don't retrain.</td>
+      <td>.NET &amp; the Enterprise Lane §The request loop, C# edition; Backend Engineering §1</td>
+    </tr>
+    <tr>
+      <td><dfn>EF Core</dfn></td>
+      <td>The .NET ORM: DbContext + DbSet map to schema; LINQ translates to SQL; <code>.Include</code> prevents the N+1. Change tracking writes back only what changed.</td>
+      <td>.NET &amp; the Enterprise Lane §EF Core; Backend Engineering §1e (ORM decision)</td>
+    </tr>
+    <tr>
+      <td><dfn>T-SQL</dfn></td>
+      <td>SQL Server's SQL dialect: <code>TOP</code> vs LIMIT, <code>GETDATE()</code>, <code>IDENTITY</code>, <code>MERGE</code> instead of UPSERT. The shared 90% of the language is identical.</td>
+      <td>.NET &amp; the Enterprise Lane §SQL Server; SQL &amp; PostgreSQL (the base language)</td>
+    </tr>
+  </tbody>
+</table>
+
 <footer class="lesson-foot">
   <span>Reference · Glossary — shared vocabulary</span>
-  <span>Mission: HackerRank JS Basic + reading JS/React at work</span>
+  <span>Mission: an exploration-and-learning shelf — made for freelancers, staff engineers, and programmers; tomorrow for designers and entrepreneurs</span>
 </footer>
 
 </main>

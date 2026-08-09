@@ -1,0 +1,834 @@
+Ignoring display artifacts and reviewing substance only.
+
+## Overall verdict
+
+This is a **strong companion doc**. It does an excellent job explaining Angular’s three eras:
+
+1. AngularJS dirty-checking,
+2. Angular 2+ classes + zone.js,
+3. modern Angular Signals + standalone + zoneless.
+
+Its strongest contribution is the central thesis:
+
+> Angular and React moved in the same direction — narrower reactivity — but through different mechanisms. React narrowed developer bookkeeping with hooks and compiler; Angular narrowed framework watching with Signals.
+
+That framing is excellent and should remain the heart of the doc.
+
+However, compared with the rest of your shelf, this doc is currently more of an **evolution essay** than a full **reference**. It lacks several shelf-standard sections:
+
+- scope/definition,
+- evolution/constraint inversions table,
+- intersection with neighbors,
+- underlying theory,
+- formal mental models section,
+- principles,
+- worked example,
+- failure modes,
+- migration paths,
+- ecosystem/tooling catalog,
+- summary checklist,
+- primary sources.
+
+It also needs some factual/status precision around Angular versions, zoneless status, LTS, `effect()` cleanup, `httpResource()`, and modern Signals APIs.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Core thesis | Very strong |
+| Era comparison | Strong |
+| Angular/React contrast | Strong but should be tightened against duplication |
+| Practical reading guidance | Good, needs expansion |
+| Migration guidance | Missing |
+| Signals/RxJS boundary | Needs expansion |
+| Failure modes | Missing |
+| Worked example | Missing |
+| Shelf consistency | Needs more standard sections |
+| Version/status precision | Needs verification |
+
+I would rate it approximately:
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 8 / 10 |
+| Conceptual completeness | 8.5 / 10 |
+| Practical completeness | 6.5 / 10 |
+| Shelf consistency | 6.5 / 10 |
+| Duplication control | 8.5 / 10 |
+
+---
+
+# 1. What the document does especially well
+
+## 1.1 The three-era framing is excellent
+
+The table:
+
+| Era | Paradigm | State mechanism | Reactivity model |
+|---|---|---|---|
+| AngularJS | `$scope` tree | dirty-checking |
+| Angular 2+ | class fields | zone.js broadcast |
+| Modern Angular | `signal()`/`computed()`/`effect()` | signal graph |
+
+is the right structure.
+
+It makes Angular’s history understandable as a sequence of reactivity models rather than a random list of framework versions.
+
+Keep this.
+
+---
+
+## 1.2 The “wider detection → narrower detection” thesis is the best part
+
+The line:
+
+> AngularJS watched everything in the `$scope` tree. Angular 2+ watched all components on every async event. Signals watch only the signal’s dependency graph.
+
+is the strongest conceptual insight in the doc.
+
+It explains why Angular changed without reducing the story to “Angular copied React” or “Signals are better.”
+
+This should be elevated into the principles section.
+
+---
+
+## 1.3 The Angular/React contrast is valuable
+
+The explanation:
+
+> React started from functions and added storage outside the function.  
+> Angular started from classes and replaced the mutation-detection mechanism.
+
+is very good.
+
+It avoids framework tribalism and correctly says that both frameworks narrowed reactivity from different starting points.
+
+---
+
+## 1.4 The “what you’ll encounter at work” section is practical
+
+This section is one of the most useful parts:
+
+- AngularJS code is old but still maintained,
+- Angular 2–15 is the mainstream enterprise codebase,
+- modern Angular is what new projects scaffold.
+
+That is exactly the kind of reading-at-work orientation the shelf needs.
+
+---
+
+## 1.5 The lifecycle translation tables are useful
+
+The AngularJS → Angular 2+ and Angular 2+ → React hooks tables are helpful for cross-framework literacy.
+
+They allow a React developer to read Angular without fully relearning Angular from scratch.
+
+Keep these, but refine some timing/equivalence notes.
+
+---
+
+# 2. Duplication boundaries
+
+This doc mostly avoids duplication, but a few boundaries should be made explicit.
+
+| Topic | Best owner | What this doc should do |
+|---|---|---|
+| React class-to-hooks arc | `class-to-hooks-paradigm-shift.html` | Link; do not re-teach React hooks |
+| React Compiler/RSC/Signals debate | `react-2024-and-beyond.html` | Link; keep only Angular’s perspective |
+| Frontend camp landscape | `frontend-camps-survey.html` | Link; this doc owns Angular-specific evolution |
+| TypeScript shift | `javascript-across-stacks.html` | Link; mention Angular’s TS-first bet briefly |
+| State theory | `what-is-state-prequel.html` | Link; this doc owns Angular state mechanisms |
+| Angular evolution | This doc | Own fully |
+| Angular mental models | This doc | Own fully |
+| Angular migration paths | This doc | Needs expansion |
+| Angular tooling ecosystem | This doc | Needs addition |
+
+The main duplication risk is the React comparison. The doc should compare Angular and React only enough to clarify Angular’s choices, then link outward for React internals.
+
+---
+
+# 3. High-priority completeness gaps
+
+These are the most important improvements.
+
+---
+
+## 3.1 Add a scope and definition section
+
+The doc should begin by stating what it is and is not.
+
+Suggested addition:
+
+> This doc covers Angular’s mental-model evolution: AngularJS, Angular 2+, and modern Angular. It is not an Angular tutorial, not a React doc, and not a full frontend framework survey. Its purpose is to help you recognize which Angular era a codebase belongs to and understand why Angular’s state and reactivity model changed.
+
+This prevents the doc from being judged as a complete Angular guide.
+
+---
+
+## 3.2 Add an evolution/constraint inversion table
+
+Most shelf docs have a constraint inversion section. This doc has the idea, but not the table.
+
+Add:
+
+| Inversion | Before | After | What changed |
+|---|---|---|---|
+| Small apps → large apps | AngularJS dirty-checking | Need for predictable change detection | Watch count and digest cost became unsustainable |
+| Manual sync → framework broadcast | Developers manually triggered updates | zone.js intercepted async events | Angular removed explicit “notify” calls but paid tree-walk cost |
+| Broadcast → narrowed detection | zone.js checked broadly | OnPush + immutable inputs | Teams needed to reduce unnecessary checking |
+| Manual narrowing → automatic tracking | OnPush discipline | Signals dependency graph | Framework could know exactly what depends on what |
+| Runtime patching → explicit scheduling | zone.js monkey-patching | zoneless change detection | Smaller runtime, clearer execution model |
+| Class fields + RxJS → reactive primitives | Mutable fields and observable plumbing | `signal()`, `computed()`, `effect()` | Reactivity became built into the framework |
+
+This would bring the doc into line with the shelf pattern.
+
+---
+
+## 3.3 Add an intersection-with-neighbors section
+
+Add a short table showing where this doc sits.
+
+| Neighbor | Relationship |
+|---|---|
+| `class-to-hooks-paradigm-shift.html` | React’s parallel arc; useful for comparing hooks vs Signals |
+| `react-2024-and-beyond.html` | React’s reason for not adopting Signals; compiler vs Signals |
+| `frontend-camps-survey.html` | Angular’s place in the wider frontend landscape |
+| `javascript-across-stacks.html` | TypeScript shift and language-level competition |
+| `what-is-state-prequel.html` | General theory of state; Angular is one implementation story |
+| `ui-ux-web-design.html` | Angular UI patterns implement UX state visibility |
+| `system-design.html` | Angular apps still depend on API/data architecture |
+
+This strengthens shelf coherence.
+
+---
+
+## 3.4 Add an underlying theory section
+
+The doc explains mechanisms, but it should formalize the theory behind them.
+
+Add:
+
+> **Underlying theory — what makes Angular’s reactivity work**
+
+| Theory/mechanism | What it explains |
+|---|---|
+| Dirty-checking | Compare current and previous values until stable |
+| Digest cycle | Repeat checks until no watcher reports change |
+| Zone.js | Intercept async events and notify framework |
+| Change detection tree | Angular walks component tree to check bindings |
+| OnPush strategy | Check component only when inputs change by reference or events originate inside |
+| Signals dependency graph | Reading a signal inside a reactive context creates a subscription |
+| Computed signals | Lazily derived values that invalidate when dependencies change |
+| Effects | Side effects rerun when tracked dependencies change |
+| Dependency injection | Object construction and lifetime managed by injector hierarchy |
+| Template compilation | Angular templates are compiled into optimized instructions |
+
+This would make the doc more rigorous.
+
+---
+
+## 3.5 Add a formal mental models section
+
+The doc has a comparison table, but it should add a mental models table like other shelf docs.
+
+Add:
+
+| Era | Core mental model | What “change” means | Debugging intuition |
+|---|---|---|---|
+| AngularJS | `$scope` tree + digest cycle | Mutate scope; digest detects difference | Trace `$watch`, `$apply`, digest loops |
+| Angular 2+ | Class fields + zone broadcast | Mutate field; zone tells Angular something happened | Trace event source, change detection path, OnPush inputs |
+| Modern Angular | Signal graph | Write signal; subscribers update | Trace which signal changed, which computed/effect subscribed |
+
+Add:
+
+> In AngularJS, ask: “Which watch saw the change?”  
+> In Angular 2+, ask: “Which zone event triggered change detection?”  
+> In modern Angular, ask: “Which signal changed, and what subscribed to it?”
+
+This is very high value.
+
+---
+
+## 3.6 Add migration paths
+
+This is a major missing piece.
+
+The doc says AngularJS → Angular 2+ had “0% migration path,” but it should explain the actual migration options.
+
+Add:
+
+> **Migration paths**
+
+| From → To | Trigger | Strategy | Risks |
+|---|---|---|---|
+| AngularJS → Angular 2+ | Digest performance, old architecture, no TS | Rewrite, strangler fig, or hybrid `ngUpgrade` | Big-bang failure, duplicated code, routing mismatch |
+| AngularJS → modern Angular via hybrid | Need incremental migration | Use `UpgradeModule`, route-by-route extraction | Two frameworks running, bundle size, mental overhead |
+| NgModules → standalone | Boilerplate, modern DX | Convert declarations to standalone, use `provideRouter`, `provideHttpClient` | Incomplete migration, mixed module/standalone confusion |
+| zone.js → zoneless | Runtime cost, debugging complexity | Adopt Signals, remove zone-dependent patterns | Missing async triggers, stale UI if state not signal-based |
+| RxJS-heavy state → Signals | Simpler synchronous state | Move UI state to signals; keep streams in RxJS | Mixing models without clear boundary |
+| OnPush optimization → Signals | Manual change detection discipline | Replace manual `markForCheck` with signal-driven bindings | Overusing effects instead of computed |
+
+Add:
+
+> Angular’s eras are physically visible in code, but migrations should usually be incremental. The hardest migration is AngularJS to Angular because the mental model, template syntax, dependency injection, routing, and build system all changed.
+
+---
+
+## 3.7 Add Signals vs RxJS guidance
+
+This is essential for reading real Angular code.
+
+Add:
+
+> **Signals vs RxJS — when to use which**
+
+| Concern | Prefer Signals | Prefer RxJS |
+|---|---|---|
+| Synchronous UI state | Yes | Usually no |
+| Derived state | `computed()` | `map`/`combineLatest` only if already stream-based |
+| Form state | Signals or typed forms | Complex async validation streams |
+| HTTP requests | `httpResource()`/signals where available | `HttpClient` + RxJS operators |
+| Event streams | Simple events can use outputs | Complex event composition |
+| Cancellation | Depends on resource/API | RxJS strong |
+| Debounce/throttle/switch | Not native to signals | RxJS strong |
+| Long-lived subscriptions | Be careful | Good with lifecycle cleanup |
+| Component state | Signals | Avoid if simpler signals suffice |
+
+Add:
+
+> Signals are not a replacement for RxJS. Signals are best for synchronous reactive state. RxJS is best for asynchronous stream composition. Modern Angular code often needs both, with a clear boundary between them.
+
+This is one of the most useful practical additions you can make.
+
+---
+
+## 3.8 Add modern Angular template syntax
+
+The doc mentions Signals but misses the new template control flow.
+
+Add:
+
+> Modern Angular introduced built-in control flow:
+
+```html
+@if (items.length) {
+  <ul>
+    @for (item of items; track item.id) {
+      <li>{{ item.name }}</li>
+    } @empty {
+      <li>No items</li>
+    }
+  </ul>
+}
+```
+
+Also mention:
+
+- `@if`,
+- `@for`,
+- `@switch`,
+- `@defer` for lazy loading template blocks.
+
+Why this matters:
+
+- older code uses `*ngIf`, `*ngFor`,
+- modern code may use `@if`, `@for`,
+- readers need to recognize both.
+
+---
+
+## 3.9 Add modern Signals API surface
+
+The doc covers `signal()`, `computed()`, `effect()`, but modern Angular has more.
+
+Add:
+
+| API | Purpose |
+|---|---|
+| `input()` | Signal-based input |
+| `input.required()` | Required input |
+| `output()` | Signal-based output |
+| `model()` | Two-way binding signal |
+| `linkedSignal()` | Derived writable signal |
+| `toSignal()` | Convert observable to signal |
+| `toObservable()` | Convert signal to observable |
+| `untracked()` | Read signal without creating dependency |
+| `DestroyRef` | Cleanup/lifecycle hook |
+| `takeUntilDestroyed()` | RxJS cleanup helper |
+
+Be careful with version-specific APIs; verify before publishing.
+
+---
+
+## 3.10 Add dependency injection depth
+
+The doc mentions DI but does not explain it enough.
+
+Add:
+
+> **Dependency injection — Angular’s structural superpower**
+
+Include:
+
+- constructor injection,
+- `inject()` function in modern Angular,
+- `providedIn: 'root'`,
+- hierarchical injectors,
+- injection tokens,
+- service lifetime.
+
+Add:
+
+> DI is one reason Angular kept classes. It gives services a clear construction model and makes testing easier. React can approximate DI with context or external stores, but Angular’s DI is a first-class framework feature.
+
+This helps explain why Angular did not move to hooks.
+
+---
+
+## 3.11 Add forms guidance
+
+Enterprise Angular code often contains forms. The doc should mention them.
+
+Add:
+
+| Form type | What you see | When common |
+|---|---|---|
+| Template-driven forms | `ngModel`, `#form="ngForm"` | Simpler forms, older code |
+| Reactive forms | `FormGroup`, `FormControl`, `FormBuilder` | Enterprise apps |
+| Typed forms | Typed `FormControl<string>` | Angular 14+ |
+| Signal forms | Emerging/newer patterns | Modern apps, verify current status |
+
+Add:
+
+> When reading Angular enterprise code, forms are often where state, validation, and change detection meet.
+
+---
+
+## 3.12 Add performance patterns
+
+The doc mentions OnPush, but should expand.
+
+Add:
+
+| Technique | Era | Purpose |
+|---|---|---|
+| `$watchCollection` / one-time binding | AngularJS | Reduce digest cost |
+| `OnPush` | Angular 2+ | Narrow change detection |
+| `trackBy` | Angular 2+ | Avoid rebuilding lists unnecessarily |
+| immutable inputs | Angular 2+ | Make OnPush predictable |
+| `async` pipe | Angular 2+ | Subscribe/unsubscribe safely |
+| Signals | Modern | Automatic dependency tracking |
+| zoneless | Modern | Remove zone broadcast overhead |
+| `@defer` | Modern | Defer template blocks |
+
+This would make the doc more practical.
+
+---
+
+## 3.13 Add failure modes
+
+This is missing and important.
+
+Add:
+
+| Failure mode | What happens | Fix |
+|---|---|---|
+| Big-bang AngularJS rewrite | Migration stalls; two systems diverge | Strangler fig, route-by-route, hybrid upgrade |
+| Digest explosion | Too many watchers; UI lags | Reduce watches, one-time binding, componentize, migrate |
+| Zone.js hidden triggers | Change detection runs unexpectedly or not when expected | Understand zones, use `runOutsideAngular`, move toward zoneless |
+| OnPush stale UI | Component does not update | Use immutable inputs, `markForCheck`, or signals |
+| Overusing effects | Effect loops, unnecessary side effects | Use `computed()` for derived state |
+| Reading signals inside effects unnecessarily | Extra dependencies, reruns | Use `untracked()` where appropriate |
+| RxJS subscription leaks | Memory leaks, stale events | Use `async` pipe, `takeUntilDestroyed`, explicit teardown |
+| Mixing Signals/RxJS without boundary | Confusing data flow | Signals for state, RxJS for streams |
+| NgModule/standalone half-migration | Mixed mental models | Complete incremental migration with clear conventions |
+| Treating Angular like React | Expecting component function rerun | Learn signal graph model |
+| DI over-abstraction | Services everywhere, hidden coupling | Keep service boundaries explicit |
+
+---
+
+## 3.14 Add principles
+
+Add shelf-standard principles.
+
+| Principle | Meaning |
+|---|---|
+| Detection narrows over time | Angular’s history is the history of watching less |
+| Explicit dependencies beat broadcast | Signals know their subscribers; zones broadcast |
+| State is component-scoped but framework-tracked | Angular owns scheduling, not just storage |
+| Classes remain the component boundary | Angular modernized without abandoning classes |
+| DI is structural | Constructor/injector model shapes testability and architecture |
+| Templates are compiled | Template syntax is not arbitrary HTML; it compiles to instructions |
+| Signals are graph nodes | A signal is not a React state hook; it is a reactive cell |
+| RxJS and Signals serve different jobs | Streams and state are not the same problem |
+| Migration should be incremental | Era jumps are visible, but adoption should be gradual |
+
+---
+
+## 3.15 Add a worked example
+
+The doc needs a concrete example.
+
+Best option: show the same counter in all three eras.
+
+### AngularJS
+
+```js
+angular.module('app', [])
+  .controller('CounterCtrl', function($scope) {
+    $scope.count = 0;
+    $scope.increment = function() {
+      $scope.count++;
+    };
+  });
+```
+
+### Angular 2+
+
+```ts
+@Component({
+  selector: 'app-counter',
+  template: `
+    <p>Count: {{ count }}</p>
+    <button (click)="increment()">+</button>
+  `
+})
+export class CounterComponent {
+  count = 0;
+
+  increment() {
+    this.count++;
+  }
+}
+```
+
+### Modern Angular
+
+```ts
+@Component({
+  selector: 'app-counter',
+  standalone: true,
+  template: `
+    <p>Count: {{ count() }}</p>
+    <button (click)="increment()">+</button>
+  `
+})
+export class CounterComponent {
+  count = signal(0);
+
+  increment() {
+    this.count.update(c => c + 1);
+  }
+}
+```
+
+Then add a second example showing derived state:
+
+```ts
+items = signal<Item[]>([]);
+
+total = computed(() =>
+  this.items().reduce((sum, item) => sum + item.price, 0)
+);
+```
+
+This makes the signal model concrete.
+
+---
+
+## 3.16 Add ecosystem/tooling catalog
+
+The doc lacks an ecosystem section.
+
+Add:
+
+| Category | Tools | Purpose |
+|---|---|---|
+| CLI/build | Angular CLI, Nx, esbuild/Vite builder | Scaffolding, builds, monorepos |
+| UI libraries | Angular Material, PrimeNG, Taiga UI | Component systems |
+| State management | NgRx, Elf, NGXS, signal stores | App-level state |
+| Reactive programming | RxJS | Stream composition |
+| Signals interop | `toSignal`, `toObservable`, `httpResource` | Bridging RxJS and signals |
+| Testing | Jasmine/Karma, Jest, Vitest, TestBed | Unit/integration testing |
+| E2E | Playwright, Cypress | Browser flows |
+| Debugging | Angular DevTools | Component tree, signals, change detection |
+| Migration | `ng update`, schematics, ESLint rules | Version upgrades, standalone migration |
+| Linting/formatting | Angular ESLint, Prettier | Code quality |
+
+Add decision metrics if you want to match other shelf docs:
+
+- migration safety,
+- learning curve,
+- enterprise support,
+- signals compatibility,
+- test reliability,
+- build speed.
+
+---
+
+## 3.17 Add a summary checklist
+
+Add:
+
+| Question | If you cannot answer… |
+|---|---|
+| Is this AngularJS, Angular 2+, or modern Angular? | Check module style, decorators, signals, standalone |
+| Does state live in `$scope`, class fields, or signals? | Identify the era’s state mechanism |
+| How does change detection know something changed? | Digest, zone.js, or signal graph |
+| Is the app using NgModules or standalone? | Check `standalone: true`, `bootstrapApplication`, `NgModule` |
+| Are inputs plain `@Input()` or signal inputs? | Check `input()` / `input.required()` |
+| Is RxJS used for state or streams? | Separate state from async stream concerns |
+| Is zoneless enabled? | Check `provideZonelessChangeDetection` |
+| Are templates using `*ngIf`/`*ngFor` or `@if`/`@for`? | Identify Angular version era |
+| Are subscriptions cleaned up? | Check `async` pipe, `takeUntilDestroyed`, `ngOnDestroy` |
+| Are effects used only for side effects? | Derived state should use `computed()` |
+
+---
+
+# 4. Factual and precision improvements
+
+These are important.
+
+| Location | Issue | Suggested fix |
+|---|---|---|
+| AngularJS date | “released in 2010” | Fine, but can say “introduced around 2010” |
+| AngularJS lifecycle table | `$onInit`, `$onChanges`, etc. are component hooks, not raw controller hooks | Clarify they apply to AngularJS 1.5+ component API |
+| Angular versioning | “v22 or v23 at time of reading” | Avoid hardcoding; say “current major at time of publication” |
+| LTS claim | “19.x LTS remains supported” | Verify LTS policy and supported versions before publishing |
+| Signals stabilization | “preview in 16, stabilizing in 17+” | Good, but verify exact status |
+| Standalone | “v14 preview, v15 stable, v17 default” | Good; verify wording |
+| Zoneless | “Angular 18 experimental; Angular 20+ moving toward default” | Soften/verify; say “experimental/developer preview moving toward stable” |
+| `effect()` cleanup | “effect’s cleanup is the return value” | Verify for target Angular versions; otherwise recommend `DestroyRef` |
+| `httpResource()` | “v20+” | Verify exact introduction version |
+| NgModules | “no new features added since v17” | Soften: “legacy path; new work focuses on standalone/signals” |
+| DI/hooks claim | “you cannot inject into a function’s call order — DI requires a constructor” | Soften: Angular’s DI is class/injector-centric; hooks-style DI would require a different design |
+| React Signals claim | “Signals would break per-render closure model” | Say “React team argued Signals conflict with React’s per-render snapshot model” |
+| Signals vs hooks | “Preact Signals proved this approach works; Angular Signals made it official” | Good, but keep focused on Angular |
+| `input.required()` | v17.2+ | Verify |
+| RxJS `httpResource()` | Signal-based HTTP client | Verify API name/version |
+| Angular release cadence | “version increases by 2 per year” | Usually true, but say “major releases roughly every six months” |
+
+---
+
+# 5. Structural improvements
+
+The doc would benefit from being reorganized into a more shelf-consistent shape.
+
+## Suggested outline
+
+1. **How to use this doc**
+   - scope,
+   - boundaries,
+   - reading order.
+
+2. **Definition**
+   - what Angular evolution is,
+   - what it is not.
+
+3. **Timeline**
+   - AngularJS,
+   - Angular 2+,
+   - modern Angular.
+
+4. **Evolution — constraint inversions**
+   - dirty-checking,
+   - zone.js,
+   - OnPush,
+   - Signals,
+   - zoneless.
+
+5. **Intersection with neighbors**
+   - React docs,
+   - camps survey,
+   - TS shift,
+   - state prequel.
+
+6. **Underlying theory**
+   - digest,
+   - zones,
+   - signal graph,
+   - DI,
+   - template compilation.
+
+7. **Era 1 — AngularJS**
+   - `$scope`,
+   - digest,
+   - two-way binding,
+   - why it collapsed.
+
+8. **Era 2 — Angular 2+**
+   - classes,
+   - TypeScript,
+   - zone.js,
+   - NgModules,
+   - OnPush.
+
+9. **Era 3 — Modern Angular**
+   - standalone,
+   - Signals,
+   - zoneless,
+   - new control flow,
+   - signal inputs/outputs/models.
+
+10. **Mental models**
+   - digest model,
+   - zone model,
+   - signal graph model.
+
+11. **Signals vs RxJS**
+   - when to use which,
+   - interop.
+
+12. **Reading Angular at work**
+   - AngularJS checklist,
+   - Angular 2–15 checklist,
+   - modern Angular checklist.
+
+13. **Lifecycle translation**
+   - AngularJS → Angular 2+,
+   - Angular 2+ → React hooks.
+
+14. **Migration paths**
+   - AngularJS → Angular,
+   - NgModules → standalone,
+   - zone.js → zoneless,
+   - RxJS → Signals boundary.
+
+15. **Worked example**
+   - counter across eras,
+   - derived total with signals.
+
+16. **Failure modes**
+
+17. **Principles**
+
+18. **Ecosystem/tooling**
+
+19. **Current state and future**
+
+20. **Summary checklist**
+
+21. **Primary sources**
+
+---
+
+# 6. Concrete additions to make
+
+## 6.1 Scope snippet
+
+```md
+This doc covers Angular’s mental-model evolution: AngularJS, Angular 2+, and modern Angular.
+It is not an Angular tutorial and not a React comparison doc.
+Its purpose is to help you recognize which Angular era a codebase belongs to and understand why Angular’s state and reactivity model changed.
+```
+
+## 6.2 Evolution snippet
+
+```md
+Angular’s history is the history of narrowing change detection:
+
+- AngularJS watched the whole scope tree.
+- Angular 2+ watched the component tree after every async event.
+- OnPush narrowed detection by reference checks.
+- Signals narrowed detection to the dependency graph.
+- Zoneless removes the broadcast engine entirely.
+```
+
+## 6.3 Mental model snippet
+
+```md
+In AngularJS, ask: “Which watch saw the change?”
+In Angular 2+, ask: “Which async event triggered change detection?”
+In modern Angular, ask: “Which signal changed, and what subscribed to it?”
+```
+
+## 6.4 Signals/RxJS snippet
+
+```md
+Signals are not a replacement for RxJS.
+
+Use signals for synchronous reactive state.
+Use RxJS for asynchronous stream composition, cancellation, debounce, throttle, and complex event pipelines.
+
+Modern Angular often needs both — the skill is knowing the boundary.
+```
+
+## 6.5 Worked example snippet
+
+```md
+AngularJS: mutate $scope.count.
+Angular 2+: mutate this.count.
+Modern Angular: call this.count.update(c => c + 1).
+
+The syntax changes, but the deeper shift is detection:
+AngularJS must search for the change.
+Angular 2+ must be told something happened.
+Modern Angular knows exactly what changed.
+```
+
+---
+
+# 7. Priority roadmap
+
+## Must add
+
+1. Scope/definition section.
+2. Evolution/constraint inversion table.
+3. Intersection with neighbors.
+4. Underlying theory section.
+5. Formal mental models section.
+6. Migration paths.
+7. Signals vs RxJS boundary.
+8. Failure modes.
+9. Worked example.
+10. Principles.
+11. Summary checklist.
+12. Version/status verification.
+
+## Should add
+
+13. Modern template control flow: `@if`, `@for`, `@switch`, `@defer`.
+14. Signal inputs/outputs/models.
+15. Dependency injection depth.
+16. Forms overview.
+17. Performance patterns.
+18. Ecosystem/tooling catalog.
+19. Reading checklists per era.
+20. Primary sources.
+
+## Optional enrichment
+
+21. SSR/hydration in modern Angular.
+22. NgRx and signal stores.
+23. Angular Material/design systems.
+24. Testing patterns.
+25. Security/sanitization.
+26. AI-assisted Angular migration.
+
+---
+
+# 8. Bottom line
+
+This is a **strong conceptual companion doc** with an excellent central thesis:
+
+> Angular and React both narrowed reactivity, but Angular narrowed the framework’s watcher while React narrowed the developer’s bookkeeping.
+
+To become a full shelf reference, it needs more practical and structural depth:
+
+- evolution table,
+- mental models,
+- migration paths,
+- Signals/RxJS boundary,
+- failure modes,
+- worked example,
+- ecosystem,
+- checklist,
+- version precision.
+
+## Final recommendation
+
+**Publishable as a companion essay now, but should be expanded before being treated as a complete Angular evolution reference.**
+
+The highest-leverage improvements are:
+
+> constraint inversions, formal mental models, Signals/RxJS guidance, migration paths, failure modes, worked example, and verification of modern Angular version/status claims.
