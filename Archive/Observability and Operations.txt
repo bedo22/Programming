@@ -1,0 +1,498 @@
+## Overall verdict
+
+This is an **exceptionally well-structured document** that fills a critical gap in the shelf: the operational practice layer that sits between "the code shipped" and "the user is fine." The definition is precise, the history is well-paced, the constraint inversions are sharp, the SLO/alert/incident/postmortem/runbook chain is complete, and the worked example (the checkout incident) is the best worked example I've seen across the entire shelf — it exercises every section of the doc in a realistic, timestamped narrative.
+
+The doc's greatest strength is its **ownership discipline**. It knows exactly what it owns (the operational practice) and what it doesn't (the architecture of signals, the severity vocabulary, the debugging method, the request-loop instrumentation). The intersection table is the most detailed and precise of any doc on the shelf.
+
+The doc's main gaps are in the **operational practices it doesn't yet cover**: on-call design, capacity planning, deployment operations, chaos engineering, operational readiness reviews, observability cost management, operational maturity, shift-left operations, operational debt/toil, and operational team metrics. These are all practices that belong to this doc and are not covered by any other doc on the shelf.
+
+There is also one **factual error** in the error-budget arithmetic that needs correction.
+
+### Rough assessment
+
+| Area | Assessment |
+|---|---|
+| Definition and scope | Excellent — precise, well-bounded |
+| History | Excellent — clear eras, each leaves a tool category |
+| Constraint inversions | Excellent — four inversions, each well-framed |
+| Intersection with neighbors | Excellent — the most detailed ownership table on the shelf |
+| Underlying theory | Strong — error-budget arithmetic, cognition, observability definition |
+| Mental models | Strong — six models, each with "when you reach for it" |
+| SLO design | Thorough — SLI classes, targets, windows, ownership |
+| Alert design | Thorough — three shapes, design checklist, fatigue as design failure |
+| Incident response | Complete — lifecycle, roles, rules |
+| Postmortems | Strong — blameless by design, template, loop closes in backlog |
+| Runbooks | Practical — shape, ownership, drill requirement |
+| Worked example | Excellent — the best on the shelf |
+| Failure modes | Comprehensive — ten modes, each with root cause |
+| Ecosystem | Comprehensive — eight categories with decision metrics |
+| Future | Good — LLM spans, agents, eBPF, AI-assisted IR |
+| Summary checklist | Actionable — ten questions, each linked to a section |
+| On-call design | Missing |
+| Capacity planning / load testing | Missing |
+| Deployment operations | Missing |
+| Chaos engineering practice | Missing (mentioned in mental models but not covered) |
+| Operational readiness reviews | Missing |
+| Observability cost management | Missing |
+| Operational maturity model | Missing |
+| Operational debt / toil | Missing |
+| Operational team metrics | Missing |
+| Primary sources | Thin |
+
+### Rough ratings
+
+| Criterion | Rating |
+|---|---:|
+| Correctness | 8.5 / 10 (one factual error in error-budget math) |
+| Conceptual completeness | 8 / 10 |
+| Practical completeness | 7 / 10 |
+| Shelf consistency | 9 / 10 |
+| Duplication control | 9.5 / 10 |
+| Worked example quality | 10 / 10 |
+
+---
+
+# 1. What the document does exceptionally well
+
+## 1.1 The definition is precise and well-bounded
+
+> "Observability & operations is the discipline of knowing whether the live system is healthy, finding the fault when it isn't, and returning it to health without losing what the failure taught you."
+
+This is a three-part definition that covers the entire operational lifecycle: watch (observability), find (localization), fix (mitigation), learn (postmortem). It also correctly distinguishes observability from monitoring: "monitoring is the subset that checks known answers; observability is the ability to ask questions you did not think to ask." This is the Charity Majors framing, correctly attributed.
+
+The three-judgment table (what deserves a target, what deserves an alert, what deserves a postmortem) is an excellent way to define the discipline's unique contribution. Each judgment is explicitly owned here and not elsewhere.
+
+## 1.2 The history is well-paced and leaves a tool category per era
+
+The history table is one of the best on the shelf. Each era has:
+- A clear time range
+- A specific tool or practice
+- A "what it left behind" column that names the lasting contribution
+
+This is better than most history sections because it doesn't just list events — it shows how each era's solution became the next era's constraint. The progression from "paging" → "monitoring" → "log centralization" → "distributed tracing" → "metrics 2.0" → "SRE formalized" → "OpenTelemetry" → "AI era" is clean and each step is justified.
+
+## 1.3 The constraint inversions are sharp
+
+The four inversions are well-framed:
+- Dashboards → SLO burn (symptoms → promises)
+- Hero on-call → blameless process (personal → system)
+- Free-text logs → correlated telemetry (searchable → understood)
+- Uptime as metric → user impact as metric (infrastructure → outcomes)
+
+Each inversion has a clear "before" and "after" and a "what changed" column. The pattern is consistent with the rest of the shelf.
+
+## 1.4 The intersection table is the most detailed on the shelf
+
+The ownership contract table is the most detailed and precise of any doc on the shelf. It covers six neighbor disciplines and for each one specifies:
+- Shared DNA
+- Where they diverge
+- What stays where
+
+This is the gold standard for duplication control. The doc explicitly states what it does NOT own and where that content lives. This is the model that other docs should follow.
+
+## 1.5 The error-budget arithmetic is well-explained
+
+The error-budget section correctly explains:
+- How to calculate a budget from an SLO (99.9% over 30 days = ~43 minutes)
+- What burn rate means (1× = on target, 2× = budget gone in half the window)
+- Multi-window burn-rate alerting (short + long windows catch both spikes and grinds)
+- The policy consequence (a spent budget is a decision trigger, not a shame event)
+
+This is the clearest explanation of error budgets I've seen in the shelf.
+
+## 1.6 The mental models are practical and well-framed
+
+The six mental models are:
+1. The dashboard is a hypothesis, not a mirror
+2. An alert is a contract with a human
+3. Reliability is a budget, not a prayer
+4. Drills are scheduled work
+5. Every incident ends in the backlog
+6. The system is the unit of learning
+
+Each model has a "when you reach for it" column that makes it actionable. The "alert is a contract with a human" model is particularly powerful — it reframes alert design from "what should we alert on?" to "what are we willing to spend a human's attention on?" This is the correct framing.
+
+## 1.7 The alert design section is thorough
+
+The three alert shapes (threshold, burn-rate, event/anomaly) are well-differentiated. The alert design checklist (actionable, directed, non-redundant, owned, escapable) is comprehensive. The "alert fatigue is a design failure, not a character flaw" framing is correct and important — it shifts blame from the operator to the alert system.
+
+## 1.8 The incident response lifecycle is complete
+
+The lifecycle (detection → triage & severity → command → mitigation → verification → follow-up) is complete and each phase has a clear output. The rules that make it work are well-stated:
+- Mitigation outranks diagnosis
+- The timeline is written during the incident
+- On-call has authority
+- Freeze during SEV-1/2
+- Comms are a deliverable
+
+These are the correct rules and they're stated clearly.
+
+## 1.9 The worked example is the best on the shelf
+
+The checkout incident example is the best worked example I've seen across the entire shelf. It:
+- Exercises every section of the doc (SLO design, alert design, incident response, postmortem, runbooks)
+- Is timestamped and realistic
+- Shows the localization loop (requestId → trace → cache miss storm)
+- Shows the mitigation decision (rollback-first)
+- Shows the postmortem with action items
+- Ends with a lesson that ties everything together: "no step was heroic"
+
+This is the model that other docs' worked examples should follow.
+
+## 1.10 The failure modes are comprehensive
+
+The ten failure modes are well-chosen and each has a root cause. The "on-call without authority" mode is particularly important — it names a structural failure (process without decision rights) that is common in practice but rarely named.
+
+---
+
+# 2. Factual error to correct
+
+## 2.1 The error-budget arithmetic has a math error
+
+The doc states:
+
+> "A 10-minute incident burns ~23% of the month's budget; three of those and the budget is gone."
+
+Let me verify: 99.9% over 30 days = 0.1% × 43,200 minutes = 43.2 minutes of error budget. A 10-minute incident = 10/43.2 ≈ 23.1% of the budget. Three such incidents = 3 × 23.1% ≈ 69.4% of the budget. That is not "gone." The statement should be:
+
+> "A 10-minute incident burns ~23% of the month's budget; **four** of those and the budget is nearly gone (92%)."
+
+Or alternatively:
+
+> "A 10-minute incident burns ~23% of the month's budget; **two** of those and you've burned nearly half."
+
+The current statement is inaccurate and should be corrected.
+
+---
+
+# 3. Completeness gaps — practices this doc should own but doesn't cover
+
+These are all practices that belong to this doc and are not covered by any other doc on the shelf. I've verified each against the shelf's ownership table.
+
+## 3.1 Missing: On-call design / rotation patterns
+
+The doc mentions on-call extensively (alert fatigue, roles, authority, the pager) but doesn't cover the design of on-call rotations themselves. This is a core operational practice that belongs here.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Rotation schedules | Primary/secondary rotation, rotation length (1 week vs 2 weeks), handoff procedures |
+| Escalation paths | Primary → secondary → engineering manager → VP; time-based escalation (page not ack'd in 5 minutes → escalate) |
+| Shadow on-call | Training new on-call engineers by pairing them with experienced ones; the shadow observes and learns without carrying the pager |
+| On-call compensation | Time off in lieu, on-call stipend, on-call as a promotion criterion; the cultural signal of "we value your sleep" |
+| On-call load targets | Pages per week targets (e.g., < 2 pages/week per engineer); if exceeded, the team invests in reducing alert volume |
+| Handoff procedures | Written handoff at rotation change: ongoing incidents, known issues, upcoming changes, pending action items |
+| On-call tooling | PagerDuty/Opsgenie/Incident.io configuration: escalation policies, schedules, overrides, maintenance windows |
+
+This is a genuine gap. No other doc on the shelf covers on-call design. The doc mentions on-call in the mental models ("an alert is a contract with a human"), the alert design section ("page a human for SEV-1/2 only"), and the incident response section ("on-call has authority"), but it doesn't cover the design of the rotation itself.
+
+## 3.2 Missing: Capacity planning / load testing operations
+
+The doc covers SLOs and alerts but doesn't cover the operational practice of capacity planning: load testing before launch, capacity modeling, headroom planning, autoscaling tuning. System Design covers capacity estimation at the architecture level (Little's Law, Amdahl's Law), but the operational practice of running load tests, interpreting results, and adjusting capacity is not covered here.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Load testing before launch | Run load tests at 2× expected peak before launch; verify SLOs hold under load |
+| Capacity modeling | Use Little's Law (L = λW) to model queue depth; use Amdahl's Law to identify the serial bottleneck |
+| Headroom planning | Maintain 30–40% headroom at steady state; autoscaling triggers at 70% utilization |
+| Autoscaling tuning | Scale-up threshold, scale-down threshold, cooldown period, min/max replicas |
+| Load test interpretation | Identify the knee of the latency-throughput curve; the knee is where queueing starts |
+| Capacity review cadence | Monthly capacity review: compare actual load to forecast; adjust headroom |
+
+This is a genuine gap. System Design covers the theory (Little's Law, Amdahl's Law) but not the operational practice of running load tests and adjusting capacity.
+
+## 3.3 Missing: Deployment operations / release management
+
+The doc covers incidents, SLOs, and alerts but doesn't cover the operational side of deployments: canary analysis, progressive rollouts, rollback procedures, deploy freezes, release trains. The CI/CD doc owns the pipeline mechanics (build, test, deploy), but the operational judgment around deployments (when to deploy, how to read canary metrics, when to abort) is an operational practice.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Canary analysis | Deploy to 1–5% of traffic first; compare error rate, latency, and SLO burn against baseline; abort if SLO burn exceeds threshold |
+| Progressive rollouts | 1% → 5% → 25% → 50% → 100%; hold at each stage for a bake period; monitor SLOs at each stage |
+| Rollback procedures | Rollback-first: if canary fails, roll back immediately; don't forward-fix during an incident |
+| Deploy freezes | Freeze deploys during SEV-1/2 incidents, during peak traffic windows, and during major events (Black Friday, product launches) |
+| Release trains | Fixed release cadence (e.g., weekly) vs continuous deployment; the trade-off between speed and coordination |
+| Deploy-readiness checklist | All tests pass, canary is green, runbook is updated, on-call is aware, rollback is tested |
+
+This is a genuine gap. The CI/CD doc owns the pipeline mechanics, but the operational judgment around deployments belongs here.
+
+## 3.4 Missing: Chaos engineering as a practice
+
+The doc mentions "Drills convert runbooks from fiction to procedure" in the mental models and "Have the runbooks been executed in a drill this quarter?" in the checklist. But chaos engineering as a discipline (GameDay exercises, fault injection, steady-state hypothesis) is not covered. The ecosystem table lists "Chaos Engineering / Reliability Testing" tools (Chaos Mesh, Litmus, Gremlin, Steadybit, AWS Fault Injection Simulator).
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Steady-state hypothesis | Define the expected behavior before the experiment (e.g., "p99 latency < 300ms, error rate < 0.1%") |
+| Fault injection | Kill a pod, introduce latency, drop packets, exhaust disk, corrupt a cache entry |
+| GameDay exercises | Scheduled, team-wide chaos experiments; everyone participates; the goal is to find weaknesses before they become incidents |
+| Blast radius control | Start with the smallest possible blast radius; expand only if the system handles it |
+| Automation | Automate chaos experiments in CI; run them on a schedule; treat them as tests |
+| Chaos engineering maturity | Level 0: no chaos → Level 1: manual GameDays → Level 2: automated fault injection → Level 3: continuous chaos in production |
+
+This is a genuine gap. The doc mentions drills but doesn't explain the practice of chaos engineering.
+
+## 3.5 Missing: Operational readiness reviews
+
+The doc covers postmortems (after failure) but doesn't cover operational readiness reviews (before launch): production readiness checklists, launch reviews, go/no-go criteria.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Production readiness checklist | Observability (SLOs, alerts, dashboards, traces), runbooks, on-call rotation, capacity, rollback plan, security review |
+| Launch review | Go/no-go decision based on readiness checklist; the launch captain signs off |
+| Operational acceptance criteria | SLOs are defined and measurable, alerts are configured and tested, runbooks are written and drilled, on-call is staffed |
+| Pre-launch load test | Run load test at 2× expected peak; verify SLOs hold |
+| Post-launch monitoring | Watch SLOs for the first 24–48 hours after launch; the launch captain is on-call |
+
+This is a genuine gap. No other doc on the shelf covers operational readiness reviews.
+
+## 3.6 Missing: Observability cost management
+
+The doc mentions "Cost per query" and "Retention vs. cost curve" in the ecosystem table but doesn't cover the operational practice of managing observability costs: sampling strategies, retention policies, cardinality management, log volume control.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Sampling strategies | Head-based sampling (sample at ingestion) vs tail-based sampling (sample after the trace is complete, keep errors and slow traces) |
+| Retention policies | Hot storage (7 days, fast queries) → warm storage (30 days, slower queries) → cold storage (1 year, archive) |
+| Cardinality management | High-cardinality labels (user_id, request_id) explode metric storage; use exemplars instead of labels for high-cardinality data |
+| Log volume control | Structured logging reduces volume; log levels (DEBUG, INFO, WARN, ERROR) control verbosity; log sampling for high-volume services |
+| Cost attribution | Attribute observability costs to teams/services; the team that emits the telemetry pays for it |
+| Cost review cadence | Monthly observability cost review: compare actual cost to budget; identify top cost drivers; reduce or eliminate |
+
+This is a genuine gap. Observability cost management is a real operational concern that operators deal with daily.
+
+## 3.7 Missing: Operational maturity model
+
+The doc covers individual practices (SLOs, alerts, incidents, postmortems, runbooks) but doesn't present a maturity model that shows how an organization progresses through these practices.
+
+**What to add:**
+
+| Level | Name | Characteristics |
+|---|---|---|
+| Level 0 | No observability | No metrics, no logs, no traces; incidents are discovered by users; no postmortems |
+| Level 1 | Basic monitoring | Host-level metrics (CPU, memory, disk); dashboards exist but are not actionable; no SLOs |
+| Level 2 | SLOs defined | SLOs are defined for key journeys; error budgets exist; alerts are tied to SLOs |
+| Level 3 | Error budgets enforced | Error budgets are consumed publicly; feature work is gated by budget; postmortems produce action items |
+| Level 4 | Proactive reliability | Chaos engineering is practiced; load tests run before launch; operational readiness reviews are standard |
+| Level 5 | Self-healing | Automated rollback, automated scaling, automated failover; incidents are rare and short |
+
+This is a genuine gap. A maturity model helps readers understand where they are and what to do next.
+
+## 3.8 Missing: Shift-left for operations
+
+The doc mentions "Observability ships with the service" as a principle but doesn't cover the practice of embedding operational concerns earlier in the development lifecycle.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Operational acceptance criteria in design reviews | Every design review includes an operational section: SLOs, alerts, runbooks, on-call |
+| Observability requirements in user stories | Every user story includes observability requirements: what metrics to emit, what alerts to configure, what runbook to write |
+| SLO targets set before code is written | The SLO target is set during design review, not after the code is written |
+| Operational review gate in CI | CI fails if the service has no SLOs, no alerts, no runbooks |
+| Operational debt tracked in the backlog | Missing runbooks, stale alerts, untested backups are tracked as operational debt in the backlog |
+
+This is a genuine gap. The principle "Observability ships with the service" is stated but the practice of embedding operational concerns earlier is not covered.
+
+## 3.9 Missing: Operational debt / toil
+
+The doc covers "alert debt" implicitly (alert fatigue, alerts without runbooks) but doesn't name the broader concept of operational debt: accumulated toil, missing runbooks, stale alerts, untested backups, unpracticed failovers.
+
+**What to add:**
+
+| Aspect | What to cover |
+|---|---|
+| Operational debt defined | Accumulated work that makes operations harder: missing runbooks, stale alerts, untested backups, unpracticed failovers, manual processes that should be automated |
+| Toil defined (from SRE) | Manual, repetitive, automatable work that scales linearly with service growth; the goal is to reduce toil to < 50% of on-call time |
+| Operational debt inventory | A list of all operational debt items, each with an owner and a ticket; reviewed monthly |
+| Operational debt budget | A percentage of each sprint is allocated to reducing operational debt (e.g., 20%) |
+| Toil tracking | Track toil hours per week per engineer; if toil exceeds 50%, the team invests in automation |
+
+This is a genuine gap. The concept of operational debt/toil is central to SRE practice and is not covered by any other doc on the shelf.
+
+## 3.10 Missing: Operational team metrics
+
+The doc covers SLOs for the service but doesn't cover metrics for the operations team itself.
+
+**What to add:**
+
+| Metric | What it measures | Target |
+|---|---|---|
+| MTTD (Mean Time to Detect) | How long from the start of an incident to detection | < 5 minutes for SEV-1/2 |
+| MTTR (Mean Time to Resolve) | How long from detection to resolution | < 30 minutes for SEV-1/2 |
+| Alert-to-ack time | How long from page to acknowledgement | < 5 minutes |
+| Pages per week per engineer | On-call load | < 2 pages/week |
+| Postmortem action item completion rate | Percentage of action items completed within 30 days | > 80% |
+| Runbook drill frequency | How often runbooks are executed in drills | At least once per quarter |
+| Error budget consumption | Percentage of error budget consumed per month | < 100% (if > 100%, reliability work outranks features) |
+| Toil percentage | Percentage of on-call time spent on toil | < 50% |
+
+This is a genuine gap. The ecosystem table mentions "Time-to-ack" and "MTTD/MTTR" but these aren't covered as a practice section.
+
+## 3.11 Missing: Primary sources expansion
+
+The "Primary sources" section is thin. It lists sources in the history section but doesn't list the key primary sources for the practices themselves.
+
+**What to add:**
+
+| Source | What it covers |
+|---|---|
+| Google SRE Book (2016) | SLOs, error budgets, on-call, postmortems, toil, capacity planning |
+| Google SRE Workbook (2018) | Practical exercises for SLOs, alerting, incident response |
+| OpenTelemetry Specification | The vendor-neutral standard for traces, metrics, and logs |
+| The USE Method (Brendan Gregg) | Utilization, Saturation, Errors — a framework for resource analysis |
+| The RED Method (Tom Wilkie) | Rate, Errors, Duration — a framework for service-level metrics |
+| The Four Golden Signals (Google SRE Book) | Latency, traffic, errors, saturation — the four signals to monitor |
+| The Incident Command System (ICS) | The role-based incident management framework (Incident Commander, Scribe, Comms, SMEs) |
+| Blameless postmortem literature (Etsy, PagerDuty) | The practice of blameless postmortems and learning from failure |
+| Charity Majors — "Observability is a Many-Splendored Thing" | The case for observability over monitoring |
+| John Allspaw — "The Infinite Hows" | The case for blameless postmortems and learning from incidents |
+
+This is a genuine gap. The primary sources section should be expanded to cover the key sources for the practices, not just the history.
+
+---
+
+# 4. Minor improvements
+
+## 4.1 The "Underlying theory" section could briefly define the four signals
+
+The doc says: "The architecture of the signals (four signals, correlation, trace propagation) is System Design §6g's table — this section covers the theory under the practice." This is correct boundary-drawing, but a reader who hasn't read System Design §6g won't know what the four signals are. A one-sentence definition would help without duplicating:
+
+> "The four signals (metrics, logs, traces, profiles) are defined in System Design §6g; this section covers the theory under the operational practice of using them."
+
+This is a minor improvement, not a duplication.
+
+## 4.2 The "Severity vocabulary" reference could be slightly more explicit
+
+The doc says: "Severity vocabulary lives in Software Development Process §9h (SEV-1 = users blocked, SEV-4 = cosmetic)." This is correct boundary-drawing, but a reader who hasn't read that doc won't know the full severity scale. A brief parenthetical would help:
+
+> "Severity vocabulary lives in Software Development Process §9h (SEV-1 = users blocked, SEV-2 = degraded, SEV-3 = minor impact, SEV-4 = cosmetic)."
+
+This is a minor improvement, not a duplication.
+
+## 4.3 The worked example could benefit from a "what went wrong" variant
+
+The current example shows a successful incident response. A second example showing a failed response (no runbook, no roles, blame culture) would illustrate the failure modes more concretely. However, this is a "nice to have" rather than a gap. The current example is already excellent.
+
+## 4.4 The "Ecosystem" table could include "Operational debt tracking" as a category
+
+The ecosystem table covers metrics, logs, traces, APM, alerting, SLO tooling, continuous profiling, and AI-era observability. It could also include "Operational debt tracking" as a category: tools for tracking operational debt (missing runbooks, stale alerts, untested backups). However, this is a minor addition and might be better covered in the "Operational debt / toil" section (§3.9 above).
+
+## 4.5 The "Summary" checklist could include "Have you defined your operational maturity level?"
+
+The current checklist has ten questions. Adding an eleventh question about operational maturity would help readers understand where they are:
+
+> "Can you name your operational maturity level (0–5) and the next practice to adopt? (If not: §3.7)"
+
+This is a minor addition that ties the maturity model to the checklist.
+
+---
+
+# 5. What NOT to add (to avoid duplicates)
+
+Based on the shelf's ownership table, the following should NOT be added to this doc:
+
+| Topic | Owned by | Why not here |
+|---|---|---|
+| The four signals (metrics, logs, traces, profiles) | System Design §6g | This doc references them but doesn't define them |
+| Severity vocabulary (SEV-1 through SEV-4) | Software Development Process §9h | This doc references the vocabulary but doesn't define it |
+| The debugging method (hypothesis-driven debugging) | Problem-Solving §9 | This doc references the method but doesn't teach it |
+| The request-loop signals (requestId, P99, status rates) | Backend Engineering §8b | This doc consumes these signals but doesn't instrument them |
+| The SDLC operational phase | Software Development Process §9h | This doc is the full treatment of the operational layer, but the SDLC placement is owned by the Process doc |
+| The security detection/containment | Security & Threat Modeling | This doc provides the machinery (alerts, traces) but doesn't own the threat model |
+| The architecture of observability (what to emit, correlation IDs, trace propagation) | System Design §6g | This doc consumes the architecture but doesn't design it |
+| The pipeline mechanics (build, test, deploy) | CI/CD & Deployment | This doc covers the operational judgment around deployments but not the pipeline mechanics |
+
+---
+
+# 6. Priority roadmap
+
+## Must add (high priority)
+
+1. **On-call design / rotation patterns** (§3.1) — rotation schedules, escalation paths, shadow on-call, compensation, load targets, handoff procedures
+2. **Capacity planning / load testing operations** (§3.2) — load testing before launch, capacity modeling, headroom planning, autoscaling tuning
+3. **Deployment operations / release management** (§3.3) — canary analysis, progressive rollouts, rollback procedures, deploy freezes, release trains
+4. **Chaos engineering as a practice** (§3.4) — steady-state hypothesis, fault injection, GameDay exercises, blast radius control, automation
+5. **Operational readiness reviews** (§3.5) — production readiness checklist, launch review, operational acceptance criteria
+6. **Fix the factual error in error-budget arithmetic** (§2.1) — "three of those and the budget is gone" should be "four of those and the budget is nearly gone"
+
+## Should add (medium priority)
+
+7. **Observability cost management** (§3.6) — sampling strategies, retention policies, cardinality management, log volume control
+8. **Operational maturity model** (§3.7) — Level 0 through Level 5
+9. **Shift-left for operations** (§3.8) — operational acceptance criteria in design reviews, observability requirements in user stories
+10. **Operational debt / toil** (§3.9) — operational debt defined, toil defined, debt inventory, debt budget
+11. **Operational team metrics** (§3.10) — MTTD, MTTR, alert-to-ack time, pages per week, postmortem completion rate, toil percentage
+12. **Primary sources expansion** (§3.11) — Google SRE Book, OpenTelemetry spec, USE/RED methods, Four Golden Signals, ICS, blameless postmortem literature
+
+## Nice to have (low priority)
+
+13. **Brief definition of the four signals** (§4.1) — one sentence referencing System Design §6g
+14. **Slightly more explicit severity vocabulary reference** (§4.2) — add SEV-2 and SEV-3 definitions parenthetically
+15. **Operational maturity question in summary checklist** (§4.5) — add an eleventh question
+16. **"What went wrong" variant of the worked example** (§4.3) — a second example showing a failed response
+
+---
+
+# 7. Structural improvements
+
+## 7.1 Add the new sections in the correct order
+
+The new sections should be inserted in the correct order within the doc's existing structure:
+
+| Current section | New section to add | Where |
+|---|---|---|
+| §7 Principles | §7a On-call design | After Principles, before Worked example |
+| §7 Principles | §7b Capacity planning / load testing | After On-call design |
+| §7 Principles | §7c Deployment operations / release management | After Capacity planning |
+| §7 Principles | §7d Chaos engineering | After Deployment operations |
+| §7 Principles | §7e Operational readiness reviews | After Chaos engineering |
+| §7 Principles | §7f Observability cost management | After Operational readiness reviews |
+| §7 Principles | §7g Operational maturity model | After Observability cost management |
+| §7 Principles | §7h Shift-left for operations | After Operational maturity model |
+| §7 Principles | §7i Operational debt / toil | After Shift-left for operations |
+| §7 Principles | §7j Operational team metrics | After Operational debt / toil |
+
+Alternatively, these could be grouped into a new top-level section called "Operational Practices" that sits between "Principles" and "Worked example."
+
+## 7.2 Expand the "Primary sources" section
+
+The primary sources section should be expanded to cover the key sources for the practices, not just the history. See §3.11 above.
+
+## 7.3 Add the operational maturity model to the "Summary" section
+
+The summary checklist should include a question about operational maturity level. See §4.5 above.
+
+---
+
+# 8. Bottom line
+
+This is an **exceptionally well-structured document** with the best worked example on the shelf. The definition is precise, the history is well-paced, the constraint inversions are sharp, the SLO/alert/incident/postmortem/runbook chain is complete, and the intersection table is the most detailed ownership table on the shelf.
+
+The doc's main gaps are in the **operational practices it doesn't yet cover**: on-call design, capacity planning, deployment operations, chaos engineering, operational readiness reviews, observability cost management, operational maturity, shift-left operations, operational debt/toil, and operational team metrics. These are all practices that belong to this doc and are not covered by any other doc on the shelf.
+
+There is also one **factual error** in the error-budget arithmetic that needs correction: "three of those and the budget is gone" should be "four of those and the budget is nearly gone."
+
+The doc's greatest strength is its **ownership discipline**. It knows exactly what it owns and what it doesn't. The intersection table is the model that other docs should follow.
+
+## Final recommendation
+
+**Strong draft, publishable as-is for the core content (SLOs, alerts, incidents, postmortems, runbooks).** The worked example is the best on the shelf and should be preserved as-is.
+
+The highest-leverage improvements are:
+
+> On-call design, capacity planning, deployment operations, chaos engineering, operational readiness reviews, and the factual error correction in the error-budget arithmetic.
+
+The secondary improvements (observability cost management, operational maturity model, shift-left operations, operational debt/toil, operational team metrics, primary sources expansion) are important but can be added in a second pass.
+
+The doc's ownership discipline is the gold standard for the shelf. The intersection table should be preserved and used as the model for other docs' ownership tables.

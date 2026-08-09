@@ -22,7 +22,7 @@
 
 <h2>Shelf map — the complete curriculum at a glance</h2>
 
-<p>The shelf is a seven-layer Staff-Level curriculum. Each layer answers one question; each doc is one discipline. Every doc's "Intersection with neighbors" section says where its boundaries lie; this is the one-glance view.</p>
+<p>The shelf is a seven-layer Staff-Level curriculum. Each layer answers one question; each doc is one discipline. Every doc's "Intersection with neighbors" section says where its boundaries lie; this is the one-glance view. The closing band lists the supporting docs that complete the shelf — surveys and supplements, not curriculum disciplines.</p>
 
 <table>
   <thead><tr><th>Layer</th><th>Doc</th><th>What it owns</th></tr></thead>
@@ -33,8 +33,9 @@
     <tr><td><a href="./api-design.html">API Design</a></td><td>Contracts, boundaries, versioning, auth mechanics, token exchange</td></tr>
     <tr><td><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a></td><td>Schemas, keys, constraints, indexes, migrations, tenant isolation</td></tr>
     <tr><td><a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a></td><td>The query language: SELECT/JOIN/GROUP BY, window functions, UPSERT, EXPLAIN</td></tr>
-    <tr><td rowspan="2"><strong>Process &amp; Delivery</strong><br><em>How we work</em></td><td><a href="./software-development-process.html">Software Development Process</a></td><td>SDLC, Agile/Scrum/Kanban, team topology, the Agent Development Lifecycle</td></tr>
+    <tr><td rowspan="3"><strong>Process &amp; Delivery</strong><br><em>How we work</em></td><td><a href="./software-development-process.html">Software Development Process</a></td><td>SDLC, Agile/Scrum/Kanban, team topology, the Agent Development Lifecycle</td></tr>
     <tr><td><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a></td><td>Git, pipelines, release strategies, supply-chain integrity</td></tr>
+    <tr><td><a href="./observability-and-operations.html">Observability &amp; Operations</a></td><td>Alert design, incident response, postmortems, runbooks — the operational layer</td></tr>
     <tr><td rowspan="2"><strong>Quality &amp; Evidence</strong><br><em>The proof</em></td><td><a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a></td><td>Evidence, TDD, test pyramids, debugging discipline</td></tr>
     <tr><td><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a></td><td>Adversarial thinking, STRIDE, IAM, cryptography, OWASP, the review gate</td></tr>
     <tr><td rowspan="3"><strong>Implementation</strong><br><em>The micro</em></td><td><a href="./how-developers-think-frontend.html">How Developers Think: Frontend</a></td><td>The Rhythm — Model → View → Flow, Skeleton → Deepen → Polish</td></tr>
@@ -52,10 +53,20 @@
     <tr><td rowspan="3"><strong>The Freelance Web</strong><br><em>The other 60%</em></td><td><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a></td><td>The CMS ecosystem, the platform decision, how WordPress works</td></tr>
     <tr><td><a href="./payments-and-commerce.html">Payments &amp; Commerce</a></td><td>Money movement, PSPs, webhooks, PCI, subscriptions, disputes</td></tr>
     <tr><td><a href="./freelance-web-practice.html">Freelance Web Practice</a></td><td>Scoping, pricing, contracts, delivery, handoff, the maintenance retainer</td></tr>
+    <tr><td rowspan="10"><strong>Beyond the Curriculum</strong><br><em>Surveys &amp; supplements — supporting material, not disciplines</em></td><td><a href="./frontend-camps-survey.html">Frontend Camps Survey</a></td><td>The landscape of how real products ship UI — CMS, HTML-first/islands, SPA, meta-frameworks, WASM</td></tr>
+    <tr><td><a href="./frontend-income-markets.html">Frontend Income Markets</a></td><td>The demand side — where frontend skills earn, and how the market prices them</td></tr>
+    <tr><td><a href="./income-stream-landscape.html">Income Stream Landscape</a></td><td>The map of ways to earn — the journey's economic layer</td></tr>
+    <tr><td><a href="./full-stack.html">Full-Stack Thinking</a></td><td>Decisions at the seam — where logic, state, and data live across the boundary</td></tr>
+    <tr><td><a href="./beyond-the-browser.html">Beyond the Browser</a></td><td>React Native, Electron, the platform bridge — installable software from a JS background</td></tr>
+    <tr><td><a href="./terminal-applications.html">Terminal Applications</a></td><td>Building CLIs — the terminal as a development platform</td></tr>
+    <tr><td><a href="./open-source.html">Open Source</a></td><td>The ecosystem and practice of shared code — licenses, contributing, project health</td></tr>
+    <tr><td><a href="./hiring-process-and-interviews.html">Hiring Process &amp; Interviews</a></td><td>The funnel from resume to onboarding — the employment side of the shelf</td></tr>
+    <tr><td><a href="./product-shapes.html">Product Shapes</a></td><td>The recurring archetypes of web work — the triage layer over the shelf</td></tr>
+    <tr><td><a href="./recurring-fear-of-replacement.html">Recurring Fear of Replacement</a></td><td>The meta-doc — why every new wave panics juniors, and what history says happens</td></tr>
   </tbody>
 </table>
 
-<p><strong>Deliberate absences:</strong> Observability &amp; Operations has no doc — it is distributed by design: logs/metrics/traces/SLOs live in <a href="./system-design.html">System Design</a> (observability and reliability sections) and <a href="./backend-engineering.html">Backend Engineering</a> (the observability section); incident response and backup/recovery live in System Design's reliability section. <strong>CRUD &amp; Auth-in-practice have no separate doc of their own</strong> — they are folded into <a href="./backend-engineering.html">Backend Engineering</a> (the CRUD section and the auth-in-practice section) because their theory lives there and their clients (payment webhooks, CMS admins, freelance builds) route through it. The business-of-frontend docs (<a href="./frontend-camps-survey.html">Frontend camps survey</a>, <a href="./frontend-income-markets.html">Frontend income markets</a>, <a href="./income-stream-landscape.html">Income stream landscape</a>) sit outside the curriculum layers — they are career surveys, not disciplines. This glossary is the shared vocabulary across all of them.</p>
+<p><strong>Deliberate absences:</strong> <strong>CRUD &amp; Auth-in-practice have no separate doc of their own</strong> — they are folded into <a href="./backend-engineering.html">Backend Engineering</a> (the CRUD section and the auth-in-practice section) because their theory lives there and their clients (payment webhooks, CMS admins, freelance builds) route through it. Everything else is in the table above: the layers are the curriculum; the closing band holds the supporting material — which is part of the shelf but not part of the curriculum. This glossary is the shared vocabulary across all of them.</p>
 
 <h2>Design Thinking (owner: <a href="./design-thinking.html">design-thinking.html</a>)</h2>
 
@@ -768,7 +779,37 @@
     <tr>
       <td><dfn>Observability</dfn></td>
       <td>System Design</td>
-      <td>System Design §5, §6, §8; API Design §8; Dev Loop §5</td>
+      <td>System Design §5, §6, §8; API Design §8; Dev Loop §5; Ops §1, §3</td>
+    </tr>
+    <tr>
+      <td><dfn>Alert Fatigue</dfn></td>
+      <td>Ops</td>
+      <td>Ops §3, §7b, §9; SDP §9h</td>
+    </tr>
+    <tr>
+      <td><dfn>Incident Response</dfn></td>
+      <td>Ops</td>
+      <td>Ops §4, §8; SDP §9h; Security &amp; Threat Modeling §Risk management</td>
+    </tr>
+    <tr>
+      <td><dfn>Postmortem</dfn></td>
+      <td>Ops</td>
+      <td>Ops §5, §8; SDP §9h; Problem-Solving §9</td>
+    </tr>
+    <tr>
+      <td><dfn>Runbook</dfn></td>
+      <td>Ops</td>
+      <td>Ops §6, §9; SDP §9h; Security &amp; Threat Modeling §Threat modeling</td>
+    </tr>
+    <tr>
+      <td><dfn>On-Call</dfn></td>
+      <td>Ops</td>
+      <td>Ops §3, §4, §7b; SDP §9h</td>
+    </tr>
+    <tr>
+      <td><dfn>Error Budget</dfn></td>
+      <td>System Design</td>
+      <td>System Design §6f; Ops §2, §8</td>
     </tr>
     <tr>
       <td><dfn>Trust Boundary</dfn></td>

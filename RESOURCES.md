@@ -134,6 +134,7 @@ High-trust sources that ground the teaching. **Never trust parametric knowledge*
 - Expand per episode as lessons are written. Each lesson adds the sources it cited.
 - **Problem-solving reference complete** (`reference/problem-solving.html`, 826 lines, 24 sections). Bridge lessons L12–15 written.
 - **CS & SE reference complete** (`reference/cs-and-software-engineering.html`, 550 lines, 20 sections, 18 tables). Lessons L16–17 planned.
+- **Observability & Operations reference created** (`reference/observability-and-operations.html`, now 28 sections incl. 7b–7j operational practices). Glossary map updated (Process & Delivery row + Beyond the Curriculum band), cross-links added in System Design/Backend/SDP/Security. **Outside review received** (`Archive/Observability and Operations.txt`) and folded in: error-budget math corrected; on-call design, capacity/load testing, deployment ops, chaos, readiness reviews, cost management, maturity model, shift-left, debt/toil, team metrics added; primary-sources section added; summary checklist extended.
 - Verify any URL before first use in a lesson; mark paywalled/inaccessible ones.
 
 ## Software Development Process (macro-process — anchors the SDP reference)
@@ -228,3 +229,75 @@ High-trust sources that ground the teaching. **Never trust parametric knowledge*
 - **Trust:** Highest — the standard notation for algorithm complexity classification. Origin: Bachmann (1894), Landau; adopted for CS by Knuth.
 - **Grounds:** §5 (the measures — complexity classes, how to analyze an algorithm).
 - **Notes:** Wikipedia verified reachable. The article is mathematically dense; the reference doc's §5 is the accessible version.
+
+## Observability & Operations (operational layer — anchors the observability-and-operations reference)
+
+### "Site Reliability Engineering" — Google SRE Book (Beyer, Jones, Petoff & Murphy, 2016)
+- **Type:** Book (foundational, free online)
+- **URL:** https://sre.google/sre-book/table-of-contents/
+- **Trust:** Highest — authored by Google SRE; the primary source for error budgets, on-call, and incident response practice.
+- **Grounds:** Ops reference §1c (SRE era), §2 (error-budget policy), §3 (alert design), §4 (incident response), §5 (postmortems).
+- **Notes:** Free online (verified reachable). Read first: "Service Level Objectives", "Alerting on SLOs", "Being On-Call", "Postmortem Culture".
+
+### "The Site Reliability Workbook" — Google (Hine et al., 2018)
+- **Type:** Book (free online)
+- **URL:** https://sre.google/workbook/table-of-contents/
+- **Trust:** Highest — the practical companion to the SRE book, with worked SLO and alerting examples.
+- **Grounds:** Ops reference §2 (SLI selection, multi-window burn-rate alerting), §8 (the checkout incident).
+- **Notes:** Free online (verified reachable). Chapter "Alerting on SLOs" is the primary-read candidate for §3.
+
+### OpenTelemetry — official documentation
+- **Type:** Docs / Spec (vendor-neutral standard)
+- **URL:** https://opentelemetry.io/docs/
+- **Trust:** Highest — the merged OpenTracing/OpenCensus standard (2019), the industry baseline for trace propagation.
+- **Grounds:** Ops reference §1b (OpenTelemetry era), §10 (traces tooling); pairs with System Design §6g (trace propagation).
+- **Notes:** Free (verified reachable). The W3C trace context spec is the deeper primary source.
+
+### Prometheus — "Alerting" documentation
+- **Type:** Docs
+- **URL:** https://prometheus.io/docs/alerting/latest/overview/
+- **Trust:** High — the reference implementation of dimensional metrics and SLO-style alerting.
+- **Grounds:** Ops reference §3 (alert shapes, multi-window burn-rate), §10 (metrics/alerting tooling).
+- **Notes:** Free (verified reachable). The Google blog post "Alerting on SLOs" is a strong secondary source — verify reachability before citing.
+
+### PagerDuty — Incident Response Documentation (open-source repo)
+- **Type:** Docs (open-source, vendor-maintained)
+- **URL:** https://github.com/PagerDuty/incident-response-docs
+- **Trust:** Medium-High — the public de-facto reference for severity taxonomy and incident roles (Incident Commander, Scribe, Comms).
+- **Grounds:** Ops reference §4 (incident command, lifecycle), §3 (severity).
+- **Notes:** Free (verified reachable). Vendor-published; cross-check role definitions against the SRE book before recommending as a primary read.
+
+### The USE Method — Brendan Gregg
+- **Type:** Article/technique (primary author)
+- **URL:** https://www.brendangregg.com/usemethod.html
+- **Trust:** High — Brendan Gregg is the author of the method; the canonical resource-analysis framework.
+- **Grounds:** Ops reference §1e (underlying theory), §7c (capacity planning).
+- **Notes:** Free (verified reachable from this environment).
+
+### The RED Method — Tom Wilkie
+- **Type:** Article/technique (primary author)
+- **URL:** https://grafana.com/blog/the-red-method-how-to-instrument-your-services/
+- **Trust:** High — Tom Wilkie (Grafana Labs); the service-level metrics counterpart to USE.
+- **Grounds:** Ops reference §1e (rate/errors/duration for request services).
+- **Notes:** Free (verified reachable; note the URL redirects from the 2018 blog path).
+
+### Charity Majors — "Observability is a Many-Splendored Thing"
+- **Type:** Article (practitioner primary source)
+- **URL:** https://charity.wtf/p/observability-is-a-many-splendored-thing
+- **Trust:** High — a founding voice of the observability movement (Honeycomb); the observability-vs-monitoring framing.
+- **Grounds:** Ops reference §1 (definition), §1f (mental models).
+- **Notes:** Free (verified reachable from this environment).
+
+### John Allspaw — "Blameless PostMortems and a Just Culture"
+- **Type:** Article (practitioner primary source)
+- **URL:** https://codeascraft.com/2012/05/22/blameless-postmortems/
+- **Trust:** High — Etsy's VP of Ops; the origin of blameless culture in engineering.
+- **Grounds:** Ops reference §5 (postmortems).
+- **Notes:** Etsy redirects automated fetches (HTTP 403 from this environment) — verify the link resolves in a browser before recommending.
+
+### John Allspaw — "The Infinite Hows"
+- **Type:** Article
+- **URL:** https://www.oreilly.com/radar/the-infinite-hows/
+- **Trust:** High — Allspaw; why the first question of a postmortem should not be "what happened".
+- **Grounds:** Ops reference §5 (postmortem craft).
+- **Notes:** O'Reilly returned 403 to automated fetches — verify in a browser before recommending.

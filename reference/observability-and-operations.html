@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observability &amp; Operations — the discipline of running live software</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">Reference · The operational layer — knowing the live system is healthy, and finding the fault when it isn't</p>
+  <h1>Observability &amp; Operations</h1>
+  <p class="meta">What happens after deploy: choosing the right signals (SLO design), turning them into alerts that respect the humans on call (alert design), running an incident from detection through recovery (incident response), learning without blame (postmortems), and making the knowledge durable (runbooks). System Design owns the architecture of observability; Backend Engineering owns the request-loop instrumentation; this doc owns the operational practice — the discipline that keeps the architecture honest once the code is live.</p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">Definition in one paragraph</h3>
+  <p>Observability &amp; operations is the discipline of <em>knowing</em> whether the live system is healthy, <em>finding</em> the fault when it isn't, and <em>returning</em> it to health without losing what the failure taught you. It owns the judgments that no single signal can make: which measurements deserve a target, which targets deserve an alert, which alerts deserve a page, and which pages deserve a postmortem. It is the layer between "the code shipped" and "the user is fine" — and it is the only discipline on this shelf whose absence is invisible until something breaks.</p>
+</section>
+
+<h2>0. How to use this doc</h2>
+
+<p>Reading order: standalone, after System Design and Backend Engineering. Cross-links:</p>
+<ul>
+  <li>Upstream to <a href="./system-design.html">System Design</a> §6f (reliability, SLO vocabulary, recovery) and §6g (the four signals, correlation, trace propagation) — this doc consumes that architecture and does not re-teach it.</li>
+  <li>Sibling to <a href="./backend-engineering.html">Backend Engineering</a> §8b — the request-loop signals (requestId, P99, status rates) are instrumentation this doc's procedures assume.</li>
+  <li>Downstream of <a href="./software-development-process.html">Software Development Process</a> §9h — the SDLC names the operational layer; this doc is its full treatment.</li>
+  <li>Adjacent to <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> — testing is evidence <em>before</em> deploy; operations is evidence <em>after</em>. The hypothesis-driven debugging loop they share lives in <a href="./problem-solving.html">Problem-Solving</a> §9.</li>
+  <li>Consumed by <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — detection and containment read the same signals without owning the machinery.</li>
+  <li>Reference: <a href="./glossary.html">Glossary</a> (the glossary cites this doc as <em>Ops</em>).</li>
+</ul>
+
+<h2>1. Definition — what observability &amp; operations is, and what it is not</h2>
+
+<p>Operations is the work of running software after it is live: watching it, noticing when it misbehaves, fixing it fast, and making the next failure cheaper. Observability is the property that makes that work possible — the extent to which the system's internal state can be inferred from its external outputs. The two are one discipline because you cannot operate what you cannot observe, and there is no point observing what you will not act on.</p>
+
+<p>Three judgments distinguish this discipline from the docs around it:</p>
+<table>
+  <thead><tr><th>Judgment</th><th>Question it answers</th><th>Owned here because</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>What deserves a target?</strong></td>
+      <td>Which measurements are worth committing to?</td>
+      <td>Signal architecture (what to emit) is System Design §6g; choosing which few become commitments is an operational judgment.</td>
+    </tr>
+    <tr>
+      <td><strong>What deserves an alert?</strong></td>
+      <td>Which target breaches wake a human?</td>
+      <td>Every alert is a debt against someone's sleep and attention; designing that contract is operational work.</td>
+    </tr>
+    <tr>
+      <td><strong>What deserves a postmortem?</strong></td>
+      <td>Which failures earn a written learning?</td>
+      <td>Turning failures into system changes is the loop that makes operations improve instead of repeat.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>What it is not:</strong> it is not "add logs later" (that is instrumentation), not a dashboard gallery (that is decoration), and not a synonym for monitoring (monitoring is the subset that checks known answers; observability is the ability to ask questions you did not think to ask). The boundary with System Design is precise: System Design <em>designs</em> the system to be understood; operations <em>uses</em> that understanding under pressure, and reports back what the design missed.</p>
+
+<h2>1b. History — from paging to telemetry to learning machines</h2>
+
+<p>The operational layer has an evolution of its own, and each era left behind the tool category we still use:</p>
+
+<table>
+  <thead><tr><th>Era</th><th>What ran operations</th><th>What it left behind</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Mainframe &amp; telecom (1960s–80s)</strong></td>
+      <td>Operators watched console lights and physical alarms; SNMP (1988) standardized network monitoring.</td>
+      <td>The <em>page</em> — operations as a duty with a human attached, which modern on-call still inherits.</td>
+    </tr>
+    <tr>
+      <td><strong>Web 1.0 (1990s–2000s)</strong></td>
+      <td>Nagios (1999) and its descendants: scheduled checks, dashboards, "is the host up?" as the core question.</td>
+      <td><em>Monitoring</em> as a category — knowing the box is alive, but not why a request was slow.</td>
+    </tr>
+    <tr>
+      <td><strong>Log centralization (2000s)</strong></td>
+      <td>Splunk (2003), ELK: free-text logs pulled into one place, searched after the fact.</td>
+      <td>The insight that <em>firehoses of text are not signals</em> — searchable is not the same as understood.</td>
+    </tr>
+    <tr>
+      <td><strong>Distributed tracing (2010)</strong></td>
+      <td>Google's Dapper paper: one request's path across many services, end to end.</td>
+      <td>The realization that <em>correlation</em> — not volume — is what localizes a fault in a distributed system.</td>
+    </tr>
+    <tr>
+      <td><strong>Metrics 2.0 (2012)</strong></td>
+      <td>Prometheus: pull-based, dimensional, designed for containers; the USE/RED methods followed.</td>
+      <td><em>Dimensional metrics</em> — labels let one measurement answer many questions (per-service, per-route, per-tenant).</td>
+    </tr>
+    <tr>
+      <td><strong>SRE formalized (2016)</strong></td>
+      <td>Google's SRE book: error budgets, SLOs, on-call design, blameless postmortems as published practice.</td>
+      <td>The <em>error budget</em> — reliability as a product decision with a price, not a mood.</td>
+    </tr>
+    <tr>
+      <td><strong>OpenTelemetry (2019)</strong></td>
+      <td>OpenTracing + OpenCensus merged into one vendor-neutral standard; W3C trace context on the wire.</td>
+      <td><em>Interoperable telemetry</em> — traces, metrics, and logs speaking one language across every stack.</td>
+    </tr>
+    <tr>
+      <td><strong>The AI era (2023–)</strong></td>
+      <td>LLM calls become spans; agents become systems you must observe; drift replaces crash as the feared failure.</td>
+      <td>An expanding <em>event horizon</em> — see §11.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>1c. Evolution — constraint inversions in the operational layer</h2>
+
+<p>Same pattern as the rest of the shelf: each era's solution became the next era's constraint.</p>
+
+<table>
+  <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Dashboards → SLO burn</strong></td>
+      <td>Watch every metric; alert when any red line crosses.</td>
+      <td>Watch a few commitments; alert when the error budget burns too fast.</td>
+      <td>Alerts stopped enumerating symptoms and started measuring promises. Dashboards became context, not alarms.</td>
+    </tr>
+    <tr>
+      <td><strong>Hero on-call → blameless process</strong></td>
+      <td>The one engineer who "knows the system" carries the pager and the memory.</td>
+      <td>Roles, runbooks, postmortems, and shared ownership distribute the knowledge.</td>
+      <td>Failures stopped being personal and started being system properties. The system, not the person, is the unit of learning.</td>
+    </tr>
+    <tr>
+      <td><strong>Free-text logs → correlated telemetry</strong></td>
+      <td>Searchable strings; every team invents its own vocabulary.</td>
+      <td>Structured logs + requestIds + trace context; one journey across logs, metrics, and traces.</td>
+      <td>Localization became a property of the platform (System Design §6g), not a skill of the senior engineer.</td>
+    </tr>
+    <tr>
+      <td><strong>Uptime as the metric → user impact as the metric</strong></td>
+      <td>"99.9% available" measured by host pings.</td>
+      <td>SLOs measured on the journeys users actually take; availability of a dead endpoint no one calls is free.</td>
+      <td>The definition of "healthy" moved from infrastructure to outcomes.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>1d. Intersection with neighbors — the ownership contract</h2>
+
+<p>This table is the anti-duplication contract of this doc. Anything in the right column stays where it lives; this doc references it, never re-teaches it.</p>
+
+<table>
+  <thead><tr><th>Discipline</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>System Design</strong> (<a href="./system-design.html">architecture</a>)</td>
+      <td>SLI/SLO/SLA vocabulary, RPO/RTO, four signals, correlation IDs, trace propagation, DR patterns (§6f, §6g)</td>
+      <td>System Design <em>designs</em> the system to be understood; Ops <em>operates</em> through failure and reports what the design missed. Vocabulary lives there; the practice of choosing targets, designing alerts, and running incidents lives here.</td>
+    </tr>
+    <tr>
+      <td><strong>Backend Engineering</strong> (<a href="./backend-engineering.html">the request loop</a>)</td>
+      <td>RequestId correlation, P99 timing, status-rate counting, error-contract shapes (§8b)</td>
+      <td>Backend Engineering <em>emits</em> the loop's signals at the code level; Ops <em>consumes</em> them as evidence, and adds the operational judgments the code level cannot make (who gets paged, when, and with what authority).</td>
+    </tr>
+    <tr>
+      <td><strong>Software Development Process</strong> (<a href="./software-development-process.html">the lifecycle</a>)</td>
+      <td>Operations as an SDLC phase, SEV severities, hotfix paths, the loop back into the backlog (§9h)</td>
+      <td>SDP places operations in the lifecycle and names its parts; Ops is the full treatment — alert design, incident command, postmortem craft, runbooks.</td>
+    </tr>
+    <tr>
+      <td><strong>Testing &amp; Debugging</strong> (<a href="./software-testing-and-debugging.html">evidence</a>)</td>
+      <td>Hypothesis-driven debugging, reproduction discipline, root-cause thinking</td>
+      <td>Testing is evidence <em>before</em> deploy, in a controlled environment; Ops is evidence <em>after</em> deploy, in production, under time pressure, with real users as the test suite. The shared debugging method lives in Problem-Solving §9.</td>
+    </tr>
+    <tr>
+      <td><strong>Security &amp; Threat Modeling</strong> (<a href="./security-and-threat-modeling.html">adversarial thinking</a>)</td>
+      <td>Detection, containment, audit logging, runbooks for breach response</td>
+      <td>Security consumes observability ("how fast do we notice a breach") without owning the machinery; Ops provides the machinery without owning the threat model.</td>
+    </tr>
+    <tr>
+      <td><strong>Problem-Solving</strong> (<a href="./problem-solving.html">the thinking layer</a>)</td>
+      <td>Pólya phases, hypothesis testing, metacognition, the Einstellung effect</td>
+      <td>Problem-Solving owns the universal method; Ops is its most pressurized application — the same loop, with a pager attached and a timeline running.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>1e. Underlying theory — what makes operations reliable rather than hopeful</h2>
+
+<p>The architecture of the signals (the four signals — metrics, logs, traces, profiles — plus correlation and trace propagation) is System Design §6g's table — this section covers the theory <em>under</em> the practice.</p>
+
+<h3>Error-budget arithmetic</h3>
+<ul>
+  <li><strong>Availability SLO example:</strong> 99.9% over 30 days allows ~43 minutes of error budget. A 10-minute incident burns ~23% of the month's budget — four of those and the budget is nearly gone (~92%).</li>
+  <li><strong>Burn rate:</strong> how fast the budget is being consumed relative to the SLO window. 1× = exactly on target; 2× = budget gone in half the window. Burn-rate alerting (multi-window, short + long) catches both fast spikes and slow grinds — the two shapes of budget erosion.</li>
+  <li><strong>The policy consequence:</strong> a spent budget is not a shame event; it is a <em>decision trigger</em> — reliability work outranks features until the budget recovers. That inversion is the whole point of having a budget (vocabulary: System Design §6f).</li>
+</ul>
+
+<h3>The cognition of production debugging</h3>
+<ul>
+  <li>Production debugging is hypothesis testing under time pressure (the method: Problem-Solving §9). The operational discipline exists to shorten the loop: <em>detect → localize → mitigate → verify → learn</em>.</li>
+  <li>Localization without traces is guesswork by availability heuristic — the engineer debugs whatever service they know best, not whatever service failed. This is the Einstellung effect (Problem-Solving §1e) wearing an on-call badge.</li>
+  <li>Cognitive load is the opponent: an on-call engineer juggling the incident, the timeline, the chat, and the dashboard is doing the opposite of deep work. Roles and runbooks exist to move load from the human to the process (underlying theory: cognitive load, Problem-Solving §1e).</li>
+</ul>
+
+<blockquote class="callout">
+  <strong>The definition that matters:</strong> observability (control-theory sense, popularized in software by Charity Majors) is a measure of how well a system's internal states can be inferred from its external outputs. Monitoring asks <em>"is this known thing still true?"</em>; observability asks <em>"what question do I even need to ask?"</em> — the difference between a fire alarm and a sense of smell.
+</blockquote>
+
+<h2>1f. Mental models — how operators actually reason</h2>
+
+<table>
+  <thead><tr><th>Model</th><th>Core idea</th><th>When you reach for it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>The dashboard is a hypothesis, not a mirror</strong></td>
+      <td>A dashboard is an answer to a question you had yesterday; it shows what you expected to matter.</td>
+      <td>When an incident hides from every existing dashboard — the missing panel is data about your blind spots, not a tooling gap.</td>
+    </tr>
+    <tr>
+      <td><strong>An alert is a contract with a human</strong></td>
+      <td>Every page spends a human's attention and health. An alert you cannot act on, or would ignore twice, is a lie you are telling yourself.</td>
+      <td>When reviewing alert rules: delete or fix any alert without a runbook, a dismissal path, or a documented owner.</td>
+    </tr>
+    <tr>
+      <td><strong>Reliability is a budget, not a prayer</strong></td>
+      <td>Unreliability is allocated, spent, and accounted for. The question is not "can we be perfect" but "how much imperfection can we afford, and what do we trade for it?"</td>
+      <td>When a feature request races an incident backlog — the budget decides, not the loudest voice.</td>
+    </tr>
+    <tr>
+      <td><strong>Drills are scheduled work</strong></td>
+      <td>Restore drills, failover drills, and runbook walkthroughs are maintenance of the <em>process</em>, not optional dress rehearsal.</td>
+      <td>When a runbook has never been executed outside an incident: it is fiction until proven (the drill is the proof).</td>
+    </tr>
+    <tr>
+      <td><strong>Every incident ends in the backlog</strong></td>
+      <td>An incident without action items is a story; with action items, it is an investment. The loop closes when learnings return to the product backlog.</td>
+      <td>When a postmortem produces no changes — the meeting was theater (§9).</td>
+    </tr>
+    <tr>
+      <td><strong>The system is the unit of learning</strong></td>
+      <td>Blameless does not mean "no accountability." It means the design of incentives, not the character of engineers, is the primary cause to examine.</td>
+      <td>When a "human error" explanation surfaces in a postmortem — ask what the system did to make that error possible.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. SLO design — choosing what to promise</h2>
+
+<p>Vocabulary (SLI, SLO, SLA, error budget) is defined in <a href="./system-design.html">System Design</a> §6f. This section owns the practice: which SLIs to pick, what targets to set, and how the budget is governed.</p>
+
+<h3>Choosing SLIs — measure the journeys, not the boxes</h3>
+<table>
+  <thead><tr><th>SLI class</th><th>Typical definition</th><th>Decision metric for choosing it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Availability</strong></td>
+      <td>Share of valid requests answered successfully (e.g., 2xx/3xx, not 5xx)</td>
+      <td>Does a failure here block a user outcome? (A dead admin endpoint nobody calls is free.)</td>
+    </tr>
+    <tr>
+      <td><strong>Latency</strong></td>
+      <td>Percentile of request duration over the window (p50, p95, p99)</td>
+      <td>Is the user experience time-sensitive? (p99 catches tail latency; p50 hides it.)</td>
+    </tr>
+    <tr>
+      <td><strong>Throughput / capacity</strong></td>
+      <td>Requests or events processed per second, or queue depth</td>
+      <td>Is the system nearing saturation? (Saturation predicts failures before users feel them.)</td>
+    </tr>
+    <tr>
+      <td><strong>Durability</strong></td>
+      <td>Share of acknowledged writes that survive (link: RPO/RTO vocabulary in System Design §6f)</td>
+      <td>Does the system promise to keep data? (Silent data loss is the failure no dashboard shows.)</td>
+    </tr>
+    <tr>
+      <td><strong>Correctness</strong></td>
+      <td>Share of operations producing the right result (e.g., reconciliation rate, no duplicate charges)</td>
+      <td>Is wrong-but-fast worse than slow? (Payments and inventory live here.)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Setting targets and windows</h3>
+<ul>
+  <li><strong>Targets are promises you can keep, not ambitions.</strong> If the current p99 is 900ms, a 200ms SLO fails immediately and the budget is a fiction. Start where the product actually needs to be and step down deliberately.</li>
+  <li><strong>Windows hide or reveal slow grinds.</strong> A 30-day window absorbs daily spikes; a 1-hour window overreacts to blips. Multi-window burn-rate alerting uses both: a short window to catch fast burns, a long window to catch slow accumulation.</li>
+  <li><strong>Every SLO needs a designated owner</strong> — someone who can say "spend the budget" or "feature work stops." An SLO nobody can spend is a poster, not a policy.</li>
+</ul>
+
+<h2>3. Alert design — turning targets into contracts with humans</h2>
+
+<p>An alert is a message with a price: someone's attention, sleep, or escalation. The discipline is deciding <em>which</em> target breaches are worth that price, and <em>what the receiver is supposed to do</em>.</p>
+
+<h3>The three alert shapes</h3>
+<table>
+  <thead><tr><th>Shape</th><th>Fires when</th><th>Catches</th><th>Risk</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Threshold</strong></td>
+      <td>A single metric crosses a fixed value for N minutes</td>
+      <td>Simple, obvious failures (disk full, queue growing)</td>
+      <td>Static numbers drift out of truth; noise from normal variance</td>
+    </tr>
+    <tr>
+      <td><strong>Burn-rate (SLO-based)</strong></td>
+      <td>The error budget burns faster than the target over short + long windows</td>
+      <td>Both spikes <em>and</em> slow grinds; the only shape tied to user impact</td>
+      <td>Needs good SLOs to exist; fails silently if targets are fake</td>
+    </tr>
+    <tr>
+      <td><strong>Event / anomaly</strong></td>
+      <td>A specific event happens (DLQ receives a message, a poison message appears, a key expires)</td>
+      <td>Known-machinery failures with known fixes (see System Design §6e for DLQ alerting)</td>
+      <td>Duplicate signal from the same root cause; the "alert storm"</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The alert design checklist</h3>
+<ul>
+  <li><strong>Actionable:</strong> the receiver can do something with it. "Rate is high" is a fact; "cache hit ratio dropped below 80% — check the cache-key change from release 4.2 (runbook: cache-storm)" is an action.</li>
+  <li><strong>Directed:</strong> page a human for SEV-1/2 only; ticket everything else. Severity vocabulary lives in <a href="./software-development-process.html">Software Development Process</a> §9h (SEV-1 = users blocked, SEV-2 = degraded, SEV-3 = minor impact, SEV-4 = cosmetic).</li>
+  <li><strong>Non-redundant:</strong> one alert per root cause, not one per symptom. Five dashboards screaming about the same dead database is a storm, not information.</li>
+  <li><strong>Owned:</strong> every alert has a human owner and a review date. Alerts are code; they accrue debt and need refactors.</li>
+  <li><strong>Escapable:</strong> a documented dismissal path ("known issue, tracked in ticket X") so on-call can silence a known false alarm without guilt — the alternative is teaching people to ignore the pager.</li>
+</ul>
+
+<h3>Alert fatigue is a design failure, not a character flaw</h3>
+<p>When alerts stop being read, the cause is the alert system, not the operators. Fatigue has three sources: too many alerts (each one dilutes the others), alerts without actions (the brain learns they are noise), and alerts without severity (everything pages, so nothing does). The fix is always structural: prune, tie to budgets, add runbooks. The symptom of success: on-call trusts the pager enough to sleep through the ticket-level noise.</p>
+
+<h2>4. Incident response — from detection to recovery</h2>
+
+<p>An incident is an unplanned interruption that needs <em>coordinated</em> response. The difference between a fire drill and a fire: roles, a timeline, and a decision-maker.</p>
+
+<h3>The lifecycle</h3>
+<table>
+  <thead><tr><th>Phase</th><th>What happens</th><th>What it produces</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Detection</strong></td>
+      <td>An alert fires, a user reports, a dashboard looks wrong</td>
+      <td>A suspected incident — confirmed by checking user impact, not just the metric</td>
+    </tr>
+    <tr>
+      <td><strong>Triage &amp; severity</strong></td>
+      <td>How bad, how fast, how wide? SEV-1 (users blocked) through SEV-4 (cosmetic)</td>
+      <td>Whether to escalate, page, or ticket; whether the incident commander takes over</td>
+    </tr>
+    <tr>
+      <td><strong>Command</strong></td>
+      <td>Roles assigned: Incident Commander (decides), Scribe (timeline), Comms (announcements), SMEs (investigate)</td>
+      <td>One decision-maker, one record, one voice — the antidote to ten engineers chasing ten theories</td>
+    </tr>
+    <tr>
+      <td><strong>Mitigation</strong></td>
+      <td>Rollback first (fast, known); forward-fix only when rollback is impossible or slower; feature-flag off as a middle path</td>
+      <td>Users restored — <em>before</em> root cause, when the two conflict</td>
+    </tr>
+    <tr>
+      <td><strong>Verification</strong></td>
+      <td>Budgets stop burning; the journey is green again; the fix is observed, not assumed</td>
+      <td>Incident declared over with evidence</td>
+    </tr>
+    <tr>
+      <td><strong>Follow-up</strong></td>
+      <td>Postmortem (§5); action items enter the backlog; comms close out; runbooks updated</td>
+      <td>The organization learns; the next incident is cheaper</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The rules that make it work</h3>
+<ul>
+  <li><strong>Mitigation outranks diagnosis.</strong> Stopping user pain is the goal; understanding is the follow-up. The Einstellung trap is investigating the interesting bug while the checkout stays broken.</li>
+  <li><strong>The timeline is written during the incident, not after.</strong> The scribe records what happened <em>when</em> — the raw material that makes the postmortem honest instead of reconstructed.</li>
+  <li><strong>On-call has authority.</strong> The operator can roll back, disable a flag, or stop a deploy without a committee. Authority without process is chaos; process without authority is theater.</li>
+  <li><strong>Freeze during SEV-1/2.</strong> Deploys halt while the incident runs; otherwise the incident and the release pipeline fight and both lose.</li>
+  <li><strong>Comms are a deliverable.</strong> A status line exists for every incident ("investigating / mitigating / monitoring") — for internal stakeholders and, where user-facing, for customers. Silence reads as chaos, even when it isn't.</li>
+</ul>
+
+<h2>5. Postmortems &amp; learning — making failure an investment</h2>
+
+<h3>Blameless by design</h3>
+<p>A blameless postmortem is not "no accountability." It is the discipline of asking <em>what in the system made this failure possible</em> before asking <em>who</em>. Every "human error" explanation is a design question in disguise: the deploy button that lacked a confirmation, the runbook that rotted, the alert that fired at 3am with no action. The system is the unit of learning (§1f).</p>
+
+<h3>The postmortem template</h3>
+<table>
+  <thead><tr><th>Section</th><th>What it contains</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Timeline</strong></td>
+      <td>Detection → escalation → mitigation → recovery, with timestamps (from the scribe)</td>
+      <td>Fixes the record; prevents "we actually responded fine" nostalgia</td>
+    </tr>
+    <tr>
+      <td><strong>Impact</strong></td>
+      <td>Users affected, error budget burned, money or reputation cost, duration</td>
+      <td>Converts drama into accounting; the budget is the scoreboard</td>
+    </tr>
+    <tr>
+      <td><strong>Root cause &amp; contributing factors</strong></td>
+      <td>The triggering change <em>and</em> the conditions that let it hurt (no load test, no canary, alert too loose)</td>
+      <td>Fixes the soil, not just the weed; contributing factors are where the real changes live</td>
+    </tr>
+    <tr>
+      <td><strong>Action items</strong></td>
+      <td>Concrete changes, each with an owner and a ticket; tested/burn-in items marked</td>
+      <td>The only part that improves the system; everything else is narrative</td>
+    </tr>
+    <tr>
+      <td><strong>What went well</strong></td>
+      <td>Detection speed, rollback smoothness, comms clarity</td>
+      <td>Protects the practices that worked from being redesigned away</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The loop closes in the backlog</h3>
+<p>Postmortem action items are product work: they compete for the same sprint capacity as features, and the error budget decides the winner (§2). This is the same loop <a href="./software-development-process.html">Software Development Process</a> §9h describes ("operational learnings return to the backlog") — this doc's contribution is the craft that makes the learnings real: owners, tickets, and verification instead of vibes.</p>
+
+<h2>6. Runbooks — making the known response boring</h2>
+
+<p>A runbook is a written procedure for a known scenario, written <em>before</em> the incident — the difference between "we'll figure it out" and "we already did, here's how." The test of a runbook is not that it exists; it is that it has been executed in a drill (§1f).</p>
+
+<h3>The runbook shape</h3>
+<table>
+  <thead><tr><th>Field</th><th>Content</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Symptom</strong></td>
+      <td>What the alert or user report looks like (the trigger conditions)</td>
+    </tr>
+    <tr>
+      <td><strong>Check</strong></td>
+      <td>The 2–3 commands or dashboards that confirm the scenario (not the whole investigation)</td>
+    </tr>
+    <tr>
+      <td><strong>Act</strong></td>
+      <td>The concrete fix or mitigation, with the exact command or flag</td>
+    </tr>
+    <tr>
+      <td><strong>Verify</strong></td>
+      <td>How to confirm the fix landed (metrics recover, budget stops burning)</td>
+    </tr>
+    <tr>
+      <td><strong>Escalate</strong></td>
+      <td>When to stop following the book and page the owner (never make "keep trying" the last step)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The ownership rule:</strong> every runbook has an owner and a review date, because a runbook that describes a deleted service is worse than none — it wastes the exact minutes it claims to save. Alerts link to runbooks; runbooks link to the backup escalation page. The chain is the product.</p>
+
+<h2>7. Principles — the shared constants</h2>
+
+<table>
+  <thead><tr><th>Principle</th><th>Why it is constant</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Alerts are tied to user impact</strong></td>
+      <td>Signals exist to protect journeys, not components. A green dashboard beside broken users is the classic failure of monitoring-as-decoration.</td>
+    </tr>
+    <tr>
+      <td><strong>Observability ships with the service</strong></td>
+      <td>The architecture (System Design §6g) demands it; the practice enforces it at review time — a service without signals is unmergeable.</td>
+    </tr>
+    <tr>
+      <td><strong>The error budget decides, not the loudest voice</strong></td>
+      <td>Reliability work vs. feature work becomes arithmetic instead of argument (the whole point of §2).</td>
+    </tr>
+    <tr>
+      <td><strong>Rollback is the default mitigation</strong></td>
+      <td>Known beats clever in an incident. Forward-fixes are for cases where rollback is impossible or slower.</td>
+    </tr>
+    <tr>
+      <td><strong>Every incident ends in an action item</strong></td>
+      <td>Without a change, the incident was tuition without a course: paid, not learned.</td>
+    </tr>
+    <tr>
+      <td><strong>Practice the failure before it happens</strong></td>
+      <td>Drills convert runbooks from fiction to procedure and expose missing authority before it matters.</td>
+    </tr>
+    <tr>
+      <td><strong>Blameless systems, accountable fixes</strong></td>
+      <td>Blame-free inquiry plus owned, tracked, verified action items — one without the other collapses into either witch-hunts or vibes.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7b. On-call design — the rotation is a product, not a duty</h2>
+
+<p>Alerting decides <em>when</em> a human is woken; on-call design decides <em>which human, how often, and under what conditions</em> — the structure that keeps the pager sustainable.</p>
+
+<table>
+  <thead><tr><th>Aspect</th><th>What to cover</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Rotation schedules</strong></td>
+      <td>Primary/secondary rotations; one-week vs two-week lengths; who hands off to whom</td>
+      <td>Pages per engineer per week; unacknowledged-page rate</td>
+    </tr>
+    <tr>
+      <td><strong>Escalation paths</strong></td>
+      <td>Primary → secondary → manager; time-based escalation (page not acknowledged in N minutes)</td>
+      <td>Time-to-ack; percentage of incidents resolved at the first level</td>
+    </tr>
+    <tr>
+      <td><strong>Shadow on-call</strong></td>
+      <td>New operators pair with experienced ones before carrying the pager themselves</td>
+      <td>Time from first shadow shift to a confident solo shift</td>
+    </tr>
+    <tr>
+      <td><strong>Load targets</strong></td>
+      <td>A budget for pages (e.g., fewer than 2 pages per engineer per week); over budget → invest in alert quality</td>
+      <td>Pages per week; alert-to-ticket ratio</td>
+    </tr>
+    <tr>
+      <td><strong>Handoffs</strong></td>
+      <td>Written handoff at rotation change: open incidents, known issues, upcoming changes, pending action items</td>
+      <td>Could the incoming engineer answer a page alone from the handoff alone?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The rule:</strong> the rotation is a designed system, not an inherited chore. On-call without compensation, training, or a load budget is how organizations burn their operators and then blame them for being tired.</p>
+
+<h2>7c. Capacity planning &amp; load testing — knowing the ceiling</h2>
+
+<p>The theory — Little's Law, Amdahl's Law, headroom targets, the latency knee — lives in <a href="./system-design.html">System Design</a> §6b; this section owns the practice of testing the ceiling and tuning autoscaling against it.</p>
+
+<table>
+  <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Load testing before launch</strong></td>
+      <td>Run tests at 2× expected peak; verify the SLOs hold under load</td>
+      <td>Pass/fail judged against the SLO, not just "did it crash"</td>
+    </tr>
+    <tr>
+      <td><strong>Autoscaling tuning</strong></td>
+      <td>Scale-up/scale-down thresholds, cooldown periods, min/max replicas</td>
+      <td>Scale events vs. SLO burn — scaling should lead, not chase</td>
+    </tr>
+    <tr>
+      <td><strong>Review cadence</strong></td>
+      <td>Monthly: compare actual load to forecast; adjust headroom</td>
+      <td>Forecast error shrinking month over month</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7d. Deployment operations — the two decisions the toolbox doesn't own</h2>
+
+<p>The deployment toolbox — rolling, blue-green, canary, feature flags, rollback and migration limits — is owned by <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> §5 and <a href="./software-development-process.html">Software Development Process</a> §9i. Operations adds two decisions around that toolbox:</p>
+
+<table>
+  <thead><tr><th>Decision</th><th>What to do</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Deploy freezes</strong></td>
+      <td>Freeze deploys during SEV-1/2 incidents, peak traffic windows, and major events</td>
+      <td>Incidents caused by concurrent deploys (should be ~zero)</td>
+    </tr>
+    <tr>
+      <td><strong>Budget-based abort</strong></td>
+      <td>Judge the canary against the error budget: if SLO burn exceeds the threshold (§2, §3), abort and roll back — never forward-fix mid-incident (§4, §7)</td>
+      <td>Canary burn vs. the abort threshold; time from abort decision to full revert</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7e. Chaos engineering — practicing failure on purpose</h2>
+
+<p>Drills (§1f, §6) exercise <em>known</em> procedures; chaos engineering exercises <em>unknown</em> failure by injecting it deliberately, in controlled doses.</p>
+
+<table>
+  <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Steady-state hypothesis</strong></td>
+      <td>State expected behavior before the experiment ("p99 &lt; 300ms, error rate &lt; 0.1%")</td>
+      <td>A measurable hypothesis, written before the injection</td>
+    </tr>
+    <tr>
+      <td><strong>Fault injection</strong></td>
+      <td>Kill a pod, add latency, drop packets, exhaust disk, corrupt a cache entry</td>
+      <td>Degradation is observable (and bounded) per injected fault</td>
+    </tr>
+    <tr>
+      <td><strong>GameDay exercises</strong></td>
+      <td>Scheduled, team-wide experiments; everyone participates; weaknesses surface before incidents</td>
+      <td>Findings converted into tickets with owners</td>
+    </tr>
+    <tr>
+      <td><strong>Blast-radius control</strong></td>
+      <td>Start with the smallest possible blast radius; expand only when the system handles it</td>
+      <td>Scope of each experiment, staged explicitly</td>
+    </tr>
+    <tr>
+      <td><strong>Automation and maturity</strong></td>
+      <td>Manual GameDays → automated fault injection in CI (Chaos Mesh, Litmus, Gremlin) → continuous chaos in production</td>
+      <td>Cadence of experiments and share that are automated</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7f. Operational gates — shift-left and the launch gate</h2>
+
+<p>Postmortems learn <em>after</em> failure (§5); these two gates learn <em>before</em> it — one during the work, one at the launch.</p>
+
+<h3>Shift-left — operational concerns enter the work before the code</h3>
+
+<p>"Observability ships with the service" (§7) becomes concrete when operational concerns enter the work <em>before</em> the code does.</p>
+
+<table>
+  <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Design reviews</strong></td>
+      <td>Every design review includes an operational section: SLOs, alerts, runbooks, on-call</td>
+      <td>Share of designs with operational sign-off</td>
+    </tr>
+    <tr>
+      <td><strong>User stories</strong></td>
+      <td>Stories carry observability requirements: what to emit, what to alert, what to document</td>
+      <td>Share of stories with telemetry acceptance criteria</td>
+    </tr>
+    <tr>
+      <td><strong>SLOs before code</strong></td>
+      <td>The target is set at design time, not after launch</td>
+      <td>SLO-set-at-design rate</td>
+    </tr>
+    <tr>
+      <td><strong>CI operational gate</strong></td>
+      <td>CI fails for a service with no SLOs, no alerts, no runbook</td>
+      <td>Gate violations per release</td>
+    </tr>
+    <tr>
+      <td><strong>Debt in the backlog</strong></td>
+      <td>Missing runbooks, stale alerts, untested backups tracked as operational debt (§7i)</td>
+      <td>Debt tickets created per release</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The launch gate — readiness review before go-live</h3>
+
+<table>
+  <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Readiness checklist</strong></td>
+      <td>SLOs defined and measurable; alerts configured and tested; runbooks written and drilled; on-call staffed; rollback rehearsed; capacity load-tested; security review complete</td>
+      <td>Each item answered with evidence, not a checkbox</td>
+    </tr>
+    <tr>
+      <td><strong>Launch review</strong></td>
+      <td>A go/no-go decision with a named launch captain who owns it</td>
+      <td>The gate is enforced — exceptions require a named owner</td>
+    </tr>
+    <tr>
+      <td><strong>Post-launch monitoring</strong></td>
+      <td>Watch SLO burn for the first 24–48 hours; the launch captain is on-call</td>
+      <td>SLOs stay green for the first 48 hours</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7g. Observability cost management — the budget for the lens</h2>
+
+<p>Telemetry is a service you pay for like any other. The operational decisions: what to keep, what to downsample, and who pays.</p>
+
+<table>
+  <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Sampling strategies</strong></td>
+      <td>Head-based (sample at ingestion) vs. tail-based (keep errors and slow traces)</td>
+      <td>Cost per trace vs. error-retention rate</td>
+    </tr>
+    <tr>
+      <td><strong>Retention policies</strong></td>
+      <td>Hot (7 days, fast queries) → warm (30 days) → cold (1 year, archive)</td>
+      <td>Query speed vs. storage cost per tier</td>
+    </tr>
+    <tr>
+      <td><strong>Cardinality management</strong></td>
+      <td>High-cardinality labels (user_id, request_id) explode metric storage; use exemplars instead of labels</td>
+      <td>Label-cardinality growth vs. usable query answers</td>
+    </tr>
+    <tr>
+      <td><strong>Log volume control</strong></td>
+      <td>Structured logs, log levels, sampling for high-volume services</td>
+      <td>Volume per service vs. signal value</td>
+    </tr>
+    <tr>
+      <td><strong>Cost attribution</strong></td>
+      <td>The team that emits the telemetry pays for it; monthly review against a budget</td>
+      <td>Cost per team, reviewed monthly</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7h. Operational maturity — where you are, and the next practice to adopt</h2>
+
+<table>
+  <thead><tr><th>Level</th><th>Name</th><th>Characteristics</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>0</strong></td>
+      <td>None</td>
+      <td>No metrics, logs, or traces; users discover the outage</td>
+    </tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td>Monitoring</td>
+      <td>Host metrics and dashboards exist; no SLOs; alerts are symptoms</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td>SLOs defined</td>
+      <td>Targets for key journeys; alerts tied to budgets</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td>Budgets enforced</td>
+      <td>Error budgets consumed publicly; feature work gated; postmortems produce action items</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td>Proactive</td>
+      <td>Chaos exercises, load tests before launch, readiness reviews as standard practice</td>
+    </tr>
+    <tr>
+      <td><strong>5</strong></td>
+      <td>Self-healing</td>
+      <td>Automated rollback, scaling, and failover; incidents are rare and short</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>The rule:</strong> the level is where the <em>whole organization</em> operates, not where the best team does. The model is a map of the next practice, not a badge.</p>
+
+
+
+<h2>7i. Operational debt &amp; toil — paying what you postponed</h2>
+
+<table>
+  <thead><tr><th>Concept</th><th>What it is</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Operational debt</strong></td>
+      <td>Accumulated work that makes operations harder: missing runbooks, stale alerts, untested backups, unpracticed failovers, manual processes</td>
+      <td>A debt inventory — every item with an owner and a ticket</td>
+    </tr>
+    <tr>
+      <td><strong>Toil</strong></td>
+      <td>Manual, repetitive, automatable work that scales linearly with growth (SRE definition); the goal is under 50% of on-call time</td>
+      <td>Toil hours per engineer per week</td>
+    </tr>
+    <tr>
+      <td><strong>Debt budget</strong></td>
+      <td>A standing slice of each sprint (e.g., 20%) spent on reducing the inventory</td>
+      <td>Inventory shrinking sprint over sprint</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7j. Operational team metrics — measuring the operation itself</h2>
+
+<p>The service has SLOs (§2); the operations <em>team</em> needs its own scoreboard, or improvement is vibes.</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>What it measures</th><th>Reasonable target</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>MTTD</strong></td>
+      <td>Time from failure start to detection</td>
+      <td>&lt; 5 minutes for SEV-1/2</td>
+    </tr>
+    <tr>
+      <td><strong>MTTR</strong></td>
+      <td>Time from detection to resolution</td>
+      <td>&lt; 30 minutes for SEV-1/2</td>
+    </tr>
+    <tr>
+      <td><strong>Alert-to-ack</strong></td>
+      <td>Time from page to acknowledgement</td>
+      <td>&lt; 5 minutes</td>
+    </tr>
+    <tr>
+      <td><strong>Pages per week per engineer</strong></td>
+      <td>On-call load (§7b)</td>
+      <td>&lt; 2</td>
+    </tr>
+    <tr>
+      <td><strong>Postmortem action completion</strong></td>
+      <td>Action items completed within 30 days</td>
+      <td>&gt; 80%</td>
+    </tr>
+    <tr>
+      <td><strong>Drill frequency</strong></td>
+      <td>Runbooks executed in drills (§6)</td>
+      <td>At least once per quarter</td>
+    </tr>
+    <tr>
+      <td><strong>Toil percentage</strong></td>
+      <td>Share of on-call time on repetitive work (§7j)</td>
+      <td>&lt; 50%</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>8. Worked example — the checkout incident</h2>
+
+<p>One incident, end to end, exercising every section of this doc. The system: a storefront (Gateway → Checkout API → Inventory API → Postgres), with requestIds and OpenTelemetry traces wired per System Design §6g, and a checkout SLO of 99.9% availability / p99 &lt; 300ms per System Design §6f vocabulary.</p>
+
+<h3>Detection — 09:41 UTC (Tuesday)</h3>
+<p>A burn-rate alert fires: checkout error budget burning at 14× over the short window. The alert links to the cache-storm runbook (it does not — yet — describe this exact change, but it names the first checks). One engineer confirms user impact: checkout p99 is 2.1s and error rate is 8%. SEV-2 declared.</p>
+
+<h3>Triage &amp; command</h3>
+<p>The Incident Commander (IC) takes the call in the incident channel; a scribe starts the timeline; an SME pulls the release list — a cache-key change shipped 40 minutes earlier in release 4.2. The IC applies the freeze: no further deploys.</p>
+
+<h3>Localization — the correlation loop</h3>
+<p>The SME opens one failing checkout request by requestId: the trace shows Gateway → Checkout (slow) → Inventory (fast) → Postgres (fast). The hotspot is Checkout's cache layer — a miss storm. The dashboards confirm: cache hit ratio dropped from 92% to 31% at the same minute release 4.2 landed. The new cache-key scheme (which added a timestamp segment to bust stale inventory prices) made every key unique per minute: correct but unreachable — the cache was now a per-minute ornament.</p>
+
+<h3>Mitigation &amp; verification</h3>
+<p>The IC chooses rollback-first: release 4.2 is reverted and the deploy pipeline is gated. Within six minutes the hit ratio recovers to 91% and the budget stops burning; the duration is confirmed on the timeline. The incident closes at 10:12 — 31 minutes from first alert to verified recovery. No data was lost; the damage was latency and eight minutes of errored checkouts.</p>
+
+<h3>The postmortem — Thursday</h3>
+<ul>
+  <li><strong>Timeline:</strong> reconstructed from the scribe's record, including the 8-minute gap between release and first alert (the alert was budget-based, correct — but three minutes of the burn predated detection).</li>
+  <li><strong>Root cause:</strong> the cache-key change — correct reasoning, untested behavior under load.</li>
+  <li><strong>Contributing factors:</strong> no load test exercised the new key cardinality; no dashboard watched <em>cache hit ratio</em> as a release gate; the cache-storm runbook lacked the "new key scheme" entry (the runbook that existed for the old scheme was followed, then diverged).</li>
+  <li><strong>Action items (each with an owner and a ticket):</strong> add key-cardinality check to cache regression tests; add a cache-hit-ratio SLO-watch alert (ticket-level, not page-level); update the cache-storm runbook with the timestamp-key failure signature; schedule the runbook into next month's drill; burn the budget accounting into the reliability board.</li>
+  <li><strong>What went well:</strong> rollback-first discipline; the freeze worked; a single trace localized the fault in minutes instead of hours.</li>
+</ul>
+
+<p><strong>The lesson the example exists to teach:</strong> no step was heroic. Detection was a budget, localization was correlation, mitigation was a rollback, learning was tickets. That is the discipline — replacing heroics with procedure, and procedure with proof.</p>
+
+<h3>The same incident without the discipline — the failure variant</h3>
+
+<p>Rerun the story with the practice removed: no SLO burn alert (detection comes from a customer complaint on social media), no trace correlation (the engineer on call debugs the service they know best, not the failing one), no Incident Commander (five engineers chase five theories across three channels), no freeze (a second deploy lands mid-incident and changes the failure's shape), no scribe (the timeline is reconstructed from memory on Thursday), and no postmortem actions (the rollback happened, "someone" did it, and the cache-key change quietly returns in release 4.4). The outcome: hours instead of 31 minutes, two unrelated regressions introduced during investigation, and a team that still cannot say why checkout broke. The discipline is the difference — it is why every section of this doc exists.</p>
+
+<h2>9. Common failure modes</h2>
+
+<table>
+  <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Root cause</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Alert fatigue / pager storm</strong></td>
+      <td>Hundreds of alerts; on-call silences them; the real one is missed</td>
+      <td>Alerts enumerated symptoms instead of budgets; no owner, no pruning, no severity</td>
+    </tr>
+    <tr>
+      <td><strong>Dashboard wallpaper</strong></td>
+      <td>TVs full of green panels nobody reads; incidents invisible until users complain</td>
+      <td>Monitored the boxes, not the journeys; dashboards are hypotheses no one updated</td>
+    </tr>
+    <tr>
+      <td><strong>Postmortem theater</strong></td>
+      <td>Well-written documents, zero changes; the same incident recurs quarterly</td>
+      <td>Action items without owners or tickets; blamelessness used as a shield instead of an inquiry tool</td>
+    </tr>
+    <tr>
+      <td><strong>Hero on-call</strong></td>
+      <td>The one engineer who "knows the system" carries the pager and the memory</td>
+      <td>No runbooks, no drills, no bus-factor; knowledge lived in a person instead of the process</td>
+    </tr>
+    <tr>
+      <td><strong>SLOs that never bite</strong></td>
+      <td>Targets so loose or windows so long that the budget is never in danger</td>
+      <td>SLOs written for the slide deck, not for the decision; no owner with spending authority</td>
+    </tr>
+    <tr>
+      <td><strong>Metrics-only observability</strong></td>
+      <td>Dashboards show the system is slow; nobody can say which request, which service, why</td>
+      <td>No traces or correlation IDs; metrics answered "is it broken" but not "where"</td>
+    </tr>
+    <tr>
+      <td><strong>Logging PII or secrets</strong></td>
+      <td>Incident debugging becomes a compliance incident; tokens in log lines leak</td>
+      <td>No logging rules; the convenience of free text over the discipline of structured fields (see Security &amp; Threat Modeling)</td>
+    </tr>
+    <tr>
+      <td><strong>Runbooks that rot</strong></td>
+      <td>The runbook describes a deleted service; on-call follows it into a dead end at 3am</td>
+      <td>No owner, no review date, no drill — documents without maintenance are liabilities</td>
+    </tr>
+    <tr>
+      <td><strong>No drills</strong></td>
+      <td>The failover "should work"; the restore is attempted for the first time during the outage</td>
+      <td>Treating procedures as paperwork instead of machinery (System Design §6f: a backup never restored is a hope)</td>
+    </tr>
+    <tr>
+      <td><strong>On-call without authority</strong></td>
+      <td>The operator pages four managers while the checkout stays broken, waiting for permission</td>
+      <td>Process without decision rights; the pager was given to someone the system wouldn't let act</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>10. Ecosystem — tooling catalog with decision metrics</h2>
+
+<table>
+  <thead><tr><th>Category</th><th>Tools</th><th>Trigger → Target</th><th>Decision metric</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Metrics</strong></td>
+      <td>Prometheus, Grafana, Mimir/Thanos, VictoriaMetrics</td>
+      <td>Need dimensional time-series → one ingestion standard</td>
+      <td>Query speed on the dashboards you actually open; label consistency; retention cost</td>
+    </tr>
+    <tr>
+      <td><strong>Logs</strong></td>
+      <td>Loki, Elasticsearch/OpenSearch, CloudWatch Logs</td>
+      <td>Need searchable events → correlation with traces</td>
+      <td>Cost per query; parse-free structured fields; retention vs. cost curve</td>
+    </tr>
+    <tr>
+      <td><strong>Traces</strong></td>
+      <td>OpenTelemetry SDKs + Collector, Jaeger, Tempo</td>
+      <td>Need request paths across services → the standard, not the vendor</td>
+      <td>Sampling control; drop% of traces end-to-end; context propagation coverage (System Design §6g)</td>
+    </tr>
+    <tr>
+      <td><strong>APM / errors</strong></td>
+      <td>Sentry, Datadog, New Relic, Glitchtip</td>
+      <td>Need frontend-to-backend error context → per-journey visibility</td>
+      <td>Can one requestId travel from browser to database? (Yes = real APM; no = a pretty log viewer)</td>
+    </tr>
+    <tr>
+      <td><strong>Alerting &amp; on-call</strong></td>
+      <td>Alertmanager, Grafana OnCall, PagerDuty, Incident.io, Opsgenie</td>
+      <td>Need pages with ownership → escalations with a paper trail</td>
+      <td>Time-to-ack; alert-to-runbook links; false-alarm rate (the fatigue metric)</td>
+    </tr>
+    <tr>
+      <td><strong>SLO tooling</strong></td>
+      <td>Sloth, Pyrra, Grafana SLOs, Google Cloud SLO</td>
+      <td>Need budgets that bite → burn-rate alerts from SLO config, not hand-made queries</td>
+      <td>Config-as-code; multi-window burn support; error-budget reporting on the reliability board</td>
+    </tr>
+    <tr>
+      <td><strong>Continuous profiling</strong></td>
+      <td>Parca, Pyroscope, Datadog Continuous Profiler</td>
+      <td>Need "why is CPU high" answered in production → always-on sampling</td>
+      <td>Overhead %; stack depth captured; correlation with traces</td>
+    </tr>
+    <tr>
+      <td><strong>AI-era observability</strong></td>
+      <td>Langfuse, OpenLLMetry, agent-tracing layers on OTel</td>
+      <td>Need to observe LLM calls and agent loops → spans with tokens, latency, drift</td>
+      <td>Cost per trace; prompt/response capture policy; drift detection (see §11)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>11. The future — where the operational layer is heading</h2>
+
+<ul>
+  <li><strong>LLM calls as spans.</strong> A prompt is a request; a completion is a response; a model call is a span in a trace. The correlation loop of §8 extends unchanged: one requestId carries a user's journey through gateway, logic, and model.</li>
+  <li><strong>Agents as systems to observe.</strong> The Agent Development Lifecycle (<a href="./software-development-process.html">Software Development Process</a> §9d) ends in "deploy with guardrails, monitor for drift." Drift — an agent's behavior diverging from its intended task — replaces the crash as the feared failure mode, and detection needs the same signals: budgets, traces, and alerts that respect humans.</li>
+  <li><strong>eBPF and continuous profiling.</strong> Kernel-level instrumentation and always-on sampling shrink the gap between "the system looks fine" and "here is exactly where the CPU went" — more of the unknown made answerable before the question is asked.</li>
+  <li><strong>AI-assisted incident response.</strong> Summaries, correlation suggestions, and runbook lookups will compress the investigation loop. The constants do not move: a human owns the decision, the timeline stays honest, and every incident still ends in an action item.</li>
+</ul>
+
+<h2>12. Primary sources</h2>
+
+<ol>
+  <li>"Site Reliability Engineering" — Google SRE Book (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs, error budgets, on-call, toil, postmortem culture. The foundational primary source for §2–§7.</li>
+  <li>"The Site Reliability Workbook" (2018) — <a href="https://sre.google/workbook/table-of-contents/">sre.google/workbook</a> — practical SLO and alerting exercises behind §2–§3.</li>
+  <li>OpenTelemetry documentation — <a href="https://opentelemetry.io/docs/">opentelemetry.io/docs</a> — the vendor-neutral standard for traces, metrics, and logs behind §1b and §10.</li>
+  <li>The USE Method — Brendan Gregg — <a href="https://www.brendangregg.com/usemethod.html">brendangregg.com/usemethod.html</a> — utilization/saturation/errors for resource analysis (§1e, §7c).</li>
+  <li>The RED Method — Tom Wilkie — <a href="https://grafana.com/blog/the-red-method-how-to-instrument-your-services/">Grafana Labs blog</a> — rate/errors/duration for service-level metrics (§1e).</li>
+  <li>"Monitoring Distributed Systems" (the four golden signals) — <a href="https://sre.google/sre-book/monitoring-distributed-systems/">sre.google/sre-book</a> — latency, traffic, errors, saturation (§1e).</li>
+  <li>"Effective Troubleshooting" — <a href="https://sre.google/sre-book/effective-troubleshooting/">sre.google/sre-book</a> — the hypothesis loop applied in production (§1e, §8).</li>
+  <li>"Postmortem Culture: Learning from Failure" — <a href="https://sre.google/sre-book/postmortem-culture/">sre.google/sre-book</a> — blameless postmortems as a system property (§5).</li>
+  <li>PagerDuty Incident Response Documentation (open source) — <a href="https://github.com/PagerDuty/incident-response-docs">github.com/PagerDuty/incident-response-docs</a> — severity taxonomy and incident roles (Incident Commander, Scribe, Comms) behind §4.</li>
+  <li>Charity Majors — "Observability is a Many-Splendored Thing" — <a href="https://charity.wtf/p/observability-is-a-many-splendored-thing">charity.wtf</a> — the observability-vs-monitoring framing used in §1 and §1f (reachability verified).</li>
+  <li>John Allspaw — "Blameless PostMortems and a Just Culture" — <a href="https://codeascraft.com/2012/05/22/blameless-postmortems/">codeascraft.com</a> — the origin of blameless culture in engineering (§5; reachability to verify from this environment — Etsy blocks automated fetches).</li>
+  <li>John Allspaw — "The Infinite Hows" — <a href="https://www.oreilly.com/radar/the-infinite-hows/">oreilly.com/radar</a> — why "what happened" is the wrong first question (§5; reachability to verify — paywalled/403 for automated fetches).</li>
+</ol>
+
+<p>The fully grounded resource list (with trust notes) lives in <code>RESOURCES.md</code>.</p>
+
+<h2>13. Summary — the operational checklist</h2>
+
+<ul>
+  <li>Can you name the journeys users actually take, and the SLO for each? (If not: §2)</li>
+  <li>Does every alert page a human only when a budget burns, and ticket the rest? (§3)</li>
+  <li>Does every alert have a runbook, an owner, and a dismissal path? (§3, §6)</li>
+  <li>Is the definition of "health" built on user impact, not host pings? (§1c)</li>
+  <li>When the pager fires, does one person decide, one person write the timeline, and one voice speak? (§4)</li>
+  <li>Is rollback the default mitigation, with authority granted to the person holding the pager? (§4, §7)</li>
+  <li>Does every incident produce action items with owners — and do those items enter the backlog like any other work? (§5, §1f)</li>
+  <li>Have the runbooks been executed in a drill this quarter? (§6, §1f)</li>
+  <li>Is the error budget consumed publicly, and does it decide feature-vs-reliability arguments? (§2, §7)</li>
+  <li>Could a brand-new engineer localize a failed request with one requestId and one trace? (§8 — that is the whole point)</li>
+  <li>Can you name your operational maturity level, and the next practice to adopt from it? (If not: §7h)</li>
+</ul>
+
+<footer class="lesson-foot">
+  <span>Reference · Observability &amp; Operations — the discipline of running live software</span>
+  <span>Macro to: <a href="./system-design.html">System Design</a> (architecture) · Micro: <a href="./backend-engineering.html">Backend Engineering</a> (the request loop) · Process: <a href="./software-development-process.html">Software Development Process</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+</footer>
+
+</main>
+<script src="../assets/lesson.js"></script>
+</body>
+</html>
