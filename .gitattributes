@@ -1,0 +1,17 @@
+# Line-ending policy: the repo stores LF for all text; working-tree
+# endings are left to each platform. Git compares normalized content,
+# so Windows tools may keep saving CRLF without dirtying the status.
+* text=auto
+
+# Binary files must never be line-normalized.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.zip binary
+*.gz binary
+*.woff binary
+*.woff2 binary
