@@ -13,7 +13,10 @@
   <p class="kicker">REFERENCE · THE LANGUAGE, NOT THE FRAMEWORKS</p>
   <h1>JavaScript: The Language — History, Design, and the Runtime Model</h1>
   <p class="meta">How JS became JS: the 1995 Netscape/Sun deal, the Brendan Eich 10-day sprint, Mocha → LiveScript → JavaScript → ECMAScript, the prototype model, the event loop, single-threaded concurrency, and why a scripting language for form validation became the only language that runs natively in every browser. A foundation doc for the rest of the reference shelf. Sibling to <a href="./html-and-css.html">HTML & CSS</a> (the platform substrate JS manipulates).</p>
-</header>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>Language:</strong> English · <a href="./ar/javascript-the-language.html">العربية</a>
+        </p>
+      </header>
 
 <section class="recap">
   <h3 style="margin-top:0">Why this doc exists</h3>
@@ -22,7 +25,7 @@
 
 <h2>0. How to use this doc</h2>
 
-<p>Reading order: standalone. One sitting. This doc is <em>not</em> a JS tutorial — the <a href="../lessons/0001-scope-and-hoisting.html">12 lessons</a> already are (scope, closures, prototypes, arrays, <code>this</code>, objects, currying, strings, errors, modules, cert self-test). This doc is not a React doc — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> already is. This doc <em>is</em> the missing piece: the language's history, design rationale, runtime model, and core semantics map — written so you can read any JS codebase without asking "why did they do it this way?" at the language level. Cross-cutting to <a href="./html-and-css.html">HTML & CSS</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+<p>Reading order: standalone. One sitting. This doc is <em>not</em> a JS tutorial — the <a href="../lessons/0001-the-accidental-lingua-franca.html">lesson series</a> already are (from lesson 0001, the accidental lingua franca, to lesson 0022, the real world). This doc is not a React doc — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> already is. This doc <em>is</em> the missing piece: the language's history, design rationale, runtime model, and core semantics map — written so you can read any JS codebase without asking "why did they do it this way?" at the language level. Cross-cutting to <a href="./html-and-css.html">HTML & CSS</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
 <h2>1. The 10 days in May 1995</h2>
 
@@ -85,7 +88,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   <li><strong>Currying</strong> — partial application by returning functions that take the next argument.</li>
 </ul>
 
-<p>These are not "features added later." They were there in the 10-day prototype because Eich implemented the lambda calculus directly. The <code>function</code> keyword <em>is</em> a lambda. The <a href="../lessons/0002-closures.html">closures lesson</a> and <a href="../lessons/0007-currying.html">currying lesson</a> cover the mechanics; this doc covers the <em>why</em>.</p>
+<p>These are not "features added later." They were there in the 10-day prototype because Eich implemented the lambda calculus directly. The <code>function</code> keyword <em>is</em> a lambda. The <a href="../lessons/0003-what-is-state.html">closures lesson</a> covers the mechanics; this doc covers the <em>why</em>.</p>
 
 <blockquote class="callout">
   <p><strong>Primary source → </strong>Brendan Eich, <cite>JavaScript at 20</cite> (2015): "The lambda-calculus heart was there from day one. The C-shaped body was the compromise."</p>
@@ -177,7 +180,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 
 <h2>6b. The core semantics map — what ECMAScript itself defines</h2>
 
-<p>The host table above gives the <em>environment</em>. This section maps the <em>language</em> — the semantic model ECMAScript specifies independently of any host: types, equality, scope, <code>this</code>, prototypes, modules, iteration, errors, and memory. This is not a tutorial; the <a href="../lessons/0001-scope-and-hoisting.html">lessons</a> walk the mechanics. This is the design system underneath: how each dimension behaves, so that when you read a program you can predict it. One sentence to hold the whole model:</p>
+<p>The host table above gives the <em>environment</em>. This section maps the <em>language</em> — the semantic model ECMAScript specifies independently of any host: types, equality, scope, <code>this</code>, prototypes, modules, iteration, errors, and memory. This is not a tutorial; the <a href="../lessons/0001-the-accidental-lingua-franca.html">lessons</a> walk the mechanics. This is the design system underneath: how each dimension behaves, so that when you read a program you can predict it. One sentence to hold the whole model:</p>
 
 <blockquote class="callout">
   <p>JavaScript is dynamically typed, lexically scoped, prototype-based, and single-threaded. Its functions are first-class values, its objects delegate through prototype chains, and its concurrency is driven by an event loop — not shared-memory threads.</p>
@@ -255,7 +258,7 @@ for (let i = 0; i < 3; i++) {
 }
 <span class="output">// 0 1 2</span></code></pre>
 
-<p>Closures are not a "feature added later" — they are in the upper half of both real-world model categories: they remember the scope where they were <em>created</em>, not where they run. Mechanics live in the <a href="../lessons/0002-closures.html">closures lesson</a>; here the point is <em>why closures exist</em>: they are the language's answer to "how does a function keep access to the data it needs after its creator has finished?"</p>
+<p>Closures are not a "feature added later" — they are in the upper half of both real-world model categories: they remember the scope where they were <em>created</em>, not where they run. Mechanics live in the <a href="../lessons/0003-what-is-state.html">closures lesson</a>; here the point is <em>why closures exist</em>: they are the language's answer to "how does a function keep access to the data it needs after its creator has finished?"</p>
 
 <h3>6b.4 <code>this</code> — determined by the call site</h3>
 
@@ -495,7 +498,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   <li>Not React → <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a></li>
   <li>Not Angular → <a href="./angular-evolution.html">angular-evolution</a></li>
   <li>Not TypeScript → <a href="./javascript-across-stacks.html">javascript-across-stacks</a> (the TS shift is a competitor story, not a language story)</li>
-  <li>Not the 12 lessons → <a href="../lessons/0001-scope-and-hoisting.html">lessons/</a> (those are the mechanics; this is the why)</li>
+  <li>Not the lesson series → <a href="../lessons/0001-the-accidental-lingua-franca.html">lessons/</a> (those are the mechanics; this is the why)</li>
 </ul>
 
 <h2>11. Ecosystem — tooling catalog with decision metrics</h2>
@@ -685,6 +688,10 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
   </tbody>
 </table>
 
+
+<footer class="lesson-foot">
+  <span><a href="../index.html">← Back to the index</a></span>
+</footer>
 </main>
 <script src="../assets/lesson.js"></script>
 </body>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Shelf — Home — Every Doc, Every Lesson, Both Languages</title>
+    <link rel="stylesheet" href="./assets/lesson.css" />
+    <style>
+      .docmap { width: 100%; border-collapse: collapse; }
+      .docmap th { text-align: left; padding: .45rem .6rem; border-bottom: 2px solid #b6c2d0;
+                   font-size: .85rem; letter-spacing: .02em; }
+      .docmap tr.layer td { background: #eef2f7; padding: .4rem .6rem;
+                   border-top: 2px solid #b6c2d0; border-bottom: 1px solid #d7dee6;
+                   font-size: .92rem; }
+      .docmap tr.layer:first-of-type td { border-top: 1px solid #d7dee6; }
+      .docmap tr.layer td em { color: #64748b; font-style: normal; font-size: .82rem; }
+      .docmap tr.doc td { padding: .32rem .6rem; border-bottom: 1px solid #eef1f5; }
+      .docmap tr.doc.alt td { background: #fafbfd; }
+      .docmap td:last-child { white-space: nowrap; }
+      .docmap td:last-child a { color: #0f766e; text-decoration: none; }
+      .docmap td:last-child a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="lesson-head">
+        <p class="kicker">The Shelf · The learning system — the front door</p>
+        <h1>The Shelf — Every Doc, Every Lesson, Both Languages</h1>
+        <p class="meta">
+          One entry point for the whole shelf: the reference docs grouped by
+          layer, each with its Arabic version when one exists; the lesson
+          journey; and the supporting material. The glossary remains the
+          <em>learning map</em> — layer structure, ownership, deliberate
+          absences, shared vocabulary; this page is <em>navigation</em>:
+          everything, in one place, in both languages.
+        </p>
+      </header>
+
+      <section class="recap">
+        <h3 style="margin-top: 0">How to use this page</h3>
+        <ul>
+          <li><strong>Docs:</strong> each band is one layer of the glossary map (the layer name sits on its own divider row); each row below it pairs the English doc with its Arabic version (when it exists).</li>
+          <li><strong>Lessons:</strong> the numbered journey, 0001 → 0022. Reference docs point into the lessons; lessons point back into the docs.</li>
+          <li><strong>Language:</strong> every reference doc carries a Language line in its header linking to its twin.</li>
+          <li><strong>New material:</strong> when a doc or lesson is added, add one row here — that is the full cost of keeping the front door current.</li>
+        </ul>
+      </section>
+
+      <h2>1. Reference docs — by layer</h2>
+
+      <table class="docmap">
+        <thead><tr><th>Document</th><th>العربية</th></tr></thead>
+    <tbody>
+    <tr class="layer"><td colspan="2"><strong>Strategy &amp; Discovery</strong> <em>— The why</em></td></tr>
+    <tr class="doc"><td><a href="./reference/product-strategy.html">Product Strategy</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/design-thinking.html">Design Thinking</a></td><td><a href="./reference/ar/design-thinking.html">العربية</a></td></tr>
+    <tr class="layer"><td colspan="2"><strong>Architecture &amp; Contracts</strong> <em>— The macro</em></td></tr>
+    <tr class="doc"><td><a href="./reference/system-design.html">System Design</a></td><td><a href="./reference/ar/system-design.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/api-design.html">API Design</a></td><td><a href="./reference/ar/api-design.html">العربية</a></td></tr>
+    <tr class="doc"><td><a href="./reference/data-modeling-and-databases.html">Data Modeling &amp; Databases</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/sql-and-postgresql.html">SQL &amp; PostgreSQL</a></td><td>—</td></tr>
+    <tr class="layer"><td colspan="2"><strong>Process &amp; Delivery</strong> <em>— How we work</em></td></tr>
+    <tr class="doc"><td><a href="./reference/software-development-process.html">Software Development Process</a></td><td><a href="./reference/ar/software-development-process.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a></td><td><a href="./reference/ar/version-control-ci-cd-deployment.html">العربية</a></td></tr>
+    <tr class="doc"><td><a href="./reference/observability-and-operations.html">Observability &amp; Operations</a></td><td>—</td></tr>
+    <tr class="layer"><td colspan="2"><strong>Quality &amp; Evidence</strong> <em>— The proof</em></td></tr>
+    <tr class="doc"><td><a href="./reference/software-testing-and-debugging.html">Testing &amp; Debugging</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/security-and-threat-modeling.html">Security &amp; Threat Modeling</a></td><td>—</td></tr>
+    <tr class="layer"><td colspan="2"><strong>Implementation</strong> <em>— The micro</em></td></tr>
+    <tr class="doc"><td><a href="./reference/how-developers-think-frontend.html">How Developers Think: Frontend</a></td><td><a href="./reference/ar/how-developers-think-frontend.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/backend-engineering.html">Backend Engineering</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/ui-ux-web-design.html">UI/UX &amp; Web Design</a></td><td><a href="./reference/ar/ui-ux-web-design.html">العربية</a></td></tr>
+    <tr class="layer"><td colspan="2"><strong>The Substrate</strong> <em>— The tools</em></td></tr>
+    <tr class="doc"><td><a href="./reference/html-and-css.html">HTML &amp; CSS</a></td><td><a href="./reference/ar/html-and-css.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/javascript-the-language.html">JavaScript: The Language</a></td><td><a href="./reference/ar/javascript-the-language.html">العربية</a></td></tr>
+    <tr class="doc"><td><a href="./reference/javascript-across-stacks.html">JavaScript Across Stacks</a></td><td><a href="./reference/ar/javascript-across-stacks.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/nextjs-deep-dive.html">React &amp; Next.js</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/react-2024-and-beyond.html">React 2024 and beyond</a></td><td><a href="./reference/ar/react-2024-and-beyond.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/class-to-hooks-paradigm-shift.html">class-to-hooks</a></td><td><a href="./reference/ar/class-to-hooks-paradigm-shift.html">العربية</a></td></tr>
+    <tr class="doc"><td><a href="./reference/what-is-state-prequel.html">what is state</a></td><td><a href="./reference/ar/what-is-state-prequel.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/angular-evolution.html">Angular&#x27;s evolution</a></td><td><a href="./reference/ar/angular-evolution.html">العربية</a></td></tr>
+    <tr class="doc"><td><a href="./reference/terminal-and-deployment-substrate.html">Terminal &amp; the Deployment Substrate</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/dotnet-and-the-enterprise-lane.html">.NET &amp; the Enterprise Lane</a></td><td>—</td></tr>
+    <tr class="layer"><td colspan="2"><strong>The Foundation</strong> <em>— The umbrella</em></td></tr>
+    <tr class="doc"><td><a href="./reference/cs-and-software-engineering.html">CS &amp; Software Engineering</a></td><td><a href="./reference/ar/cs-and-software-engineering.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/problem-solving.html">Problem-Solving</a></td><td><a href="./reference/ar/problem-solving.html">العربية</a></td></tr>
+    <tr class="doc"><td><a href="./reference/algorithms-and-data-structures.html">Algorithms &amp; Data Structures</a></td><td>—</td></tr>
+    <tr class="layer"><td colspan="2"><strong>The Freelance Web</strong> <em>— The other 60%</em></td></tr>
+    <tr class="doc"><td><a href="./reference/wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/payments-and-commerce.html">Payments &amp; Commerce</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/freelance-web-practice.html">Freelance Web Practice</a></td><td>—</td></tr>
+    <tr class="layer"><td colspan="2"><strong>Beyond the Curriculum</strong> <em>— Surveys &amp; supplements — supporting material, not disciplines</em></td></tr>
+    <tr class="doc"><td><a href="./reference/frontend-camps-survey.html">Frontend Camps Survey</a></td><td><a href="./reference/ar/frontend-camps-survey.html">العربية</a></td></tr>
+    <tr class="doc alt"><td><a href="./reference/frontend-income-markets.html">Frontend Income Markets</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/income-stream-landscape.html">Income Stream Landscape</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/full-stack.html">Full-Stack Thinking</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/beyond-the-browser.html">Beyond the Browser</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/terminal-applications.html">Terminal Applications</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/open-source.html">Open Source</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/hiring-process-and-interviews.html">Hiring Process &amp; Interviews</a></td><td>—</td></tr>
+    <tr class="doc"><td><a href="./reference/product-shapes.html">Product Shapes</a></td><td>—</td></tr>
+    <tr class="doc alt"><td><a href="./reference/recurring-fear-of-replacement.html">Recurring Fear of Replacement</a></td><td>—</td></tr>
+    </tbody>
+      </table>
+
+      <h2>2. Lessons — the journey</h2>
+
+      <ol>
+      <li><a href="./lessons/0001-the-accidental-lingua-franca.html">0001 — The Accidental Lingua Franca — How JavaScript Became the Web's Language</a></li>
+      <li><a href="./lessons/0002-the-platform-layer.html">0002 — The Platform Layer — What the Browser Actually Is</a></li>
+      <li><a href="./lessons/0003-what-is-state.html">0003 — What Is "State"? — The Concept That Makes the Rest of Frontend Click</a></li>
+      <li><a href="./lessons/0004-js-across-stacks.html">0004 — JS Across Stacks — Where JS Runs, and Who Fights It</a></li>
+      <li><a href="./lessons/0005-the-camps.html">0005 — The Camps — How Real Products Ship UI</a></li>
+      <li><a href="./lessons/0006-the-class-to-hooks-revolution.html">0006 — The Class→Hooks Revolution — React's Biggest Mental-Model Shift</a></li>
+      <li><a href="./lessons/0007-the-rhythm.html">0007 — The Rhythm — How Developers Think When Building a Feature</a></li>
+      <li><a href="./lessons/0008-the-other-path.html">0008 — The Other Path — Angular's Evolution, for Contrast</a></li>
+      <li><a href="./lessons/0009-the-frontier.html">0009 — The Frontier — React 2024+ & Next.js</a></li>
+      <li><a href="./lessons/0010-the-contract.html">0010 — The Contract — How Systems Speak Without Speaking</a></li>
+      <li><a href="./lessons/0011-the-architecture.html">0011 — The Architecture — What Code Alone Can't Handle</a></li>
+      <li><a href="./lessons/0012-problem-solving-polyas-four-phases.html">0012 — Problem-Solving — Pólya's Four Phases</a></li>
+      <li><a href="./lessons/0013-problem-solving-computational-thinking.html">0013 — Problem-Solving — Computational Thinking + Heuristics</a></li>
+      <li><a href="./lessons/0014-problem-solving-paradigms-and-debugging.html">0014 — Problem-Solving — Paradigms + Debugging</a></li>
+      <li><a href="./lessons/0015-the-rhythm-deepened.html">0015 — The Rhythm Deepened — Why It Works, How It Fails, What Stays Constant</a></li>
+      <li><a href="./lessons/0016-cs-and-se-the-discipline.html">0016 — CS & SE — The Discipline Behind the Code</a></li>
+      <li><a href="./lessons/0017-solution-evaluation.html">0017 — Solution Evaluation — Big O, Quality Attributes, and Trade-offs</a></li>
+      <li><a href="./lessons/0018-the-software-development-process.html">0018 — The Software Development Process — From Waterfall to Agile</a></li>
+      <li><a href="./lessons/0019-scrum-kanban-and-the-ai-frontier.html">0019 — Scrum, Kanban, and the AI/Agent Frontier</a></li>
+      <li><a href="./lessons/0020-the-human-layer.html">0020 — The Human Layer: Where the System Meets the Person</a></li>
+      <li><a href="./lessons/0021-upstream-of-code.html">0021 — Upstream of Code: How Products Discover Problems</a></li>
+      <li><a href="./lessons/0022-the-real-world.html">0022 — The Real World: How Frontend Skills Become Income</a></li>
+      </ol>
+
+      <h2>3. The rest of the shelf</h2>
+
+      <ul>
+        <li><a href="./reference/glossary.html">Glossary</a> — shared terms and the learning map (Arabic: <a href="./reference/ar/glossary.html">العربية</a>)</li>
+        <li><a href="./RESOURCES.md">RESOURCES.md</a> — verified external resources with trust notes (English only by design)</li>
+        <li><a href="./Archive/">Archive</a> — the outside reviews and planning notes behind the shelf</li>
+        <li><a href="./learning-records/">learning-records/</a> — the learning records and their format</li>
+        <li><a href="./MISSION.md">MISSION.md</a> · <a href="./PLAN.md">PLAN.md</a> · <a href="./NOTES.md">NOTES.md</a> — why the shelf exists, what is planned, and the working notes</li>
+      </ul>
+
+      <footer class="lesson-foot">
+        <span>The Shelf · Home</span>
+        <span>Glossary: <a href="./reference/glossary.html">shared terms &amp; the learning map</a> · Resources: <a href="./RESOURCES.md">RESOURCES.md</a></span>
+      </footer>
+    </main>
+    <script src="./assets/lesson.js"></script>
+  </body>
+</html>

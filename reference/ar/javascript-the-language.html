@@ -13,16 +13,19 @@
   <p class="kicker">مرجع · اللغة، لا الأطر</p>
   <h1>جافاسكريبت: اللغة — التاريخ، التصميم، ونموذج التشغيل</h1>
   <p class="meta">كيف أصبحت JS هي JS: صفقة نتسكيب/صن 1995، سباق برندان إيك في 10 أيام، موكا → لايف سكريبت → جافاسكريبت → إيكماسكربت، نموذج البروتوتايب، حلقة الأحداث، التزامن أحادي المسار، ولماذا أصبحت لغة برمجية نصية لتحقق النماذج هي اللغة الوحيدة التي تعمل أصلياً في كل متصفح. وثيقة تأسيسية لباقي رف المراجع.</p>
-</header>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>اللغة:</strong> العربية · <a href="../javascript-the-language.html">English</a>
+        </p>
+      </header>
 
 <section class="recap">
   <h3 style="margin-top:0">لماذا توجد هذه الوثيقة</h3>
-  <p>وثائق المراجع الأخرى (<a href="./class-to-hooks-paradigm-shift.html">نموذج رياكت</a>، <a href="./angular-evolution.html">تطور Angular</a>، <a href="./nextjs-deep-dive.html">Next.js العميق</a>، <a href="./frontend-camps-survey.html">مسح المعسكرات</a>) تعامل JS كمسلمة. هذه الوثيقة تتراجع وتسأل: ما هي JS، ولماذا تبدو هكذا، وما الرهانات التصميمية التي جعلتها اللغة التي تعمل في كل مكان؟ شقيقة لـ <a href="./what-is-state-prequel.html">ما هي الحالة</a> (التي تغطي نظرية البرمجة عموماً) وسياق أب لـ <a href="./class-to-hooks-paradigm-shift.html">الانتقال من الكلاسات إلى الخطافات</a>. وثيقتها الشقيقة عبر المنصات (<a href="./javascript-across-stacks.html">جافاسكريبت عبر المنصات</a>) تغطي أين تعمل JS ومن يحاربها في كل مسار.</p>
+  <p>وثائق المراجع الأخرى (<a href="./class-to-hooks-paradigm-shift.html">نموذج رياكت</a>، <a href="./angular-evolution.html">تطور Angular</a>، <a href="../nextjs-deep-dive.html">Next.js العميق</a>، <a href="./frontend-camps-survey.html">مسح المعسكرات</a>) تعامل JS كمسلمة. هذه الوثيقة تتراجع وتسأل: ما هي JS، ولماذا تبدو هكذا، وما الرهانات التصميمية التي جعلتها اللغة التي تعمل في كل مكان؟ شقيقة لـ <a href="./what-is-state-prequel.html">ما هي الحالة</a> (التي تغطي نظرية البرمجة عموماً) وسياق أب لـ <a href="./class-to-hooks-paradigm-shift.html">الانتقال من الكلاسات إلى الخطافات</a>. وثيقتها الشقيقة عبر المنصات (<a href="./javascript-across-stacks.html">جافاسكريبت عبر المنصات</a>) تغطي أين تعمل JS ومن يحاربها في كل مسار.</p>
 </section>
 
 <h2>٠. كيف تستخدم هذه الوثيقة</h2>
 
-<p>ترتيب القراءة: مستقلة. جلسة واحدة. هذه الوثيقة <em>ليست</em> درس JS — <a href="../lessons/0001-scope-and-hoisting.html">الـ ١٢ درس</a> بالفعل هم (النطاق، الإغلاقات، البروتوتايبات، المصفوفات، <code>this</code>، الكائنات، الكيري، السلاسل، الأخطاء، الوحدات، اختبار الشهادة الذاتي). هذه الوثيقة <em>ليست</em> وثيقة رياكت — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> بالفعل هي. هذه الوثيقة <em>هي</em> القطعة المفقودة: تاريخ اللغة، منطق التصميم، ونموذج التشغيل، مكتوبة لتستطيع قراءة أي قاعدة كود JS دون أن تسأل "لماذا فعلوها هكذا؟" على مستوى اللغة. المرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع وثائق المراجع.</p>
+<p>ترتيب القراءة: مستقلة. جلسة واحدة. هذه الوثيقة <em>ليست</em> درس JS — <a href="../../lessons/0001-the-accidental-lingua-franca.html">سلسلة الدروس</a> بالفعل هي (من الدرس ٠٠٠١ — اللغة العرضية — إلى الدرس ٠٠٢٢ — العالم الحقيقي). هذه الوثيقة <em>ليست</em> وثيقة رياكت — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> بالفعل هي. هذه الوثيقة <em>هي</em> القطعة المفقودة: تاريخ اللغة، منطق التصميم، ونموذج التشغيل، مكتوبة لتستطيع قراءة أي قاعدة كود JS دون أن تسأل "لماذا فعلوها هكذا؟" على مستوى اللغة. المرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع وثائق المراجع.</p>
 
 <h2>١. العشرة أيام في مايو ١٩٩٥</h2>
 
@@ -85,7 +88,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   <li><strong>كيري (Currying)</strong> — تطبيق جزئي بإرجاع دوال تأخذ المعامل التالي.</li>
 </ul>
 
-<p>هذه ليست "ميزات أضيفت لاحقاً". كانت هناك في النموذج الأولي ذي الـ ١٠ أيام لأن إيك نفذ حساب اللامدا مباشرة. كلمة <code>function</code> <em>هي</em> لامدا. <a href="../lessons/0002-closures.html">درس الإغلاقات</a> و <a href="../lessons/0007-currying.html">درس الكيري</a> يغطيان الآليات؛ هذه الوثيقة تغطي <em>لماذا</em>.</p>
+<p>هذه ليست "ميزات أضيفت لاحقاً". كانت هناك في النموذج الأولي ذي الـ ١٠ أيام لأن إيك نفذ حساب اللامدا مباشرة. كلمة <code>function</code> <em>هي</em> لامدا. <a href="../../lessons/0003-what-is-state.html">درس الإغلاقات</a> يغطي الآليات؛ هذه الوثيقة تغطي <em>لماذا</em>.</p>
 
 <blockquote class="callout">
   <p><strong>مصدر أولي → </strong>برندان إيك، <cite>JavaScript at 20</cite> (٢٠١٥): "قلب حساب اللامدا كان هناك منذ اليوم الأول. الجسد على شكل C كان التنازل."</p>
@@ -180,7 +183,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   <li>ليست رياكت → <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a></li>
   <li>ليست Angular → <a href="./angular-evolution.html">angular-evolution</a></li>
   <li>ليست TypeScript → <a href="./javascript-across-stacks.html">javascript-across-stacks</a> (تحول TS قصة منافس، لا قصة لغة)</li>
-  <li>ليست الـ ١٢ درس → <a href="../lessons/0001-scope-and-hoisting.html">lessons/</a> (تلك الآليات؛ هذه الـ لماذا)</li>
+  <li>ليست الـ ١٢ درس → <a href="../../lessons/0001-the-accidental-lingua-franca.html">lessons/</a> (تلك الآليات؛ هذه الـ لماذا)</li>
 </ul>
 
 ---
@@ -261,10 +264,11 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 
 <section class="win">
   <h3>ما تغطيه هذه الوثيقة</h3>
-  <p>اللغة: التاريخ، رهانات التصميم، نموذج التشغيل، التقييس. لا أطر (<a href="./class-to-hooks-paradigm-shift.html">paradigm-shift</a>، <a href="./angular-evolution.html">angular-evolution</a>). لا آليات بنية جملة JS (<a href="../lessons/0001-scope-and-hoisting.html">الـ ١٢ درس</a>). لا الانقسام بين JS و TypeScript/Java/.NET/Spring Boot — ذلك في <a href="./javascript-across-stacks.html">الوثيقة الشقيقة عبر المنصات</a>.</p>
+  <p>اللغة: التاريخ، رهانات التصميم، نموذج التشغيل، التقييس. لا أطر (<a href="./class-to-hooks-paradigm-shift.html">paradigm-shift</a>، <a href="./angular-evolution.html">angular-evolution</a>). لا آليات بنية جملة JS (<a href="../../lessons/0001-the-accidental-lingua-franca.html">سلسلة الدروس</a>). لا الانقسام بين JS و TypeScript/Java/.NET/Spring Boot — ذلك في <a href="./javascript-across-stacks.html">الوثيقة الشقيقة عبر المنصات</a>.</p>
 </section>
 
 <footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
   <span>مرجع · جافاسكريبت: اللغة</span>
   <span>المهمة: قراءة JS/React في العمل</span>
   <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
