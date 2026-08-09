@@ -255,9 +255,9 @@
               study of the time and space resources algorithms consume (<a
                 href="https://en.wikipedia.org/wiki/Analysis_of_algorithms"
                 >Wikipedia</a
-              >). Big O notation, originally from mathematics (Bachmann 1894,
-              Landau), was adopted by Knuth for classifying algorithm
-              efficiency.
+              >). Big O notation, introduced by Bachmann in mathematics (1894)
+              and popularized by Landau, was adopted by Knuth for classifying
+              algorithm efficiency.
               <em
                 >This is the birth of solution evaluation as a formal
                 discipline.</em
@@ -398,22 +398,25 @@
           </tr>
           <tr>
             <td><strong>1984</strong></td>
-            <td>Apple Macintosh (Lisa-based)</td>
+            <td>Apple Macintosh — the GUI goes mainstream</td>
             <td>
-              Apple introduced the Macintosh — the first widely available
-              <strong>graphical user interface</strong> (GUI) with mouse, windows,
-              icons, and desktop metaphor. It shifted computing from command-line
-              to visual and influenced every OS since.
+              Apple introduced the Macintosh (January 1984) — following the Xerox
+              Star (1981) and Apple's own Lisa (1983), it became the first
+              <em>successful mass-market</em> <strong>graphical user
+              interface</strong> (GUI) with mouse, windows, icons, and desktop
+              metaphor. It shifted computing from command-line to visual and
+              influenced every OS since.
             </td>
           </tr>
           <tr>
-            <td><strong>1985</strong></td>
+            <td><strong>1983</strong></td>
             <td>GNU / the free-software movement</td>
             <td>
-              Richard Stallman launched the <strong>GNU project</strong> to
-              build a complete, free Unix, and defined copyleft (the GPL). This
-              seeded the culture that bred Linux, Git, and every open-source
-              community the industry now runs on (<a
+              Richard Stallman announced the <strong>GNU project</strong>
+              (September 1983) to build a complete, free Unix; the Free Software
+              Foundation followed in 1985, and the GPL (v1, 1989) made copyleft
+              legally enforceable. This seeded the culture that bred Linux, Git,
+              and every open-source community the industry now runs on (<a
                 href="https://en.wikipedia.org/wiki/GNU_Project"
                 >Wikipedia</a
               >).
@@ -639,8 +642,9 @@
             <td><strong>2011</strong></td>
             <td>ISO/IEC 25010 (SQuaRE)</td>
             <td>
-              Superseded ISO 9126. Expanded from 6 to
-              <strong>8 quality characteristics</strong>: functional
+              Superseded ISO/IEC 9126-1 (2001 revision of the 1991
+              standard). Expanded from 6 to <strong>8 quality
+              characteristics</strong>: functional
               suitability, performance efficiency, compatibility, usability,
               reliability, security, maintainability, portability. The modern
               standard for "what makes a solution good" (<a
@@ -716,11 +720,14 @@
             <td><strong>2018</strong></td>
             <td>GPT / BERT — pre-training at scale</td>
             <td>
-              OpenAI's GPT and Google's BERT pioneered <strong>pre-training</strong
-              >: train once on vast text, then adapt or few-shot for specific
-              tasks. This transfer learning turned the Transformer into a
-              general tool and set the scaling trajectory of today's frontier
-              models (<a href="https://en.wikipedia.org/wiki/GPT-3">Wikipedia</a
+              Building on ELMo's earlier demonstration of language-model
+              transfer, OpenAI's GPT and Google's BERT made <strong>pre-training</strong
+              > the default path at scale: train once on vast text, then adapt
+              or few-shot for specific tasks. This transfer learning turned the
+              Transformer into a general tool and set the scaling trajectory of
+              today's frontier models (<a
+                href="https://en.wikipedia.org/wiki/Generative_pre-trained_transformer"
+                >Wikipedia</a
               >).
             </td>
           </tr>
@@ -832,9 +839,9 @@
             <td><strong>2026</strong></td>
             <td>Frontier agents &amp; regulation in force</td>
             <td>
-              Frontier is now <strong>agentic</strong>: models drive systems
-              that act on tasks with tools (Claude Opus 5, Gemini 3.5 Flash),
-              and the EU AI Act's GPAI obligations have applied since 2 August 2025.
+              Frontier is now <strong>agentic</strong>: frontier models drive
+              systems that act on tasks with tools, and the EU AI Act's GPAI
+              obligations have applied since 2 August 2025.
               Judgment — deciding what to trust a model with — is the
               discipline's sharpest skill (§7).
             </td>
@@ -889,7 +896,7 @@
 <p>Turing's 1936 paper proved that some problems are <strong>provably unsolvable</strong> by any algorithm. The <em>halting problem</em> — "will this program ever stop, or will it loop forever?" — is undecidable: no algorithm can answer it for all possible programs. This isn't a limitation of current technology; it's a mathematical proof. <strong>The practical implication:</strong> there are problems you cannot solve with code, no matter how clever you are. Knowing this exists prevents you from chasing impossible solutions.</p>
 
 <h3>Computational complexity theory — what can be computed efficiently?</h3>
-<p>Even among solvable problems, some are solvable in reasonable time and some are not. The <strong>P vs NP</strong> question (the Millennium Prize problem) asks: is every problem whose solution can be <em>verified</em> quickly also solvable <em>quickly</em>? Most computer scientists believe P ≠ NP — meaning some problems are easy to check but provably hard to solve. <strong>The practical implication:</strong> for some problems (traveling salesman, knapsack at scale), there is no known efficient algorithm, and there may never be one. Brute force or heuristics are the best you can do. This is why algorithm paradigms (Problem-Solving §7) matter — they're the tools for navigating the efficiency frontier.</p>
+<p>Even among solvable problems, some are solvable in reasonable time and some are not. The <strong>P vs NP</strong> question (the Millennium Prize problem) asks: is every problem whose solution can be <em>verified</em> quickly also solvable <em>quickly</em>? Most computer scientists believe P ≠ NP — meaning some problems are easy to check but hard to solve, provably so if P ≠ NP holds. <strong>The practical implication:</strong> for some problems (traveling salesman, knapsack at scale), there is no known efficient algorithm, and there may never be one. Brute force or heuristics are the best you can do. This is why algorithm paradigms (Problem-Solving §7) matter — they're the tools for navigating the efficiency frontier.</p>
 
 <h3>Information theory — how is information quantified?</h3>
 <p>Shannon's 1948 paper defined the <strong>bit</strong> as the fundamental unit of information, and proved that information can be precisely quantified, compressed, and transmitted with calculable error rates. <strong>The practical implication:</strong> every data structure, every encoding, every compression algorithm is an instance of information theory. When you choose between storing a Set (no duplicates, O(1) lookup) and an Array (duplicates allowed, O(n) lookup), you're making an information-theoretic trade-off: how much information do you need to preserve, and how efficiently can you access it?</p>
@@ -992,7 +999,7 @@
 
 <h2>4. The parameters — quality attributes (what you measure)</h2>
 
-<p>When you evaluate a solution — whether a HackerRank algorithm or a React feature — you judge it along multiple <strong>parameters</strong>. The formal name for these parameters is <strong>quality attributes</strong> (also called "non-functional requirements" or "the ilities"). The international standard is <strong>ISO/IEC 25010</strong> (2011), which superseded ISO 9126 (1991) and defines 8 quality characteristics (<a href="https://en.wikipedia.org/wiki/ISO/IEC_25010">Wikipedia</a>):</p>
+<p>When you evaluate a solution — whether a HackerRank algorithm or a React feature — you judge it along multiple <strong>parameters</strong>. The formal name for these parameters is <strong>quality attributes</strong> (also called "non-functional requirements" or "the ilities"). The international standard is <strong>ISO/IEC 25010</strong> (2011), which superseded ISO/IEC 9126-1 (the 2001 revision of the 1991 standard) and defines 8 quality characteristics (<a href="https://en.wikipedia.org/wiki/ISO/IEC_25010">Wikipedia</a>):</p>
 
 <table>
   <thead><tr><th>Quality attribute</th><th>What it means</th><th>When it matters most</th></tr></thead>
@@ -1027,7 +1034,7 @@
 
 <h2>5. The measures — Big O notation and complexity classes</h2>
 
-<p>Big O notation is how you <strong>quantify</strong> the performance efficiency parameter. It describes how an algorithm's runtime (or memory) grows as the input size grows. The term was coined by Paul Bachmann (1894) and Edmund Landau in mathematics, and was adopted for computer science by Donald Knuth (<a href="https://en.wikipedia.org/wiki/Big_O_notation">Wikipedia</a>).</p>
+<p>Big O notation is how you <strong>quantify</strong> the performance efficiency parameter. It describes how an algorithm's runtime (or memory) grows as the input size grows. The notation was introduced by Paul Bachmann in mathematics (1894) and popularized by Edmund Landau, then adopted for computer science by Donald Knuth (<a href="https://en.wikipedia.org/wiki/Big_O_notation">Wikipedia</a>).</p>
 
 <h3>The standard complexity classes — from fastest to slowest</h3>
 <table>
@@ -1260,7 +1267,7 @@ function firstNonRepeat(str) {
     <tr><td rowspan="2"><strong>Practice platforms</strong></td><td>HackerRank, LeetCode, CodeWars</td><td>Algorithm practice with tight feedback loops. Use for CS skill (Big O, paradigms). See Problem-Solving §11 for how to use them correctly.</td></tr>
     <tr><td>Frontend Mentor</td><td>Real-world UI building practice. Use for SE skill (maintainability, component design, the rhythm).</td></tr>
     <tr><td rowspan="2"><strong>Tools</strong></td><td>Profilers (Chrome DevTools, Node profiler)</td><td>Measure performance before optimizing. The tool that makes Knuth's principle actionable.</td></tr>
-    <tr><td>ESLint, SonarQube, complexity analyzers</td><td>Automated quality measurement. Catch DRY violations, complexity hotspots, code smells.</td></tr>
+    <tr><td>ESLint, SonarQube, complexity analyzers</td><td>Automated quality measurement. Flag duplicated code (a proxy for DRY), complexity hotspots, and code smells.</td></tr>
     <tr><td rowspan="2"><strong>Communities</strong></td><td>r/learnprogramming, r/compsci</td><td>CS questions, algorithm discussion, complexity theory.</td></tr>
     <tr><td>r/softwareengineering, Stack Overflow</td><td>SE questions, design patterns, trade-off discussions.</td></tr>
   </tbody>

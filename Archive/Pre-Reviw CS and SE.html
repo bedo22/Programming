@@ -18,25 +18,25 @@
 <blockquote class="callout">
   <p><strong>Where this fits.</strong> This doc is the <em>umbrella</em> — the discipline that contains every other reference on this shelf:</p>
   <ul>
-    <li><a href="./problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline. Phase 4 (Look back) links directly to this doc's solution evaluation sections (§4–§7).</li>
-    <li><a href="./system-design.html">System Design</a> — the architecture skill. Trade-offs at scale (CAP, monolith vs microservices) are instances of this doc's trade-off framework (§6).</li>
-    <li><a href="./api-design.html">API Design</a> — the contract skill. REST vs GraphQL vs gRPC is a trade-off decision (§6).</li>
-    <li><a href="./how-developers-think-frontend.html">The Rhythm</a> — the implementation skill. "Do the simplest thing first" is KISS + YAGNI (§8). "Premature optimization is the cardinal sin" is Knuth's principle (§7).</li>
-    <li><a href="./html-and-css.html">HTML &amp; CSS</a>, <a href="./javascript-the-language.html">JavaScript</a> — the technologies, instances of the discipline.</li>
-    <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
+    <li><a href="../reference/problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline. Phase 4 (Look back) links directly to this doc's solution evaluation sections (§4–§7).</li>
+    <li><a href="../reference/system-design.html">System Design</a> — the architecture skill. Trade-offs at scale (CAP, monolith vs microservices) are instances of this doc's trade-off framework (§6).</li>
+    <li><a href="../reference/api-design.html">API Design</a> — the contract skill. REST vs GraphQL vs gRPC is a trade-off decision (§6).</li>
+    <li><a href="../reference/how-developers-think-frontend.html">The Rhythm</a> — the implementation skill. "Do the simplest thing first" is KISS + YAGNI (§8). "Premature optimization is the cardinal sin" is Knuth's principle (§7).</li>
+    <li><a href="../reference/html-and-css.html">HTML &amp; CSS</a>, <a href="../reference/javascript-the-language.html">JavaScript</a> — the technologies, instances of the discipline.</li>
+    <li>Reference: <a href="../reference/glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
   </ul>
   <p>Read this to understand <em>what discipline you're actually practicing</em> — and why HackerRank (CS) and your React job (SE) feel different even though both involve JavaScript.</p>
 </blockquote>
 
 <h2>0. How to use this doc</h2>
 
-<p>Reading order: standalone, but most useful <em>after</em> you've read <a href="./problem-solving.html">Problem-Solving</a> and <a href="./how-developers-think-frontend.html">The Rhythm</a> — those give you the thinking skills; this doc gives you the discipline they sit inside. Cross-links:</p>
+<p>Reading order: standalone, but most useful <em>after</em> you've read <a href="../reference/problem-solving.html">Problem-Solving</a> and <a href="../reference/how-developers-think-frontend.html">The Rhythm</a> — those give you the thinking skills; this doc gives you the discipline they sit inside. Cross-links:</p>
 <ul>
-  <li>Downstream: <a href="./problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline; Phase 4 (Look back) links to this doc's evaluation sections (§4–§7).</li>
-  <li>Downstream: <a href="./system-design.html">System Design</a> — trade-offs at the architecture scale; an instance of this doc's trade-off framework (§6).</li>
-  <li>Downstream: <a href="./api-design.html">API Design</a> — trade-offs at the contract scale; an instance of §6.</li>
-  <li>Downstream: <a href="./how-developers-think-frontend.html">The Rhythm</a> — implementation at the feature scale; the principles (§8) are the constants it follows.</li>
-  <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
+  <li>Downstream: <a href="../reference/problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline; Phase 4 (Look back) links to this doc's evaluation sections (§4–§7).</li>
+  <li>Downstream: <a href="../reference/system-design.html">System Design</a> — trade-offs at the architecture scale; an instance of this doc's trade-off framework (§6).</li>
+  <li>Downstream: <a href="../reference/api-design.html">API Design</a> — trade-offs at the contract scale; an instance of §6.</li>
+  <li>Downstream: <a href="../reference/how-developers-think-frontend.html">The Rhythm</a> — implementation at the feature scale; the principles (§8) are the constants it follows.</li>
+  <li>Reference: <a href="../reference/glossary.html">Glossary</a> — shared vocabulary.</li>
 </ul>
 <p><strong>If you've ever wondered why HackerRank feels different from your React job — even though both involve JavaScript — this doc answers that.</strong> Read §1 (Definition) and §2–§3 (what CS is, what SE is) first. Then §4–§7 for the evaluation skill (Big O, quality attributes, trade-offs, judgment). Then §8 for the engineering principles that survive every framework.</p>
 
@@ -129,12 +129,12 @@
 <table>
   <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
   <tbody>
-    <tr><td><a href="./problem-solving.html">Problem-Solving</a> <em>(thinking skill)</em></td><td>Problem-solving is the thinking skill <em>within</em> the discipline. Pólya's Phase 4 (Look back) <em>is</em> solution evaluation.</td><td>The parameters (§4), measures (§5), trade-offs (§6), and judgment (§7) that Phase 4 needs but doesn't define.</td></tr>
-    <tr><td><a href="./system-design.html">System Design</a> <em>(architecture)</em></td><td>System design is CS &amp; SE at the architecture scale — trade-offs across service boundaries.</td><td>The trade-off framework (§6) and the principle that "optimization is a trade-off, not a virtue" (§7).</td></tr>
-    <tr><td><a href="./api-design.html">API Design</a> <em>(contracts)</em></td><td>API design is CS &amp; SE at the contract scale — trade-offs at the interface boundary.</td><td>The quality attributes (§4) that define "what makes a good API" and the trade-off analysis (§6).</td></tr>
-    <tr><td><a href="./how-developers-think-frontend.html">The Rhythm</a> <em>(implementation)</em></td><td>The rhythm is CS &amp; SE at the feature scale — applying principles in a loop.</td><td>The engineering principles (§8): "do the simplest thing first" = KISS + YAGNI; "premature optimization is the cardinal sin" = Knuth's principle (§7).</td></tr>
-    <tr><td><a href="./html-and-css.html">HTML &amp; CSS</a> / <a href="./javascript-the-language.html">JavaScript</a> <em>(technologies)</em></td><td>These are the tools the discipline uses — instances, not the discipline itself.</td><td>The theoretical foundation (§1e) that explains why these tools exist and what they can and cannot do.</td></tr>
-    <tr><td><a href="./ui-ux-web-design.html">UI/UX</a> / <a href="./design-thinking.html">Design Thinking</a> <em>(human layer)</em></td><td>The human layer sets the requirements; CS &amp; SE implements within them.</td><td>The quality attribute "usability" (§4) — the bridge between human needs and technical implementation.</td></tr>
+    <tr><td><a href="../reference/problem-solving.html">Problem-Solving</a> <em>(thinking skill)</em></td><td>Problem-solving is the thinking skill <em>within</em> the discipline. Pólya's Phase 4 (Look back) <em>is</em> solution evaluation.</td><td>The parameters (§4), measures (§5), trade-offs (§6), and judgment (§7) that Phase 4 needs but doesn't define.</td></tr>
+    <tr><td><a href="../reference/system-design.html">System Design</a> <em>(architecture)</em></td><td>System design is CS &amp; SE at the architecture scale — trade-offs across service boundaries.</td><td>The trade-off framework (§6) and the principle that "optimization is a trade-off, not a virtue" (§7).</td></tr>
+    <tr><td><a href="../reference/api-design.html">API Design</a> <em>(contracts)</em></td><td>API design is CS &amp; SE at the contract scale — trade-offs at the interface boundary.</td><td>The quality attributes (§4) that define "what makes a good API" and the trade-off analysis (§6).</td></tr>
+    <tr><td><a href="../reference/how-developers-think-frontend.html">The Rhythm</a> <em>(implementation)</em></td><td>The rhythm is CS &amp; SE at the feature scale — applying principles in a loop.</td><td>The engineering principles (§8): "do the simplest thing first" = KISS + YAGNI; "premature optimization is the cardinal sin" = Knuth's principle (§7).</td></tr>
+    <tr><td><a href="../reference/html-and-css.html">HTML &amp; CSS</a> / <a href="../reference/javascript-the-language.html">JavaScript</a> <em>(technologies)</em></td><td>These are the tools the discipline uses — instances, not the discipline itself.</td><td>The theoretical foundation (§1e) that explains why these tools exist and what they can and cannot do.</td></tr>
+    <tr><td><a href="../reference/ui-ux-web-design.html">UI/UX</a> / <a href="../reference/design-thinking.html">Design Thinking</a> <em>(human layer)</em></td><td>The human layer sets the requirements; CS &amp; SE implements within them.</td><td>The quality attribute "usability" (§4) — the bridge between human needs and technical implementation.</td></tr>
   </tbody>
 </table>
 
@@ -234,7 +234,7 @@
     <tr><td><strong>Functional suitability</strong></td><td>Does it do what it's supposed to? Correctness, completeness, appropriateness.</td><td>Always. The baseline — if it doesn't work, nothing else matters.</td></tr>
     <tr><td><strong>Performance efficiency</strong></td><td>How fast? How much memory? Time behavior, resource utilization.</td><td>HackerRank (time limits), production at scale, real-time systems.</td></tr>
     <tr><td><strong>Compatibility</strong></td><td>Can it coexist with other systems? Can it share data?</td><td>Integration projects, shared infrastructure, migration.</td></tr>
-    <tr><td><strong>Usability</strong></td><td>Can users actually use it? Learnability, operability, accessibility.</td><td>Frontend, user-facing features. Links to <a href="./ui-ux-web-design.html">UI/UX</a>.</td></tr>
+    <tr><td><strong>Usability</strong></td><td>Can users actually use it? Learnability, operability, accessibility.</td><td>Frontend, user-facing features. Links to <a href="../reference/ui-ux-web-design.html">UI/UX</a>.</td></tr>
     <tr><td><strong>Reliability</strong></td><td>Does it keep working under stress? Maturity, fault tolerance, recoverability.</td><td>Production systems, 24/7 services, critical infrastructure.</td></tr>
     <tr><td><strong>Security</strong></td><td>Can it resist attack? Confidentiality, integrity, availability.</td><td>Any system with user data, authentication, payments.</td></tr>
     <tr><td><strong>Maintainability</strong></td><td>Can the next developer understand and modify it? Analyzability, modifiability, testability.</td><td>Code that lives more than a week. Your React job. The most underrated attribute.</td></tr>
@@ -316,7 +316,7 @@
 All three are Pareto-optimal — none dominates the others on <em>all</em> parameters. The right choice depends on your context: how many searches? How much memory? Is the data already sorted?</p>
 
 <blockquote class="callout">
-  <p><strong>Trade-offs at every scale:</strong> the same trade-off pattern appears at every level of the stack. At the algorithm level: time vs space. At the API level: REST (simplicity) vs GraphQL (flexibility) vs gRPC (performance) — see <a href="./api-design.html">API Design</a>. At the architecture level: consistency vs availability (CAP) — see <a href="./system-design.html">System Design</a>. At the feature level: "simplest thing first" vs "optimize now" — see <a href="./how-developers-think-frontend.html">The Rhythm</a>. The parameters change; the trade-off skill doesn't.</p>
+  <p><strong>Trade-offs at every scale:</strong> the same trade-off pattern appears at every level of the stack. At the algorithm level: time vs space. At the API level: REST (simplicity) vs GraphQL (flexibility) vs gRPC (performance) — see <a href="../reference/api-design.html">API Design</a>. At the architecture level: consistency vs availability (CAP) — see <a href="../reference/system-design.html">System Design</a>. At the feature level: "simplest thing first" vs "optimize now" — see <a href="../reference/how-developers-think-frontend.html">The Rhythm</a>. The parameters change; the trade-off skill doesn't.</p>
 </blockquote>
 
 <h2>7. The judgment — which parameters matter when, and when to stop</h2>
@@ -550,7 +550,7 @@ function firstNonRepeat(str) {
 
 <footer class="lesson-foot">
   <span>Reference · Computer Science &amp; Software Engineering — The Discipline Behind the Code</span>
-  <span>Umbrella for: <a href="./problem-solving.html">Problem-Solving</a> · <a href="./system-design.html">System Design</a> · <a href="./api-design.html">API Design</a> · <a href="./how-developers-think-frontend.html">The Rhythm</a> · Glossary: <a href="./glossary.html">shared terms</a></span>
+  <span>Umbrella for: <a href="../reference/problem-solving.html">Problem-Solving</a> · <a href="../reference/system-design.html">System Design</a> · <a href="../reference/api-design.html">API Design</a> · <a href="../reference/how-developers-think-frontend.html">The Rhythm</a> · Glossary: <a href="../reference/glossary.html">shared terms</a></span>
 </footer>
 
 </main>
