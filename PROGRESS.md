@@ -12,7 +12,7 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 
 ## Per-doc status (41 EN / 18 twins, measured 2026-08-10, Tier 0; corrected at v11)
 
-### Twins — ✅ AR-OK (10)
+### Twins — ✅ AR-OK (11)
 | doc | EN h2 | AR h2 |
 |---|---|---|
 | cs-and-software-engineering | 23 | 23 |
@@ -25,8 +25,9 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 | api-design | 25 | 25 |
 | ui-ux-web-design | 18 | 18 |
 | html-and-css | 23 | 23 |
+| how-developers-think-frontend | 25 | 25 |
 
-### Twins — ⏳ LAGGING (8, ordered by gap size)
+### Twins — ⏳ LAGGING (7, ordered by gap size)
 | doc | EN h2 | AR h2 | gap | tier |
 |---|---|---|---|---|
 | class-to-hooks-paradigm-shift | 35 | 19 | 16 | T2 |
@@ -36,8 +37,6 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 | javascript-the-language | 19 | 12 | 7 | T3 |
 | javascript-across-stacks | 19 | 9 | 10 | T3 |
 | frontend-camps-survey | 21 | 11 | 10 | T3 |
-| what-is-state-prequel | 15 | 15 | 0 | ✅ full parity (v12) |
-| how-developers-think-frontend | 25 | 25 | 0 | ✅ full parity (false alarm at v10) |
 
 ### EN-only — 🔴 no twin (23)
 algorithms-and-data-structures, backend-engineering, beyond-the-browser, data-modeling-and-databases, dotnet-and-the-enterprise-lane, freelance-web-practice, frontend-income-markets, full-stack, hiring-process-and-interviews, income-stream-landscape, nextjs-deep-dive, observability-and-operations, open-source, payments-and-commerce, product-shapes, product-strategy, recurring-fear-of-replacement, security-and-threat-modeling, software-testing-and-debugging, sql-and-postgresql, terminal-and-deployment-substrate, terminal-applications, wordpress-and-cms-internet.
@@ -52,6 +51,7 @@ algorithms-and-data-structures, backend-engineering, beyond-the-browser, data-mo
 - **T1.1 · ui-ux-web-design — ✅ done (v13)**: 3 sections translated (8b common interface patterns: 12 decision-table rows + state-matrix 15 rows + forms/IA/loading/visual-fundamentals/motion; 8c research methods 10-row + usability metrics + severity/triage + a11y testing workflow; 8d dark patterns 9-row + permission UX + localization/i18n + inclusive design 10-row); pre-existing drift fixed: AR §9 was missing Steps 5–6 (token mapping w/ verbatim tokens.json pre + naive-vs-designed table) — inserted; de-numbered both twins (h2+h3), AR h2 id pass 18/18 identical to EN, EN §9×2 + §8b remapped to anchors, AR reversed-token (٩§) → anchor; gates green (h2 18/18, h3 28/28, zero visible-§, ids identical, tags balanced, ratio 0.80).
 - **T1.2 · design-thinking — ✅ done (v14)**: 4 sections translated (8b synthesis: affinity/empathy/journey/POV-madlib tables; 8c ideation + prototype taxonomy: HMW/Crazy 8s/Worst-idea/roleplay/scale-matrix + concierge/Wizard-of-Oz/painted-door/concept-video; 8d desirability testing + handoff artifacts + layered-handoff callout; 8e room & org: HiPPO/buyer-vs-user/extractive research); AR §9 REPLACED by EN's full worked example (5 stages + verbatim insight pre + artifacts para) — flagged revert option if the old condensed table was intentional; pre-existing drift fixed: AR §10 academic-critique para upgraded to h3+3 bullets+thread (Norman year corrected 2023→2019), AR §12 future table +co-design row + heading subtitle «— أين يتجه»; stale EN §1d×2 → system-design #sec-intersection-with-neighbors (doc has no 1d) + §3b/§6/§7/§9/§10/§12 remapped; de-numbered both twins (h2 numeric; AR latin-letter suffixes 8b-8e too), AR h2 id pass 20/20; gates green (h2 20/20, h3 15/15, ids identical, zero visible-§, tags balanced, ratio 0.79) — pending: 2 cross-doc frags → system-design AR twin (T2).
 - **T1.3 · api-design — ✅ done (v15)**: 9 sections translated (8b conventions & identifiers 13-row + identifier-design 5-row tables; 8c collections pagination/filter/sort w/ verbatim GET pre; 8d validation errors w/ verbatim 422 pre + optimistic locking (If-Match/412); 8e 202/job-resources/webhooks w/ 3 verbatim pres + 8-row webhook table; 8f realtime/SSE/WebSocket; 8g compatibility matrix 10-row; 8h security & browser contracts (AR: security-and-threat-modeling link → ../ per EN-only rule) + a11y of scope discipline; 8i file uploads/binary; 8j AI-safe tool contracts); AR §9 (shipment tracking) already full 9-h3 mirror — kept; de-numbered both twins (h2+h3 incl latin suffixes), AR h2 id pass 25/25, EN 18 §-tokens remapped (8d×3, 8e×3, 8f×2, 8g, 8h, 10×3, 3, 5b, 11×2), AR reversed (٩§) ×3 fixed; gates green (h2 25/25, h3 23/23, ids identical, zero visible-§, pre 7/7, ratio 0.81).
+- **T1.5 · how-developers-think-frontend — ✅ done (v17)**: hygiene + §-remap only (25/25 parity already). **New: shared pipeline `/tmp/pipeline.py`** (doc-pair → de-number → AR id-pass → fold-exceptions → anchor-protected remap → verify) replaces the per-doc mutated scripts — dry-run on copies first, then real files; the v16-style script bugs (rest-capture eating text runs, pre-mask dropping content, first-char digit maps) are now one-time fixes in the pipeline. Repairs: AR had **2 multi-line `</pre>` closers** (v10-era residue — one of the files “corrected at v11” still carried 2) — normalized, pre-blocks now balance 10/10; EN+AR de-numbered (h2+h3), AR id-pass 25/25 identical; EN 40+ §-tokens remapped (incl. ranges §2–§5, §1b/1e/5a/5b/12b/13b/13c/13d); AR Arabic-Indic tokens + **letter suffixes أ/ب/ج/د/هـ/و mapped to a/b/c/d/e/f**; existing cross-doc labels folded correctly: “HTML & CSS §5b” into its anchor, bare “(Problem-Solving §6/§1f)” → real links (stepwise-refinement / mental-models anchors — legacy numbering resolved from §6≡stepwise, §11≡fluency); gates green (h2 25/25, h3 33/33, pre 10/10, ids identical, zero stray §, cross-doc anchors resolve). **AR ratio 1.17 > band 0.75–0.97** — flagged: the twin's long-standing authoring style is verbose (density audit pending, like version-control 0.55).
 - **T2 · large fills** — system-design (before SDP), software-development-process, class-to-hooks-paradigm-shift.
 - **T3 · near-rebuilds** — javascript-the-language, javascript-across-stacks, frontend-camps-survey, angular-evolution.
 - **P3 · new twins** — observability-and-operations, security-and-threat-modeling (+ glossary/hub/cs-and-se link sync).
@@ -68,3 +68,5 @@ Per-doc gates (translate-to-arabic skill): visible h2 parity, name parity, zero 
 - design-thinking AR §9 has its own worked example vs EN's — parity decision pending.
 - EN html-and-css (v16) remapped «§5 "State lives in attributes" / "Tokens over magic numbers"» quotes keep the §-link text only outside quotes — cosmetic, fine.
 - AR html-and-css (v16) — interlude & future-table demotions are content-preserving (no text lost); revert = re-add h2s if ever wanted.
+- **AR how-developers ratio 1.17** — verbose twin style (band 0.75–0.97); density audit before final pass, don't rewrite yet.
+- **Pipeline**: `/tmp/pipeline.py` (args: EN AR h2-count; config: WANT/FOLDS/ARF maps) — reuse for T2/T3 docs; rerun discipline: commit known-good → dry-run on copies → verify → real run.
