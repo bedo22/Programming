@@ -20,10 +20,10 @@
 
 <section class="recap">
  <h3 style="margin-top:0">العلاقة مع وثيقة التحوّل النموذجي الأساسية</h3>
- <p>تنتهي <a href="./class-to-hooks-paradigm-shift.html">وثيقة التحوّل من الكلاسات إلى الخطافات</a> عند عصر المترجم (§12) وتحيلك إلى هنا لتفاصيل 2024+. كل ما في هذه الوثيقة يبني على النموذج الذهني للخطافات من تلك الوثيقة — مكونات العميل ما زالت تلتقط القيم عند كل تصيير، و<code>useState</code> ما زال يعمل تمامًا كما هو موصوف هناك. الجديد: React 19 جعل ميزات المنصة حقيقية، والمترجم مستقر، وRSC تقسم المعالجة، وأصبحت React محكومةً من قِبل مؤسسة.</p>
+ <p>تنتهي <a href="./class-to-hooks-paradigm-shift.html">وثيقة التحوّل من الكلاسات إلى الخطافات</a> عند عصر المترجم (<a href="./class-to-hooks-paradigm-shift.html#sec-era-4-the-react-compiler-and-beyond"><a href="#sec-react-19-the-platform-shift">§1</a>2</a>) وتحيلك إلى هنا لتفاصيل 2024+. كل ما في هذه الوثيقة يبني على النموذج الذهني للخطافات من تلك الوثيقة — مكونات العميل ما زالت تلتقط القيم عند كل تصيير، و<code>useState</code> ما زال يعمل تمامًا كما هو موصوف هناك. الجديد: React 19 جعل ميزات المنصة حقيقية، والمترجم مستقر، وRSC تقسم المعالجة، وأصبحت React محكومةً من قِبل مؤسسة.</p>
 </section>
 
-<h2 id="sec-how-to-use-this-doc">0. كيف تستخدم هذه الوثيقة</h2>
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
 
 <p>ترتيب القراءة: <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a> ← هذا الدليل ← <a href="./frontend-camps-survey.html">frontend-camps-survey</a> (خريطة المعسكرات) ← <a href="../nextjs-deep-dive.html">nextjs-deep-dive</a> (الإطار الأكثر احتمالًا في مسار عملك مع React). ويمكن قراءتها مستقلة: يشرح كل قسم تحوّلًا واحدًا من تحوّلات ما بعد الخطافات — ما هو، وما تغيّر في الكود، وأين يقع الحد الفاصل مع وثيقة التحوّل النموذجي.</p>
 
@@ -31,19 +31,19 @@
  <p><strong>النطاق.</strong> يغطي هذا الدليل ما تغيّر في React بعدما استقر نموذج الخطافات: إصدار المنصة (React 19)، والمترجم، ومكونات الخادم، والحوكمة، والأمن، وعصر الأطر، والنتائج على النظام البيئي. يفترض أنك تفهم بالفعل الخطافات من وثيقة class-to-hooks و<em>لا</em> يعيد تدريسها. لا يعلّم أساسيات React، ولا يقارن جميع معسكرات الواجهات الأمامية (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>)، ولا يتعمق في دواخل Next.js (<a href="../nextjs-deep-dive.html">nextjs-deep-dive</a>).</p>
 </blockquote>
 
-<h2 id="sec-react-19-the-platform-shift">1. React 19 — التغيّر نحو المنصة</h2>
+<h2 id="sec-react-19-the-platform-shift">React 19 — التغيّر نحو المنصة</h2>
 
 <p>حوّل React 19 (ديسمبر 2024) عشرة أنماط مجتمعية إلى ميزات أصلية في المنصة. هذا هو الإصدار الذي يعتمد عليه المترجم وRSC، وهو المعيار الذي تُقاس به فحوصات «2024 وما بعدها» في هذا الدليل. النموذج الذهني من class-to-hooks لم يتغيّر — ما تغيّر هو أن كثيرًا مما كان النظام البيئي يبنيه بالمكتبات أصبح الآن جزءًا من React نفسها.</p>
 
 <table>
  <thead><tr><th>الميزة</th><th>ماذا تغيّر عند قراءة الكود</th></tr></thead>
  <tbody>
- <tr><td><code>Actions</code> (إجراءات النماذج/الانتقالات)</td><td>انتقالات الحالة اللاتزامنية وإرسال النماذج سلوك React من الدرجة الأولى (§2)</td></tr>
+ <tr><td><code>Actions</code> (إجراءات النماذج/الانتقالات)</td><td>انتقالات الحالة اللاتزامنية وإرسال النماذج سلوك React من الدرجة الأولى (<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a>)</td></tr>
  <tr><td><code>useActionState</code></td><td>حالة لإجراء لاتزامني: قيد الانتظار، خطأ، نتيجة</td></tr>
  <tr><td><code>useFormStatus</code></td><td>حالة الانتظار لإرسال نموذج، تُقرأ من مكوّن فرعي</td></tr>
  <tr><td><code>useOptimistic</code></td><td>واجهة تفاؤلية مع تراجع تلقائي عند الفشل</td></tr>
  <tr><td><code>use()</code></td><td>قراءة وعد أو سياق أثناء التصيير تحت Suspense</td></tr>
- <tr><td>Server Actions</td><td>تعديلات على الخادم موصولة بالنماذج والانتقالات (§2، §5)</td></tr>
+ <tr><td>Server Actions</td><td>تعديلات على الخادم موصولة بالنماذج والانتقالات (<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a>، <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
  <tr><td><code>ref</code> كخاصية prop</td><td>لم يعد <code>forwardRef</code> ضروريًا غالبًا</td></tr>
  <tr><td>بيانات تعريفية للمستند</td><td>رفع <code>&lt;title&gt;</code>/<code>&lt;meta&gt;</code>/<code>&lt;link&gt;</code> أصلية بلا مدير Head خارجي</td></tr>
  <tr><td>أولوية أوراق الأنماط + النصوص اللاتزامنية</td><td>ترتيب الأنماط والنصوص يصبح تصريحيًا</td></tr>
@@ -52,10 +52,10 @@
 </table>
 
 <blockquote class="callout">
- <p><strong>قراءة كود عصر 19:</strong> حين ترى <code>useActionState</code> + <code>&lt;form action={asyncFn}&gt;</code> + <code>useOptimistic</code>, فالشكل هو «عدّل، اعرض المتوقع، طابق». هذا يغني عن رقصة «إرسال + setLoading + setError» اليدوية. أنماط class-to-hooks §1 ما زالت سارية — هذا <em>ترتيب</em> جديد لنفس قواعد الحالة، لا نموذج حالة جديدًا.</p>
+ <p><strong>قراءة كود عصر 19:</strong> حين ترى <code>useActionState</code> + <code>&lt;form action={asyncFn}&gt;</code> + <code>useOptimistic</code>, فالشكل هو «عدّل، اعرض المتوقع، طابق». هذا يغني عن رقصة «إرسال + setLoading + setError» اليدوية. أنماط class-to-hooks <a href="./class-to-hooks-paradigm-shift.html#sec-oop-the-paradigm-classes-came-from"><a href="#sec-react-19-the-platform-shift">§1</a></a> ما زالت سارية — هذا <em>ترتيب</em> جديد لنفس قواعد الحالة، لا نموذج حالة جديدًا.</p>
 </blockquote>
 
-<h2 id="sec-actions-and-forms-progressive-enhancement-returns">2. الإجراءات والنماذج — عودة التحسّن التدريجي</h2>
+<h2 id="sec-actions-and-forms-progressive-enhancement-returns">الإجراءات والنماذج — عودة التحسّن التدريجي</h2>
 
 <p>جعل React 19 <em>إرسال النماذج</em> أمرًا معنيًا به في React. يمكن للنموذج أن يأخذ دالة <code>action</code> بدلًا من (أو إلى جانب) <code>onSubmit</code>:</p>
 
@@ -80,10 +80,10 @@
 </ul>
 
 <blockquote class="callout">
- <p><strong>إجراءات الخادم هي نقاط نهاية.</strong> كون الدالة «على الخادم» لا يجعلها آمنة. إجراءات الخادم نقاط نهاية HTTP عامة: تحقق من كل وسيط، وأذن للمستدعي، وقيّد المعدل للعمليات الحساسة، وعامل القيم المرتَّدة كغير موثوقة. بيانات النموذج مدخلات مستخدم — لا تفترض الأنواع أبدًا عند الحدود الفاصلة (§4).</p>
+ <p><strong>إجراءات الخادم هي نقاط نهاية.</strong> كون الدالة «على الخادم» لا يجعلها آمنة. إجراءات الخادم نقاط نهاية HTTP عامة: تحقق من كل وسيط، وأذن للمستدعي، وقيّد المعدل للعمليات الحساسة، وعامل القيم المرتَّدة كغير موثوقة. بيانات النموذج مدخلات مستخدم — لا تفترض الأنواع أبدًا عند الحدود الفاصلة (<a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>).</p>
 </blockquote>
 
-<h2 id="sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">3. مترجم React مستقر (أكتوبر 2025) وشحن افتراضي (2026)</h2>
+<h2 id="sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">مترجم React مستقر (أكتوبر 2025) وشحن افتراضي (2026)</h2>
 
 <p>صدر <a href="https://react.dev/blog/2025/10/07/react-compiler-1">مترجم React v1.0</a> يوم 7 أكتوبر 2025 — أول إصدار مستقر بعد نحو عقد من البحث (بدأت تجارب الفريق المرتبطة بـ Prepack في 2017). المترجم إضافة Babel تحوّل كودك إلى تمثيل متوسط عالي المستوى (IR)، يجري تحليل تدفق البيانات والقابلية للتعديل، ويدرج الحفظ التلقائي (memoization) حيث يفيد — بما في ذلك أماكن لا يستطيع <code>useMemo</code> أن يذهب إليها قانونيًا، مثل بعد عبارة return مبكرة.</p>
 
@@ -98,7 +98,7 @@
  <li><strong>اختبر تبعيات المؤثران بعد التفعيل.</strong> يمكن للحفظ المولّد أن يغيّر أي المؤثران تشتعل عندما ينتهك الكود قواعد React بهدوء. اقرأ سجل التغييرات وشغّل كامل المجموعة — عامل ترقية المترجم كترقية رئيسية لـ React.</li>
 </ul>
 
-<h2 id="sec-react-server-components-split-rendering-across-two-processes">4. مكونات الخادم تقسم التصيير عبر معالجتَين</h2>
+<h2 id="sec-react-server-components-split-rendering-across-two-processes">مكونات الخادم تقسم التصيير عبر معالجتَين</h2>
 
 <p>قوس class→hooks كان عن <em>كيف</em> يدير المكوّن حالته داخل معالج واحد. RSC تجيب عن سؤال مختلف: <em>في أي</em> معالٍج يعمل المكوّن — متصفحك أم الخادم؟ وقد صاغ دان أبراموف الفكرة بوضوح في <a href="https://overreacted.io/the-two-reacts/">The Two Reacts</a> (يناير 2024):</p>
 
@@ -111,9 +111,9 @@
 
 <p>RSC ليست نموذجًا جديدًا يستبدل الخطافات — بل هي نموذج «دالة + خطافات» الذي يقرر <em>أين تعمل كل دالة</em>. اقرأ «مكوّن العميل» ككل ما في وثيقة التحوّل النموذجي؛ و«مكوّن خادم» كمجموعة جزئية صارمة (بلا خطافات، بلا أحداث، بلا <code>window</code>) تحقق حجم حزمة صفريًا ووصولًا مباشرًا لواجهات برمجة حصرية للخادم.</p>
 
-<h3>4.1 قواعد الحدود الفاصلة في RSC</h3>
+<h3>1 قواعد الحدود الفاصلة في RSC</h3>
 
-<p>هذه هي القواعد التي <em>تعرف بها الحدّ الفاصل</em>. كل ما في هذا الدليل عن المترجم (§3) ما زال ينطبق على مكونات العميل؛ وهذه تنطبق على الخادم مقابل العميل:</p>
+<p>هذه هي القواعد التي <em>تعرف بها الحدّ الفاصل</em>. كل ما في هذا الدليل عن المترجم (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>) ما زال ينطبق على مكونات العميل؛ وهذه تنطبق على الخادم مقابل العميل:</p>
 
 <table>
  <thead><tr><th>القاعدة</th><th>المعنى</th></tr></thead>
@@ -125,11 +125,11 @@
  <tr><td>يمكن لمكونات العميل استقبال <code>children</code> معروض من الخادم</td><td>منفذ التكوين: الخادم يلفّ الجزء العميل</td></tr>
  <tr><td>لا تمرّر مكونات العميل دوالًا إلى مكونات الخادم</td><td>الخصائص الداخلة إلى مكونات الخادم يجب أن تكون قابلة للتَسلسل (لا يمكن الخادم تنفيذ بيانات العميل)</td></tr>
  <tr><td>السياق Context خاص بالعميل</td><td>المزوّدون والمستهلكون في شجرة العميل؛ لا تقرأ مكونات الخادم سياق العميل</td></tr>
- <tr><td>يجب ألاّ يرسل كود الخادم أسرارًا</td><td>ملفات الخادم لا تصل إلى العميل — لكن البيانات المتسربة <em>عبر</em> ناتج الخادم ما زالت تهم (§5)</td></tr>
+ <tr><td>يجب ألاّ يرسل كود الخادم أسرارًا</td><td>ملفات الخادم لا تصل إلى العميل — لكن البيانات المتسربة <em>عبر</em> ناتج الخادم ما زالت تهم (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
  </tbody>
 </table>
 
-<h3>4.2 أين تضع الحدود الفاصلة للعميل</h3>
+<h3>2 أين تضع الحدود الفاصلة للعميل</h3>
 
 <p>افترض مكونات الخادم لعرض البيانات؛ ادفع العميل نحو أوراق التفاعل. انقل مكوّنًا إلى العميل فقط عندما يحتاج: حالة، أو استدعاءات أثر، أو معالج أحداث، أو واجهات برمجة متصفح، أو سياقًا.</p>
 
@@ -138,7 +138,7 @@
  → server layout
  → client interactive card (gets serializable props + server-rendered children)</code></pre>
 
-<h3>4.3 التخزين المؤقت وإعادة التحقق — النموذج الذهني</h3>
+<h3>3 التخزين المؤقت وإعادة التحقق — النموذج الذهني</h3>
 
 <p>أصعب أخطاء RSC ليست أخطاء عرض تقريبًا — بل أخطاء <em>تخزين مؤقت</em>: بيانات قديمة، أو محتوى مخصًّص مخزّن أكثر من اللازم، أو بيانات تبدو حديثة رغم أنها عُرضت من تخزين خاطئ. عند قراءة كود تغذيه RSC، اسأل أيّ تخزين هو المعني:</p>
 
@@ -156,7 +156,7 @@
 
 <p>تفاصيل الإطار (تخزين Next.js) تعيش في <a href="../nextjs-deep-dive.html">Next.js deep dive</a>؛ أمّا من زاوية React فاعرف فقط: بيانات الخادم يملكها إطار العمل عبر التخزين، وواجهة تفاعلية لا تعتمد بصمت على نضارة ذلك التخزين.</p>
 
-<h3>4.4 إدارة الحالة بعد RSC</h3>
+<h3>4 إدارة الحالة بعد RSC</h3>
 
 <p>غيّر RSC <em>أين تنتمي الحالة</em>. نموذج «كل شيء في مخزن عميل عام» نموذج سابق لعصر البيانات المملوكة للخادم:</p>
 
@@ -167,7 +167,7 @@
  <tr><td>حالة العنوان</td><td>الموجّه / عناصر بحث search params</td></tr>
  <tr><td>حالة واجهة محلية</td><td>Client <code>useState</code> / <code>useReducer</code></td></tr>
  <tr><td>حالة تفاعلية مشتركة</td><td>Context أو Zustand أو Redux Toolkit أو Jotai</td></tr>
- <tr><td>حالة التعديل (انتظار/تفاؤل/خطأ)</td><td>Actions + <code>useActionState</code> + <code>useOptimistic</code> (§2)</td></tr>
+ <tr><td>حالة التعديل (انتظار/تفاؤل/خطأ)</td><td>Actions + <code>useActionState</code> + <code>useOptimistic</code> (<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a>)</td></tr>
  </tbody>
 </table>
 
@@ -175,15 +175,15 @@
  <p><strong>القاعدة:</strong> إذا كانت البيانات ملكًا للخادم ولقراءة فقط، أبْقِها على الخادم. حالة العميل للـ<em>التفاعل</em> — لا نسخة ظلّ من بيانات الخادم. عصر «جلِب إلى Redux عند التحميل» انتهى؛ المترجم يحفظ القيم، والخادم يملك البيانات، وحالة العميل تتقلص إلى ما هو تفاعل.</p>
 </blockquote>
 
-<h3>4.5 معالجة الأخطاء وحدود الأخطاء</h3>
+<h3>5 معالجة الأخطاء وحدود الأخطاء</h3>
 
-<p>حدود الأخطاء (Error Boundaries) خاصة بالعميل — لا يمكن أن تكون مكونات خادم. مكوّن خادم جذري لشجرة فاشلة لا يملك مقابل <code>error.tsx</code> لكل الشجرة، وحدود الأخطاء المتداخلة تلفّ الأشجار <em>العميلة</em>. الشكل العملي في عصر الأطر: ملف خطأ على مستوى الطريق (Next.js <code>error.tsx</code> أو عناصر الخطأ في React Router) هو اللاقطة الواعية بالخادم؛ أمّا حدود المكونات فتخص الأوراق. يجب أن تُتسلسل الأخطاء كنصوص عبر الحد الفاصل — لا تشارك أبدًا كيانات حية أو دوال (§4.1).</p>
+<p>حدود الأخطاء (Error Boundaries) خاصة بالعميل — لا يمكن أن تكون مكونات خادم. مكوّن خادم جذري لشجرة فاشلة لا يملك مقابل <code>error.tsx</code> لكل الشجرة، وحدود الأخطاء المتداخلة تلفّ الأشجار <em>العميلة</em>. الشكل العملي في عصر الأطر: ملف خطأ على مستوى الطريق (Next.js <code>error.tsx</code> أو عناصر الخطأ في React Router) هو اللاقطة الواعية بالخادم؛ أمّا حدود المكونات فتخص الأوراق. يجب أن تُتسلسل الأخطاء كنصوص عبر الحد الفاصل — لا تشارك أبدًا كيانات حية أو دوال (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.1</a>).</p>
 
-<h3>4.6 الدفق Streaming والتصيير المسبق الجزئي PPR</h3>
+<h3>6 الدفق Streaming والتصيير المسبق الجزئي PPR</h3>
 
 <p>تصيير الخادم يمكن أن يشحن تدريجيًا. الدفق (Suspense على الخادم) يرسل القشرة أولًا ثم محتوى كل مكوّن معلّق حين ينتهي؛ و<a href="https://react.dev/blog/2023/10/04/partial-prerendering">التصيير المسبق الجزئي PPR (أكتوبر 2023)</a> يعيد القشرة الثابتة عند البناء ويدفق الأجزاء الديناميكية فقط لكل طلب. عند قراءة كود، شكل «قشرة + Suspense حول منطقة واحدة» يعني عادةً أن الجزء البطيء الخاص بالمستخدم معزول كي يشحن الجزء الثابت الأكبر فورًا — نموذج Suspense نفسه لكن محسوب مسبقًا.</p>
 
-<h2 id="sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">5. الحدّ الفاصل الأمني: غيّر RSC معنى «حدّ الثقة» (ديسمبر 2025 – يناير 2026)</h2>
+<h2 id="sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">الحدّ الفاصل الأمني: غيّر RSC معنى «حدّ الثقة» (ديسمبر 2025 – يناير 2026)</h2>
 
 <p>أعطت دوال الخادم وبروتوكول RSC للمهاجمين سطحًا هجوميًا جديدًا. في <strong>ديسمبر 2025</strong> رصد ثغرة حرجة (CVSS 10.0) تسمح بتشغيل أوامر عن بُعد عبر بروتوكول RSC. شُحنت الإصلاحات، ثم وجد الباحثون تبعاتها — DoS عالي الخطورة (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55184">CVE-2025-55184</a>)، وكشف كود مصدري متوسط الخطورة (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55183">CVE-2025-55183</a>)، وDoS إضافية في يناير 2026 (<a href="https://www.cve.org/CVERecord?id=CVE-2026-23864">CVE-2026-23864</a>).</p>
 
@@ -196,7 +196,7 @@
  <li><strong>عامل إصدارات الأمان في الأطر كتحديثات نظام تشغيل.</strong> تبنّت Next.js إيقاعًا أمنيًا شهريًا رسميًا بإشعار مسبق — جدولها ولا تتركها تتأخر.</li>
 </ol>
 
-<h2 id="sec-the-react-foundation-feb-2026-meta-is-no-longer-the-sole-owner">6. مؤسسة React (فبراير 2026): لم تَعُد Meta المالك الوحيد</h2>
+<h2 id="sec-the-react-foundation-feb-2026-meta-is-no-longer-the-sole-owner">مؤسسة React (فبراير 2026): لم تَعُد Meta المالك الوحيد</h2>
 
 <p>في 24 فبراير 2026، أطلِقت <a href="https://react.dev/blog/2026/02/24/the-react-foundation">مؤسسة React</a> تحت Linux Foundation. لم تعد React وReact Native وJSX ملكًا لشركة Meta — بل أصبحت ملكًا للمؤسسة، تديرها لجنة تضمّ ثمانية أعضاء مؤسسين بلاتينيين: <strong>Amazon، وCallstack، وExpo، وHuawei، وMeta، وMicrosoft، وSoftware Mansion، وVercel</strong>. ويتولى Seth Webster دور المدير التنفيذي.</p>
 
@@ -204,13 +204,13 @@
 
 <p>تظل الحوكمة الفنية مستقلة عن المجلس — يحدد المساهمون الاتجاه الفني ويتولى المجلس إدارة الأصول والبنية التحتية. ويحسم مجلس قيادي مؤقت البنية طويلة الأمد، ويستمر تنظيم مؤتمر React Conf.</p>
 
-<h2 id="sec-react-19-2-and-the-framework-routing-era">7. React 19.2 وعصر الأطر والتوجيه</h2>
+<h2 id="sec-react-19-2-and-the-framework-routing-era">React 19.2 وعصر الأطر والتوجيه</h2>
 
-<p>شحن <a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (1 أكتوبر 2025) ثلاث ميزات تغيّر كود يومك: <code>&lt;Activity /&gt;</code> (يحفظ حالة جزء مخفي — يحلّ مشكلة «ابتعدت عن الصفحة وخسرت نموذجي») و<code>useEffectEvent</code> (الحل الموثّق لأنماط «مصفوفة التبعيات تكذب لأنني أريد أحدث الخاصية في المعالج» من §11 في وثيقة التحوّل النموذجي) وReact Performance Tracks (تراكبات أدوات المطوّر تظهر ما أُعاد التصيير ولماذا).</p>
+<p>شحن <a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (1 أكتوبر 2025) ثلاث ميزات تغيّر كود يومك: <code>&lt;Activity /&gt;</code> (يحفظ حالة جزء مخفي — يحلّ مشكلة «ابتعدت عن الصفحة وخسرت نموذجي») و<code>useEffectEvent</code> (الحل الموثّق لأنماط «مصفوفة التبعيات تكذب لأنني أريد أحدث الخاصية في المعالج» من <a href="./class-to-hooks-paradigm-shift.html#sec-why-not-just-use-functional-programming-without-hooks"><a href="#sec-react-19-the-platform-shift">§1</a>1</a> في وثيقة التحوّل النموذجي) وReact Performance Tracks (تراكبات أدوات المطوّر تظهر ما أُعاد التصيير ولماذا).</p>
 
 <p>في الوقت نفسه، تحوّلت توصية React للمشاريع الجديدة: <a href="https://react.dev/blog/2025/02/14/sunsetting-create-react-app">وضعَ Create React App في حالة غروب</a> (14 فبراير 2025) وأعلن بوضوح أن <strong>تطبيقات React الجديدة يجب أن تستخدم إطارًا</strong>. انتهى عصر «مجرد تطبيق Vite React» كبداية افتراضية. النمط أنه «الصعود في المكدس»: نموذج المكونات استقر، والطبقة التالية هي إطار العمل — التوجيه، جلب البيانات، عملية تقسيم الكود، تصيير الخادم، والتخزين.</p>
 
-<h3>7.1 اختيار إطار React بعد CRA</h3>
+<h3>1 اختيار إطار React بعد CRA</h3>
 
 <table>
  <thead><tr><th>عندما تحتاج</th><th>اتجه إليه</th><th>كن حذرًا من</th></tr></thead>
@@ -223,7 +223,7 @@
  </tbody>
 </table>
 
-<h2 id="sec-the-signals-question-and-why-react-didn-t-adopt-them">8. سؤال الإشارات — ولماذا لم تتبنَّها React</h2>
+<h2 id="sec-the-signals-question-and-why-react-didn-t-adopt-them">سؤال الإشارات — ولماذا لم تتبنَّها React</h2>
 
 <p>بحلول 2026، وحّد كل إطار تفاعلي رئيسي آخر على <strong>الإشارات</strong> كأساس وحيد جديد للتفاعلية: Angular (v17+)، وVue 3.5+، وSvelte 5 (runes)، وSolid، وPreact، وحتى Ember. الإشارة خلية تفاعلية فائقة الدقة — عندما تتغيّر قيمتها لا يتحدّث إلا الذي اشترك الدوم فيه لا المكوّن بأكمله. الطرح: تحديثات أسرع ونموذج أبسط — حالة كقيمة مع مشتركين، بدلًا من «أعد تنفيذ المكوّن».
 
@@ -231,7 +231,7 @@
 
 <p>عند قراءة كود في العمل: إن لامست Angular (<code>signal()</code>) أو Vue (<code>ref()</code>) أو Svelte (<code>$state</code>) أو Solid (<code>createSignal</code>) أو Preact (<code>signal()</code>)، تبدو مثل <code>useState</code> لكن تتصرف خلاف ذلك — المكوّن لا يُقدّم مرة أخرى؛ بل يُحدَّث مثل اشتراك الإشارة. لا تترجم 1:1 بين النموذجين؛ اقرأ وثائق كل إطار.</p>
 
-<h2 id="sec-preact-the-structural-branch-that-asks-what-if-react-were-3-5-kb">9. Preact — الفرع الهيكلي الذي طرح سؤال «ماذا لو كانت React 3.5 كيلوبايت؟»</h2>
+<h2 id="sec-preact-the-structural-branch-that-asks-what-if-react-were-3-5-kb">Preact — الفرع الهيكلي الذي طرح سؤال «ماذا لو كانت React 3.5 كيلوبايت؟»</h2>
 
 <p>ظهرت Preact في 2015. إنها تنفيذ منفصل لنفس نموذج المكوّنات — نفس JSX، نفس الخطافات (في النهاية)، نفس النموذج الذهني — لكن قاعدة كود مختلفة الأهداف. السرد الرئيسي الأصلي (ما زال على <a href="https://preactjs.com/about/project-goals">صفحة أهدافها</a>):</p>
 <ul>
@@ -240,7 +240,7 @@
  <li><strong>الوضوح:</strong> قاعدة الكود كاملة قابلة للقراءة في بضع ساعات. React ليست كذلك.</li>
 </ul>
 
-<h3>9.1 لماذا لم تُضمَّم Preact في React?</h3>
+<h3>1 لماذا لم تُضمَّم Preact في React?</h3>
 
 <p>ثلاثة أسباب، هي نفسها التي تبقّي Preact منفصلة في 2026:</p>
 <ol>
@@ -249,24 +249,24 @@
  <li><strong>التوافق حلّ عبر الأدوات.</strong> طبقة <code>preact/compat</code> طبقة الحتمية رقيقة — وجّه المُجمّع إلى <code>preact/compat</code> وستعمل أكثر مكتبات React. يمتص النظام البيئي Preact عبر التوافقية، لا عبر الاندماج.</li>
 </ol>
 
-<h3>9.2 لماذا تزداد Preact أهميةً في 2026</h3>
+<h3>2 لماذا تزداد Preact أهميةً في 2026</h3>
 
 <ul>
  <li><strong>أطر الجزر (Islands).</strong> يدعم Astro Preact كموّرد جزر من الدرجة الأولى — JS قليل للجزر التفاعلية في صفحات ثابتة غالبًا. إذا أضفت 5 كيلو بايت إلى صفحة تسويقية، تلجأ إلى المكتبة بحجم 3.5 لا 35 كيلوبايت.</li>
  <li><strong>بيئات محصورة/بسيطة.</strong> و Web views في التطبيقات الأصلية، وشاشات العرض، وهواتف منخفضة الموارد، وSPAs طرفية حيث يظهر كل كيلو في Core Web Vitals.</li>
 </ul>
 
-<p>تبنّت Preact الإشارات مبكرّا (سبتمبر 2022، <a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals</a>) كإضافة رسمية — دليل على أن على أن رفض React «لا» هو قرارٌ إداري/تصميمي (§8) لا استحالة تقنية.</p>
+<p>تبنّت Preact الإشارات مبكرّا (سبتمبر 2022، <a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals</a>) كإضافة رسمية — دليل على أن على أن رفض React «لا» هو قرارٌ إداري/تصميمي (<a href="#sec-the-signals-question-and-why-react-didn-t-adopt-them">§8</a>) لا استحالة تقنية.</p>
 
-<h3>9.3 قراءة Preact في العمل</h3>
+<h3>3 قراءة Preact في العمل</h3>
 
 <p>الاختلافات التي ستعثر عليها هي بالضبط في صفحة الاختلافات عندها: أسماء سمات DOM أصلية (<code>class</code> و<code>for</code> و <code>stroke-width</code>) و <code>onInput</code> بدل <code>onChange</code> (إلا مع <code>preact/compat</code>)، ويمكن لمكونات الفئة أن تستقبل وسيطات <code>render(props, state)</code>، والأحداث لا تنتشر عبر البوابات (portals). كل شيء آخر — إغلاق، الخطافات، مصفوفات التبعيات، دورة الحياة — يأتي تباعًا من وثيقة التّحوّل النموذجي.</p>
 
-<h3>9.4 هل ستستبدل Preact React؟</h3>
+<h3>4 هل ستستبدل Preact React؟</h3>
 
 <p>لا. الانقسام مستقر لأنه بنيوي لا شكلي: React هي الافتراض متعدد المنصّات الغني بالتحريض والمؤسسة؛ Preact هي الفرع المقتصر على الويب، الأعلى قربًا من مواصفات الويب، وحجمه الصغير. يغلق المترجم الفجوة في إعادة التصيير من أبعاد Preact، لكن لن تتدهور حزمة React إلى حجم Preact — الضريبة متعددة المنصات و RSC قرار مقصود. ومواصفة إدارتها مؤسسة بجانب تنفيذ أصغر يحتفظ به المجتمع — إن كان أكثر استدامة من شركة واحدة تملك الاثنين.</p>
 
-<h2 id="sec-migration-paths-into-react-2024">10. مسارات الترحيل إلى React 2024+</h2>
+<h2 id="sec-migration-paths-into-react-2024">مسارات الترحيل إلى React 2024+</h2>
 
 <table>
  <thead><tr><th>من ← إلى</th><th>المحفّز</th><th>الاستراتيجية</th><th>المخاطرة الرئيسية</th></tr></thead>
@@ -281,59 +281,59 @@
  </tbody>
 </table>
 
-<h2 id="sec-failure-modes">11. أنماط الفشل</h2>
+<h2 id="sec-failure-modes">أنماط الفشل</h2>
 
 <table>
  <thead><tr><th>نمط الفشل</th><th>ماذا يحدث</th><th>الإصلاح</th></tr></thead>
  <tbody>
- <tr><td>اعتماد إجراءات الخادم كأنها داخلية فقط</td><td>لا تحقق أو تصريح؛ إساءة استخدام وفساد البيانات</td><td>عامل كل دالة خادم كنقطة نهاية عامة (§5)</td></tr>
- <tr><td>حد العميل مرتفع جدًا</td><td>الصفحة كلها عميل؛ تضخّم حزمة وفقدان فوائد بيانات الخادم</td><td>ادفع حدود العميل إلى الأوراق (§4.2)</td></tr>
+ <tr><td>اعتماد إجراءات الخادم كأنها داخلية فقط</td><td>لا تحقق أو تصريح؛ إساءة استخدام وفساد البيانات</td><td>عامل كل دالة خادم كنقطة نهاية عامة (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+ <tr><td>حد العميل مرتفع جدًا</td><td>الصفحة كلها عميل؛ تضخّم حزمة وفقدان فوائد بيانات الخادم</td><td>ادفع حدود العميل إلى الأوراق (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.2</a>)</td></tr>
  <tr><td>حدّ الخادم مرتفع جدًا</td><td>مكونات تفاعلية وُضعت على الخادم خطأً؛ فشل hooks/المؤثرات</td><td>انقل المكونات التفاعلية إلى العميل</td></tr>
  <tr><td>تمرير خصائص غير قابلة للتَسلسل عبر حدود RSC</td><td>أخطاء تنفيذ أو سلوكيات مفاجئة</td><td>مرّر خصائص قابلة للتَسلسل؛ واستخدم التركيب بـ <code>children</code></td></tr>
  <tr><td>استخدام السياق في مكونات الخادم</td><td>غير مدعوم</td><td>انقل السياق إلى شجرة العميل</td></tr>
- <tr><td>الثقة الزائدة في المترجم</td><td>يتجاهل المطورون قواعد React</td><td>أبقِ قواعد اللينت؛ اختبرها سلوكيًا (§3)</td></tr>
+ <tr><td>الثقة الزائدة في المترجم</td><td>يتجاهل المطورون قواعد React</td><td>أبقِ قواعد اللينت؛ اختبرها سلوكيًا (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
  <tr><td>تعطيل قواعد اللينت ليمر مع المترجم</td><td>تُدفن الأخطاء الخفية</td><td>أصلح انتهاك القاعدة لا القاعدة ذاتها</td></tr>
- <tr><td>بيانات خادم في مخزن عميل عام</td><td>تكرار، بيانات قديمة، حزمة مبالغ</td><td>مكونات الخادم / تخزين الإطار / طبقة استعلامات (§4.4)</td></tr>
+ <tr><td>بيانات خادم في مخزن عميل عام</td><td>تكرار، بيانات قديمة، حزمة مبالغ</td><td>مكونات الخادم / تخزين الإطار / طبقة استعلامات (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
  <tr><td>الخلط بين RSC و SSR</td><td>نموذج ذهني خاطئ؛ ارتباك في الترطيب (hydration)</td><td>نموذج فصل العمليات: مكونات الخادم تُسلسل الواجهة، لا HTML فقط</td></tr>
  <tr><td>تجاهل تصحيحات الأمنية</td><td>تعرض لثغرات CVE</td><td>ثبّت وراقب وطبّق إصدارات أمان React</td></tr>
- <tr><td>ترقية المترجم دون تروٍّ</td><td>تغيّر سلوك الحفظ يكشف أخطاء خفية</td><td>إصدار محدد، مراجعة سجل التغييرات، إجراء اختبارات شاملة (§3)</td></tr>
- <tr><td>استخدام نماذج إشاراتٍ ذهنيتها داخل React</td><td>توقع تحديثات DOM دقيقة عند عدم توفرها</td><td>افهم نموذج تصيير React و memoization المترجم (§8)</td></tr>
+ <tr><td>ترقية المترجم دون تروٍّ</td><td>تغيّر سلوك الحفظ يكشف أخطاء خفية</td><td>إصدار محدد، مراجعة سجل التغييرات، إجراء اختبارات شاملة (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
+ <tr><td>استخدام نماذج إشاراتٍ ذهنيتها داخل React</td><td>توقع تحديثات DOM دقيقة عند عدم توفرها</td><td>افهم نموذج تصيير React و memoization المترجم (<a href="#sec-the-signals-question-and-why-react-didn-t-adopt-them">§8</a>)</td></tr>
  </tbody>
 </table>
 
-<h2 id="sec-principles">12. مبادئ</h2>
+<h2 id="sec-principles">مبادئ</h2>
 
 <table>
  <thead><tr><th>المبدأ</th><th>المعنى</th></tr></thead>
  <tbody>
- <tr><td>العميل والخادم معالجتان مختلفتان</td><td>RSC قرار حدود فاصل، لا خدعة تنسيق أو SSR (§4)</td></tr>
- <tr><td>المترجم يُؤتمت الحفظ (memoization) لا الصحّة</td><td>قواعد React ما زالت مطلوبة (§3)</td></tr>
- <tr><td>دوال الخادم كنهايات عامة</td><td>تحقق، وصادق، وقيّد النسبة، وراجع (§5)</td></tr>
- <tr><td>الأطر أصبحت سطح React الافتراضي</td><td>التوجيه والبيانات والتخزين والتصيير اهتمامات إطارية (§7)</td></tr>
- <tr><td>React تصبح منصةً تديرها مؤسسة</td><td>الاستقرار وتنسيق النظام البيئي أهم من إلحاح شركة واحدة (§6)</td></tr>
- <tr><td>أبقِ البيانات المملوكة للخادم على الخادم حيث أمكن</td><td>لا تنقل بيانات الخادم للقراءة فقط إلى حالة العميل دون داعٍ (§4.4)</td></tr>
- <tr><td>التفاعلية تعيش على الحافة</td><td>اجعل مكونات العميل صغيرة ورقية قدر الإمكان (§4.2)</td></tr>
- <tr><td>ترقِّ بعناية</td><td>تغييرات المترجم والأمان تتطلب ترقيات منضبطة (§3، §5)</td></tr>
+ <tr><td>العميل والخادم معالجتان مختلفتان</td><td>RSC قرار حدود فاصل، لا خدعة تنسيق أو SSR (<a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>)</td></tr>
+ <tr><td>المترجم يُؤتمت الحفظ (memoization) لا الصحّة</td><td>قواعد React ما زالت مطلوبة (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
+ <tr><td>دوال الخادم كنهايات عامة</td><td>تحقق، وصادق، وقيّد النسبة، وراجع (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+ <tr><td>الأطر أصبحت سطح React الافتراضي</td><td>التوجيه والبيانات والتخزين والتصيير اهتمامات إطارية (<a href="#sec-react-19-2-and-the-framework-routing-era">§7</a>)</td></tr>
+ <tr><td>React تصبح منصةً تديرها مؤسسة</td><td>الاستقرار وتنسيق النظام البيئي أهم من إلحاح شركة واحدة (<a href="#sec-the-react-foundation-feb-2026-meta-is-no-longer-the-sole-owner">§6</a>)</td></tr>
+ <tr><td>أبقِ البيانات المملوكة للخادم على الخادم حيث أمكن</td><td>لا تنقل بيانات الخادم للقراءة فقط إلى حالة العميل دون داعٍ (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
+ <tr><td>التفاعلية تعيش على الحافة</td><td>اجعل مكونات العميل صغيرة ورقية قدر الإمكان (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.2</a>)</td></tr>
+ <tr><td>ترقِّ بعناية</td><td>تغييرات المترجم والأمان تتطلب ترقيات منضبطة (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>، <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
  </tbody>
 </table>
 
-<h2 id="sec-ecosystem-the-tools-worth-naming">13. النظام البيئي — أدوات جديرة بأن تُذكر</h2>
+<h2 id="sec-ecosystem-the-tools-worth-naming">النظام البيئي — أدوات جديرة بأن تُذكر</h2>
 
 <table>
  <thead><tr><th>الطبقة</th><th>الأدوات</th><th>الغرض</th></tr></thead>
  <tbody>
- <tr><td>أطر العمل</td><td>Next.js, React Router, Expo, Astro, Vite</td><td>سطح العرض والتوجيه والنشر (§7)</td></tr>
- <tr><td>أدوات المترجم</td><td><code>babel-plugin-react-compiler</code>، <code>eslint-plugin-react-hooks</code></td><td>الحفظ + تطبيق قواعد React (§3)</td></tr>
+ <tr><td>أطر العمل</td><td>Next.js, React Router, Expo, Astro, Vite</td><td>سطح العرض والتوجيه والنشر (<a href="#sec-react-19-2-and-the-framework-routing-era">§7</a>)</td></tr>
+ <tr><td>أدوات المترجم</td><td><code>babel-plugin-react-compiler</code>، <code>eslint-plugin-react-hooks</code></td><td>الحفظ + تطبيق قواعد React (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
  <tr><td>أدوات المطورين</td><td>React DevTools Performance Tracks، React Scan</td><td>فحص أداء التصيير</td></tr>
- <tr><td>بيانات الخادم/العميل</td><td>TanStack Query, SWR, Apollo, RTK Query</td><td>مزامنة بيانات الخادم مع UI (§4.3)</td></tr>
- <tr><td>حالة العميل</td><td>Zustand, Redux Toolkit, Jotai, Context</td><td>حالة الواجهة التفاعلية (§4.4)</td></tr>
+ <tr><td>بيانات الخادم/العميل</td><td>TanStack Query, SWR, Apollo, RTK Query</td><td>مزامنة بيانات الخادم مع UI (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.3</a>)</td></tr>
+ <tr><td>حالة العميل</td><td>Zustand, Redux Toolkit, Jotai, Context</td><td>حالة الواجهة التفاعلية (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
  <tr><td>الاختبار</td><td>Vitest/Jest, Testing Library, Playwright</td><td>اختبار مكوّن/تكامل/من طرف إلى طرف</td></tr>
- <tr><td>تحقق من الحدود الفاصلة</td><td>Zod/Typebox/Valibot + TypeScript</td><td>تحقق مدخلات دوال الخادم (§5)</td></tr>
- <tr><td>سلسلة العرض</td><td>تدقيق التبعيات، ملفات القفل، متابعة CVE</td><td>أمن سلسة التوريد (§5)</td></tr>
+ <tr><td>تحقق من الحدود الفاصلة</td><td>Zod/Typebox/Valibot + TypeScript</td><td>تحقق مدخلات دوال الخادم (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+ <tr><td>سلسلة العرض</td><td>تدقيق التبعيات، ملفات القفل، متابعة CVE</td><td>أمن سلسة التوريد (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
  </tbody>
 </table>
 
-<h2 id="sec-the-future-signals-to-watch">14. المستقبل — إشارات تحمل المراقبة</h2>
+<h2 id="sec-the-future-signals-to-watch">المستقبل — إشارات تحمل المراقبة</h2>
 
 <table>
  <thead><tr><th>الإشارة</th><th>ماذا تعني</th></tr></thead>
@@ -347,21 +347,21 @@
  </tbody>
 </table>
 
-<h2 id="sec-summary-checklist">15. قائمة التحقق النهائية</h2>
+<h2 id="sec-summary-checklist">قائمة التحقق النهائية</h2>
 
 <table>
  <thead><tr><th>السؤال</th><th>التحقق</th></tr></thead>
  <tbody>
- <tr><td>هل هذا المكوّن عميل أم خادم؟</td><td>الحدود الفاصلة واضحة (§4)</td></tr>
+ <tr><td>هل هذا المكوّن عميل أم خادم؟</td><td>الحدود الفاصلة واضحة (<a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>)</td></tr>
  <tr><td>هل يحتاج خطافات/مؤثرات/واجهات متصفح؟</td><td>إن كان كذلك، فهو عميل</td></tr>
  <tr><td>هل البيانات للخادم ولقراءة فقط؟</td><td>يُفضَّل مكوّن خادم</td></tr>
  <tr><td>هل تُتحقق دوال الخادم وتُصادق؟</td><td>نعم — عاملها كنقاط نهاية</td></tr>
- <tr><td>هل الخصائص العابرة لحدود RSC قابلة للتسلسل؟</td><td>نعم (§4.1)</td></tr>
- <tr><td>هل المترجم مبثّت بدقة ومختبر؟</td><td>نعم (§3)</td></tr>
- <tr><td>هل قواعد اللينت تطبّق قواعد React؟</td><td>نعم (§3)</td></tr>
- <tr><td>هل اختيار الإطار مقصود؟</td><td>Next/React Router/Expo/Vite/Astro (§7)</td></tr>
- <tr><td>هل سلوك التخزين مفهوم؟</td><td>طلب / موجّه / بيانات / HTTP (§4.3)</td></tr>
- <tr><td>هل إيقاع الترقي والأمن محدَّد؟</td><td>نعم (§5)</td></tr>
+ <tr><td>هل الخصائص العابرة لحدود RSC قابلة للتسلسل؟</td><td>نعم (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.1</a>)</td></tr>
+ <tr><td>هل المترجم مبثّت بدقة ومختبر؟</td><td>نعم (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
+ <tr><td>هل قواعد اللينت تطبّق قواعد React؟</td><td>نعم (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
+ <tr><td>هل اختيار الإطار مقصود؟</td><td>Next/React Router/Expo/Vite/Astro (<a href="#sec-react-19-2-and-the-framework-routing-era">§7</a>)</td></tr>
+ <tr><td>هل سلوك التخزين مفهوم؟</td><td>طلب / موجّه / بيانات / HTTP (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.3</a>)</td></tr>
+ <tr><td>هل إيقاع الترقي والأمن محدَّد؟</td><td>نعم (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
  </tbody>
 </table>
 
