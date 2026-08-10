@@ -23,7 +23,7 @@
   <p>"The real programming is in system design." This doc captures what that means. System Design is neither the product discovery of Design Thinking nor the component loop of the developer. It is the <strong>architectural layer</strong> that translates a validated problem into a structured solution — defining services, data ownership, consistency boundaries, failure modes, and the seams where components meet. It operates at two scales simultaneously: <em>architectural</em> (macro: services, events, scaling) and <em>component</em> (micro: bounded contexts, API contracts, trust boundaries). Both are system design; neither is complete without the other.</p>
 </section>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone. Cross-links:</p>
 <ul>
@@ -57,7 +57,7 @@
 
 ---
 
-<h2 id="sec-definition-what-system-design-is-and-what-it-is-not">1. Definition — what system design <em>is</em> and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-system-design-is-and-what-it-is-not">Definition — what system design <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 
@@ -90,7 +90,7 @@
 
 ---
 
-<h2 id="sec-history-from-flowcharts-to-distributed-systems">2. History — from flowcharts to distributed systems</h2>
+<h2 id="sec-history-from-flowcharts-to-distributed-systems">History — from flowcharts to distributed systems</h2>
 
 <table>
   <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
@@ -172,7 +172,7 @@
 
 ---
 
-<h2 id="sec-evolution-paradigms-through-one-lens">3. Evolution — paradigms through one lens</h2>
+<h2 id="sec-evolution-paradigms-through-one-lens">Evolution — paradigms through one lens</h2>
 
 <p>Each era's primary constraint produced its system design. When the constraint inverted, the design bets inverted with it — the same pattern documented in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>.</p>
 
@@ -232,7 +232,7 @@
 
 <p>The arc: <strong>constraint changes → old design bet conflicts → new design bet inverts</strong>. Monolith inverted to microservices (deployment autonomy > hardware cost). SOA inverted to microservices (team autonomy > reuse). Microservices are inverting to edge/stateful-functions (latency > operational simplicity). Each inversion leaves a legacy layer that still works for its constraint.</p>
 
-<h2 id="sec-migration-paths-between-architectures">3b. Migration paths between architectures</h2>
+<h2 id="sec-migration-paths-between-architectures">Migration paths between architectures</h2>
 
 <p>Architecture migrations are rarely greenfield. They are incremental extractions, strangler figs, and parallel runs:</p>
 
@@ -287,11 +287,11 @@
   </tbody>
 </table>
 
-<p><strong>Anti-pattern:</strong> Big-bang cutover. Every row above uses strangler fig, parallel run, or incremental extraction. The architecture table in §3 shows <em>centers of gravity</em> — not mutually exclusive states.</p>
+<p><strong>Anti-pattern:</strong> Big-bang cutover. Every row above uses strangler fig, parallel run, or incremental extraction. The architecture table in <a href="#sec-evolution-paradigms-through-one-lens">§3</a> shows <em>centers of gravity</em> — not mutually exclusive states.</p>
 
 ---
 
-<h2 id="sec-intersection-with-neighbors">4. Intersection with neighbors</h2>
+<h2 id="sec-intersection-with-neighbors">Intersection with neighbors</h2>
 
 <table>
   <thead><tr><th>Discipline</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
@@ -351,7 +351,7 @@
 
 ---
 
-<h2 id="sec-underlying-theory-what-makes-a-system-designed-not-assembled">5. Underlying theory — what makes a system designed not assembled</h2>
+<h2 id="sec-underlying-theory-what-makes-a-system-designed-not-assembled">Underlying theory — what makes a system designed not assembled</h2>
 
 <p>System Design rests on a handful of proven results. Each one <em>forces</em> a decision; you cannot "work around" them.</p>
 
@@ -401,7 +401,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-mental-models-how-architects-actually-reason">5b. Mental models — how architects actually reason</h2>
+<h2 id="sec-mental-models-how-architects-actually-reason">Mental models — how architects actually reason</h2>
 
 <p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model is a compression of the theories for a specific decision context:</p>
 
@@ -451,7 +451,7 @@
 
 ---
 
-<h2 id="sec-architectural-layer-macro-patterns-with-consequences">6. Architectural layer (macro) — patterns with consequences</h2>
+<h2 id="sec-architectural-layer-macro-patterns-with-consequences">Architectural layer (macro) — patterns with consequences</h2>
 
 <h3>Microservices vs Monolith — the decision matrix</h3>
 
@@ -520,9 +520,9 @@
 
 ---
 
-<h2 id="sec-capacity-planning-how-to-estimate-load-storage-and-latency">6b. Capacity planning — how to estimate load, storage, and latency</h2>
+<h2 id="sec-capacity-planning-how-to-estimate-load-storage-and-latency">Capacity planning — how to estimate load, storage, and latency</h2>
 
-<p>Capacity planning is not perfect prediction. It is choosing an architecture that survives uncertainty — the discipline that turns §9's back-of-envelope numbers into a repeatable process.</p>
+<p>Capacity planning is not perfect prediction. It is choosing an architecture that survives uncertainty — the discipline that turns <a href="#sec-worked-example-design-a-url-shortener">§9</a>'s back-of-envelope numbers into a repeatable process.</p>
 
 <h3>Capacity planning process</h3>
 
@@ -566,9 +566,9 @@
 
 <p><strong>The rule:</strong> if the capacity model can't fit on one page, the architecture is too complex to reason about under load. The model is a decision-support artifact, not a spreadsheet for its own sake.</p>
 
-<h2 id="sec-data-architecture-storage-partitioning-replication-and-evolution">6c. Data architecture — storage, partitioning, replication, and evolution</h2>
+<h2 id="sec-data-architecture-storage-partitioning-replication-and-evolution">Data architecture — storage, partitioning, replication, and evolution</h2>
 
-<p>Data ownership (§7) says <em>who</em> writes; data architecture says <em>how it is stored, partitioned, replicated, and evolved</em>. Choose storage by access pattern, not by popularity.</p>
+<p>Data ownership (<a href="#sec-component-layer-micro-where-system-design-meets-code">§7</a>) says <em>who</em> writes; data architecture says <em>how it is stored, partitioned, replicated, and evolved</em>. Choose storage by access pattern, not by popularity.</p>
 
 <h3>Storage decision matrix</h3>
 
@@ -621,13 +621,13 @@
   <li><strong>Dual writing</strong> for migrations — write to both old and new representations until the switchover.</li>
   <li><strong>Backfills</strong> run as background jobs with checkpoints; they fail mid-way and must resume.</li>
   <li><strong>Online migrations</strong> (pgroll, gh-ost) beat downtime migrations for any always-on system.</li>
-  <li>Define <strong>retention</strong> up front — storage growth is a capacity and cost decision (§6b, cost row).</li>
+  <li>Define <strong>retention</strong> up front — storage growth is a capacity and cost decision (<a href="#sec-capacity-planning-how-to-estimate-load-storage-and-latency">§6b</a>, cost row).</li>
   <li>Treat <strong>irreversible data changes</strong> (deletes, rewrites) as one-way doors needing an ADR.</li>
 </ul>
 
-<h2 id="sec-caching-architecture-where-to-cache-what-to-cache-and-how-to-invalidate">6d. Caching architecture — where to cache, what to cache, and how to invalidate</h2>
+<h2 id="sec-caching-architecture-where-to-cache-what-to-cache-and-how-to-invalidate">Caching architecture — where to cache, what to cache, and how to invalidate</h2>
 
-<p>Caching is a scaling lever in §6; here it becomes a design discipline. Every cache is a copy of data with a <strong>staleness contract</strong> — the question is always "how stale is acceptable?"</p>
+<p>Caching is a scaling lever in <a href="#sec-architectural-layer-macro-patterns-with-consequences">§6</a>; here it becomes a design discipline. Every cache is a copy of data with a <strong>staleness contract</strong> — the question is always "how stale is acceptable?"</p>
 
 <h3>Cache levels</h3>
 
@@ -668,9 +668,9 @@
   <li><strong>Caching unauthorized or personalized data</strong> — the most serious: data leaks across tenants/users. Never cache at a layer that skips authorization (<a href="./how-developers-think-frontend.html">see Developer Loop §13c</a> for the same warning).</li>
 </ul>
 
-<h2 id="sec-event-and-queue-reliability-the-operational-layer-under-async">6e. Event and queue reliability — the operational layer under async</h2>
+<h2 id="sec-event-and-queue-reliability-the-operational-layer-under-async">Event and queue reliability — the operational layer under async</h2>
 
-<p>§10's event-driven example is the happy path. Event systems earn their complexity in these details — without them, async delivery is silent data loss.</p>
+<p><a href="#sec-worked-example-design-an-event-driven-order-system">§10</a>'s event-driven example is the happy path. Event systems earn their complexity in these details — without them, async delivery is silent data loss.</p>
 
 <table>
   <thead><tr><th>Concern</th><th>Pattern</th></tr></thead>
@@ -690,12 +690,12 @@
 </table>
 
 <blockquote class="callout">
-  <p><strong>The outbox pattern.</strong> When a service writes to its database <em>and</em> must emit an event, do both atomically: write the event row into an <strong>outbox table</strong> in the same transaction as the business write. A relay publishes outbox rows to the broker. It prevents the classic failure — "database updated, event never sent" — the exact scenario that silently breaks the inventory/order consistency in §10.</p>
+  <p><strong>The outbox pattern.</strong> When a service writes to its database <em>and</em> must emit an event, do both atomically: write the event row into an <strong>outbox table</strong> in the same transaction as the business write. A relay publishes outbox rows to the broker. It prevents the classic failure — "database updated, event never sent" — the exact scenario that silently breaks the inventory/order consistency in <a href="#sec-worked-example-design-an-event-driven-order-system">§10</a>.</p>
 </blockquote>
 
 <p><strong>The rule:</strong> an event system is production-ready only when every message can be accounted for — consumed, dead-lettered, or replayable. If an event can vanish silently, the architecture is incomplete.</p>
 
-<h2 id="sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">6f. Reliability and disaster recovery — SLOs, degradation, and recovery</h2>
+<h2 id="sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">Reliability and disaster recovery — SLOs, degradation, and recovery</h2>
 
 <p>A reliable system is not one that never fails. It is one that <em>fails in controlled, observable, recoverable ways</em>.</p>
 
@@ -710,7 +710,7 @@
     <tr><td>Error budget</td><td>Allowed unreliability — when it's spent, reliability work outranks features</td></tr>
     <tr><td>RPO</td><td>Recovery Point Objective — maximum acceptable data loss</td></tr>
     <tr><td>RTO</td><td>Recovery Time Objective — maximum acceptable downtime</td></tr>
-    <tr><td>Blast radius</td><td>What fails when one part fails (§5b failure domains)</td></tr>
+    <tr><td>Blast radius</td><td>What fails when one part fails (<a href="#sec-mental-models-how-architects-actually-reason">§5b</a> failure domains)</td></tr>
     <tr><td>Graceful degradation</td><td>What still works during partial failure</td></tr>
   </tbody>
 </table>
@@ -749,7 +749,7 @@
 
 <h3>Incident response — runbooks, on-call, and the postmortem</h3>
 
-<p>Detection is designed (§6g); response is a <em>process</em>, and it must exist before the first alert fires. The loop:</p>
+<p>Detection is designed (<a href="#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>); response is a <em>process</em>, and it must exist before the first alert fires. The loop:</p>
 
 <table>
   <thead><tr><th>Phase</th><th>What happens</th><th>The discipline</th></tr></thead>
@@ -771,14 +771,14 @@
   <li><strong>Retry budgets</strong> — cap total retries; unbounded retries become cascading load.</li>
   <li><strong>Exponential backoff with jitter</strong> — prevents thundering-herd retry storms.</li>
   <li><strong>Circuit breakers</strong> — fail fast to a broken dependency instead of piling onto it.</li>
-  <li><strong>Bulkheads</strong> — isolate thread pools/connections per dependency (§6 failure patterns).</li>
+  <li><strong>Bulkheads</strong> — isolate thread pools/connections per dependency (<a href="#sec-architectural-layer-macro-patterns-with-consequences">§6</a> failure patterns).</li>
   <li><strong>Load shedding</strong> — drop low-value work (analytics, non-critical reads) before it takes down critical paths.</li>
   <li><strong>Rate limiting</strong> — per-client and per-service caps.</li>
   <li><strong>Queue backpressure</strong> — when producers outpace consumers, let the queue signal back instead of buffering forever.</li>
   <li><strong>Cancellation propagation</strong> — when a caller gives up, cancel downstream work so it doesn't keep burning resources.</li>
 </ul>
 
-<h2 id="sec-observability-designing-systems-that-can-be-understood-in-production">6g. Observability — designing systems that can be understood in production</h2>
+<h2 id="sec-observability-designing-systems-that-can-be-understood-in-production">Observability — designing systems that can be understood in production</h2>
 
 <p>Observability is not "add logs later." It is an architectural requirement with a name: if a failure cannot be seen, localized, and reproduced, the architecture is not operationally complete.</p>
 
@@ -797,13 +797,13 @@
 <h3>Architectural requirements</h3>
 
 <ul>
-  <li><strong>Correlation IDs</strong> propagated through every request and event — one ID ties logs, traces, and metrics to a single journey (§10 does this for orders).</li>
+  <li><strong>Correlation IDs</strong> propagated through every request and event — one ID ties logs, traces, and metrics to a single journey (<a href="#sec-worked-example-design-an-event-driven-order-system">§10</a> does this for orders).</li>
   <li><strong>Structured logs</strong> (JSON), not free text — searchable, filterable, machine-parseable.</li>
   <li><strong>Trace propagation</strong> (OpenTelemetry) across every service boundary — a trace that stops at one service is a localization failure.</li>
   <li><strong>Dependency health</strong> — each service reports the state of the services it calls (the failure domain map, made visible).</li>
   <li><strong>Queue lag, cache hit ratio, saturation</strong> — the metrics that predict problems before users feel them.</li>
   <li><strong>Business metrics</strong> — checkouts, signups, payments. Technical health alone can't prove the product works.</li>
-  <li><strong>Alerts tied to user impact</strong> — noisy alerts get ignored; SLO-burn alerting (§6f) ties alarms to the error budget.</li>
+  <li><strong>Alerts tied to user impact</strong> — noisy alerts get ignored; SLO-burn alerting (<a href="#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>) ties alarms to the error budget.</li>
   <li><strong>Dashboards per service and per critical journey</strong> — a green service can still have a broken journey.</li>
 </ul>
 
@@ -813,7 +813,7 @@
 
 ---
 
-<h2 id="sec-component-layer-micro-where-system-design-meets-code">7. Component layer (micro) — where system design meets code</h2>
+<h2 id="sec-component-layer-micro-where-system-design-meets-code">Component layer (micro) — where system design meets code</h2>
 
 <p>This layer is the direct upstream of the <a href="./how-developers-think-frontend.html">developer loop</a>. Every component the developer builds lives inside a boundary defined here.</p>
 
@@ -894,7 +894,7 @@
 
 ---
 
-<h2 id="sec-why-it-is-a-method-not-an-algorithm">8. Why it is a method, not an algorithm</h2>
+<h2 id="sec-why-it-is-a-method-not-an-algorithm">Why it is a method, not an algorithm</h2>
 
 <p>Like the developer loop and Design Thinking, System Design is not an algorithm. But the <em>reason</em> is different:</p>
 
@@ -920,7 +920,7 @@
 
 ---
 
-<h2 id="sec-worked-example-design-a-url-shortener">9. Worked example — "Design a URL Shortener"</h2>
+<h2 id="sec-worked-example-design-a-url-shortener">Worked example — "Design a URL Shortener"</h2>
 
 <p>The canonical system-design interview question, walked through both layers.</p>
 
@@ -1012,7 +1012,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-worked-example-design-an-event-driven-order-system">10. Worked example — "Design an Event-Driven Order System"</h2>
+<h2 id="sec-worked-example-design-an-event-driven-order-system">Worked example — "Design an Event-Driven Order System"</h2>
 
 <p>Shows when you <em>don't</em> pick a CRUD monolith.</p>
 
@@ -1069,7 +1069,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-methodologies-heuristics">11. Methodologies / heuristics</h2>
+<h2 id="sec-methodologies-heuristics">Methodologies / heuristics</h2>
 
 <table>
   <thead><tr><th>Approach</th><th>What it gives you</th><th>Origin</th></tr></thead>
@@ -1106,7 +1106,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-common-failure-modes">12. Common failure modes</h2>
+<h2 id="sec-common-failure-modes">Common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Root cause</th></tr></thead>
@@ -1151,7 +1151,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">13. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The system design discipline is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -1225,7 +1225,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-the-future-where-system-design-is-going">14. The future — where system design is going</h2>
+<h2 id="sec-the-future-where-system-design-is-going">The future — where system design is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for system design</th></tr></thead>
@@ -1259,7 +1259,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-summary-the-architectural-checklist">15. Summary — the architectural checklist</h2>
+<h2 id="sec-summary-the-architectural-checklist">Summary — the architectural checklist</h2>
 
 <p>Before any code is written for a new domain, verify:</p>
 
@@ -1275,11 +1275,11 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
     <tr><td>Is idempotency designed into every mutating endpoint?</td><td>Stop. Retries will corrupt state.</td></tr>
     <tr><td>Does the service topology match the team topology (Conway)?</td><td>Stop. Org/arch mismatch = friction forever.</td></tr>
     <tr><td>Are the architectural decisions recorded as ADRs?</td><td>Stop. Oral tradition loses context in 6 months.</td></tr>
-    <tr><td>Does every mutating endpoint have an idempotency key and a retry budget?</td><td>Stop. Retries will corrupt state (§6e).</td></tr>
-    <tr><td>Is there a dead-letter queue and a replay path for every event stream?</td><td>Stop. Silent event loss is undetectable data corruption (§6e).</td></tr>
-    <tr><td>Are SLOs defined and tied to user impact, with error-budget alerting?</td><td>Stop. No SLO = no agreed definition of "working" (§6f).</td></tr>
-    <tr><td>Is the failure visible, localizable, and reproducible (correlation IDs, traces, structured logs)?</td><td>Stop. An unobservable system is not operationally complete (§6g).</td></tr>
-    <tr><td>Is storage chosen by access pattern, with a schema-evolution path?</td><td>Stop. The familiar database that doesn't fit the pattern becomes a bottleneck (§6c).</td></tr>
+    <tr><td>Does every mutating endpoint have an idempotency key and a retry budget?</td><td>Stop. Retries will corrupt state (<a href="#sec-event-and-queue-reliability-the-operational-layer-under-async">§6e</a>).</td></tr>
+    <tr><td>Is there a dead-letter queue and a replay path for every event stream?</td><td>Stop. Silent event loss is undetectable data corruption (<a href="#sec-event-and-queue-reliability-the-operational-layer-under-async">§6e</a>).</td></tr>
+    <tr><td>Are SLOs defined and tied to user impact, with error-budget alerting?</td><td>Stop. No SLO = no agreed definition of "working" (<a href="#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>).</td></tr>
+    <tr><td>Is the failure visible, localizable, and reproducible (correlation IDs, traces, structured logs)?</td><td>Stop. An unobservable system is not operationally complete (<a href="#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>).</td></tr>
+    <tr><td>Is storage chosen by access pattern, with a schema-evolution path?</td><td>Stop. The familiar database that doesn't fit the pattern becomes a bottleneck (<a href="#sec-data-architecture-storage-partitioning-replication-and-evolution">§6c</a>).</td></tr>
   </tbody>
 </table>
 
