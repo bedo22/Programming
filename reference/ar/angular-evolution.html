@@ -24,7 +24,23 @@
   <p>التباين الرئيسي: حيث نقلت رياكت التفاعلية من حقول المثيل إلى ترتيب استدعاء الدوال (الخطافات)، نقلتها Angular من دورة البث (zone.js) إلى اشتراكات دقيقة (الإشارات). نفس الاتجاه — مراقبة أضيق — آلية مختلفة.</p>
 </section>
 
-<h2>0. ثلاثة عصور — خط زمني</h2>
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذا المستند</h2>
+
+<p><strong>النطاق.</strong> يغطي هذا المستند تطور النموذج الذهني لـ Angular: AngularJS، وAngular 2+، وAngular الحديثة (الإشارات، standalone، بلا مناطق). غرضه أن يساعدك على التعرف على أي عصر تنتمي إليه قاعدة كود Angular وفهم لماذا تغير نموذج الحالة والتفاعلية في Angular.</p>
+
+<p><strong>ما ليس عليه.</strong> ليس برنامجاً تعليمياً لـ Angular (لا جولة في كتابة المكونات)، وليس مستند رياكت، وليس مسحاً كاملاً لأطر الواجهات الأمامية. دواخل رياكت في <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a> و<a href="./react-2024-and-beyond.html">رياكت 2024 وما بعدها</a>؛ والمنظر الأوسع في <a href="./frontend-camps-survey.html">مسح المعسكرات</a>. هذا المستند يملك تطور Angular فقط.</p>
+
+<p><strong>ترتيب القراءة.</strong> اقرأ <a href="#sec-the-three-eras-a-timeline">§٢</a>–<a href="#sec-era-3-modern-angular-2023present-signals-standalone-zoneless">§٨</a> للقوس، و<a href="#sec-mental-models-how-to-think-in-each-era">§٩</a>–<a href="#sec-why-angular-didn-t-follow-react-s-hooks-path">§١١</a> للنماذج الذهنية، و<a href="#sec-signals-vs-rxjs-which-tool-for-which-job">§١٢</a>–<a href="#sec-migration-paths">§١٥</a> للقراءة العملية والهجرة، و<a href="#sec-worked-example-a-counter-across-the-eras">§١٦</a>–<a href="#sec-principles">§١٨</a> للمثال المحلول وأنماط الفشل والمبادئ، ثم <a href="#sec-ecosystem-and-tooling-catalog">§١٩</a>–<a href="#sec-summary-checklist">§٢١</a> كمرجع. إذا كان لديك خمس دقائق فقط، فاقرأ <a href="#sec-evolution-the-constraint-inversions">§٣</a> (انعكاسات القيود) و<a href="#sec-mental-models-how-to-think-in-each-era">§٩</a> (النماذج الذهنية).</p><h2 id="sec-definition-what-angular-evolution-is">تعريف — ما هو تطور Angular</h2>
+
+<p>تطور Angular هو تاريخ إطار يتفرج أقل. كل عصر أبقى الطموح نفسه — واجهة تصريحية متزامنة مع الحالة — وغيّر <em>كيف يكتشف الإطار تغير الحالة</em>:</p>
+
+<ul>
+  <li>AngularJS راقب شجرة <code>$scope</code> كلها بالقوة الغاشمة (التحقق المتسخ).</li>
+  <li>Angular 2+ راقب كل مكون بعد كل حدث غير متزامن (بث zone.js).</li>
+  <li>Angular الحديثة تراقب رسم تبعيات الإشارة فقط (اشتراكات دقيقة الحبيبات).</li>
+</ul>
+
+<p>الأطروحة المركزية على طول الطريق: <strong>Angular ورياكت تحركا في الاتجاه نفسه — تفاعلية أضيق — عبر آليتين مختلفتين.</strong> رياكت ضيّقت محاسبة المطور (خطافات ← مصفوفات تبعيات ← مترجم)؛ Angular ضيّقت مراقبة الإطار (digest ← بث ← رسم إشارات). لا أحد منهما "متقدم"؛ كل منهما حل كلفة تصميمه الأصلي الخاص.</p><h2 id="sec-the-three-eras-a-timeline">ثلاثة عصور — خط زمني</h2>
 
 <p>Angular ليس إطار عمل واحداً. إنه ثلاثة أطر عمل بنفس الاسم — كل واحد يعيد كتابة نموذج الحالة والتفاعلية من الصفر. العصور:</p>
 
@@ -39,7 +55,54 @@
 
 <p>النمط: كل عصر وسّع تجربة المطوّر وضيّق ما كان على الإطار مراقبته. AngularJS راقب كل شيء في شجرة $scope (مكلف). Angular 2+ راقب كل المكونات عند كل حدث غير متزامن (أقل كلفة لكن لا يزال واسعاً). الإشارات تراقب فقط رسم تبعيات الإشارة (أقل ما يمكن). لرياكت نفس الاتجاه لكن آلية مختلفة: بدلاً من تضييق المراقب، ضيّقت رياكت وعي المكون بما تغير (من <code>setState</code> إلى مصفوفات التبعيات إلى استنتاج المترجم).</p>
 
-<h2>1. العصر 1 — AngularJS (2010–2016): التحقق المتسخ و $scope</h2>
+<h2 id="sec-evolution-the-constraint-inversions">التطور — انعكاسات القيود</h2>
+
+<p>كل عصر حل كلفةً خلقها العصر السابق. اقرأ القوس كانعكاسات:</p>
+
+<table>
+  <thead><tr><th>الانعكاس</th><th>قبل</th><th>بعد</th><th>ما الذي تغير</th></tr></thead>
+  <tbody>
+    <tr><td>المزامنة اليدوية ← بث الإطار</td><td>المطورون يطلقون التحديثات يدوياً (أو يعتمدون على <code>$scope.$apply</code>)</td><td>Zone.js اعترض الأحداث غير المتزامنة</td><td>Angular أزالت استدعاءات "الإشعار" الصريحة لكنها دفعت كلفة مسح الشجرة</td></tr>
+    <tr><td>تطبيقات صغيرة ← كبيرة</td><td>التحقق المتسخ في AngularJS</td><td>الحاجة إلى كشف تغير قابل للتنبؤ</td><td>عدد المراقبين وكلفة digest أصبحا لا يُحتملان عند الكبر</td></tr>
+    <tr><td>البث ← كشف مضيّق</td><td>Zone.js يفحص على نطاق واسع</td><td>OnPush + مدخلات غير قابلة للتغيير</td><td>الفرق احتاجت تقليص الفحوص غير الضرورية يدوياً</td></tr>
+    <tr><td>التضييق اليدوي ← التتبع التلقائي</td><td>انضباط OnPush</td><td>رسم تبعيات الإشارات</td><td>الإطار صار يعرف بدقة ما يعتمد على ماذا</td></tr>
+    <tr><td>ترقيع وقت التشغيل ← جدولة صريحة</td><td>ترقيع قردة zone.js</td><td>كشف تغير بلا مناطق</td><td>زمن تشغيل أصغر ونموذج تنفيذ أوضح</td></tr>
+    <tr><td>حقول كلاس + RxJS ← بدائيات تفاعلية</td><td>حقول قابلة للتغيير وسباكة قابلة للملاحظة</td><td><code>signal()</code>، <code>computed()</code>، <code>effect()</code></td><td>التفاعلية صارت مدمجة في الإطار</td></tr>
+  </tbody>
+</table>
+
+<p>تاريخ Angular هو تاريخ تضييق كشف التغيير:</p>
+
+<blockquote class="callout">
+  <p>AngularJS راقبت شجرة النطاق كلها ← Angular 2+ راقبت شجرة المكونات بعد كل حدث غير متزامن ← OnPush ضيّق الكشف بفحوصات المرجع ← الإشارات ضيّقت الكشف إلى رسم التبعيات ← بلا مناطق يزيل محرك البث كله.</p>
+</blockquote><h2 id="sec-intersection-with-the-rest-of-the-shelf">التقاطع مع بقية الرف</h2>
+
+<table>
+  <thead><tr><th>الجار</th><th>العلاقة</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a></td><td>قوس رياكت الموازي؛ قارن الخطافات مقابل الإشارات (<a href="./class-to-hooks-paradigm-shift.html#sec-what-is-state-a-prequel-before-we-can-talk-about-react-s-choices">§٢.٩ هناك</a>)</td></tr>
+    <tr><td><a href="./react-2024-and-beyond.html">react-2024-and-beyond</a></td><td>سبب رياكت في عدم تبني الإشارات؛ المترجم مقابل الإشارات</td></tr>
+    <tr><td><a href="./frontend-camps-survey.html">frontend-camps-survey</a></td><td>مكانة Angular في المنظر الأمامي الأوسع</td></tr>
+    <tr><td><a href="./javascript-across-stacks.html">javascript-across-stacks</a></td><td>تحول TypeScript والمنافسة على مستوى اللغة</td></tr>
+    <tr><td><a href="./what-is-state-prequel.html">what-is-state-prequel</a></td><td>النظرية العامة للحالة؛ Angular قصة تنفيذ واحدة منها</td></tr>
+  </tbody>
+</table><h2 id="sec-underlying-theory-what-makes-angular-s-reactivity-work">النظرية الأساسية — ما الذي يجعل تفاعلية Angular تعمل</h2>
+
+<table>
+  <thead><tr><th>النظرية / الآلية</th><th>ماذا تفسر</th></tr></thead>
+  <tbody>
+    <tr><td>التحقق المتسخ</td><td>قارن القيم الحالية والسابقة حتى الاستقرار</td></tr>
+    <tr><td>دورة digest</td><td>كرر الفحوص حتى لا يبلغ أي مراقب عن تغيير</td></tr>
+    <tr><td>Zone.js</td><td>اعترض الأحداث غير المتزامنة وأبلغ الإطار</td></tr>
+    <tr><td>شجرة كشف التغيير</td><td>Angular تمشي شجرة المكونات لفحص الربط</td></tr>
+    <tr><td>استراتيجية OnPush</td><td>افحص مكوناً فقط عندما تتغير مدخلاته بالمرجع أو ينشأ حدث داخله</td></tr>
+    <tr><td>رسم تبعيات الإشارات</td><td>قراءة إشارة داخل سياق تفاعلي تنشئ اشتراكاً</td></tr>
+    <tr><td>الإشارات المحسوبة</td><td>قيم مشتقة كسولة تبطل عند تغير تبعياتها</td></tr>
+    <tr><td>التأثيرات</td><td>آثار جانبية تعيد العمل عند تغير التبعيات المتعقبة</td></tr>
+    <tr><td>حقن الاعتماديات</td><td>بناء الكائنات ومدة حياتها يديرها تسلسل الحقن</td></tr>
+    <tr><td>ترجمة القوالب</td><td>قوالب Angular تُترجم إلى تعليمات محسنة</td></tr>
+  </tbody>
+</table><h2 id="sec-era-1-angularjs-20102016-dirty-checking-and-scope">العصر 1 — AngularJS (2010–2016): التحقق المتسخ و $scope</h2>
 
 <p>أُطلق AngularJS في 2010 بواسطة Miško Hevery، حلّاً لنفس مشكلة Backbone و Ember: جعل تطبيقات الويب الديناميكية قابلة للإدارة بهيكل. عرضه كان "Model-View-Whatever" — تضع البيانات في كائن <code>$scope</code>، و Angular يزامنها مع قالب HTML تلقائياً.</p>
 
@@ -82,7 +145,7 @@
 
 <p>قرر فريق Angular: الحل هو إعادة كتابة. ليست ترقية — إعادة كتابة من الصفر، مع TypeScript، نظام وحدات حقيقي، ونموذج تفاعلية مختلف تماماً.</p>
 
-<h2>2. العصر 2 — Angular 2+ (2016–2023): الكلاسات، TypeScript، zone.js</h2>
+<h2 id="sec-era-2-angular-2-20162023-classes-typescript-zone-js">العصر 2 — Angular 2+ (2016–2023): الكلاسات، TypeScript، zone.js</h2>
 
 <p>Angular 2 (2016) كان إعادة كتابة كاملة. نفس الفريق، نفس الشركة، نفس مجال المشكلة — لكن كل شيء جديد: TypeScript أولاً، مكونات كلاسية مع مزينات، حقن تبعيات، نظام وحدات حقيقي (NgModules)، و zone.js كمحرك تفاعلية.</p>
 
@@ -143,7 +206,7 @@ export class ChildComponent {
 
 <p>نفس التوتر كان موجوداً في عصر الكلاسات في رياكت: <code>componentDidUpdate</code> + <code>setState</code> عملا، لكن معرفة متى ولماذا أعيد تصيير مكون تطلب تنميطاً يدوياً. حل رياكت كان الخطافات (ضيّق التفاعلية إلى مصفوفات تبعيات صريحة). حل Angular كان الإشارات (ضيّق التفاعلية إلى اشتراكات صريحة).</p>
 
-<h2>3. العصر 3 — Angular الحديثة (2023–حتى الآن): الإشارات، المكونات المستقلة، بدون zone.js</h2>
+<h2 id="sec-era-3-modern-angular-2023present-signals-standalone-zoneless">العصر 3 — Angular الحديثة (2023–حتى الآن): الإشارات، المكونات المستقلة، بدون zone.js</h2>
 
 <p>بدءاً من Angular 16 (2023، معاينة) واستقراراً في 17+ (2024)، قدمت Angular ثلاثة تغييرات تعرف بأثر رجعي "Angular الحديثة": المكونات المستقلة (بدون NgModules)، الإشارات (تفاعلية دقيقة)، وبدون zone.js (V18+).</p>
 
@@ -203,9 +266,24 @@ export class CounterComponent {
 
 <p>Angular 18 (2024) قدم <code>provideZonelessChangeDetection</code> تجريبياً. Angular 20+ (2026) تتجه نحو جعل بدون zone.js الافتراضي للمشاريع الجديدة. هذا هو تعريف هجرة العصر: أزل zone.js، اعتمد كلياً على الإشارات للتفاعلية. الثمن: كل الحالة المشتركة يجب أن تمر عبر <code>signal()</code> أو نماذج مغلفة بـ <code>signal()</code>. المكسب: كشف تغيير بدون هدر — فقط المكونات التي تحتاج التحديث تتحدث.</p>
 
-<h2>4. العصور الثلاثة عبر عدسة واحدة — أين تعيش الحالة ومن يراقبها</h2>
+<h2 id="sec-mental-models-how-to-think-in-each-era">النماذج الذهنية — كيف تفكر في كل عصر</h2>
 
-<p>توسعة §3 في مستند رياكت سألت: <em>أين تعيش الحالة، من يملكها، وكيف تلمسها؟</em> نفس العدسة لـ Angular:</p>
+<table>
+  <thead><tr><th>العصر</th><th>النموذج الذهني الأساسي</th><th>ماذا يعني "التغيير"</th><th>حدس التصحيح</th></tr></thead>
+  <tbody>
+    <tr><td>AngularJS</td><td>شجرة <code>$scope</code> + دورة digest</td><td>حوّر النطاق؛ digest يكتشف الفرق</td><td>تتبع <code>$watch</code> و<code>$apply</code> وحلقات digest</td></tr>
+    <tr><td>Angular 2+</td><td>حقول كلاس + بث المنطقة</td><td>حوّر الحقل؛ المنطقة تخبر Angular أن شيئاً حدث</td><td>تتبع مصدر الحدث ومسار كشف التغيير ومدخلات OnPush</td></tr>
+    <tr><td>Angular الحديثة</td><td>رسم إشارات</td><td>اكتب إشارة؛ المشتركون يتحدثون</td><td>تتبع أي إشارة تغيرت وأي computed/effect اشترك</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p>في AngularJS اسأل: «أي مراقب رأى التغيير؟»<br>
+  في Angular 2+ اسأل: «أي حدث منطقة أطلق كشف التغيير؟»<br>
+  في Angular الحديثة اسأل: «أي إشارة تغيرت، وماذا اشترك فيها؟»</p>
+</blockquote><h2 id="sec-the-three-eras-through-one-lens-where-state-lives-and-who-watches-it">العصور الثلاثة عبر عدسة واحدة — أين تعيش الحالة ومن يراقبها</h2>
+
+<p>توسعة <a href="#sec-evolution-the-constraint-inversions">§٣</a> في مستند رياكت سألت: <em>أين تعيش الحالة، من يملكها، وكيف تلمسها؟</em> نفس العدسة لـ Angular:</p>
 
 <table>
   <thead><tr><th>العصر</th><th>الحالة تعيش في…</th><th>تقرأ الحالة بـ…</th><th>تكتب الحالة بـ…</th><th>النموذج الذهني</th><th>من يكتشف التغيير؟</th></tr></thead>
@@ -239,7 +317,7 @@ export class CounterComponent {
 
 <p>النمط: <strong>كشف أوسع → كشف أضيق.</strong> AngularJS كشف بالقوة الغاشمة (تجول كل شيء). Angular 2+ كشف بالبث + تجول الشجرة (أضف OnPush للتضييق). Angular الحديثة تكشف بالاشتراك (المشتركون فقط). اتجاه رياكت هو نفسه لكن يبدأ من مكان مختلف: رياكت كان لديها دائماً كشف ضيق (فقط المكونات التي استدعت <code>setState</code>). تطور رياكت (مصفوفات تبعيات الخطافات → المترجم) هو عن <em>تضييق ما يجب عليك تحديده يدوياً</em>، وليس تضييق مراقب الإطار.</p>
 
-<h2>5. لماذا لم تتبع Angular مسار خطافات رياكت</h2>
+<h2 id="sec-why-angular-didn-t-follow-react-s-hooks-path">لماذا لم تتبع Angular مسار خطافات رياكت</h2>
 
 <p>خطافات رياكت وإشارات Angular تحلان كلتاهما "كيف يحمل المكون حالة ويتفاعل مع التغييرات؟" — لكن من نقطتي بداية متعارضتين:</p>
 
@@ -258,7 +336,24 @@ export class CounterComponent {
   <p><strong>كلا الإطارين ضيّقا التفاعلية. ضيّقا أشياء مختلفة.</strong> رياكت ضيّقت من "أعد تصيير كل شيء" إلى "أعد تصيير فقط إذا تغيرت التبعيات" إلى "دع المترجم يكتشفها." Angular ضيّقت من "افحص كل شيء عند أي حدث غير متزامن" إلى "افحص فقط المكونات التي تشترك في إشارات تغيرت." الاتجاه هو نفسه؛ الآلية مقيدة بتصميم كل إطار الأصلي — دوال رياكت مقابل كلاسات Angular.</p>
 </blockquote>
 
-<h2>6. ما ستواجهه في كود Angular في العمل</h2>
+<h2 id="sec-signals-vs-rxjs-which-tool-for-which-job">الإشارات مقابل RxJS — أي أداة لأي مهمة</h2>
+
+<p>الإشارات ليست بديلاً عن RxJS. الإشارات أفضل لـ <strong>الحالة التفاعلية المتزامنة</strong>؛ وRxJS أفضل لـ <strong>تأليف التدفقات غير المتزامنة</strong>. كود Angular الحديث يحتاج الاثنين غالباً — والمهارة هي معرفة الحد الفاصل.</p>
+
+<table>
+  <thead><tr><th>الاهتمام</th><th>فضّل الإشارات</th><th>فضّل RxJS</th></tr></thead>
+  <tbody>
+    <tr><td>حالة واجهة متزامنة</td><td>نعم</td><td>عادة لا</td></tr>
+    <tr><td>حالة مشتقة</td><td><code>computed()</code></td><td><code>map</code> / <code>combineLatest</code> فقط إذا كانت قائمة على تدفقات أصلاً</td></tr>
+    <tr><td>طلبات HTTP</td><td><code>httpResource()</code> حيثما توفر</td><td><code>HttpClient</code> + عوامل تشغيل (الكلاسيكي)</td></tr>
+    <tr><td>تدفقات الأحداث</td><td>أحداث بسيطة عبر <code>output()</code></td><td>تأليف أحداث معقد</td></tr>
+    <tr><td>الإلغاء</td><td>يعتمد على المورد/الـ API</td><td>قوي</td></tr>
+    <tr><td>Debounce / throttle / switchMap</td><td>ليست أصلية (v22 يضيف <code>debounced()</code> تجريبياً)</td><td>قوية ومن الدرجة الأولى</td></tr>
+    <tr><td>اشتراكات طويلة العمر</td><td>بحذر (تنظيف effect)</td><td>جيدة مع تنظيف دورة الحياة (<code>takeUntilDestroyed</code>)</td></tr>
+    <tr><td>حالة المكون</td><td>نعم — الافتراضي</td><td>تجنّبها إذا كانت الإشارات الأبسط تكفي</td></tr>
+    <tr><td>التشغيل البيني</td><td><code>toSignal()</code></td><td><code>toObservable()</code></td></tr>
+  </tbody>
+</table><h2 id="sec-reading-angular-at-work">ما ستواجهه في كود Angular في العمل</h2>
 
 <p>على عكس انتقال رياكت من الكلاسات إلى الخطافات (حيث كانت المكونات الدالة موجودة طوال الوقت لكنها كانت من الدرجة الثانية)، عصور Angular مرئية فيزيائياً في الكود — هيكل الملف، الاستيرادات، والصياغة تغيرت كلياً بين الإصدارات:</p>
 
@@ -298,7 +393,7 @@ export class CounterComponent {
 
 <p>الخبر الجيد: إذا كنت تستطيع قراءة كود Angular 2-15، يمكنك قراءة كود Angular الحديث. هيكل الكلاس، المزينات، حقن التبعيات، و TypeScript هي نفسها. الاختلافات إضافية (إشارات) وليست إبدالية (لا "المكونات أصبحت دوال الآن" صدمة مثل هجرة خطافات رياكت).</p>
 
-<h2>7. ترجمة دورة الحياة: AngularJS ↔ Angular 2+ ↔ رياكت</h2>
+<h2 id="sec-lifecycle-translation-angularjs-angular-2-react">ترجمة دورة الحياة: AngularJS ↔ Angular 2+ ↔ رياكت</h2>
 
 <p>جدولان. أولاً: كيف دورة حياة مكون AngularJS ترتبط بـ Angular 2+. ثم: كيف ترتبط دورة حياة Angular 2+ بخطافات رياكت — لتتمكن من قراءة كود في أي من النماذج الثلاثة دون إعادة تعلم النموذج الذهني من الصفر.</p>
 
@@ -334,7 +429,152 @@ export class CounterComponent {
   <p><strong>الفكرة الرئيسية لقراءة كود Angular كمطوّر رياكت:</strong> دوال دورة حياة Angular هي سيرة ذاتية ("عند الولادة، عند التغيير، عند الموت") — مثل مكونات رياكت الكلاسية. خطافات رياكت استبدلت السيرة الذاتية بنموذج مزامنة ("هذا التأثير يزامن هذه القيم مع هذا التأثير الجانبي"). إشارات Angular تدفع في نفس الاتجاه — <code>effect()</code> أقرب إلى <code>useEffect</code> في رياكت من <code>ngOnInit</code> + <code>ngOnDestroy</code>. Angular الحديثة تتقارب مع نفس النمط الذي تبنّته رياكت في 2018 — مزامنة، وليس سيرة ذاتية. الفرق: Angular حافظت على الكلاس وأضافت الإشارات؛ رياكت أزالت الكلاس وأضافت الخطافات.</p>
 </blockquote>
 
-<h2>8. أين يقف Angular الآن (2026)</h2>
+<h2 id="sec-migration-paths">مسارات الهجرة</h2>
+
+<p>من AngularJS إلى Angular 2+ لم يكن هناك فعلياً مسار هجرة آلي — لكن الخيارات الفعلية وهجرات ما بعد العصر تستحق المعرفة:</p>
+
+<table>
+  <thead><tr><th>من ← إلى</th><th>المُطلق</th><th>الاستراتيجية</th><th>المخاطر</th></tr></thead>
+  <tbody>
+    <tr><td>AngularJS ← Angular 2+</td><td>أداء digest، معمارية قديمة، لا TypeScript</td><td>إعادة كتابة، شجرة خانقة (strangler fig)، أو هجين <code>ngUpgrade</code></td><td>فشل الانفجار الكبير، كود مكرر، عدم تطابق التوجيه</td></tr>
+    <tr><td>AngularJS ← حديثة عبر هجين</td><td>الحاجة إلى هجرة تدريجية</td><td><code>UpgradeModule</code>، استخراج مسار-بمسار</td><td>إطاران يعملان، حجم الحزمة، عبء ذهني</td></tr>
+    <tr><td>NgModules ← standalone</td><td>النمطية، تجربة تطوير حديثة</td><td>حوّل التعريفات إلى standalone، واستخدم <code>provideRouter</code> و<code>provideHttpClient</code></td><td>هجرة ناقصة، خلط وحدات/standalone مربك</td></tr>
+    <tr><td>zone.js ← بلا مناطق</td><td>كلفة وقت التشغيل، تعقيد التصحيح</td><td>تبنَّ الإشارات، وأزل الأنماط المعتمدة على المنطقة</td><td>مُطلقات غير متزامنة ناقصة، واجهة عالقة إذا لم تكن الحالة إشارات</td></tr>
+    <tr><td>حالة ثقيلة RxJS ← إشارات</td><td>حالة متزامنة أبسط</td><td>انقل حالة الواجهة إلى إشارات؛ أبقِ التدفقات في RxJS</td><td>خلط النموذجين بلا حد واضح</td></tr>
+    <tr><td>تحسين OnPush ← إشارات</td><td>انضباط كشف التغيير اليدوي</td><td>استبدل <code>markForCheck</code> اليدوي بربط مدفوع بالإشارات</td><td>إفراط في التأثيرات بدل computed</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p>عصور Angular مرئية فعلياً في الكود، لكن الهجرات يجب أن تكون تدريجية عادة. أصعب هجرة هي من AngularJS إلى Angular لأن النموذج الذهني وبنية القوالب وحقن الاعتماديات والتوجيه ونظام البناء تغيرت كلها. الترقيات داخل العصر تُنفذ نسخة رئيسية واحدة في كل مرة عبر <code>ng update</code> (كل نسخة رئيسية تدعم قفزة إصدار واحد).</p>
+</blockquote><h2 id="sec-worked-example-a-counter-across-the-eras">مثال محلول — عدّاد عبر العصور</h2>
+
+<p>العداد نفسه في العصور الثلاثة يظهر أين تعيش الحالة وكيف يضيق الكشف.</p>
+
+<h3>AngularJS</h3>
+
+<pre><code>angular.module('app', [])
+  .controller('CounterCtrl', function($scope) {
+    $scope.count = 0;
+    $scope.increment = function() {
+      $scope.count++;
+    };
+  });</code></pre>
+
+<h3>Angular 2+</h3>
+
+<pre><code>@Component({
+  selector: 'app-counter',
+  template: `
+    &lt;p&gt;Count: {{ count }}&lt;/p&gt;
+    &lt;button (click)="increment()"&gt;+&lt;/button&gt;
+  `
+})
+export class CounterComponent {
+  count = 0;
+
+  increment() {
+    this.count++;
+  }
+}</code></pre>
+
+<h3>Angular الحديثة</h3>
+
+<pre><code>@Component({
+  selector: 'app-counter',
+  standalone: true,
+  template: `
+    &lt;p&gt;Count: {{ count() }}&lt;/p&gt;
+    &lt;button (click)="increment()"&gt;+&lt;/button&gt;
+  `
+})
+export class CounterComponent {
+  count = signal(0);
+
+  increment() {
+    this.count.update(c =&gt; c + 1);
+  }
+}</code></pre>
+
+<blockquote class="callout">
+  <p>البنية تتغير، لكن التحول الأعمق هو الكشف: AngularJS يجب أن <em>يبحث</em> عن التغيير (digest). Angular 2+ يجب أن <em>يُخبَر</em> أن شيئاً حدث (بث المنطقة). Angular الحديثة <em>تعرف بالضبط</em> ما تغير (مشتركو الإشارات).</p>
+</blockquote>
+
+<p>الحالة المشتقة — نموذج الإشارات يجعلها تفاعلية وكسولة:</p>
+
+<pre><code>export class CartComponent {
+  items = signal&lt;Item[]&gt;([]);
+
+  total = computed(() =&gt;
+    this.items().reduce((sum, item) =&gt; sum + item.price, 0)
+  );
+}</code></pre><h2 id="sec-failure-modes">أنماط الفشل</h2>
+
+<table>
+  <thead><tr><th>نمط الفشل</th><th>ماذا يحدث</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td>إعادة كتابة AngularJS الانفجارية</td><td>الهجرة تتوقف؛ نظامان يتباعدان</td><td>شجرة خانقة، مسار-بمسار، ترقية هجينة</td></tr>
+    <tr><td>انفجار digest</td><td>مراقبون كثيرون؛ واجهة متأخرة</td><td>قلل المراقبين، ربط لمرة واحدة، اقطع للمكونات، هاجر</td></tr>
+    <tr><td>مُطلقات zone.js الخفية</td><td>كشف التغيير يعمل بشكل غير متوقع أو لا يعمل حين يُتوقع</td><td>افهم المناطق، استخدم <code>runOutsideAngular</code>، واتجه إلى بلا مناطق</td></tr>
+    <tr><td>واجهة OnPush عالقة</td><td>المكون لا يتحدث</td><td>استخدم مدخلات غير قابلة للتغيير، <code>markForCheck</code>، أو الإشارات</td></tr>
+    <tr><td>إفراط في التأثيرات</td><td>حلقات تأثير، آثار جانبية غير ضرورية</td><td>استخدم <code>computed()</code> للحالة المشتقة</td></tr>
+    <tr><td>قراءة إشارات داخل تأثيرات دون حاجة</td><td>تبعيات زائدة، أعمال متكررة</td><td>استخدم <code>untracked()</code> حيث يناسب</td></tr>
+    <tr><td>تسرب اشتراكات RxJS</td><td>تسرب ذاكرة، أحداث عالقة</td><td>استخدم أنبوب <code>async</code> و<code>takeUntilDestroyed</code> وإزالة صريحة</td></tr>
+    <tr><td>خلط الإشارات/RxJS بلا حد</td><td>تدفق بيانات مربك</td><td>إشارات للحالة، RxJS للتدفقات</td></tr>
+    <tr><td>هجرة نصف NgModule/standalone</td><td>نماذج ذهنية مختلطة</td><td>أكمل الهجرة التدريجية باصطلاحات واضحة</td></tr>
+    <tr><td>معاملة Angular كرياكت</td><td>توقع إعادة تشغيل دالة المكون</td><td>تعلم نموذج رسم الإشارات</td></tr>
+    <tr><td>إفراط تجريد الحقن</td><td>خدمات في كل مكان، اقتران خفي</td><td>أبقِ حدود الخدمات صريحة</td></tr>
+  </tbody>
+</table><h2 id="sec-principles">المبادئ</h2>
+
+<table>
+  <thead><tr><th>المبدأ</th><th>المعنى</th></tr></thead>
+  <tbody>
+    <tr><td>الكشف يضيق مع الزمن</td><td>تاريخ Angular هو تاريخ التفرج الأقل</td></tr>
+    <tr><td>التبعيات الصريحة تتفوق على البث</td><td>الإشارات تعرف مشتركيها؛ المناطق تبث للجميع</td></tr>
+    <tr><td>الحالة بنطاق المكون لكن يتعقبها الإطار</td><td>Angular تملك الجدولة، لا التخزين فقط</td></tr>
+    <tr><td>الكلاسات تبقى حد المكون</td><td>Angular حدّثت نفسها دون التخلي عن الكلاسات</td></tr>
+    <tr><td>الحقن بنيوي</td><td>نموذج الباني/الحاقن يشكل قابلية الاختبار والمعمارية</td></tr>
+    <tr><td>القوالب تُترجم</td><td>بنية القوالب ليست HTML عشوائياً؛ تترجم إلى تعليمات</td></tr>
+    <tr><td>الإشارات عقد رسم</td><td>الإشارة ليست خطاف حالة رياكت؛ إنها خلية تفاعلية</td></tr>
+    <tr><td>RxJS والإشارات يخدمان مهمتين مختلفتين</td><td>التدفقات والحالة ليستا المشكلة نفسها</td></tr>
+    <tr><td>الهجرة يجب أن تكون تدريجية</td><td>قفزات العصور مرئية، لكن التبني يجب أن يكون متدرجاً</td></tr>
+  </tbody>
+</table><h2 id="sec-ecosystem-and-tooling-catalog">كتالوج النظام البيئي والأدوات</h2>
+
+<table>
+  <thead><tr><th>الفئة</th><th>الأدوات</th><th>الغرض</th></tr></thead>
+  <tbody>
+    <tr><td>CLI / البناء</td><td>Angular CLI، Nx، باني esbuild/Vite</td><td>التوليد والبناء والمستودعات الأحادية</td></tr>
+    <tr><td>مكتبات الواجهة</td><td>Angular Material، PrimeNG، Taiga UI</td><td>أنظمة المكونات</td></tr>
+    <tr><td>إدارة الحالة</td><td>NgRx، Elf، NGXS، مخازن الإشارات</td><td>حالة مستوى التطبيق</td></tr>
+    <tr><td>البرمجة التفاعلية</td><td>RxJS</td><td>تأليف التدفقات</td></tr>
+    <tr><td>تشغيل الإشارات البيني</td><td><code>toSignal</code>، <code>toObservable</code>، <code>httpResource</code></td><td>جسر بين RxJS والإشارات</td></tr>
+    <tr><td>الاختبار</td><td>Jasmine/Karma، Jest، Vitest، TestBed</td><td>اختبار وحدة/تكامل (Vitest افتراضي منذ v21)</td></tr>
+    <tr><td>E2E</td><td>Playwright، Cypress</td><td>تدفقات المتصفح</td></tr>
+    <tr><td>التصحيح</td><td>Angular DevTools</td><td>شجرة المكونات والإشارات وكشف التغيير</td></tr>
+    <tr><td>الهجرة</td><td><code>ng update</code>، schematics، قواعد ESLint</td><td>ترقيات النسخ وهجرة standalone</td></tr>
+    <tr><td>الفحص / التنسيق</td><td>Angular ESLint، Prettier</td><td>جودة الكود</td></tr>
+  </tbody>
+</table>
+
+<p>مقاييس القرار عند الاختيار بين هذه: أمان الهجرة، منحنى التعلم، دعم المؤسسات، توافق الإشارات، موثوقية الاختبار، سرعة البناء.</p>
+
+<p>أنماط الأداء حسب العصر:</p>
+
+<table>
+  <thead><tr><th>التقنية</th><th>العصر</th><th>الغرض</th></tr></thead>
+  <tbody>
+    <tr><td><code>$watchCollection</code> / ربط لمرة واحدة</td><td>AngularJS</td><td>تقليل كلفة digest</td></tr>
+    <tr><td>كشف تغيير <code>OnPush</code></td><td>Angular 2+</td><td>تضييق كشف التغيير</td></tr>
+    <tr><td><code>trackBy</code> / <code>track</code></td><td>Angular 2+ (حديثاً: <code>@for track</code>)</td><td>تجنب إعادة بناء القوائم بلا داعٍ</td></tr>
+    <tr><td>مدخلات غير قابلة للتغيير</td><td>Angular 2+</td><td>جعل OnPush قابلاً للتنبؤ</td></tr>
+    <tr><td>أنبوب <code>async</code></td><td>Angular 2+</td><td>اشتراك/إلغاء آمن</td></tr>
+    <tr><td>الإشارات</td><td>حديثة</td><td>تتبع تبعيات تلقائي</td></tr>
+    <tr><td>بلا مناطق</td><td>حديثة</td><td>إزالة كلفة بث المنطقة</td></tr>
+    <tr><td><code>@defer</code></td><td>حديثة</td><td>تأجيل كتل القالب</td></tr>
+  </tbody>
+</table><h2 id="sec-where-angular-stands-now-2026">أين يقف Angular الآن (2026)</h2>
 
 <ul>
   <li><strong>المستقر الحالي:</strong> Angular (v22 أو v23 وقت القراءة — رقم الإصدار يزيد بمقدار 2 سنوياً منذ v17). 19.x LTS ما زال مدعوماً للمؤسسات المتمسكة.</li>
@@ -346,7 +586,23 @@ export class CounterComponent {
   <li><strong>مقابلة رياكت (2026):</strong> رياكت تبنّت المترجم لحل مشكلة "ضريبة مصفوفة التبعيات." Angular تبنّت الإشارات لحل مشكلة "ضريبة zone.js." كلاهما أزال عبء الحفظ اليدوي. كلاهما حافظ على نموذج المكون (دوال رياكت، كلاسات Angular). لا أحد "متفوق" — حلا عنق زجاجة مختلفين من نقطتي بداية مختلفتين.</li>
 </ul>
 
-<h2>9. قراءات إضافية</h2>
+<h2 id="sec-summary-checklist">قائمة ملخص</h2>
+
+<table>
+  <thead><tr><th>السؤال</th><th>إذا لم تستطع الإجابة…</th></tr></thead>
+  <tbody>
+    <tr><td>هل هذه AngularJS أم Angular 2+ أم Angular حديثة؟</td><td>افحص نمط الوحدات والمزينات والإشارات وstandalone</td></tr>
+    <tr><td>هل تعيش الحالة في <code>$scope</code> أم حقول كلاس أم إشارات؟</td><td>حدد آلية حالة العصر</td></tr>
+    <tr><td>كيف يعرف كشف التغيير أن شيئاً تغير؟</td><td>digest أم zone.js أم رسم إشارات</td></tr>
+    <tr><td>هل يستخدم التطبيق NgModules أم standalone؟</td><td>افحص <code>standalone: true</code> و<code>bootstrapApplication</code> و<code>NgModule</code></td></tr>
+    <tr><td>هل المدخلات <code>@Input()</code> عادية أم مدخلات إشارات؟</td><td>افحص <code>input()</code> / <code>input.required()</code></td></tr>
+    <tr><td>هل يُستخدم RxJS للحالة أم للتدفقات؟</td><td>افصل الحالة عن اهتمامات التدفق غير المتزامن</td></tr>
+    <tr><td>هل بلا مناطق مفعل؟</td><td>افحص <code>provideZonelessChangeDetection</code></td></tr>
+    <tr><td>هل تستخدم القوالب <code>*ngIf</code>/<code>*ngFor</code> أم <code>@if</code>/<code>@for</code>؟</td><td>حدد عصر نسخة Angular</td></tr>
+    <tr><td>هل الاشتراكات مُنظفة؟</td><td>افحص أنبوب <code>async</code> و<code>takeUntilDestroyed</code> و<code>ngOnDestroy</code></td></tr>
+    <tr><td>هل التأثيرات للآثار الجانبية فقط؟</td><td>الحالة المشتقة يجب أن تستخدم <code>computed()</code></td></tr>
+  </tbody>
+</table><h2 id="sec-primary-sources-and-further-reading">قراءات إضافية</h2>
 
 <ol>
   <li><a href="https://angular.io/guide/signals">دليل إشارات Angular</a> — الوثائق الرسمية: <code>signal()</code>، <code>computed()</code>، <code>effect()</code>، والنموذج الذهني.</li>
@@ -354,7 +610,7 @@ export class CounterComponent {
   <li><a href="https://blog.angular.dev/angular-18-zoneless-change-detection-8c235775ddec">كشف التغيير بدون Zone.js (مدونة Angular، 2024)</a> — الأساس المنطقي لإزالة zone.js.</li>
   <li><a href="https://angular.io/guide/standalone-components">دليل المكونات المستقلة</a> — ما يتغير عندما تتخلى عن NgModules.</li>
   <li><a href="https://overreacted.io/why-isnt-x-a-hook/">Why Isn't X a Hook? (Dan Abramov, 2019)</a> — حالة رياكت ضد الإشارات، التي يعارضها تبني Angular مباشرة.</li>
-  <li><a href="./class-to-hooks-paradigm-shift.html">مستند الإزاحة النموذجية (مساحة العمل هذه)</a> — قوس رياكت الموازي، مع مقابلة الخطافات-الإشارات في §2.9.</li>
+  <li><a href="./class-to-hooks-paradigm-shift.html">مستند الإزاحة النموذجية (مساحة العمل هذه)</a> — قوس رياكت الموازي، مع مقابلة الخطافات-الإشارات في <a href="./class-to-hooks-paradigm-shift.html#sec-what-is-state-a-prequel-before-we-can-talk-about-react-s-choices">§٢.٩</a>.</li>
   <li><a href="./frontend-camps-survey.html">مسح معسكرات الواجهات الأمامية (مساحة العمل هذه)</a> — أين يجلس Angular في النظام البيئي الأوسع للواجهات الأمامية.</li>
 </ol>
 
