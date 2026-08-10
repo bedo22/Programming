@@ -23,7 +23,7 @@
   <p>Most tutorials teach "how to call an API" or "how to write an OpenAPI file." API Design starts at "what contract lets both sides move without breaking each other." It is a distinct discipline with its own history, methods, and failure modes — not "REST vs GraphQL" as a religion, not "Swagger authoring" as a chore, not "SDK generation" as a silver bullet. This doc captures it as a first-class engineering concern: the interface layer that feeds system design and the developer loop. If you've ever shipped a breaking change that took down a mobile app in production, this is the layer you missed.</p>
 </section>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone. Cross-links:</p>
 <ul>
@@ -45,7 +45,7 @@
 
 ---
 
-<h2 id="sec-definition-what-api-design-is-and-what-it-is-not">1. Definition — what API design <em>is</em> and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-api-design-is-and-what-it-is-not">Definition — what API design <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 
@@ -73,13 +73,13 @@
     <tr><td>SDK / Client library generation</td><td>Codegen from a schema (OpenAPI, protobuf, GraphQL)</td><td>SDKs are a <em>convenience artifact</em>; the contract must be usable without them (curl, fetch, Postman).</td></tr>
     <tr><td>API Gateway configuration</td><td>Rate limiting, routing, auth termination, request transformation</td><td>Gateway enforces <em>policy</em>; API design defines the <em>contract</em> the gateway protects.</td></tr>
     <tr><td>Integration glue code</td><td>Adapters, transformers, BFFs (Backend-for-Frontend)</td><td>Glue code <em>papers over</em> contract mismatches; API design <em>prevents</em> the mismatch.</td></tr>
-    <tr><td>Database schema design</td><td>Tables, indexes, foreign keys, migrations</td><td>Database schema is an <em>implementation detail</em>; API contract is the <em>public boundary</em>. Leaking one into the other is a failure mode (§10).</td></tr>
+    <tr><td>Database schema design</td><td>Tables, indexes, foreign keys, migrations</td><td>Database schema is an <em>implementation detail</em>; API contract is the <em>public boundary</em>. Leaking one into the other is a failure mode (<a href="#sec-the-most-common-failure-modes">failure mode</a>).</td></tr>
   </tbody>
 </table>
 
 ---
 
-<h2 id="sec-history-from-rpc-to-graphql-to-events">2. History — from RPC to GraphQL to events</h2>
+<h2 id="sec-history-from-rpc-to-graphql-to-events">History — from RPC to GraphQL to events</h2>
 
 <table>
   <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
@@ -155,7 +155,7 @@
 
 ---
 
-<h2 id="sec-evolution-constraint-inversions-across-the-same-idea">3. Evolution — constraint inversions across the same idea</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-same-idea">Evolution — constraint inversions across the same idea</h2>
 
 <p>The core idea — <em>a stable boundary between independent deployables</em> — did not change. What changed is the dominant constraint, and the style that won:</p>
 
@@ -175,7 +175,7 @@
 
 <p>The pattern repeats: when the dominant constraint changes (binary efficiency → firewall traversal → browser native → mobile bandwidth → internal throughput → loose coupling → developer experience → AI authoring), the old style's ergonomics become friction and a new style absorbs the constraint.</p>
 
-<h2 id="sec-migration-paths-between-api-styles">3b. Migration paths between API styles</h2>
+<h2 id="sec-migration-paths-between-api-styles">Migration paths between API styles</h2>
 
 <p>API migrations are contract migrations. The consumer side usually dictates the pace:</p>
 
@@ -230,11 +230,11 @@
   </tbody>
 </table>
 
-<p><strong>Anti-pattern:</strong> Versioned URLs (/v1/, /v2/) without a migration strategy. Every row above uses a gateway/proxy layer, dual-write period, or incremental client migration. The style table in §3 shows <em>centers of gravity</em> — not mutually exclusive endpoints.</p>
+<p><strong>Anti-pattern:</strong> Versioned URLs (/v1/, /v2/) without a migration strategy. Every row above uses a gateway/proxy layer, dual-write period, or incremental client migration. The style table in <a href="#sec-evolution-constraint-inversions-across-the-same-idea">Evolution</a> shows <em>centers of gravity</em> — not mutually exclusive endpoints.</p>
 
 ---
 
-<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">4. Intersection with neighbors — where it borders other practices</h2>
+<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">Intersection with neighbors — where it borders other practices</h2>
 
 <table>
   <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
@@ -257,12 +257,12 @@
     <tr>
       <td><strong>Data Modeling</strong> (<a href="./data-modeling-and-databases.html">the vault</a>)</td>
       <td>Resource model, schema evolution, migrations, consistency</td>
-      <td>The API resource model is the schema's public projection. A bad schema ruins a good contract: the contract promises a shape, the vault must hold it. Rename a column, break the API (§10).</td>
+      <td>The API resource model is the schema's public projection. A bad schema ruins a good contract: the contract promises a shape, the vault must hold it. Rename a column, break the API (<a href="#sec-the-most-common-failure-modes">failure mode</a>).</td>
     </tr>
     <tr>
       <td><strong>Database Internals</strong></td>
       <td>Schema evolution, migrations, consistency, indexing</td>
-      <td>Database schema is <em>private</em>; API contract is <em>public</em>. Leaking DB types (ObjectId, timestamp precision, nullable FK) into the API is a failure mode (§10).</td>
+      <td>Database schema is <em>private</em>; API contract is <em>public</em>. Leaking DB types (ObjectId, timestamp precision, nullable FK) into the API is a failure mode (<a href="#sec-the-most-common-failure-modes">failure mode</a>).</td>
     </tr>
     <tr>
       <td><strong>Protocol Design (HTTP/QUIC)</strong></td>
@@ -284,7 +284,7 @@
 
 ---
 
-<h2 id="sec-underlying-theory-what-makes-a-contract-designed-not-accidental">5. Underlying theory — what makes a contract designed not accidental</h2>
+<h2 id="sec-underlying-theory-what-makes-a-contract-designed-not-accidental">Underlying theory — what makes a contract designed not accidental</h2>
 
 <table>
   <thead><tr><th>Theory</th><th>Origin</th><th>What API design takes from it</th></tr></thead>
@@ -332,7 +332,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-mental-models-how-api-designers-actually-reason">5b. Mental models — how API designers actually reason</h2>
+<h2 id="sec-mental-models-how-api-designers-actually-reason">Mental models — how API designers actually reason</h2>
 
 <p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
 
@@ -388,7 +388,7 @@
 
 ---
 
-<h2 id="sec-the-rhythm-not-the-algorithm">6. The rhythm, not the algorithm</h2>
+<h2 id="sec-the-rhythm-not-the-algorithm">The rhythm, not the algorithm</h2>
 
 <p>Like <a href="./design-thinking.html">Design Thinking</a> and <a href="./system-design.html">System Design</a>, API Design is a <strong>rhythm</strong>, not a structured algorithm. It fails the three algorithm tests:</p>
 
@@ -406,7 +406,7 @@
 
 ---
 
-<h2 id="sec-methodologies-styles-the-named-approaches">7. Methodologies / styles — the named approaches</h2>
+<h2 id="sec-methodologies-styles-the-named-approaches">Methodologies / styles — the named approaches</h2>
 
 <p>Multiple named styles exist. None is canonical; each is a different packaging of constraints for a dominant use case.</p>
 
@@ -456,7 +456,7 @@
 
 ---
 
-<h2 id="sec-principles-the-shared-constants">8. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <p>Across every style, eight principles hold:</p>
 
@@ -473,7 +473,7 @@
 
 ---
 
-<h2 id="sec-conventions-identifiers-the-rules-that-keep-contracts-predictable">8b. Conventions & identifiers — the rules that keep contracts predictable</h2>
+<h2 id="sec-conventions-identifiers-the-rules-that-keep-contracts-predictable">Conventions & identifiers — the rules that keep contracts predictable</h2>
 
 <p>Conventions are not cosmetic. They reduce consumer error and make contracts boring in the good way — so the <em>interesting</em> decisions stand out.</p>
 
@@ -509,9 +509,9 @@
   </tbody>
 </table>
 
-<p><strong>Principles:</strong> do not expose database auto-increment IDs; do not leak storage-internal object IDs; keep IDs stable even if the internal store changes; use prefixes for readability; make IDs URL-safe. An identifier is a contract, not an implementation leak — see §5b "Internal models leak" and §11.</p>
+<p><strong>Principles:</strong> do not expose database auto-increment IDs; do not leak storage-internal object IDs; keep IDs stable even if the internal store changes; use prefixes for readability; make IDs URL-safe. An identifier is a contract, not an implementation leak — see <a href="#sec-mental-models-how-api-designers-actually-reason">Mental models</a> "Internal models leak" and <a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem</a>.</p>
 
-<h2 id="sec-collections-pagination-filtering-sorting-and-search">8c. Collections — pagination, filtering, sorting, and search</h2>
+<h2 id="sec-collections-pagination-filtering-sorting-and-search">Collections — pagination, filtering, sorting, and search</h2>
 
 <p>Collections are where most contracts earn their complexity. Decide these once and reuse across every list.</p>
 
@@ -543,10 +543,10 @@
   <li>Use direct field names or <code>filter[field]</code> — pick one syntax and stay consistent.</li>
   <li><code>sort=field:asc|desc</code>, repeatable for multiple fields; document the default sort.</li>
   <li>Enforce a maximum <code>limit</code>; document what happens when a client exceeds it.</li>
-  <li>Invalid filter values are <code>400</code> with a field-level validation error (§8d), never a silent ignore.</li>
+  <li>Invalid filter values are <code>400</code> with a field-level validation error (<a href="#sec-validation-errors-transactional-safety">validation errors</a>), never a silent ignore.</li>
 </ul>
 
-<h2 id="sec-validation-errors-transactional-safety">8d. Validation errors &amp; transactional safety</h2>
+<h2 id="sec-validation-errors-transactional-safety">Validation errors &amp; transactional safety</h2>
 
 <p>A <code>422</code> that just says "bad request" is a dead end for a frontend form. Field-level validation errors turn an error into recoverable UI state.</p>
 
@@ -592,7 +592,7 @@
   <li>Document a client default: fetch, apply change, re-PATCH with the current version, retry once on 412.</li>
 </ul>
 
-<h2 id="sec-long-running-operations-202-job-resources-and-webhooks">8e. Long-running operations — <code>202</code>, job resources, and webhooks</h2>
+<h2 id="sec-long-running-operations-202-job-resources-and-webhooks">Long-running operations — <code>202</code>, job resources, and webhooks</h2>
 
 <p>Not every operation finishes inside one request. Where work is not immediate, model it explicitly so clients are not blocked, misled, or polling forever.</p>
 
@@ -614,7 +614,7 @@ Location: /v1/reports/jobs/job_123</code></pre>
   <li>Provide a job resource; support cancellation where feasible.</li>
   <li>Offer webhook notification on completion so clients do not poll.</li>
   <li>Make job-status reads idempotent; define result expiry; always let clients stop polling (a deadline, never forever).</li>
-  <li>For events, see §8g and the streaming patterns.</li>
+  <li>For events, see <a href="#sec-schema-evolution-the-compatibility-matrix">schema evolution</a> and the streaming patterns.</li>
 </ul>
 
 <p>For push completion, a webhook is the natural counterpart — its delivery contract matters as much as its payload:</p>
@@ -635,7 +635,7 @@ Location: /v1/reports/jobs/job_123</code></pre>
 
 <p><strong>A webhook is not "fire and forget."</strong> It is a contract with delivery, signature, retry, and idempotency requirements. Design it like any other endpoint, not as a side effect.</p>
 
-<h2 id="sec-realtime-and-streaming-contracts">8f. Realtime and streaming contracts</h2>
+<h2 id="sec-realtime-and-streaming-contracts">Realtime and streaming contracts</h2>
 
 <p>When a client needs updates pushed, the transport choice is a contract decision with UX consequences.</p>
 
@@ -666,9 +666,9 @@ Location: /v1/reports/jobs/job_123</code></pre>
   <li>Send heartbeats; limit message size; apply rate limits; authenticate on connect or via a short-lived ticket.</li>
 </ul>
 
-<p>An API that cannot explain what a client misses after a disconnect — or what a reconnect restores — is not streaming, it is firing. The schema (<code>event:</code> names) is the contract; see §11 for the failure that ignores it.</p>
+<p>An API that cannot explain what a client misses after a disconnect — or what a reconnect restores — is not streaming, it is firing. The schema (<code>event:</code> names) is the contract; see <a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem</a> for the failure that ignores it.</p>
 
-<h2 id="sec-schema-evolution-the-compatibility-matrix">8g. Schema evolution — the compatibility matrix</h2>
+<h2 id="sec-schema-evolution-the-compatibility-matrix">Schema evolution — the compatibility matrix</h2>
 
 <p>Every change is "safe" or "breaking" relative to the <em>typed clients you actually have</em>. Judgment + schema automation beats dogma.</p>
 
@@ -690,7 +690,7 @@ Location: /v1/reports/jobs/job_123</code></pre>
 
 <p><strong>"Safe" means safe for well-behaved clients.</strong> Typed clients that <em>exhaustively switch</em> on enums or require exact shapes still break on changes marked safe. Document your client-compat expectations so "safe" is not a guess.</p>
 
-<h2 id="sec-security-browser-contracts">8h. Security &amp; browser contracts</h2>
+<h2 id="sec-security-browser-contracts">Security &amp; browser contracts</h2>
 
 <p>Authentication and authorization are part of the contract — the client type dictates the flow. A recommended flow per client is a design decision, not folklore.</p>
 
@@ -728,7 +728,7 @@ Location: /v1/reports/jobs/job_123</code></pre>
   <li>Use SameSite cookies correctly; never expose secrets to browser bundles.</li>
 </ul>
 
-<h2 id="sec-file-uploads-binary-contracts">8i. File uploads &amp; binary contracts</h2>
+<h2 id="sec-file-uploads-binary-contracts">File uploads &amp; binary contracts</h2>
 
 <p>Binary exchange has its own patterns. The contract must cover transport, validation, and access control, not just the endpoint.</p>
 
@@ -745,7 +745,7 @@ Location: /v1/reports/jobs/job_123</code></pre>
 
 <p><strong>Always cover:</strong> content-type validation, size limits, virus scanning, signed URLs with expiry, access control, checksums, and separation of metadata from the binary.</p>
 
-<h2 id="sec-ai-safe-tool-contracts">8j. AI-safe tool contracts</h2>
+<h2 id="sec-ai-safe-tool-contracts">AI-safe tool contracts</h2>
 
 <p>AI agents consume APIs as <em>tools</em> — a capability boundary that must be especially explicit and safe. Ambiguous tools become unsafe actions.</p>
 
@@ -768,7 +768,7 @@ Location: /v1/reports/jobs/job_123</code></pre>
 
 ---
 
-<h2 id="sec-worked-example-design-a-public-shipment-tracking-api">9. Worked example — "Design a Public Shipment Tracking API"</h2>
+<h2 id="sec-worked-example-design-a-public-shipment-tracking-api">Worked example — "Design a Public Shipment Tracking API"</h2>
 
 <p>A realistic public API problem, walked end-to-end through the rhythm.</p>
 
@@ -968,7 +968,7 @@ type Shipment {
 
 ---
 
-<h2 id="sec-the-most-common-failure-modes">10. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
@@ -1021,32 +1021,32 @@ type Shipment {
     <tr>
       <td><strong>Validation errors that leave the client in the dark</strong></td>
       <td>PATCH returns generic <code>400 Bad Request</code>; the form shows one vague message and the user can't fix anything.</td>
-      <td>No field-level error catalog (§8d). A validation error is UI state for a frontend form — it needs field paths, machine codes, and messages clients can branch on, not a dead-end status.</td>
+      <td>No field-level error catalog (<a href="#sec-validation-errors-transactional-safety">validation errors</a>). A validation error is UI state for a frontend form — it needs field paths, machine codes, and messages clients can branch on, not a dead-end status.</td>
     </tr>
     <tr>
       <td><strong>Lost updates from blind read-modify-write</strong></td>
       <td>Two support agents edit the same shipment's destination; the later overwrite silently drops the other's change.</td>
-      <td>No version token or <code>If-Match</code> on the write (§8d). Idempotency keys stop duplicate creates but not concurrent overwrites — a version check returns 412 so the client can retry against the current state.</td>
+      <td>No version token or <code>If-Match</code> on the write (<a href="#sec-validation-errors-transactional-safety">validation errors</a>). Idempotency keys stop duplicate creates but not concurrent overwrites — a version check returns 412 so the client can retry against the current state.</td>
     </tr>
     <tr>
       <td><strong>Spinning a client on "forever" operations</strong></td>
       <td>Carrier polls a report status for 20 minutes; timeout kills the job mid-run; no signal.</td>
-      <td>Long work was exposed as a synchronous call instead of <code>202</code> + job resource + webhook on completion (§8e). Operations that can exceed a request budget need an explicit job lifecycle so clients don't poll into a wall.</td>
+      <td>Long work was exposed as a synchronous call instead of <code>202</code> + job resource + webhook on completion (<a href="#sec-long-running-operations-202-job-resources-and-webhooks">202 / job resources / webhooks</a>). Operations that can exceed a request budget need an explicit job lifecycle so clients don't poll into a wall.</td>
     </tr>
     <tr>
       <td><strong>Webhook replay wrecks downstream state</strong></td>
       <td>Event delivered twice (retry after timeout); consumer double-charges a shipment on the duplicate.</td>
-      <td>Webhook treated as fire-and-forget with no idempotency or signature check (§8e). Consumers must dedupe on event-ID and verify the HMAC — a webhook is an endpoint, not a side effect.</td>
+      <td>Webhook treated as fire-and-forget with no idempotency or signature check (<a href="#sec-long-running-operations-202-job-resources-and-webhooks">202 / job resources / webhooks</a>). Consumers must dedupe on event-ID and verify the HMAC — a webhook is an endpoint, not a side effect.</td>
     </tr>
     <tr>
       <td><strong>Streaming that isn't resumable</strong></td>
       <td>SSE/WebSocket drops mid-push; client silently misses events and shows a stale tracking page.</td>
-      <td>No event <code>id</code> + <code>Last-Event-ID</code> resume, no sequence numbers (§8f). "Real-time" is only a contract if a reconnect can recover exactly what was missed.</td>
+      <td>No event <code>id</code> + <code>Last-Event-ID</code> resume, no sequence numbers (<a href="#sec-realtime-and-streaming-contracts">realtime and streaming</a>). "Real-time" is only a contract if a reconnect can recover exactly what was missed.</td>
     </tr>
     <tr>
       <td><strong>Scopes that never shrink</strong></td>
       <td>A public client with a token minted for <code>shipments:write</code> also gets reports and user reads.</td>
-      <td>Token possession treated as authorization (§8h). Authorization is a scope + ownership check per request, not "has a valid JWT." Every permission should be as narrow as the calling client needs.</td>
+      <td>Token possession treated as authorization (<a href="#sec-security-browser-contracts">security and browser contracts</a>). Authorization is a scope + ownership check per request, not "has a valid JWT." Every permission should be as narrow as the calling client needs.</td>
     </tr>
   </tbody>
 </table>
@@ -1066,7 +1066,7 @@ type Shipment {
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">11. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>API design is only as good as the tooling that makes contracts visible, testable, and evolvable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
 
@@ -1134,7 +1134,7 @@ type Shipment {
 
 ---
 
-<h2 id="sec-the-future-where-api-design-is-going">12. The future — where API design is going</h2>
+<h2 id="sec-the-future-where-api-design-is-going">The future — where API design is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for API design</th></tr></thead>
@@ -1172,7 +1172,7 @@ type Shipment {
 
 ---
 
-<h2 id="sec-summary-the-contract-checklist">13. Summary — the contract checklist</h2>
+<h2 id="sec-summary-the-contract-checklist">Summary — the contract checklist</h2>
 
 <p>Before any API change merges, verify:</p>
 
@@ -1187,8 +1187,8 @@ type Shipment {
     <tr><td>Is pagination cursor-based (not offset) for collections that grow?</td><td>Stop. Offset pagination is O(n) and times out at scale.</td></tr>
     <tr><td>Does the contract pass schema validation in CI (implementation matches schema)?</td><td>Stop. Schema drift = generated SDKs lie.</td></tr>
     <tr><td>Are rate limits, quotas, and <code>Retry-After</code> headers documented and returned?</td><td>Stop. Clients can't back off; they hammer and get banned.</td></tr>
-    <tr><td>Do mutable resources expose a version token (ETag / <code>If-Match</code>) for safe concurrent writes?</td><td>Stop. Read-modify-write will silently lose updates (§8d).</td></tr>
-    <tr><td>Do long-running and push contracts exist deliberately — <code>202</code> + job resource, webhook with signature + event-ID, resumable streams?</td><td>Stop. Clients will poll, replay, or miss events with no way out (§8e, §8f).</td></tr>
+    <tr><td>Do mutable resources expose a version token (ETag / <code>If-Match</code>) for safe concurrent writes?</td><td>Stop. Read-modify-write will silently lose updates (<a href="#sec-validation-errors-transactional-safety">validation errors</a>).</td></tr>
+    <tr><td>Do long-running and push contracts exist deliberately — <code>202</code> + job resource, webhook with signature + event-ID, resumable streams?</td><td>Stop. Clients will poll, replay, or miss events with no way out (<a href="#sec-long-running-operations-202-job-resources-and-webhooks">202 / job resources / webhooks</a>, <a href="#sec-realtime-and-streaming-contracts">realtime and streaming</a>).</td></tr>
     <tr><td>Is there a deprecation calendar communicated to registered consumers?</td><td>Stop. Surprise deprecation = lost trust, churn.</td></tr>
   </tbody>
 </table>

@@ -12,7 +12,7 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 
 ## Per-doc status (41 EN / 18 twins, measured 2026-08-10, Tier 0; corrected at v11)
 
-### Twins — ✅ AR-OK (8)
+### Twins — ✅ AR-OK (9)
 | doc | EN h2 | AR h2 |
 |---|---|---|
 | cs-and-software-engineering | 23 | 23 |
@@ -22,16 +22,17 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 | version-control-ci-cd-deployment | 21 | 21 |
 | what-is-state-prequel | 15 | 15 |
 | design-thinking | 20 | 20 |
+| api-design | 25 | 25 |
 | ui-ux-web-design | 18 | 18 |
 | design-thinking | 20 | 20 |
+| api-design | 25 | 25 |
 
-### Twins — ⏳ LAGGING (10, ordered by gap size)
+### Twins — ⏳ LAGGING (9, ordered by gap size)
 | doc | EN h2 | AR h2 | gap | tier |
 |---|---|---|---|---|
 | class-to-hooks-paradigm-shift | 35 | 19 | 16 | T2 |
 | software-development-process | 34 | 19 | 15 | T2 |
 | html-and-css | 26 | 18 | 8 | T1 |
-| api-design | 25 | 16 | 9 | T1 |
 | system-design | 24 | 16 | 8 | T2 |
 | angular-evolution | 23 | 10 | 13 | T3 |
 | javascript-the-language | 19 | 12 | 7 | T3 |
@@ -51,6 +52,7 @@ algorithms-and-data-structures, backend-engineering, beyond-the-browser, data-mo
 - **T1.0 · what-is-state-prequel — ✅ done (v12)**: 8 sections translated (3b definition+2 tables, 3c state-changes w/ verbatim pre, 5b mental-models table, 6b lifecycle/ownership, 6c derived/cache/config w/ React setCount pre, 6d identity vs state, 6e failure modes, 6f principles) + §5 examples+test para, §6 lifetime-table 5 rows (DB/URL/cookie·localStorage/server session/cache), stateful-vs-stateless paras, continue-reading para replacing 2 stale §7 refs; ENIAC-bullet factual sync; stale refs fixed („باقي §0“, §1, §4, §6) + tanwin-order normalization; both twins de-numbered (h2+h3), AR id pass 15/15 identical, all visible §/&sect; remapped (EN: von-Neumann + types links, 4 §-links, 9c/10b cross-doc); gates green (h2 15/15, h3 8/8, zero visible-§, ids identical, tags balanced, ratio 0.80 in calibrated band) — pending-only: 2 cross-doc frags into class-to-hooks AR twin (T2).
 - **T1.1 · ui-ux-web-design — ✅ done (v13)**: 3 sections translated (8b common interface patterns: 12 decision-table rows + state-matrix 15 rows + forms/IA/loading/visual-fundamentals/motion; 8c research methods 10-row + usability metrics + severity/triage + a11y testing workflow; 8d dark patterns 9-row + permission UX + localization/i18n + inclusive design 10-row); pre-existing drift fixed: AR §9 was missing Steps 5–6 (token mapping w/ verbatim tokens.json pre + naive-vs-designed table) — inserted; de-numbered both twins (h2+h3), AR h2 id pass 18/18 identical to EN, EN §9×2 + §8b remapped to anchors, AR reversed-token (٩§) → anchor; gates green (h2 18/18, h3 28/28, zero visible-§, ids identical, tags balanced, ratio 0.80).
 - **T1.2 · design-thinking — ✅ done (v14)**: 4 sections translated (8b synthesis: affinity/empathy/journey/POV-madlib tables; 8c ideation + prototype taxonomy: HMW/Crazy 8s/Worst-idea/roleplay/scale-matrix + concierge/Wizard-of-Oz/painted-door/concept-video; 8d desirability testing + handoff artifacts + layered-handoff callout; 8e room & org: HiPPO/buyer-vs-user/extractive research); AR §9 REPLACED by EN's full worked example (5 stages + verbatim insight pre + artifacts para) — flagged revert option if the old condensed table was intentional; pre-existing drift fixed: AR §10 academic-critique para upgraded to h3+3 bullets+thread (Norman year corrected 2023→2019), AR §12 future table +co-design row + heading subtitle «— أين يتجه»; stale EN §1d×2 → system-design #sec-intersection-with-neighbors (doc has no 1d) + §3b/§6/§7/§9/§10/§12 remapped; de-numbered both twins (h2 numeric; AR latin-letter suffixes 8b-8e too), AR h2 id pass 20/20; gates green (h2 20/20, h3 15/15, ids identical, zero visible-§, tags balanced, ratio 0.79) — pending: 2 cross-doc frags → system-design AR twin (T2).
+- **T1.3 · api-design — ✅ done (v15)**: 9 sections translated (8b conventions & identifiers 13-row + identifier-design 5-row tables; 8c collections pagination/filter/sort w/ verbatim GET pre; 8d validation errors w/ verbatim 422 pre + optimistic locking (If-Match/412); 8e 202/job-resources/webhooks w/ 3 verbatim pres + 8-row webhook table; 8f realtime/SSE/WebSocket; 8g compatibility matrix 10-row; 8h security & browser contracts (AR: security-and-threat-modeling link → ../ per EN-only rule) + a11y of scope discipline; 8i file uploads/binary; 8j AI-safe tool contracts); AR §9 (shipment tracking) already full 9-h3 mirror — kept; de-numbered both twins (h2+h3 incl latin suffixes), AR h2 id pass 25/25, EN 18 §-tokens remapped (8d×3, 8e×3, 8f×2, 8g, 8h, 10×3, 3, 5b, 11×2), AR reversed (٩§) ×3 fixed; gates green (h2 25/25, h3 23/23, ids identical, zero visible-§, pre 7/7, ratio 0.81).
 - **T2 · large fills** — system-design (before SDP), software-development-process, class-to-hooks-paradigm-shift.
 - **T3 · near-rebuilds** — javascript-the-language, javascript-across-stacks, frontend-camps-survey, angular-evolution.
 - **P3 · new twins** — observability-and-operations, security-and-threat-modeling (+ glossary/hub/cs-and-se link sync).
