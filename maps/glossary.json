@@ -1,0 +1,933 @@
+{
+ "WANT": {},
+ "FOLDS": [
+  [
+   "<tr>\n      <td><dfn>البرمجة الديناميكية (Dynamic Programming)</dfn></td>\n      <td>تعداد مخزّن للمسائل الفرعية المتداخلة: عرّف الحالة، اكتب الانتقال، حدد الحالات الأساسية، ثم خزّن (أو جدول). نمط \"صغّر التكلفة / عظّم القيمة / اختر مجموعات فرعية\". العودية المخزنة أولاً هي المسار الكسول الصحيح.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) §7</td>\n    </tr>",
+   "<tr>\n      <td><dfn>البرمجة الديناميكية (Dynamic Programming)</dfn></td>\n      <td>تعداد مخزّن للمسائل الفرعية المتداخلة: عرّف الحالة، اكتب الانتقال، حدد الحالات الأساسية، ثم خزّن (أو جدول). نمط \"صغّر التكلفة / عظّم القيمة / اختر مجموعات فرعية\". العودية المخزنة أولاً هي المسار الكسول الصحيح.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-dynamic-programming-the-state-machine-of-optimization\">§7</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Heuristic</dfn></td>\n      <td>A rule of thumb that usually helps but doesn't guarantee a solution. Contrast with <em>algorithm</em>, which guarantees a result. Pólya's heuristics: analogy, specialization, working backwards, decomposition, variation, auxiliary elements, generalization.</td>\n      <td>Problem-Solving §4</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Heuristic</dfn></td>\n      <td>A rule of thumb that usually helps but doesn't guarantee a solution. Contrast with <em>algorithm</em>, which guarantees a result. Pólya's heuristics: analogy, specialization, working backwards, decomposition, variation, auxiliary elements, generalization.</td>\n      <td>Problem-Solving <a href=\"./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves\">§4</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Union-Find</dfn></td>\n      <td>A near-O(1) connectivity data structure: <code>find</code> walks to a root, <code>union</code> links roots (with path compression and union by rank). Beats re-running BFS when edges arrive one by one — connected components, cycle detection, Kruskal's MST.</td>\n      <td>Algorithms §5</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Union-Find</dfn></td>\n      <td>A near-O(1) connectivity data structure: <code>find</code> walks to a root, <code>union</code> links roots (with path compression and union by rank). Beats re-running BFS when edges arrive one by one — connected components, cycle detection, Kruskal's MST.</td>\n      <td>Algorithms <a href=\"../algorithms-and-data-structures.html#sec-graphs-the-model-of-connections\">§5</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الرسم الخربش / الإطار / النموذج الأولي / MVP</dfn></td>\n      <td>ثلاثة محاور: الواقعية (كم يبدو حقيقياً)، وقابلية الرمي (هل يُرمى؟)، والسلوك (ثابت مقابل قابل للنقر). الرسم الخربش = قابلية رمي عالية + واقعية منخفضة + بلا سلوك. MVP = قابلية رمي منخفضة + واقعية إنتاجية + يعمل بالكامل.</td>\n      <td>حلقة المطور §12</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الرسم الخربش / الإطار / النموذج الأولي / MVP</dfn></td>\n      <td>ثلاثة محاور: الواقعية (كم يبدو حقيقياً)، وقابلية الرمي (هل يُرمى؟)، والسلوك (ثابت مقابل قابل للنقر). الرسم الخربش = قابلية رمي عالية + واقعية منخفضة + بلا سلوك. MVP = قابلية رمي منخفضة + واقعية إنتاجية + يعمل بالكامل.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-the-vocabulary-map-sketch-wireframe-mockup-prototype-spike-mvp\">§12</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Binary Search</dfn></td>\n      <td>Halving a search space via a monotonic predicate, not just sorted arrays: \"first index where isGood(i) is true\" over half-open range <code>[lo, hi)</code>. The template that never off-by-ones; also answers \"minimize the max X\" monotonic problems.</td>\n      <td>Algorithms §6</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Binary Search</dfn></td>\n      <td>Halving a search space via a monotonic predicate, not just sorted arrays: \"first index where isGood(i) is true\" over half-open range <code>[lo, hi)</code>. The template that never off-by-ones; also answers \"minimize the max X\" monotonic problems.</td>\n      <td>Algorithms <a href=\"../algorithms-and-data-structures.html#sec-sorting-and-searching-the-preprocessing-moves\">§6</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Dynamic Programming</dfn></td>\n      <td>Cached enumeration of overlapping subproblems: define state, write the transition, set base cases, then memoize (or tabulate). The \"minimize cost / maximize value / choose subsets\" pattern. Memoized recursion first is the lazy correct path.</td>\n      <td>Algorithms §7</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Dynamic Programming</dfn></td>\n      <td>Cached enumeration of overlapping subproblems: define state, write the transition, set base cases, then memoize (or tabulate). The \"minimize cost / maximize value / choose subsets\" pattern. Memoized recursion first is the lazy correct path.</td>\n      <td>Algorithms <a href=\"../algorithms-and-data-structures.html#sec-dynamic-programming-the-state-machine-of-optimization\">§7</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Wireframe / Mockup / Prototype / MVP</dfn></td>\n      <td>Three axes: Fidelity (how real), Disposability (throw away?), Behavior (static vs clickable). Wireframe = high disposability + low fidelity + no behavior. MVP = low disposability + production fidelity + fully working.</td>\n      <td>Dev Loop §12</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Wireframe / Mockup / Prototype / MVP</dfn></td>\n      <td>Three axes: Fidelity (how real), Disposability (throw away?), Behavior (static vs clickable). Wireframe = high disposability + low fidelity + no behavior. MVP = low disposability + production fidelity + fully working.</td>\n      <td>Dev Loop <a href=\"./how-developers-think-frontend.html#sec-the-vocabulary-map-sketch-wireframe-mockup-prototype-spike-mvp\">§12</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>اتحاد-بحث (Union-Find)</dfn></td>\n      <td>بنية ترابطية شبه O(1): find يمشي إلى الجذر، union يربط الجذور (بضغط المسار والاتحاد بالرتبة). تتفوق على إعادة تشغيل BFS عند وصول الحواف واحدة تلو الأخرى — المكونات المترابطة، كشف الدورات، كروسكال.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) §5</td>\n    </tr>",
+   "<tr>\n      <td><dfn>اتحاد-بحث (Union-Find)</dfn></td>\n      <td>بنية ترابطية شبه O(1): find يمشي إلى الجذر، union يربط الجذور (بضغط المسار والاتحاد بالرتبة). تتفوق على إعادة تشغيل BFS عند وصول الحواف واحدة تلو الأخرى — المكونات المترابطة، كشف الدورات، كروسكال.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-graphs-the-model-of-connections\">§5</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Computational Thinking</dfn></td>\n      <td>The lens for structuring problems computationally (Papert 1980, Wing 2006). Four pillars: decomposition, pattern recognition, abstraction, algorithm design. These are the moves <em>within</em> Pólya's phases.</td>\n      <td>Problem-Solving §3</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Computational Thinking</dfn></td>\n      <td>The lens for structuring problems computationally (Papert 1980, Wing 2006). Four pillars: decomposition, pattern recognition, abstraction, algorithm design. These are the moves <em>within</em> Pólya's phases.</td>\n      <td>Problem-Solving <a href=\"./problem-solving.html#sec-the-lens-computational-thinking-s-four-pillars\">§3</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>البحث الثنائي (Binary Search)</dfn></td>\n      <td>تنصيف فضاء البحث عبر مسند رتيب، لا مصفوفات مرتبة فقط: \"أول فهرس حيث isGood(i) صحيح\" على نطاق نصف مفتوح [lo, hi). القالب الذي لا يخطئ بواحد؛ يجيب أيضاً عن مسائل \"صغّر أقصى X\" الرتيبة.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) §6</td>\n    </tr>",
+   "<tr>\n      <td><dfn>البحث الثنائي (Binary Search)</dfn></td>\n      <td>تنصيف فضاء البحث عبر مسند رتيب، لا مصفوفات مرتبة فقط: \"أول فهرس حيث isGood(i) صحيح\" على نطاق نصف مفتوح [lo, hi). القالب الذي لا يخطئ بواحد؛ يجيب أيضاً عن مسائل \"صغّر أقصى X\" الرتيبة.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-sorting-and-searching-the-preprocessing-moves\">§6</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الهيكل العظمي → تعميق → تلميع (Skeleton → Deepen → Polish)</dfn></td>\n      <td>الدورة 0: توضيح. الدورة 1: أبسط الهياكل، HTML دلالي فقط، معالجات فارغة. الدورة 2: ترقية حيث يظهر الألم. الدورة 3: أداء، حالات حافة، إمكانية وصول.</td>\n      <td>حلقة المطور §1، §3، §4، §5</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الهيكل العظمي → تعميق → تلميع (Skeleton → Deepen → Polish)</dfn></td>\n      <td>الدورة 0: توضيح. الدورة 1: أبسط الهياكل، HTML دلالي فقط، معالجات فارغة. الدورة 2: ترقية حيث يظهر الألم. الدورة 3: أداء، حالات حافة، إمكانية وصول.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§1</a>، <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§3</a>، <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§4</a>، <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§5</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Exchange Argument</dfn></td>\n      <td>The proof a greedy choice is safe: \"if an optimal solution differs from mine, I can swap my choice in without making it worse.\" Without that argument, greedy is a gamble and DP is the safe answer.</td>\n      <td>Algorithms §8</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Exchange Argument</dfn></td>\n      <td>The proof a greedy choice is safe: \"if an optimal solution differs from mine, I can swap my choice in without making it worse.\" Without that argument, greedy is a gamble and DP is the safe answer.</td>\n      <td>Algorithms <a href=\"../algorithms-and-data-structures.html#sec-greedy-the-beautiful-lie\">§8</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الإيقاع، لا الخوارزمية (Rhythm, Not Algorithm)</dfn></td>\n      <td>المدخلات غير معرفة مسبقاً، الخطوات غير حتمية، لا إنهاء ثابت. الإيقاع = نمط تتقنه لتتمكن من ارتجاله. المطورون الكبار يعزفون القاعدة الكودية. المبتدئون يعزفون النوتات.</td>\n      <td>حلقة المطور §10</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الإيقاع، لا الخوارزمية (Rhythm, Not Algorithm)</dfn></td>\n      <td>المدخلات غير معرفة مسبقاً، الخطوات غير حتمية، لا إنهاء ثابت. الإيقاع = نمط تتقنه لتتمكن من ارتجاله. المطورون الكبار يعزفون القاعدة الكودية. المبتدئون يعزفون النوتات.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-why-is-it-a-rhythm-not-a-structured-algorithm\">§10</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>حجة التبادل (Exchange Argument)</dfn></td>\n      <td>البرهان أن اختياراً جشعاً آمن: \"إذا اختلف حل أمثل عن حلي، أستطيع مبادلة اختياري دون أن يسوء\". دون هذه الحجة، الجشع مقامرة والبرمجة الديناميكية هي الجواب الآمن.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) §8</td>\n    </tr>",
+   "<tr>\n      <td><dfn>حجة التبادل (Exchange Argument)</dfn></td>\n      <td>البرهان أن اختياراً جشعاً آمن: \"إذا اختلف حل أمثل عن حلي، أستطيع مبادلة اختياري دون أن يسوء\". دون هذه الحجة، الجشع مقامرة والبرمجة الديناميكية هي الجواب الآمن.</td>\n      <td>الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-greedy-the-beautiful-lie\">§8</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الاستدلال الإرشادي (Heuristic)</dfn></td>\n      <td>قاعدة تجريبية تساعد غالباً لكنها لا تضمن حلاً. قارنها بالخوارزمية التي تضمن النتيجة. استدلالات بوليا: القياس، التخصيص، العمل بالعكس، التحليل، التغيير، العناصر المساعدة، التعميم.</td>\n      <td>حل المشكلات §4</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الاستدلال الإرشادي (Heuristic)</dfn></td>\n      <td>قاعدة تجريبية تساعد غالباً لكنها لا تضمن حلاً. قارنها بالخوارزمية التي تضمن النتيجة. استدلالات بوليا: القياس، التخصيص، العمل بالعكس، التحليل، التغيير، العناصر المساعدة، التعميم.</td>\n      <td>حل المشكلات <a href=\"./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves\">§4</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الأنماط الخادعة (Dark Patterns)</dfn></td>\n      <td>أنماط مضللة (فندق الصراصير، التكاليف المخفية، الاستمرارية القسرية). أصبحت منظمة الآن: قانون الخدمات الرقمية الأوروبي (٢٠٢٢)، وقانون حذف كاليفورنيا (٢٠٢٣)، وقاعدة الخيار السلبي FTC.</td>\n      <td>UI/UX §11</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الأنماط الخادعة (Dark Patterns)</dfn></td>\n      <td>أنماط مضللة (فندق الصراصير، التكاليف المخفية، الاستمرارية القسرية). أصبحت منظمة الآن: قانون الخدمات الرقمية الأوروبي (٢٠٢٢)، وقانون حذف كاليفورنيا (٢٠٢٣)، وقاعدة الخيار السلبي FTC.</td>\n      <td>UI/UX <a href=\"./ui-ux-web-design.html#sec-ethics-dark-patterns-localization-and-inclusive-design\">§11</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Spiral Development / IID</dfn></td>\n      <td>Iterative & Incremental Development (Larman & Basili, 2003) — older than Waterfall. Boehm named it \"Spiral\" (1986): Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper.</td>\n      <td>Dev Loop §11</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Spiral Development / IID</dfn></td>\n      <td>Iterative & Incremental Development (Larman & Basili, 2003) — older than Waterfall. Boehm named it \"Spiral\" (1986): Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper.</td>\n      <td>Dev Loop <a href=\"./how-developers-think-frontend.html#sec-what-is-this-process-called-entity-types-and-terminology\">§11</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Pólya's Four Phases</dfn></td>\n      <td>The universal problem-solving rhythm (1945): Understand → Plan → Execute → Look back. A rhythm, not a waterfall — you cycle, returning to earlier phases when later ones reveal gaps.</td>\n      <td>Problem-Solving §2</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Pólya's Four Phases</dfn></td>\n      <td>The universal problem-solving rhythm (1945): Understand → Plan → Execute → Look back. A rhythm, not a waterfall — you cycle, returning to earlier phases when later ones reveal gaps.</td>\n      <td>Problem-Solving <a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">§2</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Skeleton → Deepen → Polish</dfn></td>\n      <td>Round 0: Clarify. Round 1: Simplest structures, semantic HTML, stub handlers. Round 2: Upgrade where pain appears, full styling, real logic. Round 3: Perf, edge cases, a11y.</td>\n      <td>Dev Loop §1, §3–5</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Skeleton → Deepen → Polish</dfn></td>\n      <td>Round 0: Clarify. Round 1: Simplest structures, semantic HTML, stub handlers. Round 2: Upgrade where pain appears, full styling, real logic. Round 3: Perf, edge cases, a11y.</td>\n      <td>Dev Loop <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§1</a>, <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§3</a>–5</td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Data Shape First</dfn></td>\n      <td>Sketch the nouns, fields, collection types, operations, component state ownership <em>before</em> writing HTML. The shape determines the UI structure; changing it late is expensive.</td>\n      <td>Dev Loop §2, §13</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Data Shape First</dfn></td>\n      <td>Sketch the nouns, fields, collection types, operations, component state ownership <em>before</em> writing HTML. The shape determines the UI structure; changing it late is expensive.</td>\n      <td>Dev Loop <a href=\"./how-developers-think-frontend.html#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example\">§2</a>, <a href=\"./how-developers-think-frontend.html#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example\">§13</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Model / View / Flow (Three Threads)</dfn></td>\n      <td>The mental loop: Thread 1 = Data structures & state shape. Thread 2 = Structure + layout (HTML). Thread 3 = Events, data movement, logic. Intertwined, not sequential.</td>\n      <td>Dev Loop §1</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Model / View / Flow (Three Threads)</dfn></td>\n      <td>The mental loop: Thread 1 = Data structures & state shape. Thread 2 = Structure + layout (HTML). Thread 3 = Events, data movement, logic. Intertwined, not sequential.</td>\n      <td>Dev Loop <a href=\"./how-developers-think-frontend.html#sec-the-three-thread-mental-model-not-a-sequence-a-loop\">§1</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>التطوير الحلزوني / التكراري التزايدي (Spiral / IID)</dfn></td>\n      <td>التطوير التكراري والتزايدي (لارمان وباسيلي، ٢٠٠٣) أقدم من الشلال. بوهم سماه \"حلزونياً\" (١٩٨٦): خطة → تحليل مخاطر → هندسة → تقييم، وكل دورة أعمق.</td>\n      <td>حلقة المطور §11</td>\n    </tr>",
+   "<tr>\n      <td><dfn>التطوير الحلزوني / التكراري التزايدي (Spiral / IID)</dfn></td>\n      <td>التطوير التكراري والتزايدي (لارمان وباسيلي، ٢٠٠٣) أقدم من الشلال. بوهم سماه \"حلزونياً\" (١٩٨٦): خطة → تحليل مخاطر → هندسة → تقييم، وكل دورة أعمق.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-what-is-this-process-called-entity-types-and-terminology\">§11</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>نموذج ذهني ثلاثي الخيوط (Three-Thread Mental Model)</dfn></td>\n      <td>خيط 1: النموذج (هياكل البيانات، شكل الحالة). خيط 2: العرض (البنية + التخطيط). خيط 3: التدفق (أحداث، حركة بيانات، منطق). تدور فيهم، كل دورة أعمق.</td>\n      <td>حلقة المطور §1</td>\n    </tr>",
+   "<tr>\n      <td><dfn>نموذج ذهني ثلاثي الخيوط (Three-Thread Mental Model)</dfn></td>\n      <td>خيط 1: النموذج (هياكل البيانات، شكل الحالة). خيط 2: العرض (البنية + التخطيط). خيط 3: التدفق (أحداث، حركة بيانات، منطق). تدور فيهم، كل دورة أعمق.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-the-three-thread-mental-model-not-a-sequence-a-loop\">§1</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>شكل البيانات يقود واجهة المستخدم (Data Shape Drives UI)</dfn></td>\n      <td>الأسماء وحقولها تحدد شجرة المكون، لا التخطيط البصري. إذا كانت بياناتك الأساسية شجرة، واجهة المستخدم <em>ستكون</em> بها تكرار في مكان ما.</td>\n      <td>حلقة المطور §13</td>\n    </tr>",
+   "<tr>\n      <td><dfn>شكل البيانات يقود واجهة المستخدم (Data Shape Drives UI)</dfn></td>\n      <td>الأسماء وحقولها تحدد شجرة المكون، لا التخطيط البصري. إذا كانت بياناتك الأساسية شجرة، واجهة المستخدم <em>ستكون</em> بها تكرار في مكان ما.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example\">§13</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>التفكير الحسابي (Computational Thinking)</dfn></td>\n      <td>عدسة هيكلة المشكلات حسابياً (بابيرت ١٩٨٠، وينغ ٢٠٠٦). أربع ركائز: التحليل، التعرف على الأنماط، التجريد، تصميم الخوارزميات. هذه حركات داخل مراحل بوليا.</td>\n      <td>حل المشكلات §3</td>\n    </tr>",
+   "<tr>\n      <td><dfn>التفكير الحسابي (Computational Thinking)</dfn></td>\n      <td>عدسة هيكلة المشكلات حسابياً (بابيرت ١٩٨٠، وينغ ٢٠٠٦). أربع ركائز: التحليل، التعرف على الأنماط، التجريد، تصميم الخوارزميات. هذه حركات داخل مراحل بوليا.</td>\n      <td>حل المشكلات <a href=\"./problem-solving.html#sec-the-lens-computational-thinking-s-four-pillars\">§3</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الترتيب الطوبولوجي (Topological Sort)</dfn></td>\n      <td>ترتيب عقد DAG بحيث تشير كل حافة للأمام — خوارزمية كان أو DFS بترتيب لاحق؛ تعمل كشف دورات مزدوجاً. نمط \"المتطلبات/التبعيات/الترتيب\".</td>\n      <td>الخوارزميات وهياكل البيانات (EN) §5</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الترتيب الطوبولوجي (Topological Sort)</dfn></td>\n      <td>ترتيب عقد DAG بحيث تشير كل حافة للأمام — خوارزمية كان أو DFS بترتيب لاحق؛ تعمل كشف دورات مزدوجاً. نمط \"المتطلبات/التبعيات/الترتيب\".</td>\n      <td>الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-graphs-the-model-of-connections\">§5</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Topological Sort</dfn></td>\n      <td>Ordering a DAG's nodes so every edge points forward — Kahn's algorithm or DFS post-order; doubles as cycle detection. The \"prerequisites / dependencies / ordering\" pattern.</td>\n      <td>Algorithms §5</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Topological Sort</dfn></td>\n      <td>Ordering a DAG's nodes so every edge points forward — Kahn's algorithm or DFS post-order; doubles as cycle detection. The \"prerequisites / dependencies / ordering\" pattern.</td>\n      <td>Algorithms <a href=\"../algorithms-and-data-structures.html#sec-graphs-the-model-of-connections\">§5</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>تصفح بالمؤشر (Keyset/Cursor Pagination)</dfn></td>\n      <td>تصفح باستخدام مفتاح ترتيب مستقر (<code>after: \"cursor\"</code>) بدلاً من الإزاحة. O(1) مقابل O(n) للصفوف المتخطاة. افتراضي للمجموعات النامية.</td>\n      <td>تصميم API §9، §10</td>\n    </tr>",
+   "<tr>\n      <td><dfn>تصفح بالمؤشر (Keyset/Cursor Pagination)</dfn></td>\n      <td>تصفح باستخدام مفتاح ترتيب مستقر (<code>after: \"cursor\"</code>) بدلاً من الإزاحة. O(1) مقابل O(n) للصفوف المتخطاة. افتراضي للمجموعات النامية.</td>\n      <td>تصميم API <a href=\"./api-design.html#sec-collections-pagination-filtering-sorting-and-search\">§9</a>، <a href=\"./api-design.html#sec-collections-pagination-filtering-sorting-and-search\">§10</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>ADR (Architecture Decision Record)</dfn></td>\n      <td>Lightweight markdown: Title, Status, Context, Decision, Consequences. Git-tracked. Captures <em>why</em>, not just <em>what</em> (Nygard, 2011).</td>\n      <td>System Design §9</td>\n    </tr>",
+   "<tr>\n      <td><dfn>ADR (Architecture Decision Record)</dfn></td>\n      <td>Lightweight markdown: Title, Status, Context, Decision, Consequences. Git-tracked. Captures <em>why</em>, not just <em>what</em> (Nygard, 2011).</td>\n      <td>System Design <a href=\"./system-design.html#sec-methodologies-heuristics\">§9</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Derived State</dfn></td>\n      <td>Values computed from other state at render time (filtered list, active count). <strong>Never store derived values in state</strong> — it's the most common frontend bug.</td>\n      <td>Dev Loop §13</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Derived State</dfn></td>\n      <td>Values computed from other state at render time (filtered list, active count). <strong>Never store derived values in state</strong> — it's the most common frontend bug.</td>\n      <td>Dev Loop <a href=\"./how-developers-think-frontend.html#sec-frontend-state-decisions-the-taxonomy\">§13</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Cursor Pagination (Keyset)</dfn></td>\n      <td>Pagination using a stable sort key (<code>after: \"cursor\"</code>) instead of offset. O(1) vs O(n) for skipped rows. Default for growing collections.</td>\n      <td>API Design §9, §10</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Cursor Pagination (Keyset)</dfn></td>\n      <td>Pagination using a stable sort key (<code>after: \"cursor\"</code>) instead of offset. O(1) vs O(n) for skipped rows. Default for growing collections.</td>\n      <td>API Design <a href=\"./api-design.html#sec-collections-pagination-filtering-sorting-and-search\">§9</a>, <a href=\"./api-design.html#sec-collections-pagination-filtering-sorting-and-search\">§10</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>مراحل بوليا الأربع (Pólya's Four Phases)</dfn></td>\n      <td>الإيقاع العالمي لحل المشكلات (١٩٤٥): افهم ← خطط ← نفّذ ← انظر للخلف. إيقاع لا شلال — تدور وتعود للمراحل المبكرة حين تكشف اللاحقة ثغرات.</td>\n      <td>حل المشكلات §2</td>\n    </tr>",
+   "<tr>\n      <td><dfn>مراحل بوليا الأربع (Pólya's Four Phases)</dfn></td>\n      <td>الإيقاع العالمي لحل المشكلات (١٩٤٥): افهم ← خطط ← نفّذ ← انظر للخلف. إيقاع لا شلال — تدور وتعود للمراحل المبكرة حين تكشف اللاحقة ثغرات.</td>\n      <td>حل المشكلات <a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">§2</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Insight Statement</dfn></td>\n      <td>A reframed problem: \"Users don't forget because of memory — they forget because the trigger is hidden by their environment.\" Output of the Define stage.</td>\n      <td>Design Thinking §9</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Insight Statement</dfn></td>\n      <td>A reframed problem: \"Users don't forget because of memory — they forget because the trigger is hidden by their environment.\" Output of the Define stage.</td>\n      <td>Design Thinking <a href=\"./design-thinking.html#sec-synthesis-from-raw-field-data-to-an-insight-statement\">§9</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الحالة تعيش حيث تُشارك (State Lives Where It's Shared)</dfn></td>\n      <td>ارفع الحالة لأدنى سلف مشترك؛ استخلص، لا تكرر. تخزين القيم المستخلصة = أحد أكثر أخطاء حالة الواجهة الأمامية شيوعاً.</td>\n      <td>حلقة المطور §13</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الحالة تعيش حيث تُشارك (State Lives Where It's Shared)</dfn></td>\n      <td>ارفع الحالة لأدنى سلف مشترك؛ استخلص، لا تكرر. تخزين القيم المستخلصة = أحد أكثر أخطاء حالة الواجهة الأمامية شيوعاً.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-frontend-state-decisions-the-taxonomy\">§13</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>الحالة المشتقة (Derived State)</dfn></td>\n      <td>قيم تُحسب من حالة أخرى وقت العرض (قائمة مفلترة، عدد نشط). لا تخزّن قيماً مشتقة في الحالة أبداً — هذا أكثر أخطاء الواجهات الأمامية شيوعاً.</td>\n      <td>حلقة المطور §13</td>\n    </tr>",
+   "<tr>\n      <td><dfn>الحالة المشتقة (Derived State)</dfn></td>\n      <td>قيم تُحسب من حالة أخرى وقت العرض (قائمة مفلترة، عدد نشط). لا تخزّن قيماً مشتقة في الحالة أبداً — هذا أكثر أخطاء الواجهات الأمامية شيوعاً.</td>\n      <td>حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-frontend-state-decisions-the-taxonomy\">§13</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Dark Patterns</dfn></td>\n      <td>Deceptive patterns (roach motel, hidden costs, forced continuity). Now regulated: EU DSA (2022), California Delete Act (2023), FTC negative option rule.</td>\n      <td>UI/UX §11</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Dark Patterns</dfn></td>\n      <td>Deceptive patterns (roach motel, hidden costs, forced continuity). Now regulated: EU DSA (2022), California Delete Act (2023), FTC negative option rule.</td>\n      <td>UI/UX <a href=\"./ui-ux-web-design.html#sec-ethics-dark-patterns-localization-and-inclusive-design\">§11</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Motion as Meaning</dfn></td>\n      <td>Motion explains spatial relationships (where did this come from?) not \"delight.\" FLIP animations, shared element transitions, View Transitions API.</td>\n      <td>UI/UX §11</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Motion as Meaning</dfn></td>\n      <td>Motion explains spatial relationships (where did this come from?) not \"delight.\" FLIP animations, shared element transitions, View Transitions API.</td>\n      <td>UI/UX <a href=\"./ui-ux-web-design.html#sec-common-interface-patterns-and-how-to-choose-between-them\">§11</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>عبارة رؤية (Insight Statement)</dfn></td>\n      <td>مشكلة معاد صياغتها: \"المرضى لا ينسون بسبب الذاكرة — بل ينسون لأن المحفز (الزجاجة) مخفي في بيئتهم\". مخرج طور التعريف.</td>\n      <td>التفكير التصميمي §9</td>\n    </tr>",
+   "<tr>\n      <td><dfn>عبارة رؤية (Insight Statement)</dfn></td>\n      <td>مشكلة معاد صياغتها: \"المرضى لا ينسون بسبب الذاكرة — بل ينسون لأن المحفز (الزجاجة) مخفي في بيئتهم\". مخرج طور التعريف.</td>\n      <td>التفكير التصميمي <a href=\"./design-thinking.html#sec-synthesis-from-raw-field-data-to-an-insight-statement\">§9</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>سجل قرار معماري (ADR)</dfn></td>\n      <td>Markdown خفيف: عنوان، حالة، سياق، قرار، عواقب. متعقب بـ Git. يلتقط <em>لماذا</em>، لا <em>ماذا</em> فقط (نيجارد، ٢٠١١).</td>\n      <td>التصميم المعماري §9</td>\n    </tr>",
+   "<tr>\n      <td><dfn>سجل قرار معماري (ADR)</dfn></td>\n      <td>Markdown خفيف: عنوان، حالة، سياق، قرار، عواقب. متعقب بـ Git. يلتقط <em>لماذا</em>، لا <em>ماذا</em> فقط (نيجارد، ٢٠١١).</td>\n      <td>التصميم المعماري <a href=\"./system-design.html#sec-methodologies-heuristics\">§9</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>اختبار العقد (Contract Testing)</dfn></td>\n      <td>بوابة CI: التنفيذ يجب أن يطابق المخطط. Pact (موجه بالمستهلك)، Dredd، Schemathesis. يمنع انحراف المخطط.</td>\n      <td>تصميم API §10</td>\n    </tr>",
+   "<tr>\n      <td><dfn>اختبار العقد (Contract Testing)</dfn></td>\n      <td>بوابة CI: التنفيذ يجب أن يطابق المخطط. Pact (موجه بالمستهلك)، Dredd، Schemathesis. يمنع انحراف المخطط.</td>\n      <td>تصميم API <a href=\"./api-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§10</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>المعسكر = مركز ثقل، لا نادٍ (Camp = Center of Gravity)</dfn></td>\n      <td>المستودعات تخلط المعسكرات؛ تتبع من يملك أول رسم. CSS Zen Garden ≠ تطبيق React.</td>\n      <td>المعسكرات §0</td>\n    </tr>",
+   "<tr>\n      <td><dfn>المعسكر = مركز ثقل، لا نادٍ (Camp = Center of Gravity)</dfn></td>\n      <td>المستودعات تخلط المعسكرات؛ تتبع من يملك أول رسم. CSS Zen Garden ≠ تطبيق React.</td>\n      <td>المعسكرات <a href=\"./frontend-camps-survey.html#sec-market-gravity-who-hires-which-camp\">§0</a></td>\n    </tr>"
+  ],
+  [
+   "<tr>\n      <td><dfn>Contract Testing</dfn></td>\n      <td>CI gate: implementation must match schema. Pact (consumer-driven), Dredd, Schemathesis. Prevents schema drift.</td>\n      <td>API Design §10</td>\n    </tr>",
+   "<tr>\n      <td><dfn>Contract Testing</dfn></td>\n      <td>CI gate: implementation must match schema. Pact (consumer-driven), Dredd, Schemathesis. Prevents schema drift.</td>\n      <td>API Design <a href=\"./api-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§10</a></td>\n    </tr>"
+  ],
+  [
+   "SQL وPostgreSQL (EN) §الـJOINs؛ هندسة الواجهات الخلفية (EN) §1e (N+1)؛ نمذجة البيانات وقواعد البيانات (EN) §الفهرسة",
+   "SQL وPostgreSQL (EN) §الـJOINs؛ هندسة الواجهات الخلفية (EN) <a href=\"../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time\">§1</a>e (N+1)؛ نمذجة البيانات وقواعد البيانات (EN) §الفهرسة"
+  ],
+  [
+   "SQL &amp; PostgreSQL §JOINs; Backend Engineering §1e (N+1); Data Modeling &amp; Databases §Indexing",
+   "SQL &amp; PostgreSQL §JOINs; Backend Engineering <a href=\"../backend-engineering.html#sec-data-access-orms-vs-raw-sql\">§1e</a> (N+1); Data Modeling &amp; Databases §Indexing"
+  ],
+  [
+   "JS عبر المكدسات §3؛ التصميم المعماري §3؛ تصميم API §3؛ UI/UX §3؛ HTML & CSS §3؛ التفكير التصميمي §3",
+   "JS عبر المكدسات <a href=\"./javascript-across-stacks.html#sec-the-backend-perspective\">§3</a>؛ التصميم المعماري <a href=\"./system-design.html#sec-evolution-paradigms-through-one-lens\">§3</a>؛ تصميم API <a href=\"./api-design.html#sec-evolution-constraint-inversions-across-the-same-idea\">§3</a>؛ UI/UX <a href=\"./ui-ux-web-design.html#sec-evolution-constraint-inversions-across-ui-history\">§3</a>؛ HTML & CSS <a href=\"./html-and-css.html#sec-evolution-constraint-inversions-across-the-platform\">§3</a>؛ التفكير التصميمي <a href=\"./design-thinking.html#sec-evolution-from-industrial-design-to-software-and-policy\">§3</a>"
+  ],
+  [
+   "JS Across Stacks §3; System Design §3; API Design §3; UI/UX §3; HTML & CSS §3; Design Thinking §3",
+   "JS Across Stacks <a href=\"./javascript-across-stacks.html#sec-the-backend-perspective\">§3</a>; System Design <a href=\"./system-design.html#sec-evolution-paradigms-through-one-lens\">§3</a>; API Design <a href=\"./api-design.html#sec-evolution-constraint-inversions-across-the-same-idea\">§3</a>; UI/UX <a href=\"./ui-ux-web-design.html#sec-evolution-constraint-inversions-across-ui-history\">§3</a>; HTML & CSS <a href=\"./html-and-css.html#sec-evolution-constraint-inversions-across-the-platform\">§3</a>; Design Thinking <a href=\"./design-thinking.html#sec-evolution-from-industrial-design-to-software-and-policy\">§3</a>"
+  ],
+  [
+   "System Design §7; API Design §4; HTML & CSS §4; Security &amp; Threat Modeling §Threat modeling",
+   "System Design <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>; API Design <a href=\"./api-design.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§4</a>; HTML & CSS <a href=\"./html-and-css.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§4</a>; Security &amp; Threat Modeling §Threat modeling"
+  ],
+  [
+   "المراقبة والتشغيل (EN) §6، §9؛ SDP (EN) §9ح؛ الأمن ونمذجة التهديدات (EN) §نمذجة التهديدات",
+   "المراقبة والتشغيل (EN) <a href=\"../observability-and-operations.html#sec-principles-the-shared-constants\">§6</a>، <a href=\"../observability-and-operations.html#sec-common-failure-modes\">§9</a>؛ SDP (EN) <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9ح</a>؛ الأمن ونمذجة التهديدات (EN) §نمذجة التهديدات"
+  ],
+  [
+   "المراقبة والتشغيل (EN) §4، §8؛ SDP (EN) §9ح؛ الأمن ونمذجة التهديدات (EN) §إدارة المخاطر",
+   "المراقبة والتشغيل (EN) <a href=\"../observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment\">§4</a>، <a href=\"../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§8</a>؛ SDP (EN) <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9ح</a>؛ الأمن ونمذجة التهديدات (EN) §إدارة المخاطر"
+  ],
+  [
+   ".NET &amp; the Enterprise Lane §The request loop, C# edition; Backend Engineering §1",
+   ".NET &amp; the Enterprise Lane §The request loop, C# edition; Backend Engineering <a href=\"../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time\">§1</a>"
+  ],
+  [
+   ".NET &amp; the Enterprise Lane §EF Core; Backend Engineering §1e (ORM decision)",
+   ".NET &amp; the Enterprise Lane §EF Core; Backend Engineering <a href=\"../backend-engineering.html#sec-data-access-orms-vs-raw-sql\">§1e</a> (ORM decision)"
+  ],
+  [
+   ".NET والممر المؤسسي (EN) §حلقة الطلب بنسخة C#؛ هندسة الواجهات الخلفية (EN) §1",
+   ".NET والممر المؤسسي (EN) §حلقة الطلب بنسخة C#؛ هندسة الواجهات الخلفية (EN) <a href=\"../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time\">§1</a>"
+  ],
+  [
+   ".NET والممر المؤسسي (EN) §EF Core؛ هندسة الواجهات الخلفية (EN) §1e (قرار ORM)",
+   ".NET والممر المؤسسي (EN) §EF Core؛ هندسة الواجهات الخلفية (EN) <a href=\"../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time\">§1</a>e (قرار ORM)"
+  ],
+  [
+   "المدفوعات والتجارة (EN) §أنماط التكامل؛ هندسة الواجهات الخلفية (EN) §5",
+   "المدفوعات والتجارة (EN) §أنماط التكامل؛ هندسة الواجهات الخلفية (EN) <a href=\"../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it\">§5</a>"
+  ],
+  [
+   "Payments &amp; Commerce §Integration patterns; Backend Engineering §5",
+   "Payments &amp; Commerce §Integration patterns; Backend Engineering <a href=\"../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it\">§5</a>"
+  ],
+  [
+   "Ops §4, §8; SDP §9h; Security &amp; Threat Modeling §Risk management",
+   "Ops <a href=\"../observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment\">§4</a>, <a href=\"../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§8</a>; SDP <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9h</a>; Security &amp; Threat Modeling §Risk management"
+  ],
+  [
+   "Ops §6, §9; SDP §9h; Security &amp; Threat Modeling §Threat modeling",
+   "Ops <a href=\"../observability-and-operations.html#sec-principles-the-shared-constants\">§6</a>, <a href=\"../observability-and-operations.html#sec-common-failure-modes\">§9</a>; SDP <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9h</a>; Security &amp; Threat Modeling §Threat modeling"
+  ],
+  [
+   "تصميم API §7، §8، §11؛ التصميم المعماري §11؛ معسكرات §4؛ JS اللغة §6",
+   "تصميم API <a href=\"./api-design.html#sec-methodologies-styles-the-named-approaches\">§7</a>، <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>، <a href=\"./api-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§11</a>؛ التصميم المعماري <a href=\"./system-design.html#sec-methodologies-heuristics\">§11</a>؛ معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>؛ JS اللغة <a href=\"./javascript-the-language.html#sec-the-host-environment-not-the-language\">§6</a>"
+  ],
+  [
+   "API Design §7, §8, §11; System Design §11; Camps §4; JS Language §6",
+   "API Design <a href=\"./api-design.html#sec-methodologies-styles-the-named-approaches\">§7</a>, <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>, <a href=\"./api-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§11</a>; System Design <a href=\"./system-design.html#sec-methodologies-heuristics\">§11</a>; Camps <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>; JS Language <a href=\"./javascript-the-language.html#sec-the-host-environment-not-the-language\">§6</a>"
+  ],
+  [
+   "System Design §5, §6, §8; API Design §8; Dev Loop §5; Ops §1, §3",
+   "System Design <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>, <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>, <a href=\"./system-design.html#sec-why-it-is-a-method-not-an-algorithm\">§8</a>; API Design <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>; Dev Loop <a href=\"./how-developers-think-frontend.html#sec-the-three-thread-mental-model-not-a-sequence-a-loop\">§5</a>; Ops <a href=\"../observability-and-operations.html#sec-slo-design-choosing-what-to-promise\">§1</a>, <a href=\"../observability-and-operations.html#sec-incident-response-from-detection-to-recovery\">§3</a>"
+  ],
+  [
+   "HTML & CSS §1، §8؛ UI/UX §2؛ معسكرات §2؛ التصميم المعماري §6",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-principles-the-shared-constants\">§8</a>؛ UI/UX <a href=\"./ui-ux-web-design.html#sec-history-from-print-composition-to-systems-driven-ui\">§2</a>؛ معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-b-html-first-and-islands\">§2</a>؛ التصميم المعماري <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "HTML & CSS §1، §5؛ UI/UX §2؛ معسكرات §2؛ التصميم المعماري §6",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>؛ UI/UX <a href=\"./ui-ux-web-design.html#sec-history-from-print-composition-to-systems-driven-ui\">§2</a>؛ معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-b-html-first-and-islands\">§2</a>؛ التصميم المعماري <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "UI/UX §1، §7؛ HTML & CSS §1، §7؛ معسكرات §4؛ حلقة المطور §3",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-definition-what-ui-ux-is-and-what-it-is-not\">§1</a>، <a href=\"./ui-ux-web-design.html#sec-methodologies-named-frameworks\">§7</a>؛ HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-methodologies-named-frameworks\">§7</a>؛ معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>؛ حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§3</a>"
+  ],
+  [
+   "المراقبة والتشغيل (EN) §5، §8؛ SDP (EN) §9ح؛ حل المشكلات §9",
+   "المراقبة والتشغيل (EN) <a href=\"../observability-and-operations.html#sec-runbooks-making-the-known-response-boring\">§5</a>، <a href=\"../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§8</a>؛ SDP (EN) <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9ح</a>؛ حل المشكلات <a href=\"./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted\">§9</a>"
+  ],
+  [
+   "التصميم المعماري §5، §6، §8؛ تصميم API §8؛ حلقة المطور §5",
+   "التصميم المعماري <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>، <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>، <a href=\"./system-design.html#sec-why-it-is-a-method-not-an-algorithm\">§8</a>؛ تصميم API <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>؛ حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-the-three-thread-mental-model-not-a-sequence-a-loop\">§5</a>"
+  ],
+  [
+   "التصميم المعماري (EN) §6ف؛ المراقبة والتشغيل (EN) §2، §8",
+   "التصميم المعماري (EN) <a href=\"./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery\">§6ف</a>؛ المراقبة والتشغيل (EN) <a href=\"../observability-and-operations.html#sec-alert-design-turning-targets-into-contracts-with-humans\">§2</a>، <a href=\"../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§8</a>"
+  ],
+  [
+   "HTML & CSS §1, §5; UI/UX §2; Camps §2; System Design §6",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>, <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>; UI/UX <a href=\"./ui-ux-web-design.html#sec-history-from-print-composition-to-systems-driven-ui\">§2</a>; Camps <a href=\"./frontend-camps-survey.html#sec-camp-b-html-first-and-islands\">§2</a>; System Design <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "UI/UX §1, §7; HTML & CSS §1, §7; Camps §4; Dev Loop §3",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-definition-what-ui-ux-is-and-what-it-is-not\">§1</a>, <a href=\"./ui-ux-web-design.html#sec-methodologies-named-frameworks\">§7</a>; HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>, <a href=\"./html-and-css.html#sec-methodologies-named-frameworks\">§7</a>; Camps <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>; Dev Loop <a href=\"./how-developers-think-frontend.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§3</a>"
+  ],
+  [
+   "التصميم المعماري §7؛ ممارسة العمل الحر (EN) §النطاق",
+   "التصميم المعماري <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>؛ ممارسة العمل الحر (EN) §النطاق"
+  ],
+  [
+   "System Design §7; Freelance Web Practice §Scoping",
+   "System Design <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>; Freelance Web Practice §Scoping"
+  ],
+  [
+   "التصميم المعماري §7؛ تصميم API §4؛ HTML & CSS §4",
+   "التصميم المعماري <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>؛ تصميم API <a href=\"./api-design.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§4</a>؛ HTML & CSS <a href=\"./html-and-css.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§4</a>"
+  ],
+  [
+   "المراقبة والتشغيل (EN) §3، §7ب، §9؛ SDP (EN) §9ح",
+   "المراقبة والتشغيل (EN) <a href=\"../observability-and-operations.html#sec-incident-response-from-detection-to-recovery\">§3</a>، <a href=\"../observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty\">§7ب</a>، <a href=\"../observability-and-operations.html#sec-common-failure-modes\">§9</a>؛ SDP (EN) <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9ح</a>"
+  ],
+  [
+   "المراقبة والتشغيل (EN) §3، §4، §7ب؛ SDP (EN) §9ح",
+   "المراقبة والتشغيل (EN) <a href=\"../observability-and-operations.html#sec-incident-response-from-detection-to-recovery\">§3</a>، <a href=\"../observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment\">§4</a>، <a href=\"../observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty\">§7ب</a>؛ SDP (EN) <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9ح</a>"
+  ],
+  [
+   "التصميم المعماري §6، §7؛ تصميم API §8، §9",
+   "التصميم المعماري <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>، <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>؛ تصميم API <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>، <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>"
+  ],
+  [
+   "System Design §6, §7; API Design §8, §9",
+   "System Design <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>, <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>; API Design <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>, <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>"
+  ],
+  [
+   "Ops §5, §8; SDP §9h; Problem-Solving §9",
+   "Ops <a href=\"../observability-and-operations.html#sec-runbooks-making-the-known-response-boring\">§5</a>, <a href=\"../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§8</a>; SDP <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9h</a>; Problem-Solving <a href=\"./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted\">§9</a>"
+  ],
+  [
+   "Problem-Solving §1; Design Thinking §2",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-definition-what-problem-solving-is-and-what-it-is-not\">§1</a>; Design Thinking <a href=\"./design-thinking.html#sec-history-five-phases-of-the-idea\">§2</a>"
+  ],
+  [
+   "تصميم API §8، §9؛ التصميم المعماري §6",
+   "تصميم API <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>، <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>؛ التصميم المعماري <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "API Design §8, §9; System Design §6",
+   "API Design <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>, <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>; System Design <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "حل المشكلات §1؛ التفكير التصميمي §2",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-definition-what-problem-solving-is-and-what-it-is-not\">§1</a>؛ التفكير التصميمي <a href=\"./design-thinking.html#sec-history-five-phases-of-the-idea\">§2</a>"
+  ],
+  [
+   "الخوارزميات وهياكل البيانات (EN) §2",
+   "الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80\">§2</a>"
+  ],
+  [
+   "الخوارزميات وهياكل البيانات (EN) §3",
+   "الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-stacks-queues-and-linked-lists-the-shapes\">§3</a>"
+  ],
+  [
+   "الخوارزميات وهياكل البيانات (EN) §4",
+   "الخوارزميات وهياكل البيانات (EN) <a href=\"../algorithms-and-data-structures.html#sec-trees-and-heaps-the-hierarchies\">§4</a>"
+  ],
+  [
+   "UI/UX §1، §8؛ HTML & CSS §1، §8",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-definition-what-ui-ux-is-and-what-it-is-not\">§1</a>، <a href=\"./ui-ux-web-design.html#sec-principles-the-shared-constants\">§8</a>؛ HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "UI/UX §7؛ HTML &amp; CSS §7، §8",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-methodologies-named-frameworks\">§7</a>؛ HTML &amp; CSS <a href=\"./html-and-css.html#sec-methodologies-named-frameworks\">§7</a>، <a href=\"./html-and-css.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "System Design §6f; Ops §2, §8",
+   "System Design <a href=\"./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery\">§6f</a>; Ops <a href=\"../observability-and-operations.html#sec-alert-design-turning-targets-into-contracts-with-humans\">§2</a>, <a href=\"../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§8</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §1، §3",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is\">§1</a>، <a href=\"./software-development-process.html#sec-the-agile-manifesto-4-values-12-principles-2001\">§3</a>"
+  ],
+  [
+   "UI/UX §7; HTML & CSS §7, §8",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-methodologies-named-frameworks\">§7</a>; HTML & CSS <a href=\"./html-and-css.html#sec-methodologies-named-frameworks\">§7</a>, <a href=\"./html-and-css.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "UI/UX §9; HTML & CSS §0, §4",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns\">§9</a>; HTML & CSS <a href=\"./html-and-css.html#sec-how-to-use-this-doc\">§0</a>, <a href=\"./html-and-css.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§4</a>"
+  ],
+  [
+   "HTML &amp; CSS §1، §3، §7",
+   "HTML &amp; CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-evolution-constraint-inversions-across-the-platform\">§3</a>، <a href=\"./html-and-css.html#sec-methodologies-named-frameworks\">§7</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §1ب",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-history-from-waterfall-to-agile-to-ai-agents-1970present\">§1ب</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §1ه",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-underlying-theory-empirical-process-control-and-lean\">§1ه</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §9د",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle\">§9د</a>"
+  ],
+  [
+   "Ops §3, §7b, §9; SDP §9h",
+   "Ops <a href=\"../observability-and-operations.html#sec-incident-response-from-detection-to-recovery\">§3</a>, <a href=\"../observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty\">§7b</a>, <a href=\"../observability-and-operations.html#sec-common-failure-modes\">§9</a>; SDP <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9h</a>"
+  ],
+  [
+   "Ops §3, §4, §7b; SDP §9h",
+   "Ops <a href=\"../observability-and-operations.html#sec-incident-response-from-detection-to-recovery\">§3</a>, <a href=\"../observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment\">§4</a>, <a href=\"../observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty\">§7b</a>; SDP <a href=\"./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy\">§9h</a>"
+  ],
+  [
+   "التصميم المعماري §7، §10",
+   "التصميم المعماري <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>، <a href=\"./system-design.html#sec-worked-example-design-an-event-driven-order-system\">§10</a>"
+  ],
+  [
+   "التصميم المعماري §6، §10",
+   "التصميم المعماري <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>، <a href=\"./system-design.html#sec-worked-example-design-an-event-driven-order-system\">§10</a>"
+  ],
+  [
+   "التصميم المعماري §8، §11",
+   "التصميم المعماري <a href=\"./system-design.html#sec-why-it-is-a-method-not-an-algorithm\">§8</a>، <a href=\"./system-design.html#sec-methodologies-heuristics\">§11</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §2",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-the-sdlc-the-six-phases\">§2</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §1",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is\">§1</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §3",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-the-agile-manifesto-4-values-12-principles-2001\">§3</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §4",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-scrum-the-most-widely-adopted-agile-framework\">§4</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §5",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-kanban-flow-not-timeboxes\">§5</a>"
+  ],
+  [
+   "عملية تطوير البرمجيات §6",
+   "عملية تطوير البرمجيات <a href=\"./software-development-process.html#sec-xp-lean-devops-the-rest-of-the-landscape\">§6</a>"
+  ],
+  [
+   "التفكير التصميمي §2، §5",
+   "التفكير التصميمي <a href=\"./design-thinking.html#sec-history-five-phases-of-the-idea\">§2</a>، <a href=\"./design-thinking.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>"
+  ],
+  [
+   "التفكير التصميمي §0، §7",
+   "التفكير التصميمي <a href=\"./design-thinking.html#sec-how-to-use-this-doc\">§0</a>، <a href=\"./design-thinking.html#sec-methodologies-the-named-frameworks\">§7</a>"
+  ],
+  [
+   "التفكير التصميمي §6، §7",
+   "التفكير التصميمي <a href=\"./design-thinking.html#sec-the-rhythm-not-the-algorithm\">§6</a>، <a href=\"./design-thinking.html#sec-methodologies-the-named-frameworks\">§7</a>"
+  ],
+  [
+   "التفكير التصميمي §2، §7",
+   "التفكير التصميمي <a href=\"./design-thinking.html#sec-history-five-phases-of-the-idea\">§2</a>، <a href=\"./design-thinking.html#sec-methodologies-the-named-frameworks\">§7</a>"
+  ],
+  [
+   "التصميم المعماري §5، §9",
+   "التصميم المعماري <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>، <a href=\"./system-design.html#sec-worked-example-design-a-url-shortener\">§9</a>"
+  ],
+  [
+   "التصميم المعماري §5، §6",
+   "التصميم المعماري <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>، <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "UI/UX §6؛ HTML & CSS §6",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-the-rhythm-not-the-algorithm\">§6</a>؛ HTML & CSS <a href=\"./html-and-css.html#sec-practical-surface-the-controls-the-platform-hands-you\">§6</a>"
+  ],
+  [
+   "UI/UX §8؛ HTML & CSS §8",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-principles-the-shared-constants\">§8</a>؛ HTML & CSS <a href=\"./html-and-css.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "Design Thinking §2, §5",
+   "Design Thinking <a href=\"./design-thinking.html#sec-history-five-phases-of-the-idea\">§2</a>, <a href=\"./design-thinking.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>"
+  ],
+  [
+   "Design Thinking §0, §7",
+   "Design Thinking <a href=\"./design-thinking.html#sec-how-to-use-this-doc\">§0</a>, <a href=\"./design-thinking.html#sec-methodologies-the-named-frameworks\">§7</a>"
+  ],
+  [
+   "Design Thinking §6, §7",
+   "Design Thinking <a href=\"./design-thinking.html#sec-the-rhythm-not-the-algorithm\">§6</a>, <a href=\"./design-thinking.html#sec-methodologies-the-named-frameworks\">§7</a>"
+  ],
+  [
+   "Design Thinking §2, §7",
+   "Design Thinking <a href=\"./design-thinking.html#sec-history-five-phases-of-the-idea\">§2</a>, <a href=\"./design-thinking.html#sec-methodologies-the-named-frameworks\">§7</a>"
+  ],
+  [
+   "System Design §7, §10",
+   "System Design <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>, <a href=\"./system-design.html#sec-worked-example-design-an-event-driven-order-system\">§10</a>"
+  ],
+  [
+   "System Design §6, §10",
+   "System Design <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>, <a href=\"./system-design.html#sec-worked-example-design-an-event-driven-order-system\">§10</a>"
+  ],
+  [
+   "System Design §8, §11",
+   "System Design <a href=\"./system-design.html#sec-why-it-is-a-method-not-an-algorithm\">§8</a>, <a href=\"./system-design.html#sec-methodologies-heuristics\">§11</a>"
+  ],
+  [
+   "HTML & CSS §1, §3, §9",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>, <a href=\"./html-and-css.html#sec-evolution-constraint-inversions-across-the-platform\">§3</a>, <a href=\"./html-and-css.html#sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader\">§9</a>"
+  ],
+  [
+   "HTML & CSS §1, §3, §7",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>, <a href=\"./html-and-css.html#sec-evolution-constraint-inversions-across-the-platform\">§3</a>, <a href=\"./html-and-css.html#sec-methodologies-named-frameworks\">§7</a>"
+  ],
+  [
+   "HTML & CSS §0، §1، §5",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-how-to-use-this-doc\">§0</a>، <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>"
+  ],
+  [
+   "HTML & CSS §1، §5، §8",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>، <a href=\"./html-and-css.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "HTML &amp; CSS §1، §9",
+   "HTML &amp; CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader\">§9</a>"
+  ],
+  [
+   "System Design §5, §9",
+   "System Design <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>, <a href=\"./system-design.html#sec-worked-example-design-a-url-shortener\">§9</a>"
+  ],
+  [
+   "System Design §5, §6",
+   "System Design <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>, <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "التفكير التصميمي §10",
+   "التفكير التصميمي <a href=\"./design-thinking.html#sec-the-most-common-failure-modes\">§10</a>"
+  ],
+  [
+   "Design Thinking §10",
+   "Design Thinking <a href=\"./design-thinking.html#sec-the-most-common-failure-modes\">§10</a>"
+  ],
+  [
+   "API Design §10, §11",
+   "API Design <a href=\"./api-design.html#sec-the-most-common-failure-modes\">§10</a>, <a href=\"./api-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§11</a>"
+  ],
+  [
+   "Problem-Solving §10",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-the-look-back-phase-in-depth-what-everyone-skips\">§10</a>"
+  ],
+  [
+   "Problem-Solving §11",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-fluency-vs-storage-strength-in-problem-solving\">§11</a>"
+  ],
+  [
+   "CS &amp; SE §7, §9b",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-the-judgment-which-parameters-matter-when-and-when-to-stop\">§7</a>, <a href=\"./cs-and-software-engineering.html#sec-the-most-common-failure-modes\">§9b</a>"
+  ],
+  [
+   "التفكير التصميمي §5",
+   "التفكير التصميمي <a href=\"./design-thinking.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>"
+  ],
+  [
+   "التصميم المعماري §7",
+   "التصميم المعماري <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>"
+  ],
+  [
+   "التصميم المعماري §5",
+   "التصميم المعماري <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>"
+  ],
+  [
+   "التصميم المعماري §6",
+   "التصميم المعماري <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "CS &amp; SE §7، §9ب",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-the-judgment-which-parameters-matter-when-and-when-to-stop\">§7</a>، <a href=\"./cs-and-software-engineering.html#sec-the-most-common-failure-modes\">§9ب</a>"
+  ],
+  [
+   "Design Thinking §5",
+   "Design Thinking <a href=\"./design-thinking.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>"
+  ],
+  [
+   "Problem-Solving §1",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-definition-what-problem-solving-is-and-what-it-is-not\">§1</a>"
+  ],
+  [
+   "Problem-Solving §5",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works\">§5</a>"
+  ],
+  [
+   "Problem-Solving §6",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-mental-models-how-expert-problem-solvers-actually-reason\">§6</a>"
+  ],
+  [
+   "Problem-Solving §7",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">§7</a>"
+  ],
+  [
+   "Problem-Solving §9",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted\">§9</a>"
+  ],
+  [
+   "تصميم API §10، §11",
+   "تصميم API <a href=\"./api-design.html#sec-the-most-common-failure-modes\">§10</a>، <a href=\"./api-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§11</a>"
+  ],
+  [
+   "حلقة المطور §2، §3",
+   "حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-evolution-constraint-inversions-across-the-same-idea\">§2</a>، <a href=\"./how-developers-think-frontend.html#sec-intersection-with-neighbors-where-it-borders-other-practices\">§3</a>"
+  ],
+  [
+   "API Design §8, §9",
+   "API Design <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>, <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>"
+  ],
+  [
+   "HTML & CSS §1, §5",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>, <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>"
+  ],
+  [
+   "HTML & CSS §1, §9",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>, <a href=\"./html-and-css.html#sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader\">§9</a>"
+  ],
+  [
+   "HTML & CSS §0، §5",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-how-to-use-this-doc\">§0</a>، <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>"
+  ],
+  [
+   "HTML & CSS §1، §5",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-definition-what-html-css-is-and-what-it-is-not\">§1</a>، <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>"
+  ],
+  [
+   "HTML & CSS §3، §9",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-evolution-constraint-inversions-across-the-platform\">§3</a>، <a href=\"./html-and-css.html#sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader\">§9</a>"
+  ],
+  [
+   "HTML &amp; CSS §5",
+   "HTML &amp; CSS <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>"
+  ],
+  [
+   "HTML &amp; CSS §9",
+   "HTML &amp; CSS <a href=\"./html-and-css.html#sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader\">§9</a>"
+  ],
+  [
+   "المعسكرات §4، §10",
+   "المعسكرات <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>، <a href=\"./frontend-camps-survey.html#sec-how-the-camps-relate-to-your-react-mental-model\">§10</a>"
+  ],
+  [
+   "System Design §7",
+   "System Design <a href=\"./system-design.html#sec-component-layer-micro-where-system-design-meets-code\">§7</a>"
+  ],
+  [
+   "System Design §5",
+   "System Design <a href=\"./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled\">§5</a>"
+  ],
+  [
+   "System Design §6",
+   "System Design <a href=\"./system-design.html#sec-architectural-layer-macro-patterns-with-consequences\">§6</a>"
+  ],
+  [
+   "تصميم API §8، §9",
+   "تصميم API <a href=\"./api-design.html#sec-principles-the-shared-constants\">§8</a>، <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>"
+  ],
+  [
+   "حل المشكلات §10",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-the-look-back-phase-in-depth-what-everyone-skips\">§10</a>"
+  ],
+  [
+   "حل المشكلات §11",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-fluency-vs-storage-strength-in-problem-solving\">§11</a>"
+  ],
+  [
+   "JS Language §3",
+   "JS Language <a href=\"./javascript-the-language.html#sec-the-design-prototype-model-not-classes\">§3</a>"
+  ],
+  [
+   "JS Language §4",
+   "JS Language <a href=\"./javascript-the-language.html#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart\">§4</a>"
+  ],
+  [
+   "JS Language §5",
+   "JS Language <a href=\"./javascript-the-language.html#sec-the-design-single-threaded-event-loop\">§5</a>"
+  ],
+  [
+   "JS Language §6",
+   "JS Language <a href=\"./javascript-the-language.html#sec-the-host-environment-not-the-language\">§6</a>"
+  ],
+  [
+   "JS Language §7",
+   "JS Language <a href=\"./javascript-the-language.html#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point\">§7</a>"
+  ],
+  [
+   "JS Language §8",
+   "JS Language <a href=\"./javascript-the-language.html#sec-the-engines-v8-spidermonkey-javascriptcore\">§8</a>"
+  ],
+  [
+   "JS Language §9",
+   "JS Language <a href=\"./javascript-the-language.html#sec-the-wasm-junction\">§9</a>"
+  ],
+  [
+   "CS &amp; SE §2",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-what-is-computer-science-the-science-of-computation\">§2</a>"
+  ],
+  [
+   "CS &amp; SE §3",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-what-is-software-engineering-the-engineering-of-software\">§3</a>"
+  ],
+  [
+   "CS &amp; SE §4",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-the-parameters-quality-attributes-what-you-measure\">§4</a>"
+  ],
+  [
+   "CS &amp; SE §5",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-the-measures-big-o-notation-and-complexity-classes\">§5</a>"
+  ],
+  [
+   "CS &amp; SE §6",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-the-trade-offs-when-parameters-conflict\">§6</a>"
+  ],
+  [
+   "CS &amp; SE §8",
+   "CS &amp; SE <a href=\"./cs-and-software-engineering.html#sec-engineering-principles-dry-solid-kiss-yagni\">§8</a>"
+  ],
+  [
+   "حلقة المطور §7",
+   "حلقة المطور <a href=\"./how-developers-think-frontend.html#sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice\">§7</a>"
+  ],
+  [
+   "حل المشكلات §1",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-definition-what-problem-solving-is-and-what-it-is-not\">§1</a>"
+  ],
+  [
+   "حل المشكلات §5",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works\">§5</a>"
+  ],
+  [
+   "حل المشكلات §6",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-mental-models-how-expert-problem-solvers-actually-reason\">§6</a>"
+  ],
+  [
+   "حل المشكلات §7",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">§7</a>"
+  ],
+  [
+   "حل المشكلات §9",
+   "حل المشكلات <a href=\"./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted\">§9</a>"
+  ],
+  [
+   "API Design §0",
+   "API Design <a href=\"./api-design.html#sec-how-to-use-this-doc\">§0</a>"
+  ],
+  [
+   "API Design §5",
+   "API Design <a href=\"./api-design.html#sec-underlying-theory-what-makes-a-contract-designed-not-accidental\">§5</a>"
+  ],
+  [
+   "API Design §9",
+   "API Design <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>"
+  ],
+  [
+   "UI/UX §7, §11",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-methodologies-named-frameworks\">§7</a>, <a href=\"./ui-ux-web-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§11</a>"
+  ],
+  [
+   "HTML & CSS §0",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-how-to-use-this-doc\">§0</a>"
+  ],
+  [
+   "HTML & CSS §5",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-underlying-theory-the-algorithms-the-platform-runs\">§5</a>"
+  ],
+  [
+   "Algorithms §2",
+   "Algorithms <a href=\"../algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80\">§2</a>"
+  ],
+  [
+   "Algorithms §3",
+   "Algorithms <a href=\"../algorithms-and-data-structures.html#sec-stacks-queues-and-linked-lists-the-shapes\">§3</a>"
+  ],
+  [
+   "Algorithms §4",
+   "Algorithms <a href=\"../algorithms-and-data-structures.html#sec-trees-and-heaps-the-hierarchies\">§4</a>"
+  ],
+  [
+   "HTML & CSS §9",
+   "HTML & CSS <a href=\"./html-and-css.html#sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader\">§9</a>"
+  ],
+  [
+   "UI/UX §5, §8",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>, <a href=\"./ui-ux-web-design.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "Every doc §6",
+   "Every doc <a href=\"./design-thinking.html#sec-the-rhythm-not-the-algorithm\">§6</a>"
+  ],
+  [
+   "تصميم API §0",
+   "تصميم API <a href=\"./api-design.html#sec-how-to-use-this-doc\">§0</a>"
+  ],
+  [
+   "تصميم API §5",
+   "تصميم API <a href=\"./api-design.html#sec-underlying-theory-what-makes-a-contract-designed-not-accidental\">§5</a>"
+  ],
+  [
+   "تصميم API §9",
+   "تصميم API <a href=\"./api-design.html#sec-worked-example-design-a-public-shipment-tracking-api\">§9</a>"
+  ],
+  [
+   "UI/UX §5، §8",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>، <a href=\"./ui-ux-web-design.html#sec-principles-the-shared-constants\">§8</a>"
+  ],
+  [
+   "المعسكرات §7",
+   "المعسكرات <a href=\"./frontend-camps-survey.html#sec-the-typescript-shift\">§7</a>"
+  ],
+  [
+   "المعسكرات §5",
+   "المعسكرات <a href=\"./frontend-camps-survey.html#sec-camp-e-the-other-major-ui-libraries-signals-world\">§5</a>"
+  ],
+  [
+   "JS اللغة §6",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-the-host-environment-not-the-language\">§6</a>"
+  ],
+  [
+   "JS اللغة §3",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-the-design-prototype-model-not-classes\">§3</a>"
+  ],
+  [
+   "JS اللغة §5",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-the-design-single-threaded-event-loop\">§5</a>"
+  ],
+  [
+   "JS اللغة §4",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart\">§4</a>"
+  ],
+  [
+   "JS اللغة §7",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point\">§7</a>"
+  ],
+  [
+   "JS اللغة §9",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-the-wasm-junction\">§9</a>"
+  ],
+  [
+   "JS اللغة §8",
+   "JS اللغة <a href=\"./javascript-the-language.html#sec-the-engines-v8-spidermonkey-javascriptcore\">§8</a>"
+  ],
+  [
+   "معسكرات §10",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-how-the-camps-relate-to-your-react-mental-model\">§10</a>"
+  ],
+  [
+   "كل مستند §6",
+   "كل مستند <a href=\"./design-thinking.html#sec-the-rhythm-not-the-algorithm\">§6</a>"
+  ],
+  [
+   "SDP §1, §3",
+   "SDP <a href=\"./software-development-process.html#sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is\">§1</a>, <a href=\"./software-development-process.html#sec-the-agile-manifesto-4-values-12-principles-2001\">§3</a>"
+  ],
+  [
+   "معسكرات §1",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-a-cms-and-classic-server-rendered-apps\">§1</a>"
+  ],
+  [
+   "معسكرات §2",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-b-html-first-and-islands\">§2</a>"
+  ],
+  [
+   "معسكرات §3",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-c-client-spas\">§3</a>"
+  ],
+  [
+   "معسكرات §4",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>"
+  ],
+  [
+   "معسكرات §5",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-e-the-other-major-ui-libraries-signals-world\">§5</a>"
+  ],
+  [
+   "معسكرات §6",
+   "معسكرات <a href=\"./frontend-camps-survey.html#sec-camp-f-wasm-and-non-js-ui-engines\">§6</a>"
+  ],
+  [
+   "Camps §10",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-how-the-camps-relate-to-your-react-mental-model\">§10</a>"
+  ],
+  [
+   "UI/UX §5",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-underlying-theory-the-ideas-it-borrows-from\">§5</a>"
+  ],
+  [
+   "Camps §1",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-camp-a-cms-and-classic-server-rendered-apps\">§1</a>"
+  ],
+  [
+   "Camps §2",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-camp-b-html-first-and-islands\">§2</a>"
+  ],
+  [
+   "Camps §3",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-camp-c-client-spas\">§3</a>"
+  ],
+  [
+   "Camps §4",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-camp-d-meta-frameworks-the-industrial-default-for-new-react\">§4</a>"
+  ],
+  [
+   "Camps §5",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-camp-e-the-other-major-ui-libraries-signals-world\">§5</a>"
+  ],
+  [
+   "Camps §6",
+   "Camps <a href=\"./frontend-camps-survey.html#sec-camp-f-wasm-and-non-js-ui-engines\">§6</a>"
+  ],
+  [
+   "UI/UX §9",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns\">§9</a>"
+  ],
+  [
+   "UI/UX §7",
+   "UI/UX <a href=\"./ui-ux-web-design.html#sec-methodologies-named-frameworks\">§7</a>"
+  ],
+  [
+   "SDP §1b",
+   "SDP <a href=\"./software-development-process.html#sec-history-from-waterfall-to-agile-to-ai-agents-1970present\">§1b</a>"
+  ],
+  [
+   "SDP §1e",
+   "SDP <a href=\"./software-development-process.html#sec-underlying-theory-empirical-process-control-and-lean\">§1e</a>"
+  ],
+  [
+   "SDP §9d",
+   "SDP <a href=\"./software-development-process.html#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle\">§9d</a>"
+  ],
+  [
+   "SDP §2",
+   "SDP <a href=\"./software-development-process.html#sec-the-sdlc-the-six-phases\">§2</a>"
+  ],
+  [
+   "SDP §1",
+   "SDP <a href=\"./software-development-process.html#sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is\">§1</a>"
+  ],
+  [
+   "SDP §3",
+   "SDP <a href=\"./software-development-process.html#sec-the-agile-manifesto-4-values-12-principles-2001\">§3</a>"
+  ],
+  [
+   "SDP §4",
+   "SDP <a href=\"./software-development-process.html#sec-scrum-the-most-widely-adopted-agile-framework\">§4</a>"
+  ],
+  [
+   "SDP §5",
+   "SDP <a href=\"./software-development-process.html#sec-kanban-flow-not-timeboxes\">§5</a>"
+  ],
+  [
+   "SDP §6",
+   "SDP <a href=\"./software-development-process.html#sec-xp-lean-devops-the-rest-of-the-landscape\">§6</a>"
+  ]
+ ]
+}
