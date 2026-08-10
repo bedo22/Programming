@@ -35,21 +35,21 @@
           <li>
             <a href="./problem-solving.html">حل المشكلات</a> — مهارة التفكير
             داخل الانضباط. المرحلة ٤ (النظر للخلف) ترتبط مباشرة بأقسام تقييم
-            الحلول في هذا المستند (§٤–§٧).
+            الحلول في هذا المستند (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
           </li>
           <li>
             <a href="./system-design.html">التصميم المعماري</a> — مهارة العمارة.
             المفاضلات على النطاق الواسع (CAP، أحادي مقابل خدمات مصغرة) هي حالات
-            من إطار المفاضلات في هذا المستند (§٦).
+            من إطار المفاضلات في هذا المستند (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
           </li>
           <li>
             <a href="./api-design.html">تصميم API</a> — مهارة العقود. REST مقابل
-            GraphQL مقابل gRPC هو قرار مفاضلة (§٦).
+            GraphQL مقابل gRPC هو قرار مفاضلة (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
           </li>
           <li>
             <a href="./how-developers-think-frontend.html">الإيقاع</a> — مهارة
-            التنفيذ. "افعل أبسط شيء أولاً" هو KISS + YAGNI (§٨). "التحسين المبكر
-            هو الخطيئة الكبري" هو مبدأ كنوث (§٧).
+            التنفيذ. "افعل أبسط شيء أولاً" هو KISS + YAGNI (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>). "التحسين المبكر
+            هو الخطيئة الكبري" هو مبدأ كنوث (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
           </li>
           <li>
             <a href="./html-and-css.html">HTML & CSS</a>،
@@ -68,7 +68,7 @@
         </p>
       </blockquote>
 
-      <h2 id="sec-how-to-use-this-doc">٠. كيف تستخدم هذا المستند</h2>
+      <h2 id="sec-how-to-use-this-doc">كيف تستخدم هذا المستند</h2>
 
       <p>
         ترتيب القراءة: مستقل، لكن الأكثر فائدة <em>بعد</em> أن تقرأ
@@ -81,20 +81,20 @@
         <li>
           أسفلاً: <a href="./problem-solving.html">حل المشكلات</a> — مهارة
           التفكير داخل الانضباط؛ المرحلة ٤ (النظر للخلف) ترتبط بأقسام التقييم في
-          هذا المستند (§٤–§٧).
+          هذا المستند (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
         </li>
         <li>
           أسفلاً: <a href="./system-design.html">التصميم المعماري</a> —
           المفاضلات على نطاق العمارة؛ حالة من إطار المفاضلات في هذا المستند
-          (§٦).
+          (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
         </li>
         <li>
           أسفلاً: <a href="./api-design.html">تصميم API</a> — المفاضلات على نطاق
-          العقد؛ حالة من §٦.
+          العقد؛ حالة من <a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>.
         </li>
         <li>
           أسفلاً: <a href="./how-developers-think-frontend.html">الإيقاع</a> —
-          التنفيذ على نطاق الميزة؛ المبادئ (§٨) هي الثوابت التي يتبعها.
+          التنفيذ على نطاق الميزة؛ المبادئ (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>) هي الثوابت التي يتبعها.
         </li>
         <li>مرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة.</li>
       </ul>
@@ -103,8 +103,8 @@
           >إذا تساءلت يوماً لماذا يبدو HackerRank مختلفاً عن وظيفتك في React —
           رغم أن كلاهما يتضمن JavaScript — فهذا المستند يجيب.</strong
         >
-        اقرأ §١ (التعريف) و§٢–§٣ (ما هو CS، ما هو SE) أولاً. ثم §٤–§٧ لمهارة
-        التقييم (O الكبير، سمات الجودة، المفاضلات، الحكم). ثم §٨ للمبادئ
+        اقرأ <a href="#sec-definition-what-cs-is-what-se-is-and-how-they-differ">§١</a> (التعريف) و<a href="#sec-what-is-computer-science-the-science-of-computation">§٢</a>–<a href="#sec-what-is-software-engineering-the-engineering-of-software">§٣</a> (ما هو CS، ما هو SE) أولاً. ثم <a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a> لمهارة
+        التقييم (O الكبير، سمات الجودة، المفاضلات، الحكم). ثم <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a> للمبادئ
         الهندسية التي تنجو من كل إطار عمل.
       </p>
 
@@ -112,12 +112,12 @@
         <strong>النطاق وغير الأهداف.</strong> مظلة مفاهيمية، لا موسوعة — يشرح
         هذا المستند العلاقة بين CS &amp; SE ومهارة التقييم التي تربطهما، ولا
         يحاول تغطية الانضباط كاملاً. التقنيات المحددة وأنماط التنفيذ
-        والانضباطات المجاورة مغطاة في المراجع المرتبطة (§٣ب هي الخريطة) أو
+        والانضباطات المجاورة مغطاة في المراجع المرتبطة (<a href="#sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">§٣ب</a> هي الخريطة) أو
         تُترك عمداً خارج النطاق.
       </p>
 
 
-      <h2 id="sec-definition-what-cs-is-what-se-is-and-how-they-differ">١. التعريف — ما هو CS، ما هو SE، وكيف يختلفان</h2>
+      <h2 id="sec-definition-what-cs-is-what-se-is-and-how-they-differ">التعريف — ما هو CS، ما هو SE، وكيف يختلفان</h2>
 
       <h3>علوم الحاسوب — علم الحساب</h3>
       <p>
@@ -233,7 +233,7 @@
 
       
 
-      <h2 id="sec-history-from-lovelace-to-the-ai-era-1843present">١ب. التاريخ — من لوفليس إلى عصر الذكاء الاصطناعي (١٨٤٣–الحاضر)</h2>
+      <h2 id="sec-history-from-lovelace-to-the-ai-era-1843present">التاريخ — من لوفليس إلى عصر الذكاء الاصطناعي (١٨٤٣–الحاضر)</h2>
 
       <p>
         للانضباط نسب تمتد الآن نحو قرنين من الأفكار، بخيوط تتشابك معاً مع الوقت: خيط العلم (ما يمكن
@@ -705,7 +705,7 @@
               ويولّد الكود داخل IDE. لأول مرة،
               <strong>كتب الذكاء الاصطناعي الكود عند كوع المطور</strong>. أعاد
               تأطير الوظيفة: كتابة أقل، مراجعة أكثر — مهارة التقييم التي يعلمها
-              هذا المستند (§٤–§٧) أصبحت عنق الزجاجة، وكانت قاعدة «عامل مخرجات الذكاء الاصطناعي كمدخلات غير موثوقة» (§٩د) ذات صلة من اليوم الأول (<a
+              هذا المستند (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>) أصبحت عنق الزجاجة، وكانت قاعدة «عامل مخرجات الذكاء الاصطناعي كمدخلات غير موثوقة» (<a href="#sec-the-future-the-evaluation-premium">§٩د</a>) ذات صلة من اليوم الأول (<a
                 href="https://en.wikipedia.org/wiki/GitHub_Copilot"
                 >Wikipedia</a
               >).
@@ -776,7 +776,7 @@
             <td><strong>٢٠٢٦</strong></td>
             <td>وكلاء الحدود والتنظيم ساري المفعول</td>
             <td>
-              الحدود الآن <strong>وكيلية</strong>: نماذج حدودية تقود أنظمة تتصرف في المهام بالأدوات، والتزامات GPAI في قانون الذكاء الاصطناعي الأوروبي سارية منذ ٢ أغسطس ٢٠٢٥. الحكم — تقرير ما تثق به لنموذج — هو أمضى مهارات الانضباط (§٧).
+              الحدود الآن <strong>وكيلية</strong>: نماذج حدودية تقود أنظمة تتصرف في المهام بالأدوات، والتزامات GPAI في قانون الذكاء الاصطناعي الأوروبي سارية منذ ٢ أغسطس ٢٠٢٥. الحكم — تقرير ما تثق به لنموذج — هو أمضى مهارات الانضباط (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
             </td>
           </tr>
         </tbody>
@@ -795,7 +795,7 @@
         عن التحسين، ماذا تثق به لنموذج — <em>أكثر</em> قيمة، لا أقل.
       </p>
 
-      <h2 id="sec-evolution-constraint-inversions-across-the-discipline">١ج. التطور — انعكاسات القيود عبر الانضباط</h2>
+      <h2 id="sec-evolution-constraint-inversions-across-the-discipline">التطور — انعكاسات القيود عبر الانضباط</h2>
 
       <p>
         تطور الانضباط عبر انعكاسات القيود — لحظات تغير فيها السؤال المهيمن لأن
@@ -862,7 +862,7 @@
             <td>
               مهارة التقييم — الحكم هل الحل صحيح، كفؤ، قابل للصيانة — تصبح
               <em>أكثر</em> قيمة، لا أقل. الذكاء الاصطناعي يستطيع الكتابة؛ هل
-              يستطيع الحكم؟ (انظر §٩د.)
+              يستطيع الحكم؟ (انظر <a href="#sec-the-future-the-evaluation-premium">§٩د</a>.)
             </td>
           </tr>
         </tbody>
@@ -872,10 +872,10 @@
         <strong>النمط:</strong> كل انعكاس <em>يضيف</em> معاملاً دون إزالة
         القديمين. الحل الحديث يجب أن يكون صحيحاً <em>و</em> سريعاً
         <em>و</em> قابلاً للصيانة <em>و</em> قابلاً للتوسع <em>و</em> آمناً.
-        المفاضلات بينها هي حكم الهندسة التي يعلمها هذا المستند (§٦–§٧).
+        المفاضلات بينها هي حكم الهندسة التي يعلمها هذا المستند (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
       </p>
 
-      <h2 id="sec-intersection-with-neighbors-the-umbrella">١د. التقاطع مع الجيران — المظلة</h2>
+      <h2 id="sec-intersection-with-neighbors-the-umbrella">التقاطع مع الجيران — المظلة</h2>
 
       <p>
         هذا المستند هو <strong>المظلة</strong> — كل مرجع آخر على هذا الرف هو
@@ -901,7 +901,7 @@
               (النظر للخلف) <em>هي</em> تقييم الحلول.
             </td>
             <td>
-              المعاملات (§٤)، المقاييس (§٥)، المفاضلات (§٦)، والحكم (§٧) التي
+              المعاملات (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>)، المقاييس (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>)، المفاضلات (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>)، والحكم (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>) التي
               تحتاجها المرحلة ٤ ولا تعرفها.
             </td>
           </tr>
@@ -915,7 +915,7 @@
               الخدمات.
             </td>
             <td>
-              إطار المفاضلات (§٦) والمبدأ أن "التحسين مفاضلة، لا فضيلة" (§٧).
+              إطار المفاضلات (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>) والمبدأ أن "التحسين مفاضلة، لا فضيلة" (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
             </td>
           </tr>
           <tr>
@@ -924,8 +924,8 @@
               تصميم API هو CS & SE على نطاق العقد — مفاضلات عند حدود الواجهة.
             </td>
             <td>
-              سمات الجودة (§٤) التي تعرف "ما يجعل API جيداً" وتحليل المفاضلات
-              (§٦).
+              سمات الجودة (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>) التي تعرف "ما يجعل API جيداً" وتحليل المفاضلات
+              (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
             </td>
           </tr>
           <tr>
@@ -935,8 +935,8 @@
             </td>
             <td>الإيقاع هو CS & SE على نطاق الميزة — تطبيق المبادئ في حلقة.</td>
             <td>
-              المبادئ الهندسية (§٨): "افعل أبسط شيء أولاً" = KISS + YAGNI؛
-              "التحسين المبكر هو الخطيئة الكبري" = مبدأ كنوث (§٧).
+              المبادئ الهندسية (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>): "افعل أبسط شيء أولاً" = KISS + YAGNI؛
+              "التحسين المبكر هو الخطيئة الكبري" = مبدأ كنوث (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
             </td>
           </tr>
           <tr>
@@ -947,7 +947,7 @@
             </td>
             <td>هذه أدوات الانضباط يستخدمها — حالات، لا الانضباط نفسه.</td>
             <td>
-              الأساس النظري (§١ه) الذي يشرح لماذا توجد هذه الأدوات وماذا يمكنها
+              الأساس النظري (<a href="#sec-underlying-theory-complexity-computability-and-information">§١ه</a>) الذي يشرح لماذا توجد هذه الأدوات وماذا يمكنها
               ولا يمكنها أن تفعل.
             </td>
           </tr>
@@ -959,7 +959,7 @@
             </td>
             <td>الطبقة البشرية تحدد المتطلبات؛ CS & SE ينفذ ضمنها.</td>
             <td>
-              سمة الجودة "قابلية الاستخدام" (§٤) — الجسر بين الحاجات البشرية
+              سمة الجودة "قابلية الاستخدام" (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>) — الجسر بين الحاجات البشرية
               والتنفيذ التقني.
             </td>
           </tr>
@@ -968,14 +968,14 @@
 
       <p>
         <strong>قاعدة الحدود:</strong> إذا كنت تسأل "ما يمكن حسابه وبأي سرعة؟"،
-        فهذا CS (هذا المستند، §١ه، §٥). إذا كنت تسأل "كيف أفكر في هذه المشكلة؟"،
+        فهذا CS (هذا المستند، <a href="#sec-underlying-theory-complexity-computability-and-information">§١ه</a>، <a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>). إذا كنت تسأل "كيف أفكر في هذه المشكلة؟"،
         فذاك حل المشكلات. إذا كنت تسأل "كيف أبني هذه الميزة؟"، فذاك الإيقاع. إذا
         كنت تسأل "كيف تتلاءم الخدمات معاً؟"، فذاك التصميم المعماري. إذا كنت تسأل
         "ما يجعل هذا الحل <em>جيداً</em> — وكيف أقيس وأفاضل بين المعايير؟"، فذاك
-        تقييم حلول هذا المستند (§٤–§٧).
+        تقييم حلول هذا المستند (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>).
       </p>
 
-      <h2 id="sec-underlying-theory-complexity-computability-and-information">١ه. النظرية الكامنة — التعقيد، قابلية الحساب، والمعلومات</h2>
+      <h2 id="sec-underlying-theory-complexity-computability-and-information">النظرية الكامنة — التعقيد، قابلية الحساب، والمعلومات</h2>
 
       <p>
         يستقر الانضباط على ثلاث دعائم نظرية من خيط العلم. لا تحتاج لإثبات
@@ -1002,7 +1002,7 @@
         إثباتاً بشكل مشروط (إذا صح P ≠ NP). <strong>التطبيق العملي:</strong> لبعض المشكلات (بائع متجول،
         حقيبة على النطاق الواسع)، لا توجد خوارزمية كفؤة معروفة، وربما لن توجد
         أبداً. القوة الغاشمة أو خوارزميات تقريبية هي أفضل ما يمكنك. لهذا
-        أنماط الخوارزميات (حل المشكلات §٧) مهمة — هي أدوات للتنقل على حدود
+        أنماط الخوارزميات (حل المشكلات <a href="./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog">§٧</a>) مهمة — هي أدوات للتنقل على حدود
         الكفاءة.
       </p>
 
@@ -1022,12 +1022,12 @@
           <strong>كيف تربط النظرية بالممارسة:</strong> قابلية الحساب تخبرك ما هو
           ممكن. التعقيد يخبرك ما هو كفؤ. نظرية المعلومات تخبرك كيف تمثل
           البيانات. معاً تعرفون فضاء الحلول التي يمكنك الاختيار منها. المبادئ
-          الهندسية (§٨) وحكم المفاضلات (§٧) هي كيف تبحر في ذلك الفضاء تحت قيود
+          الهندسية (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>) وحكم المفاضلات (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>) هي كيف تبحر في ذلك الفضاء تحت قيود
           العالم الحقيقي.
         </p>
       </blockquote>
 
-      <h2 id="sec-mental-models-the-engineering-mindset">١و. النماذج العقلية — عقلية المهندس</h2>
+      <h2 id="sec-mental-models-the-engineering-mindset">النماذج العقلية — عقلية المهندس</h2>
 
       <p>
         عقلية المهندس تختلف جوهرياً عن عقلية العالم، والتعرف على التحول هو نموذج
@@ -1104,12 +1104,12 @@
         <li>
           <strong>التجريد يدير التعقيد.</strong> الدماغ البشري يستوعب ~٤ عناصر
           في الذاكرة العاملة (كوان ٢٠٠١). قاعدة كود ١٠٠،٠٠٠ سطر لا تُدار إلا
-          بالتجريد — إخفاء التفاصيل خلف واجهات. كل مبدأ في §٨ (DRY، SOLID، فصل
+          بالتجريد — إخفاء التفاصيل خلف واجهات. كل مبدأ في <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a> (DRY، SOLID، فصل
           الاهتمامات) استراتيجية لإدارة التعقيد بالتجريد.
         </li>
       </ul>
 
-      <h2 id="sec-what-is-computer-science-the-science-of-computation">٢. ما هي علوم الحاسوب؟ — علم الحساب</h2>
+      <h2 id="sec-what-is-computer-science-the-science-of-computation">ما هي علوم الحاسوب؟ — علم الحساب</h2>
 
       <p>
         علوم الحاسوب هي دراسة <strong>الحساب</strong> — ما يمكن حسابه، بأي
@@ -1161,8 +1161,8 @@
 
       <p>
         <strong>ما يعطيك CS كممارس:</strong> المفردات والأدوات لجانب العلم في
-        التقييم — O الكبير (§٥)، فئات التعقيد، نماذج الخوارزميات (حل المشكلات
-        §٧)، مفاضلات بنى البيانات. عندما تحلل تعقيد وقت ومكان حل، أنت تفعل CS.
+        التقييم — O الكبير (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>)، فئات التعقيد، نماذج الخوارزميات (حل المشكلات
+        <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>)، مفاضلات بنى البيانات. عندما تحلل تعقيد وقت ومكان حل، أنت تفعل CS.
         عندما تختار بين نهج القوة الغاشمة O(n²) وآخر خريطة تجزئة O(n)، أنت تطبق
         CS.
       </p>
@@ -1176,7 +1176,7 @@
         المعماري للأنظمة على النطاق.
       </p>
 
-      <h2 id="sec-what-is-software-engineering-the-engineering-of-software">٣. ما هي هندسة البرمجيات؟ — هندسة البرمجيات</h2>
+      <h2 id="sec-what-is-software-engineering-the-engineering-of-software">ما هي هندسة البرمجيات؟ — هندسة البرمجيات</h2>
 
       <p>
         هندسة البرمجيات هي
@@ -1199,12 +1199,12 @@
           <tr>
             <td><strong>تصميم البرمجيات</strong></td>
             <td>كيف تنظم كود — أنماط، مبادئ، عمارة</td>
-            <td>SOLID، DRY، فصل الاهتمامات، تصميم مكونات (§٨)</td>
+            <td>SOLID، DRY، فصل الاهتمامات، تصميم مكونات (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>)</td>
           </tr>
           <tr>
             <td><strong>جودة البرمجيات</strong></td>
             <td>كيف تقيم وتقيس كود "جيد"</td>
-            <td>سمات جودة ISO ٢٥٠١٠ (§٤)، مراجعات كود، اختبارات</td>
+            <td>سمات جودة ISO ٢٥٠١٠ (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>)، مراجعات كود، اختبارات</td>
           </tr>
           <tr>
             <td><strong>عملية البرمجيات</strong></td>
@@ -1224,15 +1224,15 @@
           <tr>
             <td><strong>اختبار وتحقق البرمجيات</strong></td>
             <td>كيف تثبت أن البرمجيات تفعل ما تدعي</td>
-            <td>اختبارات وحدة، تكامل، مرحلة "النظر للخلف" (حل المشكلات §١٠)</td>
+            <td>اختبارات وحدة، تكامل، مرحلة "النظر للخلف" (حل المشكلات <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§١٠</a>)</td>
           </tr>
         </tbody>
       </table>
 
       <p>
         <strong>ما يعطيك SE كممارس:</strong> المفردات والأدوات لجانب الهندسة في
-        التقييم — سمات الجودة (§٤)، المبادئ الهندسية (§٨)، تحليل المفاضلات (§٦)،
-        وحكم "متى هذا جيد بما يكفي ليسلم؟" (§٧). عندما تقرر "هذا الكود مقروء بما
+        التقييم — سمات الجودة (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>)، المبادئ الهندسية (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>)، تحليل المفاضلات (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>)،
+        وحكم "متى هذا جيد بما يكفي ليسلم؟" (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>). عندما تقرر "هذا الكود مقروء بما
         يكفي"، عندما تختار البساطة على الدهاء، عندما تجعل مفاضلة صريحة — أنت
         تفعل SE.
       </p>
@@ -1251,7 +1251,7 @@
         </p>
       </blockquote>
 
-            <h2 id="sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">٣ب. بقية الانضباط الهندسي — حيث يغطيه الرف</h2>
+            <h2 id="sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">بقية الانضباط الهندسي — حيث يغطيه الرف</h2>
 
       <p>
         المظلة تسمي الانضباط كله؛ لا تعيد تعليم كل مجال. الرف يملك معظم
@@ -1284,8 +1284,8 @@
             <td>الاختبار والتحقق (كيف تثبت الصحة)</td>
             <td>
               <a href="../software-testing-and-debugging.html">اختبار البرمجيات</a> (النسخة
-              الإنجليزية). هذا المستند يغطي <em>المبادئ</em> (§٨) وعقلية التقييم
-              (§٤–§٧)؛ التقنيات تعيش هناك.
+              الإنجليزية). هذا المستند يغطي <em>المبادئ</em> (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>) وعقلية التقييم
+              (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>)؛ التقنيات تعيش هناك.
             </td>
           </tr>
           <tr>
@@ -1303,20 +1303,20 @@
             <td>
               <a href="./system-design.html">التصميم المعماري</a> — حيث تصبح
               مفاضلات الاتساق/التوافر والفشل الجزئي والبيانات على النطاق الواسع
-              صريحة (صف CAP في §٦).
+              صريحة (صف CAP في <a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
             </td>
           </tr>
           <tr>
             <td>الأمن وخطر سلسلة التوريد</td>
             <td>
-              <a href="./system-design.html">التصميم المعماري</a> (الأمن كقيد تصميم) و<a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> وتاريخ هذا المستند (§١ب: Log4Shell) كلحظة أصبح فيها من
+              <a href="./system-design.html">التصميم المعماري</a> (الأمن كقيد تصميم) و<a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> وتاريخ هذا المستند (<a href="#sec-history-from-lovelace-to-the-ai-era-1843present">§١ب</a>: Log4Shell) كلحظة أصبح فيها من
               الدرجة الأولى.
             </td>
           </tr>
           <tr>
             <td>الديون التقنية والاقتران والتماسك</td>
             <td>
-              <a href="./glossary.html">المصطلحات</a> للتعريفات، و§٨ (SOLID، فصل الاهتمامات) للمبادئ خلفها، و§٨ج أدناه للديون التقنية.
+              <a href="./glossary.html">المصطلحات</a> للتعريفات، و<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a> (SOLID، فصل الاهتمامات) للمبادئ خلفها، و<a href="#sec-technical-debt-when-speed-now-costs-later">§٨ج</a> أدناه للديون التقنية.
             </td>
           </tr>
           <tr>
@@ -1335,7 +1335,7 @@
             <td>
               مجالات مجاورة لعلوم الحاسوب، غير مغطاة على هذا الرف؛ هذا المستند
               يبقى مع ما يستخدمه: الخوارزميات وقابلية الحساب والتعقيد ونظرية
-              المعلومات (§٢).
+              المعلومات (<a href="#sec-what-is-computer-science-the-science-of-computation">§٢</a>).
             </td>
           </tr>
           <tr>
@@ -1344,8 +1344,8 @@
             </td>
             <td>
               لا يوجد مستند مخصص بعد. الآن:
-              <a href="./glossary.html">المصطلحات</a> للتعريفات، و§٧ ("قس
-              أولاً، حسن المسار الحرج") و§٨ب ("قس قبل التحسين")، و§٩هـ أدناه للقياس العملي ومزالق القياس.
+              <a href="./glossary.html">المصطلحات</a> للتعريفات، و<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a> ("قس
+              أولاً، حسن المسار الحرج") و<a href="#sec-principles-the-shared-constants">§٨ب</a> ("قس قبل التحسين")، و<a href="#sec-measurement-why-measure-first-is-harder-than-it-sounds">§٩هـ</a> أدناه للقياس العملي ومزالق القياس.
             </td>
           </tr>
           <tr>
@@ -1354,7 +1354,7 @@
               التواصل)
             </td>
             <td>
-              لا يوجد مستند مخصص بعد. الآن: §١ب (قانون بروكس) لماذا يهم
+              لا يوجد مستند مخصص بعد. الآن: <a href="#sec-history-from-lovelace-to-the-ai-era-1843present">§١ب</a> (قانون بروكس) لماذا يهم
               الفريق، و<a href="./software-development-process.html"
                 >عملية تطوير البرمجيات</a
               >
@@ -1382,7 +1382,7 @@
         </tbody>
       </table>
 
-      <h2 id="sec-the-parameters-quality-attributes-what-you-measure">٤. المعاملات — سمات الجودة (ما تقيس)</h2>
+      <h2 id="sec-the-parameters-quality-attributes-what-you-measure">المعاملات — سمات الجودة (ما تقيس)</h2>
 
       <p>
         عندما تقيم حلاً — سواء خوارزمية HackerRank أو ميزة React — تحكم عليه على
@@ -1476,22 +1476,22 @@
           <tr>
             <td><strong>تعقيد الوقت</strong></td>
             <td>كيف ينمو وقت التشغيل مع حجم المدخلات</td>
-            <td>تدوين O الكبير (§٥)</td>
+            <td>تدوين O الكبير (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>)</td>
           </tr>
           <tr>
             <td><strong>تعقيد الفضاء</strong></td>
             <td>كيف تنمو استهلاك الذاكرة مع حجم المدخلات</td>
-            <td>تدوين O الكبير (§٥)</td>
+            <td>تدوين O الكبير (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>)</td>
           </tr>
           <tr>
             <td><strong>الصحة</strong></td>
             <td>هل ينتج المخرجات الصحيحة لكل مدخلات صحيحة؟</td>
-            <td>حالات اختبار، حالات حدية (حل المشكلات §١٠)</td>
+            <td>حالات اختبار، حالات حدية (حل المشكلات <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§١٠</a>)</td>
           </tr>
           <tr>
             <td><strong>العمومية</strong></td>
             <td>هل يحل صنف مشكلات، لا مجرد حالة محددة؟</td>
-            <td>استدلال بولي "التعميم" (حل المشكلات §٤)</td>
+            <td>استدلال بولي "التعميم" (حل المشكلات <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§٤</a>)</td>
           </tr>
           <tr>
             <td><strong>المقروئية</strong></td>
@@ -1506,12 +1506,12 @@
           <strong>إعادة الصياغة المفتاحية:</strong> "المعاملات"، "سمات الجودة"،
           "متطلبات غير وظيفية"، و"الإيليتيز" كلها أسماء لنفس الشيء — الأبعاد
           التي تقيم بها حلاً. ISO ٢٥٠١٠ يعطي الـ ٨ القياسية. تحليل الخوارزميات
-          يضيف تعقيد الوقت والفضاء. مهارة الحكم (§٧) هي معرفة
+          يضيف تعقيد الوقت والفضاء. مهارة الحكم (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>) هي معرفة
           <em>أي المعاملات تخدم أي سياق</em>.
         </p>
       </blockquote>
 
-      <h2 id="sec-the-measures-big-o-notation-and-complexity-classes">٥. المقاييس — تدوين O الكبير وفئات التعقيد</h2>
+      <h2 id="sec-the-measures-big-o-notation-and-complexity-classes">المقاييس — تدوين O الكبير وفئات التعقيد</h2>
 
       <p>
         تدوين O الكبير هو كيف <strong>تكمم</strong> معامل كفاءة الأداء. يصف كيف
@@ -1619,7 +1619,7 @@
         مهارة الحكم.
       </p>
 
-      <h2 id="sec-the-trade-offs-when-parameters-conflict">٦. المفاضلات — عندما تتصارع المعاملات</h2>
+      <h2 id="sec-the-trade-offs-when-parameters-conflict">المفاضلات — عندما تتصارع المعاملات</h2>
 
       <p>
         <strong>المفاضلة</strong> قرار ظرفي حيث تحسين معامل يقلل آخر (<a
@@ -1707,10 +1707,10 @@
         </p>
       </blockquote>
 
-      <h2 id="sec-the-judgment-which-parameters-matter-when-and-when-to-stop">٧. الحكم — أي المعاملات تهم متى، ومتى تتوقف</h2>
+      <h2 id="sec-the-judgment-which-parameters-matter-when-and-when-to-stop">الحكم — أي المعاملات تهم متى، ومتى تتوقف</h2>
 
       <p>
-        هذه المهارة التي تربط المعاملات (§٤)، المقاييس (§٥)، والمفاضلات (§٦).
+        هذه المهارة التي تربط المعاملات (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>)، المقاييس (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>)، والمفاضلات (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
         <strong
           >الحكم هو معرفة أي المعاملات تهم لسياقك، ومتى الحل "جيد بما يكفي"
           للتوقف.</strong
@@ -1798,12 +1798,12 @@
         الاصطناعي استبداله.
       </p>
 
-      <h2 id="sec-engineering-principles-dry-solid-kiss-yagni">٨. المبادئ الهندسية — DRY، SOLID، KISS، YAGNI</h2>
+      <h2 id="sec-engineering-principles-dry-solid-kiss-yagni">المبادئ الهندسية — DRY، SOLID، KISS، YAGNI</h2>
 
       <p>
         هذه المبادئ المسماة التي تنجو من كل إطار عمل، كل عصر، كل لغة. هي ثوابت
-        هندسة البرمجيات — الاستدلالات التي تقود قرارات المفاضلات في §٦ والحكم في
-        §٧.
+        هندسة البرمجيات — الاستدلالات التي تقود قرارات المفاضلات في <a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a> والحكم في
+        <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>.
       </p>
 
       <h3>KISS — اجعله بسيطاً، غبياً</h3>
@@ -1924,7 +1924,7 @@
         </li>
       </ul>
 
-      <h2 id="sec-principles-the-shared-constants">٨ب. المبادئ — الثوابت المشتركة</h2>
+      <h2 id="sec-principles-the-shared-constants">المبادئ — الثوابت المشتركة</h2>
 
       <p>
         عبر كل عصر، كل لغة، كل إطار عمل، مبادئ معينة لا تتغير. هذه الثوابت التي
@@ -1986,14 +1986,14 @@
             <td><strong>قس قبل التحسين</strong></td>
             <td>
               "أظن إنه بطيء" ليس دليل. صف، وقت، احصل أرقام حقيقية. هذا نفس مبدأ
-              "ملموس قبل مجرد" كحل المشكلات §٨ — استخدم مثالاً ملموساً قبل
+              "ملموس قبل مجرد" كحل المشكلات <a href="./problem-solving.html#sec-the-role-of-examples-concrete-before-abstract">§٨</a> — استخدم مثالاً ملموساً قبل
               التعميم.
             </td>
           </tr>
         </tbody>
       </table>
 
-            <h2 id="sec-technical-debt-when-speed-now-costs-later">٨ج. الديون التقنية — عندما يكلف الوقت الآن لاحقاً</h2>
+            <h2 id="sec-technical-debt-when-speed-now-costs-later">الديون التقنية — عندما يكلف الوقت الآن لاحقاً</h2>
 
       <p>
         <strong>الديون التقنية</strong> هي التكلفة المستقبلية لاختيار السرعة
@@ -2008,11 +2008,11 @@
         <li><strong>دين المعرفة</strong> أشد خفاء: قرارات غير موثقة وأجزاء غير مستكشفة من قاعدة الكود لا يفهمها إلا المؤلف الأصلي.</li>
       </ul>
       <p>
-        تسمية قرار "ديناً" تجعله صريحاً (§٨ب): يمكنك حينها أن تقرر بوعي متى
+        تسمية قرار "ديناً" تجعله صريحاً (<a href="#sec-principles-the-shared-constants">§٨ب</a>): يمكنك حينها أن تقرر بوعي متى
         تسدده.
       </p>
 
-      <h2 id="sec-worked-example-evaluating-a-brute-force-solution">٩. مثال محلول — تقييم حل قوة غاشمة</h2>
+      <h2 id="sec-worked-example-evaluating-a-brute-force-solution">مثال محلول — تقييم حل قوة غاشمة</h2>
 
       <p>
         لنتابع تقييم الحل عبر مشكلة حقيقية:
@@ -2038,8 +2038,7 @@ function firstNonRepeat(str) {
   }
   return null;
 }
-</pre
-      >
+</pre>
       <p><strong>قيم المعاملات:</strong></p>
       <ul>
         <li>
@@ -2059,7 +2058,7 @@ function firstNonRepeat(str) {
 
       <h3>الترقية (مرحلة ٤ — النظر للخلف: "هل أستطيع اشتقاقه بشكل مختلف؟")</h3>
       <p>
-        المشكلة تقول "أحسب التكرارات" — هذا نمط خريطة التجزئة (حل المشكلات §٧).
+        المشكلة تقول "أحسب التكرارات" — هذا نمط خريطة التجزئة (حل المشكلات <a href="./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog">§٧</a>).
         بدلاً من إعادة العد لكل حرف، أحسب مرة، ثم أفحص مرة:
       </p>
       <pre
@@ -2076,8 +2075,7 @@ function firstNonRepeat(str) {
   for (const ch of str) if (counts[ch] === 1) return ch;
   return null;
 }
-</pre
-      >
+</pre>
       <p><strong>أعد تقييم المعاملات:</strong></p>
       <ul>
         <li>
@@ -2091,7 +2089,7 @@ function firstNonRepeat(str) {
         <li>
           <strong>تعقيد الفضاء:</strong> O(n) — كائن العد يخزن حتى n مدخلات.
           <strong>هذه المفاضلة:</strong> استبدلنا O(1) فضاء بتحسين O(n) وقت. وقت
-          مقابل فضاء (§٦).
+          مقابل فضاء (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>).
         </li>
         <li>
           <strong>المقروئية:</strong> ✅ لا يزال مقروءاً — ربما أكثر، لأن نهج
@@ -2135,13 +2133,13 @@ function firstNonRepeat(str) {
       </table>
 
       <p>
-        <strong>هذه مهارة الحكم (§٧) في العمل:</strong> نفس الحلين، إجابات
+        <strong>هذه مهارة الحكم (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>) في العمل:</strong> نفس الحلين، إجابات
         مختلفة حسب السياق. جواب CS دائماً "استخدم الخوارزمية المثلى." جواب SE
         "استخدم أبسط خوارزمية تناسب القيد." الممارس الناضج يعرف أي إجابة السياق
         يطلب.
       </p>
 
-      <h2 id="sec-the-most-common-failure-modes">٩ب. أوضاع الفشل الأكثر شيوعاً</h2>
+      <h2 id="sec-the-most-common-failure-modes">أوضاع الفشل الأكثر شيوعاً</h2>
       <table>
         <thead>
           <tr>
@@ -2158,7 +2156,7 @@ function firstNonRepeat(str) {
               البدء والمستخدم لا يلاحظ أبداً.
             </td>
             <td>
-              قس أولاً (§٧). صف، وقت، احصل أرقام حقيقية. حسّن المسار الحرج فقط.
+              قس أولاً (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>). صف، وقت، احصل أرقام حقيقية. حسّن المسار الحرج فقط.
             </td>
           </tr>
           <tr>
@@ -2201,7 +2199,7 @@ function firstNonRepeat(str) {
               للصيانة — المطور التالي لا يستطيع لمسه.
             </td>
             <td>
-              اجعل المفاضلات صريحة (§٨ب). سم ما تضحي: "أضحي بالمقروئية لتسريع
+              اجعل المفاضلات صريحة (<a href="#sec-principles-the-shared-constants">§٨ب</a>). سم ما تضحي: "أضحي بالمقروئية لتسريع
               ١٠× هنا."
             </td>
           </tr>
@@ -2230,7 +2228,7 @@ function firstNonRepeat(str) {
         </tbody>
       </table>
 
-      <h2 id="sec-ecosystem-books-tools-and-communities">٩ج. النظام الإيكولوجي — كتب، أدوات، ومجتمعات</h2>
+      <h2 id="sec-ecosystem-books-tools-and-communities">النظام الإيكولوجي — كتب، أدوات، ومجتمعات</h2>
       <table>
         <thead>
           <tr>
@@ -2278,7 +2276,7 @@ function firstNonRepeat(str) {
             <td>HackerRank، LeetCode، CodeWars</td>
             <td>
               ممارسة خوارزمية بحلقات رد فعل ضيقة. استخدم لمهارة CS (O الكبير،
-              النماذج). انظر حل المشكلات §١١ لكيفية استخدامها صحيحاً.
+              النماذج). انظر حل المشكلات <a href="./problem-solving.html#sec-fluency-vs-storage-strength-in-problem-solving">§١١</a> لكيفية استخدامها صحيحاً.
             </td>
           </tr>
           <tr>
@@ -2311,7 +2309,7 @@ function firstNonRepeat(str) {
         </tbody>
       </table>
 
-      <h2 id="sec-the-future-the-evaluation-premium">٩د. المستقبل — قسط التقييم</h2>
+      <h2 id="sec-the-future-the-evaluation-premium">المستقبل — قسط التقييم</h2>
 
       <p>
         الذكاء الاصطناعي يغير الانضباط — لكن ليس كما يخاف معظم الناس. المهارة
@@ -2330,12 +2328,12 @@ function firstNonRepeat(str) {
           >دور الإنسان ينتقل من "هل تستطيع كتابته" إلى "هل تستطيع الحكم
           عليه."</strong
         >
-        هذه مهارة التقييم (§٤–§٧)، وتصبح المهارة القسطية.
+        هذه مهارة التقييم (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>)، وتصبح المهارة القسطية.
       </p>
 
       <h3>فخ الطلاقة يتفاقم</h3>
       <p>
-        نفس فخ حل المشكلات §١١ ينطبق هنا: الذكاء الاصطناعي يجعل من السهل الشعور
+        نفس فخ حل المشكلات <a href="./problem-solving.html#sec-fluency-vs-storage-strength-in-problem-solving">§١١</a> ينطبق هنا: الذكاء الاصطناعي يجعل من السهل الشعور
         أنك تفهم حل دون بناء المخطط العقلي الذي يسمح لك بالارتجال عندما يكسر.
         عندما يولد الذكاء الاصطناعي حل O(n²) وتقبله دون تحليل التعقيد، ربحت حل
         لكن ليس المهارة. <strong>العلاج:</strong> قيم دائماً كود مولد بالذكاء
@@ -2346,17 +2344,17 @@ function firstNonRepeat(str) {
       <h3>ما يبقى بشرياً</h3>
       <ul>
         <li>
-          <strong>حكم السياق (§٧):</strong> الذكاء الاصطناعي لا يعرف قيود مشروعك
+          <strong>حكم السياق (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>):</strong> الذكاء الاصطناعي لا يعرف قيود مشروعك
           — الموعد النهائي، الفريق، قاعدة الكود الموجودة. لا يستطيع تقرير "هل
           هذا جيد بما يكفي ليسلم؟" هذا لا يزال لك.
         </li>
         <li>
-          <strong>قرارات المفاضلات (§٦):</strong> الذكاء الاصطناعي يستطيع سرد
+          <strong>قرارات المفاضلات (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>):</strong> الذكاء الاصطناعي يستطيع سرد
           المفاضلات، لكن القرار — "سأضحي بالمقروئية للأداء هنا لأن هذا على
           المسار الحرج" — قرار حكم بشري.
         </li>
         <li>
-          <strong>معرفة أي المعاملات تهم (§٤):</strong> الذكاء الاصطناعي لا يعرف
+          <strong>معرفة أي المعاملات تهم (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>):</strong> الذكاء الاصطناعي لا يعرف
           هل تحل تحدي HackerRank (وقت/فضاء) أم تبني ميزة إنتاج (قابلية
           صيانة/استخدام). أنت تعرف.
         </li>
@@ -2375,7 +2373,7 @@ function firstNonRepeat(str) {
         يعالجها. حواجز الانضباط:
       </p>
       <ul>
-        <li>راجع كل اقتراح بقائمة التحقق §١٠ — يبقى الإنسان مسؤولاً عن الصحة والأمان وقابلية الصيانة.</li>
+        <li>راجع كل اقتراح بقائمة التحقق <a href="#sec-summary-the-complete-evaluation-checklist">§١٠</a> — يبقى الإنسان مسؤولاً عن الصحة والأمان وقابلية الصيانة.</li>
         <li>لا تلصق أبداً أسراراً أو بيانات شخصية في المطالبات؛ عامل مخرجات النموذج كمدخلات غير موثوقة حتى تُتحقق.</li>
         <li>تحقق من الإصدارات والتراخيص قبل قبول تبعيات أو كود مولّد.</li>
         <li>اختبر الكود المولّد مثل أي كود آخر — ليس معفى من الاختبار أو مراجعة الأمان أو معايير قابلية الصيانة.</li>
@@ -2389,10 +2387,10 @@ function firstNonRepeat(str) {
         تتغير؛ الحكم لا. لهذا هذا المستند موجود.
       </p>
 
-            <h2 id="sec-measurement-why-measure-first-is-harder-than-it-sounds">٩هـ. القياس — لماذا "قس أولاً" أصعب مما يبدو</h2>
+            <h2 id="sec-measurement-why-measure-first-is-harder-than-it-sounds">القياس — لماذا "قس أولاً" أصعب مما يبدو</h2>
 
       <p>
-        §٨ب يقول "قس قبل أن تحسّن" — لكن القياس نفسه مهارة. المقاييس
+        <a href="#sec-principles-the-shared-constants">§٨ب</a> يقول "قس قبل أن تحسّن" — لكن القياس نفسه مهارة. المقاييس
         المعيارية (benchmarks) تضلل عبر <strong>تأثيرات الإحماء</strong>،
         <strong>التخزين المؤقت</strong>، <strong>ضوضاء جمع القمامة</strong>،
         <strong>تحسين المترجم</strong> (إزالة الكود الميت، التضمين)،
@@ -2401,11 +2399,11 @@ function firstNonRepeat(str) {
       </p>
       <ul>
         <li>قس <strong>المسار الحرج في ظروف واقعية</strong> — أحجام المدخلات الفعلية في البيئة الفعلية.</li>
-        <li>استخدم <strong>التحليل (profiling) والتتبع</strong> قبل التنظير حول عنق الزجاجة (انظر "تحسين المعامل الخاطئ" في §٩ب).</li>
+        <li>استخدم <strong>التحليل (profiling) والتتبع</strong> قبل التنظير حول عنق الزجاجة (انظر "تحسين المعامل الخاطئ" في <a href="#sec-the-most-common-failure-modes">§٩ب</a>).</li>
         <li>عامل أرقام القياس كـ<strong>فرضيات</strong>: كررها ونوّعها، وأكدها بإشارات من النهاية-للنهاية — مقاييس المراقبة، اختبارات A/B — لا بمقاييس مصغرة معزولة.</li>
       </ul>
 
-      <h2 id="sec-summary-the-complete-evaluation-checklist">١٠. ملخص — قائمة التحقق الكاملة للتقييم</h2>
+      <h2 id="sec-summary-the-complete-evaluation-checklist">ملخص — قائمة التحقق الكاملة للتقييم</h2>
 
       <p>
         في المرة القادمة تحل مشكلة — سواء تحدي HackerRank أو ميزة React — شغل
@@ -2422,15 +2420,15 @@ function firstNonRepeat(str) {
         <tbody>
           <tr>
             <td>هل الحل <strong>صحيح</strong>؟ هل يتعامل مع حالات حدية؟</td>
-            <td>شغل كتالوج الحالات الحدية (حل المشكلات §١٠)</td>
+            <td>شغل كتالوج الحالات الحدية (حل المشكلات <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§١٠</a>)</td>
           </tr>
           <tr>
             <td>ما <strong>تعقيد الوقت</strong> (O الكبير)؟</td>
-            <td>احسب الحلقات (§٥). عرف الحد المهيمن.</td>
+            <td>احسب الحلقات (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>). عرف الحد المهيمن.</td>
           </tr>
           <tr>
             <td>ما <strong>تعقيد الفضاء</strong>؟</td>
-            <td>احسب بنى البيانات الإضافية (§٥).</td>
+            <td>احسب بنى البيانات الإضافية (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§٥</a>).</td>
           </tr>
           <tr>
             <td>هل <strong>مقروء</strong>؟ هل المطور التالي يفهمه؟</td>
@@ -2438,23 +2436,23 @@ function firstNonRepeat(str) {
           </tr>
           <tr>
             <td>ما <strong>المفاضلات</strong> التي أجريها؟</td>
-            <td>سمها صريحة (§٦): "أستبدل فضاء بوقت هنا."</td>
+            <td>سمها صريحة (<a href="#sec-the-trade-offs-when-parameters-conflict">§٦</a>): "أستبدل فضاء بوقت هنا."</td>
           </tr>
           <tr>
             <td>أي <strong>المعاملات تهم</strong> لهذا السياق؟</td>
-            <td>افحص جدول السياق (§٧). HackerRank؟ إنتاج؟ مقابلة؟</td>
+            <td>افحص جدول السياق (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>). HackerRank؟ إنتاج؟ مقابلة؟</td>
           </tr>
           <tr>
             <td>هل <strong>جيد بما يكفي</strong> — أم أهندس بإفراط؟</td>
-            <td>افحص مبدأ كنوث (§٧). هل قست؟ هل هذا على المسار الحرج؟</td>
+            <td>افحص مبدأ كنوث (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>). هل قست؟ هل هذا على المسار الحرج؟</td>
           </tr>
           <tr>
             <td>هل يتبع <strong>المبادئ</strong> (KISS، DRY، YAGNI، SOLID)؟</td>
-            <td>راجع §٨. هل تعقيد غير ضروري؟ تكرار؟ عمومية تكهنية؟</td>
+            <td>راجع <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>. هل تعقيد غير ضروري؟ تكرار؟ عمومية تكهنية؟</td>
           </tr>
           <tr>
             <td>هل أستطيع <strong>تسجيل النمط</strong>؟</td>
-            <td>سم النموذج (حل المشكلات §٧). أي إشارة أخبرتك بالنهج؟</td>
+            <td>سم النموذج (حل المشكلات <a href="./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog">§٧</a>). أي إشارة أخبرتك بالنهج؟</td>
           </tr>
         <tr>
             <td>هل يحل <strong>المشكلة الصحيحة</strong>؟ هل المتطلبات ومعايير القبول واضحة؟</td>
@@ -2474,7 +2472,7 @@ function firstNonRepeat(str) {
           </tr>
           <tr>
             <td>هل <strong>تبعياته آمنة ومرخصة ومصانة</strong>؟</td>
-            <td>دقق سلسلة التوريد (§٣ب)</td>
+            <td>دقق سلسلة التوريد (<a href="#sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">§٣ب</a>)</td>
           </tr>
           <tr>
             <td>هل هو <strong>ميسور الوصول وقابل للاستخدام</strong>؟</td>
@@ -2482,7 +2480,7 @@ function firstNonRepeat(str) {
           </tr>
           <tr>
             <td>هل <strong>كل كود مولّد بالذكاء الاصطناعي روجع وتحقق منه</strong>؟</td>
-            <td>شغّل الحواجز الواقية (§٩د)</td>
+            <td>شغّل الحواجز الواقية (<a href="#sec-the-future-the-evaluation-premium">§٩د</a>)</td>
           </tr>
         </tbody>
       </table>

@@ -21,34 +21,34 @@
 <blockquote class="callout">
   <p><strong>Where this fits.</strong> This doc is the <em>umbrella</em> — the discipline that grounds every technical reference on this shelf; adjacent references (UI/UX, Design Thinking) intersect it by shaping requirements and human constraints:</p>
   <ul>
-    <li><a href="./problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline. Phase 4 (Look back) links directly to this doc's solution evaluation sections (§4–§7).</li>
-    <li><a href="./system-design.html">System Design</a> — the architecture skill. Trade-offs at scale (CAP, monolith vs microservices) are instances of this doc's trade-off framework (§6).</li>
-    <li><a href="./api-design.html">API Design</a> — the contract skill. REST vs GraphQL vs gRPC is a trade-off decision (§6).</li>
-    <li><a href="./how-developers-think-frontend.html">The Rhythm</a> — the implementation skill. "Do the simplest thing first" is KISS + YAGNI (§8). "Premature optimization is the cardinal sin" is Knuth's principle (§7).</li>
+    <li><a href="./problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline. Phase 4 (Look back) links directly to this doc's solution evaluation sections (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>).</li>
+    <li><a href="./system-design.html">System Design</a> — the architecture skill. Trade-offs at scale (CAP, monolith vs microservices) are instances of this doc's trade-off framework (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>).</li>
+    <li><a href="./api-design.html">API Design</a> — the contract skill. REST vs GraphQL vs gRPC is a trade-off decision (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>).</li>
+    <li><a href="./how-developers-think-frontend.html">The Rhythm</a> — the implementation skill. "Do the simplest thing first" is KISS + YAGNI (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>). "Premature optimization is the cardinal sin" is Knuth's principle (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>).</li>
     <li><a href="./html-and-css.html">HTML &amp; CSS</a>, <a href="./javascript-the-language.html">JavaScript</a> — the technologies, instances of the discipline.</li>
     <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
   </ul>
   <p>Read this to understand <em>what discipline you're actually practicing</em> — and why HackerRank (CS) and your React job (SE) feel different even though both involve JavaScript.</p>
 </blockquote>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful <em>after</em> you've read <a href="./problem-solving.html">Problem-Solving</a> and <a href="./how-developers-think-frontend.html">The Rhythm</a> — those give you the thinking skills; this doc gives you the discipline they sit inside. Cross-links:</p>
 <ul>
-  <li>Downstream: <a href="./problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline; Phase 4 (Look back) links to this doc's evaluation sections (§4–§7).</li>
-  <li>Downstream: <a href="./system-design.html">System Design</a> — trade-offs at the architecture scale; an instance of this doc's trade-off framework (§6).</li>
-  <li>Downstream: <a href="./api-design.html">API Design</a> — trade-offs at the contract scale; an instance of §6.</li>
-  <li>Downstream: <a href="./how-developers-think-frontend.html">The Rhythm</a> — implementation at the feature scale; the principles (§8) are the constants it follows.</li>
+  <li>Downstream: <a href="./problem-solving.html">Problem-Solving</a> — the thinking skill within the discipline; Phase 4 (Look back) links to this doc's evaluation sections (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>).</li>
+  <li>Downstream: <a href="./system-design.html">System Design</a> — trade-offs at the architecture scale; an instance of this doc's trade-off framework (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>).</li>
+  <li>Downstream: <a href="./api-design.html">API Design</a> — trade-offs at the contract scale; an instance of <a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>.</li>
+  <li>Downstream: <a href="./how-developers-think-frontend.html">The Rhythm</a> — implementation at the feature scale; the principles (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>) are the constants it follows.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
-  <li>Broader map: §3b lists where the other major areas of the discipline — testing, security, operations, data — live on this shelf.</li>
+  <li>Broader map: <a href="#sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">§3b</a> lists where the other major areas of the discipline — testing, security, operations, data — live on this shelf.</li>
 </ul>
-<p><strong>If you've ever wondered why HackerRank feels different from your React job — even though both involve JavaScript — this doc answers that.</strong> Read §1 (Definition) and §2–§3 (what CS is, what SE is) first. Then §4–§7 for the evaluation skill (Big O, quality attributes, trade-offs, judgment). Then §8 for the engineering principles that survive every framework.</p>
+<p><strong>If you've ever wondered why HackerRank feels different from your React job — even though both involve JavaScript — this doc answers that.</strong> Read <a href="#sec-definition-what-cs-is-what-se-is-and-how-they-differ">§1</a> (Definition) and <a href="#sec-what-is-computer-science-the-science-of-computation">§2</a>–<a href="#sec-what-is-software-engineering-the-engineering-of-software">§3</a> (what CS is, what SE is) first. Then <a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a> for the evaluation skill (Big O, quality attributes, trade-offs, judgment). Then <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a> for the engineering principles that survive every framework.</p>
 
 <blockquote class="callout">
-  <p><strong>Scope and non-goals.</strong> This document is a conceptual umbrella, not an encyclopedia. It explains the relationship between computer science and software engineering and introduces the evaluation skills that connect them. Specific technologies, implementation patterns, and adjacent disciplines are covered in the linked references (§3b is the map) or intentionally left out of scope.</p>
+  <p><strong>Scope and non-goals.</strong> This document is a conceptual umbrella, not an encyclopedia. It explains the relationship between computer science and software engineering and introduces the evaluation skills that connect them. Specific technologies, implementation patterns, and adjacent disciplines are covered in the linked references (<a href="#sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">§3b</a> is the map) or intentionally left out of scope.</p>
 </blockquote>
 
-<h2 id="sec-definition-what-cs-is-what-se-is-and-how-they-differ">1. Definition — what CS <em>is</em>, what SE <em>is</em>, and how they differ</h2>
+<h2 id="sec-definition-what-cs-is-what-se-is-and-how-they-differ">Definition — what CS <em>is</em>, what SE <em>is</em>, and how they differ</h2>
 
 <h3>Computer Science — the science of computation</h3>
 <p>Computer science is the study of <strong>what can be computed, how efficiently, and what the fundamental limits of computation are</strong> (<a href="https://en.wikipedia.org/wiki/Computer_science">Wikipedia</a>). It is a <em>science</em>: it discovers what is possible, asks "what are the theoretical limits?", and proves theorems about computation. The core questions: What problems can be solved by an algorithm? How fast? How much memory? What problems are provably <em>unsolvable</em> (the halting problem)? What problems are solvable but not in reasonable time (P vs NP)?</p>
@@ -80,10 +80,10 @@
 <ul>
   <li><strong>Not a programming tutorial.</strong> It doesn't teach you to code. It teaches you what discipline your coding sits inside.</li>
   <li><strong>Not the SDLC.</strong> The Software Development Life Cycle is a process model (Requirements → Design → Implementation → Testing → Deployment). CS &amp; SE are the disciplines that produce the knowledge and skills the SDLC consumes.</li>
-  <li><strong>Not just for academics.</strong> The engineering principles (§8) and the evaluation skill (§4–§7) are practical — you use them every time you choose between a brute-force and an optimized solution, every time you decide "is this readable enough?", every time you make a trade-off.</li>
+  <li><strong>Not just for academics.</strong> The engineering principles (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>) and the evaluation skill (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>) are practical — you use them every time you choose between a brute-force and an optimized solution, every time you decide "is this readable enough?", every time you make a trade-off.</li>
 </ul>
 
-<h2 id="sec-history-from-lovelace-to-the-ai-era-1843present">1b. History — from Lovelace to the AI era (1843–present)</h2>
+<h2 id="sec-history-from-lovelace-to-the-ai-era-1843present">History — from Lovelace to the AI era (1843–present)</h2>
 
 <p>The discipline’s lineage now spans nearly two centuries of ideas, with threads that braid together over time: the science thread (what can be computed?), the engineering thread (how do we build reliable software?), and—since the 2010s—the intelligence thread (can software learn from data?). This timeline is selective: it highlights moments relevant to evaluation, engineering principles, and the AI era — not a complete history of computing.</p>
 
@@ -851,7 +851,7 @@
 
 <p><strong>The braided threads:</strong> The science thread (Turing → Shannon → Knuth) discovered what computation <em>is</em> and how to measure its efficiency. The engineering thread (NATO 1968 → Dijkstra → Brooks → GoF → SOLID → Agile → cloud → DevOps) discovered how to build software that <em>lasts</em> and <em>scales</em>. Since 2012 a third strand — <strong>machine intelligence</strong> (AlexNet → Transformer → LLMs) — braided in: software now learns from data, and AI assists in writing it. They meet in solution evaluation: the science gives you the measures (Big O); the engineering gives you the parameters (quality attributes) and the principles (DRY, SOLID, KISS); the AI era makes the judgment — which parameters matter when, when to stop optimizing, what to trust a model with — <em>more</em> valuable, not less.</p>
 
-<h2 id="sec-evolution-constraint-inversions-across-the-discipline">1c. Evolution — constraint inversions across the discipline</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-discipline">Evolution — constraint inversions across the discipline</h2>
 
 <p>The discipline evolved through constraint inversions — moments when the dominant question changed because a constraint changed.</p>
 
@@ -868,27 +868,27 @@
 
 <p><strong>The pattern:</strong> each inversion <em>adds</em> a parameter without removing the old ones. A modern solution must be correct <em>and</em> fast <em>and</em> maintainable <em>and</em> scalable <em>and</em> secure. The trade-offs between them are the engineering judgment this doc teaches (§6–§7).</p>
 
-<h2 id="sec-intersection-with-neighbors-the-umbrella">1d. Intersection with neighbors — the umbrella</h2>
+<h2 id="sec-intersection-with-neighbors-the-umbrella">Intersection with neighbors — the umbrella</h2>
 
 <p>This doc is the <strong>umbrella</strong> — every technical reference on this shelf is grounded in CS &amp; SE, viewed from a different angle. Adjacent references — UI/UX, Design Thinking, Problem-Solving as general cognition — intersect it by shaping requirements and human constraints rather than being instances of it. Here's how each connects:</p>
 
 <table>
   <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
   <tbody>
-    <tr><td><a href="./problem-solving.html">Problem-Solving</a> <em>(thinking skill)</em></td><td>Problem-solving is the thinking skill <em>within</em> the discipline. Pólya's Phase 4 (Look back) <em>is</em> solution evaluation.</td><td>The parameters (§4), measures (§5), trade-offs (§6), and judgment (§7) that Phase 4 needs but doesn't define.</td></tr>
-    <tr><td><a href="./system-design.html">System Design</a> <em>(architecture)</em></td><td>System design is CS &amp; SE at the architecture scale — trade-offs across service boundaries.</td><td>The trade-off framework (§6) and the principle that "optimization is a trade-off, not a virtue" (§7).</td></tr>
-    <tr><td><a href="./api-design.html">API Design</a> <em>(contracts)</em></td><td>API design is CS &amp; SE at the contract scale — trade-offs at the interface boundary.</td><td>The quality attributes (§4) that define "what makes a good API" and the trade-off analysis (§6).</td></tr>
-    <tr><td><a href="./how-developers-think-frontend.html">The Rhythm</a> <em>(implementation)</em></td><td>The rhythm is CS &amp; SE at the feature scale — applying principles in a loop.</td><td>The engineering principles (§8): "do the simplest thing first" = KISS + YAGNI; "premature optimization is the cardinal sin" = Knuth's principle (§7).</td></tr>
-    <tr><td><a href="./html-and-css.html">HTML &amp; CSS</a> / <a href="./javascript-the-language.html">JavaScript</a> <em>(technologies)</em></td><td>These are the tools the discipline uses — instances, not the discipline itself.</td><td>The theoretical foundation (§1e) that explains why these tools exist and what they can and cannot do.</td></tr>
-    <tr><td><a href="./ui-ux-web-design.html">UI/UX</a> / <a href="./design-thinking.html">Design Thinking</a> <em>(human layer)</em></td><td>The human layer sets the requirements; CS &amp; SE implements within them.</td><td>The quality attribute "usability" (§4) — the bridge between human needs and technical implementation.</td></tr>
+    <tr><td><a href="./problem-solving.html">Problem-Solving</a> <em>(thinking skill)</em></td><td>Problem-solving is the thinking skill <em>within</em> the discipline. Pólya's Phase 4 (Look back) <em>is</em> solution evaluation.</td><td>The parameters (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>), measures (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>), trade-offs (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>), and judgment (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>) that Phase 4 needs but doesn't define.</td></tr>
+    <tr><td><a href="./system-design.html">System Design</a> <em>(architecture)</em></td><td>System design is CS &amp; SE at the architecture scale — trade-offs across service boundaries.</td><td>The trade-off framework (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>) and the principle that "optimization is a trade-off, not a virtue" (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>).</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a> <em>(contracts)</em></td><td>API design is CS &amp; SE at the contract scale — trade-offs at the interface boundary.</td><td>The quality attributes (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>) that define "what makes a good API" and the trade-off analysis (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>).</td></tr>
+    <tr><td><a href="./how-developers-think-frontend.html">The Rhythm</a> <em>(implementation)</em></td><td>The rhythm is CS &amp; SE at the feature scale — applying principles in a loop.</td><td>The engineering principles (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>): "do the simplest thing first" = KISS + YAGNI; "premature optimization is the cardinal sin" = Knuth's principle (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>).</td></tr>
+    <tr><td><a href="./html-and-css.html">HTML &amp; CSS</a> / <a href="./javascript-the-language.html">JavaScript</a> <em>(technologies)</em></td><td>These are the tools the discipline uses — instances, not the discipline itself.</td><td>The theoretical foundation (<a href="#sec-underlying-theory-complexity-computability-and-information">§1e</a>) that explains why these tools exist and what they can and cannot do.</td></tr>
+    <tr><td><a href="./ui-ux-web-design.html">UI/UX</a> / <a href="./design-thinking.html">Design Thinking</a> <em>(human layer)</em></td><td>The human layer sets the requirements; CS &amp; SE implements within them.</td><td>The quality attribute "usability" (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>) — the bridge between human needs and technical implementation.</td></tr>
   </tbody>
 </table>
 
-<p><strong>The boundary rule:</strong> if you're asking "what can be computed and how fast?", that's CS (this doc, §1e, §5). If you're asking "how do I think about this problem?", that's Problem-Solving. If you're asking "how do I build this feature?", that's The Rhythm. If you're asking "how do the services fit together?", that's System Design. If you're asking "what makes this solution <em>good</em> — and how do I measure and trade off between the criteria?", that's this doc's solution evaluation (§4–§7).</p>
+<p><strong>The boundary rule:</strong> if you're asking "what can be computed and how fast?", that's CS (this doc, <a href="#sec-underlying-theory-complexity-computability-and-information">§1e</a>, <a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>). If you're asking "how do I think about this problem?", that's Problem-Solving. If you're asking "how do I build this feature?", that's The Rhythm. If you're asking "how do the services fit together?", that's System Design. If you're asking "what makes this solution <em>good</em> — and how do I measure and trade off between the criteria?", that's this doc's solution evaluation (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>).</p>
 
 <p><strong>Frontend engineering</strong> is where usability, performance, accessibility, and platform constraints meet: the browser is a runtime, a rendering engine, and a security boundary. The shelf covers it in <a href="./html-and-css.html">HTML &amp; CSS</a>, <a href="./javascript-the-language.html">JavaScript</a>, and <a href="./react-2024-and-beyond.html">React</a> — all instances of the discipline at the interface layer.</p>
 
-<h2 id="sec-underlying-theory-complexity-computability-and-information">1e. Underlying theory — complexity, computability, and information</h2>
+<h2 id="sec-underlying-theory-complexity-computability-and-information">Underlying theory — complexity, computability, and information</h2>
 
 <p>The discipline rests on three theoretical pillars from the science thread. You don't need to prove the theorems, but you need to know they exist — they define the limits of what you can do.</p>
 
@@ -896,16 +896,16 @@
 <p>Turing's 1936 paper proved that some problems are <strong>provably unsolvable</strong> by any algorithm. The <em>halting problem</em> — "will this program ever stop, or will it loop forever?" — is undecidable: no algorithm can answer it for all possible programs. This isn't a limitation of current technology; it's a mathematical proof. <strong>The practical implication:</strong> there are problems you cannot solve with code, no matter how clever you are. Knowing this exists prevents you from chasing impossible solutions.</p>
 
 <h3>Computational complexity theory — what can be computed efficiently?</h3>
-<p>Even among solvable problems, some are solvable in reasonable time and some are not. The <strong>P vs NP</strong> question (the Millennium Prize problem) asks: is every problem whose solution can be <em>verified</em> quickly also solvable <em>quickly</em>? Most computer scientists believe P ≠ NP — meaning some problems are easy to check but hard to solve, provably so if P ≠ NP holds. <strong>The practical implication:</strong> for some problems (traveling salesman, knapsack at scale), there is no known efficient algorithm, and there may never be one. Brute force or heuristics are the best you can do. This is why algorithm paradigms (Problem-Solving §7) matter — they're the tools for navigating the efficiency frontier.</p>
+<p>Even among solvable problems, some are solvable in reasonable time and some are not. The <strong>P vs NP</strong> question (the Millennium Prize problem) asks: is every problem whose solution can be <em>verified</em> quickly also solvable <em>quickly</em>? Most computer scientists believe P ≠ NP — meaning some problems are easy to check but hard to solve, provably so if P ≠ NP holds. <strong>The practical implication:</strong> for some problems (traveling salesman, knapsack at scale), there is no known efficient algorithm, and there may never be one. Brute force or heuristics are the best you can do. This is why algorithm paradigms (Problem-Solving <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>) matter — they're the tools for navigating the efficiency frontier.</p>
 
 <h3>Information theory — how is information quantified?</h3>
 <p>Shannon's 1948 paper defined the <strong>bit</strong> as the fundamental unit of information, and proved that information can be precisely quantified, compressed, and transmitted with calculable error rates. <strong>The practical implication:</strong> every data structure, every encoding, every compression algorithm is an instance of information theory. When you choose between storing a Set (no duplicates, O(1) lookup) and an Array (duplicates allowed, O(n) lookup), you're making an information-theoretic trade-off: how much information do you need to preserve, and how efficiently can you access it?</p>
 
 <blockquote class="callout">
-  <p><strong>How the theory connects to practice:</strong> Computability tells you what's possible. Complexity tells you what's efficient. Information theory tells you how to represent data. Together they define the space of solutions you can choose from. The engineering principles (§8) and the trade-off judgment (§7) are how you navigate that space under real-world constraints.</p>
+  <p><strong>How the theory connects to practice:</strong> Computability tells you what's possible. Complexity tells you what's efficient. Information theory tells you how to represent data. Together they define the space of solutions you can choose from. The engineering principles (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>) and the trade-off judgment (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>) are how you navigate that space under real-world constraints.</p>
 </blockquote>
 
-<h2 id="sec-mental-models-the-engineering-mindset">1f. Mental models — the engineering mindset</h2>
+<h2 id="sec-mental-models-the-engineering-mindset">Mental models — the engineering mindset</h2>
 
 <p>The engineering mindset is fundamentally different from the scientific mindset, and recognizing the shift is a key mental model.</p>
 
@@ -929,10 +929,10 @@
 <ul>
   <li><strong>Trade-offs are inevitable, not optional.</strong> You cannot maximize all parameters simultaneously. Faster code is often less readable. More flexible code is often more complex. The engineering question is never "what's the best?" but "what's the best <em>given these constraints</em>?"</li>
   <li><strong>Constraints drive design.</strong> The deadline, the team size, the existing codebase, the hardware — these aren't obstacles to good design; they <em>are</em> the design. A solution that's optimal in theory but misses the deadline is a worse engineering outcome than a "good enough" solution that ships.</li>
-  <li><strong>Abstraction manages complexity.</strong> The human brain can hold ~4 items in working memory (Cowan 2001). A 100,000-line codebase is only manageable because of abstraction — hiding detail behind interfaces. Every principle in §8 (DRY, SOLID, separation of concerns) is a strategy for managing complexity through abstraction.</li>
+  <li><strong>Abstraction manages complexity.</strong> The human brain can hold ~4 items in working memory (Cowan 2001). A 100,000-line codebase is only manageable because of abstraction — hiding detail behind interfaces. Every principle in <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a> (DRY, SOLID, separation of concerns) is a strategy for managing complexity through abstraction.</li>
 </ul>
 
-<h2 id="sec-what-is-computer-science-the-science-of-computation">2. What is Computer Science? — the science of computation</h2>
+<h2 id="sec-what-is-computer-science-the-science-of-computation">What is Computer Science? — the science of computation</h2>
 
 <p>Computer science is the study of <strong>computation</strong> — what can be computed, how efficiently, and what the limits are. It is not "the study of computers" any more than astronomy is "the study of telescopes." The computer is the instrument; computation is the subject. The field has several core areas:</p>
 
@@ -948,33 +948,33 @@
   </tbody>
 </table>
 
-<p><strong>What CS gives you as a practitioner:</strong> the vocabulary and tools for the science side of evaluation — Big O (§5), complexity classes, algorithm paradigms (Problem-Solving §7), data structure trade-offs. When you analyze a solution's time and space complexity, you're doing CS. When you choose between a brute-force O(n²) approach and a hash-map O(n) approach, you're applying CS.</p>
+<p><strong>What CS gives you as a practitioner:</strong> the vocabulary and tools for the science side of evaluation — Big O (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>), complexity classes, algorithm paradigms (Problem-Solving <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>), data structure trade-offs. When you analyze a solution's time and space complexity, you're doing CS. When you choose between a brute-force O(n²) approach and a hash-map O(n) approach, you're applying CS.</p>
 
 <p><strong>Beyond the six areas above:</strong> the complete field also includes operating systems, computer networking, compilers and formal methods, human–computer interaction, computer graphics, and AI/ML — with the mathematical foundations beneath everything: logic, probability, and discrete structures. Most practitioners meet these through the stack: <a href="./algorithms-and-data-structures.html">Algorithms &amp; Data Structures</a> for the core, <a href="./system-design.html">System Design</a> for systems at scale.</p>
 
-<h2 id="sec-what-is-software-engineering-the-engineering-of-software">3. What is Software Engineering? — the engineering of software</h2>
+<h2 id="sec-what-is-software-engineering-the-engineering-of-software">What is Software Engineering? — the engineering of software</h2>
 
 <p>Software engineering is the <strong>engineering discipline of building reliable, maintainable software systems at scale</strong>. It was named in 1968 at the NATO conference, in response to the "software crisis" — projects that were over budget, over schedule, and poor quality. The field has several core areas:</p>
 
 <table>
   <thead><tr><th>Area</th><th>What it covers</th><th>Your touchpoint</th></tr></thead>
   <tbody>
-    <tr><td><strong>Software design</strong></td><td>How to structure code — patterns, principles, architecture</td><td>SOLID, DRY, separation of concerns, component design (§8)</td></tr>
-    <tr><td><strong>Software quality</strong></td><td>How to measure and evaluate "good" code</td><td>ISO 25010 quality attributes (§4), code reviews, testing</td></tr>
+    <tr><td><strong>Software design</strong></td><td>How to structure code — patterns, principles, architecture</td><td>SOLID, DRY, separation of concerns, component design (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>)</td></tr>
+    <tr><td><strong>Software quality</strong></td><td>How to measure and evaluate "good" code</td><td>ISO 25010 quality attributes (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>), code reviews, testing</td></tr>
     <tr><td><strong>Software process</strong></td><td>How to organize the work — methodologies, lifecycles</td><td>Agile, the SDLC, the rhythm (L7), iterative development</td></tr>
     <tr><td><strong>Software project management</strong></td><td>How to coordinate teams, estimate, deliver</td><td>Brooks's Law, sprint planning, communication overhead</td></tr>
     <tr><td><strong>Software maintenance</strong></td><td>How to keep software alive for years — debugging, refactoring, evolution</td><td>The 80% of software's life that happens after initial release</td></tr>
-    <tr><td><strong>Software testing &amp; verification</strong></td><td>How to prove software does what it claims</td><td>Unit tests, integration tests, the "Look back" phase (Problem-Solving §10)</td></tr>
+    <tr><td><strong>Software testing &amp; verification</strong></td><td>How to prove software does what it claims</td><td>Unit tests, integration tests, the "Look back" phase (Problem-Solving <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§10</a>)</td></tr>
   </tbody>
 </table>
 
-<p><strong>What SE gives you as a practitioner:</strong> the vocabulary and tools for the engineering side of evaluation — quality attributes (§4), engineering principles (§8), trade-off analysis (§6), and the judgment of "when is this good enough to ship?" (§7). When you decide "this code is readable enough," when you choose simplicity over cleverness, when you make a trade-off explicit — you're doing SE.</p>
+<p><strong>What SE gives you as a practitioner:</strong> the vocabulary and tools for the engineering side of evaluation — quality attributes (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>), engineering principles (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>), trade-off analysis (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>), and the judgment of "when is this good enough to ship?" (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>). When you decide "this code is readable enough," when you choose simplicity over cleverness, when you make a trade-off explicit — you're doing SE.</p>
 
 <blockquote class="callout">
   <p><strong>How CS and SE braid:</strong> CS tells you what's <em>possible</em> (the algorithm exists, it's O(n log n)). SE tells you what's <em>advisable</em> (the O(n log n) algorithm is 50 lines and unmaintainable; the O(n²) algorithm is 5 lines and obvious — for n &lt; 1000, the second is the better engineering choice). <strong>The mature practitioner uses both: CS to know what's possible, SE to choose what's advisable.</strong></p>
 </blockquote>
 
-<h2 id="sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">3b. The rest of the engineering discipline — where the shelf covers it</h2>
+<h2 id="sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">The rest of the engineering discipline — where the shelf covers it</h2>
 
 <p>An umbrella names the whole discipline; it does not re-teach every area. The shelf owns most of the discipline in dedicated references — when one of these starts to matter in your work, read its owning doc:</p>
 
@@ -997,7 +997,7 @@
   <li><strong>Dependencies &amp; supply chain.</strong> Modern software is assembled as much as written: package managers, lockfiles, semantic versioning, dependency audits, SBOMs, license compliance, vulnerability scanning, reproducible builds.</li>
 </ul>
 
-<h2 id="sec-the-parameters-quality-attributes-what-you-measure">4. The parameters — quality attributes (what you measure)</h2>
+<h2 id="sec-the-parameters-quality-attributes-what-you-measure">The parameters — quality attributes (what you measure)</h2>
 
 <p>When you evaluate a solution — whether a HackerRank algorithm or a React feature — you judge it along multiple <strong>parameters</strong>. The formal name for these parameters is <strong>quality attributes</strong> (also called "non-functional requirements" or "the ilities"). The international standard is <strong>ISO/IEC 25010</strong> (2011), which superseded ISO/IEC 9126-1 (the 2001 revision of the 1991 standard) and defines 8 quality characteristics (<a href="https://en.wikipedia.org/wiki/ISO/IEC_25010">Wikipedia</a>):</p>
 
@@ -1020,19 +1020,19 @@
 <table>
   <thead><tr><th>Parameter</th><th>What it measures</th><th>Measured by</th></tr></thead>
   <tbody>
-    <tr><td><strong>Time complexity</strong></td><td>How the runtime grows with input size</td><td>Big O notation (§5)</td></tr>
-    <tr><td><strong>Space complexity</strong></td><td>How the memory usage grows with input size</td><td>Big O notation (§5)</td></tr>
-    <tr><td><strong>Correctness</strong></td><td>Does it produce the right output for all valid inputs?</td><td>Test cases, edge cases (Problem-Solving §10)</td></tr>
-    <tr><td><strong>Generality</strong></td><td>Does it solve a class of problems, not just the specific instance?</td><td>Pólya's "generalization" heuristic (Problem-Solving §4)</td></tr>
+    <tr><td><strong>Time complexity</strong></td><td>How the runtime grows with input size</td><td>Big O notation (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>)</td></tr>
+    <tr><td><strong>Space complexity</strong></td><td>How the memory usage grows with input size</td><td>Big O notation (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>)</td></tr>
+    <tr><td><strong>Correctness</strong></td><td>Does it produce the right output for all valid inputs?</td><td>Test cases, edge cases (Problem-Solving <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§10</a>)</td></tr>
+    <tr><td><strong>Generality</strong></td><td>Does it solve a class of problems, not just the specific instance?</td><td>Pólya's "generalization" heuristic (Problem-Solving <a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>)</td></tr>
     <tr><td><strong>Readability</strong></td><td>Can another developer understand the approach?</td><td>Code review, the "explain it to a duck" test</td></tr>
   </tbody>
 </table>
 
 <blockquote class="callout">
-  <p><strong>The key reframe:</strong> "parameters," "quality attributes," "non-functional requirements," and "the ilities" are all names for the same thing — the dimensions along which you evaluate a solution. ISO 25010 gives the standard 8. Algorithm analysis adds time and space complexity. The judgment skill (§7) is knowing <em>which parameters matter for which context</em>.</p>
+  <p><strong>The key reframe:</strong> "parameters," "quality attributes," "non-functional requirements," and "the ilities" are all names for the same thing — the dimensions along which you evaluate a solution. ISO 25010 gives the standard 8. Algorithm analysis adds time and space complexity. The judgment skill (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>) is knowing <em>which parameters matter for which context</em>.</p>
 </blockquote>
 
-<h2 id="sec-the-measures-big-o-notation-and-complexity-classes">5. The measures — Big O notation and complexity classes</h2>
+<h2 id="sec-the-measures-big-o-notation-and-complexity-classes">The measures — Big O notation and complexity classes</h2>
 
 <p>Big O notation is how you <strong>quantify</strong> the performance efficiency parameter. It describes how an algorithm's runtime (or memory) grows as the input size grows. The notation was introduced by Paul Bachmann in mathematics (1894) and popularized by Edmund Landau, then adopted for computer science by Donald Knuth (<a href="https://en.wikipedia.org/wiki/Big_O_notation">Wikipedia</a>).</p>
 
@@ -1055,15 +1055,15 @@
   <li><strong>Count the loops.</strong> A single loop over n items is O(n). A nested loop (loop within a loop) is O(n²). A loop that halves the input each iteration (binary search) is O(log n).</li>
   <li><strong>Identify the dominant term.</strong> If an algorithm is O(n² + n + 5), the Big O is O(n²) — the highest-order term dominates as n grows. Constants and lower-order terms don't matter at scale.</li>
   <li><strong>Consider best, worst, and average cases.</strong> Big O usually describes the <em>worst case</em> (the upper bound). Quick sort is O(n²) worst case but O(n log n) average — which is why it's widely used despite the worse worst case.</li>
-  <li><strong>Measure space separately.</strong> Time complexity is how fast; space complexity is how much memory. An in-place sort uses O(1) extra space; a merge sort uses O(n) extra space. Both are O(n log n) in time — the trade-off is in space (§6).</li>
+  <li><strong>Measure space separately.</strong> Time complexity is how fast; space complexity is how much memory. An in-place sort uses O(1) extra space; a merge sort uses O(n) extra space. Both are O(n log n) in time — the trade-off is in space (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>).</li>
 </ol>
 
 <h3>Why Big O matters — the "at n=1000" column</h3>
 <p>Look at the table: O(n) does 1,000 operations at n=1000. O(n²) does 1,000,000. O(2ⁿ) does more operations than there are atoms in the universe. <strong>This is why brute force isn't always enough</strong> — it works for small n, but as n grows, the gap between complexity classes becomes astronomical. On HackerRank, the time limit is typically 1-2 seconds, which translates to roughly 10⁸ operations — a rough heuristic, since actual limits depend on language, hardware, and operation cost. If your solution is O(n²) and n = 10⁵, that's 10¹⁰ operations — too slow. You need O(n log n) or better.</p>
 
-<p><strong>But — and this is the engineering judgment (§7):</strong> for n &lt; 100, O(n²) is fine. 10,000 operations is instant. The CS answer is "use the optimal algorithm." The SE answer is "use the simplest algorithm that fits within the time limit for the expected input size." Knowing the difference is the judgment skill.</p>
+<p><strong>But — and this is the engineering judgment (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>):</strong> for n &lt; 100, O(n²) is fine. 10,000 operations is instant. The CS answer is "use the optimal algorithm." The SE answer is "use the simplest algorithm that fits within the time limit for the expected input size." Knowing the difference is the judgment skill.</p>
 
-<h2 id="sec-the-trade-offs-when-parameters-conflict">6. The trade-offs — when parameters conflict</h2>
+<h2 id="sec-the-trade-offs-when-parameters-conflict">The trade-offs — when parameters conflict</h2>
 
 <p>A <strong>trade-off</strong> is a situational decision where improving one parameter diminishes another (<a href="https://en.wikipedia.org/wiki/Trade-off">Wikipedia</a>). In software, you cannot maximize all quality attributes simultaneously. The engineering skill is making trade-offs <em>explicit</em> — naming what you're sacrificing and why.</p>
 
@@ -1092,9 +1092,9 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   <p><strong>Trade-offs at every scale:</strong> the same trade-off pattern appears at every level of the stack. At the algorithm level: time vs space. At the API level: REST (simplicity) vs GraphQL (flexibility) vs gRPC (performance) — see <a href="./api-design.html">API Design</a>. At the architecture level: consistency vs availability (CAP) — see <a href="./system-design.html">System Design</a>. At the feature level: "simplest thing first" vs "optimize now" — see <a href="./how-developers-think-frontend.html">The Rhythm</a>. The parameters change; the trade-off skill doesn't.</p>
 </blockquote>
 
-<h2 id="sec-the-judgment-which-parameters-matter-when-and-when-to-stop">7. The judgment — which parameters matter when, and when to stop</h2>
+<h2 id="sec-the-judgment-which-parameters-matter-when-and-when-to-stop">The judgment — which parameters matter when, and when to stop</h2>
 
-<p>This is the skill that ties together the parameters (§4), the measures (§5), and the trade-offs (§6). <strong>Judgment is knowing which parameters matter for your context, and when the solution is "good enough" to stop.</strong> It cannot be reduced to a formula — it's a context-dependent decision that improves with experience.</p>
+<p>This is the skill that ties together the parameters (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>), the measures (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>), and the trade-offs (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>). <strong>Judgment is knowing which parameters matter for your context, and when the solution is "good enough" to stop.</strong> It cannot be reduced to a formula — it's a context-dependent decision that improves with experience.</p>
 
 <h3>Which parameters matter for which context?</h3>
 <table>
@@ -1123,9 +1123,9 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
 
 <p><strong>This is the same judgment as The Rhythm's "feel the friction" (L7/L15):</strong> you don't optimize upfront — you build the simplest thing first, feel where it creaks, then optimize there. The React Compiler (L15) automates memoization and performance decisions in many cases — but the human still decides <em>which parameters matter</em> for the context. That's the judgment AI can't replace.</p>
 
-<h2 id="sec-engineering-principles-dry-solid-kiss-yagni">8. Engineering principles — DRY, SOLID, KISS, YAGNI</h2>
+<h2 id="sec-engineering-principles-dry-solid-kiss-yagni">Engineering principles — DRY, SOLID, KISS, YAGNI</h2>
 
-<p>These are the named principles that survive every framework, every era, every language. They're the constants of software engineering — the heuristics that guide the trade-off decisions in §6 and the judgment in §7.</p>
+<p>These are the named principles that survive every framework, every era, every language. They're the constants of software engineering — the heuristics that guide the trade-off decisions in <a href="#sec-the-trade-offs-when-parameters-conflict">§6</a> and the judgment in <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>.</p>
 
 <h3>KISS — Keep It Simple, Stupid</h3>
 <p><strong>Origin:</strong> Kelly Johnson, Lockheed Skunk Works (1960s) — aircraft design. <strong>Principle:</strong> simplicity should be a key goal in design, and unnecessary complexity should be avoided. <strong>In practice:</strong> this is The Rhythm's "do the simplest thing that could possibly work" (L7). The simplest solution is usually the most maintainable, the most testable, and the fastest to ship. Complexity has a cost; simplicity has a compounding return.</p>
@@ -1159,7 +1159,7 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   <li><strong>Low coupling, high cohesion</strong> (Stevens, Myers &amp; Constantine, 1974): modules should be internally coherent (high cohesion) and minimally dependent on each other (low coupling). Boundaries, layering, and dependency direction are the architecture of this principle — it is why separation of concerns works. At scale this is System Design’s territory (<a href="./system-design.html">System Design</a>).</li>
 </ul>
 
-<h2 id="sec-principles-the-shared-constants">8b. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <p>Across every era, every language, every framework, certain principles don't change. These are the constants that survive from Knuth (1968) to the React Compiler (2024):</p>
 <table>
@@ -1168,14 +1168,14 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
     <tr><td><strong>Correctness before efficiency</strong></td><td>A fast wrong answer is worse than a slow right one. Get it working first (brute force), then optimize. This is Pólya's Phase 3 before Phase 4, and The Rhythm's Round 1 before Round 2.</td></tr>
     <tr><td><strong>Simplicity compounds</strong></td><td>Simple code is easier to read, test, modify, and debug. Complexity has a maintenance cost that grows over time. KISS is the expression; the compounding return is the reason.</td></tr>
     <tr><td><strong>Optimization is a trade-off, not a virtue</strong></td><td>Faster often means less readable, more memory, or more complex. Don't optimize without measuring and without considering the trade-off. Knuth's "premature optimization" principle.</td></tr>
-    <tr><td><strong>Abstraction manages complexity</strong></td><td>The human brain can hold ~4 items in working memory. Abstraction (interfaces, functions, modules) hides detail so you can reason about the big picture. Every principle in §8 is an abstraction strategy.</td></tr>
+    <tr><td><strong>Abstraction manages complexity</strong></td><td>The human brain can hold ~4 items in working memory. Abstraction (interfaces, functions, modules) hides detail so you can reason about the big picture. Every principle in <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a> is an abstraction strategy.</td></tr>
     <tr><td><strong>Constraints drive design</strong></td><td>The deadline, the team, the existing codebase — these aren't obstacles; they're the design parameters. A solution that ignores real constraints is theoretical, not engineering.</td></tr>
     <tr><td><strong>Trade-offs should be explicit</strong></td><td>When you sacrifice readability for performance, name it. When you sacrifice flexibility for simplicity, name it. Implicit trade-offs become technical debt; explicit trade-offs become design decisions.</td></tr>
-    <tr><td><strong>Measure before optimizing</strong></td><td>"I think it's slow" is not evidence. Profile, time, get real numbers. This is the same "concrete before abstract" principle as Problem-Solving §8 — use a concrete example before generalizing.</td></tr>
+    <tr><td><strong>Measure before optimizing</strong></td><td>"I think it's slow" is not evidence. Profile, time, get real numbers. This is the same "concrete before abstract" principle as Problem-Solving <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a> — use a concrete example before generalizing.</td></tr>
   </tbody>
 </table>
 
-<h2 id="sec-technical-debt-when-speed-now-costs-later">8c. Technical debt — when speed now costs later</h2>
+<h2 id="sec-technical-debt-when-speed-now-costs-later">Technical debt — when speed now costs later</h2>
 
 <p><strong>Technical debt</strong> is the future cost of choosing speed now: code that works today but is harder to change tomorrow. Some debt is <em>deliberate</em> (ship the feature now, refactor when it is proven); some is <em>accidental</em> (sloppiness, drift, abandoned experiments). The engineering skill is knowing when debt is acceptable and when it must be paid down.</p>
 <ul>
@@ -1183,9 +1183,9 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   <li>The standard paydown is <strong>refactoring</strong> — behavior-preserving improvement — plus <strong>migration</strong> and <strong>removal</strong> of dead code and obsolete dependencies.</li>
   <li><strong>Knowledge debt</strong> is subtler: undocumented decisions and unexplored parts of the codebase that only the original author understands.</li>
 </ul>
-<p>Naming a decision “debt” makes it explicit (§8b): you can then decide deliberately when to pay it.</p>
+<p>Naming a decision “debt” makes it explicit (<a href="#sec-principles-the-shared-constants">§8b</a>): you can then decide deliberately when to pay it.</p>
 
-<h2 id="sec-worked-example-evaluating-a-brute-force-solution">9. Worked example — evaluating a brute-force solution</h2>
+<h2 id="sec-worked-example-evaluating-a-brute-force-solution">Worked example — evaluating a brute-force solution</h2>
 
 <p>Let's trace solution evaluation through a real problem: <strong>"Find the first non-repeating character in a string."</strong></p>
 
@@ -1211,7 +1211,7 @@ function firstNonRepeat(str) {
 </ul>
 
 <h3>The upgrade (Phase 4 — Look back: "can I derive it differently?")</h3>
-<p>The problem says "count occurrences" — that's the hash-map pattern (Problem-Solving §7). Instead of re-counting for each character, count once, then scan once:</p>
+<p>The problem says "count occurrences" — that's the hash-map pattern (Problem-Solving <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>). Instead of re-counting for each character, count once, then scan once:</p>
 <pre style="background:#f4f4f4; padding:1rem; overflow-x:auto; font-size:.85rem;">
 function firstNonRepeat(str) {
   const counts = {};
@@ -1226,7 +1226,7 @@ function firstNonRepeat(str) {
 <ul>
   <li><strong>Correctness:</strong> ✅ Still works — same logic, different order.</li>
   <li><strong>Time complexity:</strong> O(n) — two single passes. At n=10⁵, that's 2×10⁵ — fast enough for any HackerRank time limit. <strong>This is the upgrade that matters.</strong></li>
-  <li><strong>Space complexity:</strong> O(n) in the general case — the counts object stores up to n entries (O(1) when the character alphabet is fixed and small, e.g. ASCII). <strong>This is the trade-off:</strong> we traded O(1) space for O(n) time improvement. Time vs space (§6).</li>
+  <li><strong>Space complexity:</strong> O(n) in the general case — the counts object stores up to n entries (O(1) when the character alphabet is fixed and small, e.g. ASCII). <strong>This is the trade-off:</strong> we traded O(1) space for O(n) time improvement. Time vs space (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>).</li>
   <li><strong>Readability:</strong> ✅ Still readable — arguably more so, because the two-pass approach separates "count" from "find."</li>
 </ul>
 
@@ -1240,23 +1240,23 @@ function firstNonRepeat(str) {
   </tbody>
 </table>
 
-<p><strong>This is the judgment skill (§7) in action:</strong> the same two solutions, different answers depending on context. The CS answer is always "use the optimal algorithm." The SE answer is "use the simplest algorithm that fits the constraint." The mature practitioner knows which answer the context calls for.</p>
+<p><strong>This is the judgment skill (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>) in action:</strong> the same two solutions, different answers depending on context. The CS answer is always "use the optimal algorithm." The SE answer is "use the simplest algorithm that fits the constraint." The mature practitioner knows which answer the context calls for.</p>
 
-<h2 id="sec-the-most-common-failure-modes">9b. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>The fix</th></tr></thead>
   <tbody>
-    <tr><td><strong>Premature optimization</strong></td><td>You optimize before measuring. You spend 2 hours making a function 5% faster when it runs once at startup and the user never notices.</td><td>Measure first (§7). Profile, time, get real numbers. Optimize only the critical path.</td></tr>
+    <tr><td><strong>Premature optimization</strong></td><td>You optimize before measuring. You spend 2 hours making a function 5% faster when it runs once at startup and the user never notices.</td><td>Measure first (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>). Profile, time, get real numbers. Optimize only the critical path.</td></tr>
     <tr><td><strong>Over-engineering</strong></td><td>You build flexibility you don't need — a configuration layer for one use case, a generic framework for one problem. Violates YAGNI.</td><td>Build the simplest thing that works. Add flexibility only when you have a second use case (not a predicted one).</td></tr>
     <tr><td><strong>Gold-plating</strong></td><td>You keep adding features, polishing details, refining edge cases — past the point of diminishing returns. The solution is "better" but not meaningfully, and it's late.</td><td>Define "done" before you start. Ship when the core parameters meet the threshold. "Perfect is the enemy of good."</td></tr>
     <tr><td><strong>Optimizing the wrong parameter</strong></td><td>You make the algorithm O(n log n) but the real bottleneck is the database query. You optimize the part that's already fast enough.</td><td>Profile the whole system, not just the function. Find the actual bottleneck before optimizing.</td></tr>
-    <tr><td><strong>Ignoring trade-offs</strong></td><td>You optimize for performance without acknowledging the readability cost. The code is fast but unmaintainable — the next developer can't touch it.</td><td>Make trade-offs explicit (§8b). Name what you're sacrificing: "I'm trading readability for a 10× speedup here."</td></tr>
+    <tr><td><strong>Ignoring trade-offs</strong></td><td>You optimize for performance without acknowledging the readability cost. The code is fast but unmaintainable — the next developer can't touch it.</td><td>Make trade-offs explicit (<a href="#sec-principles-the-shared-constants">§8b</a>). Name what you're sacrificing: "I'm trading readability for a 10× speedup here."</td></tr>
     <tr><td><strong>Premature DRY</strong></td><td>You see two similar functions and merge them — but they represent different business rules. Now a change to one breaks the other.</td><td>DRY is about knowledge duplication, not code duplication. Merge only when the two pieces represent the same knowledge.</td></tr>
     <tr><td><strong>Not-invented-here syndrome</strong></td><td>You rewrite a library from scratch because "I could do it better." You could — but you'd also inherit the maintenance cost and the bug surface.</td><td>Use the library. Your time is better spent on your actual problem, not reimplementing solved ones.</td></tr>
   </tbody>
 </table>
 
-<h2 id="sec-ecosystem-books-tools-and-communities">9c. Ecosystem — books, tools, and communities</h2>
+<h2 id="sec-ecosystem-books-tools-and-communities">Ecosystem — books, tools, and communities</h2>
 <table>
   <thead><tr><th>Category</th><th>Resource</th><th>What it gives you</th></tr></thead>
   <tbody>
@@ -1264,7 +1264,7 @@ function firstNonRepeat(str) {
     <tr><td><em>The Pragmatic Programmer</em> — Hunt &amp; Thomas (1999)</td><td>DRY, rubber duck debugging, the pragmatic mindset. The engineering principles as practice.</td></tr>
     <tr><td rowspan="2"><strong>Quality books</strong></td><td><em>Clean Code</em> — Robert C. Martin</td><td>The SE principles in action: naming, functions, comments, formatting. How to write code that's maintainable.</td></tr>
     <tr><td><em>Refactoring</em> — Martin Fowler</td><td>How to improve code without changing behavior. The catalog of code smells and refactoring techniques.</td></tr>
-    <tr><td rowspan="2"><strong>Practice platforms</strong></td><td>HackerRank, LeetCode, CodeWars</td><td>Algorithm practice with tight feedback loops. Use for CS skill (Big O, paradigms). See Problem-Solving §11 for how to use them correctly.</td></tr>
+    <tr><td rowspan="2"><strong>Practice platforms</strong></td><td>HackerRank, LeetCode, CodeWars</td><td>Algorithm practice with tight feedback loops. Use for CS skill (Big O, paradigms). See Problem-Solving <a href="./problem-solving.html#sec-fluency-vs-storage-strength-in-problem-solving">§11</a> for how to use them correctly.</td></tr>
     <tr><td>Frontend Mentor</td><td>Real-world UI building practice. Use for SE skill (maintainability, component design, the rhythm).</td></tr>
     <tr><td rowspan="2"><strong>Tools</strong></td><td>Profilers (Chrome DevTools, Node profiler)</td><td>Measure performance before optimizing. The tool that makes Knuth's principle actionable.</td></tr>
     <tr><td>ESLint, SonarQube, complexity analyzers</td><td>Automated quality measurement. Flag duplicated code (a proxy for DRY), complexity hotspots, and code smells.</td></tr>
@@ -1273,27 +1273,27 @@ function firstNonRepeat(str) {
   </tbody>
 </table>
 
-<h2 id="sec-the-future-the-evaluation-premium">9d. The future — the evaluation premium</h2>
+<h2 id="sec-the-future-the-evaluation-premium">The future — the evaluation premium</h2>
 
 <p>AI is changing the discipline — but not in the way most people fear. The skill that becomes <em>more</em> valuable is the one this doc teaches: <strong>solution evaluation</strong>.</p>
 
 <h3>AI shifts the bottleneck from writing to evaluating</h3>
-<p>Before AI: the bottleneck was <em>writing</em> code. Most of your time was spent typing, debugging syntax, looking up API docs. After AI (Copilot, ChatGPT): the bottleneck shifts to <em>evaluating</em> code. AI can generate a solution in seconds — but is it correct? Is it efficient? Is it maintainable? Did it make the right trade-offs? <strong>The human's job shifts from "can you write it" to "can you judge it."</strong> This is the evaluation skill (§4–§7), and it becomes the premium skill.</p>
+<p>Before AI: the bottleneck was <em>writing</em> code. Most of your time was spent typing, debugging syntax, looking up API docs. After AI (Copilot, ChatGPT): the bottleneck shifts to <em>evaluating</em> code. AI can generate a solution in seconds — but is it correct? Is it efficient? Is it maintainable? Did it make the right trade-offs? <strong>The human's job shifts from "can you write it" to "can you judge it."</strong> This is the evaluation skill (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>), and it becomes the premium skill.</p>
 
 <h3>The fluency trap intensifies</h3>
-<p>The same trap from Problem-Solving §11 applies here: AI makes it easy to feel you understand a solution without building the mental schema that lets you improvise when it breaks. When AI generates an O(n²) solution and you accept it without analyzing the complexity, you've gained a solution but not the skill. <strong>The remedy:</strong> always evaluate AI-generated code the same way you'd evaluate your own — name the parameters, measure the complexity, check the trade-offs. The evaluation is where the learning happens.</p>
+<p>The same trap from Problem-Solving <a href="./problem-solving.html#sec-fluency-vs-storage-strength-in-problem-solving">§11</a> applies here: AI makes it easy to feel you understand a solution without building the mental schema that lets you improvise when it breaks. When AI generates an O(n²) solution and you accept it without analyzing the complexity, you've gained a solution but not the skill. <strong>The remedy:</strong> always evaluate AI-generated code the same way you'd evaluate your own — name the parameters, measure the complexity, check the trade-offs. The evaluation is where the learning happens.</p>
 
 <h3>What stays human</h3>
 <ul>
-  <li><strong>Context judgment (§7):</strong> AI doesn't know your project's constraints — the deadline, the team, the existing codebase. It can't decide "is this good enough to ship?" That's still yours.</li>
-  <li><strong>Trade-off decisions (§6):</strong> AI can list the trade-offs, but the decision — "I'll sacrifice readability for performance here because this is on the critical path" — is a human judgment call.</li>
-  <li><strong>Knowing which parameters matter (§4):</strong> AI doesn't know whether you're solving a HackerRank challenge (time/space) or building a production feature (maintainability/usability). You do.</li>
+  <li><strong>Context judgment (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>):</strong> AI doesn't know your project's constraints — the deadline, the team, the existing codebase. It can't decide "is this good enough to ship?" That's still yours.</li>
+  <li><strong>Trade-off decisions (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>):</strong> AI can list the trade-offs, but the decision — "I'll sacrifice readability for performance here because this is on the critical path" — is a human judgment call.</li>
+  <li><strong>Knowing which parameters matter (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>):</strong> AI doesn't know whether you're solving a HackerRank challenge (time/space) or building a production feature (maintainability/usability). You do.</li>
 </ul>
 
 <h3>The guardrails — treat AI output as untrusted input</h3>
 <p>If AI code must be evaluated, the evaluation needs rules. AI-generated code can be <strong>incorrect but plausible</strong>, insecure, inefficient, outdated (APIs that no longer exist), or licensed problematically (trained on code you cannot legally copy). It can also leak data if you paste private code into prompts, and it can be manipulated through prompt injection in the very data it processes. The discipline’s guardrails:</p>
 <ul>
-  <li><strong>Review every suggestion</strong> with the §10 checklist — the human remains responsible for correctness, security, and maintainability.</li>
+  <li><strong>Review every suggestion</strong> with the <a href="#sec-summary-the-complete-evaluation-checklist">§10</a> checklist — the human remains responsible for correctness, security, and maintainability.</li>
   <li><strong>Never paste secrets or personal data</strong> into prompts; treat model output as untrusted input until verified.</li>
   <li><strong>Verify versions and licenses</strong> before accepting generated dependencies or code.</li>
   <li><strong>Test generated code like any other code</strong> — it is not exempt from testing, security review, or maintainability standards.</li>
@@ -1301,38 +1301,38 @@ function firstNonRepeat(str) {
 
 <p><strong>The enduring insight:</strong> the discipline has survived nearly two centuries of change — from punch cards to cloud, from waterfall to Agile, from manual coding to AI-assisted. Through every inversion, the evaluation skill — knowing what makes a solution good, measuring it, and making trade-off decisions — has only become <em>more</em> valuable. The tools change; the judgment doesn't. That's why this doc exists.</p>
 
-<h2 id="sec-measurement-why-measure-first-is-harder-than-it-sounds">9e. Measurement — why "measure first" is harder than it sounds</h2>
+<h2 id="sec-measurement-why-measure-first-is-harder-than-it-sounds">Measurement — why "measure first" is harder than it sounds</h2>
 
-<p>§8b says “measure before optimizing” — but measurement itself is a skill. Benchmarks mislead through <strong>warm-up effects</strong>, <strong>caching</strong>, <strong>garbage-collection noise</strong>, <strong>compiler optimization</strong> (dead-code elimination, inlining), and <strong>unrepresentative data</strong>. Microbenchmarks often measure the wrong layer entirely.</p>
+<p><a href="#sec-principles-the-shared-constants">§8b</a> says “measure before optimizing” — but measurement itself is a skill. Benchmarks mislead through <strong>warm-up effects</strong>, <strong>caching</strong>, <strong>garbage-collection noise</strong>, <strong>compiler optimization</strong> (dead-code elimination, inlining), and <strong>unrepresentative data</strong>. Microbenchmarks often measure the wrong layer entirely.</p>
 <ul>
   <li>Measure the <strong>critical path under realistic conditions</strong> — the actual input sizes in the actual environment.</li>
-  <li>Use <strong>profiling and tracing</strong> before theorizing about bottlenecks (see §9b’s “optimizing the wrong parameter”).</li>
+  <li>Use <strong>profiling and tracing</strong> before theorizing about bottlenecks (see <a href="#sec-the-most-common-failure-modes">§9b</a>’s “optimizing the wrong parameter”).</li>
   <li>Treat benchmark numbers as <strong>hypotheses</strong>: repeat and vary them, and confirm with end-to-end signals — observability metrics, A/B tests — rather than isolated microbenchmarks.</li>
 </ul>
 
-<h2 id="sec-summary-the-complete-evaluation-checklist">10. Summary — the complete evaluation checklist</h2>
+<h2 id="sec-summary-the-complete-evaluation-checklist">Summary — the complete evaluation checklist</h2>
 
 <p>Next time you solve a problem — whether a HackerRank challenge or a React feature — run this checklist. If you can answer each, you've evaluated your solution. If not, go back and evaluate.</p>
 
 <table>
   <thead><tr><th>Question</th><th>If you can't answer…</th></tr></thead>
   <tbody>
-    <tr><td>Is the solution <strong>correct</strong>? Does it handle edge cases?</td><td>Run the edge-case catalog (Problem-Solving §10)</td></tr>
-    <tr><td>What is its <strong>time complexity</strong> (Big O)?</td><td>Count the loops (§5). Identify the dominant term.</td></tr>
-    <tr><td>What is its <strong>space complexity</strong>?</td><td>Count the extra data structures (§5).</td></tr>
+    <tr><td>Is the solution <strong>correct</strong>? Does it handle edge cases?</td><td>Run the edge-case catalog (Problem-Solving <a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">§10</a>)</td></tr>
+    <tr><td>What is its <strong>time complexity</strong> (Big O)?</td><td>Count the loops (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>). Identify the dominant term.</td></tr>
+    <tr><td>What is its <strong>space complexity</strong>?</td><td>Count the extra data structures (<a href="#sec-the-measures-big-o-notation-and-complexity-classes">§5</a>).</td></tr>
     <tr><td>Is it <strong>readable</strong>? Can the next developer understand it?</td><td>Explain it to a duck. If you stumble, it's not clear enough.</td></tr>
-    <tr><td>What <strong>trade-offs</strong> am I making?</td><td>Name them explicitly (§6): "I'm trading space for time here."</td></tr>
-    <tr><td>Which <strong>parameters matter</strong> for this context?</td><td>Check the context table (§7). HackerRank? Production? Interview?</td></tr>
-    <tr><td>Is it <strong>good enough</strong> — or am I over-engineering?</td><td>Check Knuth's principle (§7). Have I measured? Is this on the critical path?</td></tr>
-    <tr><td>Does it follow the <strong>principles</strong> (KISS, DRY, YAGNI, SOLID)?</td><td>Review §8. Is there unnecessary complexity? Duplication? Speculative generality?</td></tr>
-    <tr><td>Can I <strong>file the pattern</strong>?</td><td>Name the paradigm (Problem-Solving §7). What signal told you the approach?</td></tr>
+    <tr><td>What <strong>trade-offs</strong> am I making?</td><td>Name them explicitly (<a href="#sec-the-trade-offs-when-parameters-conflict">§6</a>): "I'm trading space for time here."</td></tr>
+    <tr><td>Which <strong>parameters matter</strong> for this context?</td><td>Check the context table (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>). HackerRank? Production? Interview?</td></tr>
+    <tr><td>Is it <strong>good enough</strong> — or am I over-engineering?</td><td>Check Knuth's principle (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>). Have I measured? Is this on the critical path?</td></tr>
+    <tr><td>Does it follow the <strong>principles</strong> (KISS, DRY, YAGNI, SOLID)?</td><td>Review <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>. Is there unnecessary complexity? Duplication? Speculative generality?</td></tr>
+    <tr><td>Can I <strong>file the pattern</strong>?</td><td>Name the paradigm (Problem-Solving <a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§7</a>). What signal told you the approach?</td></tr>
     <tr><td>Does it solve the <strong>right problem</strong>? Are the requirements and acceptance criteria clear?</td><td>Review the requirements work before coding (<a href="./software-development-process.html">Process</a>)</td></tr>
     <tr><td>Is it <strong>tested enough</strong> for the risk level?</td><td>Walk the test pyramid (<a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a>)</td></tr>
     <tr><td>Is it <strong>secure</strong> and privacy-respecting?</td><td>Threat-model it (<a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>)</td></tr>
     <tr><td>Can it be <strong>deployed, monitored, and rolled back</strong>?</td><td>CI/CD and observability (<a href="./version-control-ci-cd-deployment.html">CI/CD</a> · <a href="./observability-and-operations.html">Observability</a>)</td></tr>
-    <tr><td>Are its <strong>dependencies safe, licensed, and maintained</strong>?</td><td>Audit the supply chain (§3b)</td></tr>
+    <tr><td>Are its <strong>dependencies safe, licensed, and maintained</strong>?</td><td>Audit the supply chain (<a href="#sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">§3b</a>)</td></tr>
     <tr><td>Is it <strong>accessible and usable</strong>?</td><td>Check it against a human (<a href="./ui-ux-web-design.html">UI/UX</a>)</td></tr>
-    <tr><td>Is all <strong>AI-generated code reviewed and verified</strong>?</td><td>Run the guardrails (§9d)</td></tr>
+    <tr><td>Is all <strong>AI-generated code reviewed and verified</strong>?</td><td>Run the guardrails (<a href="#sec-the-future-the-evaluation-premium">§9d</a>)</td></tr>
   </tbody>
 </table>
 
