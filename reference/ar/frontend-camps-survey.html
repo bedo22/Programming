@@ -24,7 +24,7 @@
 
     <p>مرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع مستندات المرجع.</p>
 
-    <h2>٠. كيف تستخدم هذه الخريطة</h2>
+    <h2 id="sec-how-to-use-this-map">كيف تستخدم هذه الخريطة</h2>
 
     <table>
       <thead><tr><th>المعسكر</th><th>وحدة العمل</th><th>وقت التشغيل الافتراضي</th><th>استراتيجية تحميل JS</th></tr></thead>
@@ -43,7 +43,7 @@
       <p><strong>ملاءمة المهمة.</strong> مهمتك لا تزال أساسيات JS → قراءة React في العمل. هذا المسح توجيه للنصف الثاني. لا تحتاج لإتقان كل معسكر. تحتاج أن تفتح مستودعاً وتقول: "هذا HTML-first مع جزر Preact" أو "هذا تطبيق App Router RSC" دون ذعر.</p>
     </blockquote>
 
-    <h2>١. معسكر A — CMS وتطبيقات مُعرضة من الخادم كلاسيكية</h2>
+    <h2 id="sec-camp-a-cms-and-classic-server-rendered-apps">معسكر A — CMS وتطبيقات مُعرضة من الخادم كلاسيكية</h2>
 
     <p>أقدم نمط صناعي: الخادم يملك المستند. PHP (WordPress، Laravel)، Rails، Django، ASP.NET MVC، وأطر مشابهة تعرض HTML في كل طلب. JavaScript سكر اختياري للنماذج، الشرائح، وأدوات الإدارة.</p>
 
@@ -70,7 +70,7 @@
 
     <p><strong>نصيحة قراءة لمتعلم JS:</strong> لا تخلط بين "هناك وسم <code>script</code>" و "هذا تطبيق React." تتبع من يملك الطلاء الأول: إذا أرسل الخادم HTML كاملاً لمحتوى الصفحة، فأنت في معسكر A (أو B)، حتى لو ثبت ويدجت React لاحقاً.</p>
 
-    <h2>٢. معسكر B — HTML-first والجزر</h2>
+    <h2 id="sec-camp-b-html-first-and-islands">معسكر B — HTML-first والجزر</h2>
 
     <p>أطر HTML-first تعامل المستند كمنتج و JavaScript كأداة دقيقة. السفينة الرئيسية الحديثة هي <strong>Astro</strong>: تشحن صفر JS افتراضياً؛ تفعيل "جزر" تفاعلية (React، Preact، Svelte، Vue، Solid) فقط حيث يلزم. العائلة ذات الصلة: <strong>HTMX</strong> / Alpine / UI موجه من الخادم — أبقِ المنطق على الخادم، بادل شظايا HTML عبر السلك.</p>
 
@@ -78,7 +78,7 @@
     <ul>
       <li>معظم المسارات HTML ساكنة أو معروضة من الخادم مع حزمة عميل شبه معدومة.</li>
       <li>توجيهات مثل <code>client:load</code> / <code>client:visible</code> على المكونات (Astro) — حدود ترطيب صريحة.</li>
-      <li>اختيار Preact على React للجزر لأن ~3.5&nbsp;kB مهم عندما باقي الصفحة ساكنة (انظر مستند التحول §18.5b).</li>
+      <li>اختيار Preact على React للجزر لأن ~3.5&nbsp;kB مهم عندما باقي الصفحة ساكنة (انظر <a href="#sec-market-gravity-who-hires-which-camp">§٩</a>).</li>
       <li>سمات HTMX مثل <code>hx-get</code>، <code>hx-swap</code> — تحديثات صفحة جزئية بلا موجّه عميل.</li>
     </ul>
 
@@ -108,7 +108,7 @@ const posts = await getPosts();
 <LikeButton client:visible />
 </code></pre>
 
-    <h2>٣. معسكر C — SPA (React، Vue، Svelte، Solid)</h2>
+    <h2 id="sec-camp-c-client-spas">معسكر C — SPA (React، Vue، Svelte، Solid)</h2>
 
     <p>العميل يملك الواجهة بالكامل بعد التحميل الأول. الخادم يرسل غلاف HTML فارغ + حزمة JS كبيرة. التوجيه، الحالة، جلب البيانات — كلها في المتصفح.</p>
 
@@ -140,7 +140,7 @@ const posts = await getPosts();
 }
 </code></pre>
 
-    <h2>٤. معسكر D — ميتا-أطر العمل (Next.js، Remix، Nuxt، SvelteKit، Astro + SSR)</h2>
+    <h2 id="sec-camp-d-meta-frameworks-the-industrial-default-for-new-react">معسكر D — ميتا-أطر العمل (Next.js، Remix، Nuxt، SvelteKit، Astro + SSR)</h2>
 
     <p>ميتا-إطار العمل يملك التقسيم: يقرر لكل مسار ما يُعرض على الخادم، ما يُبنى عند البناء، وما يترطب على العميل. العلم الرئيسي: <strong>مكونات خادم React (RSC)</strong> في Next.js App Router — الدوال تعمل على الخادم، ترجع UI، لا حافلات (hooks) على الخادم.</p>
 
@@ -181,7 +181,7 @@ const posts = await getPosts();
 }
 </code></pre>
 
-    <h2>٥. معسكر E — مكتبات الإشارات (Preact Signals، Solid، Qwik، Vue، Svelte 5 runes)</h2>
+    <h2 id="sec-camp-e-the-other-major-ui-libraries-signals-world">معسكر E — مكتبات الإشارات (Preact Signals، Solid، Qwik، Vue، Svelte 5 runes)</h2>
 
     <p>نموذج تفاعلي مختلف: <strong>الإشارات</strong> (خلايا تفاعلية دقيقة) بدلاً من الدالة التفاعلية ذات المدى العلوي لـ React. التبعيات تتعقب تلقائياً؛ لا إعادة عرض المكون بالكامل عند تغير حالة ورقة.</p>
 
@@ -196,7 +196,7 @@ const posts = await getPosts();
     <table>
       <thead><tr><th>المكتبة</th><th>نمط API</th><th>ملاحظات</th></tr></thead>
       <tbody>
-        <tr><td><strong>Preact Signals</strong></td><td>Hooks + إضافة <code>@preact/signals</code></td><td>API بشكل React، ويب-first، صغيرة؛ مستند التحول §18.5b</td></tr>
+        <tr><td><strong>Preact Signals</strong></td><td>Hooks + إضافة <code>@preact/signals</code></td><td>API بشكل React، ويب-first، صغيرة؛ <a href="#sec-market-gravity-who-hires-which-camp">§٩</a></td></tr>
         <tr><td><strong>Solid</strong></td><td>إشارات أولية، JSX، لا DOM وهمي</td><td>أداء قريب من DOM خام؛ نموذج ذهني مختلف عن React</td></tr>
         <tr><td><strong>Qwik</strong></td><td>استئناف، <code>useSignal</code>، <code>useClientEffect</code></td><td>صفر JS في التحميل الأول؛ التفاعل يستأنف من HTML</td></tr>
         <tr><td><strong>Vue 3 / Svelte 5</strong></td><td>ref()/reactive()، runes</td><td>إشارات مدمجة في DX الإطار</td></tr>
@@ -216,7 +216,53 @@ const posts = await getPosts();
         <li>الفريق يعرف نموذج React الذهني جيداً؛ تكلفة التحول > الفائدة.</li>
       </ul>
 
-    <h2>٦. معسكر F — WASM / واجهة أنظمة هجينة</h2>
+    <h2 id="sec-mental-models-how-camp-practitioners-actually-reason">النماذج الذهنية — كيف يفكر ممارسو المعسكرات فعلاً</h2>
+
+<p>كل معسكر يدرّب نموذجاً ذهنياً مختلفاً. إذا كنت تعرف نموذج إعادة العرض في React فقط، ستقرأ كود المعسكرات الأخرى خطأً. إليك كيف يفكر ممارسو كل معسكر فعلاً:</p>
+
+<table>
+  <thead><tr><th>المعسكر</th><th>النموذج الذهني الأساسي</th><th>ماذا تعني «التغيير»</th><th>حدس التصحيح</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>CMS / كلاسيكي (A)</strong></td>
+      <td>الصفحة = قالب + بيانات. الخادم يعيد عرض الصفحة الكاملة عند تغير الحالة.</td>
+      <td>رحلة ذهاب وإياب كاملة أو استبدال جزء جزئي.</td>
+      <td>تتبع القالب + المتحكم. لا ترطيب عميل.</td>
+    </tr>
+    <tr>
+      <td><strong>HTML-first / الجزر (B)</strong></td>
+      <td>مستند ثابت بثقوب دقيقة للتفاعلية.</td>
+      <td>الجزيرة وحدها تعيد العرض؛ الباقي HTML خامل.</td>
+      <td>اعثر على توجيه <code>client:*</code> ← هذه حدود React/Preact.</td>
+    </tr>
+    <tr>
+      <td><strong>SPA React (C)</strong></td>
+      <td>الواجهة = f(الحالة). إعادة العرض = إعادة تشغيل دالة المكون + الفرق.</td>
+      <td>تغير الحالة ← يعاد تشغيل المكون ← يعيد الأطفال العرض (إلا مع memo).</td>
+      <td>React DevTools: لماذا أعاد هذا العرض؟ إغلاق قديم؟ memo ناقص؟</td>
+    </tr>
+    <tr>
+      <td><strong>ميتا-إطار RSC (D)</strong></td>
+      <td>مكونات الخادم = دوال نقية لكل طلب. مكونات العميل = نموذج React.</td>
+      <td>الخادم: طلب جديد = دالة جديدة. العميل: مثل SPA.</td>
+      <td>افحص حد <code>"use client"</code>. سجلات الخادم ≠ سجلات العميل.</td>
+    </tr>
+    <tr>
+      <td><strong>الإشارات (E)</strong></td>
+      <td>رسم تفاعلي: خلايا (إشارات) ← مشتقات (computed) ← تأثيرات. لا إعادة تشغيل مكون.</td>
+      <td>اكتب إلى إشارة ← المشتركون وحدهم يتحدثون. دالة المكون تعمل مرة غالباً.</td>
+      <td>Signal DevTools: أي الإشارات تغيرت؟ أي تأثيرات اشتعلت؟ لا «عدّاد عرض».</td>
+    </tr>
+    <tr>
+      <td><strong>WASM (F)</strong></td>
+      <td>زمن تشغيل لغة أجنبية. JS = صمغ؛ المنطق = وحدة مُجمَّعة.</td>
+      <td>استدعِ الدالة المُصدَّرة ← احصل على النتيجة. لا تفاعلية داخل WASM.</td>
+      <td>حلل وحدة WASM (perfetto، wasm-bugs). جهة JS رقيقة.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>مزلقة النقل:</strong> جلب نموذج «إعادة العرض» من React إلى أطر الإشارات يسبب فرط الاشتراك (معاملة الإشارات كحالة، وقراءتها أثناء العرض). جلب نموذج «علم الأوساخ» للإشارات إلى React يسبب فقدان memo. تعلم النموذج الأصلي للمعسكر أولاً.</p><h2 id="sec-camp-f-wasm-and-non-js-ui-engines">معسكر F — WASM / واجهة أنظمة هجينة</h2>
 
     <p>منطق ثقيل (فيزياء، تشفير، معالجة صور، محركات ألعاب) مترجم إلى WebAssembly. JS طبقة غراء رفيعة للـ DOM، الشبكة، والتكامل مع المنصة.</p>
 
@@ -240,7 +286,89 @@ const posts = await getPosts();
       <li>الفريق يفتقر مهارات لغات الأنظمة.</li>
     </ul>
 
-    <h2>٧. كيف تختار المعسكرات في الممارسة</h2>
+    <h2 id="sec-identifying-the-camp-from-a-repository">تحديد المعسكر من مستودع</h2>
+
+<p>أسرع طريقة لتحديد المعسكر ليست قراءة كل ملف — بل قراءة <em>مصادر الحقيقة</em>: التبعيات، الإعدادات، شكل المجلدات، والـ HTML الذي يرسله الخادم فعلاً. اعمل من الأعلى إلى الأسفل:</p>
+
+<h3>أول الملفات التي تفحصها</h3>
+<table>
+  <thead><tr><th>الفحص</th><th>ماذا يخبرك</th></tr></thead>
+  <tbody>
+    <tr><td>تبعيات <code>package.json</code></td><td>عائلة الإطار — React، Vue، Angular، Svelte، Solid، Preact، HTMX، Alpine، Astro</td></tr>
+    <tr><td>ملفات الإعداد</td><td><code>next.config.*</code>، <code>astro.config.*</code>، <code>angular.json</code>، <code>nuxt.config.*</code>، <code>vite.config.*</code> — ميتا-إطار مقابل مجمّع عارٍ</td></tr>
+    <tr><td>بنية المجلدات</td><td><code>app/</code> أو <code>pages/</code> (ميتا-إطار) مقابل <code>src/</code> + <code>index.html</code> (SPA) مقابل مجلدات القوالب (مُعرض من الخادم) — ما الذي <em>من أجل</em> كل تخطيط ومتى تستخدم مجلدات الميزات يعيش في <a href="./system-design.html">تصميم الأنظمة</a> §هندسة قاعدة الكود</td></tr>
+    <tr><td>HTML البداية</td><td><code>&lt;div id="root"&gt;&lt;/div&gt;</code> فارغ = قشرة SPA؛ محتوى كامل مقروء في المصدر = مستند مُعرض من الخادم</td></tr>
+    <tr><td>ملفات الصفحة/المكونات</td><td>علامات حدود الخادم/العميل: <code>"use client"</code>، <code>client:*</code>، <code>route.ts</code>، المحمّلات/الإجراءات</td></tr>
+    <tr><td>مصدر HTML الشَّبكي</td><td>اعرض المصدر للصفحة الحية: هل المحتوى موجود <em>أصلاً</em> في الـ HTML، أم يظهر فقط بعد تشغيل JS؟</td></tr>
+  </tbody>
+</table>
+
+<h3>روائح المعسكر — القراءة السريعة</h3>
+<table>
+  <thead><tr><th>المعسكر</th><th>إشارات في المستودع</th></tr></thead>
+  <tbody>
+    <tr><td>CMS / كلاسيكي</td><td>قوالب <code>.php</code> / <code>.erb</code> / <code>.jinja</code>، <code>wp-content</code>، الثيمات، jQuery، مسارات خادم تعرض صفحات كاملة</td></tr>
+    <tr><td>HTML-first / الجزر</td><td><code>.astro</code>، <code>client:*</code>، HTMX <code>hx-*</code>، Alpine، استبدالات HTML جزئية، تكاد لا توجد حزمة عميل</td></tr>
+    <tr><td>SPA</td><td><code>index.html</code> بجذر فارغ، موجّه عميل، مخزن، عميل API، إعداد Vite/Webpack SPA</td></tr>
+    <tr><td>ميتا-إطار</td><td><code>app/</code> أو <code>pages/</code>، <code>route.ts</code>، <code>page.tsx</code>، <code>layout.tsx</code>، محمّلات/إجراءات، <code>"use client"</code>، إعداد SSR/SSG/ISR</td></tr>
+    <tr><td>عالم الإشارات</td><td><code>signal()</code>، <code>computed()</code>، <code>ref()</code>، <code>reactive()</code>، <code>$state</code>، <code>createSignal</code>، Vue Composition API، Svelte runes</td></tr>
+    <tr><td>هجين WASM</td><td><code>.wasm</code>، مصادر Rust/C++، <code>wasm-bindgen</code>، Blazor، Emscripten، ملفات صمغ JS</td></tr>
+  </tbody>
+</table>
+
+<p><strong>مثال محلول.</strong> تفتح مستودعاً فيه <code>package.json</code> يحتوي <code>next</code> و<code>react</code> و<code>tailwindcss</code>؛ ودليل <code>app/</code> بملفات <code>layout.tsx</code> و<code>page.tsx</code> وعدة ملفات تبدأ بـ <code>"use client"</code>، و<code>posts/[slug]/page.tsx</code>؛ وصفحات تسويق بلا مكونات عميل. القراءة:</p>
+<ol>
+  <li><strong>المعسكر الأساسي:</strong> ميتا-إطار (App Router RSC مع جزر عميل).</li>
+  <li><strong>نموذج العرض:</strong> RSC — الصفحات مكونات خادم إلا مع علامة عميل؛ التفاعلية تعيش خلف <code>"use client"</code> فقط.</li>
+  <li><strong>التوجيه:</strong> نظام الملفات؛ <code>[slug]</code> مسار ديناميكي؛ <code>layout.tsx</code> يستمر عبر التنقل.</li>
+  <li><strong>نموذج البيانات:</strong> مكونات الخادم تجلب المحتوى؛ مكونات العميل تدير الحالة التفاعلية.</li>
+  <li><strong>مناطق الخطر:</strong> حد الخادم/العميل، التخزين المؤقت، عدم تطابق الترطيب.</li>
+  <li><strong>حد النموذج الذهني:</strong> نموذج إعادة العرض في React ينطبق داخل مكونات العميل فقط؛ صفحات التسويق تتصرف أشبه بمخرج ثابت / HTML-first.</li>
+</ol><h2 id="sec-cross-camp-dimensions-rendering-routing-state-data">أبعاد المعسكرات المتقاطعة — العرض، التوجيه، الحالة، البيانات</h2>
+
+<p>تختلف المعسكرات في أربعة أبعاد تشترك في الباقي. معرفة أين تجلس قاعدة كود على كل واحد هي «قراءتها» كلها.</p>
+
+<h3>استراتيجية العرض والترطيب</h3>
+<table>
+  <thead><tr><th>الاستراتيجية</th><th>ارتباط المعسكر</th><th>JS المشحونة</th><th>نموذج التفاعلية</th><th>الخطر الرئيسي</th></tr></thead>
+  <tbody>
+    <tr><td>صفحة كاملة مُعرضة من الخادم</td><td>CMS / كلاسيكي</td><td>ضئيلة</td><td>رحلة ذهاب وإياب أو تحسين صغير</td><td>احتكاك إعادة تحميل الصفحة</td></tr>
+    <tr><td>HTML ثابت + جزر</td><td>HTML-first</td><td>منخفضة جداً</td><td>الجزر ترطّب انتقائياً</td><td>تفشي الجزر</td></tr>
+    <tr><td>CSR / SPA</td><td>SPA</td><td>عالية</td><td>العميل يملك الواجهة بعد التحميل</td><td>الطلاء الأول، SEO، حجم الحزمة</td></tr>
+    <tr><td>SSR</td><td>ميتا-إطار</td><td>متوسطة</td><td>الخادم يعرض، العميل يرطب</td><td>كلفة/عدم تطابق الترطيب</td></tr>
+    <tr><td>SSG / ISR</td><td>ميتا-إطار</td><td>منخفضة–متوسطة</td><td>HTML معروض مسبقاً + ترطيب عميل</td><td>بيانات قديمة / تعقيد الإبطال</td></tr>
+    <tr><td>بث / RSC</td><td>ميتا-إطار</td><td>موجّه</td><td>مكونات خادم + جزر عميل</td><td>تعقيد الحد / التخزين المؤقت</td></tr>
+    <tr><td>وحدة WASM</td><td>هجين WASM</td><td>ثنائي + صمغ JS</td><td>منطق مُجمَّع، صمغ DOM في JS</td><td>تعقيد سلسلة الأدوات / الذاكرة</td></tr>
+  </tbody>
+</table>
+
+<h3>ملكية الحالة والبيانات</h3>
+<table>
+  <thead><tr><th>المعسكر</th><th>حالة الخادم</th><th>حالة العميل</th><th>حالة URL</th><th>الأدوات المعتادة</th></tr></thead>
+  <tbody>
+    <tr><td>CMS / كلاسيكي</td><td>قاعدة البيانات / سياق القالب</td><td>حالة أدوات صغيرة</td><td>URL الصفحة</td><td>واجهات CMS، jQuery، سكربتات صغيرة</td></tr>
+    <tr><td>HTML-first</td><td>محتوى مُعرض من الخادم</td><td>حالة محلية للجزيرة</td><td>روابط / أجزاء / استعلام</td><td>خصائص Astro، HTMX، Alpine</td></tr>
+    <tr><td>SPA</td><td>مخزن API مؤقت</td><td>مخزن عام / محلي</td><td>موجّه / معاملات بحث</td><td>Redux، Zustand، Pinia، NgRx، TanStack Query</td></tr>
+    <tr><td>ميتا-إطار</td><td>بيانات / مخزن خادم مؤقت</td><td>حالة عميل تفاعلية</td><td>موجّه / معاملات بحث</td><td>RSC، محمّلات/إجراءات، React Query، مخزن Next المؤقت</td></tr>
+    <tr><td>عالم الإشارات</td><td>طبقة API / مخزن</td><td>إشارات / مخازن دقيقة الحبيبات</td><td>حالة الموجّه</td><td>Vue refs، Svelte runes، إشارات Solid، إشارات Angular</td></tr>
+    <tr><td>هجين WASM</td><td>API أو ذاكرة محلية</td><td>حالة التطبيق غالباً داخل WASM</td><td>موجّه / صمغ JS</td><td>wasm-bindgen، حالة Blazor، توافق JS</td></tr>
+  </tbody>
+</table>
+
+<p>أول سؤال في أي معسكر ليس «أي إطار؟» بل <em>«أين يعيش مصدر الحقيقة؟»</em> — خادم، عميل، URL، أو ذاكرة WASM. كل شيء آخر يتبع.</p>
+
+<h3>التوجيه</h3>
+<table>
+  <thead><tr><th>المعسكر</th><th>نموذج التوجيه</th></tr></thead>
+  <tbody>
+    <tr><td>CMS / كلاسيكي</td><td>عناوين URL خادم، عرض قوالب، أحياناً موجّه إدارة في العميل</td></tr>
+    <tr><td>HTML-first</td><td>روابط أصلية، مسارات خادم، استبدالات جزئية HTMX</td></tr>
+    <tr><td>SPA</td><td>موجّه عميل: React Router، Vue Router، Angular Router</td></tr>
+    <tr><td>ميتا-إطار</td><td>مسارات نظام الملفات أو إعداد؛ تنقل خادم/عميل؛ محمّلات/إجراءات</td></tr>
+    <tr><td>عالم الإشارات</td><td>موجّه الإطار: Angular، Vue، SvelteKit، SolidStart</td></tr>
+    <tr><td>هجين WASM</td><td>عادة موجّه التطبيق المضيف؛ WASM لا يملك التوجيه</td></tr>
+  </tbody>
+</table><h2 id="sec-choosing-a-camp-constraint-based-selection">كيف تختار المعسكرات في الممارسة</h2>
 
     <table>
       <thead><tr><th>السياق</th><th>المعسكر الافتراضي</th><th>لماذا</th></tr></thead>
@@ -257,7 +385,94 @@ const posts = await getPosts();
 
     <p>يضع <strong>تقرير مهارات المطورين من HackerRank</strong> والاستطلاعات الصناعية JavaScript باستمرار في مركز فحوصات التوظيف؛ كلمات إطار العمل تدور (React يظل مهيمناً؛ Next.js يظهر أكثر في الإعلانات كل عام؛ Angular يحتفظ بنشآت الشركات). لمسارات الدخل التي تستخدم هذه المهارات، لا فقط موضة الأطر، اقرأ <a href="../frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a>.</p>
 
-    <h2>٣ب. مسارات الهجرة بين المعسكرات</h2>
+    <h2 id="sec-hybrid-patterns">الأنماط الهجينة</h2>
+
+<p>قواعد الكود الحقيقية غالباً هجينة مقصودة، لا تصميم رديء. سمّ المعسكر الأساسي أولاً، ثم المعسكر الثانوي المضمّن.</p>
+
+<blockquote class="callout">
+  <p><strong>الأطر ليست معسكرات.</strong> يمكن لإطار أن يخدم معسكرات متعددة حسب استراتيجية العرض وملكية الحالة وميزانية JS: Preact عارض جزر صديق للإشارات (E أو B)، وAngular يمكن أن يكون شبيه ميتا-إطار وقائماً على الإشارات (D أو E)، وAstro يمكن أن يكون معسكر B أو D، وReact يمكن أن يكون جزيرة أو SPA أو ميتا-إطار.</p>
+</blockquote>
+
+<table>
+  <thead><tr><th>الهجين</th><th>الوصف</th></tr></thead>
+  <tbody>
+    <tr><td>CMS + إدارة SPA</td><td>الصفحات العامة مُعرضة من الخادم؛ الإدارة/لوحة القيادة SPA عميل</td></tr>
+    <tr><td>CMS + جزر</td><td>محتوى CMS مُعرض في الخادم؛ الأدوات ترطّب كجزر</td></tr>
+    <tr><td>CMS بلا رأس + ميتا-إطار</td><td>CMS يقدم واجهة المحتوى؛ Next/Nuxt/SvelteKit يعرض</td></tr>
+    <tr><td>ميتا-إطار + جزر</td><td>مسارات التطبيق تستخدم RSC/SSR؛ صفحات التسويق تتصرف HTML-first</td></tr>
+    <tr><td>SPA + WASM</td><td>قشرة تطبيق React/Vue؛ وحدة WASM للحساب الثقيل</td></tr>
+    <tr><td>ميكرو-فرونت</td><td>معسكرات/أطر متعددة تتعايش تحت قشرة واحدة</td></tr>
+  </tbody>
+</table>
+
+<p>حين يبدو المستودع محيراً، افترض هجيناً حتى يثبت العكس: حدد المعسكر الأساسي، ثم المعسكر الثانوي المضمّن، ثم اقرأ كل واحد <em>داخل نموذجه الذهني الخاص</em>.</p>
+<h2 id="sec-operations-seo-accessibility-performance-security-deployment">التشغيل — SEO، الوصولية، الأداء، الأمان، النشر</h2>
+
+<h3>ملف التشغيل لكل معسكر</h3>
+<table>
+  <thead><tr><th>المعسكر</th><th>SEO</th><th>الوصولية</th><th>الأداء</th><th>الأمان</th></tr></thead>
+  <tbody>
+    <tr><td>CMS / كلاسيكي</td><td>قوي إذا كان HTML الخادم كاملاً</td><td>يعتمد على القوالب الدلالية</td><td>زمن استجابة الخادم هو المهم</td><td>خطر حقن القوالب / الإضافات</td></tr>
+    <tr><td>HTML-first</td><td>قوي</td><td>قوي مع HTML دلالي</td><td>ميزانية JS ممتازة</td><td>خطر حقن HTML / استجابات HTMX</td></tr>
+    <tr><td>SPA</td><td>ضعيف إلا مع عرض مسبق</td><td>إدارة التركيز عند تغير المسار</td><td>كلفة الحزمة / الترطيب</td><td>XSS، التعامل مع الرموز</td></tr>
+    <tr><td>ميتا-إطار</td><td>قوي مع استخدام جيد لـ SSR/SSG/RSC</td><td>HTML خادم + إدارة تركيز عميل</td><td>يعتمد على تصميم الحد/التخزين</td><td>حد سر خادم/عميل</td></tr>
+    <tr><td>الإشارات</td><td>يعتمد على وضع العرض</td><td>التحديثات التفاعلية يجب أن تحفظ التركيز/الدلالات</td><td>تحديثات دقيقة الحبيبات يمكن أن تكون فعالة</td><td>أمان الويب المعتاد</td></tr>
+    <tr><td>WASM</td><td>يعتمد على التطبيق المضيف</td><td>واجهة JS تبقى مسؤولة</td><td>حجم الثنائي / الذاكرة / زمن التحميل</td><td>صندوق WASM؛ صمغ JS يبقى مكشوفاً</td></tr>
+  </tbody>
+</table>
+
+<h3>ملف النشر</h3>
+<table>
+  <thead><tr><th>المعسكر</th><th>النشر المعتاد</th></tr></thead>
+  <tbody>
+    <tr><td>CMS / كلاسيكي</td><td>خادم PHP / Rails / Django؛ CDN للأصول</td></tr>
+    <tr><td>HTML-first</td><td>استضافة ثابتة / CDN؛ خادم اختياري للأجزاء</td></tr>
+    <tr><td>SPA</td><td>استضافة ثابتة / CDN + خلفية API</td></tr>
+    <tr><td>ميتا-إطار</td><td>خادم Node / حافة (Vercel، Netlify، Cloudflare، استضافة ذاتية)</td></tr>
+    <tr><td>الإشارات</td><td>يعتمد على الإطار: ثابت، SSR، أو ميتا-إطار</td></tr>
+    <tr><td>WASM</td><td>ثابت / CDN مع أصول ثنائية؛ أو وحدات حافة</td></tr>
+  </tbody>
+</table>
+
+<p>اختيار المعسكر يغير التشغيل. موقع جزر ثابت وتطبيق RSC متدفق لهما احتياجات استضافة وتخزين مؤقت وقابلية مراقبة مختلفة جداً.</p>
+<h2 id="sec-the-typescript-shift">تحول TypeScript</h2>
+
+<p>لم يعد TypeScript «جميلاً أن تملكه» في الواجهة الأمامية الصناعية. استطلاعات Stack Overflow أظهرت JavaScript كلغة الأكثر استخداماً سنوات متتالية، مع TypeScript كطبقة معنونة يتبناها معظم الفرق المحترفة لكود التطبيق. للقصة الكاملة JS-مقابل-كل-شيء عبر الخلفية/الجوّال/المدمج/الذكاء الاصطناعي، انظر <a href="./javascript-across-stacks.html">JavaScript عبر الأكوام</a>. الواقع العملي في 2026:</p>
+<ul>
+  <li>قوالب Next.js / Vite / Angular الجديدة تفترض TypeScript أو تقدمه أولاً.</li>
+  <li>أنواع المكتبات تُشحن داخل الحزمة؛ <code>any</code> رائحة مراجعة كود، لا استراتيجية.</li>
+  <li>مهمتك تبقى صحيحة في <strong>JS عادي أولاً</strong> — الأنواع تجلس فوق النماذج الذهنية التي تبنيها (النطاق، الإغلاقات، <code>this</code>، الوحدات). تعلّم TS قبل تلك النماذج هو حفظ ترميز لسلوك لا تستطيع التنبؤ به بعد.</li>
+</ul>
+
+<p>حين تضيف TS لاحقاً: ابدأ بـ <code>strict</code>، وعلّم حدود الدوال والبيانات من واجهات API، واترك الاستدلال المحلي وشأنه. الشهادة لا تتطلب TypeScript؛ كود العمل غالباً سيتطلبه.</p>
+<h2 id="sec-the-ai-era-layer-tooling-not-a-ui-camp">طبقة عصر الذكاء الاصطناعي (أداة، لا معسكر واجهة)</h2>
+
+<p>الذكاء الاصطناعي لم يخترع نموذج عرض جديداً. غيّر <em>كيف يُنتج الكود ويُراجع</em>:</p>
+<ul>
+  <li><strong>المساعدون والوكلاء</strong> يولّدون المكونات والاختبارات وإعادة البناء — الجودة ما زالت تعتمد على الإنسان الذي يعرف قراءة الإغلاقات ومصفوفات التبعيات.</li>
+  <li><strong>ميزات منتجات الذكاء الاصطناعي</strong> في التطبيقات: واجهات دردشة، رموز متدفقة، واجهات استدعاء أدوات — عادة ما زالت مكونات React/Vue فوق SSE/WebSocket.</li>
+  <li><strong>عمل تدريب / ترميز الذكاء الاصطناعي</strong> كمسار دخل لمن يستطيع تقييم جودة الكود والواجهات — انظر <a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a>.</li>
+</ul>
+
+<p>أظهر استطلاع Stack Overflow لعام 2024 أغلبيات كبيرة من المطورين يستخدمون أدوات الذكاء الاصطناعي في العمل. بحلول 2026 أصبح ذلك محيطاً. المميِّز ليس «هل تستطيع الطلب؟» بل «هل تستطيع تمييز متى يكون الخطاف المُولَّد خاطئاً؟». لهذا تعمل هذه المساحة على أساسيات JS قبل موضة الأطر.</p>
+
+<p><strong>الذكاء الاصطناعي لا يزيل اختلافات المعسكرات؛ يجعل التعرف أهم.</strong> الكود المُولَّد يمكن أن يبدو مقنعاً في المعسكر الخطأ: اصطلاحات React لصقت في Svelte، وواجهات برمجية مخترعة، ومكونات مفرطة التوليد تخفي نموذج العرض الحقيقي. وظيفة الإنسان في المراجعة هي إعادة تحديد المعسكر، وفحص القيود، والتحقق أن الاصطلاح يطابق فعلاً.</p>
+<h2 id="sec-market-gravity-who-hires-which-camp">جاذبية السوق (من يوظف أي معسكر)</h2>
+
+<table>
+  <thead><tr><th>شكل صاحب العمل</th><th>جاذبية الكومة الشائعة</th></tr></thead>
+  <tbody>
+    <tr><td>الشركات الناشئة / SaaS المنتجات</td><td>React + Next.js أو SPA؛ TypeScript</td></tr>
+    <tr><td>المؤسسات / الحكومة</td><td>Angular أو React؛ أحياناً Vue؛ عمليات ثقيلة</td></tr>
+    <tr><td>الوكالات / مواقع التسويق</td><td>WordPress، Webflow، Astro، مواقع Next تسويقية</td></tr>
+    <tr><td>فرق أنظمة التصميم / المنصات</td><td>مكتبات مكونات React (أو Vue)، Storybook</td></tr>
+    <tr><td>الألعاب / الأدوات / CAD في المتصفح</td><td>WASM + قشرة JS رقيقة</td></tr>
+    <tr><td>ناشرو المحتوى</td><td>CMS + HTML-first أو SSG ميتا-إطار</td></tr>
+  </tbody>
+</table>
+
+<p>تقرير HackerRank لمهارات المطورين واستطلاعات الصناعة تضع JavaScript باستمرار في مركز فحوص التوظيف؛ كلمات الأطر تدور (React تبقى مهيمنة؛ Next.js يظهر أكثر في الإعلانات كل عام؛ Angular يملك مجالات المؤسسات). لتدفقات الدخل التي تستخدم هذه المهارات لا موضة الأكوام، اقرأ <a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a>.</p>
+<h2 id="sec-migration-paths-between-camps">مسارات الهجرة بين المعسكرات</h2>
 
     <p>الفرق نادراً ما تبقى في معسكر واحد للأبد. هجرات شائعة ونقاط احتكاكها:</p>
 
@@ -312,9 +527,9 @@ const posts = await getPosts();
       </tbody>
     </table>
 
-    <p><strong>نمط مضاد:</strong> إعادة كتابة كبيرة. كل هجرة ناجحة في الجدول أعلاه تدريجية، مسار بمسار، أو جزيرة بجزيرة. حدود المعسكر في جدول المسح (§٠) هي مراكز ثقل — لا جدران.</p>
+    <p><strong>نمط مضاد:</strong> إعادة كتابة كبيرة. كل هجرة ناجحة في الجدول أعلاه تدريجية، مسار بمسار، أو جزيرة بجزيرة. حدود المعسكر في جدول المسح (<a href="#sec-how-to-use-this-map">§٠</a>) هي مراكز ثقل — لا جدران.</p>
 
-    <h2>١٠. كيف ترتبط المعسكرات بنموذجك الذهني لـ React</h2>
+    <h2 id="sec-how-the-camps-relate-to-your-react-mental-model">كيف ترتبط المعسكرات بنموذجك الذهني لـ React</h2>
 
     <table>
       <thead><tr><th>المعسكر</th><th>هل ينطبق نموذج صندوق إعادة العرض؟</th></tr></thead>
@@ -336,7 +551,36 @@ const posts = await getPosts();
       <li><a href="../nextjs-deep-dive.html">غوص عميق في Next.js</a> — الميتا-إطار العمل الذي ستقابله غالباً في وظيفة React.</li>
       <li><a href="../frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a> — جانب الطلب: وظائف، فريلانس، شرح AI، سياق مصر عن بعد.</</ul>
 
-    <h2>١١. النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+    <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2><h2 id="sec-principles-the-invariants-across-every-camp">المبادئ — الثوابت عبر كل معسكر</h2>
+
+<ol>
+  <li><strong>المعسكرات مراكز ثقل.</strong> التطبيقات الحقيقية هجينة؛ حدد الأساسي ثم الثانوي.</li>
+  <li><strong>استراتيجية العرض هي الفاصل الرئيسي.</strong> أين يُنتج الـ HTML أهم من صيغة الإطار.</li>
+  <li><strong>موقع الحالة يحدد النموذج الذهني.</strong> خادم، عميل، URL، إشارات، أو ذاكرة WASM يغير طريقة تفكيرك.</li>
+  <li><strong>ميزانية JS قيد معسكر.</strong> HTML-first وWASM يهتمان بالبايتات بشكل مختلف عن SPA.</li>
+  <li><strong>لا تنقل النماذج الذهنية عمياءً.</strong> إعادة عرض React ≠ رسم إشارات ≠ قوالب خادم.</li>
+  <li><strong>اختر بالقيود لا بالموضة.</strong> المحتوى والتفاعلية وSEO والفريق والميزانية تقرر.</li>
+  <li><strong>الهجرة تدريجية.</strong> شجرة خانقة، مسار-بمسار، جزيرة-بجزيرة — لا انفجار كبير أبداً.</li>
+  <li><strong>المنصة مشتركة.</strong> كل معسكر يُترجم في النهاية إلى HTML/CSS/JS/واجهات متصفح.</li>
+</ol>
+<h2 id="sec-final-checklist-reading-a-real-repo">قائمة الملخص — قراءة مستودع حقيقي</h2>
+
+<p>الأسئلة التي تحدد فهمك — المرجع عند فتح أي مستودع واجهة:</p>
+
+<table>
+  <thead><tr><th>السؤال</th><th>الجواب المختصر</th></tr></thead>
+  <tbody>
+    <tr><td>أي معسكر؟</td><td>اقرأ التبعيات والإعداد وبنية المجلدات وHTML المصدر — لا كل ملف</td></tr>
+    <tr><td>أين يعيش مصدر الحقيقة؟</td><td>خادم، عميل، URL، إشارات، أم ذاكرة WASM؟</td></tr>
+    <tr><td>ما استراتيجية العرض؟</td><td>كامل من الخادم، جزر، CSR، SSR، SSG/ISR، بث/RSC، أم WASM؟</td></tr>
+    <tr><td>من يملك الحالة؟</td><td>خادم/عميل/URL — وكلاهما يحدد نموذجك الذهني</td></tr>
+    <tr><td>هجين؟</td><td>سمِّ الأساسي ثم الثانوي المضمّن</td></tr>
+    <tr><td>ما حدود الخادم/العميل؟</td><td><code>"use client"</code>، <code>client:*</code>، المحمّلات/الإجراءات</td></tr>
+    <tr><td>ما ميزانية JS؟</td><td>بايتات المعسكر تحدد توقعات الأداء</td></tr>
+    <tr><td>ما منطقة الخطر؟</td><td>حدود الترطيب، التخزين المؤقت، الأسرار، الوصولية</td></tr>
+  </tbody>
+</table>
+
 
     <p>مسح المعسكرات جيد فقط بقدر الأدوات التي تجعل حدوده مرئية، قابلة للاختبار، وقابلة للهجرة. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
 
