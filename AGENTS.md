@@ -14,6 +14,7 @@ Static HTML teaching shelf. English docs in `reference/<topic>.html`, Arabic RTL
 The hygiene mechanics have ONE implementation, in the global skill:
 
 - `~/.agents/skills/translate-to-arabic/scripts/twin-pipeline.py <en> <ar> <N> --map maps/<doc>.json`
+- `~/.agents/skills/translate-to-arabic/scripts/splice-sections.py <src> <out> <manifest.json> [--expect N]` — byte-exact section splice/rebuild (large fills, reorders, demotes); never hand-splice twin HTML
   (run from `reference/`) — strip numerals → positional id-pass → folds → §-remap → change report.
 - `~/.agents/skills/translate-to-arabic/scripts/verify-twins.py <doc-stem>` (repo root) — the gate
   battery: h2/h3/pre balance, visible-h2 parity, ids identical in twins, numeral-free, zero stray §,
