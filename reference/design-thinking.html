@@ -23,7 +23,7 @@
   <p>Most engineering tutorials start at "how to implement." Design Thinking starts at "what problem is worth solving, and for whom." It is a distinct discipline with its own history, methods, and failure modes — not "design" as in visual styling, not "UX research" as a phase, not a design sprint as an event. This doc captures it as a first-class engineering concern: the upstream layer that feeds system design and the developer loop. If you've ever built the wrong thing perfectly, this is the layer you missed.</p>
 </section>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone. Cross-links:</p>
 <ul>
@@ -44,7 +44,7 @@
   <p>Design Thinking lives in the intersection. If any circle is empty, the product fails.</p>
 </blockquote>
 
-<h2 id="sec-definition-what-design-thinking-is-and-what-it-is-not">1. Definition — what Design Thinking <em>is</em> and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-design-thinking-is-and-what-it-is-not">Definition — what Design Thinking <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 
@@ -75,7 +75,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 
 ---
 
-<h2 id="sec-history-five-phases-of-the-idea">2. History — five phases of the idea</h2>
+<h2 id="sec-history-five-phases-of-the-idea">History — five phases of the idea</h2>
 
 <table>
   <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures</th><th>What shifted</th></tr></thead>
@@ -156,14 +156,14 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
       <td><strong>2018–present</strong></td>
       <td>Critique and backlash</td>
       <td>Natasha Jen ("Design Thinking is Bullshit"), Don Norman ("Rethinking Design Thinking"), Bruce Nussbaum</td>
-      <td>Design Thinking becomes a corporate ritual ("design theater") — method without empathy. See §10.</td>
+      <td>Design Thinking becomes a corporate ritual ("design theater") — method without empathy. See <a href="#sec-the-most-common-failure-modes">the most common failure modes</a>.</td>
     </tr>
   </tbody>
 </table>
 
 ---
 
-<h2 id="sec-evolution-from-industrial-design-to-software-and-policy">3. Evolution — from industrial design to software and policy</h2>
+<h2 id="sec-evolution-from-industrial-design-to-software-and-policy">Evolution — from industrial design to software and policy</h2>
 
 <p>The core idea — <em>problem framing before solution</em> — did not change. What changed is where it was applied:</p>
 
@@ -180,7 +180,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 
 <p>The methods migrated because the <em>constraint inversion</em> pattern (see <a href="./javascript-across-stacks.html">JS Across Stacks</a>) repeated: when the dominant constraint changes (manufacturing → service delivery → software speed → regulatory accountability → model behavior), the old toolkit no longer fits and the discipline adapts.</p>
 
-<h2 id="sec-migration-paths-adopting-design-thinking-in-existing-orgs">3b. Migration paths — adopting Design Thinking in existing orgs</h2>
+<h2 id="sec-migration-paths-adopting-design-thinking-in-existing-orgs">Migration paths — adopting Design Thinking in existing orgs</h2>
 
 <p>Organizations don't "switch to Design Thinking" in one step. Common adoption paths:</p>
 
@@ -235,11 +235,11 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   </tbody>
 </table>
 
-<p><strong>Anti-pattern:</strong> Certifying everyone in a 2-day workshop and calling it "transformation." The rhythm (§6) survives; the branded methodologies (§7) often don't. Adoption is a series of small bets (§9), not a rollout.</p>
+<p><strong>Anti-pattern:</strong> Certifying everyone in a 2-day workshop and calling it "transformation." The rhythm (<a href="#sec-the-rhythm-not-the-algorithm">The rhythm</a>) survives; the branded methodologies (<a href="#sec-methodologies-the-named-frameworks">Methodologies</a>) often don't. Adoption is a series of small bets (<a href="#sec-worked-example-reduce-missed-medication-doses">worked example</a>), not a rollout.</p>
 
 ---
 
-<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">4. Intersection with neighbors — where it borders other practices</h2>
+<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">Intersection with neighbors — where it borders other practices</h2>
 
 <table>
   <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
@@ -284,7 +284,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 
 ---
 
-<h2 id="sec-underlying-theory-the-ideas-it-borrows-from">5. Underlying theory — the ideas it borrows from</h2>
+<h2 id="sec-underlying-theory-the-ideas-it-borrows-from">Underlying theory — the ideas it borrows from</h2>
 
 <p>Design Thinking does not have a single unified theory. It borrows from several established fields:</p>
 
@@ -324,7 +324,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   </tbody>
 </table>
 
-<h2 id="sec-mental-models-how-designers-actually-reason">5b. Mental models — how designers actually reason</h2>
+<h2 id="sec-mental-models-how-designers-actually-reason">Mental models — how designers actually reason</h2>
 
 <p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
 
@@ -382,11 +382,11 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   </tbody>
 </table>
 
-<p><strong>Anti-pattern:</strong> Running a Design Sprint and calling it "doing Design Thinking." The rhythm (§6) survives; the branded methodologies (§7) often don't. Adoption is a series of small bets (§9), not a rollout.</p>
+<p><strong>Anti-pattern:</strong> Running a Design Sprint and calling it "doing Design Thinking." The rhythm (<a href="#sec-the-rhythm-not-the-algorithm">The rhythm</a>) survives; the branded methodologies (<a href="#sec-methodologies-the-named-frameworks">Methodologies</a>) often don't. Adoption is a series of small bets (<a href="#sec-worked-example-reduce-missed-medication-doses">worked example</a>), not a rollout.</p>
 
 ---
 
-<h2 id="sec-the-rhythm-not-the-algorithm">6. The rhythm, not the algorithm</h2>
+<h2 id="sec-the-rhythm-not-the-algorithm">The rhythm, not the algorithm</h2>
 
 <p>Like the <a href="./how-developers-think-frontend.html">developer loop</a>, Design Thinking is a <strong>rhythm</strong>, not a structured algorithm. It fails the three algorithm tests:</p>
 
@@ -404,7 +404,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 
 ---
 
-<h2 id="sec-methodologies-the-named-frameworks">7. Methodologies — the named frameworks</h2>
+<h2 id="sec-methodologies-the-named-frameworks">Methodologies — the named frameworks</h2>
 
 <p>Multiple named processes exist. None is canonical; each is a different packaging of the same rhythm.</p>
 
@@ -448,7 +448,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 
 ---
 
-<h2 id="sec-principles-the-shared-constants">8. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <p>Across every methodology, seven principles hold:</p>
 
@@ -462,7 +462,7 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   <li><strong>Fail forward.</strong> A failed prototype is a successful learning event. The goal is to invalidate bad hypotheses cheap.</li>
 </ol>
 
-<h2 id="sec-synthesis-from-raw-field-data-to-an-insight-statement">8b. Synthesis — from raw field data to an insight statement</h2>
+<h2 id="sec-synthesis-from-raw-field-data-to-an-insight-statement">Synthesis — from raw field data to an insight statement</h2>
 
 <p>Principles say <em>respect the user</em>; synthesis is the <em>mechanics</em> of turning raw observations into a defensible problem statement. This is where most teams get stuck: they interview, then panic. Four tools close the gap between the Empathize and Define stages.</p>
 
@@ -497,14 +497,14 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 </table>
 
 <blockquote class="callout">
-  <p><strong>The POV madlib.</strong> <code>[User] needs a way to [Need] because [Surprising insight/constraint].</code> The §9 worked example is exactly this shape: "Patients need a way to see their medication trigger at the right moment <em>because the bottle is hidden by their environment.</em>" If your statement survives without the "because," you haven't found the insight yet — keep synthesizing.</p>
+  <p><strong>The POV madlib.</strong> <code>[User] needs a way to [Need] because [Surprising insight/constraint].</code> The <a href="#sec-worked-example-reduce-missed-medication-doses">worked example</a> worked example is exactly this shape: "Patients need a way to see their medication trigger at the right moment <em>because the bottle is hidden by their environment.</em>" If your statement survives without the "because," you haven't found the insight yet — keep synthesizing.</p>
 </blockquote>
 
 <p><strong>Synthesis order:</strong> Affinity diagram the raw data → build one empathy map (or journey map) to expose the contradiction → write a POV madlib. Stop when the POV surprises someone who was in the field. If it surprises no one, you've clustered, not synthesized.</p>
 
-<h2 id="sec-ideation-and-prototype-catalogs-the-mechanics-behind-40-sketches">8c. Ideation and prototype catalogs — the mechanics behind "40 sketches"</h2>
+<h2 id="sec-ideation-and-prototype-catalogs-the-mechanics-behind-40-sketches">Ideation and prototype catalogs — the mechanics behind "40 sketches"</h2>
 
-<p>§9 shows Crazy 8s once. A practitioner needs a catalog of moves to pick against the <em>kind</em> of block they're hitting, and a taxonomy of prototypes to test without writing code.</p>
+<p><a href="#sec-worked-example-reduce-missed-medication-doses">worked example</a> shows Crazy 8s once. A practitioner needs a catalog of moves to pick against the <em>kind</em> of block they're hitting, and a taxonomy of prototypes to test without writing code.</p>
 
 <h3>Ideation techniques</h3>
 
@@ -573,9 +573,9 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 
 <p><strong>Selection by learning goal:</strong> desirability = painted door / concierge; perceived experience = Wizard of Oz; emotional resonance = concept video; business value = concierge. March the prototype to the learning goal, never to "what we can build."</p>
 
-<h2 id="sec-desirability-testing-and-the-handoff-proving-value-then-transferring-it">8d. Desirability testing and the handoff — proving value, then transferring it</h2>
+<h2 id="sec-desirability-testing-and-the-handoff-proving-value-then-transferring-it">Desirability testing and the handoff — proving value, then transferring it</h2>
 
-<p>The value of a concept is proven by behavior, and a validated concept then needs a path out of Design Thinking and into System Design (§1d). Two halves:</p>
+<p>The value of a concept is proven by behavior, and a validated concept then needs a path out of Design Thinking and into System Design (<a href="./system-design.html#sec-intersection-with-neighbors">Intersection with neighbors</a>). Two halves:</p>
 
 <h3>Desirability — behaving over saying</h3>
 
@@ -631,10 +631,10 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
 <p><strong>Handoff rule:</strong> Design Thinking is done only when the output is an artifact the next process can consume without re-running discovery. A raw pile of quotes is not a handoff; an opportunity tree or hypothesis statement is.</p>
 
 <blockquote class="callout">
-  <p><strong>Layered handoff.</strong> Insight (Design Thinking) → <em>this is the problem</em>. Then System Design owns <em>architecture fits it at scale</em> (§1d), and UI/UX owns <em>the pixels that carry the empathy</em>. The artifacts above are what survive the move across those seams.</p>
+  <p><strong>Layered handoff.</strong> Insight (Design Thinking) → <em>this is the problem</em>. Then System Design owns <em>architecture fits it at scale</em> (<a href="./system-design.html#sec-intersection-with-neighbors">Intersection with neighbors</a>), and UI/UX owns <em>the pixels that carry the empathy</em>. The artifacts above are what survive the move across those seams.</p>
 </blockquote>
 
-<h2 id="sec-managing-the-room-and-the-organization">8e. Managing the room and the organization</h2>
+<h2 id="sec-managing-the-room-and-the-organization">Managing the room and the organization</h2>
 
 <p>Design Thinking fails as often from <em>social</em> rejection as from method error. Two forces you never get to ignore:</p>
 
@@ -659,11 +659,11 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   </tbody>
 </table>
 
-<p>Design thinking is a joint activity. See also §3b's migration-path risks (leadership reverts, token inclusion) and §12's co-design future.</p>
+<p>Design thinking is a joint activity. See also <a href="#sec-migration-paths-adopting-design-thinking-in-existing-orgs">Migration paths</a>'s migration-path risks (leadership reverts, token inclusion) and <a href="#sec-the-future-where-design-thinking-is-going">the future</a>'s co-design future.</p>
 
 ---
 
-<h2 id="sec-worked-example-reduce-missed-medication-doses">9. Worked example — "Reduce missed medication doses"</h2>
+<h2 id="sec-worked-example-reduce-missed-medication-doses">Worked example — "Reduce missed medication doses"</h2>
 
 <p>A classic human-centered design problem, walked through the d.school 5 stages:</p>
 
@@ -702,7 +702,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2 id="sec-the-most-common-failure-modes">10. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
@@ -754,7 +754,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">11. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>Design Thinking is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
 
@@ -822,7 +822,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2 id="sec-the-future-where-design-thinking-is-going">12. The future — where Design Thinking is going</h2>
+<h2 id="sec-the-future-where-design-thinking-is-going">The future — where Design Thinking is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for Design Thinking</th></tr></thead>
@@ -848,7 +848,7 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2 id="sec-summary-the-mental-checklist">13. Summary — the mental checklist</h2>
+<h2 id="sec-summary-the-mental-checklist">Summary — the mental checklist</h2>
 
 <p>Before any feature enters the backlog, verify:</p>
 
