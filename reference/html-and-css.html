@@ -70,7 +70,7 @@
   <tbody>
     <tr><td>CSS as "styling language"</td><td>Colors, fonts, spacing, "making it look good"</td><td>CSS is a <em>constraint-solving language for box layout</em>. Styling is one output; layout, theming, state exposure, and a11y tree integration are others.</td></tr>
     <tr><td>Tailwind / Bootstrap / CSS-in-JS</td><td>Utility classes, component frameworks, runtime style injection, zero-runtime extraction</td><td>Tools are <em>authoring abstractions</em>; the platform contract (cascade, specificity, inheritance, computed values) is what they all compile <em>to</em>. The contract doesn't change when the tool does.</td></tr>
-    <tr><td>Semantic HTML as "SEO checklist"</td><td><code><h1></code> for ranking, <code><article></code> for crawlers</td><td>Semantic HTML <em>is the accessibility tree</em>. Screen readers, reader modes, RSS, Safari Reader, Windows High Contrast — all consume the AOM. SEO is a side effect.</td></tr>
+    <tr><td>Semantic HTML as "SEO checklist"</td><td><code>&lt;h1&gt;</code> for ranking, <code><article></code> for crawlers</td><td>Semantic HTML <em>is the accessibility tree</em>. Screen readers, reader modes, RSS, Safari Reader, Windows High Contrast — all consume the AOM. SEO is a side effect.</td></tr>
     <tr><td>HTML as "template language"</td><td>Interpolation, loops, conditionals, partials (Jinja, Blade, JSX, Vue templates)</td><td>Templates <em>produce</em> HTML. HTML is the <em>output format</em> the browser parses. The platform sees only the serialized result.</td></tr>
     <tr><td>CSS variables = theming</td><td><code>--color-primary: blue</code> swapped for dark mode</td><td>Custom properties are <em>cascade-participating values</em>. They inherit, they fallback, they can be overridden per subtree. Theming is one use case; algorithmic layout (calc with vars) is another.</td></tr>
     <tr><td>Layout = Flexbox or Grid</td><td>Choosing <code>display: flex</code> vs <code>display: grid</code></td><td>Layout is the <em>entire formatting context system</em>: normal flow, floats, positioning, flex, grid, table, ruby, multi-column, masonry. The choice is irreversible-ish per formatting context root.</td></tr>
@@ -87,7 +87,7 @@
       <td><strong>1989–1991</strong></td>
       <td>HTML at CERN, SGML heritage</td>
       <td>Tim Berners-Lee, Dan Connolly (SGML), IETF HTML WG</td>
-      <td>HTML as SGML application. <code><a></code>, <code><p></code>, <code><h1-h6></code>, <code><ul></code>/<code><ol></code>, <code><img></code>. No layout, no style. Documents linked by URLs.</td>
+      <td>HTML as SGML application. <code><a></code>, <code><p></code>, <code>&lt;h1-h6&gt;</code>, <code><ul></code>/<code><ol></code>, <code><img></code>. No layout, no style. Documents linked by URLs.</td>
     </tr>
     <tr>
       <td><strong>1994–1996</strong></td>
