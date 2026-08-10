@@ -71,7 +71,7 @@
         </p>
       </blockquote>
 
-      <h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+      <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
       <p>
         Reading order: standalone, but most useful <em>after</em> the
@@ -109,12 +109,11 @@
           "pipeline," or a "rollback" actually is — and why teams do them — this
           doc answers that.</strong
         >
-        Read §1 (Definition) and §2 (the model) first; then §4–§6 for the
-        pipeline stages; then §9c for the future and §9d for the checklist.
+        Read <a href="#sec-definition-what-version-control-is-and-what-it-is-not">Definition</a> (Definition) and <a href="#sec-branching-strategies-how-teams-share-the-dag">Branching strategies</a> (the model) first; then <a href="#sec-continuous-delivery-continuous-deployment-get-the-distinction-right">Continuous Delivery & Continuous Deployment</a> through <a href="#sec-a-concrete-walkthrough-one-push-taken-through-every-stage">A concrete walkthrough</a> for the
+        pipeline stages; then <a href="#sec-the-future-where-the-delivery-layer-is-heading">The future</a> for the future and <a href="#sec-the-complete-mental-checklist">The complete mental checklist</a> for the checklist.
       </p>
 
-      <h2 id="sec-definition-what-version-control-is-and-what-it-is-not">
-        1. Definition — what version control is and what it is <em>not</em>
+      <h2 id="sec-definition-what-version-control-is-and-what-it-is-not">Definition — what version control is and what it is <em>not</em>
       </h2>
 
       <p>
@@ -145,12 +144,12 @@
           <strong>Continuous Delivery</strong> — the team keeps the deliverable
           production-ready and releases it manually or by flag;
           <strong>continuous deployment</strong> releases without a human gate.
-          The two are often conflated; §4 keeps them apart.
+          The two are often conflated; <a href="#sec-continuous-delivery-continuous-deployment-get-the-distinction-right">Continuous Delivery & Continuous Deployment</a> keeps them apart.
         </li>
       </ul>
       <p>
         <strong>Deployment</strong> is putting a verified, versioned release
-        into a running environment — strategy in §5.
+        into a running environment — strategy in <a href="#sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies</a>.
       </p>
 
       <h3>What this doc is NOT</h3>
@@ -177,8 +176,7 @@
           operations practice is a separate specialty.
         </li>
       </ul>
-      <h2 id="sec-history-from-file-locking-to-git-and-the-distributed-pull-request-2005present">
-        1b. History — from file-locking to Git and the distributed pull request
+      <h2 id="sec-history-from-file-locking-to-git-and-the-distributed-pull-request-2005present">History — from file-locking to Git and the distributed pull request
         (2005–present)
       </h2>
 
@@ -230,7 +228,7 @@
               Built for the Linux kernel to solve the failure of distributed
               collaboration. <strong>Distributed</strong>: every clone is a
               complete repository with full history, not a snapshot.
-              Content-addressed, DAG-based (see §2/§1e). No central server
+              Content-addressed, DAG-based (see <a href="#sec-branching-strategies-how-teams-share-the-dag">Branching strategies</a> / <a href="#sec-underlying-theory-content-addressing-and-the-snapshot-model-why-every-git-command-clicks">Underlying theory</a>). No central server
               required (<a
                 href="https://git-scm.com/book/en/v2/Getting-Started-A-Short-History-of-Git"
                 >Pro Git</a
@@ -266,7 +264,7 @@
         where "collaboration without a human bottleneck" arrived.
       </p>
 
-      <h2 id="sec-evolution-the-constraint-inversions">1c. Evolution — the constraint inversions</h2>
+      <h2 id="sec-evolution-the-constraint-inversions">Evolution — the constraint inversions</h2>
 
       <p>
         Version control's evolution is a sequence of constraint inversions, one
@@ -303,8 +301,7 @@
         </li>
       </ul>
 
-      <h2 id="sec-intersection-with-neighbors-the-delivery-layer-at-the-border">
-        1d. Intersection with neighbors — the delivery layer at the border
+      <h2 id="sec-intersection-with-neighbors-the-delivery-layer-at-the-border">Intersection with neighbors — the delivery layer at the border
       </h2>
 
       <p>
@@ -344,8 +341,7 @@
           (merge, branch, deploy, rollback).
         </li>
       </ul>
-      <h2 id="sec-underlying-theory-content-addressing-and-the-snapshot-model-why-every-git-command-clicks">
-        1e. Underlying theory — content-addressing and the snapshot model (why
+      <h2 id="sec-underlying-theory-content-addressing-and-the-snapshot-model-why-every-git-command-clicks">Underlying theory — content-addressing and the snapshot model (why
         every Git command clicks)
       </h2>
 
@@ -458,8 +454,7 @@
         commits to production."
       </p>
 
-      <h2 id="sec-mental-models-how-senior-engineers-actually-reason-about-delivery">
-        1f. Mental models — how senior engineers actually reason about delivery
+      <h2 id="sec-mental-models-how-senior-engineers-actually-reason-about-delivery">Mental models — how senior engineers actually reason about delivery
       </h2>
 
       <p>
@@ -496,7 +491,7 @@
           bug; everything else stops until green returns.
         </li>
       </ul>
-      <h2 id="sec-branching-strategies-how-teams-share-the-dag">2. Branching strategies — how teams share the DAG</h2>
+      <h2 id="sec-branching-strategies-how-teams-share-the-dag">Branching strategies — how teams share the DAG</h2>
 
       <p>
         Branches are how <em>many</em> people safely work on <em>one</em> shared
@@ -540,7 +535,7 @@
         at any moment? Then GitHub Flow/trunk-based. Do you publish tagged
         versions to paying customers with a strict cadence? Then a release
         branch adds structure. When in doubt, start trunk-based — the ceremony
-        emerges when a release actually needs it (§9b "over-engineering").
+        emerges when a release actually needs it (<a href="#sec-the-most-common-failure-modes">The most common failure modes</a> "over-engineering").
       </p>
 
       <h3>The pull request as the unit of change (with CI + review)</h3>
@@ -553,8 +548,7 @@
         <em>live</em> by branch protection that won't merge a busted main.
       </p>
 
-      <h2 id="sec-the-collaboration-loop-push-pull-merge-and-the-pull-request">
-        2b. The collaboration loop — push/pull, merge, and the pull request
+      <h2 id="sec-the-collaboration-loop-push-pull-merge-and-the-pull-request">The collaboration loop — push/pull, merge, and the pull request
       </h2>
 
       <p>The daily rhythm of a contributor who uses the model above:</p>
@@ -695,7 +689,7 @@
           </tr>
           <tr>
             <td>Require signed commits <em>(optional)</em></td>
-            <td>Stronger provenance (§3 supply chain).</td>
+            <td>Stronger provenance (<a href="#sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">Continuous Integration</a> supply chain).</td>
           </tr>
         </tbody>
       </table>
@@ -710,16 +704,16 @@
         variables keep local and CI environments close.
       </p>
 
-      <h2 id="sec-debugging-across-time-bisect-blame-and-recover">2c. Debugging across time — bisect, blame, and recover</h2>
+      <h2 id="sec-debugging-across-time-bisect-blame-and-recover">Debugging across time — bisect, blame, and recover</h2>
 
       <p>
         Version control is not just where code is stored; it is a searchable
         history. When a symptom appears and pre-production tests (<a
-          href="./software-testing-and-debugging.html"
-          >Testing &amp; Debugging §10</a
-        >) cannot tell you which change caused it, the snapshot model (§1e)
+          href="./software-testing-and-debugging.html#sec-debugging-the-evidence-when-a-test-fails"
+          >Testing &amp; Debugging — Debugging</a
+        >) cannot tell you which change caused it, the snapshot model (<a href="#sec-underlying-theory-content-addressing-and-the-snapshot-model-why-every-git-command-clicks">Underlying theory</a>)
         turns the search into a timeline. The thinking loop underneath is
-        <a href="./problem-solving.html">Problem-Solving §9</a> (observe,
+        <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Problem-Solving — Debugging as problem-solving</a> (observe,
         hypothesize, predict, test, conclude); these are Git's timeline tools
         that make the search efficient:
       </p>
@@ -737,7 +731,7 @@
             <td><code>git bisect</code></td>
             <td>"Which commit introduced this bug?"</td>
             <td>
-              Binary-search debugging (§10 of Testing &amp; Debugging) over
+              Binary-search debugging (see <a href="./software-testing-and-debugging.html#sec-debugging-the-evidence-when-a-test-fails">Debugging — the evidence when a test fails</a>) over
               history: mark a known-good commit and a known-bad one, and Git
               checks out the midpoint; you say good or bad; it halves the range
               each step until the culprit commit is isolated — O(log n) commits
@@ -761,7 +755,7 @@
               (history stays intact, safe on shared branches).
               <code>git reset</code> moves a branch pointer back (rewrites
               history — only for unshared/unpushed work). Deployment rollback is
-              the live-environment counterpart (§5).
+              the live-environment counterpart (<a href="#sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies</a>).
             </td>
           </tr>
         </tbody>
@@ -776,8 +770,7 @@
         the evidence, Problem-Solving owns the thinking.
       </p>
 
-      <h2 id="sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">
-        3. Continuous Integration — what a pipeline actually runs, and why it's
+      <h2 id="sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">Continuous Integration — what a pipeline actually runs, and why it's
         a gate
       </h2>
 
@@ -825,7 +818,7 @@
         verified" enforceable rather than aspirational. Green is not proof that
         production is safe — it only means the configured checks passed.
         Migrations, environment differences, dependency drift, and operations
-        still need the release and observability controls below. Tools (per §9):
+        still need the release and observability controls below. Tools (per <a href="#sec-worked-example-the-hackerrank-repo-shipped">Worked example</a>):
         GitHub Actions, GitLab CI, Jenkins, CircleCI — all "workflow/pipeline as
         a file in the repo."
       </p>
@@ -852,13 +845,13 @@
         <li>
           <strong>Quarantine flaky tests</strong> — a flaky test trains the team
           to ignore red; isolate it and fix it rather than rerunning blindly
-          (<a href="./software-testing-and-debugging.html"
-            >Testing &amp; Debugging §14</a
+          (<a href="./software-testing-and-debugging.html#sec-the-most-common-failure-modes"
+            >Testing &amp; Debugging — The most common failure modes</a
           >).
         </li>
         <li>
           <strong>Build the artifact once</strong> — a single verified build
-          promoted across stages, never rebuilt per environment (§5).
+          promoted across stages, never rebuilt per environment (<a href="#sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies</a>).
         </li>
         <li>
           <strong>Separate required from optional checks</strong> — protect
@@ -914,8 +907,7 @@
         </li>
       </ul>
 
-      <h2 id="sec-continuous-delivery-continuous-deployment-get-the-distinction-right">
-        4. Continuous Delivery &amp; Continuous Deployment — get the distinction
+      <h2 id="sec-continuous-delivery-continuous-deployment-get-the-distinction-right">Continuous Delivery &amp; Continuous Deployment — get the distinction
         right
       </h2>
 
@@ -962,7 +954,7 @@
             </td>
             <td>
               When deploys are tiny, reversible, and fully warmed by
-              flags/canaries (§6) so automation is safe.
+              flags/canaries (<a href="#sec-a-concrete-walkthrough-one-push-taken-through-every-stage">A concrete walkthrough</a>) so automation is safe.
             </td>
           </tr>
           <tr>
@@ -976,10 +968,10 @@
       <p>
         Both share a hard precondition: the pipeline must be so reliable and the
         rollback so cheap that "every passing change to live" (or "any change to
-        live in minutes") is safe. Without §6's strategies and §8's rollback,
+        live in minutes") is safe. Without the strategies of <a href="#sec-a-concrete-walkthrough-one-push-taken-through-every-stage">A concrete walkthrough</a> and the rollback covered in <a href="#sec-principles-the-shared-constants">Principles</a>,
         neither can be honest.
       </p>
-      <h2 id="sec-deployment-strategies-the-ship-it-safely-toolbox">5. Deployment strategies — the "ship it safely" toolbox</h2>
+      <h2 id="sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies — the "ship it safely" toolbox</h2>
 
       <p>
         Deployment is not one button; it's a set of strategies trading
@@ -1057,7 +1049,7 @@
         <strong>Deploy ≠ release.</strong> Deployed code can be invisible (flag
         off), and a release can be gradual (canary). This mental split lets
         teams ship small (deploy) while controlling user exposure (release later
-        / partially). That's exactly §1f's senior model, now mechanized.
+        / partially). That's exactly the <a href="#sec-mental-models-how-senior-engineers-actually-reason-about-delivery">Mental models</a> section's senior model, now mechanized.
       </p>
 
       <h3>Feature flag lifecycle — flags are not free</h3>
@@ -1147,7 +1139,7 @@
           </tr>
           <tr>
             <td><strong>Feature flags</strong></td>
-            <td>Control runtime behavior without redeploying (§5).</td>
+            <td>Control runtime behavior without redeploying (<a href="#sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies</a>).</td>
           </tr>
           <tr>
             <td><strong>Client secrets</strong></td>
@@ -1248,7 +1240,7 @@
         <li>
           <strong>Deploy by digest</strong> (containers) — reference the image by
           SHA, not just a mutable tag, so the artifact you ship is exactly the one
-          you built and signed (§3).
+          you built and signed (<a href="#sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">Continuous Integration</a>).
         </li>
       </ul>
 
@@ -1256,8 +1248,8 @@
       <ul>
         <li>
           <strong>Secrets storage</strong> — use a secret manager/vault, never the
-          repo (<a href="./software-testing-and-debugging.html"
-            >Testing &amp; Debugging §1e</a
+          repo (<a href="./software-testing-and-debugging.html#sec-underlying-theory-oracles-isolation-determinism-and-risk"
+            >Testing &amp; Debugging — Underlying theory</a
           >), and rotate anything that leaks.
         </li>
         <li>
@@ -1341,7 +1333,7 @@
         </li>
       </ul>
 
-      <h2 id="sec-semver-and-releases-naming-the-snapshots-you-ship">5b. SemVer and releases — naming the snapshots you ship</h2>
+      <h2 id="sec-semver-and-releases-naming-the-snapshots-you-ship">SemVer and releases — naming the snapshots you ship</h2>
 
       <p>
         Commits are for developers; <strong>versions</strong> are the language
@@ -1389,7 +1381,7 @@
         <code>v2.1.0</code>, reference the exact artifact for deploy/rollback.
         Version control + CI + releases all speak =
         <code>MAJOR.MINOR.PATCH</code>, the one string that ties a commit to a
-        live artifact (cf. §1d, API Design).
+        live artifact (cf. <a href="./api-design.html#sec-intersection-with-neighbors-where-it-borders-other-practices">API Design — Intersection with neighbors</a>).
       </p>
 
       <h3>Release governance — deciding what users get, and when</h3>
@@ -1420,7 +1412,7 @@
           configuration.
         </li>
       </ul>
-      <h2 id="sec-a-concrete-walkthrough-one-push-taken-through-every-stage">6. A concrete walkthrough — one push taken through every stage</h2>
+      <h2 id="sec-a-concrete-walkthrough-one-push-taken-through-every-stage">A concrete walkthrough — one push taken through every stage</h2>
 
       <p>
         Everything so far, as a single flow from "a dev hits save" to "real
@@ -1456,7 +1448,7 @@ Users: run the new version. If a defect slips through:
         to production."
       </p>
 
-      <h2 id="sec-the-ecosystem-platforms-and-how-they-differ">7. The ecosystem — platforms and how they differ</h2>
+      <h2 id="sec-the-ecosystem-platforms-and-how-they-differ">The ecosystem — platforms and how they differ</h2>
 
       <p>Where CI/CD actually runs (each cited to the primary source):</p>
       <table>
@@ -1555,7 +1547,7 @@ Users: run the new version. If a defect slips through:
         alongside the repo — fewer places wins.
       </p>
 
-      <h2 id="sec-principles-the-shared-constants">8. Principles — the shared constants</h2>
+      <h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
       <p>
         The invariants that survive tool churn (each underlined in a section
@@ -1661,7 +1653,7 @@ Users: run the new version. If a defect slips through:
         measure the pipeline, not individual developer effort — the Process doc
         owns team cadence.
       </p>
-      <h2 id="sec-worked-example-the-hackerrank-repo-shipped">9. Worked example — the HackerRank repo, shipped</h2>
+      <h2 id="sec-worked-example-the-hackerrank-repo-shipped">Worked example — the HackerRank repo, shipped</h2>
 
       <p>
         Make it concrete with a real project: your solutions repo (built during
@@ -1722,7 +1714,7 @@ Users: run the new version. If a defect slips through:
         above, used daily.
       </p>
 
-      <h2 id="sec-the-most-common-failure-modes">9b. The most common failure modes</h2>
+      <h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
       <table>
         <thead>
@@ -1814,7 +1806,7 @@ Users: run the new version. If a defect slips through:
           </tr>
         </tbody>
       </table>
-      <h2 id="sec-the-future-where-the-delivery-layer-is-heading">9c. The future — where the delivery layer is heading</h2>
+      <h2 id="sec-the-future-where-the-delivery-layer-is-heading">The future — where the delivery layer is heading</h2>
 
       <p>Trends with real momentum, not speculation:</p>
       <ul>
@@ -1845,7 +1837,7 @@ Users: run the new version. If a defect slips through:
         </li>
       </ul>
 
-      <h2 id="sec-the-complete-mental-checklist">9d. The complete mental checklist</h2>
+      <h2 id="sec-the-complete-mental-checklist">The complete mental checklist</h2>
 
       <p>
         If you remember only one image, remember the DAG-and-pipeline picture:

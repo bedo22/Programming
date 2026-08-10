@@ -90,7 +90,7 @@
         </p>
       </blockquote>
 
-      <h2>0. How to use this doc</h2>
+      <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
       <p>
         Reading order: standalone, but most useful <em>between</em> the Design
@@ -122,8 +122,7 @@
         </li>
       </ul>
 
-      <h2>
-        1. Definition — what problem-solving <em>is</em> and what it is
+      <h2 id="sec-definition-what-problem-solving-is-and-what-it-is-not">Definition — what problem-solving <em>is</em> and what it is
         <em>not</em>
       </h2>
 
@@ -275,7 +274,7 @@
           <tr>
             <td>Debugging problem</td>
             <td>"Why does this function return undefined?"</td>
-            <td>This doc, §9</td>
+            <td>This doc, <a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a></td>
           </tr>
           <tr>
             <td>UI feature problem</td>
@@ -311,7 +310,7 @@
         start there and come back only when you have a well-defined core.
       </p>
 
-      <h2>1b. History — from mathematics to programming (1945–present)</h2>
+      <h2 id="sec-history-from-mathematics-to-programming-1945present">History — from mathematics to programming (1945–present)</h2>
 
       <p>
         The problem-solving methodology in this doc is not new — it has an
@@ -442,10 +441,10 @@
         unchanged. What evolved around them is: the domain (math → programming →
         universal), the extensions (metacognition, computational thinking), the
         tools (pen and paper → platforms → AI), and the understanding of
-        <em>why</em> the method works (cognitive science — see §1e).
+        <em>why</em> the method works (cognitive science — see <a href="#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">Underlying theory</a>).
       </p>
 
-      <h2>1c. Evolution — constraint inversions across the same idea</h2>
+      <h2 id="sec-evolution-constraint-inversions-across-the-same-idea">Evolution — constraint inversions across the same idea</h2>
 
       <p>
         Like every discipline on this shelf, problem-solving evolved through
@@ -520,7 +519,7 @@
             <td>
               Implementation is no longer the bottleneck. The skill shifts from
               "can you write the code" to "can you recognize the right approach,
-              decompose, and verify." But the fluency trap (§11) intensifies —
+              decompose, and verify." But the fluency trap (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>) intensifies —
               AI makes it easy to feel you understand without building storage
               strength.
             </td>
@@ -528,8 +527,7 @@
         </tbody>
       </table>
 
-      <h2>
-        1d. Intersection with neighbors — where it borders other practices
+      <h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">Intersection with neighbors — where it borders other practices
       </h2>
 
       <p>
@@ -615,7 +613,7 @@
             </td>
             <td>
               Same four phases, inverted direction: you start from the symptom
-              and work backwards to the cause. See §9.
+              and work backwards to the cause. See <a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a>.
             </td>
           </tr>
         </tbody>
@@ -630,8 +628,7 @@
         dev loop. Each layer feeds the next.
       </p>
 
-      <h2>
-        1e. Underlying theory — the cognitive science behind why the method
+      <h2 id="sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">Underlying theory — the cognitive science behind why the method
         works
       </h2>
 
@@ -699,7 +696,7 @@
         >). The same applies to problem-solving: an expert sees "hash-map
         frequency counting" as one chunk; a novice sees "create object, iterate,
         check key, increment" as four separate items. This is why pattern filing
-        (§10) matters — each filed pattern adds a chunk to your schema, freeing
+        (<a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth</a>) matters — each filed pattern adds a chunk to your schema, freeing
         working memory for reasoning.
       </p>
 
@@ -712,7 +709,7 @@
           >Wikipedia</a
         >). In the water-jar experiment, subjects who learned one solution
         method kept applying it to later problems even when a simpler solution
-        was available. This is why Schoenfeld's metacognition (§5) is essential
+        was available. This is why Schoenfeld's metacognition (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>) is essential
         — without monitoring your approach, you fall into the Einstellung trap:
         applying the first method that comes to mind, not the best one. The
         metacognitive check "is this approach worth continuing?" is the antidote
@@ -724,15 +721,15 @@
         The brain has two thinking modes: <strong>System 1</strong> (fast,
         intuitive, pattern-matching — the "blink") and
         <strong>System 2</strong> (slow, analytical, deliberate — the "think").
-        Problem-solving uses both: System 1 for pattern recognition (§3 — "I've
+        Problem-solving uses both: System 1 for pattern recognition (<a href="#sec-the-lens-computational-thinking-s-four-pillars">The lens</a> — "I've
         seen this before, it's a hash-map problem") and System 2 for
         verification and when patterns don't match. The danger: System 1 is fast
         but error-prone — it can match a surface similarity that doesn't reflect
-        deep structure (§1f). Phase 4 (Look back) is the System 2 check on
+        deep structure (<a href="#sec-mental-models-how-expert-problem-solvers-actually-reason">Mental models</a>). Phase 4 (Look back) is the System 2 check on
         System 1's intuition.
       </p>
 
-      <h2>1f. Mental models — how expert problem-solvers actually reason</h2>
+      <h2 id="sec-mental-models-how-expert-problem-solvers-actually-reason">Mental models — how expert problem-solvers actually reason</h2>
 
       <p>
         Research on expertise (Simon &amp; Chase 1973, Schoenfeld 1985,
@@ -782,7 +779,7 @@
             </td>
             <td>
               Generate multiple candidate approaches, then select. If one fails,
-              switch to another — the metacognitive loop (§5) is running.
+              switch to another — the metacognitive loop (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>) is running.
             </td>
           </tr>
           <tr>
@@ -834,7 +831,7 @@
         <strong>What this means for your practice:</strong> the goal is not to
         solve more problems faster — it's to <em>build richer schemas</em>.
         Every problem you solve and file (Phase 4) adds a pattern to your
-        library. Every problem you attempt before reading the solution (§11)
+        library. Every problem you attempt before reading the solution (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>)
         strengthens the retrieval pathway. The expert advantage compounds: each
         filed pattern makes the next problem faster to recognize, which frees
         more working memory for reasoning, which lets you solve harder problems,
@@ -842,7 +839,7 @@
         expertise.
       </p>
 
-      <h2>2. The universal meta-rhythm — Pólya's four phases</h2>
+      <h2 id="sec-the-universal-meta-rhythm-polya-s-four-phases">The universal meta-rhythm — Pólya's four phases</h2>
 
       <p>
         George Pólya, a Hungarian mathematician, published
@@ -945,7 +942,7 @@
           </tr>
           <tr>
             <td>Is the input sorted?</td>
-            <td>Sorted input may unlock binary search or two pointers (§7b).</td>
+            <td>Sorted input may unlock binary search or two pointers (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>).</td>
           </tr>
           <tr>
             <td>Are duplicates allowed?</td>
@@ -1013,7 +1010,7 @@
 
       <h3>Phase 2 — Devise a plan</h3>
       <p>
-        This is where heuristics live (see §4 for the full dictionary). Pólya's
+        This is where heuristics live (see <a href="#sec-polya-s-heuristic-dictionary-the-moves">Pólya's heuristic dictionary</a> for the full dictionary). Pólya's
         key questions:
       </p>
       <ul>
@@ -1080,7 +1077,7 @@
             >Can you use the result, or the method, for another problem?</strong
           >
           This is <em>pattern filing</em> — the act that builds pattern
-          recognition over time (see §3).
+          recognition over time (see <a href="#sec-the-lens-computational-thinking-s-four-pillars">The lens</a>).
         </li>
         <li>
           <strong>What did you learn?</strong> What pattern did this problem
@@ -1095,7 +1092,7 @@
         one-off solution into reusable pattern knowledge.
       </p>
 
-      <h2>3. The lens — Computational thinking's four pillars</h2>
+      <h2 id="sec-the-lens-computational-thinking-s-four-pillars">The lens — Computational thinking's four pillars</h2>
 
       <p>
         If Pólya's four phases are the <em>rhythm</em> (the process you cycle
@@ -1200,7 +1197,7 @@
         </p>
       </blockquote>
 
-      <h2>4. Pólya's heuristic dictionary — the moves</h2>
+      <h2 id="sec-polya-s-heuristic-dictionary-the-moves">Pólya's heuristic dictionary — the moves</h2>
 
       <p>
         Heuristics are
@@ -1294,11 +1291,10 @@
         answer look like?). Then decomposition (can I break it apart?). Most
         problems yield to one of these within a few minutes of cycling. If none
         work, the problem may need a technique you haven't learned yet — which
-        is itself useful information (see §7).
+        is itself useful information (see <a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>).
       </p>
 
-      <h2>
-        5. Schoenfeld's extension — metacognition (the missing fifth element)
+      <h2 id="sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension — metacognition (the missing fifth element)
       </h2>
 
       <p>
@@ -1338,7 +1334,7 @@
         <li>
           <strong>"Is this approach worth continuing?"</strong> — Sunk cost is a
           trap. If brute force works but is too slow, don't keep optimizing it —
-          step back and consider a different paradigm (§7).
+          step back and consider a different paradigm (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>).
         </li>
         <li>
           <strong>"Should I go back to Phase 1?"</strong> — Sometimes your plan
@@ -1419,7 +1415,7 @@
         is what separates problem-solvers who get unstuck from those who spiral.
       </p>
 
-      <h2>6. Stepwise refinement — top-down decomposition for programming</h2>
+      <h2 id="sec-stepwise-refinement-top-down-decomposition-for-programming">Stepwise refinement — top-down decomposition for programming</h2>
 
       <p>
         While Pólya's framework is domain-general, Niklaus Wirth (creator of
@@ -1518,7 +1514,7 @@
         </p>
       </blockquote>
 
-      <h2>7. Algorithm design paradigms — the technique catalog</h2>
+      <h2 id="sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms — the technique catalog</h2>
 
       <p>
         During Phase 2 (Devise a plan), after you've decomposed and recognized
@@ -1736,7 +1732,7 @@
 
       <h3>7b. Paradigm recognition — reading the signal in the problem</h3>
       <p>
-        The most practical recognition skill (§1f) is matching
+        The most practical recognition skill (<a href="#sec-mental-models-how-expert-problem-solvers-actually-reason">Mental models</a>) is matching
         <em>phrases in the problem statement</em> to a paradigm. These signals
         are heuristics, not proofs — but they're right often enough to start:
       </p>
@@ -1750,7 +1746,7 @@
         <tbody>
           <tr>
             <td>"Count occurrences" / "how many times"</td>
-            <td>Hash map (§7)</td>
+            <td>Hash map (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>)</td>
           </tr>
           <tr>
             <td>"Find duplicates"</td>
@@ -1809,7 +1805,7 @@
       <blockquote class="callout">
         <p>
           <strong>The recognition loop:</strong> these signals are not learned by
-          reading — they're learned by filing (§10). Each problem you solve and
+          reading — they're learned by filing (<a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth</a>). Each problem you solve and
           file under its signal adds one more row to your mental version of this
           table. After 50 filed problems, "count occurrences" fires the hash-map
           reflex before you finish the sentence.
@@ -1824,12 +1820,12 @@
         — you intuitively recognized that counting occurrences is a hash-map
         problem, not a brute-force "search the array each time" problem. That
         recognition is exactly the pattern-recognition pillar of computational
-        thinking (§3). The skill to build: solve enough problems that you start
+        thinking (<a href="#sec-the-lens-computational-thinking-s-four-pillars">The lens</a>). The skill to build: solve enough problems that you start
         recognizing the paradigm from the problem statement, before you even
         plan the steps.
       </p>
 
-      <h2>8. The role of examples — concrete before abstract</h2>
+      <h2 id="sec-the-role-of-examples-concrete-before-abstract">The role of examples — concrete before abstract</h2>
 
       <p>
         One of Pólya's most practical heuristics is
@@ -1906,7 +1902,7 @@
         time.
       </p>
 
-      <h2>9. Debugging as problem-solving — the same four phases, inverted</h2>
+      <h2 id="sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving — the same four phases, inverted</h2>
 
       <p>
         Debugging <em>is</em> problem-solving. The problem is simply: "Why
@@ -1990,7 +1986,7 @@
       <h3>Binary search debugging — divide &amp; conquer applied</h3>
       <p>
         When a bug is somewhere in a large codebase or a long process, apply
-        divide &amp; conquer (§7): put a checkpoint in the <em>middle</em>. Is
+        divide &amp; conquer (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>): put a checkpoint in the <em>middle</em>. Is
         the state correct there? If yes, the bug is in the second half. If no,
         it's in the first half. Repeat. This turns a linear search into a
         logarithmic one — the same algorithm design paradigm applied to the
@@ -2012,7 +2008,7 @@
           </tr>
           <tr>
             <td>Binary search debugging</td>
-            <td>Locate where state breaks in a long process (§9 above)</td>
+            <td>Locate where state breaks in a long process (<a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a> above)</td>
           </tr>
           <tr>
             <td>Console/log assertions</td>
@@ -2038,7 +2034,7 @@
       </table>
       <p>
         These are not separate tricks — they're the hypothesis-driven method
-        (§9) with specific instruments. Pick the cheapest instrument that can
+        (<a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a>) with specific instruments. Pick the cheapest instrument that can
         confirm or refute your current hypothesis.
       </p>
       <blockquote class="callout">
@@ -2048,7 +2044,7 @@
           loop. The <em>engineering practice</em> — the evidence when a test
           fails, and the team-scale toolbox (isolation, observability, test
           oracles) — is developed in
-          <a href="./software-testing-and-debugging.html">Testing &amp; Debugging §9</a>, and
+          <a href="./software-testing-and-debugging.html">Testing &amp; Debugging <a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a></a>, and
           finding <em>when</em> a wrong change arrived plus recovering from it
           (git bisect, blame, revert, rollback) is covered in
           <a href="./version-control-ci-cd-deployment.html"
@@ -2057,7 +2053,7 @@
         </p>
       </blockquote>
 
-      <h2>10. The "Look back" phase in depth — what everyone skips</h2>
+      <h2 id="sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth — what everyone skips</h2>
 
       <p>
         Phase 4 (Look back) is the phase that builds the most long-term skill
@@ -2163,7 +2159,7 @@
           <strong>More general?</strong> Could you make this a reusable
           <code>countOccurrences(tokens)</code> function that works for any
           array of tokens, not just words? This is Pólya's "generalization"
-          heuristic (§4) — and it's how you build a personal utility library.
+          heuristic (<a href="#sec-polya-s-heuristic-dictionary-the-moves">Pólya's heuristic dictionary</a>) — and it's how you build a personal utility library.
         </li>
       </ul>
 
@@ -2190,7 +2186,7 @@
         </li>
       </ul>
       <p>
-        This is how pattern recognition (§3) is built — not by reading about
+        This is how pattern recognition (<a href="#sec-the-lens-computational-thinking-s-four-pillars">The lens</a>) is built — not by reading about
         patterns, but by <em>filing</em> them after solving. Each filed pattern
         is one more entry in your mental lookup table. After 50 problems, you'll
         recognize categories from the problem statement. After 200, you'll
@@ -2229,8 +2225,8 @@
   Mistakes made:     forgetting the empty-string split bug (§13)</code></pre>
       <p>
         Keep a single file of these (physical index card or a Markdown file).
-        Each solved problem earns one card. Reviewing the deck weekly (§11 — the
-        retrieval practice) is how the table in §7b becomes your reflexes.
+        Each solved problem earns one card. Reviewing the deck weekly (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a> — the
+        retrieval practice) is how the table in <a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a> becomes your reflexes.
       </p>
 
       <h4>Correctness is not the same as passing tests</h4>
@@ -2278,7 +2274,7 @@
         token <em>k</em>, the Map holds the correct count for the first <em>k</em>
         tokens." If that's true at the start, stays true after each iteration,
         and the loop terminates, the result is correct — you don't need to hope.
-        This is the reasoning that AI (§13d) can't do for you.
+        This is the reasoning that AI (<a href="#sec-the-future-where-problem-solving-methodology-is-heading">The future</a>) can't do for you.
       </p>
 
       <h4>Verification strategy — testing is part of solving</h4>
@@ -2300,7 +2296,7 @@
           </tr>
           <tr>
             <td>Edge cases</td>
-            <td>Empty, single, max, boundary — the §10 catalog</td>
+            <td>Empty, single, max, boundary — <a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth</a> catalog</td>
           </tr>
           <tr>
             <td>Hand trace</td>
@@ -2335,7 +2331,7 @@
         </tbody>
       </table>
 
-      <h2 id="sec-fluency-vs-storage-strength-in-problem-solving">11. Fluency vs storage strength in problem-solving</h2>
+      <h2 id="sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</h2>
 
       <p>
         Reading someone else's solution and understanding it gives you
@@ -2454,7 +2450,7 @@
         </li>
       </ul>
 
-      <h2 id="sec-the-right-questions-a-catalog">12. The right questions — a catalog</h2>
+      <h2 id="sec-the-right-questions-a-catalog">The right questions — a catalog</h2>
 
       <p>
         You said it's not just about answering your questions, but about finding
@@ -2578,7 +2574,7 @@
         </li>
       </ul>
 
-      <h2 id="sec-principles-the-shared-constants">12b. Principles — the shared constants</h2>
+      <h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
       <p>
         Across every paradigm, every era, and every extension, certain
@@ -2642,7 +2638,7 @@
           <tr>
             <td><strong>Effortful retrieval builds skill</strong></td>
             <td>
-              The fluency-vs-storage distinction (§11). Passive reading builds
+              The fluency-vs-storage distinction (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>). Passive reading builds
               fluency; effortful retrieval builds storage strength. This is
               Ericsson's deliberate practice principle: the effort is the signal
               that learning is happening.
@@ -2673,8 +2669,7 @@
         </tbody>
       </table>
 
-      <h2 id="sec-worked-example-your-hackerrank-word-frequency-counter-traced-through-polya">
-        13. Worked example — your HackerRank word-frequency counter, traced
+      <h2 id="sec-worked-example-your-hackerrank-word-frequency-counter-traced-through-polya">Worked example — your HackerRank word-frequency counter, traced
         through Pólya
       </h2>
 
@@ -2723,7 +2718,7 @@
           sub-problems), <strong>abstraction</strong> (defining "normalize" as
           lowercase + strip), and <strong>algorithm design</strong> (the
           hash-map counting logic). You chose the
-          <strong>hash table paradigm</strong> (§7) — correctly recognizing that
+          <strong>hash table paradigm</strong> (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>) — correctly recognizing that
           counting is a hash-map problem.
         </li>
         <li>
@@ -2776,10 +2771,10 @@
         plan was incomplete — fix it first.
       </p>
 
-      <h2 id="sec-a-second-worked-example-two-sum-traced-through-polya">13a. A second worked example — two-sum, traced through Pólya</h2>
+      <h2 id="sec-a-second-worked-example-two-sum-traced-through-polya">A second worked example — two-sum, traced through Pólya</h2>
 
       <p>
-        The word-frequency example (§13) showed the hash-map paradigm. This one
+        The word-frequency example (<a href="#sec-worked-example-your-hackerrank-word-frequency-counter-traced-through-polya">Worked example</a>) showed the hash-map paradigm. This one
         shows the same four phases producing a <em>different</em> paradigm — so
         you see the rhythm does not change even when the technique does.
         Problem: given an array of integers and a target, return the indices of
@@ -2809,14 +2804,14 @@
 */</code></pre>
 
       <p>
-        <strong>Tracing the example</strong> (§8): target 9. i=0, value 2 →
+        <strong>Tracing the example</strong> (<a href="#sec-the-role-of-examples-concrete-before-abstract">The role of examples</a>): target 9. i=0, value 2 →
         complement 7 not in Map → store {2:0}. i=1, value 7 → complement 2
         IS in Map → return [0, 1]. The hand trace confirms the plan before any
         code is written.
       </p>
       <ul>
         <li>
-          <strong>Correctness argument</strong> (§10): the loop invariant is
+          <strong>Correctness argument</strong> (<a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth</a>): the loop invariant is
           "for every element seen so far, its complement relationship is
           recorded." If a solution exists, when we reach the second of its two
           numbers, the first is already in the Map — so the solution is found
@@ -2844,11 +2839,11 @@
         word-frequency example — Input/Operation/Output, a brute-force baseline,
         an upgrade chosen by recognition, a concrete trace, a correctness
         argument, edge cases, and a filed pattern. The technique changed; the
-        rhythm did not. That constancy is the meta-skill §13d says survives every
+        rhythm did not. That constancy is the meta-skill <a href="#sec-the-future-where-problem-solving-methodology-is-heading">The future</a> says survives every
         paradigm shift.
       </p>
 
-      <h2 id="sec-the-most-common-failure-modes">13b. The most common failure modes</h2>
+      <h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
       <p>
         Every discipline has its characteristic ways of going wrong. These are
@@ -2888,7 +2883,7 @@
             </td>
             <td>
               Attempt before reading. Solve, then compare. Re-solve from memory
-              the next day (§11). If it feels easy, you're not building storage
+              the next day (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>). If it feels easy, you're not building storage
               strength.
             </td>
           </tr>
@@ -2900,7 +2895,7 @@
               more thing..." — but the approach itself is wrong.
             </td>
             <td>
-              The metacognitive check (§5): "Am I progressing or spinning? Is
+              The metacognitive check (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>): "Am I progressing or spinning? Is
               this the right paradigm?" If you've been stuck 10 minutes on the
               same approach, stop. Try a different heuristic. Re-read the
               problem.
@@ -2941,7 +2936,7 @@
               is not debugging — it's gambling.
             </td>
             <td>
-              Hypothesis-driven debugging (§9): observe → hypothesize → predict
+              Hypothesis-driven debugging (<a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a>): observe → hypothesize → predict
               → test → conclude. Never change code without a hypothesis. Change
               one thing at a time.
             </td>
@@ -2954,7 +2949,7 @@
               built execution skill but not recognition skill.
             </td>
             <td>
-              Interleave problem types (§11). Mix hash-map with DP with greedy
+              Interleave problem types (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>). Mix hash-map with DP with greedy
               with graph. The skill that matters most is <em>recognition</em> —
               knowing which paradigm to use — and that only comes from mixed
               practice.
@@ -2980,7 +2975,7 @@
 
       <h3>Emotional and cognitive regulation — the traps that feel like thinking</h3>
       <p>
-        Schoenfeld's fifth resource is "beliefs" (§5): what you believe about
+        Schoenfeld's fifth resource is "beliefs" (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>): what you believe about
         problem-solving changes how well you solve. Several failure modes aren't
         about technique at all — they're about your state while solving. These
         traps are worth naming because you can't debug a problem you can't name:
@@ -3013,7 +3008,7 @@
               first idea that came to mind.
             </td>
             <td>
-              The metacognitive check (§5): "Am I progressing or spinning? Is
+              The metacognitive check (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>): "Am I progressing or spinning? Is
               this the right paradigm?" Timebox the current approach.
             </td>
           </tr>
@@ -3034,7 +3029,7 @@
               it.
             </td>
             <td>
-              Re-solve from memory later (§11). Understanding that can't be
+              Re-solve from memory later (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>). Understanding that can't be
               reproduced is fluency, not storage.
             </td>
           </tr>
@@ -3044,8 +3039,8 @@
               "Too many details, too many constraints, where do I even begin?"
             </td>
             <td>
-              Decompose (§6): reduce scope to a solved sub-problem, then expand.
-              The complexity budget (§2) helps by proving the full scale is
+              Decompose (<a href="#sec-stepwise-refinement-top-down-decomposition-for-programming">Stepwise refinement</a>): reduce scope to a solved sub-problem, then expand.
+              The complexity budget (<a href="#sec-the-universal-meta-rhythm-polya-s-four-phases">The universal meta-rhythm</a>) helps by proving the full scale is
               tractable.
             </td>
           </tr>
@@ -3058,7 +3053,7 @@
         of it.
       </p>
 
-      <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">13c. Ecosystem — tooling catalog with decision metrics</h2>
+      <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
       <p>
         Problem-solving is only as good as the practice environment that builds
@@ -3103,7 +3098,7 @@
             <td><a href="https://codewars.com">CodeWars</a></td>
             <td>Kata-style practice. Community solutions for comparison.</td>
             <td>
-              Good for variation practice (§11) — seeing multiple approaches to
+              Good for variation practice (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>) — seeing multiple approaches to
               the same problem. Gamified, lower pressure.
             </td>
           </tr>
@@ -3127,7 +3122,7 @@
           <tr>
             <td>Cormen et al., <em>Introduction to Algorithms</em> (CLRS)</td>
             <td>
-              The technique catalog (§7) in depth — DP, D&amp;C, greedy, graphs.
+              The technique catalog (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>) in depth — DP, D&amp;C, greedy, graphs.
             </td>
             <td>
               The reference for <em>when</em> to use each paradigm. Heavy; use
@@ -3143,7 +3138,7 @@
             </td>
             <td>Beginner questions, moral support, practice advice.</td>
             <td>
-              For wisdom (§teaching philosophy): test your understanding by
+              For wisdom (teaching philosophy): test your understanding by
               explaining to others. Community guidelines are strict — read
               before posting.
             </td>
@@ -3171,7 +3166,7 @@
             </td>
             <td>
               The single most important tool. Offloads working memory to an
-              external representation (§1e). No setup, no distraction, no AI
+              external representation (<a href="#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">Underlying theory</a>). No setup, no distraction, no AI
               doing the thinking for you.
             </td>
           </tr>
@@ -3179,7 +3174,7 @@
             <td>Debugger (browser DevTools, Node debugger)</td>
             <td>Phase 3 (execute + check), Phase 9 (debugging).</td>
             <td>
-              For hypothesis-driven debugging (§9): set breakpoints, inspect
+              For hypothesis-driven debugging (<a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving</a>): set breakpoints, inspect
               state, verify predictions. Not a substitute for understanding — a
               tool for testing hypotheses.
             </td>
@@ -3192,7 +3187,7 @@
             </td>
             <td>
               <strong>Use with caution.</strong> AI is a fluency trap amplifier
-              (§11): it makes understanding feel easy without building storage
+              (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>): it makes understanding feel easy without building storage
               strength. Use AI to <em>check</em> your plan, not to
               <em>replace</em> Phase 2. Do not let AI replace your own planning
               attempt — the retention cost is real.
@@ -3211,7 +3206,7 @@
       <ol>
         <li>
           <strong>Attempt the problem yourself first.</strong> The effortful
-          attempt (§11) is what builds storage strength — AI can't do it for you.
+          attempt (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>) is what builds storage strength — AI can't do it for you.
         </li>
         <li>
           <strong>Write Input / Operation / Output.</strong> — Phase 1 before
@@ -3231,7 +3226,7 @@
         </li>
         <li>
           <strong>Verify everything AI produces.</strong> — run it through the
-          §10 edge-case catalog and a brute-force comparator. Trust, but verify.
+          <a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth</a> edge-case catalog and a brute-force comparator. Trust, but verify.
         </li>
         <li>
           <strong>Re-solve the problem later without AI.</strong> — if you can't,
@@ -3259,11 +3254,11 @@
         </p>
       </blockquote>
 
-      <h2 id="sec-the-future-where-problem-solving-methodology-is-heading">13d. The future — where problem-solving methodology is heading</h2>
+      <h2 id="sec-the-future-where-problem-solving-methodology-is-heading">The future — where problem-solving methodology is heading</h2>
 
       <h3>AI-assisted problem-solving: the constraint is inverting again</h3>
       <p>
-        The latest constraint inversion (§1c) is AI. Copilot can write the
+        The latest constraint inversion (<a href="#sec-evolution-constraint-inversions-across-the-same-idea">Evolution</a>) is AI. Copilot can write the
         algorithm. ChatGPT can explain the approach. Claude can debug your code.
         This doesn't make problem-solving methodology obsolete — it
         <em>reshapes</em> which parts matter most:
@@ -3332,13 +3327,13 @@
         into parts AI can handle?), and <strong>verification</strong> (is this
         solution actually correct?). These are exactly Phases 1, 2, and 4 — the
         phases that require judgment, not execution. The premium on recognition
-        skill (§1f — classifying by deep structure, not surface features)
+        skill (<a href="#sec-mental-models-how-expert-problem-solvers-actually-reason">Mental models</a> — classifying by deep structure, not surface features)
         increases as execution becomes commoditized.
       </p>
 
       <h3>The fluency trap intensifies</h3>
       <p>
-        AI makes the fluency trap (§11) <em>worse</em>. When ChatGPT can explain
+        AI makes the fluency trap (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>) <em>worse</em>. When ChatGPT can explain
         any solution in clear prose, the gap between "I understand this" and "I
         can produce this from memory" grows wider. The solution is the same:
         attempt before asking AI, solve before reading the editorial, re-solve
@@ -3361,7 +3356,7 @@
         algorithms — the one skill that compounds across your entire career.
       </p>
 
-      <h2 id="sec-summary-the-complete-mental-checklist">14. Summary — the complete mental checklist</h2>
+      <h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
       <p>
         Print this table. Run it on every problem — from a HackerRank challenge
