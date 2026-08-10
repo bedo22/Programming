@@ -41,7 +41,7 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
   <p><em>No other doc on the shelf teaches how to query a database.</em> The data-modeling doc designs schemas and even shows two example queries; the backend doc names ORMs and transactions — but nobody teaches the language itself: what a JOIN is, when GROUP BY applies, what a window function does, how UPSERT makes an idempotent write. That gap matters for every audience on this shelf: the freelancer debugging a WordPress <code>wp_postmeta</code> query, the React developer wiring a Supabase query to a Next.js page, the backend engineer optimizing an N+1, and the systems designer explaining why the index table exists. SQL is the single most transferable skill in backend work — the language is ~90% identical across PostgreSQL, MySQL, and SQLite. This doc teaches it once, engine-agnostic first, with PostgreSQL as the engine of record (it is the shelf's default) and a dedicated section for the WordPress-relevant MySQL differences. One scope note: <strong>this is not a database-administration course</strong> — WAL tuning, <code>pg_hba.conf</code>, and server configuration belong to the platform, not to this shelf.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read this after <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> (so the schema vocabulary is warm) and alongside <a href="./backend-engineering.html">Backend Engineering</a> §1e (the ORM-vs-raw-SQL decision). Cross-links:</p>
 <ul>
@@ -55,7 +55,7 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
 
 <p><strong>If you can design a schema but freeze at the query — or you've memorized "JOIN" without knowing what the engine actually does — this is the map.</strong> Read the Definition (what SQL is and is not), then the Query fundamentals and JOINs before anything else; the rest is depth on demand.</p>
 
-<h2>Definition — what SQL is, and what it is not</h2>
+<h2 id="sec-definition-what-sql-is-and-what-it-is-not">Definition — what SQL is, and what it is not</h2>
 
 <p><strong>SQL is a declarative language.</strong> You say <em>what</em> you want ("all shipments for this customer, newest first"), and the engine decides <em>how</em> to get it — which indexes to walk, how to join, what order to do things in. That is the opposite of your imperative code: in the request loop you write steps; in SQL you write the goal. The job of a good SQL writer is to phrase the goal so the engine's planner can see the cheap path (which is what the index and EXPLAIN sections are about).</p>
 
@@ -84,7 +84,7 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
 
 <p><strong>Statement classes:</strong> DDL (schema: <code>CREATE TABLE</code>, <code>ALTER</code>) — the data-modeling doc's territory; DML (data: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) — this doc's core; TCL (transactions: <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code>); DCL (permissions: <code>GRANT</code>). This doc teaches DML and the TCL you need to keep writes safe.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
   <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
@@ -97,7 +97,7 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
   </tbody>
 </table>
 
-<h2>Query fundamentals — the SELECT anatomy</h2>
+<h2 id="sec-query-fundamentals-the-select-anatomy">Query fundamentals — the SELECT anatomy</h2>
 
 <p>Every query is one sentence: <em>from these tables, filter to these rows, shape them into these columns.</em> The single most important mental model in SQL is that <strong>the written order and the execution order are different</strong>:</p>
 
@@ -157,7 +157,7 @@ FROM shipments;
 SELECT '42'::int,  total::numeric(10,2)   -- PostgreSQL cast syntax
 SELECT CAST('42' AS INT);                -- standard, works everywhere</pre>
 
-<h2>JOINs — the core skill</h2>
+<h2 id="sec-joins-the-core-skill">JOINs — the core skill</h2>
 
 <p>Relational data lives in separate tables; JOINs bring it back together. A JOIN is a <em>pairing rule</em>: for each row on the left, find matching rows on the right by a key. Everything else is which rows you keep.</p>
 
@@ -203,7 +203,7 @@ CROSS JOIN LATERAL (
 
 <p>Read it as "for each customer, run this inner query using the customer's id" — which is exactly how the engine executes it. Use LATERAL when a correlated subquery returns a set you want to join against; use a window function when the "top N per group" is computed over the whole partition at once (Window functions section) — LATERAL wins when you need <em>other</em> columns from the inner query.</p>
 
-<h2>Aggregation — folding rows into groups</h2>
+<h2 id="sec-aggregation-folding-rows-into-groups">Aggregation — folding rows into groups</h2>
 
 <p>Aggregation is WHERE's sibling at the set level: <strong>WHERE filters rows; GROUP BY folds them into groups; HAVING filters the groups.</strong> Every column in the SELECT must be either an aggregate function or a GROUP BY column — the engine enforces this, and the error is your friend.</p>
 
@@ -235,7 +235,7 @@ GROUP BY ROLLUP (carrier);
 -- rows: one per carrier, then one NULL row = the grand total
 -- CUBE does the same for every combination of the grouping columns (ROLLUP's superset)</pre>
 
-<h2>Subqueries and CTEs — composing queries</h2>
+<h2 id="sec-subqueries-and-ctes-composing-queries">Subqueries and CTEs — composing queries</h2>
 
 <p>A query can appear inside another query in three places, with three different meanings:</p>
 
@@ -280,7 +280,7 @@ WITH RECURSIVE tree AS (
 )
 SELECT * FROM tree;</pre>
 
-<h2>Window functions — ranking and running totals</h2>
+<h2 id="sec-window-functions-ranking-and-running-totals">Window functions — ranking and running totals</h2>
 
 <p>Aggregates fold rows into one result per group. <strong>Window functions compute an aggregate-style value but keep every row.</strong> That is the entire difference — and why "top N per group" needs them (GROUP BY would collapse the rows you want to keep).</p>
 
@@ -331,7 +331,7 @@ WHERE rn &lt;= 3;</pre>
 -- Keyset (fast, uses the index):
 SELECT * FROM events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;</pre>
 
-<h2>Writing data — INSERT, UPDATE, DELETE, UPSERT</h2>
+<h2 id="sec-writing-data-insert-update-delete-upsert">Writing data — INSERT, UPDATE, DELETE, UPSERT</h2>
 
 <p>Reads dominate the language, but writes are where correctness lives. The four verbs, with the PostgreSQL extras that make writes safer:</p>
 
@@ -365,7 +365,7 @@ ON CONFLICT (name) DO NOTHING;          -- the "get-or-create" pattern
 
 <p><code>RETURNING</code> (PostgreSQL) returns the affected rows — the lazy developer's gift: one round trip to insert and read the generated id, which is exactly what a request handler needs to build its response. (SQLite supports it too; MySQL's equivalent is a follow-up <code>LAST_INSERT_ID()</code>.)</p>
 
-<h2>Transactions in SQL — BEGIN, COMMIT, ROLLBACK</h2>
+<h2 id="sec-transactions-in-sql-begin-commit-rollback">Transactions in SQL — BEGIN, COMMIT, ROLLBACK</h2>
 
 <p>A transaction is a batch of statements that succeed or fail together. The request loop's multi-step writes (charge + create shipment + notify) are only atomic if wrapped:</p>
 
@@ -412,7 +412,7 @@ SELECT pg_advisory_xact_lock(12345);  -- transaction lock; releases automaticall
 
 <p>The session form follows the connection, so a leaked lock holds until the connection closes; the xact form follows the transaction, which is the one the request-loop's short transactions want. Use table locks rarely and advisory locks rarely; the queue's SKIP LOCKED pattern covers most real needs.</p>
 
-<h2>PostgreSQL features — why the shelf defaults to it</h2>
+<h2 id="sec-postgresql-features-why-the-shelf-defaults-to-it">PostgreSQL features — why the shelf defaults to it</h2>
 
 <p>The data-modeling doc chooses PostgreSQL for good reason; this section is the syntax behind that choice. Everything here is PostgreSQL-specific (until noted), and each feature answers a real shelf need.</p>
 
@@ -496,7 +496,7 @@ CREATE TABLE order_lines (
 -- TABLESAMPLE: a 1% slice for testing, without a full scan
 SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
 
-<h2>Performance — reading and fixing slow queries</h2>
+<h2 id="sec-performance-reading-and-fixing-slow-queries">Performance — reading and fixing slow queries</h2>
 
 <p>The tuning loop belongs to <a href="./data-modeling-and-databases.html">Data Modeling §Indexing</a> and §Reading EXPLAIN ANALYZE — this section is the query side of that loop: what to look for, and the anti-patterns that defeat the planner.</p>
 
@@ -522,7 +522,7 @@ SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
 
 <p><strong>Connection pooling (PgBouncer):</strong> PostgreSQL's per-connection memory makes hundreds of idle app connections wasteful. PgBouncer sits in front and reuses a small pool. <em>Transaction mode</em> — a connection is held only for the duration of one transaction, which is what stateless request loops want; <em>session mode</em> pins a connection per client session, needed for prepared statements that must survive. The shelf's statelessness rule (Backend §Serverless) is exactly the constraint that makes transaction mode the default choice.</p>
 
-<h2>MySQL / MariaDB — the WordPress engine</h2>
+<h2 id="sec-mysql-mariadb-the-wordpress-engine">MySQL / MariaDB — the WordPress engine</h2>
 
 <p><a href="./wordpress-and-cms-internet.html">WordPress</a> runs on MySQL/MariaDB. The language you just learned is ~90% the same; this section is the 10% that differs, plus the schema shape you will actually query as a freelancer.</p>
 
@@ -557,7 +557,7 @@ JOIN   wp_posts p ON p.ID = tr.object_id
 WHERE  tt.taxonomy = 'category' AND p.post_status = 'publish'
 GROUP BY t.name;</pre>
 
-<h2>SQLite — the embedded engine</h2>
+<h2 id="sec-sqlite-the-embedded-engine">SQLite — the embedded engine</h2>
 
 <p>SQLite is not a server — it is a library that reads and writes a single file. It is the most deployed database engine on earth (every phone and browser ships one) and the shelf's local-development companion: tests, prototypes, and the terminal substrate's own file-backed stores.</p>
 
@@ -572,7 +572,7 @@ GROUP BY t.name;</pre>
 
 <p>The good news: the SQL you learned here is SQLite's SQL. The <a href="./data-modeling-and-databases.html">data-modeling</a> ecosystem rule applies — SQLite for embedded/local, PostgreSQL for anything non-trivial. The migration path is a dump-and-load (<code>.dump</code> in SQLite; <code>pg_dump</code> + <code>psql</code> in PostgreSQL) with a few type-name touch-ups.</p>
 
-<h2>Worked example — the query layer for shipment tracking</h2>
+<h2 id="sec-worked-example-the-query-layer-for-shipment-tracking">Worked example — the query layer for shipment tracking</h2>
 
 <p>The shelf has designed this system twice: the schema in <a href="./data-modeling-and-databases.html">Data Modeling §Worked example</a>, the API in <a href="./api-design.html">API Design</a>. Here is the query layer that connects them — the actual SQL behind four endpoints, each optimized with the tools from this doc.</p>
 
@@ -612,7 +612,7 @@ RETURNING id;</pre>
 
 <p><strong>The optimization pass:</strong> run each through <code>EXPLAIN ANALYZE</code>. The tell-tale <code>Seq Scan</code> on <code>shipment_events</code> for query 2 says the index is missing; the fix is the index the data-modeling doc already prescribes: <code>CREATE INDEX ON shipment_events (shipment_id, event_id DESC);</code> — the pair covers the WHERE and the ORDER BY in one structure. That is the whole loop: query → explain → index → re-explain.</p>
 
-<h2>Query recipes — the patterns production actually uses</h2>
+<h2 id="sec-query-recipes-the-patterns-production-actually-uses">Query recipes — the patterns production actually uses</h2>
 
 <p>Three patterns appear in almost every real codebase. Each is a small, memorizable recipe that folds the earlier sections together.</p>
 
@@ -639,7 +639,7 @@ RETURNING *;</pre>
 
 <p>That's the entire queue primitive: a table of jobs, a claim with <code>SKIP LOCKED</code> so concurrent workers never collide, and a retry column for the <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> doc's retry habit. Add <code>attempts</code>/<code>max_attempts</code> counters and a <code>RETURNING *</code> — and you have the same shape as Redis-backed queues, without the second system. This is the pattern behind "why is my job stuck in 'pending'" — usually a worker died after claiming, so add a timeout that requeues stale <code>processing</code> rows.</p>
 
-<h2>psql &amp; COPY — the operator's quick tools</h2>
+<h2 id="sec-psql-copy-the-operator-s-quick-tools">psql &amp; COPY — the operator's quick tools</h2>
 
 <p>The <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> doc opens databases with <code>psql</code>; here are the meta-commands that make it a REPL, not a toy:</p>
 
@@ -665,7 +665,7 @@ COPY (SELECT * FROM shipments WHERE created_at &gt; '2026-01-01')
 
 <p>COPY in the app runs as <code>\copy</code> in psql (client-side, no server path needed). For real migrations of millions of rows, the data-modeling doc's migration discipline applies — COPY into a staging table, validate, then swap.</p>
 
-<h2>The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>What it looks like</th><th>The fix</th></tr></thead>
@@ -683,7 +683,7 @@ COPY (SELECT * FROM shipments WHERE created_at &gt; '2026-01-01')
   </tbody>
 </table>
 
-<h2>Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <table>
   <thead><tr><th>Tool</th><th>What it is</th><th>Decision metric</th></tr></thead>
@@ -699,7 +699,7 @@ COPY (SELECT * FROM shipments WHERE created_at &gt; '2026-01-01')
   </tbody>
 </table>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <table>
   <thead><tr><th>#</th><th>The line</th></tr></thead>

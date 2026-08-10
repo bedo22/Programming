@@ -71,7 +71,7 @@
         </p>
       </blockquote>
 
-      <h2>0. How to use this doc</h2>
+      <h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
       <p>
         Reading order: standalone, but most useful <em>after</em> the
@@ -113,7 +113,7 @@
         pipeline stages; then §9c for the future and §9d for the checklist.
       </p>
 
-      <h2>
+      <h2 id="sec-definition-what-version-control-is-and-what-it-is-not">
         1. Definition — what version control is and what it is <em>not</em>
       </h2>
 
@@ -177,7 +177,7 @@
           operations practice is a separate specialty.
         </li>
       </ul>
-      <h2>
+      <h2 id="sec-history-from-file-locking-to-git-and-the-distributed-pull-request-2005present">
         1b. History — from file-locking to Git and the distributed pull request
         (2005–present)
       </h2>
@@ -266,7 +266,7 @@
         where "collaboration without a human bottleneck" arrived.
       </p>
 
-      <h2>1c. Evolution — the constraint inversions</h2>
+      <h2 id="sec-evolution-the-constraint-inversions">1c. Evolution — the constraint inversions</h2>
 
       <p>
         Version control's evolution is a sequence of constraint inversions, one
@@ -303,7 +303,7 @@
         </li>
       </ul>
 
-      <h2>
+      <h2 id="sec-intersection-with-neighbors-the-delivery-layer-at-the-border">
         1d. Intersection with neighbors — the delivery layer at the border
       </h2>
 
@@ -344,7 +344,7 @@
           (merge, branch, deploy, rollback).
         </li>
       </ul>
-      <h2>
+      <h2 id="sec-underlying-theory-content-addressing-and-the-snapshot-model-why-every-git-command-clicks">
         1e. Underlying theory — content-addressing and the snapshot model (why
         every Git command clicks)
       </h2>
@@ -458,7 +458,7 @@
         commits to production."
       </p>
 
-      <h2>
+      <h2 id="sec-mental-models-how-senior-engineers-actually-reason-about-delivery">
         1f. Mental models — how senior engineers actually reason about delivery
       </h2>
 
@@ -496,7 +496,7 @@
           bug; everything else stops until green returns.
         </li>
       </ul>
-      <h2>2. Branching strategies — how teams share the DAG</h2>
+      <h2 id="sec-branching-strategies-how-teams-share-the-dag">2. Branching strategies — how teams share the DAG</h2>
 
       <p>
         Branches are how <em>many</em> people safely work on <em>one</em> shared
@@ -553,7 +553,7 @@
         <em>live</em> by branch protection that won't merge a busted main.
       </p>
 
-      <h2>
+      <h2 id="sec-the-collaboration-loop-push-pull-merge-and-the-pull-request">
         2b. The collaboration loop — push/pull, merge, and the pull request
       </h2>
 
@@ -710,7 +710,7 @@
         variables keep local and CI environments close.
       </p>
 
-      <h2>2c. Debugging across time — bisect, blame, and recover</h2>
+      <h2 id="sec-debugging-across-time-bisect-blame-and-recover">2c. Debugging across time — bisect, blame, and recover</h2>
 
       <p>
         Version control is not just where code is stored; it is a searchable
@@ -776,7 +776,7 @@
         the evidence, Problem-Solving owns the thinking.
       </p>
 
-      <h2>
+      <h2 id="sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">
         3. Continuous Integration — what a pipeline actually runs, and why it's
         a gate
       </h2>
@@ -914,7 +914,7 @@
         </li>
       </ul>
 
-      <h2>
+      <h2 id="sec-continuous-delivery-continuous-deployment-get-the-distinction-right">
         4. Continuous Delivery &amp; Continuous Deployment — get the distinction
         right
       </h2>
@@ -979,7 +979,7 @@
         live in minutes") is safe. Without §6's strategies and §8's rollback,
         neither can be honest.
       </p>
-      <h2>5. Deployment strategies — the "ship it safely" toolbox</h2>
+      <h2 id="sec-deployment-strategies-the-ship-it-safely-toolbox">5. Deployment strategies — the "ship it safely" toolbox</h2>
 
       <p>
         Deployment is not one button; it's a set of strategies trading
@@ -1341,7 +1341,7 @@
         </li>
       </ul>
 
-      <h2>5b. SemVer and releases — naming the snapshots you ship</h2>
+      <h2 id="sec-semver-and-releases-naming-the-snapshots-you-ship">5b. SemVer and releases — naming the snapshots you ship</h2>
 
       <p>
         Commits are for developers; <strong>versions</strong> are the language
@@ -1420,7 +1420,7 @@
           configuration.
         </li>
       </ul>
-      <h2>6. A concrete walkthrough — one push taken through every stage</h2>
+      <h2 id="sec-a-concrete-walkthrough-one-push-taken-through-every-stage">6. A concrete walkthrough — one push taken through every stage</h2>
 
       <p>
         Everything so far, as a single flow from "a dev hits save" to "real
@@ -1456,7 +1456,7 @@ Users: run the new version. If a defect slips through:
         to production."
       </p>
 
-      <h2>7. The ecosystem — platforms and how they differ</h2>
+      <h2 id="sec-the-ecosystem-platforms-and-how-they-differ">7. The ecosystem — platforms and how they differ</h2>
 
       <p>Where CI/CD actually runs (each cited to the primary source):</p>
       <table>
@@ -1555,7 +1555,7 @@ Users: run the new version. If a defect slips through:
         alongside the repo — fewer places wins.
       </p>
 
-      <h2>8. Principles — the shared constants</h2>
+      <h2 id="sec-principles-the-shared-constants">8. Principles — the shared constants</h2>
 
       <p>
         The invariants that survive tool churn (each underlined in a section
@@ -1661,7 +1661,7 @@ Users: run the new version. If a defect slips through:
         measure the pipeline, not individual developer effort — the Process doc
         owns team cadence.
       </p>
-      <h2>9. Worked example — the HackerRank repo, shipped</h2>
+      <h2 id="sec-worked-example-the-hackerrank-repo-shipped">9. Worked example — the HackerRank repo, shipped</h2>
 
       <p>
         Make it concrete with a real project: your solutions repo (built during
@@ -1722,7 +1722,7 @@ Users: run the new version. If a defect slips through:
         above, used daily.
       </p>
 
-      <h2>9b. The most common failure modes</h2>
+      <h2 id="sec-the-most-common-failure-modes">9b. The most common failure modes</h2>
 
       <table>
         <thead>
@@ -1814,7 +1814,7 @@ Users: run the new version. If a defect slips through:
           </tr>
         </tbody>
       </table>
-      <h2>9c. The future — where the delivery layer is heading</h2>
+      <h2 id="sec-the-future-where-the-delivery-layer-is-heading">9c. The future — where the delivery layer is heading</h2>
 
       <p>Trends with real momentum, not speculation:</p>
       <ul>
@@ -1845,7 +1845,7 @@ Users: run the new version. If a defect slips through:
         </li>
       </ul>
 
-      <h2>9d. The complete mental checklist</h2>
+      <h2 id="sec-the-complete-mental-checklist">9d. The complete mental checklist</h2>
 
       <p>
         If you remember only one image, remember the DAG-and-pipeline picture:

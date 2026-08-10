@@ -23,7 +23,7 @@
   <p>Lesson 5 introduced <code>this</code> and <code>bind</code> because you'll meet them in older React code at work. But you asked the rightMeta question: <em>why did React move away from classes at all? Wasn't the functional style enough?</em> This doc answers both — because the answer is counterintuitive: React already had function components before hooks, and they weren't enough. Hooks were the missing piece that made functions viable for real components. The story has four eras.</p>
 </section>
 
-<h2>0. Before the classes: a word on foundations</h2>
+<h2 id="sec-before-the-classes-a-word-on-foundations">0. Before the classes: a word on foundations</h2>
 
 <p>This section used to hold a deep prequel on programming primitives, the four theories of computation (Turing machine, lambda calculus, von Neumann architecture, information theory), the data→value→variable→state chain, types, and lifetime. That prequel now lives in its own reference doc — <a href="./what-is-state-prequel.html">What Is "State"? — A Prequel to Programming in React</a> — and the JavaScript language foundation (history, design, runtime model) lives in <a href="./javascript-the-language.html">JavaScript: The Language</a>. Read both if the phrase "Turing's state register is the same concept as <code>useState</code>" doesn't feel immediately obvious.</p>
 
@@ -31,7 +31,7 @@
 
 <p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
-<h2>1. OOP — the paradigm classes came from</h2>
+<h2 id="sec-oop-the-paradigm-classes-came-from">1. OOP — the paradigm classes came from</h2>
 
 <p>Before we can talk about why React moved <em>away</em> from classes, we have to ask: what paradigm do classes belong to, and why did anyone think it was the right fit for UIs in the first place?</p>
 
@@ -102,7 +102,7 @@ export default withAuth(withTheme(withRouter(MyComponent)));
 
 <p>You can read the whole shift as: <strong>React took OOP's encapsulation + FP's composition, and dropped OOP's inheritance + mutable-this</strong>. Hooks are literally functions you compose; <code>useRef</code> is the one place the old OOP instance-field model survives.</p>
 
-<h2>2. What is "state"? A prequel — before we can talk about React's choices</h2>
+<h2 id="sec-what-is-state-a-prequel-before-we-can-talk-about-react-s-choices">2. What is "state"? A prequel — before we can talk about React's choices</h2>
 
 <p>Section 1 took "state" as a given. That skips the most important part of the story. <em>State</em> is not a React concept, nor a JavaScript concept — it is a stolen idea with a 70-year history, and the way React treats it today is the result of several migrations across paradigms. If you do not know where state lived before React, you cannot tell what is unusual about where React puts it now.</p>
 
@@ -247,7 +247,7 @@ function Counter() {
   <p><strong>The one-sentence history.</strong> State started as a separate object (MVC model), got pushed into the document (web), leaked into closures (jQuery), got pulled back into framework models (Backbone/Angular), got pushed into the component (React classes), got pulled halfway out into stores (Flux/Redux), got stored in React itself by call order (hooks), and most recently got split between browser-state and server-data (RSC). Every one of these moves solved a specific bug and introduced a new one. Reading React today means understanding which of these eras the file you are looking at belongs to.</p>
 </blockquote>
 
-<h2>3. The four eras — a timeline</h2>
+<h2 id="sec-the-four-eras-a-timeline">3. The four eras — a timeline</h2>
 
 <table>
   <thead><tr><th>Era</th><th>Years</th><th>Style</th><th>State?</th><th>Side effects?</th></tr></thead>
@@ -303,7 +303,7 @@ function Counter() {
 
 <p>The pattern: each era inherits the previous era's limitations and solves one of them, but introduces a new kind of complexity. Era 4 is notable because it <em>removes</em> complexity (deps arrays, manual memoization) without changing the mental model — the first era that simplifies rather than adds.</p>
 
-<h2>3b. The version markers — which React are you reading?</h2>
+<h2 id="sec-the-version-markers-which-react-are-you-reading">3b. The version markers — which React are you reading?</h2>
 
 <p>Section 3 told the eras as a timeline; this is the <em>version</em> layer you apply when you open an unfamiliar file. Era tells you the mental model (§4–§6); version tells you which API calls to expect. Most of the surface below appears in §§6–12 and in the companion doc <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>; this map is the index.</p>
 
@@ -321,7 +321,7 @@ function Counter() {
 
 <p><strong>The version heuristic for reading files:</strong> <code>ReactDOM.render(</code> → pre-18; <code>createRoot</code> → 18+; <code>use</code> in a component → 18.3+; <code>action</code> on a <code>&lt;form&gt;</code> or <code>useActionState</code> → 19; <code>useEffectEvent</code> / <code>&lt;Activity /&gt;</code> → 19.2. Each recognizer vaults you into the right chapter when a file's era isn't obvious from its shape.</p>
 
-<h2>4. Era 1 — Class components, the original model</h2>
+<h2 id="sec-era-1-class-components-the-original-model">4. Era 1 — Class components, the original model</h2>
 
 <p>React shipped in 2013 with one component model: <code>React.createClass()</code>, a factory returning an object with a <code>render()</code> method, mutable <code>this.state</code>, and lifecycle methods that fire at specific points in the component's existence. The familiar ES6 <code>class Foo extends React.Component</code> syntax arrived later (0.13, 2015) as a thin wrapper over the same instance model. A class component is that object — <code>this</code> is the instance; here is the canonical shape:</p>
 
@@ -407,7 +407,7 @@ const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
   <li>Ahead-of-time compilation strategies (component folding, Prepack experiments) hit dead ends with class patterns.</li>
 </ul>
 
-<h2>5. Era 2 — Function components appear, but they're second-class (2015)</h2>
+<h2 id="sec-era-2-function-components-appear-but-they-re-second-class-2015">5. Era 2 — Function components appear, but they're second-class (2015)</h2>
 
 <p>In 2015 React added function components — a simpler way to write components that had no state and no side effects:</p>
 
@@ -427,7 +427,7 @@ const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
 
 <p>This is the answer to "wasn't functional enough?" — <strong>no, it wasn't.</strong> Pure functions can render a UI from props, but a real interactive component needs to hold state over time and respond to the outside world (timers, subscriptions, DOM mutations, fetches). Pure functions can't do that. <em>Something</em> had to bridge the gap. In classes, the bridge was the instance and its lifecycle methods. In functions, the bridge didn't exist yet.</p>
 
-<h2>5b. Mental models — how React developers actually reason</h2>
+<h2 id="sec-mental-models-how-react-developers-actually-reason">5b. Mental models — how React developers actually reason</h2>
 
 <p>Before hooks, React developers reasoned in <strong>lifecycle phases</strong>: mount → update → unmount. Each phase had a specific method. The mental model was "what do I do when the component mounts? What about when props change? What about cleanup?"</p>
 
@@ -459,7 +459,7 @@ const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
 
 <p><strong>The closure trap:</strong> Function components capture the values from their render. A <code>useEffect</code> with <code>[]</code> deps sees the values from the <em>first</em> render forever. This is not a bug — it's the model. The fix is the dependency array, which tells React: "re-create this closure when these values change." Understanding <em>when</em> a closure is created is the mental skill hooks demand.</p>
 
-<h2>6. Era 3 — Hooks (2018): making functions first-class</h2>
+<h2 id="sec-era-3-hooks-2018-making-functions-first-class">6. Era 3 — Hooks (2018): making functions first-class</h2>
 
 <p>Hooks shipped in React 16.8 (February 2019). The name is literal: a hook <em>hooks into</em> React's features (state, effects, context, refs) from inside a function. The function is no longer stateless — it just delegates its state to React via a hook call.</p>
 
@@ -570,7 +570,7 @@ class ProfilePage extends React.Component {
   <p><strong>This is the deepest reason for the shift.</strong> Closures over captured values are <em>correct by default</em> in React's model (UI is a function of state — each render is a snapshot). <code>this</code> in classes is a mutable escape hatch from that model. It causes the bugs React spent five years watching users hit. Hooks embrace the closure model instead of fighting it.</p>
 </blockquote>
 
-<h2>6b. The modern hooks catalog</h2>
+<h2 id="sec-the-modern-hooks-catalog">6b. The modern hooks catalog</h2>
 
 <p>Everything below is a hook you will read in real code. The mental model is always the same: <strong>a hook is a function that asks React for a capability</strong> — the capability lives in React's per-component fiber node, and the component is just a description of which capabilities it wants, in call order (§8). All the names below are variations on that one idea.</p>
 
@@ -597,7 +597,7 @@ class ProfilePage extends React.Component {
 
 <p><strong>Reading rule:</strong> every <code>use</code>-prefixed call is either (a) asking React for a capability, or (b) <code>use</code> itself, reading a promise. There is no other way to be "stateful" in a function component. A custom hook — a function whose name starts with <code>use</code> — is sugar over some of the above; read what it calls.</p>
 
-<h2>7. The stale-closure "problem" — and why it isn't one</h2>
+<h2 id="sec-the-stale-closure-problem-and-why-it-isn-t-one">7. The stale-closure "problem" — and why it isn't one</h2>
 
 <p>Once people started using hooks, a new complaint appeared: <em>the stale-closure bug</em>. An effect captures a state value at render time; by the time the effect runs, the value might be old. Example:</p>
 
@@ -632,7 +632,7 @@ useEffect(() => {
 
 <p>The lesson: <strong>closures capture values; that's a feature, not a bug.</strong> The stale-closure bugs happen when you lie to React about which values the effect reads. The <code>exhaustive-deps</code> lint rule catches this automatically. Fix the deps (or restructure to avoid them) — don't go back to <code>this</code>.</p>
 
-<h2>7b. Effects vs event handlers — two places that "do something", opposite rules</h2>
+<h2 id="sec-effects-vs-event-handlers-two-places-that-do-something-opposite-rules">7b. Effects vs event handlers — two places that "do something", opposite rules</h2>
 
 <p>Two places in a component can run code. They feel similar because both are callbacks React invokes, but their rules are opposites — and knowing which one you're reading tells you most of what you can assume next.</p>
 
@@ -648,7 +648,7 @@ useEffect(() => {
 
 <p>The shortcut question for an unknown function: <strong>"was this called by a user event, or by React finishing a render?"</strong> Event handlers read fresh values and may <code>setState</code> freely. Effects read the closure from the render that scheduled them and re-run only when their dependency array says to — so a "stale" read there is a missing dep (§7, §10), and an unconditional <code>setState</code> there is a feedback loop.</p>
 
-<h2>7c. Data fetching patterns — where the data comes from</h2>
+<h2 id="sec-data-fetching-patterns-where-the-data-comes-from">7c. Data fetching patterns — where the data comes from</h2>
 
 <p>Fetching is the most common real-world <code>useEffect</code> use — and the one the React team most often steers away from. Reading code at work, you'll see five shapes; recognize the trade before judging the pattern:</p>
 
@@ -675,7 +675,7 @@ useEffect(() => {
 
 <p>The reading rule: a fetch inside <code>useEffect</code> is not wrong by default — but it is often not the best tool. The framework/query-library shapes own caching, retries, and cancelation for you; the effect shape makes you re-implement all three by hand.</p>
 
-<h2>8. The rules of hooks — and where the design came from</h2>
+<h2 id="sec-the-rules-of-hooks-and-where-the-design-came-from">8. The rules of hooks — and where the design came from</h2>
 
 <p>Hooks have two rules (enforced by a linter):</p>
 <ol>
@@ -687,7 +687,7 @@ useEffect(() => {
 
 <p>For <code>useState</code>, both rules are safe — adding a new unconditional call doesn't break other hooks, and you can't break other state slots by updating one. The design chose only the hooks that composed cleanly. That's why there's no <code>useMemo</code>-free <code>useShouldComponentUpdate</code> hook — it would conflict between custom hooks.</p>
 
-<h2>9. The storage models — three places state can live in React</h2>
+<h2 id="sec-the-storage-models-three-places-state-can-live-in-react">9. The storage models — three places state can live in React</h2>
 
 <blockquote class="callout">
   <p>This is the box model summarized. The three storage rows below — state, ref, local variables — are what "which box does this callback see?" collapses to.</p>
@@ -706,7 +706,7 @@ useEffect(() => {
 
 <p>In classes there were effectively two places: <code>this.state</code> (state) and instance fields (<code>this.something</code> = refs). Hooks split these cleanly: <code>useState</code> for trigger-render state, <code>useRef</code> for doesn't-trigger mutable boxes, function-body <code>let</code> for throwaway scratch.</p>
 
-<h2>9b. Strict Mode and batching — two "extra renders" that are the engine working</h2>
+<h2 id="sec-strict-mode-and-batching-two-extra-renders-that-are-the-engine-working">9b. Strict Mode and batching — two "extra renders" that are the engine working</h2>
 
 <p>Two behaviors look like render-count glitches but are the engine doing its job:</p>
 
@@ -729,7 +729,7 @@ function onClick() {
 
 <p>The updater form <code>c =&gt; c + 1</code> reads the latest value instead of a captured snapshot, so batched updates compose instead of clobbering each other. In pre-18 code you'll sometimes see <code>flushSync</code> or a <code>this.state.count</code> read inside a handler to grab the latest — the old workaround for unbatched updates.</p>
 
-<h2>9c. Reconciliation, keys, and component identity</h2>
+<h2 id="sec-reconciliation-keys-and-component-identity">9c. Reconciliation, keys, and component identity</h2>
 
 <p>When a render produces new output, React reconciles it with the old output — deciding "which DOM nodes change." It does not compare every node by value; it does a keyed diff:</p>
 
@@ -747,7 +747,7 @@ function onClick() {
 
 <p>The identity sentence to keep: <em>a node keeps its state when its identity stays; it loses state when its type or key changes.</em> When a list "remembers" the wrong item's scroll, input, or checkbox, the bug is identity — and the fix is almost always its <code>key</code>.</p>
 
-<h2>9d. Suspense and use — declarative waiting, and reading resources in render</h2>
+<h2 id="sec-suspense-and-use-declarative-waiting-and-reading-resources-in-render">9d. Suspense and use — declarative waiting, and reading resources in render</h2>
 
 <p>Suspense answers a question the previous sections never asked: <em>what does the UI show while a component's data isn't ready?</em> It is the last piece of the modern reading surface.</p>
 
@@ -775,7 +775,7 @@ startTransition(() =&gt; setSearchResults(results));  <span class="comment-line"
 
 <p>Reading rule for concurrent-era code: <em>concurrent React is not parallel rendering.</em> It means React can prepare and prioritize updates more flexibly — urgent input reactions first, deferred heavy work after. <code>isPending</code>/<code>startTransition</code> and <code>deferredValue</code> are the visible watermark of that era.</p>
 
-<h2>10. The classic bugs — and which storage model fixes each</h2>
+<h2 id="sec-the-classic-bugs-and-which-storage-model-fixes-each">10. The classic bugs — and which storage model fixes each</h2>
 
 <p>Four bug shapes recur at work — each maps to a storage-model mismatch. (Lesson 2 covered the closure mechanics; this is the map.)</p>
 
@@ -789,7 +789,7 @@ startTransition(() =&gt; setSearchResults(results));  <span class="comment-line"
   </tbody>
 </table>
 
-<h2>10b. Derived state — compute during render, don't store</h2>
+<h2 id="sec-derived-state-compute-during-render-don-t-store">10b. Derived state — compute during render, don't store</h2>
 
 <pre><code><span class="bad">// Don't — a derived value stored as state: two sources of truth that must stay in sync</span>
 const [fullName, setFullName] = useState('');
@@ -802,7 +802,7 @@ const fullName = first + ' ' + last;</code></pre>
 
 <p>Derived values are recomputed each render. If a computation ever gets expensive, keep it stable <em>without</em> adding state: hoist it to a module constant, memoize with <code>useMemo</code>, or let the React Compiler decide (§12). Don't reach for state to cache a computation.</p>
 
-<h2>10c. Context — the mental model for shared state</h2>
+<h2 id="sec-context-the-mental-model-for-shared-state">10c. Context — the mental model for shared state</h2>
 
 <p>State shared by several components is normally passed top-down by props. When the passing distance gets long — the classic "prop drilling" — React gives you <code>Context</code>: a value provided near the top and read anywhere below, skipping every intermediate props layer.</p>
 
@@ -829,7 +829,7 @@ const theme = useContext(ThemeCtx);</code></pre>
 
 <p>Rule: props for passing data; context for genuinely global data (theme, locale, auth). The hidden cost is re-render churn — if the provider's <code>value</code> is a fresh object each render, every consumer re-renders each render. Keep the value's identity stable (memoize it) or split providers.</p>
 
-<h2>10d. Forms and Actions — submission becomes a first-class shape</h2>
+<h2 id="sec-forms-and-actions-submission-becomes-a-first-class-shape">10d. Forms and Actions — submission becomes a first-class shape</h2>
 
 <p>Older forms are controlled or uncontrolled; React 19 broke new ground by making the <em>submission</em> itself a React concept.</p>
 
@@ -858,7 +858,7 @@ const theme = useContext(ThemeCtx);</code></pre>
 
 <p>Reading old forms, translate <code>onSubmit={handle}</code> + <code>event.preventDefault()</code> as the React 16/17 way; <code>action</code> + the three hooks as the 19 way. Both mean "respond when the user submits" — the modern one keeps pending/result attached to the action instead of hand-managed.</p>
 
-<h2>10e. State design — where state should live</h2>
+<h2 id="sec-state-design-where-state-should-live">10e. State design — where state should live</h2>
 
 <p>Most state bugs are <em>placement</em> bugs, not logic bugs. The rule: <strong>as close to use as possible, as high as sharing requires</strong> — and don't lift until a second consumer appears.</p>
 
@@ -883,7 +883,7 @@ const theme = useContext(ThemeCtx);</code></pre>
 
 <p>Close the loop: state up, data down. Two components need the same value? The nearest common parent owns it and passes it to both. One more consumer appears? <em>Then</em> context or a library, not before.</p>
 
-<h2>10f. Refs in depth and memoization — the remaining manual doors</h2>
+<h2 id="sec-refs-in-depth-and-memoization-the-remaining-manual-doors">10f. Refs in depth and memoization — the remaining manual doors</h2>
 
 <p><strong>Refs</strong> are the last OOP-style instance field in a functional model — a mutable box that survives renders without triggering them. Three real uses:</p>
 
@@ -908,7 +908,7 @@ const theme = useContext(ThemeCtx);</code></pre>
 
 <p>Memoization is not free — it adds dependency tracking, memory, and bug surface. The React Compiler (§12) automates it: in new code you may see none of these by hand. But old code still has them, and an <em>incorrect</em> one still hides bugs — reading them requires the same identity thinking as §9c.</p>
 
-<h2>11. Why not just use functional programming without hooks?</h2>
+<h2 id="sec-why-not-just-use-functional-programming-without-hooks">11. Why not just use functional programming without hooks?</h2>
 
 <p>You asked the key question: <em>wasn't functional enough?</em> The honest answer: pure functional programming — functions that take props and return JSX, with no side effects — works perfectly for presentational components. The problem is that <strong>real interactive UIs are not pure functions.</strong> They need:</p>
 <ul>
@@ -928,13 +928,13 @@ const theme = useContext(ThemeCtx);</code></pre>
 
 <p>This is also why the React docs <a href="https://react.dev/blog/2023/03/16/introducing-react-dev">say (2023)</a>: "We've taught React with function components and Hooks from the beginning." Classes are still supported (the legacy API section documents them) but the new docs don't teach them at all — they teach hooks-first because that's the model the React team chose.</p>
 
-<h2>12. Era 4 — the React Compiler and beyond</h2>
+<h2 id="sec-era-4-the-react-compiler-and-beyond">12. Era 4 — the React Compiler and beyond</h2>
 
 <p>The full post-hooks story — the React Compiler (stable Oct 2025, ship-by-default 2026), React Server Components, the React Foundation, the RSC security lesson, why React didn't adopt signals, Preact as the structural branch, and React 19.2's <code>useEffectEvent</code>/<code>Activity</code> — now lives in a companion reference doc: <a href="./react-2024-and-beyond.html">React 2024 and beyond — compiler, RSC, foundation</a>.</p>
 
 <p>What matters for the arc of this doc: the compiler automates memoization without changing the hooks mental model. RSC splits components into client (full hooks model) and server (no hooks, no events, run once). The foundation changes who governs React, not how React works. None of these reverse the shift from classes to functions — they complete it.</p>
 
-<h2>13. Where classes still live — and whether to learn them</h2>
+<h2 id="sec-where-classes-still-live-and-whether-to-learn-them">13. Where classes still live — and whether to learn them</h2>
 
 <blockquote class="callout">
   <h3>Should you learn class components?</h3>
@@ -948,7 +948,7 @@ const theme = useContext(ThemeCtx);</code></pre>
   <p><strong>No — don't invest in mastering them.</strong> You won't write new class components in 2025. Spend that time on hooks (useState, useEffect, useRef, useMemo, useCallback, useContext) and on the closure mental model (the re-render box model). That's what you'll write.</p>
 </blockquote>
 
-<h2>13b. Reading at work — the era-recognition checklist</h2>
+<h2 id="sec-reading-at-work-the-era-recognition-checklist">13b. Reading at work — the era-recognition checklist</h2>
 
 <p>The whole doc is a set of recognition skills. When you open a React file, answer <em>"which era / version is this?"</em> first — everything else follows from the answer.</p>
 
@@ -982,7 +982,7 @@ const theme = useContext(ThemeCtx);</code></pre>
   <li>A warning from React (missing deps, hook order, setState in render) maps to a specific section of this doc — look it up.</li>
 </ul>
 
-<h2>13c. Legacy patterns — the old code you'll read</h2>
+<h2 id="sec-legacy-patterns-the-old-code-you-ll-read">13c. Legacy patterns — the old code you'll read</h2>
 
 <p>Older codebases use patterns that predate hooks. Recognize the wrapper, and map it to its function-era replacement:</p>
 
@@ -1004,7 +1004,7 @@ const theme = useContext(ThemeCtx);</code></pre>
 
 <p>The string thread: <em>every legacy pattern was a workaround for "functions can't hold state yet."</em> Reading old files is recognizing the wrapper — and knowing what the hooks-era version actually is.</p>
 
-<h2>13d. Failure modes — when modern React "just doesn't work"</h2>
+<h2 id="sec-failure-modes-when-modern-react-just-doesn-t-work">13d. Failure modes — when modern React "just doesn't work"</h2>
 
 <p>Most real-world React failures resolve to one of these — each with a tell and a first move:</p>
 
@@ -1027,7 +1027,7 @@ const theme = useContext(ThemeCtx);</code></pre>
   </tbody>
 </table>
 
-<h2>13e. Principles — the invariants every pattern obeys</h2>
+<h2 id="sec-principles-the-invariants-every-pattern-obeys">13e. Principles — the invariants every pattern obeys</h2>
 
 <table>
   <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
@@ -1045,7 +1045,7 @@ const theme = useContext(ThemeCtx);</code></pre>
   </tbody>
 </table>
 
-<h2>13f. Hydration — server HTML meets client state</h2>
+<h2 id="sec-hydration-server-html-meets-client-state">13f. Hydration — server HTML meets client state</h2>
 
 <p><strong>SSR</strong> renders the same component tree to HTML on the server. The client receives that HTML <em>plus</em> the JavaScript payload; it does not re-render from scratch — it <em>reuses</em> the server HTML, attaches events and state to it, and only then do server- and client-rendered trees stay in sync. That attachment step is <strong>hydration</strong>.</p>
 
@@ -1064,7 +1064,7 @@ useEffect(() =&gt; { setWidth(window.innerWidth); }, []);</code></pre>
 
 <p>Reading rule for hydration-era files: keep the first render identical between processes; move anything browser-specific into effects. This is the client half of the split-process model from the companion doc (<a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>).</p>
 
-<h2>14. The lifecycle-to-hooks translation table</h2>
+<h2 id="sec-the-lifecycle-to-hooks-translation-table">14. The lifecycle-to-hooks translation table</h2>
 
 <p>When refactoring a class component to a function component (or reading an old one), here's how the lifecycle biography maps to effects:</p>
 
@@ -1084,7 +1084,7 @@ useEffect(() =&gt; { setWidth(window.innerWidth); }, []);</code></pre>
 
 <p>The mental shift: lifecycle methods are a <strong>biography</strong> ("what happens at birth / middle / death") while effects are a <strong>synchronization</strong> ("keep this external state in sync with this render's values"). Dan Abramov's <a href="https://overreacted.io/a-complete-guide-to-useeffect/">Complete Guide to useEffect</a> frames this as: stop asking "when does this run?" and start asking "what am I synchronizing, and with which values?"</p>
 
-<h2>15. The current state — and what you'll write</h2>
+<h2 id="sec-the-current-state-and-what-you-ll-write">15. The current state — and what you'll write</h2>
 
 <p>As of 2026, modern React is function components + hooks + (optionally) the React Compiler. The dominant mental model:</p>
 <ul>
@@ -1099,7 +1099,7 @@ useEffect(() =&gt; { setWidth(window.innerWidth); }, []);</code></pre>
 
 <p>Is there a "next paradigm after functional"? Not in React's component model — but the surrounding stack did not freeze in 2023. The function+hooks model held, and the next shifts happened around it, not against it. The next section covers those shifts.</p>
 
-<h2>16. A recommended reading order, from React's own writing</h2>
+<h2 id="sec-a-recommended-reading-order-from-react-s-own-writing">16. A recommended reading order, from React's own writing</h2>
 
 <ol>
   <li><a href="https://react.dev/blog/2023/03/16/introducing-react-dev">Introducing react.dev (2023)</a> — why the new docs teach hooks-first.</li>

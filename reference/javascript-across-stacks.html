@@ -23,7 +23,7 @@
   <p>JS-the-language is one thing (<a href="./javascript-the-language.html">javascript-the-language</a>). JS-as-deployed is five different stories. Where JS runs changes what you use of it, what you wish were different, and who was built to replace it. This doc answers: "if JS is everywhere, why are there still five other major languages in the industry?" Sibling to <a href="./javascript-the-language.html">javascript-the-language</a> and <a href="./frontend-camps-survey.html">frontend-camps-survey</a> — the camps survey covers the frontend-only framework camps; this one covers language-level competition across every stack.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: standalone. What "perspective" means here: same language, different host + different constraints = a different competitor set. Each section follows the same template: what this perspective uses of JS → what doesn't fit → the competitors → one positioning table per competitor (what each optimizes for) → one paragraph on the theory that justifies creating it instead of extending Java/C++. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
@@ -35,7 +35,7 @@
   <p><strong>The pattern.</strong> Across all perspectives, one rule emerges from the data: a new language wins when the dominant constraint changes and the old language's design bet conflicts with the new constraint. JS won the browser because the constraint was 1995 download size + scripting glue. TypeScript won JS tooling because the constraint changed to large-team maintainability. Go won networked services because the constraint changed to concurrency-first. Rust won systems because the constraint changed to memory safety without GC. Java extended C++ syntax but won on the JVM bet (write once, ship anywhere). The rule: extend when the constraint is unchanged, invent when it inverts.</p>
 </blockquote>
 
-<h2>1. The Frontend Perspective</h2>
+<h2 id="sec-the-frontend-perspective">1. The Frontend Perspective</h2>
 
 <p><strong>What the frontend uses of JS:</strong> the language + DOM + fetch + Canvas/WebGL + WASM interop. The browser only runs JS (and WASM). There is no language-level competitor on the frontend — the browser chooses for you.</p>
 
@@ -56,7 +56,7 @@
   </tbody>
 </table>
 
-<h2>2. The TypeScript Shift (the JS competitor that survived)</h2>
+<h2 id="sec-the-typescript-shift-the-js-competitor-that-survived">2. The TypeScript Shift (the JS competitor that survived)</h2>
 
 <p>TS is not a separate perspective — it's the frontend perspective's internal evolution. But it deserves its own section because it's the only "competitor" that didn't fight JS from outside; it replaced JS from inside.</p>
 
@@ -64,7 +64,7 @@
 
 <p><strong>The theory — why extend, not replace:</strong> The constraint didn't invert. The codebase grew, the team grew, the maintainability burden grew — but the target (the browser) and the runtime (JS) stayed the same. Adding types on top preserves 100% of the JS ecosystem, 100% of the runtime, 100% of the developer's mental model. The "compile away" property is the key: at runtime, there is no TS. This is the general rule — if the constraint is "the same platform, more safety," you extend. If the constraint is "a different platform," you invent.</p>
 
-<h2>2b. Writing typed JS — the type system in practice</h2>
+<h2 id="sec-writing-typed-js-the-type-system-in-practice">2b. Writing typed JS — the type system in practice</h2>
 
 <p>§2 argued <em>why</em> TS exists. This is <em>how</em> it works as a system of rules: a static overlay that type-checks before the engine ever runs, then erases to plain JS. Three ideas are the whole job.</p>
 
@@ -153,7 +153,7 @@ function handle(r: Result): number {
 
 <p><strong>Gradual adoption path:</strong> point <code>tsc</code> at existing JS with <code>allowJs</code>; enable <code>checkJs</code> so <code>// @ts-check</code> on a file starts complaining; add <code>.d.ts</code> for untyped packages (or <code>declare module</code>); then flip <code>strict</code> once the code compiles clean on basic settings. Every file migrates on its own schedule — which is exactly why TS won instead of a new language: it lets you extend one production codebase inside the existing runtime.</p>
 
-<h2>3. The Backend Perspective</h2>
+<h2 id="sec-the-backend-perspective">3. The Backend Perspective</h2>
 
 <p><strong>What backend uses of JS:</strong> Node.js — the event loop + npm + <code>fs</code>/<code>net</code>/<code>http</code> modules. One process multiplexes thousands of connections on a single thread's event loop: non-blocking I/O + async callbacks, with a small OS thread pool for blocking work (<code>fs</code>, crypto, DNS). The same loop from the browser, transplanted to the server.</p>
 
@@ -246,7 +246,7 @@ function handle(r: Result): number {
   </tbody>
 </table>
 
-<h2>3b. The Node runtime — how JS actually behaves on a server</h2>
+<h2 id="sec-the-node-runtime-how-js-actually-behaves-on-a-server">3b. The Node runtime — how JS actually behaves on a server</h2>
 
 <p>§3 positioned Node against other backend languages; this subsection is about the <em>runtime itself</em> — the mechanisms that make server-side JS behave the way it does. Frameworks come and go, but these mechanics are the constants.</p>
 
@@ -307,7 +307,7 @@ src.pipe(res);
   <p><strong>The fence-line:</strong> <em>this</em> section is about how JS behaves on the server — loop phases, streams, V8/libuv, and the three runtimes. <em>What you build with it</em> — middleware chains, authentication vs. authorization, ORMs vs. raw SQL, queues, caching, transactions, and the Skeleton → Deepen → Polish loop — lives in the <a href="./backend-engineering.html">Backend Engineering</a> reference.</p>
 </blockquote>
 
-<h2>4. The Mobile Perspective</h2>
+<h2 id="sec-the-mobile-perspective">4. The Mobile Perspective</h2>
 
 <p><strong>What mobile uses of JS:</strong> React Native (Expo, bare), Capacitor/Ionic (WebView + native plugins), NativeScript. JS runs on a JS engine (Hermes on Android, JavaScriptCore on iOS) bridged to native modules. UI is native (React Native) or WebView (Capacitor). For the installable-hosts deep dive — the decision matrix, React Native's architecture, Electron/Tauri, Smart TV, gaming — see <a href="./beyond-the-browser.html">Beyond the Browser</a>. This section keeps the language-level comparison; that doc owns the shipping story.</p>
 
@@ -352,7 +352,7 @@ src.pipe(res);
   </tbody>
 </table>
 
-<h2>5. The Embedded / IoT Perspective</h2>
+<h2 id="sec-the-embedded-iot-perspective">5. The Embedded / IoT Perspective</h2>
 
 <p><strong>What IoT uses of JS:</strong> Espruino (JS on microcontrollers), Johnny-Five (Node on host + Firmata on device), Tessel, low.js. JS runs on devices with ≥100KB RAM (ESP32, STM32). The event loop model actually fits IoT well — sensors are async events.</p>
 
@@ -376,7 +376,7 @@ src.pipe(res);
 
 ---
 
-<h2>5b. Mental models — how cross-stack reasoning actually works</h2>
+<h2 id="sec-mental-models-how-cross-stack-reasoning-actually-works">5b. Mental models — how cross-stack reasoning actually works</h2>
 
 <p>When developers move between stacks (frontend, backend, mobile, embedded, AI), they don't just learn new syntax — they <em>swap mental models</em>. Each stack has a primary abstraction that determines what "easy" and "hard" mean. The same code pattern that is idiomatic in one stack is an anti-pattern in another.</p>
 
@@ -427,7 +427,7 @@ src.pipe(res);
 
 ---
 
-<h2>6. The AI / Data-Science Perspective</h2>
+<h2 id="sec-the-ai-data-science-perspective">6. The AI / Data-Science Perspective</h2>
 
 <p><strong>What AI uses of JS:</strong> almost nothing in the model layer (PyTorch/JAX/CUDA are Python/C++). Everything in the application layer: Next.js + Vercel AI SDK + fetch to model APIs, LangChain.js, Transformers.js (WASM), TensorFlow.js (WebGL/WASM). JS is the <em>delivery vehicle</em> for models trained elsewhere.</p>
 
@@ -448,13 +448,13 @@ src.pipe(res);
   <p><strong>One-paragraph theory:</strong> AI picked Python because NumPy existed in 2006, before "AI" meant LLMs. The lock-in is library lock-in, not language lock-in. JS owns the application layer because the web is the delivery target. Mojo (Chris Lattner, 2023) is the first serious attempt to invert the constraint: keep Python syntax, add a compiler, remove the GIL, target accelerators directly. If it works, it's the first language that extends Python's syntax but replaces its runtime — the inverse of TypeScript's "compile away" strategy.</p>
 </blockquote>
 
-<h2>7. The "Other" Perspective: Edge, Serverless, Build Tools</h2>
+<h2 id="sec-the-other-perspective-edge-serverless-build-tools">7. The "Other" Perspective: Edge, Serverless, Build Tools</h2>
 
 <p><strong>Where JS is the default entirely due to the host being JS:</strong> Cloudflare Workers, Vercel Edge Functions, Deno Deploy, Bun, esbuild/rolldown/Vite (written in Go/Rust but drive the JS ecosystem). The edge runtime picked JS because V8 is already there, the security sandbox already exists, and cold-start matters more than steady-state perf.</p>
 
 <p><strong>Competitor: WASM on the edge.</strong> Cloudflare supports WASM components; Fastly Compute@Edge is WASM-first. But WASM still needs JS glue for DOM/HTTP in the browser, and the edge is converging on the same APIs (WinterCG). Here JS has no real language competitor — WASM is a partner, not a replacement, same as in the browser.</p>
 
-<h2>8. The Pattern: When Does a New Language Beat Extending an Old One?</h2>
+<h2 id="sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">8. The Pattern: When Does a New Language Beat Extending an Old One?</h2>
 
 <p>Across all seven perspectives, one rule emerges from the data:</p>
 
@@ -479,7 +479,7 @@ src.pipe(res);
 
 <p>JS's original constraint: <em>a scripting language for Netscape Navigator 2.0, downloaded over 28k modem, written in 10 days.</em> That constraint is gone. The new constraints (large teams, mobile, edge, AI delivery) each spawned their own response — TS, RN/Flutter, Workers, Vercel AI SDK. None replaced JS because none inverted the <em>browser</em> constraint. The browser still only runs JS (and WASM). As long as that's true, JS survives at the center and the competitors orbit around it.</p>
 
-<h2>9. Choosing a Stack</h2>
+<h2 id="sec-choosing-a-stack">9. Choosing a Stack</h2>
 
 <p>The pattern (§8) explains winners after the fact; this is the forward version — how to pick a stack today. Same rule, applied first: identify the <em>dominant constraint</em>, then the language whose design bet matches it. "Which language is best?" is the wrong question. "Which constraint dominates, and who bet on it?" is the one that answers.</p>
 
@@ -502,7 +502,7 @@ src.pipe(res);
   <p><strong>Do not choose a language because it is better in the abstract. Choose the language whose design bet matches the dominant constraint.</strong></p>
 </blockquote>
 
-<h2>10. Migration Paths</h2>
+<h2 id="sec-migration-paths">10. Migration Paths</h2>
 
 <p>Because language choice is a bet on a constraint, migrations happen when the constraint changes mid-project — team grows, workload shifts, a host moves. Each row gives the trigger, the strategy, and the risk of the common cross-stack moves.</p>
 
@@ -522,7 +522,7 @@ src.pipe(res);
 
 <p>The lazy rule: prefer the path that <em>extends</em> what exists. Migrations that keep the runtime and platform (JS→TS) are cheap; migrations that change the runtime (Node→Go/Rust) should be targeted at hot paths, not done wholesale.</p>
 
-<h2>11. Failure Modes</h2>
+<h2 id="sec-failure-modes">11. Failure Modes</h2>
 
 <p>The most common cross-stack mistakes, each read back against this doc's rule.</p>
 
@@ -543,7 +543,7 @@ src.pipe(res);
   </tbody>
 </table>
 
-<h2>12. Principles</h2>
+<h2 id="sec-principles">12. Principles</h2>
 
 <p>The durable takeaways — the parts to carry into any polyglot decision.</p>
 
@@ -562,7 +562,7 @@ src.pipe(res);
   </tbody>
 </table>
 
-<h2>13. A Worked Example — a Realtime Collaborative Editor</h2>
+<h2 id="sec-a-worked-example-a-realtime-collaborative-editor">13. A Worked Example — a Realtime Collaborative Editor</h2>
 
 <p>A product, a set of constraints, and the language decisions each one forces. This is §5b's mental models and §9's checklist applied to one concrete thing.</p>
 
@@ -581,7 +581,7 @@ src.pipe(res);
 
 <p><strong>What the example shows:</strong> no single "best language" — each slice answers a different dominant constraint. The same product spans five lanes, and this doc's rule picks a language for each independently. The seams (shared CRDT code, the typed BFF↔core contract, presence on the socket) are where interop cost is paid (§9, §11).</p>
 
-<h2>14. The Future — Signals Worth Watching</h2>
+<h2 id="sec-the-future-signals-worth-watching">14. The Future — Signals Worth Watching</h2>
 
 <table>
   <thead><tr><th>Signal</th><th>What it would mean</th><th>Which section it touches</th></tr></thead>
@@ -597,7 +597,7 @@ src.pipe(res);
   </tbody>
 </table>
 
-<h2>15. Summary Checklist</h2>
+<h2 id="sec-summary-checklist">15. Summary Checklist</h2>
 
 <table>
   <thead><tr><th>Question</th><th>Check</th></tr></thead>

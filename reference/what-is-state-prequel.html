@@ -25,7 +25,7 @@
 
 <p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
-<h2>1. When did "programming" appear?</h2>
+<h2 id="sec-when-did-programming-appear">1. When did "programming" appear?</h2>
 
 <p>Two words people use loosely that we have to separate first: <strong>algorithm</strong> and <strong>program</strong>.</p>
 
@@ -48,7 +48,7 @@
 
 <p>So: the <em>algorithm</em> as a concept is older than mathematics itself; the <em>word</em> "algorithm" is ~1,200 years old (from Al-Khwarizmi); the <em>idea of programming a machine</em> is from the 1840s (Lovelace); the <em>practice</em> of running programs on real machines from the 1940s (Zuse, then ENIAC); and what you'd recognize as programming today from the 1950s (Fortran). The 70 years since Fortran are variations on one theme: tell a machine how to transform inputs into outputs.</p>
 
-<h2>2. The four theories underneath — what makes programming possible at all</h2>
+<h2 id="sec-the-four-theories-underneath-what-makes-programming-possible-at-all">2. The four theories underneath — what makes programming possible at all</h2>
 
 <p>The last section told you <em>when</em> things happened. This section tells you <em>what</em> the ideas are that make programming work. Four theories, all worked out between 1936 and 1948 — and they are not historical footnotes. The code you write today directly radiates from them. If you skip this section, "variable," "function," "type," and "state" will feel like arbitrary labels from a language spec. They aren't. Every strange term in the subsections below will be defined on first use — but be patient: the first two subsections are the most abstract, and they pay off in the last two, which connect directly to the hardware and to JS.</p>
 
@@ -223,7 +223,7 @@ function D(P) {
 
 <p>The rest of this doc (primitives, types, state, lifetime) and the main paradigm-shift doc (OOP, hooks, compiler, RSC) are elaborations on these four foundations. When you read "state" in the main doc, mentally replace it with "Turing's state register." When you read "function" in the hooks sections, think "lambda calculus pure function (Church, 1936)." When you read "variable" anywhere, think "von Neumann memory address with a name." When you read "type" in the next section, think "Shannon's proof that bits cannot interpret themselves."</p>
 
-<h2>3. The two primitives — data and operations</h2>
+<h2 id="sec-the-two-primitives-data-and-operations">3. The two primitives — data and operations</h2>
 
 <p>Strip away all the paradigms (OOP, FP, procedural, declarative) and programming has just two building blocks:</p>
 
@@ -282,7 +282,7 @@ function D(P) {
 
 <p>Everything else — types, classes, modules, hooks, components — is a way of <em>organizing</em> variables and functions. Classes bundle variables with the functions that operate on them. Modules group related functions and variables under a namespace. Hooks are functions backed by hidden storage (React's state-slot array). The two atoms (data via variables, operations via functions) never go away.</p>
 
-<h2>3b. What "state" is — a definition you can test</h2>
+<h2 id="sec-what-state-is-a-definition-you-can-test">3b. What "state" is — a definition you can test</h2>
 
 <p>The title of this doc asks a question we&rsquo;ve been circling. Here is the answer, up front, so everything after it is applying one idea instead of hunting for it:</p>
 
@@ -324,7 +324,7 @@ function D(P) {
 
 <p>This test is the spine of the whole reference shelf. &sect;5 sharpens it into lifetimes and reachability; &sect;6c separates the state-like pretenders (derived, cache, config); &sect;6e collects the ways even careful developers misapply in practice.</p>
 
-<h2>3c. State changes — one step at a time</h2>
+<h2 id="sec-state-changes-one-step-at-a-time">3c. State changes — one step at a time</h2>
 
 <p>State is not a snapshot; state <em>moves</em>. A step is one event producing a new state:</p>
 
@@ -360,7 +360,7 @@ function D(P) {
 
 <p>In dynamically-typed JS, variables don't have types; <em>values</em> do — a variable is just a name binding to whatever value you assigned it last. <code>let x = 5;</code> — x is bound to a number value. <code>x = "hello";</code> — x is re-bound to a string value. In statically-typed C, a variable's type is fixed at compile time by the declaration: <code>int x; x = "hello";</code> won't compile. JS swapped compile-time type safety for run-time flexibility — a trade-off that made rapid iteration easier and a whole class of bugs harder to catch.</p>
 
-<h2>5. The key distinction — variables ≠ state</h2>
+<h2 id="sec-the-key-distinction-variables-state">5. The key distinction — variables ≠ state</h2>
 
 <p>Here is the distinction this whole doc leans on. People say "state is data in memory," and that is true but it is not the part that matters. <strong>State IS normal variables.</strong> There is no special "state" cell type in memory. What we call "state" is a <em>role</em> a variable plays, not a different kind of thing. The label just says <em>this particular normal variable matters across events</em>.</p>
 
@@ -409,7 +409,7 @@ function D(P) {
 
 <p>So the test for "is this variable state?" is not "does it live in memory?" (everything does) — it is <em>"does the next event / call / render depend on the value this variable had after the previous one?"</em> If yes, it's state. If no, it's just a temporary scratch variable.</p>
 
-<h2>5b. Mental models — how developers actually reason about state</h2>
+<h2 id="sec-mental-models-how-developers-actually-reason-about-state">5b. Mental models — how developers actually reason about state</h2>
 
 <p>Before any framework is involved, the developer's mental model of state determines how they design code. The same runtime program is "obviously correct" or "obviously broken" depending on which of three mental models the developer carries.</p>
 
@@ -476,7 +476,7 @@ function D(P) {
 
 <p><strong>Stateful vs stateless.</strong> These words read as opposites but describe two answers to one question: <em>does this unit keep state between interactions?</em> A unit is <strong>stateful</strong> when it does (a component with <code>useState</code>, a server process with in-memory counters), and <strong>stateless</strong> when it does not (<code>add(a,b)</code>, an HTTP handler that touches nothing but its input). The subtle case that trips people up is <strong>externally stateful</strong>: a unit that is itself stateless but leans on state stored elsewhere — an HTTP handler that is stateless per request yet reads the session cookie and the database. &ldquo;Stateless&rdquo; never means &ldquo;no state exists anywhere&rdquo;; it means <em>this</em> unit isn&rsquo;t the one keeping it.</p>
 
-<h2>6b. State lifecycle and ownership — who creates it, who kills it</h2>
+<h2 id="sec-state-lifecycle-and-ownership-who-creates-it-who-kills-it">6b. State lifecycle and ownership — who creates it, who kills it</h2>
 
 <p>Asking "is it state?" is the first question. The second is "whose state is it?" Every piece of state needs an owner — something responsible for creating it, keeping it reachable, and destroying it. Ownership is the discipline that keeps state from turning into dumped globals.</p>
 
@@ -507,7 +507,7 @@ function D(P) {
 
 <p>This is the why behind React&rsquo;s &ldquo;lift state up&rdquo; rule: the nearest common owner of several pieces of state is where that state should live. It is also the pattern the whole shelf shares — system-design&rsquo;s &ldquo;one database owns the row&rdquo; is the same sentence with bigger nouns.</p>
 
-<h2>6c. Derived state, cache, and configuration — the things that look like state</h2>
+<h2 id="sec-derived-state-cache-and-configuration-the-things-that-look-like-state">6c. Derived state, cache, and configuration — the things that look like state</h2>
 
 <p>Once you can identify state, the next skill is identifying <em>false state</em> — values people store as state that should just be computed, cached, or read from the environment.</p>
 
@@ -530,7 +530,7 @@ setCount(items.length);                  <span class="comment-line">// must be k
 
 <p>&mdash; breaks the moment one spot updates <code>items</code> without updating <code>count</code>. The fix: <code>const count = items.length</code> — derived in render, never owned. &sect;10b of the paradigm doc makes this the rule; here it is the principle.</p>
 
-<h2>6d. Identity vs state, and immutable vs mutable state</h2>
+<h2 id="sec-identity-vs-state-and-immutable-vs-mutable-state">6d. Identity vs state, and immutable vs mutable state</h2>
 
 <p><strong>Identity</strong> is the thing that persists: "which entity is this?" <strong>State</strong> is the changeable information about that entity. A user keeps her identity while her email and preferences change; an order keeps its id while its status passes paid → shipped → delivered. Confusing the two is where most "where do I put this?" arguments come from.</p>
 
@@ -553,7 +553,7 @@ setCount(items.length);                  <span class="comment-line">// must be k
 
 <p>Immutable state is still state. The phrase means state is changed by producing new values, not that state disappears. React&rsquo;s <code>useState</code> / <code>setCount</code> is immutable state: <code>count + 1</code> yields a new value and the old render&rsquo;s snapshot stays intact until the next one.</p>
 
-<h2>6e. Failure modes — where the model breaks</h2>
+<h2 id="sec-failure-modes-where-the-model-breaks">6e. Failure modes — where the model breaks</h2>
 
 <p>Every pattern in this prequel has a known way to go wrong, and they&rsquo;re worth cataloguing here so you meet them as "oh, that one," not as a mystery.</p>
 
@@ -571,7 +571,7 @@ setCount(items.length);                  <span class="comment-line">// must be k
 
 <p>Debugging trick for all of them: for any suspicious value, run the &sect;3b test, then ask who owns it (&sect;6b), then where it lives (&sect;6), then how it changes (&sect;6d). The failure is almost always that those four answers are inconsistent with what the code actually does.</p>
 
-<h2>6f. Principles — the invariants to hold onto</h2>
+<h2 id="sec-principles-the-invariants-to-hold-onto">6f. Principles — the invariants to hold onto</h2>
 
 <p><em>State is persistence with consequence, under one owner.</em> The whole prequel, compressed into rules you can judge code against:</p>
 
@@ -587,7 +587,7 @@ setCount(items.length);                  <span class="comment-line">// must be k
 
 <p>From here, the class-to-hooks paradigm doc turns these rules into React&rsquo;s specific grammar: hook slots replace closure cells, the setter replaces raw assignment, and a render is a snapshot of immutable state. This prequel is the abstract layer those rules sit on.</p>
 
-<h2>7. The whole rest of the class-to-hooks doc, in one sentence</h2>
+<h2 id="sec-the-whole-rest-of-the-class-to-hooks-doc-in-one-sentence">7. The whole rest of the class-to-hooks doc, in one sentence</h2>
 
 <p>State is a thing that <em>persists</em> and that <em>the next event depends on</em>. The history of UI programming is the history of <em>where that state lives</em>: in a global variable, in a closure, in a class instance field, in a framework store, in a hook slot, in a server database. Each migration was a different answer to one question: <em>where does the state live, and who is responsible for keeping it alive across events?</em> React itself moved state roughly every 3-5 years — class instance (2013) → hook slot (2018) → client/server split (2022) → compiler-memoized hooks (2024) — and the <a href="./class-to-hooks-paradigm-shift.html">main paradigm-shift doc</a> is the inside of that story.</p>
 

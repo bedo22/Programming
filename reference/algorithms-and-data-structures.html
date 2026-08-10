@@ -42,7 +42,7 @@
   <p><strong>Why this doc exists separately.</strong> Everything else on the shelf assumes you can implement; Problem-Solving deliberately stops at <em>choosing</em> the technique. Between "use a hash map for counting" and "the count is correct on the first try, in O(n), handling the empty array" lies a body of templates, edge cases, and trade-offs — that body is this doc. It is a toolkit, not a textbook: every structure gets its what, its why, its when, and a working template. The theory behind complexity classes lives in CS &amp; Software Engineering; the pedagogy of recognition lives in Problem-Solving; the code lives here.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <ul>
   <li><strong>To pass a HackerRank/LeetCode screen:</strong> read §2–§7 (structures + graph + recursion + sort/search), then drill the templates until they're typed from memory — the binary search template (§7), the BFS template (§6), the sliding-window template (§2). Then use the cheat sheet (§11) to practice <em>recognition</em>, which is the skill that decays first.</li>
@@ -51,7 +51,7 @@
   <li><strong>The rule:</strong> implement first, optimize after. A correct O(n²) answer passes; a wrong O(n log n) answer doesn't. Brute force is a valid Phase 2 plan (Problem-Solving's rule, applied here).</li>
 </ul>
 
-<h2>Complexity — the quick review</h2>
+<h2 id="sec-complexity-the-quick-review">Complexity — the quick review</h2>
 
 <p>The full theory lives in <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a>; the working version:</p>
 
@@ -87,7 +87,7 @@
 </tbody>
 </table>
 
-<h2>Arrays, strings, and hashing — the 80%</h2>
+<h2 id="sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</h2>
 
 <p>Most interview problems — and most production code — are these three structures. Master this section and you can pass the majority of easy and many medium problems.</p>
 
@@ -129,7 +129,7 @@ return best;</code></pre>
 
 <p>Precompute <code>prefix[i] = sum of elements 0..i-1</code>, then any subarray sum is <code>prefix[j+1] - prefix[i]</code> in O(1). The upgrade pattern: "range sum queries" or "subarray sums equal to k" become a hash map of prefix counts — a classic "what could I remember?" move.</p>
 
-<h2>Stacks, queues, and linked lists — the shapes</h2>
+<h2 id="sec-stacks-queues-and-linked-lists-the-shapes">Stacks, queues, and linked lists — the shapes</h2>
 
 <h3>Stack — the monotonic-stack pattern</h3>
 
@@ -195,7 +195,7 @@ return out;</code></pre>
 
 <p><strong>The takeaway:</strong> the hash map alone can't track recency, and the list alone can't find a node in O(1) — the pair is the whole point. Recognize "cache with a size limit" and you've recognized this shape.</p>
 
-<h2>Trees and heaps — the hierarchies</h2>
+<h2 id="sec-trees-and-heaps-the-hierarchies">Trees and heaps — the hierarchies</h2>
 
 <h3>Binary trees — traversals first</h3>
 
@@ -297,7 +297,7 @@ function inorder(node, out = []) {
 
 <p><strong>The two invariants to keep straight:</strong> sift-up on <code>push</code> (new element walks toward the root while it's smaller than its parent), sift-down on <code>pop</code> (the promoted last element walks toward the leaves while it's larger than a child). For a max-heap, flip the comparisons. For "k largest", push into a min-heap of size k — the root is the smallest of the current top-k, so it's the one to evict.</p>
 
-<h2>Recursion — the self-referential move</h2>
+<h2 id="sec-recursion-the-self-referential-move">Recursion — the self-referential move</h2>
 
 <p>Every structure above is finite and concrete; recursion is the idea that a function can <em>be its own template</em> — a problem solved by solving a smaller version of the same problem. You've been using it since the tree traversals (§4): <code>inorder(node)</code> calls <code>inorder(node.left)</code>. A standalone treatment because it is the engine behind DFS (§6), divide-and-conquer (§7), and DP (§8), and because the two failure modes are common and cheap to fix.</p>
 
@@ -330,7 +330,7 @@ function power(x, n) {
 
 <p><strong>The test that settles it:</strong> draw the recursion tree for your recurrence. If the same state appears in multiple branches, the naive recursion recomputes it — that's the DP signal (add a cache). If every state appears once, you have divide-and-conquer, and caching buys nothing.</p>
 
-<h2>Graphs — the model of connections</h2>
+<h2 id="sec-graphs-the-model-of-connections">Graphs — the model of connections</h2>
 
 <h3>Representation first</h3>
 
@@ -416,7 +416,7 @@ function components(graph, n) {
 }</code></pre>
 
 <p><strong>Why it's the hidden winner:</strong> "number of connected components in a network", "friend circles", "accounts merge", Kruskal's MST — anything about connectivity that <em>grows</em> edge by edge. Path compression (the find loop shortcutting to the root) + union by rank make both operations near-O(1) amortized — faster than re-running BFS after every new edge.</p>
-<h2>Sorting and searching — the preprocessing moves</h2>
+<h2 id="sec-sorting-and-searching-the-preprocessing-moves">Sorting and searching — the preprocessing moves</h2>
 
 <h3>The sort menu</h3>
 
@@ -449,7 +449,7 @@ return lo;                            // first good index</code></pre>
   <li><strong>The hidden pattern:</strong> binary search works on any <em>monotonic predicate</em>, not just sorted arrays — "find the smallest capacity that can ship in d days", "find the kth smallest pair distance" — if the answer space is monotonic (can I afford X? yes → also yes for larger X), binary search the answer.</li>
 </ul>
 
-<h2>Dynamic programming — the state machine of optimization</h2>
+<h2 id="sec-dynamic-programming-the-state-machine-of-optimization">Dynamic programming — the state machine of optimization</h2>
 
 <p>DP is the hardest family because it looks like recursion and is actually <em>cached enumeration</em>. The framework, applied every time:</p>
 
@@ -478,7 +478,7 @@ return lo;                            // first good index</code></pre>
 
 <p><strong>A functional note (the FP edge):</strong> memoized DP is pure functions + a cache — the same "remember the answer" idea the <a href="./what-is-state-prequel.html">lambda calculus</a> gets by substitution. <code>reduce</code> is the tabulation loop in disguise: <code>states.reduce((acc, x) =&gt; transition(acc, x), base)</code> is a 1D DP with a single accumulator. The shelf's FP foundations (<a href="./what-is-state-prequel.html">What Is State</a>, <a href="./javascript-the-language.html">JavaScript: The Language</a>) are all the FP you need here — no monads required.</p>
 
-<h2>Greedy — the beautiful lie</h2>
+<h2 id="sec-greedy-the-beautiful-lie">Greedy — the beautiful lie</h2>
 
 <p>Greedy: take the locally best move and hope it's globally optimal. When it works it's O(n) and elegant; when it doesn't it's wrong with a plausible-looking answer. <strong>The test is the exchange argument:</strong> "if an optimal solution differs from mine, I can swap my choice in without making it worse" — if you can't sketch that argument, greedy is a gamble, and DP is the safe answer.</p>
 
@@ -489,7 +489,7 @@ return lo;                            // first good index</code></pre>
   <li><strong>The tell:</strong> problems phrased "minimize the number of X" or "maximize Y with these resources" where a simple ordering argument exists. When in doubt, DP.</li>
 </ul>
 
-<h2>Bit manipulation and math — the trick drawer</h2>
+<h2 id="sec-bit-manipulation-and-math-the-trick-drawer">Bit manipulation and math — the trick drawer</h2>
 
 <ul>
   <li><strong>XOR properties:</strong> a ^ a = 0, a ^ 0 = a, XOR is commutative/associative → "the single number that appears once among pairs" is <code>arr.reduce((a, b) =&gt; a ^ b)</code>. XOR also swaps two variables and finds the two unique numbers (xor all, then split on a set bit).</li>
@@ -498,7 +498,7 @@ return lo;                            // first good index</code></pre>
   <li><strong>Math staples:</strong> GCD via Euclid (<code>while (b) [a, b] = [b, a % b]</code>), modular arithmetic (a mod m rules; modular exponentiation by repeated squaring), the sieve of Eratosthenes for primes up to n in O(n log log n), combinatorics (n choose k via Pascal's triangle / multiplicative formula).</li>
 </ul>
 
-<h2>Pattern recognition cheat sheet — signal → technique</h2>
+<h2 id="sec-pattern-recognition-cheat-sheet-signal-technique">Pattern recognition cheat sheet — signal → technique</h2>
 
 <p>The companion to <a href="./problem-solving.html">Problem-Solving</a> §7b's recognition tables — the operational version, signal first:</p>
 
@@ -525,7 +525,7 @@ return lo;                            // first good index</code></pre>
 
 <p><strong>Reading order reminder:</strong> never start coding before classifying. If the problem doesn't fit any row, brute force is a legitimate classification — implement it, then look for the "what could I remember?" upgrade (Problem-Solving's Phase 3 rule).</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>The doc in twelve lines:</p>
 
@@ -547,7 +547,7 @@ return lo;                            // first good index</code></pre>
 </tbody>
 </table>
 
-<h2>Failure modes — the edge-case checklist</h2>
+<h2 id="sec-failure-modes-the-edge-case-checklist">Failure modes — the edge-case checklist</h2>
 
 <p>The checklist to run after any solution, before you call it done. Most lost marks are here, not in missing algorithms:</p>
 

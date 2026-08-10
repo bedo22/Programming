@@ -44,7 +44,7 @@
   <p><strong>Neighbors on the shelf:</strong> <a href="./freelance-web-practice.html">Freelance Web Practice</a> (the business of scoping, pricing, and delivering — this doc is the <em>technical</em> triage, that one is the <em>commercial</em> one) · <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (which stack fits which shape) · <a href="./product-strategy.html">Product Strategy</a> (when a shape becomes a product with unit economics) · <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> (the platform most client shapes actually ship on) · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (the money shapes) · <a href="./glossary.html">Glossary</a></p>
 </blockquote>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read the Definition (what a shape is and is not), then the taxonomy table to see all twelve shapes at once, then the selection guide — and when a real brief arrives, jump straight to that shape's link map. Read this doc <em>before</em> you scope or quote a project; the shape determines what the honest scope even is. Cross-links:</p>
 <ul>
@@ -56,7 +56,7 @@
 
 <p><strong>If you've ever over-built a landing page into a full-stack app, or under-built a SaaS and missed tenant isolation — this is the map.</strong> One shape per project, one dominant constraint, one decision that matters most.</p>
 
-<h2>Definition — what a product shape is, and what it is not</h2>
+<h2 id="sec-definition-what-a-product-shape-is-and-what-it-is-not">Definition — what a product shape is, and what it is not</h2>
 
 <p>A <strong>product shape</strong> is a recurring archetype of web work with its own dominant constraint — the one property that, if mishandled, sinks the project. A landing page is constrained by <em>load speed and conversion</em>; a dashboard by <em>data density and state</em>; a booking system by <em>time math</em>. The shape is not the discipline: a dashboard still needs APIs, data, and security, but those are the <em>how</em> — the shape tells you which <em>how</em> matters most and which failure kills you first.</p>
 
@@ -73,11 +73,11 @@
   </tbody>
 </table>
 
-<h2>History — why work arrives as shapes, not disciplines</h2>
+<h2 id="sec-history-why-work-arrives-as-shapes-not-disciplines">History — why work arrives as shapes, not disciplines</h2>
 
 <p>Disciplines are how the industry <em>organized knowledge</em>; shapes are how work <em>actually arrives</em>. The first web projects were marketing pages and catalogs — two shapes that are still the bulk of small-budget work. As the web industrialized, the shapes multiplied: dashboards arrived with internal tooling, SaaS arrived with subscription billing, booking systems arrived with scheduling services. Each new shape was a response to a business need, and each carries the constraint of the business it serves — a checkout must not double-charge, a booking must not double-book. The discipline docs abstracted the underlying skill; this doc keeps the business reality attached to it.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
   <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
@@ -91,7 +91,7 @@
   </tbody>
 </table>
 
-<h2>Underlying theory — the constraint is the shape</h2>
+<h2 id="sec-underlying-theory-the-constraint-is-the-shape">Underlying theory — the constraint is the shape</h2>
 
 <p>Every shape has one property that fails <em>first</em> and fails <em>visibly</em>. That property is its dominant constraint, and it comes from the shape's business purpose, not its technology:</p>
 
@@ -101,7 +101,7 @@
   <li><strong>Shapes nest.</strong> A SaaS is a CRUD app with multi-tenancy and billing; a storefront is a content site with a checkout; a booking system is a CRUD app with calendar logic. When shapes nest, the <em>outer</em> constraint dominates.</li>
 </ul>
 
-<h2>Mental models — frames for thinking about shapes</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-shapes">Mental models — frames for thinking about shapes</h2>
 
 <table>
   <thead><tr><th>Frame</th><th>What it does</th></tr></thead>
@@ -114,7 +114,7 @@
   </tbody>
 </table>
 
-<h2>The shape taxonomy — twelve archetypes at a glance</h2>
+<h2 id="sec-the-shape-taxonomy-twelve-archetypes-at-a-glance">The shape taxonomy — twelve archetypes at a glance</h2>
 
 <p>Ordered roughly by frequency in freelance work. The identifying question is the client sentence that most often reveals the shape:</p>
 
@@ -136,7 +136,7 @@
   </tbody>
 </table>
 
-<h2>Shape selection guide — "the client says X, which shape is this?"</h2>
+<h2 id="sec-shape-selection-guide-the-client-says-x-which-shape-is-this">Shape selection guide — "the client says X, which shape is this?"</h2>
 
 <p>Most briefs arrive in the client's words, not the shape's name. Match the sentence to the shape:</p>
 
@@ -186,7 +186,7 @@
   </tbody>
 </table>
 
-<h2>Per-shape link maps — the decisions each shape stresses</h2>
+<h2 id="sec-per-shape-link-maps-the-decisions-each-shape-stresses">Per-shape link maps — the decisions each shape stresses</h2>
 
 <p>Each map names the 2–3 decisions that <em>actually differ by shape</em> and points to the discipline doc that owns the rest. The discipline docs teach the full method; these maps say which sections to read <em>for this shape</em>.</p>
 
@@ -295,7 +295,7 @@
   </tbody>
 </table>
 
-<h2>Principles — the shared constants across every shape</h2>
+<h2 id="sec-principles-the-shared-constants-across-every-shape">Principles — the shared constants across every shape</h2>
 
 <ul>
   <li><strong>Identify the shape before the stack.</strong> Every wrong build starts with a missing triage.</li>
@@ -306,7 +306,7 @@
   <li><strong>Scope follows shape.</strong> An honest scope for a landing page is smaller than for a SaaS — quote accordingly (<a href="./freelance-web-practice.html">Freelance Web Practice</a> owns the arithmetic).</li>
 </ul>
 
-<h2>Worked example — one brief, triaged end to end</h2>
+<h2 id="sec-worked-example-one-brief-triaged-end-to-end">Worked example — one brief, triaged end to end</h2>
 
 <p>Brief: <em>"Our clinic needs a website where patients can book appointments, and I need to be able to update the content myself."</em></p>
 
@@ -368,7 +368,7 @@
 
 <p>Here the tempting mis-triage is to hear "weekly menus" and build a content site with a store bolted on. The money shape wins, and the scope follows: the shop is the product, the menus are the decoration.</p>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead>
@@ -383,7 +383,7 @@
   </tbody>
 </table>
 
-<h2>The freelancer's scoping checklist — run before you quote</h2>
+<h2 id="sec-the-freelancer-s-scoping-checklist-run-before-you-quote">The freelancer's scoping checklist — run before you quote</h2>
 
 <p>Five questions, answered from the brief before any code or any price:</p>
 
@@ -395,7 +395,7 @@
   <li><strong>What is the client's ability to maintain this after handoff?</strong> "I can edit it myself" is a scope item, not a wish (<a href="./freelance-web-practice.html">Freelance Web Practice</a> owns the delivery).</li>
 </ol>
 
-<h2>Ecosystem — the shape-aware tooling catalog</h2>
+<h2 id="sec-ecosystem-the-shape-aware-tooling-catalog">Ecosystem — the shape-aware tooling catalog</h2>
 
 <p>The tools change faster than the shapes; here's what each <em>kind</em> is for, so a new tool slots into its row:</p>
 
@@ -414,7 +414,7 @@
 
 <p>Every row maps to a shape above — the tool is the vehicle, the shape is the rule. When a new tool appears, ask which shape it serves and whether it improves that shape's dominant constraint; if neither, it's noise.</p>
 
-<h2>The future — AI changes which shapes appear, not the triage</h2>
+<h2 id="sec-the-future-ai-changes-which-shapes-appear-not-the-triage">The future — AI changes which shapes appear, not the triage</h2>
 
 <p>AI erodes the <em>build</em> cost of the simple shapes fastest: landing pages, content sites, and simple CRUD apps can now be scaffolded by a model. The shapes don't disappear — but their <em>marginal</em> constraints get sharper. A landing page is no longer hard because it's hard to build; it's hard because conversion and speed are measurable, and the bar rises. The complex shapes (SaaS, booking, migration, performance) survive because their constraints — tenant isolation, time math, preservation, measurement — are exactly what AI is worst at. The triage discipline survives because the death modes don't change: a double-booking is a double-booking whether the calendar was hand-built or AI-generated. The premium shifts from <em>writing the code a shape needs</em> to <em>recognizing which shape the brief is and where the real risk sits</em> — which is the whole job of this doc.</p>
 
@@ -427,7 +427,7 @@
 
 <p>AI doesn't remove shapes — it changes which ones are commodity. The building of the simple shapes cheapens; the constraints of every shape remain.</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Print this. It is the entire doc in twelve lines, one per shape:</p>
 
@@ -452,7 +452,7 @@
 <p>And the triage that runs before all of them: <strong>name the shape, name the constraint, name the death mode, route to the owning doc, scope to the shape.</strong></p>
 
 <section class="cite">
-  <h2>Primary sources</h2>
+  <h2 id="sec-primary-sources">Primary sources</h2>
   <ol>
     <li>The shelf itself — every discipline doc cited in the link maps above. This doc is a routing table over them, not a source of new knowledge.</li>
     <li>Core Web Vitals — <a href="https://web.dev/articles/vitals">web.dev — Web Vitals</a>, the constraint that defines the performance shape.</li>
@@ -462,7 +462,7 @@
 </section>
 
 <section class="teacher">
-  <h2>Ask your teacher</h2>
+  <h2 id="sec-ask-your-teacher">Ask your teacher</h2>
   <p>Three follow-ups to deepen this:</p>
   <ul>
     <li>"Take the last real project brief I got and walk me through your triage: shape, constraint, death mode, owning docs — before any code."</li>

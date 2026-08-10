@@ -44,7 +44,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
   <p><em>Frontend Camps Survey</em> classifies WordPress as "Camp A — CMS and classic server-rendered apps" in a few paragraphs. But the ecosystem behind that classification runs more websites than every other platform combined. Most engineering curricula skip it entirely — "it's legacy PHP" — while most paid web work (freelance, agencies, client sites, content marketing sites) happens inside it. This doc is the middle ground: rigorous enough for an engineer (how the Loop works, why the database is shaped that way, when headless is the right call), practical enough for a freelancer (how to choose, how to maintain, what clients actually need). The gap it fills: nobody on the shelf explained why WordPress won, how it works, and when — despite its reputation — it is still the right tool. One scope note: <strong>this is not a WordPress tutorial</strong> — it is the strategic and architectural guide; step-by-step building is what the linked docs, the Codex, and the plugin docs are for.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read this after <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (so you've seen where WordPress sits in the landscape) and after <a href="./backend-engineering.html">Backend Engineering</a> §1 (so you understand the request loop WordPress runs on). Freelancers should read it together with <a href="./freelance-web-practice.html">Freelance Web Practice</a>. Cross-links:</p>
 <ul>
@@ -58,7 +58,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 
 <p><strong>If you've ever dismissed WordPress as "not real development", lost a client to Wix, or inherited a plugin mess you had to untangle — this is the map.</strong> Read the Definition and History first (why the ecosystem is shaped this way), then How WordPress works, then the decision matrix when a choice matters.</p>
 
-<h2>Definition — what the CMS internet is, and what it is not</h2>
+<h2 id="sec-definition-what-the-cms-internet-is-and-what-it-is-not">Definition — what the CMS internet is, and what it is not</h2>
 
 <p>The CMS internet is the ecosystem of platforms whose core job is <strong>managing content for non-developers</strong>. A Content Management System (CMS) separates two surfaces that custom development fuses: the <strong>editing surface</strong> (what the site owner uses — the admin dashboard) and the <strong>rendering surface</strong> (what visitors see — the theme or frontend). That separation is the entire product.</p>
 
@@ -80,7 +80,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 
 <p>WordPress alone outnumbers every custom-framework site combined roughly 3-to-1. An engineer who can't navigate this ecosystem is professionally illiterate in the world where most web money moves.</p>
 
-<h2>History — why WordPress won</h2>
+<h2 id="sec-history-why-wordpress-won">History — why WordPress won</h2>
 
 <p>The CMS internet emerged through the same constraint inversions as every discipline on this shelf — each inversion pushed power from the developer to the site owner:</p>
 
@@ -98,7 +98,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 
 <p><strong>Why WordPress specifically won:</strong> timing (it arrived as PHP hosting became cheap and universal), an open license with no licensing fees, a plugin system with an API simple enough for solo developers, a theme system that let any designer reskin it, and a community that turned every problem into a Stack Overflow answer. Its competitors had some of these; none had all of them. The pattern is the same one this shelf documents everywhere else: <strong>the winning system is the one that makes the common case cheap for the least-skilled participant</strong>, not the one that is technically best.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
 <thead><tr><th>Neighbor doc</th><th>What belongs here</th><th>What belongs next door</th></tr></thead>
@@ -115,7 +115,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 
 <p><strong>Key rule:</strong> if the topic is "how the CMS internet works and which platform to pick", it belongs here. If it is "how the underlying engine works generically" (requests, contracts, schemas, threats), it belongs next door and is linked, not re-taught.</p>
 
-<h2>Underlying theory — the invariants of the CMS world</h2>
+<h2 id="sec-underlying-theory-the-invariants-of-the-cms-world">Underlying theory — the invariants of the CMS world</h2>
 
 <table>
 <thead><tr><th>Invariant</th><th>What it means</th><th>Why it matters</th></tr></thead>
@@ -129,7 +129,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 </tbody>
 </table>
 
-<h2>Mental models — frames for thinking about the CMS world</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-the-cms-world">Mental models — frames for thinking about the CMS world</h2>
 
 <table>
 <thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
@@ -144,7 +144,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 </tbody>
 </table>
 
-<h2>How WordPress works — the mechanics</h2>
+<h2 id="sec-how-wordpress-works-the-mechanics">How WordPress works — the mechanics</h2>
 
 <p>Enough to navigate and debug, not to write a theme from scratch (the <a href="https://developer.wordpress.org/">WordPress Developer Handbook</a> is the reference). The runtime in one line: <strong>PHP on the request path, MySQL/MariaDB behind it, accessed through the <code>wpdb</code> object</strong> — every query the Loop runs is a SQL statement against the <code>wp_</code>-prefixed tables, so the language and the schema conventions from <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL §MySQL/MariaDB</a> apply directly.</p>
 
@@ -216,7 +216,7 @@ register_taxonomy('brand', 'product', ['hierarchical' =&gt; true]);</pre>
 
 <p><strong>The rule:</strong> a slow WordPress site is almost never "WordPress is slow" — it is missing its cache layers, running 40 plugins on shared hosting, or querying meta unindexed. Same diagnosis loop as everywhere else on this shelf.</p>
 
-<h2>Content modeling — blocks vs ACF vs CPTs vs meta</h2>
+<h2 id="sec-content-modeling-blocks-vs-acf-vs-cpts-vs-meta">Content modeling — blocks vs ACF vs CPTs vs meta</h2>
 
 <p>WordPress gives you four ways to hold content, and choosing between them is the schema decision of this world — the <a href="./data-modeling-and-databases.html">Data Modeling</a> craft, CMS edition. The decision table:</p>
 
@@ -236,7 +236,7 @@ register_taxonomy('brand', 'product', ['hierarchical' =&gt; true]);</pre>
 
 <p><strong>The warning:</strong> post meta is flexible but not relationally strong — heavy meta queries (the "meta-query-itis" failure mode) are how WordPress sites get slow. If the data is queried often and is central to the product (booking slots, inventory, memberships), post meta is the wrong home: custom tables or a separate service earn their complexity exactly where queries outgrow <code>wp_postmeta</code>.</p>
 
-<h2>Modern WordPress — Gutenberg, REST, and headless</h2>
+<h2 id="sec-modern-wordpress-gutenberg-rest-and-headless">Modern WordPress — Gutenberg, REST, and headless</h2>
 
 <h3>Gutenberg and the block standard</h3>
 
@@ -282,7 +282,7 @@ const posts = await fetch(
 
 <p><strong>The trade, stated plainly:</strong> headless trades editing simplicity and plugin compatibility for frontend freedom. It is not automatically better — it is the deliberate purchase of a frontend team's flexibility at the price of the ecosystem's free features.</p>
 
-<h2>The managed and no-code landscape</h2>
+<h2 id="sec-the-managed-and-no-code-landscape">The managed and no-code landscape</h2>
 
 <p>WordPress is the biggest CMS, but the managed platforms own whole segments of the web — especially where the client edits everything:</p>
 
@@ -334,7 +334,7 @@ const posts = await fetch(
 
 <p><strong>The decision rule:</strong> if the store <em>is</em> the product, Shopify is the lazy default — checkout, PCI, and subscriptions solved. If the site is content-first and the store is secondary, WooCommerce keeps the client in one admin. Custom storefronts are the engineer's choice and the client's risk — same math as the headless trade.</p>
 
-<h2>WordPress development workflow — code vs. content</h2>
+<h2 id="sec-wordpress-development-workflow-code-vs-content">WordPress development workflow — code vs. content</h2>
 
 <p>How an engineer actually develops and deploys WordPress professionally. The one idea that makes it all coherent: <strong>code and content have different lifecycles</strong> — code is versioned and deployed; content is migrated, imported, or synced deliberately. Treating the database like code is a common source of pain.</p>
 
@@ -362,7 +362,7 @@ const posts = await fetch(
 
 <p><strong>Testing WordPress:</strong> sites are commonly treated as untestable, but critical flows — checkout, forms, login, search, redirects — can and should be tested: PHP lint and WordPress Coding Standards (PHP_CodeSniffer) in CI; unit tests for custom plugin/theme logic; end-to-end tests (Playwright/Cypress) for the critical client flows; and migration tests (export/import and search-replace scripts run against staging before they touch production).</p>
 
-<h2>When to choose what — the decision matrix</h2>
+<h2 id="sec-when-to-choose-what-the-decision-matrix">When to choose what — the decision matrix</h2>
 
 <table>
 <thead><tr><th>Client / project</th><th>Default choice</th><th>Why</th><th>Reconsider when</th></tr></thead>
@@ -394,7 +394,7 @@ const posts = await fetch(
 
 <p>In those cases the plugin economy stops paying for itself: the 70% that "exists as a plugin" starts fighting you, and the <a href="./backend-engineering.html">Backend Engineering</a> path — this shelf's main path — is the honest answer.</p>
 
-<h2>Migration paths</h2>
+<h2 id="sec-migration-paths">Migration paths</h2>
 
 <table>
 <thead><tr><th>Path</th><th>When it makes sense</th><th>The mechanics</th></tr></thead>
@@ -411,7 +411,7 @@ const posts = await fetch(
 
 <p><strong>The mechanics that bite:</strong> URL changes must use the proper search-replace (WP-CLI <code>wp search-replace --recurse-objects</code>) — a naive SQL find-replace corrupts serialized data, the classic migration disaster. Media files move separately (copy the uploads directory, or external storage/CDN). And after any migration, test the real things: forms, redirects, media, menus, plugins — a migration is not done when the pages load, it's done when the workflows work.</p>
 
-<h2>Security, performance &amp; maintenance — the ops playbook</h2>
+<h2 id="sec-security-performance-maintenance-the-ops-playbook">Security, performance &amp; maintenance — the ops playbook</h2>
 
 <p>The mindset layer lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (threat models, STRIDE, the risk register); here is the WordPress-specific operational baseline that keeps a client site alive and fast:</p>
 
@@ -484,7 +484,7 @@ const posts = await fetch(
 </tbody>
 </table>
 
-<h2>The freelancer's reality — "a website I can edit myself"</h2>
+<h2 id="sec-the-freelancer-s-reality-a-website-i-can-edit-myself">The freelancer's reality — "a website I can edit myself"</h2>
 
 <p>This is the single most common web request on earth, and it deserves its own section because it is a <em>requirements sentence</em>, not a platform question. It decomposes into:</p>
 <ul>
@@ -500,7 +500,7 @@ const posts = await fetch(
   <li><strong>Maintenance is a product.</strong> WordPress requires updates (core, themes, plugins) forever, and that is a recurring service with a price, not a favor. The operational side — the security baseline and maintenance cadence — is the ops playbook above; the pricing is in <a href="./freelance-web-practice.html">Freelance Web Practice</a>.</li>
 </ul>
 
-<h2>Client requirements — multilingual, SEO, accessibility, legal</h2>
+<h2 id="sec-client-requirements-multilingual-seo-accessibility-legal">Client requirements — multilingual, SEO, accessibility, legal</h2>
 
 <p>Four requirement families that appear in most client projects. None is a plugin you bolt on at the end — each shapes the content model and the build from the start:</p>
 
@@ -601,7 +601,7 @@ const posts = await fetch(
 
 <p><strong>The developer's role:</strong> legal text is usually not yours to author — but implementing it correctly is: consent checkboxes, analytics loading only after consent, form storage decisions, and payment security. "The lawyer writes it, you wire it" is the boundary.</p>
 
-<h2>Worked example — "a website I can edit myself, with bookings"</h2>
+<h2 id="sec-worked-example-a-website-i-can-edit-myself-with-bookings">Worked example — "a website I can edit myself, with bookings"</h2>
 
 <p>A local clinic wants a site with services, a blog, and an online booking form. Walk through the decision, the build, and the handoff:</p>
 
@@ -643,7 +643,7 @@ const posts = await fetch(
 
 <p><strong>The lesson:</strong> the "correct" engineering answer (custom build) was the wrong business answer. The platform choice was decided by two questions — who edits, and what must it do — and the engineering discipline (content model, security baseline, cache, handoff) was applied <em>inside</em> the platform. That combination is the professional's edge over both the template-store freelancer and the framework purist.</p>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
 <thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
@@ -667,7 +667,7 @@ const posts = await fetch(
 </tbody>
 </table>
 
-<h2>Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <table>
 <thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
@@ -686,7 +686,7 @@ const posts = await fetch(
 </tbody>
 </table>
 
-<h2>The future — where the CMS internet is going</h2>
+<h2 id="sec-the-future-where-the-cms-internet-is-going">The future — where the CMS internet is going</h2>
 
 <table>
 <thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
@@ -702,7 +702,7 @@ const posts = await fetch(
 
 <p>The direction is not "WordPress dies" — it is <em>the editing surface becomes a commodity, and the content's structure becomes the asset</em>. The skill of the next decade is designing content that outlives whichever platform renders it.</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Before you pick a platform, configure an admin, or accept a client project, run this:</p>
 

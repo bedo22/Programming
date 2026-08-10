@@ -44,7 +44,7 @@
   <p><strong>Neighbors on the shelf:</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (the hosts map — this doc's upstream) · <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (React Native sits beside the meta-framework camp) · <a href="./react-2024-and-beyond.html">React 2024 &amp; Beyond</a> (the foundation now owns RN/Expo) · <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> (the Rhythm — the model that transfers) · <a href="./system-design.html">System Design</a> (push, offline sync, deep links as design concerns) · <a href="./glossary.html">Glossary</a></p>
 </blockquote>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read the Definition (the platform-bridge vocabulary — it reframes every section), then the outside-the-browser map to see the whole landscape and what this doc does and doesn't own, then the Decision Matrix. After that, read the sections for the platforms you actually care about — React Native and Electron get the deepest treatment; Smart TV and Gaming are full but compact sections. Cross-links:</p>
 <ul>
@@ -57,7 +57,7 @@
 
 <p><strong>If you've ever asked "should this be an app?" or wondered how React Native and Electron actually work under the hood — this is the map.</strong> One spectrum, four bridges, and the constraints every installable platform shares.</p>
 
-<h2>Definition — the platform bridge problem</h2>
+<h2 id="sec-definition-the-platform-bridge-problem">Definition — the platform bridge problem</h2>
 
 <p>The browser is a sandbox with three specific models: a <strong>rendering model</strong> (DOM + CSS), a <strong>security model</strong> (same-origin, sandboxed), and a <strong>distribution model</strong> (URLs, no install). Every platform outside the browser changes at least one of these — and the tool that carries your JavaScript across the boundary is the <strong>bridge</strong>. The whole outside-the-browser world is a spectrum of how far from the browser you go, and what you trade:</p>
 
@@ -75,7 +75,7 @@
 
 <p><strong>The core vocabulary:</strong> a <strong>bridge</strong> is the mechanism that lets JS talk to a native platform. React Native bridges JS to native UI components; Electron bridges JS to Chromium plus Node; Capacitor bridges a web app to a native shell. Where the bridge is heavy (serialization, async, version churn), performance and correctness suffer — which is why each ecosystem's history is largely the history of making its bridge thinner.</p>
 
-<h2>The outside-the-browser map — what JavaScript runs on</h2>
+<h2 id="sec-the-outside-the-browser-map-what-javascript-runs-on">The outside-the-browser map — what JavaScript runs on</h2>
 
 <p>JavaScript runs in far more places than phones and desktops. Before building anything, know the full map — and know that most of it is <em>already covered elsewhere on this shelf</em>, so this doc only owns the installable-UI hosts:</p>
 
@@ -96,7 +96,7 @@
 
 <p><strong>Duplication boundaries:</strong> the native-landscape tables (Kotlin/Compose, Swift/SwiftUI, Flutter) already live in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §4 — this doc links there instead of re-teaching them. The server, edge, embedded, and AI hosts are fully owned by the stacks doc — this doc only summarizes them in the map above. The CLIs host is a whole doc already.</p>
 
-<h2>The decision matrix — when to use what</h2>
+<h2 id="sec-the-decision-matrix-when-to-use-what">The decision matrix — when to use what</h2>
 
 <p>Every platform decision reduces to one question: <strong>"Does the user need to INSTALL this, and does it need NATIVE capabilities?"</strong></p>
 
@@ -118,7 +118,7 @@
 
 <p>The four-way short version: <strong>no install, no native → web. Install + native + JS team → React Native. Install + desktop + JS team → Electron/Tauri. Install + maximum fidelity + native team → Kotlin/Swift.</strong> Everything else is a middle-ground variant of one of those.</p>
 
-<h2>React Native — the mobile bridge</h2>
+<h2 id="sec-react-native-the-mobile-bridge">React Native — the mobile bridge</h2>
 
 <h3>How your React code becomes a native app</h3>
 
@@ -207,7 +207,7 @@ const shadow = Platform.select({
 
 <p>When you need hardware access (camera, Bluetooth, biometrics, NFC) or platform-specific APIs: <strong>Expo modules</strong> cover ~90% of cases and are maintained by the Expo team; <strong>community modules</strong> (<code>react-native-camera</code>, <code>react-native-maps</code>) cover more; <strong>custom native modules</strong> are where you write Kotlin/Swift and expose it to JS via JSI — the one place you need real native literacy. Everything else stays in TypeScript.</p>
 
-<h2>Android &amp; iOS platform literacy — the minimum to ship and debug</h2>
+<h2 id="sec-android-ios-platform-literacy-the-minimum-to-ship-and-debug">Android &amp; iOS platform literacy — the minimum to ship and debug</h2>
 
 <p>You don't become an Android developer. You learn what Android and iOS impose on an app, because those constraints shape every RN decision:</p>
 
@@ -231,7 +231,7 @@ const shadow = Platform.select({
 
 <p><strong>Crash reporting is your other test suite.</strong> Errors on a phone arrive as two kinds: JS exceptions and native crashes. Sentry or Crashlytics catches both — upload the Metro <strong>source maps</strong> so JS errors surface as readable stack traces, and let the tool symbolicate the native crash report (iOS/Android) back to a function-and-line stack. Wire it in before launch; it's the difference between "users reported a bug" and a stack trace in your inbox.</p>
 
-<h2>Electron &amp; Tauri — the desktop bridge</h2>
+<h2 id="sec-electron-tauri-the-desktop-bridge">Electron &amp; Tauri — the desktop bridge</h2>
 
 <h3>Architecture: two processes and a pipe between them</h3>
 
@@ -272,7 +272,7 @@ const shadow = Platform.select({
 
 <p><strong>The decision:</strong> Electron when you need maximum compatibility and ecosystem; Tauri when bundle size matters and you can tolerate WebView inconsistencies. Both give your React app a filesystem and a system tray.</p>
 
-<h2>PWA and Capacitor — the middle ground</h2>
+<h2 id="sec-pwa-and-capacitor-the-middle-ground">PWA and Capacitor — the middle ground</h2>
 
 <p><strong>PWA (Progressive Web App)</strong> — your web app made installable, with no app store. Service Worker (offline + push), Web App Manifest (install prompt, icon, splash screen), and web APIs for camera/GPS (limited vs native). <strong>When it wins:</strong> content apps, e-commerce, internal tools — anywhere you want "installable" without store review. <strong>When it loses:</strong> heavy native integration, background processing, store discovery.</p>
 
@@ -280,7 +280,7 @@ const shadow = Platform.select({
 
 <p>The relationship: <strong>PWA gets you "installable" with zero shell; Capacitor gets you the native shell; React Native gets you native UI.</strong> Choose the thinnest bridge that satisfies the decision matrix.</p>
 
-<h2>Smart TV — Tizen &amp; webOS, the hidden ~300M screens</h2>
+<h2 id="sec-smart-tv-tizen-webos-the-hidden-300m-screens">Smart TV — Tizen &amp; webOS, the hidden ~300M screens</h2>
 
 <p>The biggest outside-the-browser market most developers never think about: every Samsung TV since 2015 runs Tizen, every LG TV runs webOS — together roughly 300M living-room screens — and <strong>both are web-app platforms</strong>. Your app is HTML, CSS, and JavaScript running inside a Chromium-derived engine the TV ships with. A team that can build a web frontend can build the shell of a TV app.</p>
 
@@ -300,7 +300,7 @@ const shadow = Platform.select({
 
 <p>For a React developer: your skills transfer directly (it's a web app in a Chromium shell). The new literacy is the media pipeline (AVPlay/EME), DRM licensing, and the device-fragmentation tax of model years. This is a genuine career lane for streaming apps — and most developers have never heard of it.</p>
 
-<h2>Gaming — the JS lane outside the browser</h2>
+<h2 id="sec-gaming-the-js-lane-outside-the-browser">Gaming — the JS lane outside the browser</h2>
 
 <p>Yes, JavaScript escaped into gaming — but the shape of it surprises most developers. The big console lane (Unity C#, Unreal C++) is not JS. The real JS lane has two parts:</p>
 
@@ -319,7 +319,7 @@ const shadow = Platform.select({
 
 <p><strong>When a React developer touches this:</strong> your component/state/loop discipline transfers to game UI and to the game loop (update → render), but a game is a different architecture than a web app — a persistent render loop instead of a render-per-state-change. Start with a browser engine; it's the least wasted motion, and the mini-game port is an adapter + a budget exercise.</p>
 
-<h2>Constraints that apply to every installable platform</h2>
+<h2 id="sec-constraints-that-apply-to-every-installable-platform">Constraints that apply to every installable platform</h2>
 
 <p>Everything above — mobile, desktop, TV, games — hits the same walls that simply don't exist on the web. Design against this table:</p>
 
@@ -340,11 +340,11 @@ const shadow = Platform.select({
 
 <p>These are system-design concerns too — push, offline sync, and deep linking are architecture, not cosmetics, and <a href="./system-design.html">System Design</a> is where they get their full treatment.</p>
 
-<h2>The native landscape — link, don't duplicate</h2>
+<h2 id="sec-the-native-landscape-link-don-t-duplicate">The native landscape — link, don't duplicate</h2>
 
 <p>You need to <em>understand</em> the native platforms your bridges target, but you don't need to learn to build in them. <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §4 already carries the deep comparison tables for each native lane — Kotlin/Jetpack Compose (React Native compiles to native Android views; you write Kotlin only for custom native modules), Swift/SwiftUI (the iOS equivalent), and Dart/Flutter (Google's cross-platform alternative with its own renderer — you choose it for pixel-perfect cross-platform consistency, not native feel). If a native decision comes up, read that section; it is the authority, and this doc deliberately does not repeat it.</p>
 
-<h2>Worked example — a habit tracker, every way</h2>
+<h2 id="sec-worked-example-a-habit-tracker-every-way">Worked example — a habit tracker, every way</h2>
 
 <pre>The same product, four installable approaches — and one to reject:
 
@@ -390,7 +390,7 @@ Browser notification    →  expo-notifications (native push)
 history.pushState       →  router.push("/habit/123")
 </pre>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Fix</th></tr></thead>
@@ -409,7 +409,7 @@ history.pushState       →  router.push("/habit/123")
   </tbody>
 </table>
 
-<h2>Principles</h2>
+<h2 id="sec-principles">Principles</h2>
 
 <table>
   <thead><tr><th>Principle</th><th>Why</th></tr></thead>
@@ -425,7 +425,7 @@ history.pushState       →  router.push("/habit/123")
   </tbody>
 </table>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Print this. It is the entire doc in ten lines:</p>
 
@@ -446,7 +446,7 @@ history.pushState       →  router.push("/habit/123")
 </table>
 
 <section class="cite">
-  <h2>Primary sources</h2>
+  <h2 id="sec-primary-sources">Primary sources</h2>
   <ol>
     <li>React Native documentation — <a href="https://reactnative.dev/architecture/landing-page">New Architecture</a> — JSI, Fabric, and TurboModules as the bridge replacement, the architecture this doc's §4 rests on.</li>
     <li>Electron documentation — <a href="https://www.electronjs.org/docs/latest/tutorial/process-model">Process Model</a> — the main/renderer/IPC split and the security rules (sandbox, <code>nodeIntegration</code>).</li>
@@ -457,7 +457,7 @@ history.pushState       →  router.push("/habit/123")
 </section>
 
 <section class="teacher">
-  <h2>Ask your teacher</h2>
+  <h2 id="sec-ask-your-teacher">Ask your teacher</h2>
   <p>Three follow-ups to deepen this:</p>
   <ul>
     <li>"Walk me through the React Native New Architecture from a real codebase — where exactly does JSI let JS touch a C++ object, and what breaks if I ignore it?"</li>

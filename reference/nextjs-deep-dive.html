@@ -46,7 +46,7 @@
         </p>
       </section>
 
-      <h2>0. How to use this doc</h2>
+      <h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
       <p>
         Reading order:
@@ -70,7 +70,7 @@
         real codebase raises a question.
       </p>
 
-      <h2>1. Definition — what Next.js is (and is not)</h2>
+      <h2 id="sec-definition-what-next-js-is-and-is-not">1. Definition — what Next.js is (and is not)</h2>
 
       <p>
         <strong>Is:</strong> a React meta-framework — routing, rendering
@@ -129,7 +129,7 @@
         disappears.
       </p>
 
-      <h2>1b. History — the 10-year line</h2>
+      <h2 id="sec-history-the-10-year-line">1b. History — the 10-year line</h2>
 
       <p>
         Next's features are answers to specific problems that appeared in order.
@@ -210,7 +210,7 @@
         </tbody>
       </table>
 
-      <h2>1c. Evolution — constraint inversions</h2>
+      <h2 id="sec-evolution-constraint-inversions">1c. Evolution — constraint inversions</h2>
 
       <p>
         Every discipline on this shelf rides constraint inversions — a
@@ -289,7 +289,7 @@
         </tbody>
       </table>
 
-      <h2>
+      <h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">
         1d. Intersection with neighbors — where it borders other practices
       </h2>
 
@@ -376,7 +376,7 @@
         </tbody>
       </table>
 
-      <h2>1e. Underlying theory — the models Next builds on</h2>
+      <h2 id="sec-underlying-theory-the-models-next-builds-on">1e. Underlying theory — the models Next builds on</h2>
 
       <p>
         Next didn't invent these; it productized them. When a Next behavior is
@@ -443,7 +443,7 @@
         </tbody>
       </table>
 
-      <h2>1f. Mental models — six that cover 90% of Next reading</h2>
+      <h2 id="sec-mental-models-six-that-cover-90-of-next-reading">1f. Mental models — six that cover 90% of Next reading</h2>
 
       <table>
         <thead>
@@ -526,7 +526,7 @@
 
       ---
 
-      <h2>2. Pages Router vs App Router</h2>
+      <h2 id="sec-pages-router-vs-app-router">2. Pages Router vs App Router</h2>
 
       <p>
         Next had two successive routing systems. You will meet both in the wild.
@@ -581,7 +581,7 @@
         not mix the mental models.
       </p>
 
-      <h2>3. App Router file conventions (the vocabulary)</h2>
+      <h2 id="sec-app-router-file-conventions-the-vocabulary">3. App Router file conventions (the vocabulary)</h2>
 
       <p>Under <code>app/</code>, filenames are special:</p>
       <ul>
@@ -639,7 +639,7 @@
         <a href="./system-design.html">System Design</a> §Codebase architecture.
       </p>
 
-      <h2>4. Server Components vs Client Components</h2>
+      <h2 id="sec-server-components-vs-client-components">4. Server Components vs Client Components</h2>
 
       <p>
         This is the load-bearing idea. Default in <code>app/</code>:
@@ -717,7 +717,7 @@ export default async function PostsPage() {
         </p>
       </blockquote>
 
-      <h2>5. Data fetching patterns</h2>
+      <h2 id="sec-data-fetching-patterns">5. Data fetching patterns</h2>
 
       <h3>5.1 async Server Components + <code>fetch</code></h3>
       <p>
@@ -777,7 +777,7 @@ export async function POST(request: Request) {
 }
 </code></pre>
 
-      <h2>6. Caching mental model — including Cache Components</h2>
+      <h2 id="sec-caching-mental-model-including-cache-components">6. Caching mental model — including Cache Components</h2>
 
       <p>
         Next's cache story is the part that confuses experienced SPA developers
@@ -886,7 +886,7 @@ export async function POST(request: Request) {
         </li>
       </ol>
 
-      <h2>
+      <h2 id="sec-middleware-next-image-next-font-and-metadata">
         7. Middleware, <code>next/image</code>, <code>next/font</code>, and
         metadata
       </h2>
@@ -927,7 +927,7 @@ export async function POST(request: Request) {
         headless-CMS rendering layer.
       </p>
 
-      <h2>8. Turbopack and the build toolchain</h2>
+      <h2 id="sec-turbopack-and-the-build-toolchain">8. Turbopack and the build toolchain</h2>
 
       <p>
         <strong>Turbopack</strong> is Next's Rust-based bundler (Webpack
@@ -958,7 +958,7 @@ export async function POST(request: Request) {
         like React upgrades — exact versions, full test runs.
       </p>
 
-      <h2>9. Navigation, streaming, and UX primitives</h2>
+      <h2 id="sec-navigation-streaming-and-ux-primitives">9. Navigation, streaming, and UX primitives</h2>
 
       <ul>
         <li>
@@ -997,7 +997,7 @@ export async function POST(request: Request) {
         and React versions must both support them.
       </p>
 
-      <h2>10. Auth, env, and security (frontend-adjacent)</h2>
+      <h2 id="sec-auth-env-and-security-frontend-adjacent">10. Auth, env, and security (frontend-adjacent)</h2>
 
       <ul>
         <li>
@@ -1055,7 +1055,7 @@ export async function POST(request: Request) {
         </tbody>
       </table>
 
-      <h2>11. AI readiness — product features, not hype</h2>
+      <h2 id="sec-ai-readiness-product-features-not-hype">11. AI readiness — product features, not hype</h2>
 
       <p>
         Next is a common host for AI product UI because streaming and server
@@ -1089,7 +1089,7 @@ export async function POST(request: Request) {
         remains: render loading/error/partial states without stale closures.
       </p>
 
-      <h2>12. Deployment targets</h2>
+      <h2 id="sec-deployment-targets">12. Deployment targets</h2>
 
       <p>
         You deploy a Next app, not a pile of React components. The build
@@ -1132,7 +1132,7 @@ export async function POST(request: Request) {
         </tbody>
       </table>
 
-      <h2>13. Testing in Next.js</h2>
+      <h2 id="sec-testing-in-next-js">13. Testing in Next.js</h2>
 
       <p>Testing has to respect the server/client split:</p>
       <ul>
@@ -1153,7 +1153,7 @@ export async function POST(request: Request) {
         <li><strong>Full flow</strong> — Playwright / Cypress end-to-end.</li>
       </ul>
 
-      <h2>14. Worked example — a product page with reviews and streaming</h2>
+      <h2 id="sec-worked-example-a-product-page-with-reviews-and-streaming">14. Worked example — a product page with reviews and streaming</h2>
 
       <p>
         Everything above, walked through one realistic route.
@@ -1208,7 +1208,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
         user sees — and that's the next section.
       </p>
 
-      <h2>15. Failure modes</h2>
+      <h2 id="sec-failure-modes">15. Failure modes</h2>
 
       <table>
         <thead>
@@ -1309,7 +1309,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
         </tbody>
       </table>
 
-      <h2>16. Principles</h2>
+      <h2 id="sec-principles">16. Principles</h2>
 
       <table>
         <thead>
@@ -1370,7 +1370,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
         </tbody>
       </table>
 
-      <h2>17. Ecosystem — a tooling catalog</h2>
+      <h2 id="sec-ecosystem-a-tooling-catalog">17. Ecosystem — a tooling catalog</h2>
 
       <table>
         <thead>
@@ -1434,7 +1434,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
         </tbody>
       </table>
 
-      <h2>18. The future — signals to watch</h2>
+      <h2 id="sec-the-future-signals-to-watch">18. The future — signals to watch</h2>
 
       <table>
         <thead>
@@ -1481,7 +1481,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
         </tbody>
       </table>
 
-      <h2>19. What you will actually read at work — the checklist</h2>
+      <h2 id="sec-what-you-will-actually-read-at-work-the-checklist">19. What you will actually read at work — the checklist</h2>
 
       <table>
         <thead>
@@ -1548,7 +1548,7 @@ export function generateMetadata({ params }) { ... }  <span class="comment-line"
 <span class="comment-line">// 4) CDN? → deployment / purge / ISR window</span>
 </code></pre>
 
-      <h2>20. How this ties back to the lessons</h2>
+      <h2 id="sec-how-this-ties-back-to-the-lessons">20. How this ties back to the lessons</h2>
 
       <table>
         <thead>

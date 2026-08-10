@@ -40,7 +40,7 @@
   <p>Most tutorials teach backend <em>syntax</em> — how to write a route, how to call an ORM method. Almost none teach the <em>thinking process</em> that precedes it: how an experienced engineer answers "what does this request do to the data, and when?" before writing a line. The frontend micro-loop is now well mapped (<em>The Rhythm</em>). The backend has no equivalent map — engineers transfer the React mental model to the server and it silently breaks them: they hold state in memory that should be in the database, they treat each request as if the previous one left everything in place, they write queries without thinking about transactional boundaries. This doc is the missing map. If you've ever written an endpoint that worked in Postman and fell apart under load or concurrency, this is the layer you missed.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: a sibling to <a href="./how-developers-think-frontend.html">The Rhythm</a> — read that first if you haven't. This doc is most useful once you own the language basics (<a href="./javascript-the-language.html">the language</a>, or an equivalent runtime), the <a href="./api-design.html">API contract</a>, and where this service meets the rest of the <a href="./system-design.html">system</a>. Cross-links:</p>
 <ul>
@@ -54,11 +54,11 @@
 
 <p><strong>If you've ever written an endpoint that worked in Postman and fell apart in production — this is the map.</strong> Read §1 (the mental model), §1b (the request lifecycle), §2 (the rounds), and §6 (the worked example) first. Then the theory (§1c evolution, §5 transactions), the failure modes (§9), and the tooling catalog (§8) when you've shipped a real feature.</p>
 
-<h2>0b. Definition — what backend engineering is and is not</h2>
+<h2 id="sec-definition-what-backend-engineering-is-and-is-not">0b. Definition — what backend engineering is and is not</h2>
 
 <p>Backend engineering is the mental model that says: every server feature is a <em>loop</em> of one disposable request. The scaffold your framework gives you is 20%. The discipline is the long tail. It is <em>not</em> a toolchain, a set of APIs, or a database pattern — it is the thinking process that precedes every line of code. This doc is the map for that process.</p>
 
-<h2>0c. History — the constraint inversions</h2>
+<h2 id="sec-history-the-constraint-inversions">0c. History — the constraint inversions</h2>
 
 <p>Backend engineering evolved through constraint inversions, the same pattern that shaped every discipline on this shelf:</p>
 
@@ -74,7 +74,7 @@
 
 <p>The pattern: every inversion pushed the loop toward smaller, stateless, asynchronous units. The request is the atom; state lives in deliberate external places.</p>
 
-<h2>0d. Intersection with the other shelves</h2>
+<h2 id="sec-intersection-with-the-other-shelves">0d. Intersection with the other shelves</h2>
 
 <p>Backend engineering is the micro-loop that lives <em>inside</em> the macro layers:</p>
 
@@ -94,7 +94,7 @@
 
 <p><strong>Key rule:</strong> if the topic is "how a request becomes a row" or "what happens inside one handler", it belongs here. If it's "how the service fits into the fleet" or "how the UI calls the endpoint", it belongs next door.</p>
 
-<h2>0e. Underlying theory — the invariants to trust</h2>
+<h2 id="sec-underlying-theory-the-invariants-to-trust">0e. Underlying theory — the invariants to trust</h2>
 
 <table>
 <thead><tr><th>Invariant</th><th>What it means</th><th>Why it matters</th></tr></thead>
@@ -108,7 +108,7 @@
 </tbody>
 </table>
 
-<h2>0f. Mental models — frames for thinking about the server</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-the-server">0f. Mental models — frames for thinking about the server</h2>
 
 <table>
 <thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
@@ -123,11 +123,11 @@
 </tbody>
 </table>
 
-<h2>0g. Rhythm, not algorithm — the update-the-loop discipline</h2>
+<h2 id="sec-rhythm-not-algorithm-the-update-the-loop-discipline">0g. Rhythm, not algorithm — the update-the-loop discipline</h2>
 
 <p>Backend work is not a fixed algorithm; it is a <em>rhythm</em> of three rounds. The skeleton is fast. The deepen is thoughtful. The polish is obsessive. The same three rounds apply whether you're writing a single route or a full service. The only difference from <em>The Rhythm</em> is that the "hot reload" is a curl or a test.</p>
 
-<h2>1. The backend mental model — one request at a time</h2>
+<h2 id="sec-the-backend-mental-model-one-request-at-a-time">1. The backend mental model — one request at a time</h2>
 
 <p>Backend work is a <em>loop</em>, not a toolchain. The scaffold your framework generates is the easy 20%; the mental model is the long tail.</p>
 
@@ -156,7 +156,7 @@
 
 <p><strong>The signature backend bug is scope confusion:</strong> putting truth in a module-level <code>Map</code> (lost on restart, invisible to other instances) or in a process-global mutable variable that two requests touch concurrently — then wondering why an endpoint "sometimes" returns stale data. The golden rule: <strong>if two requests must see the same value, it is a database row, not a variable.</strong> In-memory state is only ever a cache with a known invalidation story (§4).</p>
 
-<h2>1b. The request lifecycle — the timeline inside the brackets</h2>
+<h2 id="sec-the-request-lifecycle-the-timeline-inside-the-brackets">1b. The request lifecycle — the timeline inside the brackets</h2>
 
 <p>An experienced backend dev reads a handler as a <em>timeline</em>, not a block. The route you wrote is a fraction of what actually runs:</p>
 
@@ -186,7 +186,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>Result-shaping rule:</strong> shape the response at the handler boundary, never by default-serializing your ORM entity (see <a href="./api-design.html">API Design §10</a>). Serializing the entity couples your API to your storage schema: rename a column and you break the public contract.</p>
 
-<h2>1c. Evolution — the constraint inversions</h2>
+<h2 id="sec-evolution-the-constraint-inversions">1c. Evolution — the constraint inversions</h2>
 
 <p>Like every discipline on this shelf, backend engineering evolved through constraint inversions — moments when a constraint changed and the old approach stopped being sufficient:</p>
 
@@ -203,7 +203,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The pattern:</strong> every inversion pushed the loop toward the same shape — <em>smaller, stateless, asynchronous units.</em> The request is the atom; state lives in deliberate external places; work that doesn't belong in the response is deferred. Learn that shape once and every framework — Express, FastAPI, Go's net/http — is just notation for it.</p>
 
-<h2>1d. Authentication vs. authorization — identity, then permission</h2>
+<h2 id="sec-authentication-vs-authorization-identity-then-permission">1d. Authentication vs. authorization — identity, then permission</h2>
 
 <p>The two words are routinely conflated. They are different layers with different failure modes:</p>
 
@@ -244,7 +244,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The practical rule:</strong> the auth decision is mostly a <em>business decision</em> — how much do you want to own credential security, and how fast do you need to ship — not an engineering showcase. Passwords and 2FA are a compliance surface (see <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>); a managed provider moves that surface into someone else's SLA. For a small product or a client build, managed auth is rarely the wrong answer; for a large organization, identity is a product and the provider choice is strategic. The <a href="./security-and-threat-modeling.html">Security doc</a> covers what still lands on your plate either way: your app's own authorization, account-takeover recovery, audit logging, and the seam where "logged in" meets "your user's data is now in your system."</p>
 
-<h2>1e. Data access — ORMs vs. raw SQL</h2>
+<h2 id="sec-data-access-orms-vs-raw-sql">1e. Data access — ORMs vs. raw SQL</h2>
 
 <p>The ORM is a shorthand for "the entity is a class." Raw SQL is a shorthand for "the database is the system." Both are patterns; neither is a default religion:</p>
 
@@ -283,7 +283,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The rules:</strong> set a hard <code>max_connections</code> budget — pool size × instances must fit, or queries queue instead of failing fast; transaction mode breaks session features (prepared statements, session-scoped settings), so know which your driver uses; and treat pool exhaustion as a signal worth alerting on — it is the first thing to die under load spikes.</p>
 
-<h2>2. The three rounds — how a server feature actually gets built</h2>
+<h2 id="sec-the-three-rounds-how-a-server-feature-actually-gets-built">2. The three rounds — how a server feature actually gets built</h2>
 
 <p><em>The Rhythm</em>'s rounds apply here too, with a server-specific spine. The loop per feature is the same Skeleton → Deepen → Polish cycle:</p>
 
@@ -298,7 +298,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The feedback-loop difference:</strong> the frontend sees its result in <em>milliseconds</em> (hot reload). The backend sees its result only when it <em>receives a request</em> — so your "hot reload" is a script, a one-off client call, or a test that hits the route. Senior devs treat a curled request / minimal integration test with exactly the seriousness the frontend gives Fast Refresh: the tighter the loop, the faster the learning.</p>
 
-<h2>3. Background work — queues, jobs, and why you defer</h2>
+<h2 id="sec-background-work-queues-jobs-and-why-you-defer">3. Background work — queues, jobs, and why you defer</h2>
 
 <p>The asynchronous inversion (§1c) made deferred work a first-class part of the loop. Mental model: <strong>a request answers fast; heavy or optional work is queued.</strong></p>
 
@@ -315,7 +315,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>And the queue must be durable</strong> — a broker (BullMQ/Redis, SQS, RabbitMQ, Kafka), never "a list in memory on one process." Same rule as state above: if more than one worker can exist, the queue is external.</p>
 
-<h2>4. Caching — the three layers where latency hides</h2>
+<h2 id="sec-caching-the-three-layers-where-latency-hides">4. Caching — the three layers where latency hides</h2>
 
 <p>Cache turns a slow read into a fast answer. Mental model: three layers, each with its own invalidation story — and <strong>invalidation is the actual engineering</strong>:</p>
 
@@ -349,7 +349,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p>Data structures in one line each: <strong>string</strong> (values, counters, TTL), <strong>hash</strong> (a record: session fields), <strong>list</strong> (FIFO queues), <strong>set</strong> (uniqueness: "is this user in the cohort?"), <strong>sorted set</strong> (leaderboards, rate-limit windows, <em>by-score</em> range queries). Persistence (RDB snapshots / AOF log) is a durability option, not a promise — treat Redis as a cache and queue, never as the source of truth your database should be; the write-through discipline is the database's job. For the data-store selection decision and where it sits beside Postgres: <a href="./data-modeling-and-databases.html">Data Modeling</a> §Ecosystem. Hosted faces: Upstash, Supabase Redis, any PaaS's managed Redis — the <a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a> eras apply.</p>
 
-<h2>5. Transactions and concurrency — "the row changed since I read it"</h2>
+<h2 id="sec-transactions-and-concurrency-the-row-changed-since-i-read-it">5. Transactions and concurrency — "the row changed since I read it"</h2>
 
 <p>Two requests hitting the same record is the normal form of failure under load, and it is the most under-taught topic in backend code. Two concepts make it legible:</p>
 
@@ -367,7 +367,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p>But note the scope: reads do not need transactions; writes do. A read-only endpoint that starts a transaction is usually noise. If a read feeds a later write, those must be in the same transaction. See <a href="./api-design.html">API Design</a> for idempotency keys on the write side of the contract.</p>
 
-<h2>6. Worked example — trace the loop end to end</h2>
+<h2 id="sec-worked-example-trace-the-loop-end-to-end">6. Worked example — trace the loop end to end</h2>
 
 <p>One mini-feature, all three rounds: the user adds an item to a cart.</p>
 
@@ -407,7 +407,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p>That is the whole loop: three rounds, each one deeper, the same Request → Process → Respond model. The Rhythm's rounds — minus the hot-reload luxuries — with the source of truth replaced by "the database decides."</p>
 
-<h2>7. State — the identity and session decision</h2>
+<h2 id="sec-state-the-identity-and-session-decision">7. State — the identity and session decision</h2>
 
 <p>Where identity lives is a <strong>state</strong> decision that shapes every handler, so it deserves its own section and terminates the loop backward to §1:</p>
 
@@ -422,7 +422,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>Rule to live by:</strong> choose based on which you need to revoke. Sessions revoke instantly because a server-side record is looked up per request; a stateless JWT is only revocable before it <em>expires</em> (short lifetime, or a token-blocklist/refresh-token boundary). If "log this user out now" is a requirement (account security, admin bans), you need a server-side record that can be checked or invalidated — a session store, or a token-blocklist/refresh-token revoke. If revocation isn't a business need, stateless claims win. Read both sides in <a href="./api-design.html">API Design</a> before choosing.</p>
 
-<h2>7b. CRUD — the shape of most web apps</h2>
+<h2 id="sec-crud-the-shape-of-most-web-apps">7b. CRUD — the shape of most web apps</h2>
 
 <p>Four verbs built a third of the web. "It's just CRUD" is said dismissively; the professional version of CRUD is where the loop's discipline shows — every handler is a <em>request → validate → authorize → mutate → respond</em> sequence, and the five steps below are where most real bugs live.</p>
 
@@ -459,7 +459,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>If your whole API is CRUD over a database, the abstraction is thin:</strong> Express + an ORM route-generator (or tools like Fastify + Drizzle, NestJS modules, Django's generic views, PostgREST) cover it. The part that is never "just CRUD" is the loop around it — validation, ownership, idempotency, events (see <a href="./api-design.html">API Design</a> and <a href="./data-modeling-and-databases.html">Data Modeling</a>).</p>
 
-<h2>8. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">8. Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>Same format as the other reference shelf catalog tables — a quick map of category, representative tools, the trigger that justifies adding one, the decision metric that tells you it's working:</p>
 
@@ -513,7 +513,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The tool filter</strong> applies to every category above: does the tool make a <em>decision</em> visible, testable, or reversible? Anti-tooling clause: before adopting role-based access control because a framework shipped it, ask whether ownership or admin, not roles, is what the data requires. The right tool is invisible — you notice it is wrong when a decision is forced through a shape it never had.</p>
 
-<h2>8b. Observability — see the loop, not just run it</h2>
+<h2 id="sec-observability-see-the-loop-not-just-run-it">8b. Observability — see the loop, not just run it</h2>
 
 <p>Backend engineering is invisible until it fails. The loop is observable when you put these signals on every request:</p>
 
@@ -533,7 +533,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>What to do with the signals once they exist</strong> — targets, alerts, incidents, postmortems — is the operational discipline: see <a href="./observability-and-operations.html">Observability &amp; Operations</a>.</p>
 
-<h2>8c. Error handling — the error is part of the contract</h2>
+<h2 id="sec-error-handling-the-error-is-part-of-the-contract">8c. Error handling — the error is part of the contract</h2>
 
 <p>Backend engineering is not just happy-path code. The error contract is part of the API:</p>
 
@@ -548,7 +548,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>Rule:</strong> the error response is part of the contract. Never leak internal stack traces to the client. Use requestId for correlation. The error boundary middleware (last in the chain) catches everything.</p>
 
-<h2>9. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">9. The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>What happens</th><th>Fix / mental model</th></tr></thead>
@@ -564,7 +564,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
   </tbody>
 </table>
 
-<h2>10. Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">10. Summary — the complete mental checklist</h2>
 
 <p>Before you write your next endpoint, run this. If you can answer each row, you're ready to code; if not, sketch until you can.</p>
 

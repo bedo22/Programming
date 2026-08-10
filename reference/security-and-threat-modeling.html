@@ -47,7 +47,7 @@
   <p><em>API Design</em> teaches how to issue a JWT. <em>Backend Engineering</em> teaches how to check ownership before returning a record. <em>System Design</em> teaches where to put a trust boundary. But nobody on the shelf teaches the <em>discipline itself</em>: how to enumerate the ways a system can be attacked (STRIDE), how to decide what must be protected and how much that protection costs, and how to say no when the answer matters more than shipping. Security is not a checklist of HTTP headers or ORM settings — it is <strong>adversarial thinking plus risk management</strong>, and it has its own history (the perimeter dissolved), its own mental models (defense in depth, least privilege), and its own failure modes (security theater, rolling your own crypto). That is the gap this doc fills: everything else on the shelf assumes a well-intentioned user; this doc assumes an adversary with a plan.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read this after <a href="./system-design.html">System Design</a> §5d (so you've seen trust boundaries drawn) and after <a href="./backend-engineering.html">Backend Engineering</a> §1d (so you've seen authorization checks). Most readers come back when a feature needs a design review, a dependency gets compromised, or a "quick endpoint" needs hardening. Cross-links:</p>
 <ul>
@@ -61,7 +61,7 @@
 
 <p><strong>If you've ever shipped an endpoint that turned out to let anyone read someone else's data, committed a secret, or trusted input from the internet — this is the map.</strong> Read the Definition and Mental models first, then Threat modeling (the core skill), then the OWASP section. Come back to IAM and Cryptography when you design auth for real.</p>
 
-<h2>Definition — security as the CIA triad</h2>
+<h2 id="sec-definition-security-as-the-cia-triad">Definition — security as the CIA triad</h2>
 
 <p>Security is not "adding encryption." It is the preservation of three properties, together, for as long as the system exists — the <strong>CIA triad</strong>:</p>
 
@@ -76,7 +76,7 @@
 
 <p>The triad is a <em>trade-off engine</em>, not a slogan: every design choice trades one leg against another, and every leg has a cost. Stronger confidentiality (encrypt everything, verify everyone) costs availability (more failure points, slower requests). Perfect integrity (immutable append-only everything) costs availability and storage. <strong>Security work is the explicit, recorded answer to "which leg does this system bet on, and what did we give the adversary instead?"</strong> — the same posture this shelf takes toward CAP (see <a href="./system-design.html">System Design §6c</a>) and consistency (see <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a>). The availability leg is where security meets reliability: an attacker's cheapest move is often to make the system unusable, which is why denial-of-service shows up in the threat model below and why SRE work is security work.</p>
 
-<h2>History — the constraint inversions</h2>
+<h2 id="sec-history-the-constraint-inversions">History — the constraint inversions</h2>
 
 <p>Security evolved through the same pattern of constraint inversions as every discipline on this shelf — each one forced by the previous model breaking:</p>
 
@@ -92,7 +92,7 @@
 
 <p>The pattern: each inversion moved trust away from a place it could be <em>assumed</em> (the network, the codebase, the end of the pipeline, the app itself) to a place it must be <em>proven</em> — and pushed the proof earlier in the process. The constant: <strong>adversarial thinking is the skill; the tools just moved where it happens.</strong></p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <p>This doc deliberately owns <em>none</em> of the mechanics. Its entire job is the mindset, the threat model, and the gate — everything mechanical lives next door and is linked, not re-taught:</p>
 
@@ -111,7 +111,7 @@
 
 <p><strong>Key rule:</strong> if the topic is "how does the attacker think, what is at risk, and what do we say no to" — it belongs here. If the topic is "what is the exact header, query, or pipeline step" — it belongs next door. This doc references; it never re-teaches.</p>
 
-<h2>Underlying theory — threat modeling</h2>
+<h2 id="sec-underlying-theory-threat-modeling">Underlying theory — threat modeling</h2>
 
 <p>Threat modeling is the core skill of the discipline: <strong>enumerating, before you build, the ways an adversary can abuse what you're building</strong> — then choosing which ones to defend against. It has three parts.</p>
 
@@ -137,7 +137,7 @@
 
 <p>The discipline: <strong>draw the data-flow diagram first</strong> — every actor (user, cron job, other service, admin tool), every store, every process, and every arrow of data between them. Then mark every boundary. Then run STRIDE on each arrow. The drawing is the threat model's skeleton; STRIDE is its muscle. A feature with no diagram has no threat model, and a feature with no threat model ships bugs on purpose. (The architecture-side treatment of where boundaries go, and how blast radius contains a breach, is <a href="./system-design.html">System Design §5d</a>; this is the per-feature method.)</p>
 
-<h2>Running a threat model — the process</h2>
+<h2 id="sec-running-a-threat-model-the-process">Running a threat model — the process</h2>
 
 <p>STRIDE and trust boundaries are the vocabulary; this is the session. The output of a threat model is not "we looked at it" — it is a written register of threats, priorities, and decisions, reviewed when the system changes:</p>
 
@@ -156,7 +156,7 @@
 
 <p>This is the classic method (Microsoft's STRIDE-based practice). Alternatives exist and are worth knowing by name: <strong>PASTA</strong> (a 7-stage risk-centric process), <strong>TRIKE</strong> (risk-management-focused, with a requirements model), and <strong>attack trees</strong> (decompose an attacker's goal into AND/OR sub-attacks — good for single high-stakes goals like "steal the database"). Tools (the Microsoft Threat Modeling Tool, OWASP Threat Dragon) automate the drawing and the STRIDE prompts, but the discipline is the session, not the tool — a diagram nobody reasoned over is decoration.</p>
 
-<h2>Risk management — the decision framework</h2>
+<h2 id="sec-risk-management-the-decision-framework">Risk management — the decision framework</h2>
 
 <p>"Security is risk management" is the thesis; this is the machinery. A risk is a <em>threat with a likelihood and an impact</em>, and every security decision is a treatment choice made on that math:</p>
 
@@ -187,7 +187,7 @@
 
 <p><strong>Measuring posture — the metrics that matter:</strong> the register lives or dies on a few numbers you can actually move: <strong>vulnerability density</strong> (open findings per component — trend it down), <strong>patch SLA</strong> (% of critical patches applied within 7 days — the Log4Shell lesson), <strong>threat-model coverage</strong> (% of new features with a register entry), and <strong>pen-test findings by severity</strong> (zero critical/high at launch). Detection-and-response measurement — <strong>MTTD/MTTR</strong>, how fast you notice and contain a breach — is the observability domain and lives in <a href="./system-design.html">System Design §6f</a> (SLOs, on-call, incident response); security consumes those numbers but doesn't own that machinery. The operational practice — alert design, incident response, postmortems — is <a href="./observability-and-operations.html">Observability &amp; Operations</a>.</p>
 
-<h2>Mental models — frames for thinking about security</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-security">Mental models — frames for thinking about security</h2>
 
 <table>
 <thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
@@ -201,7 +201,7 @@
 </tbody>
 </table>
 
-<h2>Identity &amp; Access Management (IAM)</h2>
+<h2 id="sec-identity-access-management-iam">Identity &amp; Access Management (IAM)</h2>
 
 <p>IAM is the discipline of answering two different questions that are constantly confused:</p>
 
@@ -238,7 +238,7 @@
 
 <p>The wire-level mechanics — OAuth 2.1 flows, OIDC claims, JWT vs. opaque tokens, refresh boundaries, mTLS and SPIFFE for service-to-service — are <a href="./api-design.html">API Design's</a> job (§8h, §10). What belongs here: the mental model that <strong>authentication is a gate and authorization is a per-request decision, and the two must never be merged into "has a valid token"</strong>.</p>
 
-<h2>Cryptography &amp; data protection</h2>
+<h2 id="sec-cryptography-data-protection">Cryptography &amp; data protection</h2>
 
 <p>Cryptography is the tool for confidentiality, integrity, and non-repudiation — and the three jobs use <em>different</em> primitives that are constantly swapped for each other:</p>
 
@@ -259,7 +259,7 @@
   <li><strong>Secrets (API keys, DB passwords) get a secrets manager and a rotation story</strong> — and the <em>pipeline</em> side of secret hygiene (scanning, least-privilege injection) lives in <a href="./version-control-ci-cd-deployment.html">CI/CD — Secrets and configuration</a>.</li>
 </ul>
 
-<h2>Application security: the OWASP taxonomy</h2>
+<h2 id="sec-application-security-the-owasp-taxonomy">Application security: the OWASP taxonomy</h2>
 
 <p>OWASP's Top 10 is the shared vocabulary of application attacks — an <em>awareness document</em>, not an exhaustive catalog, so treat it as a checklist to start from, never a completeness proof. The point here is not the list — it is the <em>classes</em>: each row is a way of thinking about what the app trusts. The mechanics of each live next door; the class itself lives here.</p>
 
@@ -277,7 +277,7 @@
 
 <p><strong>The unifying insight: every class is a violated trust assumption about input, output, identity, or state.</strong> The threat-modeling habit (STRIDE each endpoint) is what surfaces the class before it ships.</p>
 
-<h2>Infrastructure &amp; network security</h2>
+<h2 id="sec-infrastructure-network-security">Infrastructure &amp; network security</h2>
 
 <p>The fleet-level controls that make a breach survivable:</p>
 
@@ -311,7 +311,7 @@
 
 <p>Same shape as the rest of this doc: assume the trusted thing can be hostile, verify at the boundary, and keep the blast radius small enough that one bad dependency is an incident, not a company-ending event.</p>
 
-<h2>The AI-era attack surface</h2>
+<h2 id="sec-the-ai-era-attack-surface">The AI-era attack surface</h2>
 
 <p>LLMs and agents changed the attack surface in two ways: they added new vulnerability classes, and they made existing ones easier. This is the youngest domain — treat its "best practices" as provisional and keep the threat-modeling habit on top of them.</p>
 
@@ -328,7 +328,7 @@
 
 <p>Where the AI-agent lifecycle itself — design, tools, evaluation, failure modes — is owned: <a href="./software-development-process.html">Software Development Process §9d</a> (the Agent Development Lifecycle). This doc owns what an adversary does to it.</p>
 
-<h2>Compliance — when security becomes auditable</h2>
+<h2 id="sec-compliance-when-security-becomes-auditable">Compliance — when security becomes auditable</h2>
 
 <p>Compliance is what happens when security requirements are written into law, contracts, or industry rules. The mindset content is simple — the rest is your organization's compliance program — but a security reference must know the vocabulary, because clients and employers will use it as a requirement:</p>
 
@@ -347,7 +347,7 @@
 
 <p><strong>The principle: compliance is not security.</strong> Compliance is the minimum bar a regulator or contract requires; security is protecting assets beyond that bar. A system can be fully compliant and still vulnerable (the standards are checklists of controls, not proofs of safety) — and a system can be secure and non-compliant (an unpatchable legacy box behind a firewall). Treat compliance as a floor the business chooses for market reasons, then do the threat modeling on top of it. For the freelancer tier this matters once: the moment a client asks about PCI or GDPR, the question "what are we actually required to do, and where is the seam?" is answered by <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> and by this doc's checklist — not by fear.</p>
 
-<h2>Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <table>
 <thead><tr><th>Principle</th><th>The rule of thumb</th></tr></thead>
@@ -380,7 +380,7 @@
 </tbody>
 </table>
 
-<h2>Worked example — threat-modeling a file-upload endpoint</h2>
+<h2 id="sec-worked-example-threat-modeling-a-file-upload-endpoint">Worked example — threat-modeling a file-upload endpoint</h2>
 
 <p>A classic feature with a surprisingly large attack surface. The discipline: draw the data flow, mark the boundaries, then run STRIDE against each arrow.</p>
 
@@ -417,7 +417,7 @@
 
 <p><strong>Step 3 — the decisions that cost nothing:</strong> read-side authorization, server-side validation, opaque keys, quota limits, audit logging. <strong>The decisions that cost something:</strong> sandboxing the worker, malware scanning, signed URLs for direct-to-storage uploads (see <a href="./api-design.html">API Design</a> for the presigned-URL pattern). Threat modeling is what makes the second list explicit — before the incident makes it urgent.</p>
 
-<h2>The security checklist — the gate</h2>
+<h2 id="sec-the-security-checklist-the-gate">The security checklist — the gate</h2>
 
 <p>Run this at design time and at PR review. If a row can't be answered, the change isn't ready — this is the shift-left inversion in practice:</p>
 
@@ -436,7 +436,7 @@
 </tbody>
 </table>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
 <thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
@@ -451,7 +451,7 @@
 </tbody>
 </table>
 
-<h2>Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <table>
 <thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
@@ -468,7 +468,7 @@
 </tbody>
 </table>
 
-<h2>The future — where security is going</h2>
+<h2 id="sec-the-future-where-security-is-going">The future — where security is going</h2>
 
 <table>
 <thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
@@ -484,7 +484,7 @@
 
 <p>The direction is not "more controls" — it is <em>fewer trust assumptions, proven at more points, earlier in the process</em>, with the residual risk owned by a human who can say no.</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Before you merge anything, run this. If you can answer each row, the change has a threat model; if not, sketch until it does.</p>
 

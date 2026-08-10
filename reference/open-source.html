@@ -44,7 +44,7 @@
   <p><strong>Neighbors on the shelf:</strong> <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (the Git/PR mechanics — this doc is the ecosystem around them) · <a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> (what a contribution must prove) · <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (supply chain, the supply-chain risk layer) · <a href="./terminal-applications.html">Building CLIs &amp; Terminal Applications</a> (a concrete type of project you might contribute to) · <a href="./glossary.html">Glossary</a></p>
 </blockquote>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read the Definition (what "open source" actually means — it is narrower than you think), then the License table so you can read a LICENSE file, then the Governance table, then the Contributor Journey — the walkthrough you'll actually live. The mechanics of forking and PRs live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a>; this doc is why you do them and how the process works socially. Cross-links:</p>
 <ul>
@@ -57,7 +57,7 @@
 
 <p><strong>If you've ever wanted to contribute to a project but didn't know where to start, or read a LICENSE file and weren't sure what it allowed — this is the map.</strong> Read the contributor journey once; the licenses and governance tables are your reference at each step.</p>
 
-<h2>Definition — what "open source" is, and what it is not</h2>
+<h2 id="sec-definition-what-open-source-is-and-what-it-is-not">Definition — what "open source" is, and what it is not</h2>
 
 <p><strong>Open source</strong> is a practice of <em>licensing and collaboration</em>: source code made publicly available under a license that grants others the right to view, modify, and distribute it. That last word — <em>license</em> — is the whole legal engine. "Open source" is not "free," not "no license," and not "public domain":</p>
 
@@ -74,11 +74,11 @@
 
 <p>The practical rule: <strong>a project's LICENSE file is the contract that makes it usable by you, and that governs what you may do with a contribution.</strong> Read it before you depend on the project, and know it before you contribute.</p>
 
-<h2>History — how the commons came to be</h2>
+<h2 id="sec-history-how-the-commons-came-to-be">History — how the commons came to be</h2>
 
 <p>The short version: the 1980s saw proprietary software lock down source code; Richard Stallman founded GNU and invented copyleft to guarantee the right to share; Linus Torvalds released Linux under the GPL in 1991; Eric Raymond's 1997 essay "The Cathedral and the Bazaar" named the peer-production model; and in 1998 the term "open source" was coined as a pragmatic, business-friendly rebrand of the same practice. The shelf's history timeline in <a href="./cs-and-software-engineering.html">Computer Science &amp; Software Engineering</a> covers this in depth — this doc inherits that history and focuses on the present practice.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
   <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
@@ -91,7 +91,7 @@
   </tbody>
 </table>
 
-<h2>Underlying theory — the commons, and how it stays alive</h2>
+<h2 id="sec-underlying-theory-the-commons-and-how-it-stays-alive">Underlying theory — the commons, and how it stays alive</h2>
 
 <p>Open source works because of a specific economic shape: the cost of copying is near zero, and the value of a shared pool grows with contributors. Three mechanisms keep the pool healthy:</p>
 
@@ -101,7 +101,7 @@
   <li><strong>The maintainer bottleneck.</strong> Contributors are many, maintainers are few, and maintenance is unpaid. The scarcest resource in open source is not code — it is <em>review attention</em>. Every contribution either spends or earns that attention.</li>
 </ul>
 
-<h2>Mental models — frames for thinking about open source</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-open-source">Mental models — frames for thinking about open source</h2>
 
 <table>
   <thead><tr><th>Frame</th><th>What it does</th></tr></thead>
@@ -114,7 +114,7 @@
   </tbody>
 </table>
 
-<h2>Licenses — the legal contract, permissively or copyleft</h2>
+<h2 id="sec-licenses-the-legal-contract-permissively-or-copyleft">Licenses — the legal contract, permissively or copyleft</h2>
 
 <p>Licenses fall into two families. The difference is what happens to <em>derivative work</em>:</p>
 
@@ -134,7 +134,7 @@
 
 <p><strong>Who owns your contribution.</strong> By default you own code you wrote; contributing it under a project's license is a grant, not a transfer. The exception is code written as part of your job — your employment contract often assigns that copyright to your employer, so check before contributing "I wrote it at work" code. The DCO/CLA you sign is the project recording this ownership line, not creating it.</p>
 
-<h2>Governance — who runs the project, and how</h2>
+<h2 id="sec-governance-who-runs-the-project-and-how">Governance — who runs the project, and how</h2>
 
 <p>Governance decides who can merge, who decides scope, and how disputes resolve. It shapes your experience as a contributor more than you'd think:</p>
 
@@ -149,7 +149,7 @@
 </table>
 
 <p>The practical read: a project's governance model is visible in its CONTRIBUTING.md and its maintainer list. Foundation and meritocratic projects reward patient, incremental contribution; corporate-backed ones often need an issue first, and sometimes an internal champion. Read the room before you commit effort.</p>
-<h2>The contributor journey — from finding a project to your first merge</h2>
+<h2 id="sec-the-contributor-journey-from-finding-a-project-to-your-first-merge">The contributor journey — from finding a project to your first merge</h2>
 
 <p>The path is the same for every project. The mechanics (fork, branch, PR, merge) live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a>; here is the <em>strategy</em> of the journey:</p>
 
@@ -183,7 +183,7 @@
 
 <p><strong>The emotional arc is real and normal:</strong> imposter syndrome before the first PR, anxiety during review, relief at the merge, then — after enough contributions — being offered review duties or maintainer access. That arc is the whole point; it is how the community renews itself.</p>
 
-<h2>Code review — from both sides of the table</h2>
+<h2 id="sec-code-review-from-both-sides-of-the-table">Code review — from both sides of the table</h2>
 
 <table>
   <thead><tr><th>As a contributor</th><th>As a reviewer</th></tr></thead>
@@ -198,7 +198,7 @@
 
 <p>Review is the quality mechanism Linus's Law describes. The fastest way to become a better contributor is to review other people's PRs first — reading someone else's code against the project's conventions teaches you the standards you'll be held to.</p>
 
-<h2>Maintaining a project — the other side of the wall</h2>
+<h2 id="sec-maintaining-a-project-the-other-side-of-the-wall">Maintaining a project — the other side of the wall</h2>
 
 <p>Contributing and maintaining are different crafts. If you maintain:</p>
 
@@ -209,7 +209,7 @@
   <li><strong>Handing off is a success, not a failure.</strong> Archiving, transferring to a foundation, or naming new maintainers keeps the commons alive when your life changes. A graceful handoff is how mature projects survive their founders.</li>
 </ul>
 
-<h2>Business models — how open source pays for itself</h2>
+<h2 id="sec-business-models-how-open-source-pays-for-itself">Business models — how open source pays for itself</h2>
 
 <p>Open source code is free; the work around it is not. The models that keep projects alive (each has a licensing consequence worth knowing):</p>
 
@@ -226,7 +226,7 @@
 
 <p>The income dimension — how much, and whether it's a realistic primary income — is covered in <a href="./frontend-income-markets.html">Frontend Income Markets</a> §7. Here, the takeaway is the licensing consequence: a project's funding model and its license are chosen together, and the license you pick for your own project shapes what funding is possible.</p>
 
-<h2>Contributing to AI-agent CLIs — the concrete case</h2>
+<h2 id="sec-contributing-to-ai-agent-clis-the-concrete-case">Contributing to AI-agent CLIs — the concrete case</h2>
 
 <p>The most direct place to apply all of this is the CLI tools you use daily. AI-agent CLIs (Claude Code, Codex, Aider, Continue) are open source projects with unusually clean extension points, and they are actively looking for contributors:</p>
 
@@ -237,7 +237,7 @@
   <li><strong>Governance is young.</strong> Several of these projects are corporate-backed or brand-new, so governance is still settling — which makes early contributions land harder and be valued more.</li>
 </ul>
 
-<h2>Principles — the shared constants of open source</h2>
+<h2 id="sec-principles-the-shared-constants-of-open-source">Principles — the shared constants of open source</h2>
 
 <ul>
   <li><strong>Read the LICENSE before you touch anything.</strong> It is the contract that makes the code usable.</li>
@@ -248,7 +248,7 @@
   <li><strong>Give back what you take.</strong> Reporting a bug well, writing documentation, or reviewing one PR is a real contribution — not everything is code.</li>
 </ul>
 
-<h2>Worked example — one contribution, end to end</h2>
+<h2 id="sec-worked-example-one-contribution-end-to-end">Worked example — one contribution, end to end</h2>
 
 <p>Suppose you use a small open-source CLI for formatting and hit a bug: it mangles files with an unusual path. Here's the full journey:</p>
 
@@ -280,7 +280,7 @@
 
 <p>The same journey on an AI-agent CLI differs only in step 4 (you're tracing the tool-calling seam) and step 5 (tests are eval-based). The arc — find, claim, fix small, survive review, merge — is universal.</p>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead>
@@ -295,7 +295,7 @@
   </tbody>
 </table>
 
-<h2>Ecosystem — the terrain you'll navigate</h2>
+<h2 id="sec-ecosystem-the-terrain-you-ll-navigate">Ecosystem — the terrain you'll navigate</h2>
 
 <table>
   <thead><tr><th>Layer</th><th>Tools / platforms</th><th>What they're for</th></tr></thead>
@@ -308,11 +308,11 @@
   </tbody>
 </table>
 
-<h2>The future — trust becomes the product</h2>
+<h2 id="sec-the-future-trust-becomes-the-product">The future — trust becomes the product</h2>
 
 <p>Two trends are reshaping open source. First, <strong>the supply chain became an attack surface</strong> — the 2024 xz-utils backdoor showed that a patient contributor can inject a backdoor into a widely-installed library. The response is provenance (SLSA, sigstore signatures, SBOMs) and a sharper eye on who maintains what. Second, <strong>AI changes who contributes</strong>: models can now draft PRs, which floods maintainers with review work and makes the review bottleneck tighter than ever. The result is the same shift the rest of the shelf predicts — <em>evaluation and judgment become the premium skills</em>. In open source, that means the contributors who understand the code, the project's scope, and the culture — the ones this doc teaches you to be — are more valuable, not less.</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Print this. It is the entire doc in eleven lines:</p>
 
@@ -334,7 +334,7 @@
 </table>
 
 <section class="cite">
-  <h2>Primary sources</h2>
+  <h2 id="sec-primary-sources">Primary sources</h2>
   <ol>
     <li>Stallman, Richard — <a href="https://www.gnu.org/philosophy/free-sw.html">The GNU Free Software Definition</a> — the four freedoms.</li>
     <li>Open Source Initiative — <a href="https://opensource.org/osd">The Open Source Definition</a> — the pragmatic counterpart to GNU's four freedoms.</li>
@@ -345,7 +345,7 @@
 </section>
 
 <section class="teacher">
-  <h2>Ask your teacher</h2>
+  <h2 id="sec-ask-your-teacher">Ask your teacher</h2>
   <p>Three follow-ups to deepen this:</p>
   <ul>
     <li>"Pick one dependency from my current projects, read its LICENSE and CONTRIBUTING.md, and walk me through what a first contribution to it would look like."</li>

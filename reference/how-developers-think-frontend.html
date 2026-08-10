@@ -43,7 +43,7 @@
   <p>Most tutorials teach <em>syntax</em> — how to write a component, how to call <code>useState</code>, how to style with CSS. Almost none teach the <em>thinking process</em> that precedes the code: how an experienced developer breaks down a feature into data, structure, and behavior, cycles through them, and knows when to stop. This doc captures that process in full — the loop, its history, its vocabulary, and the single most important upfront decision: the data shape. If you've ever stared at a blank file wondering "where do I even start?", this is the map.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful <em>after</em> you understand the platform (<a href="./html-and-css.html">HTML &amp; CSS</a>) and the language (<a href="./javascript-the-language.html">JavaScript: The Language</a>), and <em>before</em> you start any non-trivial UI feature. Cross-links:</p>
 <ul>
@@ -59,7 +59,7 @@
 
 <p><strong>If you've ever stared at a blank file wondering "where do I even start?" — this is the map.</strong> Read §1 (the three threads), §2–§5 (the rounds), §5a (state decisions), and §13 (the worked example) first. Then come back for the theory (§1e) and the failure modes (§13b) when you've tried the loop on a real feature.</p>
 
-<h2>1b. Definition — what the dev loop <em>is</em> and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-the-dev-loop-is-and-what-it-is-not">1b. Definition — what the dev loop <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 <p>The development loop is the <strong>implementation rhythm</strong> that turns a known solution into a working UI feature. It is three threads — Model (data/state), View (structure/layout), Flow (events/logic) — cycled in rounds (Skeleton → Deepen → Polish), each round deeper than the last. It produces <em>working code</em> — the feature itself. The rhythm is universal: the same Model→View→Flow cycle applies whether you're building a todo list, a dashboard, or a complex form.</p>
@@ -76,7 +76,7 @@
 <h3>Well-defined vs wicked — where the loop lives</h3>
 <p>The dev loop lives squarely in <strong>wicked problem</strong> territory (see <a href="./problem-solving.html">Problem-Solving §1</a>): the requirements evolve, the success criteria are subjective ("does it look right?"), and there's no clear stopping rule — only better or worse. This is why it's a rhythm, not an algorithm. A HackerRank challenge (well-defined) gets an algorithm; a UI feature (wicked) gets a rhythm. Both use the same underlying thinking process (Pólya's four phases), but they converge to different output types.</p>
 
-<h2>1c. Evolution — constraint inversions across the same idea</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-same-idea">1c. Evolution — constraint inversions across the same idea</h2>
 
 <p>Like every discipline on this shelf, the dev loop evolved through constraint inversions — moments when a constraint changed and the old approach stopped being sufficient.</p>
 
@@ -94,7 +94,7 @@
 
 <p><strong>The pattern:</strong> the loop's <em>shape</em> (three threads, cycled in rounds) has been stable since Boehm named it in 1986. What changes is the <em>scale</em> (project → feature), the <em>speed</em> (days → milliseconds), the <em>where</em> (client → server+client), and the <em>who</em> (human → human+AI). The rhythm survives because it's the shape of iterative work itself, not a tool.</p>
 
-<h2>1d. Intersection with neighbors — where it borders other practices</h2>
+<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">1d. Intersection with neighbors — where it borders other practices</h2>
 
 <p>The dev loop sits between the layer that finds the solution and the layer that renders it. Every neighbor is a sibling, not a substitute.</p>
 
@@ -112,7 +112,7 @@
 
 <p><strong>The boundary rule:</strong> if you're deciding <em>what</em> to build, that's Design Thinking. If you're deciding <em>how to solve the problem</em>, that's Problem-Solving. If you're deciding <em>how the solution fits at scale</em>, that's System Design. If you're <em>building the feature</em>, that's the dev loop. Each layer feeds the next.</p>
 
-<h2>1e. Underlying theory — why the loop works (the cognitive science)</h2>
+<h2 id="sec-underlying-theory-why-the-loop-works-the-cognitive-science">1e. Underlying theory — why the loop works (the cognitive science)</h2>
 
 <p>The three-thread loop wasn't derived from cognitive science — it was derived from practice, from decades of developers noticing what works. But cognitive science explains <em>why</em> it works, providing the theoretical foundation.</p>
 
@@ -135,7 +135,7 @@
 <p>Larman and Basili's 2003 IEEE paper (<a href="https://en.wikipedia.org/wiki/Iterative_and_incremental_development">Wikipedia</a>) traced iterative and incremental development back to the 1950s — it's <em>older</em> than Waterfall. Project Mercury (NASA) code was built iteratively. The spiral didn't invent the loop; it <em>named</em> what good developers already did. The frontend loop is the same pattern, at a different scale — the latest inversion in an 80-year lineage of iterative practice.</p>
 
 
-<h2>1. The three-thread mental model — not a sequence, a loop</h2>
+<h2 id="sec-the-three-thread-mental-model-not-a-sequence-a-loop">1. The three-thread mental model — not a sequence, a loop</h2>
 
 <p>When a senior developer sits down to build a feature, they do <strong>not</strong> follow a waterfall: "first structure, then layout, then functionality." Instead they hold <strong>three intertwined threads</strong> and cycle through them, each pass deeper than the last:</p>
 
@@ -200,7 +200,7 @@
 
 ---
 
-<h2>2. Round 0 — The three clarifying questions (the hardest part)</h2>
+<h2 id="sec-round-0-the-three-clarifying-questions-the-hardest-part">2. Round 0 — The three clarifying questions (the hardest part)</h2>
 
 <p>Before any code, before any HTML, you answer these three questions. This is where the data shape <em>starts</em> — not because you're designing algorithms, but because the shape of the data determines everything downstream.</p>
 
@@ -234,7 +234,7 @@
 
 ---
 
-<h2>3. Round 1 — Skeleton pass (the thinnest end-to-end slice)</h2>
+<h2 id="sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice">3. Round 1 — Skeleton pass (the thinnest end-to-end slice)</h2>
 
 <p>You touch all three threads with the <strong>cheapest</strong> version of each. The goal: a working end-to-end path, however minimal.</p>
 
@@ -290,7 +290,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>4. Round 2 — Deepening pass (make it real)</h2>
+<h2 id="sec-round-2-deepening-pass-make-it-real">4. Round 2 — Deepening pass (make it real)</h2>
 
 <p>Now you go back through each thread and make the skeleton real:</p>
 
@@ -338,7 +338,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>5. Round 3 — Edge cases and polish (the difference between works and ships)</h2>
+<h2 id="sec-round-3-edge-cases-and-polish-the-difference-between-works-and-ships">5. Round 3 — Edge cases and polish (the difference between works and ships)</h2>
 
 <ul>
   <li>What if the API fails? (→ error state)</li>
@@ -377,7 +377,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>5a. Frontend state decisions — the taxonomy</h2>
+<h2 id="sec-frontend-state-decisions-the-taxonomy">5a. Frontend state decisions — the taxonomy</h2>
 
 <p>§1–§5 treat "state" as a single idea, but the Model thread is actually <strong>several different kinds of state</strong>, and mixing them is the source of most frontend bugs. Here's the taxonomy the rounds navigate:</p>
 
@@ -502,7 +502,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>5b. Mental models — how developers actually reason across rounds</h2>
+<h2 id="sec-mental-models-how-developers-actually-reason-across-rounds">5b. Mental models — how developers actually reason across rounds</h2>
 
 <p>The loop in §1–§5 is a sequence of <em>passes</em>, but the developer's mental model is more like a <strong>triple-thread</strong>: a thread for "is this <em>correct</em>?" a thread for "is this <em>complete</em>?" and a thread for "is this <em>cheap</em>?" Different camps weight these threads differently.</p>
 
@@ -551,7 +551,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>6. Where data structures & algorithms actually show up in frontend</h2>
+<h2 id="sec-where-data-structures-algorithms-actually-show-up-in-frontend">6. Where data structures & algorithms actually show up in frontend</h2>
 
 <p>You don't start with "what algorithm should I use?" You start with "what's the simplest structure?" and only reach for a specific algorithm when you <em>feel the pain</em> — slow rendering, sluggish search, duplicate logic.</p>
 
@@ -571,7 +571,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>7. The honest truth about how senior devs work</h2>
+<h2 id="sec-the-honest-truth-about-how-senior-devs-work">7. The honest truth about how senior devs work</h2>
 
 <ol>
   <li><strong>They copy first, understand later.</strong> They've seen the pattern (list, form, modal, dashboard) dozens of times. They skeleton it from muscle memory, then adapt.</li>
@@ -583,7 +583,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>8. Your takeaway — the deliberate practice loop</h2>
+<h2 id="sec-your-takeaway-the-deliberate-practice-loop">8. Your takeaway — the deliberate practice loop</h2>
 
 <p>If you're learning, practice the <strong>skeleton → deepen → polish</strong> loop deliberately:</p>
 
@@ -602,7 +602,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>9. What is this process called? — Entity types and terminology</h2>
+<h2 id="sec-what-is-this-process-called-entity-types-and-terminology">9. What is this process called? — Entity types and terminology</h2>
 
 <p>The loop described above (Model → View → Flow, shallow then deepen) is <strong>not the SDLC</strong> and <strong>not a project methodology</strong>. Those live at project scale (see <a href="./software-development-process.html">Software Development Process §1</a>). This loop is smaller and older than any named methodology. Here's how it fits into the entity types one level up:</p>
 
@@ -633,7 +633,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>10. Why is it a rhythm, not a structured algorithm?</h2>
+<h2 id="sec-why-is-it-a-rhythm-not-a-structured-algorithm">10. Why is it a rhythm, not a structured algorithm?</h2>
 
 <p>Because a structured algorithm has <strong>predefined inputs, deterministic steps, and a fixed termination condition</strong>. QuickSort is a structured algorithm: give it an array, it sorts it, you're done. The steps are the same every time.</p>
 
@@ -651,7 +651,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>11. History of this loop — from NASA to React</h2>
+<h2 id="sec-history-of-this-loop-from-nasa-to-react">11. History of this loop — from NASA to React</h2>
 
 <p>The thread runs through the whole history of software, but the full Waterfall → Spiral → IID → XP → Agile → Lean timeline belongs to the process doc (see <a href="./software-development-process.html">Software Development Process §1b</a>). Here we keep only the two steps that matter for this doc: the ancestor that named the loop, and the modern framework shift that made it visible at feature scale.</p>
 
@@ -675,7 +675,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>12. The vocabulary map — sketch, wireframe, mockup, prototype, spike, MVP</h2>
+<h2 id="sec-the-vocabulary-map-sketch-wireframe-mockup-prototype-spike-mvp">12. The vocabulary map — sketch, wireframe, mockup, prototype, spike, MVP</h2>
 
 <p>You hear a lot of names because <strong>the same loop runs at different scales</strong> with different vocabulary. A frontend developer directly encounters these while implementing; the full UX-artifact taxonomy (PoC, versioning, releases) lives in <a href="./design-thinking.html">Design Thinking</a> and <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>. Here's the map:</p>
 
@@ -757,7 +757,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
-<h2>12b. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">12b. Principles — the shared constants</h2>
 
 <p>Across every framework, every era, every tool, these frontend-specific principles don't change. General engineering principles this loop rests on — cycling don't-waterfall, simplest-thing-first, deferring decisions, and avoiding premature optimization — are covered in <a href="./cs-and-software-engineering.html">CS &amp; SE</a> and <a href="./problem-solving.html">Problem-Solving</a>; this doc applies them to a single feature rather than restating them.</p>
 
@@ -773,7 +773,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 </table>
 
 
-<h2>13. "Sketching the data shape" — what it actually means, with a full worked example</h2>
+<h2 id="sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">13. "Sketching the data shape" — what it actually means, with a full worked example</h2>
 
 <p>This is the part that confuses everyone, and it's the most important one. The data shape is <strong>the structure of the values your program holds in memory while running</strong>. Not the database, not the API response, not the UI — <em>what your code is actually pushing around</em>. It's the answer to: "what kind of value is at the heart of this feature?"</p>
 
@@ -908,7 +908,7 @@ Option C:  todos: { [id]: Todo }          ← object as a map
 
 ---
 
-<h2>13b. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">13b. The most common failure modes</h2>
 
 <p>These are the characteristic ways the dev loop goes wrong — the traps that catch practitioners at every level, from junior to senior.</p>
 
@@ -936,7 +936,7 @@ Option C:  todos: { [id]: Todo }          ← object as a map
   </tbody>
 </table>
 
-<h2>13c. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">13c. Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The dev loop is only as fast as its feedback loop allows. Here's the catalog of tools that make the loop work, with decision metrics for choosing the right ones.</p>
 
@@ -961,7 +961,7 @@ Option C:  todos: { [id]: Todo }          ← object as a map
   <p><strong>The one tool that matters most: pen and paper.</strong> The data-shape sketch (§13) is the single most important upfront decision, and it should happen on paper before any code. No tool substitutes for the act of writing "what are the nouns? what fields? what collection type?" by hand. The tightest feedback loop is between your pen and your brain.</p>
 </blockquote>
 
-<h2>13d. The future — where the dev loop is heading</h2>
+<h2 id="sec-the-future-where-the-dev-loop-is-heading">13d. The future — where the dev loop is heading</h2>
 
 <h3>React Compiler: automating the optimization round</h3>
 <p>The <a href="https://react.dev/learn/react-compiler">React Compiler</a> (2024+) automatically handles memoization — the manual <code>useMemo</code>, <code>useCallback</code>, and <code>React.memo</code> that developers reach for in Round 2-3. This doesn't change the loop's shape (you still cycle Model → View → Flow), but it changes what <em>Round 2 (Deepen)</em> produces: instead of manually optimizing re-renders, the compiler does it for you. The human's Round 2 shifts from "performance optimization" to "making the data and flow right" — which is where the judgment actually matters.</p>
@@ -976,7 +976,7 @@ Option C:  todos: { [id]: Todo }          ← object as a map
 <p>Frameworks change. React becomes Next.js becomes whatever comes next. But the three-thread loop (Model → View → Flow, cycled in rounds) has survived from Boehm's spiral model (1986) through XP (1999) through Agile (2001) through React (2013) through Server Components (2023) through the React Compiler (2024). The rhythm survives because it's the shape of iterative work itself — the same pattern that Larman and Basili traced back to the 1950s, applied at the scale of a single afternoon's work. Learn the rhythm once, and it serves you across every framework, every era. That's why this reference exists: not to teach you React, but to teach you the thinking process that generates features — the one skill that compounds across your entire career.</p>
 
 
-<h2>14. Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">14. Summary — the complete mental checklist</h2>
 
 <p>Next time you sit down to build a feature, run this checklist. If you can answer each, you're ready to code. If not, sketch until you can.</p>
 

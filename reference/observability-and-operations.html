@@ -20,7 +20,7 @@
   <p>Observability &amp; operations is the discipline of <em>knowing</em> whether the live system is healthy, <em>finding</em> the fault when it isn't, and <em>returning</em> it to health without losing what the failure taught you. It owns the judgments that no single signal can make: which measurements deserve a target, which targets deserve an alert, which alerts deserve a page, and which pages deserve a postmortem. It is the layer between "the code shipped" and "the user is fine" — and it is the only discipline on this shelf whose absence is invisible until something breaks.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: standalone, after System Design and Backend Engineering. Cross-links:</p>
 <ul>
@@ -32,7 +32,7 @@
   <li>Reference: <a href="./glossary.html">Glossary</a> (the glossary cites this doc as <em>Ops</em>).</li>
 </ul>
 
-<h2>1. Definition — what observability &amp; operations is, and what it is not</h2>
+<h2 id="sec-definition-what-observability-operations-is-and-what-it-is-not">1. Definition — what observability &amp; operations is, and what it is not</h2>
 
 <p>Operations is the work of running software after it is live: watching it, noticing when it misbehaves, fixing it fast, and making the next failure cheaper. Observability is the property that makes that work possible — the extent to which the system's internal state can be inferred from its external outputs. The two are one discipline because you cannot operate what you cannot observe, and there is no point observing what you will not act on.</p>
 
@@ -60,7 +60,7 @@
 
 <p><strong>What it is not:</strong> it is not "add logs later" (that is instrumentation), not a dashboard gallery (that is decoration), and not a synonym for monitoring (monitoring is the subset that checks known answers; observability is the ability to ask questions you did not think to ask). The boundary with System Design is precise: System Design <em>designs</em> the system to be understood; operations <em>uses</em> that understanding under pressure, and reports back what the design missed.</p>
 
-<h2>1b. History — from paging to telemetry to learning machines</h2>
+<h2 id="sec-history-from-paging-to-telemetry-to-learning-machines">1b. History — from paging to telemetry to learning machines</h2>
 
 <p>The operational layer has an evolution of its own, and each era left behind the tool category we still use:</p>
 
@@ -110,7 +110,7 @@
   </tbody>
 </table>
 
-<h2>1c. Evolution — constraint inversions in the operational layer</h2>
+<h2 id="sec-evolution-constraint-inversions-in-the-operational-layer">1c. Evolution — constraint inversions in the operational layer</h2>
 
 <p>Same pattern as the rest of the shelf: each era's solution became the next era's constraint.</p>
 
@@ -144,7 +144,7 @@
   </tbody>
 </table>
 
-<h2>1d. Intersection with neighbors — the ownership contract</h2>
+<h2 id="sec-intersection-with-neighbors-the-ownership-contract">1d. Intersection with neighbors — the ownership contract</h2>
 
 <p>This table is the anti-duplication contract of this doc. Anything in the right column stays where it lives; this doc references it, never re-teaches it.</p>
 
@@ -184,7 +184,7 @@
   </tbody>
 </table>
 
-<h2>1e. Underlying theory — what makes operations reliable rather than hopeful</h2>
+<h2 id="sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">1e. Underlying theory — what makes operations reliable rather than hopeful</h2>
 
 <p>The architecture of the signals (the four signals — metrics, logs, traces, profiles — plus correlation and trace propagation) is System Design §6g's table — this section covers the theory <em>under</em> the practice.</p>
 
@@ -206,7 +206,7 @@
   <strong>The definition that matters:</strong> observability (control-theory sense, popularized in software by Charity Majors) is a measure of how well a system's internal states can be inferred from its external outputs. Monitoring asks <em>"is this known thing still true?"</em>; observability asks <em>"what question do I even need to ask?"</em> — the difference between a fire alarm and a sense of smell.
 </blockquote>
 
-<h2>1f. Mental models — how operators actually reason</h2>
+<h2 id="sec-mental-models-how-operators-actually-reason">1f. Mental models — how operators actually reason</h2>
 
 <table>
   <thead><tr><th>Model</th><th>Core idea</th><th>When you reach for it</th></tr></thead>
@@ -244,7 +244,7 @@
   </tbody>
 </table>
 
-<h2>2. SLO design — choosing what to promise</h2>
+<h2 id="sec-slo-design-choosing-what-to-promise">2. SLO design — choosing what to promise</h2>
 
 <p>Vocabulary (SLI, SLO, SLA, error budget) is defined in <a href="./system-design.html">System Design</a> §6f. This section owns the practice: which SLIs to pick, what targets to set, and how the budget is governed.</p>
 
@@ -287,7 +287,7 @@
   <li><strong>Every SLO needs a designated owner</strong> — someone who can say "spend the budget" or "feature work stops." An SLO nobody can spend is a poster, not a policy.</li>
 </ul>
 
-<h2>3. Alert design — turning targets into contracts with humans</h2>
+<h2 id="sec-alert-design-turning-targets-into-contracts-with-humans">3. Alert design — turning targets into contracts with humans</h2>
 
 <p>An alert is a message with a price: someone's attention, sleep, or escalation. The discipline is deciding <em>which</em> target breaches are worth that price, and <em>what the receiver is supposed to do</em>.</p>
 
@@ -328,7 +328,7 @@
 <h3>Alert fatigue is a design failure, not a character flaw</h3>
 <p>When alerts stop being read, the cause is the alert system, not the operators. Fatigue has three sources: too many alerts (each one dilutes the others), alerts without actions (the brain learns they are noise), and alerts without severity (everything pages, so nothing does). The fix is always structural: prune, tie to budgets, add runbooks. The symptom of success: on-call trusts the pager enough to sleep through the ticket-level noise.</p>
 
-<h2>4. Incident response — from detection to recovery</h2>
+<h2 id="sec-incident-response-from-detection-to-recovery">4. Incident response — from detection to recovery</h2>
 
 <p>An incident is an unplanned interruption that needs <em>coordinated</em> response. The difference between a fire drill and a fire: roles, a timeline, and a decision-maker.</p>
 
@@ -378,7 +378,7 @@
   <li><strong>Comms are a deliverable.</strong> A status line exists for every incident ("investigating / mitigating / monitoring") — for internal stakeholders and, where user-facing, for customers. Silence reads as chaos, even when it isn't.</li>
 </ul>
 
-<h2>5. Postmortems &amp; learning — making failure an investment</h2>
+<h2 id="sec-postmortems-learning-making-failure-an-investment">5. Postmortems &amp; learning — making failure an investment</h2>
 
 <h3>Blameless by design</h3>
 <p>A blameless postmortem is not "no accountability." It is the discipline of asking <em>what in the system made this failure possible</em> before asking <em>who</em>. Every "human error" explanation is a design question in disguise: the deploy button that lacked a confirmation, the runbook that rotted, the alert that fired at 3am with no action. The system is the unit of learning (§1f).</p>
@@ -418,7 +418,7 @@
 <h3>The loop closes in the backlog</h3>
 <p>Postmortem action items are product work: they compete for the same sprint capacity as features, and the error budget decides the winner (§2). This is the same loop <a href="./software-development-process.html">Software Development Process</a> §9h describes ("operational learnings return to the backlog") — this doc's contribution is the craft that makes the learnings real: owners, tickets, and verification instead of vibes.</p>
 
-<h2>6. Runbooks — making the known response boring</h2>
+<h2 id="sec-runbooks-making-the-known-response-boring">6. Runbooks — making the known response boring</h2>
 
 <p>A runbook is a written procedure for a known scenario, written <em>before</em> the incident — the difference between "we'll figure it out" and "we already did, here's how." The test of a runbook is not that it exists; it is that it has been executed in a drill (§1f).</p>
 
@@ -451,7 +451,7 @@
 
 <p><strong>The ownership rule:</strong> every runbook has an owner and a review date, because a runbook that describes a deleted service is worse than none — it wastes the exact minutes it claims to save. Alerts link to runbooks; runbooks link to the backup escalation page. The chain is the product.</p>
 
-<h2>7. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">7. Principles — the shared constants</h2>
 
 <table>
   <thead><tr><th>Principle</th><th>Why it is constant</th></tr></thead>
@@ -487,7 +487,7 @@
   </tbody>
 </table>
 
-<h2>7b. On-call design — the rotation is a product, not a duty</h2>
+<h2 id="sec-on-call-design-the-rotation-is-a-product-not-a-duty">7b. On-call design — the rotation is a product, not a duty</h2>
 
 <p>Alerting decides <em>when</em> a human is woken; on-call design decides <em>which human, how often, and under what conditions</em> — the structure that keeps the pager sustainable.</p>
 
@@ -524,7 +524,7 @@
 
 <p><strong>The rule:</strong> the rotation is a designed system, not an inherited chore. On-call without compensation, training, or a load budget is how organizations burn their operators and then blame them for being tired.</p>
 
-<h2>7c. Capacity planning &amp; load testing — knowing the ceiling</h2>
+<h2 id="sec-capacity-planning-load-testing-knowing-the-ceiling">7c. Capacity planning &amp; load testing — knowing the ceiling</h2>
 
 <p>The theory — Little's Law, Amdahl's Law, headroom targets, the latency knee — lives in <a href="./system-design.html">System Design</a> §6b; this section owns the practice of testing the ceiling and tuning autoscaling against it.</p>
 
@@ -549,7 +549,7 @@
   </tbody>
 </table>
 
-<h2>7d. Deployment operations — the two decisions the toolbox doesn't own</h2>
+<h2 id="sec-deployment-operations-the-two-decisions-the-toolbox-doesn-t-own">7d. Deployment operations — the two decisions the toolbox doesn't own</h2>
 
 <p>The deployment toolbox — rolling, blue-green, canary, feature flags, rollback and migration limits — is owned by <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> §5 and <a href="./software-development-process.html">Software Development Process</a> §9i. Operations adds two decisions around that toolbox:</p>
 
@@ -569,7 +569,7 @@
   </tbody>
 </table>
 
-<h2>7e. Chaos engineering — practicing failure on purpose</h2>
+<h2 id="sec-chaos-engineering-practicing-failure-on-purpose">7e. Chaos engineering — practicing failure on purpose</h2>
 
 <p>Drills (§1f, §6) exercise <em>known</em> procedures; chaos engineering exercises <em>unknown</em> failure by injecting it deliberately, in controlled doses.</p>
 
@@ -604,7 +604,7 @@
   </tbody>
 </table>
 
-<h2>7f. Operational gates — shift-left and the launch gate</h2>
+<h2 id="sec-operational-gates-shift-left-and-the-launch-gate">7f. Operational gates — shift-left and the launch gate</h2>
 
 <p>Postmortems learn <em>after</em> failure (§5); these two gates learn <em>before</em> it — one during the work, one at the launch.</p>
 
@@ -666,7 +666,7 @@
   </tbody>
 </table>
 
-<h2>7g. Observability cost management — the budget for the lens</h2>
+<h2 id="sec-observability-cost-management-the-budget-for-the-lens">7g. Observability cost management — the budget for the lens</h2>
 
 <p>Telemetry is a service you pay for like any other. The operational decisions: what to keep, what to downsample, and who pays.</p>
 
@@ -701,7 +701,7 @@
   </tbody>
 </table>
 
-<h2>7h. Operational maturity — where you are, and the next practice to adopt</h2>
+<h2 id="sec-operational-maturity-where-you-are-and-the-next-practice-to-adopt">7h. Operational maturity — where you are, and the next practice to adopt</h2>
 
 <table>
   <thead><tr><th>Level</th><th>Name</th><th>Characteristics</th></tr></thead>
@@ -743,7 +743,7 @@
 
 
 
-<h2>7i. Operational debt &amp; toil — paying what you postponed</h2>
+<h2 id="sec-operational-debt-toil-paying-what-you-postponed">7i. Operational debt &amp; toil — paying what you postponed</h2>
 
 <table>
   <thead><tr><th>Concept</th><th>What it is</th><th>Decision metric</th></tr></thead>
@@ -766,7 +766,7 @@
   </tbody>
 </table>
 
-<h2>7j. Operational team metrics — measuring the operation itself</h2>
+<h2 id="sec-operational-team-metrics-measuring-the-operation-itself">7j. Operational team metrics — measuring the operation itself</h2>
 
 <p>The service has SLOs (§2); the operations <em>team</em> needs its own scoreboard, or improvement is vibes.</p>
 
@@ -811,7 +811,7 @@
   </tbody>
 </table>
 
-<h2>8. Worked example — the checkout incident</h2>
+<h2 id="sec-worked-example-the-checkout-incident">8. Worked example — the checkout incident</h2>
 
 <p>One incident, end to end, exercising every section of this doc. The system: a storefront (Gateway → Checkout API → Inventory API → Postgres), with requestIds and OpenTelemetry traces wired per System Design §6g, and a checkout SLO of 99.9% availability / p99 &lt; 300ms per System Design §6f vocabulary.</p>
 
@@ -842,7 +842,7 @@
 
 <p>Rerun the story with the practice removed: no SLO burn alert (detection comes from a customer complaint on social media), no trace correlation (the engineer on call debugs the service they know best, not the failing one), no Incident Commander (five engineers chase five theories across three channels), no freeze (a second deploy lands mid-incident and changes the failure's shape), no scribe (the timeline is reconstructed from memory on Thursday), and no postmortem actions (the rollback happened, "someone" did it, and the cache-key change quietly returns in release 4.4). The outcome: hours instead of 31 minutes, two unrelated regressions introduced during investigation, and a team that still cannot say why checkout broke. The discipline is the difference — it is why every section of this doc exists.</p>
 
-<h2>9. Common failure modes</h2>
+<h2 id="sec-common-failure-modes">9. Common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Root cause</th></tr></thead>
@@ -900,7 +900,7 @@
   </tbody>
 </table>
 
-<h2>10. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">10. Ecosystem — tooling catalog with decision metrics</h2>
 
 <table>
   <thead><tr><th>Category</th><th>Tools</th><th>Trigger → Target</th><th>Decision metric</th></tr></thead>
@@ -956,7 +956,7 @@
   </tbody>
 </table>
 
-<h2>11. The future — where the operational layer is heading</h2>
+<h2 id="sec-the-future-where-the-operational-layer-is-heading">11. The future — where the operational layer is heading</h2>
 
 <ul>
   <li><strong>LLM calls as spans.</strong> A prompt is a request; a completion is a response; a model call is a span in a trace. The correlation loop of §8 extends unchanged: one requestId carries a user's journey through gateway, logic, and model.</li>
@@ -965,7 +965,7 @@
   <li><strong>AI-assisted incident response.</strong> Summaries, correlation suggestions, and runbook lookups will compress the investigation loop. The constants do not move: a human owns the decision, the timeline stays honest, and every incident still ends in an action item.</li>
 </ul>
 
-<h2>12. Primary sources</h2>
+<h2 id="sec-primary-sources">12. Primary sources</h2>
 
 <ol>
   <li>"Site Reliability Engineering" — Google SRE Book (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs, error budgets, on-call, toil, postmortem culture. The foundational primary source for §2–§7.</li>
@@ -984,7 +984,7 @@
 
 <p>The fully grounded resource list (with trust notes) lives in <code>RESOURCES.md</code>.</p>
 
-<h2>13. Summary — the operational checklist</h2>
+<h2 id="sec-summary-the-operational-checklist">13. Summary — the operational checklist</h2>
 
 <ul>
   <li>Can you name the journeys users actually take, and the SLO for each? (If not: §2)</li>

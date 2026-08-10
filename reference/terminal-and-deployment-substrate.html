@@ -43,7 +43,7 @@ system-design.html (latency, edge, failure domains)</pre>
   <p><em>No other doc on the shelf teaches the terminal or what a container is.</em> The curriculum assumes you can run commands, read a log, and picture a deployment target — and never once shows you how. The study guides reviewed against this shelf claimed these topics were covered; the audit found the Docker mental model (image vs. container) and the entire terminal survival kit were absent. This doc closes that gap with the smallest possible surface: the ~20% of the terminal that solves 99% of web engineering problems, the one-paragraph mental models for Docker and Kubernetes, and the three-era cloud map. One scope note: <strong>this is not a sysadmin or DevOps course</strong> — the "safely ignore" table in the Definition is as important as the rest.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read this early — it is the plumbing for everything else. It pairs with <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> (the pipeline that consumes Docker images) and <a href="./backend-engineering.html">Backend Engineering</a> (the server you run with these commands). Cross-links:</p>
 <ul>
@@ -57,7 +57,7 @@ system-design.html (latency, edge, failure domains)</pre>
 
 <p><strong>If you've ever googled "how to kill a process on port 3000", drawn a blank at "docker run", or nodded along when someone said "Pods and Services" — this is the map.</strong> Read the Definition (what this doc is and is not), then the Shell fundamentals and Survival kit, then Docker and Cloud. The Worked examples are where it comes together.</p>
 
-<h2>Definition — the substrate, and what it is not</h2>
+<h2 id="sec-definition-the-substrate-and-what-it-is-not">Definition — the substrate, and what it is not</h2>
 
 <p>The substrate is everything your code runs <em>on</em>: the operating system, the terminal that drives it, the container format that packages it, and the cloud eras that rent it. Web engineers do not administrate this layer; they <strong>operate it</strong> — enough to unblock themselves, run their code, and understand the deployment targets their systems design chooses.</p>
 
@@ -73,7 +73,7 @@ system-design.html (latency, edge, failure domains)</pre>
 
 <p><strong>The boundary rule:</strong> if the task happens <em>while developing or shipping a web application</em>, it belongs to your literacy. If the task is <em>keeping infrastructure alive as a job</em>, it belongs to SREs and Platform Engineers — and the cloud does most of it for you anyway.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
   <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
@@ -88,7 +88,7 @@ system-design.html (latency, edge, failure domains)</pre>
 
 <p>The order of dependence: you cannot use Git, npm, Docker, or WP-CLI without the terminal; you cannot reason about deployment without the cloud map; you cannot deploy without containers. Learn this layer once, shallowly, and every other doc stops assuming and starts referencing.</p>
 
-<h2>The terminal — the universal remote</h2>
+<h2 id="sec-the-terminal-the-universal-remote">The terminal — the universal remote</h2>
 
 <p><strong>The terminal is the raw interface to every tool on this shelf.</strong> GUIs hide complexity behind buttons; the terminal exposes the underlying operations — and every tool the shelf teaches (Git, npm, Node, Docker, curl, WP-CLI) is designed terminal-first. When a GUI exists, it is a skin over the same command. What the terminal gives you that GUIs cannot:</p>
 
@@ -104,7 +104,7 @@ system-design.html (latency, edge, failure domains)</pre>
 
 <p><strong>Linux is the universal host.</strong> Whether you deploy to AWS, Vercel, a Raspberry Pi, or a container, the environment is almost always Linux. macOS is Unix underneath (very similar); Windows developers use WSL to emulate it. So the terminal habits you build locally transfer to production almost unchanged — which is exactly why "it worked in my terminal" is the closest thing to "it works in production" you will ever get.</p>
 
-<h2>Shell fundamentals — the environment you type into</h2>
+<h2 id="sec-shell-fundamentals-the-environment-you-type-into">Shell fundamentals — the environment you type into</h2>
 
 <p><strong>Terminal vs. shell vs. command line.</strong> The <em>terminal</em> is the window you look at (iTerm2, Windows Terminal, GNOME Terminal); the <em>shell</em> is the program inside it that interprets what you type (bash on most Linux, zsh on macOS since Catalina); the <em>command line</em> is the interface where you type. The distinction matters when you edit shell config: your aliases and PATH additions live in <code>~/.bashrc</code> on Linux and <code>~/.zshrc</code> on macOS — put them in the wrong file and nothing happens.</p>
 
@@ -123,7 +123,7 @@ cd src ; ls                      # ; run both, regardless of success</pre>
 
 <p><strong>Aliases and built-in help.</strong> <code>alias gs='git status'</code> defines a shortcut you will see in other people's configs. When you meet a command you don't know, the terminal documents itself: <code>man lsof</code> is the full manual, <code>lsof --help</code> the quick summary.</p>
 
-<h2>The survival kit — the 20% for 99%</h2>
+<h2 id="sec-the-survival-kit-the-20-for-99">The survival kit — the 20% for 99%</h2>
 
 <p>Six small tables. These are not "nice to know" — they are the set that unblocks 99% of web engineering problems: moving around, finding what is running, configuring the environment, searching logs, testing endpoints, and not shooting yourself in the foot. Practice each until it is reflex; that is the entire curriculum.</p>
 
@@ -213,7 +213,7 @@ ps aux | grep node               # find processes without a GUI task manager</pr
 
 <p><strong>The rule that saves servers:</strong> never run your Node/Python server with <code>sudo</code>. If the app is compromised, an attacker inherits root and owns the whole machine. Run as an unprivileged user; the process manager or platform does the privileged parts.</p>
 
-<h2>Docker — the deployment unit</h2>
+<h2 id="sec-docker-the-deployment-unit">Docker — the deployment unit</h2>
 
 <p><strong>The mental model in one sentence:</strong> an <strong>image</strong> is the blueprint (a recipe: base OS + runtime + your code + config), built once and versioned; a <strong>container</strong> is a running process created from that image, started as many times as you like. You never "edit a running container" — you rebuild the image and start a new one. That one sentence is the entire mental model; everything else is tooling.</p>
 
@@ -297,7 +297,7 @@ volumes:
 
 <p><strong>Safely ignore:</strong> multi-stage Dockerfiles tuned for legacy apps, image-layer micro-optimization, and container networking internals. If you can read a simple Dockerfile and run compose, you have the literacy this shelf requires.</p>
 
-<h2>Kubernetes — orchestration literacy</h2>
+<h2 id="sec-kubernetes-orchestration-literacy">Kubernetes — orchestration literacy</h2>
 
 <p>Kubernetes (K8s) is the "operating system of the data center": it takes container images and decides where they run, how many copies exist, and how traffic reaches them. You will almost certainly <strong>never administer a cluster</strong> — managed platforms and system-design warnings see to that — but the primitives appear constantly in job posts, platform docs, and architecture conversations. Three nouns are enough:</p>
 
@@ -312,7 +312,7 @@ volumes:
 
 <p>The connection between the three: a <strong>Deployment creates Pods</strong>, and a <strong>Service routes traffic to the healthy Pods</strong> behind it — that chain is the whole wiring. When a platform says "deploy a Deployment with a Service", you can now picture the thing: three ephemeral containers behind a stable address. That is the entire literacy bar. The moment someone proposes running Kubernetes <em>yourself</em>, remember the shelf's own warning — <a href="./system-design.html">System Design</a> lists "Kafka + Kubernetes + Istio for a 3-person CRUD team" as the canonical overkill. Cluster administration is a career, not a skill; you are licensed to nod and defer.</p>
 
-<h2>Cloud — the three eras of renting compute</h2>
+<h2 id="sec-cloud-the-three-eras-of-renting-compute">Cloud — the three eras of renting compute</h2>
 
 <p>Since AWS launched S3 and EC2 in 2006 (<a href="./cs-and-software-engineering.html">CS &amp; SE history</a>), compute has been rentable by the minute instead of bought as hardware. Three eras of that rent define every deployment target you will choose from — each rents one layer higher up the stack:</p>
 
@@ -329,7 +329,7 @@ volumes:
 
 <p><strong>Edge &amp; data gravity:</strong> reading a database in us-east-1 from a user in Tokyo pays a physics penalty — the speed of light — which is why CDNs and edge compute push work to where the users are. The modern pattern moves compute <em>to the data</em>. The depth (latency budgets, consistency across edges, Durable Objects) belongs to <a href="./system-design.html">System Design</a>; this doc's job is just to make "edge" mean "closer to the user, because physics".</p>
 
-<h2>Where does your code run — one map</h2>
+<h2 id="sec-where-does-your-code-run-one-map">Where does your code run — one map</h2>
 
 <p>The terminal, Docker, and cloud sections are three views of the same ladder. Every environment below is a place your code runs, with a different way in, different common failure, and different debug reflex — learn the ladder so a "works locally" report always gets the follow-up: <em>where?</em></p>
 
@@ -345,7 +345,7 @@ volumes:
 
 <p>Notice the ladder's logic: every step up keeps the same code, the same <em>image</em>, but changes who runs it and how you see it. That is the whole relationship between this doc and <a href="./system-design.html">System Design</a> — you choose the rungs; this doc gives you the map.</p>
 
-<h2>Worked example — the ghost port</h2>
+<h2 id="sec-worked-example-the-ghost-port">Worked example — the ghost port</h2>
 
 <p>The most common local-development bug in existence: <code>EADDRINUSE</code>. You restart your server and the port is taken by a process you forgot about. The senior reflex, in four commands:</p>
 
@@ -362,7 +362,7 @@ $ npm run dev      # works</pre>
 
 <p>That is the whole pattern, and it generalizes to every debugging session on the shelf: <strong>read the error → find the evidence (log, process, port) → act on exactly what the evidence names → verify</strong>. The junior clicks around the IDE; the senior opens the terminal, tails the log, greps for the error, finds the PID, and kills it. This is the habit <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> formalizes — the terminal is just where the evidence lives.</p>
 
-<h2>Worked example — I just cloned a repo</h2>
+<h2 id="sec-worked-example-i-just-cloned-a-repo">Worked example — I just cloned a repo</h2>
 
 <p>The other daily ritual: a teammate hands you a repo URL and you need it running. The whole ladder in one session — reading files, env vars, and Docker Compose all at once:</p>
 
@@ -379,7 +379,7 @@ $ npm run dev              # works</pre>
 
 <p>Same pattern, one rung down the ladder: the error names an address (<code>127.0.0.1:5432</code>), you read the repo's <code>docker-compose.yml</code> to see what should own that port, you start it, you verify. What <em>changed</em> between first and second try? Nothing in the code — only the environment the code runs in. That is the substrate.</p>
 
-<h2>The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Symptom</th><th>Cause</th><th>The fix</th></tr></thead>
@@ -395,7 +395,7 @@ $ npm run dev              # works</pre>
   </tbody>
 </table>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Print this. It is the entire doc in eleven lines:</p>
 

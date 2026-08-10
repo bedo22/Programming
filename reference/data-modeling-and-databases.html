@@ -40,7 +40,7 @@ api-design.html          backend-engineering.html</pre>
   <p><em>System Design</em> tells the reader which database to choose. <em>API Design</em> tells the reader how to expose the data. But nobody on the shelf teaches the reader how to actually design the schema — the normalization, the keys, the indexes, the migration path. That is this doc's gap. And it is arguably the most important skill in backend work: a bad data model ruins a perfectly designed API and a perfectly architected system. The lineage it stands on is the relational model, Codd's 1970 paper that turned data storage from a navigational chore into a declarative discipline.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read this after you've seen <a href="./system-design.html">System Design</a> (so you know why the store was chosen) and after <a href="./backend-engineering.html">Backend Engineering</a> §1e–§5 (so you know what the loop needs from the vault). Most readers come back to it when a query is slow, a migration is scary, or a schema is being born. Cross-links:</p>
 <ul>
@@ -54,13 +54,13 @@ api-design.html          backend-engineering.html</pre>
 
 <p><strong>If you've ever had a schema that worked in dev and died in production — a query that slowed to seconds at 100k rows, or a "quick" column add that took the API down — this is the map.</strong> Read the Definition and Mental models first, then Relational modeling (the tables), then Worked example. Come back to Indexing and EXPLAIN ANALYZE when you ship something real.</p>
 
-<h2>Definition — what data modeling is and what it is not</h2>
+<h2 id="sec-definition-what-data-modeling-is-and-what-it-is-not">Definition — what data modeling is and what it is not</h2>
 
 <p>Data modeling is the discipline of turning facts, relationships, and access patterns into <em>durable structures with enforced rules</em>. It is the answer to three questions asked together: What must survive? What must stay consistent? How will it be read back?</p>
 
 <p>It is <em>not</em> ORM mastery — an ORM is a tool for talking to a schema, not a substitute for designing one. It is <em>not</em> database administration — backups, replication, and capacity are operations. It is <em>not</em> "which database should I pick" — that is System Design's decision, and it only sets the sandbox. And it is <em>not</em> drawing boxes in a diagram tool — the diagram is notation, the design is the decision about keys, constraints, and access paths. A data model is judged by what it <em>enforces</em> and how it <em>performs under the queries the app actually issues</em>.</p>
 
-<h2>History — from navigational to relational and back</h2>
+<h2 id="sec-history-from-navigational-to-relational-and-back">History — from navigational to relational and back</h2>
 
 <p>Data modeling evolved through the same constraint inversions that shaped every discipline on this shelf:</p>
 
@@ -77,7 +77,7 @@ api-design.html          backend-engineering.html</pre>
 
 <p>The pattern: every inversion pushed modeling toward <em>declaring intent and letting the engine enforce it</em>, then circled back to add flexibility where enforcement costs more than it saves. The vault is designed, not assembled — but it is designed for the queries, not for the theory.</p>
 
-<h2>Intersection with neighbors</h2>
+<h2 id="sec-intersection-with-neighbors">Intersection with neighbors</h2>
 
 <table>
 <thead><tr><th>Neighbor doc</th><th>What belongs here</th><th>What belongs next door</th></tr></thead>
@@ -99,7 +99,7 @@ api-design.html          backend-engineering.html</pre>
   <li>Deploy-time migration risk, rollback limits → <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a>.</li>
 </ul>
 
-<h2>Underlying theory — the invariants to trust</h2>
+<h2 id="sec-underlying-theory-the-invariants-to-trust">Underlying theory — the invariants to trust</h2>
 
 <table>
 <thead><tr><th>Invariant</th><th>What it means</th><th>Why it matters</th></tr></thead>
@@ -114,7 +114,7 @@ api-design.html          backend-engineering.html</pre>
 </tbody>
 </table>
 
-<h2>Mental models — frames for thinking about the vault</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-the-vault">Mental models — frames for thinking about the vault</h2>
 
 <table>
 <thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
@@ -129,7 +129,7 @@ api-design.html          backend-engineering.html</pre>
 </tbody>
 </table>
 
-<h2>Relational modeling — keys, constraints, and normalization (1NF–3NF)</h2>
+<h2 id="sec-relational-modeling-keys-constraints-and-normalization-1nf3nf">Relational modeling — keys, constraints, and normalization (1NF–3NF)</h2>
 
 <p>Normalization is the discipline of removing <em>redundant storage</em> by analyzing what a table's facts <em>depend on</em>. Each normal form removes one class of update anomaly: store a fact once, change it once, and it is true everywhere.</p>
 
@@ -183,7 +183,7 @@ api-design.html          backend-engineering.html</pre>
 
 <p><strong>Boyce-Codd Normal Form</strong> tightens 3NF: every determinant must be a candidate key. In practice, 3NF covers the overwhelming majority of real schemas; BCNF matters only with overlapping candidate keys (two natural keys that cross). The pragmatic rule: <strong>stop at 3NF unless a specific anomaly proves it needs more</strong>. The cost of normalization is join complexity — if a read path needs five joins for a simple result, that schema is over-normalized for that path. Denormalize for a <em>measured</em> read, and document the invalidation story in the migration.</p>
 
-<h2>Relationship patterns — cardinality and keys</h2>
+<h2 id="sec-relationship-patterns-cardinality-and-keys">Relationship patterns — cardinality and keys</h2>
 
 <p>Relationships are the join between tables — and each cardinality has a canonical shape:</p>
 
@@ -202,7 +202,7 @@ api-design.html          backend-engineering.html</pre>
 
 <p><strong>Why polymorphic associations are a smell:</strong> the <code>commentable_id</code> can't be a foreign key — there's no single parent table — so the engine enforces nothing. Orphaned comments, dangling IDs, and join conditions that must guess the type are the result. Alternatives: separate FK columns per parent with a <code>CHECK</code> guaranteeing exactly one is set, or separate junction tables. The schema is allowed to repeat a shape to keep enforcement.</p>
 
-<h2>Data types — choosing column types</h2>
+<h2 id="sec-data-types-choosing-column-types">Data types — choosing column types</h2>
 
 <p>The type is the schema's smallest unit of correctness: it enforces domain rules, decides storage and index behavior, and outlives every query. Choose the most specific type that fits the fact.</p>
 
@@ -225,7 +225,7 @@ api-design.html          backend-engineering.html</pre>
 
 <p><strong>BIGSERIAL vs. UUID — the decision rule:</strong> autoincrement for internal identity (compact, sequential, friendly to B-Tree index locality, natural for joins); UUID when identifiers are generated outside the database (distributed writers) or exposed publicly (no count/order leakage, no enumeration). For UUIDs on hot tables, prefer a time-ordered variant (UUIDv7) — random UUIDs fragment clustered indexes. Public-facing identity never means "send the internal id" — it means a separate opaque identifier, shaped at the boundary (see <a href="./backend-engineering.html">Backend Engineering §1b</a>).</p>
 
-<h2>Constraints — the enforcement toolkit</h2>
+<h2 id="sec-constraints-the-enforcement-toolkit">Constraints — the enforcement toolkit</h2>
 
 <p>The database enforces what the app merely hopes. Each constraint is a cheap, permanent invariant — write the claim in DDL, and every future writer (including the ones you forgot) obeys it.</p>
 
@@ -250,7 +250,7 @@ api-design.html          backend-engineering.html</pre>
 </ul>
 <p>And index every FK column — the FK is the default join path, and unindexed FKs make deletes and joins scan.</p>
 
-<h2>Indexing strategies — the read path</h2>
+<h2 id="sec-indexing-strategies-the-read-path">Indexing strategies — the read path</h2>
 
 <p>The query planner will use an index only if it estimates it's cheaper than walking the table. The index <em>is</em> the read path: designing the schema includes designing which paths exist.</p>
 
@@ -275,7 +275,7 @@ SELECT * FROM shipment_events ORDER BY id LIMIT 20 OFFSET 10000;
 -- Good: keyset — the index jumps straight to the page
 SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;</pre>
 
-<h2>Reading EXPLAIN ANALYZE — the tuning loop</h2>
+<h2 id="sec-reading-explain-analyze-the-tuning-loop">Reading EXPLAIN ANALYZE — the tuning loop</h2>
 
 <p>The query planner picks the cheapest estimated plan. When a query is slow, the plan tells you <em>why</em> — and the gap between <em>estimated</em> and <em>actual</em> tells you whether the problem is the schema or the statistics. The loop:</p>
 
@@ -300,7 +300,7 @@ SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;<
 
 <p>The cost numbers are planner units, not milliseconds — compare nodes inside <em>one</em> plan, never across queries. <code>ANALYZE</code> executes the query, so never run it on production writes during peak load (see the <a href="https://www.postgresql.org/docs/current/using-explain.html">PostgreSQL EXPLAIN documentation</a>).</p>
 
-<h2>Schema evolution — migrations as design decisions</h2>
+<h2 id="sec-schema-evolution-migrations-as-design-decisions">Schema evolution — migrations as design decisions</h2>
 
 <p>A schema change is a deployment with an extra hazard: the data already exists and old code is still running against it. The safe pattern is <em>expand and contract</em> (a.k.a. parallel change) — the same discipline <a href="./api-design.html">API Design</a> uses for contracts, applied to rows.</p>
 
@@ -325,7 +325,7 @@ SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;<
 
 <p>Reads that feed writes must sit in the same transaction — and the migration file is where such consistency decisions get documented, not the changelog.</p>
 
-<h2>CAP applied to schema design</h2>
+<h2 id="sec-cap-applied-to-schema-design">CAP applied to schema design</h2>
 
 <p>CAP is usually discussed at the infrastructure level (see <a href="./system-design.html">System Design §6c</a>): which store, which consistency model. But the choice is <em>made in the schema</em>. The vault is not uniformly consistent — you decide per structure how fresh a read may be and what a write must atomically move.</p>
 
@@ -342,7 +342,7 @@ SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;<
 
 <p><strong>Key rule:</strong> state the consistency choice per table in the migration file. "This column is eventually consistent, refreshed by job X" is a design decision that must be written down where the schema change lives — otherwise the next engineer inherits a mystery.</p>
 
-<h2>Isolation levels — the transaction knob</h2>
+<h2 id="sec-isolation-levels-the-transaction-knob">Isolation levels — the transaction knob</h2>
 
 <p>ACID's <em>I</em> is a dial, not a switch: each isolation level permits a different class of concurrency anomaly, and the schema is where the choice is made per transaction. (The transaction itself — what moves together in the handler — lives in <a href="./backend-engineering.html">Backend Engineering §5</a>; this is the consistency side.)</p>
 
@@ -358,7 +358,7 @@ SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;<
 
 <p><strong>The key insight:</strong> isolation is a per-transaction decision, not a per-database one. Run <code>READ COMMITTED</code> for everyday traffic and escalate <code>SERIALIZABLE</code> for the specific transactions that must not interleave. And design the schema to make the common case cheap: short transactions, indexed lookups, and constraints that fail fast instead of waiting on locks.</p>
 
-<h2>Beyond the relational default — read models and event sourcing</h2>
+<h2 id="sec-beyond-the-relational-default-read-models-and-event-sourcing">Beyond the relational default — read models and event sourcing</h2>
 
 <p>Not every fact belongs in a normalized table. Two patterns recur when the access paths stop fitting:</p>
 
@@ -381,7 +381,7 @@ SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;<
 
 <p><strong>When JSONB beats tables:</strong> sparse, varied, or shape-changing payloads (webhook payloads, feature-flag config, event payloads) — a <code>jsonb</code> column with a <code>CHECK</code> constraint is a schema with a softer enforcement. The rule: enforce structurally what must never be wrong; let JSONB hold what varies. For the storage-and-streaming side of this — document vs. key-value vs. wide-column vs. graph stores, and when to leave the relational model entirely — see <a href="./system-design.html">System Design §6c</a> (data architecture) and §6e (event and queue reliability). The lazy rule for stores: don't add one unless the relational model has a proven, measured limitation; every extra store is another synchronization problem.</p>
 
-<h2>Views and materialized views — shaping reads without duplicating writes</h2>
+<h2 id="sec-views-and-materialized-views-shaping-reads-without-duplicating-writes">Views and materialized views — shaping reads without duplicating writes</h2>
 
 <table>
 <thead><tr><th>Type</th><th>What it is</th><th>When to use</th></tr></thead>
@@ -393,7 +393,7 @@ SELECT * FROM shipment_events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;<
 
 <p>Views are free (they are just named queries) — use them liberally as the read-side interface. Materialized views are caches: they must be refreshed (<code>REFRESH MATERIALIZED VIEW</code>) on a schedule or after source writes, and the freshness trade-off is exactly the invalidation story this doc keeps asking for — write it down next to the view definition.</p>
 
-<h2>Multi-tenancy — sharing the vault safely</h2>
+<h2 id="sec-multi-tenancy-sharing-the-vault-safely">Multi-tenancy — sharing the vault safely</h2>
 
 <p>When one deployment serves many customers (tenants), the isolation choice is a schema decision:</p>
 
@@ -416,7 +416,7 @@ CREATE POLICY tenant_isolation ON shipments
 
 <p>Tenant isolation is a security control, not just a schema decision: the threat model it defends against, and the other layers that must hold when the schema's enforcement fails, live in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (Infrastructure section and the security checklist).</p>
 
-<h2>Schema in code — ORMs, query builders, raw SQL</h2>
+<h2 id="sec-schema-in-code-orms-query-builders-raw-sql">Schema in code — ORMs, query builders, raw SQL</h2>
 
 <p>How the schema is declared and accessed is a tooling decision — the schema itself is the design. The decision table (the runtime side lives in <a href="./backend-engineering.html">Backend Engineering §1e</a>):</p>
 
@@ -431,7 +431,7 @@ CREATE POLICY tenant_isolation ON shipments
 
 <p>The lazy rule: start with the tool that makes the schema <em>versioned and reviewable</em> (that is non-negotiable), and pick ORM-vs-builder-vs-raw by how much of your workload is one-table CRUD. Whatever you choose, the schema is designed in this doc's terms first — tools then translate it.</p>
 
-<h2>Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <table>
 <thead><tr><th>Principle</th><th>The rule of thumb</th></tr></thead>
@@ -446,7 +446,7 @@ CREATE POLICY tenant_isolation ON shipments
 </tbody>
 </table>
 
-<h2>Worked example — "Design the schema for a shipment tracking system"</h2>
+<h2 id="sec-worked-example-design-the-schema-for-a-shipment-tracking-system">Worked example — "Design the schema for a shipment tracking system"</h2>
 
 <p><a href="./api-design.html">API Design's worked example</a> designs the public tracking API; this is its vault — the schema that example's endpoints read. Start from the facts, not the UI:</p>
 
@@ -565,7 +565,7 @@ enum ShipmentStatus {
   returned
 }</pre>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
 <thead><tr><th>Failure</th><th>Symptom</th><th>Fix</th></tr></thead>
@@ -588,7 +588,7 @@ enum ShipmentStatus {
 </tbody>
 </table>
 
-<h2>Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <table>
 <thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
@@ -604,7 +604,7 @@ enum ShipmentStatus {
 </tbody>
 </table>
 
-<h2>The future — where data modeling is going</h2>
+<h2 id="sec-the-future-where-data-modeling-is-going">The future — where data modeling is going</h2>
 
 <table>
 <thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
@@ -620,7 +620,7 @@ enum ShipmentStatus {
 
 <p>The direction is not "less schema" or "more schema" — it is <em>schema where it must be enforced, softer where it must vary</em>, with the choice made explicitly and recorded in the migration.</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Before you create a table, run this. If you can answer each row, you're ready to write the migration; if not, sketch until you can.</p>
 

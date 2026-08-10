@@ -31,7 +31,7 @@
   <p>Read this to understand <em>what discipline you're actually practicing</em> — and why HackerRank (CS) and your React job (SE) feel different even though both involve JavaScript.</p>
 </blockquote>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful <em>after</em> you've read <a href="./problem-solving.html">Problem-Solving</a> and <a href="./how-developers-think-frontend.html">The Rhythm</a> — those give you the thinking skills; this doc gives you the discipline they sit inside. Cross-links:</p>
 <ul>
@@ -48,7 +48,7 @@
   <p><strong>Scope and non-goals.</strong> This document is a conceptual umbrella, not an encyclopedia. It explains the relationship between computer science and software engineering and introduces the evaluation skills that connect them. Specific technologies, implementation patterns, and adjacent disciplines are covered in the linked references (§3b is the map) or intentionally left out of scope.</p>
 </blockquote>
 
-<h2>1. Definition — what CS <em>is</em>, what SE <em>is</em>, and how they differ</h2>
+<h2 id="sec-definition-what-cs-is-what-se-is-and-how-they-differ">1. Definition — what CS <em>is</em>, what SE <em>is</em>, and how they differ</h2>
 
 <h3>Computer Science — the science of computation</h3>
 <p>Computer science is the study of <strong>what can be computed, how efficiently, and what the fundamental limits of computation are</strong> (<a href="https://en.wikipedia.org/wiki/Computer_science">Wikipedia</a>). It is a <em>science</em>: it discovers what is possible, asks "what are the theoretical limits?", and proves theorems about computation. The core questions: What problems can be solved by an algorithm? How fast? How much memory? What problems are provably <em>unsolvable</em> (the halting problem)? What problems are solvable but not in reasonable time (P vs NP)?</p>
@@ -83,7 +83,7 @@
   <li><strong>Not just for academics.</strong> The engineering principles (§8) and the evaluation skill (§4–§7) are practical — you use them every time you choose between a brute-force and an optimized solution, every time you decide "is this readable enough?", every time you make a trade-off.</li>
 </ul>
 
-<h2>1b. History — from Lovelace to the AI era (1843–present)</h2>
+<h2 id="sec-history-from-lovelace-to-the-ai-era-1843present">1b. History — from Lovelace to the AI era (1843–present)</h2>
 
 <p>The discipline’s lineage now spans nearly two centuries of ideas, with threads that braid together over time: the science thread (what can be computed?), the engineering thread (how do we build reliable software?), and—since the 2010s—the intelligence thread (can software learn from data?). This timeline is selective: it highlights moments relevant to evaluation, engineering principles, and the AI era — not a complete history of computing.</p>
 
@@ -851,7 +851,7 @@
 
 <p><strong>The braided threads:</strong> The science thread (Turing → Shannon → Knuth) discovered what computation <em>is</em> and how to measure its efficiency. The engineering thread (NATO 1968 → Dijkstra → Brooks → GoF → SOLID → Agile → cloud → DevOps) discovered how to build software that <em>lasts</em> and <em>scales</em>. Since 2012 a third strand — <strong>machine intelligence</strong> (AlexNet → Transformer → LLMs) — braided in: software now learns from data, and AI assists in writing it. They meet in solution evaluation: the science gives you the measures (Big O); the engineering gives you the parameters (quality attributes) and the principles (DRY, SOLID, KISS); the AI era makes the judgment — which parameters matter when, when to stop optimizing, what to trust a model with — <em>more</em> valuable, not less.</p>
 
-<h2>1c. Evolution — constraint inversions across the discipline</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-discipline">1c. Evolution — constraint inversions across the discipline</h2>
 
 <p>The discipline evolved through constraint inversions — moments when the dominant question changed because a constraint changed.</p>
 
@@ -868,7 +868,7 @@
 
 <p><strong>The pattern:</strong> each inversion <em>adds</em> a parameter without removing the old ones. A modern solution must be correct <em>and</em> fast <em>and</em> maintainable <em>and</em> scalable <em>and</em> secure. The trade-offs between them are the engineering judgment this doc teaches (§6–§7).</p>
 
-<h2>1d. Intersection with neighbors — the umbrella</h2>
+<h2 id="sec-intersection-with-neighbors-the-umbrella">1d. Intersection with neighbors — the umbrella</h2>
 
 <p>This doc is the <strong>umbrella</strong> — every technical reference on this shelf is grounded in CS &amp; SE, viewed from a different angle. Adjacent references — UI/UX, Design Thinking, Problem-Solving as general cognition — intersect it by shaping requirements and human constraints rather than being instances of it. Here's how each connects:</p>
 
@@ -888,7 +888,7 @@
 
 <p><strong>Frontend engineering</strong> is where usability, performance, accessibility, and platform constraints meet: the browser is a runtime, a rendering engine, and a security boundary. The shelf covers it in <a href="./html-and-css.html">HTML &amp; CSS</a>, <a href="./javascript-the-language.html">JavaScript</a>, and <a href="./react-2024-and-beyond.html">React</a> — all instances of the discipline at the interface layer.</p>
 
-<h2>1e. Underlying theory — complexity, computability, and information</h2>
+<h2 id="sec-underlying-theory-complexity-computability-and-information">1e. Underlying theory — complexity, computability, and information</h2>
 
 <p>The discipline rests on three theoretical pillars from the science thread. You don't need to prove the theorems, but you need to know they exist — they define the limits of what you can do.</p>
 
@@ -905,7 +905,7 @@
   <p><strong>How the theory connects to practice:</strong> Computability tells you what's possible. Complexity tells you what's efficient. Information theory tells you how to represent data. Together they define the space of solutions you can choose from. The engineering principles (§8) and the trade-off judgment (§7) are how you navigate that space under real-world constraints.</p>
 </blockquote>
 
-<h2>1f. Mental models — the engineering mindset</h2>
+<h2 id="sec-mental-models-the-engineering-mindset">1f. Mental models — the engineering mindset</h2>
 
 <p>The engineering mindset is fundamentally different from the scientific mindset, and recognizing the shift is a key mental model.</p>
 
@@ -932,7 +932,7 @@
   <li><strong>Abstraction manages complexity.</strong> The human brain can hold ~4 items in working memory (Cowan 2001). A 100,000-line codebase is only manageable because of abstraction — hiding detail behind interfaces. Every principle in §8 (DRY, SOLID, separation of concerns) is a strategy for managing complexity through abstraction.</li>
 </ul>
 
-<h2>2. What is Computer Science? — the science of computation</h2>
+<h2 id="sec-what-is-computer-science-the-science-of-computation">2. What is Computer Science? — the science of computation</h2>
 
 <p>Computer science is the study of <strong>computation</strong> — what can be computed, how efficiently, and what the limits are. It is not "the study of computers" any more than astronomy is "the study of telescopes." The computer is the instrument; computation is the subject. The field has several core areas:</p>
 
@@ -952,7 +952,7 @@
 
 <p><strong>Beyond the six areas above:</strong> the complete field also includes operating systems, computer networking, compilers and formal methods, human–computer interaction, computer graphics, and AI/ML — with the mathematical foundations beneath everything: logic, probability, and discrete structures. Most practitioners meet these through the stack: <a href="./algorithms-and-data-structures.html">Algorithms &amp; Data Structures</a> for the core, <a href="./system-design.html">System Design</a> for systems at scale.</p>
 
-<h2>3. What is Software Engineering? — the engineering of software</h2>
+<h2 id="sec-what-is-software-engineering-the-engineering-of-software">3. What is Software Engineering? — the engineering of software</h2>
 
 <p>Software engineering is the <strong>engineering discipline of building reliable, maintainable software systems at scale</strong>. It was named in 1968 at the NATO conference, in response to the "software crisis" — projects that were over budget, over schedule, and poor quality. The field has several core areas:</p>
 
@@ -974,7 +974,7 @@
   <p><strong>How CS and SE braid:</strong> CS tells you what's <em>possible</em> (the algorithm exists, it's O(n log n)). SE tells you what's <em>advisable</em> (the O(n log n) algorithm is 50 lines and unmaintainable; the O(n²) algorithm is 5 lines and obvious — for n &lt; 1000, the second is the better engineering choice). <strong>The mature practitioner uses both: CS to know what's possible, SE to choose what's advisable.</strong></p>
 </blockquote>
 
-<h2>3b. The rest of the engineering discipline — where the shelf covers it</h2>
+<h2 id="sec-the-rest-of-the-engineering-discipline-where-the-shelf-covers-it">3b. The rest of the engineering discipline — where the shelf covers it</h2>
 
 <p>An umbrella names the whole discipline; it does not re-teach every area. The shelf owns most of the discipline in dedicated references — when one of these starts to matter in your work, read its owning doc:</p>
 
@@ -997,7 +997,7 @@
   <li><strong>Dependencies &amp; supply chain.</strong> Modern software is assembled as much as written: package managers, lockfiles, semantic versioning, dependency audits, SBOMs, license compliance, vulnerability scanning, reproducible builds.</li>
 </ul>
 
-<h2>4. The parameters — quality attributes (what you measure)</h2>
+<h2 id="sec-the-parameters-quality-attributes-what-you-measure">4. The parameters — quality attributes (what you measure)</h2>
 
 <p>When you evaluate a solution — whether a HackerRank algorithm or a React feature — you judge it along multiple <strong>parameters</strong>. The formal name for these parameters is <strong>quality attributes</strong> (also called "non-functional requirements" or "the ilities"). The international standard is <strong>ISO/IEC 25010</strong> (2011), which superseded ISO/IEC 9126-1 (the 2001 revision of the 1991 standard) and defines 8 quality characteristics (<a href="https://en.wikipedia.org/wiki/ISO/IEC_25010">Wikipedia</a>):</p>
 
@@ -1032,7 +1032,7 @@
   <p><strong>The key reframe:</strong> "parameters," "quality attributes," "non-functional requirements," and "the ilities" are all names for the same thing — the dimensions along which you evaluate a solution. ISO 25010 gives the standard 8. Algorithm analysis adds time and space complexity. The judgment skill (§7) is knowing <em>which parameters matter for which context</em>.</p>
 </blockquote>
 
-<h2>5. The measures — Big O notation and complexity classes</h2>
+<h2 id="sec-the-measures-big-o-notation-and-complexity-classes">5. The measures — Big O notation and complexity classes</h2>
 
 <p>Big O notation is how you <strong>quantify</strong> the performance efficiency parameter. It describes how an algorithm's runtime (or memory) grows as the input size grows. The notation was introduced by Paul Bachmann in mathematics (1894) and popularized by Edmund Landau, then adopted for computer science by Donald Knuth (<a href="https://en.wikipedia.org/wiki/Big_O_notation">Wikipedia</a>).</p>
 
@@ -1063,7 +1063,7 @@
 
 <p><strong>But — and this is the engineering judgment (§7):</strong> for n &lt; 100, O(n²) is fine. 10,000 operations is instant. The CS answer is "use the optimal algorithm." The SE answer is "use the simplest algorithm that fits within the time limit for the expected input size." Knowing the difference is the judgment skill.</p>
 
-<h2>6. The trade-offs — when parameters conflict</h2>
+<h2 id="sec-the-trade-offs-when-parameters-conflict">6. The trade-offs — when parameters conflict</h2>
 
 <p>A <strong>trade-off</strong> is a situational decision where improving one parameter diminishes another (<a href="https://en.wikipedia.org/wiki/Trade-off">Wikipedia</a>). In software, you cannot maximize all quality attributes simultaneously. The engineering skill is making trade-offs <em>explicit</em> — naming what you're sacrificing and why.</p>
 
@@ -1092,7 +1092,7 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   <p><strong>Trade-offs at every scale:</strong> the same trade-off pattern appears at every level of the stack. At the algorithm level: time vs space. At the API level: REST (simplicity) vs GraphQL (flexibility) vs gRPC (performance) — see <a href="./api-design.html">API Design</a>. At the architecture level: consistency vs availability (CAP) — see <a href="./system-design.html">System Design</a>. At the feature level: "simplest thing first" vs "optimize now" — see <a href="./how-developers-think-frontend.html">The Rhythm</a>. The parameters change; the trade-off skill doesn't.</p>
 </blockquote>
 
-<h2>7. The judgment — which parameters matter when, and when to stop</h2>
+<h2 id="sec-the-judgment-which-parameters-matter-when-and-when-to-stop">7. The judgment — which parameters matter when, and when to stop</h2>
 
 <p>This is the skill that ties together the parameters (§4), the measures (§5), and the trade-offs (§6). <strong>Judgment is knowing which parameters matter for your context, and when the solution is "good enough" to stop.</strong> It cannot be reduced to a formula — it's a context-dependent decision that improves with experience.</p>
 
@@ -1123,7 +1123,7 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
 
 <p><strong>This is the same judgment as The Rhythm's "feel the friction" (L7/L15):</strong> you don't optimize upfront — you build the simplest thing first, feel where it creaks, then optimize there. The React Compiler (L15) automates memoization and performance decisions in many cases — but the human still decides <em>which parameters matter</em> for the context. That's the judgment AI can't replace.</p>
 
-<h2>8. Engineering principles — DRY, SOLID, KISS, YAGNI</h2>
+<h2 id="sec-engineering-principles-dry-solid-kiss-yagni">8. Engineering principles — DRY, SOLID, KISS, YAGNI</h2>
 
 <p>These are the named principles that survive every framework, every era, every language. They're the constants of software engineering — the heuristics that guide the trade-off decisions in §6 and the judgment in §7.</p>
 
@@ -1159,7 +1159,7 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   <li><strong>Low coupling, high cohesion</strong> (Stevens, Myers &amp; Constantine, 1974): modules should be internally coherent (high cohesion) and minimally dependent on each other (low coupling). Boundaries, layering, and dependency direction are the architecture of this principle — it is why separation of concerns works. At scale this is System Design’s territory (<a href="./system-design.html">System Design</a>).</li>
 </ul>
 
-<h2>8b. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">8b. Principles — the shared constants</h2>
 
 <p>Across every era, every language, every framework, certain principles don't change. These are the constants that survive from Knuth (1968) to the React Compiler (2024):</p>
 <table>
@@ -1175,7 +1175,7 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   </tbody>
 </table>
 
-<h2>8c. Technical debt — when speed now costs later</h2>
+<h2 id="sec-technical-debt-when-speed-now-costs-later">8c. Technical debt — when speed now costs later</h2>
 
 <p><strong>Technical debt</strong> is the future cost of choosing speed now: code that works today but is harder to change tomorrow. Some debt is <em>deliberate</em> (ship the feature now, refactor when it is proven); some is <em>accidental</em> (sloppiness, drift, abandoned experiments). The engineering skill is knowing when debt is acceptable and when it must be paid down.</p>
 <ul>
@@ -1185,7 +1185,7 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
 </ul>
 <p>Naming a decision “debt” makes it explicit (§8b): you can then decide deliberately when to pay it.</p>
 
-<h2>9. Worked example — evaluating a brute-force solution</h2>
+<h2 id="sec-worked-example-evaluating-a-brute-force-solution">9. Worked example — evaluating a brute-force solution</h2>
 
 <p>Let's trace solution evaluation through a real problem: <strong>"Find the first non-repeating character in a string."</strong></p>
 
@@ -1242,7 +1242,7 @@ function firstNonRepeat(str) {
 
 <p><strong>This is the judgment skill (§7) in action:</strong> the same two solutions, different answers depending on context. The CS answer is always "use the optimal algorithm." The SE answer is "use the simplest algorithm that fits the constraint." The mature practitioner knows which answer the context calls for.</p>
 
-<h2>9b. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">9b. The most common failure modes</h2>
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>The fix</th></tr></thead>
   <tbody>
@@ -1256,7 +1256,7 @@ function firstNonRepeat(str) {
   </tbody>
 </table>
 
-<h2>9c. Ecosystem — books, tools, and communities</h2>
+<h2 id="sec-ecosystem-books-tools-and-communities">9c. Ecosystem — books, tools, and communities</h2>
 <table>
   <thead><tr><th>Category</th><th>Resource</th><th>What it gives you</th></tr></thead>
   <tbody>
@@ -1273,7 +1273,7 @@ function firstNonRepeat(str) {
   </tbody>
 </table>
 
-<h2>9d. The future — the evaluation premium</h2>
+<h2 id="sec-the-future-the-evaluation-premium">9d. The future — the evaluation premium</h2>
 
 <p>AI is changing the discipline — but not in the way most people fear. The skill that becomes <em>more</em> valuable is the one this doc teaches: <strong>solution evaluation</strong>.</p>
 
@@ -1301,7 +1301,7 @@ function firstNonRepeat(str) {
 
 <p><strong>The enduring insight:</strong> the discipline has survived nearly two centuries of change — from punch cards to cloud, from waterfall to Agile, from manual coding to AI-assisted. Through every inversion, the evaluation skill — knowing what makes a solution good, measuring it, and making trade-off decisions — has only become <em>more</em> valuable. The tools change; the judgment doesn't. That's why this doc exists.</p>
 
-<h2>9e. Measurement — why "measure first" is harder than it sounds</h2>
+<h2 id="sec-measurement-why-measure-first-is-harder-than-it-sounds">9e. Measurement — why "measure first" is harder than it sounds</h2>
 
 <p>§8b says “measure before optimizing” — but measurement itself is a skill. Benchmarks mislead through <strong>warm-up effects</strong>, <strong>caching</strong>, <strong>garbage-collection noise</strong>, <strong>compiler optimization</strong> (dead-code elimination, inlining), and <strong>unrepresentative data</strong>. Microbenchmarks often measure the wrong layer entirely.</p>
 <ul>
@@ -1310,7 +1310,7 @@ function firstNonRepeat(str) {
   <li>Treat benchmark numbers as <strong>hypotheses</strong>: repeat and vary them, and confirm with end-to-end signals — observability metrics, A/B tests — rather than isolated microbenchmarks.</li>
 </ul>
 
-<h2>10. Summary — the complete evaluation checklist</h2>
+<h2 id="sec-summary-the-complete-evaluation-checklist">10. Summary — the complete evaluation checklist</h2>
 
 <p>Next time you solve a problem — whether a HackerRank challenge or a React feature — run this checklist. If you can answer each, you've evaluated your solution. If not, go back and evaluate.</p>
 

@@ -23,7 +23,7 @@
   <p>"The real programming is in system design." This doc captures what that means. System Design is neither the product discovery of Design Thinking nor the component loop of the developer. It is the <strong>architectural layer</strong> that translates a validated problem into a structured solution — defining services, data ownership, consistency boundaries, failure modes, and the seams where components meet. It operates at two scales simultaneously: <em>architectural</em> (macro: services, events, scaling) and <em>component</em> (micro: bounded contexts, API contracts, trust boundaries). Both are system design; neither is complete without the other.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: standalone. Cross-links:</p>
 <ul>
@@ -57,7 +57,7 @@
 
 ---
 
-<h2>1. Definition — what system design <em>is</em> and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-system-design-is-and-what-it-is-not">1. Definition — what system design <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 
@@ -90,7 +90,7 @@
 
 ---
 
-<h2>2. History — from flowcharts to distributed systems</h2>
+<h2 id="sec-history-from-flowcharts-to-distributed-systems">2. History — from flowcharts to distributed systems</h2>
 
 <table>
   <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
@@ -172,7 +172,7 @@
 
 ---
 
-<h2>3. Evolution — paradigms through one lens</h2>
+<h2 id="sec-evolution-paradigms-through-one-lens">3. Evolution — paradigms through one lens</h2>
 
 <p>Each era's primary constraint produced its system design. When the constraint inverted, the design bets inverted with it — the same pattern documented in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>.</p>
 
@@ -232,7 +232,7 @@
 
 <p>The arc: <strong>constraint changes → old design bet conflicts → new design bet inverts</strong>. Monolith inverted to microservices (deployment autonomy > hardware cost). SOA inverted to microservices (team autonomy > reuse). Microservices are inverting to edge/stateful-functions (latency > operational simplicity). Each inversion leaves a legacy layer that still works for its constraint.</p>
 
-<h2>3b. Migration paths between architectures</h2>
+<h2 id="sec-migration-paths-between-architectures">3b. Migration paths between architectures</h2>
 
 <p>Architecture migrations are rarely greenfield. They are incremental extractions, strangler figs, and parallel runs:</p>
 
@@ -291,7 +291,7 @@
 
 ---
 
-<h2>4. Intersection with neighbors</h2>
+<h2 id="sec-intersection-with-neighbors">4. Intersection with neighbors</h2>
 
 <table>
   <thead><tr><th>Discipline</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
@@ -351,7 +351,7 @@
 
 ---
 
-<h2>5. Underlying theory — what makes a system designed not assembled</h2>
+<h2 id="sec-underlying-theory-what-makes-a-system-designed-not-assembled">5. Underlying theory — what makes a system designed not assembled</h2>
 
 <p>System Design rests on a handful of proven results. Each one <em>forces</em> a decision; you cannot "work around" them.</p>
 
@@ -401,7 +401,7 @@
   </tbody>
 </table>
 
-<h2>5b. Mental models — how architects actually reason</h2>
+<h2 id="sec-mental-models-how-architects-actually-reason">5b. Mental models — how architects actually reason</h2>
 
 <p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model is a compression of the theories for a specific decision context:</p>
 
@@ -451,7 +451,7 @@
 
 ---
 
-<h2>6. Architectural layer (macro) — patterns with consequences</h2>
+<h2 id="sec-architectural-layer-macro-patterns-with-consequences">6. Architectural layer (macro) — patterns with consequences</h2>
 
 <h3>Microservices vs Monolith — the decision matrix</h3>
 
@@ -520,7 +520,7 @@
 
 ---
 
-<h2>6b. Capacity planning — how to estimate load, storage, and latency</h2>
+<h2 id="sec-capacity-planning-how-to-estimate-load-storage-and-latency">6b. Capacity planning — how to estimate load, storage, and latency</h2>
 
 <p>Capacity planning is not perfect prediction. It is choosing an architecture that survives uncertainty — the discipline that turns §9's back-of-envelope numbers into a repeatable process.</p>
 
@@ -566,7 +566,7 @@
 
 <p><strong>The rule:</strong> if the capacity model can't fit on one page, the architecture is too complex to reason about under load. The model is a decision-support artifact, not a spreadsheet for its own sake.</p>
 
-<h2>6c. Data architecture — storage, partitioning, replication, and evolution</h2>
+<h2 id="sec-data-architecture-storage-partitioning-replication-and-evolution">6c. Data architecture — storage, partitioning, replication, and evolution</h2>
 
 <p>Data ownership (§7) says <em>who</em> writes; data architecture says <em>how it is stored, partitioned, replicated, and evolved</em>. Choose storage by access pattern, not by popularity.</p>
 
@@ -625,7 +625,7 @@
   <li>Treat <strong>irreversible data changes</strong> (deletes, rewrites) as one-way doors needing an ADR.</li>
 </ul>
 
-<h2>6d. Caching architecture — where to cache, what to cache, and how to invalidate</h2>
+<h2 id="sec-caching-architecture-where-to-cache-what-to-cache-and-how-to-invalidate">6d. Caching architecture — where to cache, what to cache, and how to invalidate</h2>
 
 <p>Caching is a scaling lever in §6; here it becomes a design discipline. Every cache is a copy of data with a <strong>staleness contract</strong> — the question is always "how stale is acceptable?"</p>
 
@@ -668,7 +668,7 @@
   <li><strong>Caching unauthorized or personalized data</strong> — the most serious: data leaks across tenants/users. Never cache at a layer that skips authorization (<a href="./how-developers-think-frontend.html">see Developer Loop §13c</a> for the same warning).</li>
 </ul>
 
-<h2>6e. Event and queue reliability — the operational layer under async</h2>
+<h2 id="sec-event-and-queue-reliability-the-operational-layer-under-async">6e. Event and queue reliability — the operational layer under async</h2>
 
 <p>§10's event-driven example is the happy path. Event systems earn their complexity in these details — without them, async delivery is silent data loss.</p>
 
@@ -695,7 +695,7 @@
 
 <p><strong>The rule:</strong> an event system is production-ready only when every message can be accounted for — consumed, dead-lettered, or replayable. If an event can vanish silently, the architecture is incomplete.</p>
 
-<h2>6f. Reliability and disaster recovery — SLOs, degradation, and recovery</h2>
+<h2 id="sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">6f. Reliability and disaster recovery — SLOs, degradation, and recovery</h2>
 
 <p>A reliable system is not one that never fails. It is one that <em>fails in controlled, observable, recoverable ways</em>.</p>
 
@@ -778,7 +778,7 @@
   <li><strong>Cancellation propagation</strong> — when a caller gives up, cancel downstream work so it doesn't keep burning resources.</li>
 </ul>
 
-<h2>6g. Observability — designing systems that can be understood in production</h2>
+<h2 id="sec-observability-designing-systems-that-can-be-understood-in-production">6g. Observability — designing systems that can be understood in production</h2>
 
 <p>Observability is not "add logs later." It is an architectural requirement with a name: if a failure cannot be seen, localized, and reproduced, the architecture is not operationally complete.</p>
 
@@ -813,7 +813,7 @@
 
 ---
 
-<h2>7. Component layer (micro) — where system design meets code</h2>
+<h2 id="sec-component-layer-micro-where-system-design-meets-code">7. Component layer (micro) — where system design meets code</h2>
 
 <p>This layer is the direct upstream of the <a href="./how-developers-think-frontend.html">developer loop</a>. Every component the developer builds lives inside a boundary defined here.</p>
 
@@ -894,7 +894,7 @@
 
 ---
 
-<h2>8. Why it is a method, not an algorithm</h2>
+<h2 id="sec-why-it-is-a-method-not-an-algorithm">8. Why it is a method, not an algorithm</h2>
 
 <p>Like the developer loop and Design Thinking, System Design is not an algorithm. But the <em>reason</em> is different:</p>
 
@@ -920,7 +920,7 @@
 
 ---
 
-<h2>9. Worked example — "Design a URL Shortener"</h2>
+<h2 id="sec-worked-example-design-a-url-shortener">9. Worked example — "Design a URL Shortener"</h2>
 
 <p>The canonical system-design interview question, walked through both layers.</p>
 
@@ -1012,7 +1012,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>10. Worked example — "Design an Event-Driven Order System"</h2>
+<h2 id="sec-worked-example-design-an-event-driven-order-system">10. Worked example — "Design an Event-Driven Order System"</h2>
 
 <p>Shows when you <em>don't</em> pick a CRUD monolith.</p>
 
@@ -1069,7 +1069,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>11. Methodologies / heuristics</h2>
+<h2 id="sec-methodologies-heuristics">11. Methodologies / heuristics</h2>
 
 <table>
   <thead><tr><th>Approach</th><th>What it gives you</th><th>Origin</th></tr></thead>
@@ -1106,7 +1106,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>12. Common failure modes</h2>
+<h2 id="sec-common-failure-modes">12. Common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Root cause</th></tr></thead>
@@ -1151,7 +1151,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>13. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">13. Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The system design discipline is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -1225,7 +1225,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>14. The future — where system design is going</h2>
+<h2 id="sec-the-future-where-system-design-is-going">14. The future — where system design is going</h2>
 
 <table>
   <thead><tr><th>Signal (2024–2026)</th><th>What it means for system design</th></tr></thead>
@@ -1259,7 +1259,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2>15. Summary — the architectural checklist</h2>
+<h2 id="sec-summary-the-architectural-checklist">15. Summary — the architectural checklist</h2>
 
 <p>Before any code is written for a new domain, verify:</p>
 

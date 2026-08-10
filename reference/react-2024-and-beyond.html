@@ -23,7 +23,7 @@
   <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm-shift reference</a> ends at the compiler era (§12) and sends you here for the 2024+ details. Everything in this doc builds on the hooks mental model from that reference — client components still capture values per render, <code>useState</code> still works exactly as described there. The big news: React 19 made the platform features real, the compiler is stable, RSC splits the process, and React is now foundation-governed.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a> → this guide → <a href="./frontend-camps-survey.html">frontend-camps-survey</a> (camps map) → <a href="./nextjs-deep-dive.html">nextjs-deep-dive</a> (the framework most likely in your React-at-work path). Standalone: each section explains one post-hooks shift — what it is, what changed for code, and where the boundary with the paradigm-shift reference sits.</p>
 
@@ -31,7 +31,7 @@
   <p><strong>Scope.</strong> This guide covers what changed in React after the hooks paradigm settled: the platform ship (React 19), the Compiler, React Server Components, governance, security, the framework era, and the ecosystem consequences. It assumes you already understand hooks from the class-to-hooks doc and <em>does not</em> re-teach them. It does not teach React fundamentals, does not compare all frontend camps (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>), and does not deeply cover Next.js internals (<a href="./nextjs-deep-dive.html">nextjs-deep-dive</a>).</p>
 </blockquote>
 
-<h2>1. React 19 — the platform shift</h2>
+<h2 id="sec-react-19-the-platform-shift">1. React 19 — the platform shift</h2>
 
 <p>React 19 (Dec 2024) turned several community patterns into platform features. This is the release the compiler and RSC depend on, and the one every "2024 and beyond" check in this guide is measured against. The mental model from class-to-hooks is unchanged — what changed is that more things the ecosystem used to build with libraries are now part of React itself.</p>
 
@@ -55,7 +55,7 @@
   <p><strong>Reading 19-era code:</strong> when you see <code>useActionState</code> + a <code>&lt;form action={asyncFn}&gt;</code> + <code>useOptimistic</code>, the shape is "mutate, show predicted, reconcile." This replaces the old "submit + setLoading + setError" hand-rolled dance. The patterns from class-to-hooks §1 still apply — this is a new <em>arrangement</em> of the same state rules, not a new state model.</p>
 </blockquote>
 
-<h2>2. Actions and forms — progressive enhancement returns</h2>
+<h2 id="sec-actions-and-forms-progressive-enhancement-returns">2. Actions and forms — progressive enhancement returns</h2>
 
 <p>React 19 made <em>form submission</em> a React concern. A form can take an <code>action</code> function instead of (or alongside) an <code>onSubmit</code>:</p>
 
@@ -83,7 +83,7 @@
   <p><strong>Server Actions are endpoints.</strong> Being "server-side" does not make a function safe. Server Actions are public HTTP endpoints: validate every argument, authorize the caller, rate-limit sensitive operations, and treat return values as untrusted. Form data is user input — never assume the types at the boundary (§4).</p>
 </blockquote>
 
-<h2>3. The React Compiler is stable (Oct 2025) and ship-by-default (2026)</h2>
+<h2 id="sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">3. The React Compiler is stable (Oct 2025) and ship-by-default (2026)</h2>
 
 <p>The <a href="https://react.dev/blog/2025/10/07/react-compiler-1">React Compiler v1.0</a> shipped October 7, 2025 — the first stable release after nearly a decade of research (the team's Prepack experiments started in 2017). The compiler is a Babel plugin that lowers your code into its own High-Level Intermediate Representation, runs data-flow and mutability analysis, and inserts memoization where it helps — including in places where <code>useMemo</code> cannot legally go, like after an early return.</p>
 
@@ -98,7 +98,7 @@
   <li><strong>Test effect dependencies after enabling.</strong> Compiler-generated memoization can change which effects fire when code quietly violates the Rules of React. Read the changelog and run the suite — treat a compiler upgrade like a React major upgrade.</li>
 </ul>
 
-<h2>4. React Server Components split rendering across two processes</h2>
+<h2 id="sec-react-server-components-split-rendering-across-two-processes">4. React Server Components split rendering across two processes</h2>
 
 <p>The class→hooks arc was about <em>how</em> a component manages state inside one process. RSC answers a different question: <em>which process</em> a component runs in — yours (the browser) or the server's. Dan Abramov framed it cleanly in <a href="https://overreacted.io/the-two-reacts/">The Two Reacts</a> (Jan 2024):</p>
 
@@ -185,7 +185,7 @@
 
 <p>Server rendering can ship progressively. Streaming (Suspense on the server) sends the shell first and each suspended server component's content as it finishes; <a href="https://react.dev/blog/2023/10/04/partial-prerendering">partial prerendering (PPR, Oct 2023)</a> pre-renders the static shell at build time and streams only the dynamic parts per request. When reading code, a "shell plus suspense around one region" shape usually means the slow, user-specific part is isolated so the static majority ships instantly — the same Suspense mental model, now precomputed.</p>
 
-<h2>5. The security boundary: RSC changed what a "trust boundary" means (Dec 2025 – Jan 2026)</h2>
+<h2 id="sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">5. The security boundary: RSC changed what a "trust boundary" means (Dec 2025 – Jan 2026)</h2>
 
 <p>Server Functions and the RSC wire protocol gave attackers a new surface. In <strong>December 2025</strong>, a critical CVE (CVSS 10.0) allowed remote code execution through the RSC protocol. The fixes shipped, then researchers found follow-ups — high-severity Denial of Service (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55184">CVE-2025-55184</a>), medium-severity source-code exposure (<a href="https://www.cve.org/CVERecord?id=CVE-2025-55183">CVE-2025-55183</a>), and a further DoS in January 2026 (<a href="https://www.cve.org/CVERecord?id=CVE-2026-23864">CVE-2026-23864</a>).</p>
 
@@ -198,7 +198,7 @@
   <li><strong>Run framework security releases like OS updates.</strong> Next.js adopted a formal monthly security cadence with advance notice — schedule them, don't let them drift.</li>
 </ol>
 
-<h2>6. The React Foundation (Feb 2026): Meta is no longer the sole owner</h2>
+<h2 id="sec-the-react-foundation-feb-2026-meta-is-no-longer-the-sole-owner">6. The React Foundation (Feb 2026): Meta is no longer the sole owner</h2>
 
 <p>On February 24, 2026, the <a href="https://react.dev/blog/2026/02/24/the-react-foundation">React Foundation</a> launched under the Linux Foundation. React, React Native, and JSX are no longer owned by Meta — they are now owned by the foundation, governed by a board with eight Platinum founding members: <strong>Amazon, Callstack, Expo, Huawei, Meta, Microsoft, Software Mansion, and Vercel</strong>. Seth Webster serves as executive director.</p>
 
@@ -206,7 +206,7 @@
 
 <p>Technical governance stays independent of the board — contributors set technical direction; the board manages assets and infrastructure. A provisional leadership council is determining the long-term structure; React Conf planning continues.</p>
 
-<h2>7. React 19.2 and the framework/routing era</h2>
+<h2 id="sec-react-19-2-and-the-framework-routing-era">7. React 19.2 and the framework/routing era</h2>
 
 <p><a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (Oct 1, 2025) shipped three features that change daily code: <code>&lt;Activity /&gt;</code> (preserves a hidden subtree's state — the "navigated away and lost my form" problem solved at the framework level), <code>useEffectEvent</code> (the documented fix for the "deps array lies because I want latest props in the handler" pattern from the paradigm-shift doc's §11), and React Performance Tracks (DevTools overlays for what re-rendered and why).</p>
 
@@ -225,7 +225,7 @@
   </tbody>
 </table>
 
-<h2>8. The signals question — and why React didn't adopt them</h2>
+<h2 id="sec-the-signals-question-and-why-react-didn-t-adopt-them">8. The signals question — and why React didn't adopt them</h2>
 
 <p>By 2026, every other major reactive framework standardized on <strong>signals</strong> as the primary reactivity primitive: Angular (v17+), Vue 3.5+, Svelte 5 (runes), Solid, Preact, and even Ember. A signal is a fine-grained reactive cell — when its value changes, only the DOM that subscribes updates, not the whole component. The pitch: faster updates and a simpler mental model — state as a value with subscribers, rather than "re-render the function."</p>
 
@@ -233,7 +233,7 @@
 
 <p>For reading code at work: if you touch Angular (<code>signal()</code>), Vue (<code>ref()</code>), Svelte (<code>$state</code>), Solid (<code>createSignal</code>), or Preact (<code>signal()</code>), they look like <code>useState</code> but behave differently — the component doesn't re-run; the binding updates. Don't translate 1:1 between the two reactivity models; read each framework's signals doc.</p>
 
-<h2>9. Preact — the structural branch that asks "what if React were 3.5 kB?"</h2>
+<h2 id="sec-preact-the-structural-branch-that-asks-what-if-react-were-3-5-kb">9. Preact — the structural branch that asks "what if React were 3.5 kB?"</h2>
 
 <p>Preact appeared in 2015. It is a separate implementation of the same component model — same JSX, same hooks (eventually), same mental model — but a different codebase with different goals. The original pitch (still on <a href="https://preactjs.com/about/project-goals">the project goals page</a>):</p>
 <ul>
@@ -268,7 +268,7 @@
 
 <p>No. The split is stable because it is structural, not stylistic: React is the multi-platform, abstraction-rich, foundation-backed default; Preact is the web-only, web-spec-first, size-first branch. The compiler closes the re-render gap on one of Preact's dimensions, but React's bundle will not collapse to Preact's — the cross-platform and RSC tax is a deliberate choice. A foundation-governed spec alongside a community-maintained smaller implementation is, if anything, more sustainable than one company owning both.</p>
 
-<h2>10. Migration paths into React 2024+</h2>
+<h2 id="sec-migration-paths-into-react-2024">10. Migration paths into React 2024+</h2>
 
 <table>
   <thead><tr><th>From → To</th><th>Trigger</th><th>Strategy</th><th>Main risk</th></tr></thead>
@@ -283,7 +283,7 @@
   </tbody>
 </table>
 
-<h2>11. Failure modes</h2>
+<h2 id="sec-failure-modes">11. Failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix</th></tr></thead>
@@ -303,7 +303,7 @@
   </tbody>
 </table>
 
-<h2>12. Principles</h2>
+<h2 id="sec-principles">12. Principles</h2>
 
 <table>
   <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
@@ -319,7 +319,7 @@
   </tbody>
 </table>
 
-<h2>13. Ecosystem — the tools worth naming</h2>
+<h2 id="sec-ecosystem-the-tools-worth-naming">13. Ecosystem — the tools worth naming</h2>
 
 <table>
   <thead><tr><th>Layer</th><th>Tools</th><th>Purpose</th></tr></thead>
@@ -335,7 +335,7 @@
   </tbody>
 </table>
 
-<h2>14. The future — signals to watch</h2>
+<h2 id="sec-the-future-signals-to-watch">14. The future — signals to watch</h2>
 
 <table>
   <thead><tr><th>Signal</th><th>What it would mean</th></tr></thead>
@@ -349,7 +349,7 @@
   </tbody>
 </table>
 
-<h2>15. Summary checklist</h2>
+<h2 id="sec-summary-checklist">15. Summary checklist</h2>
 
 <table>
   <thead><tr><th>Question</th><th>Check</th></tr></thead>

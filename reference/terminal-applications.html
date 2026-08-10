@@ -41,7 +41,7 @@
   <p><strong>Neighbors on the shelf:</strong> <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> (using the terminal — this doc's upstream) · <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (Node as one JS stack) · <a href="./backend-engineering.html">Backend Engineering</a> (servers — the sibling platform) · <a href="./open-source.html">Open Source</a> (how CLI projects get contributions — this doc feeds the CLI contribution case) · <a href="./glossary.html">Glossary</a></p>
 </blockquote>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read the Definition (what a CLI is and isn't — the vocabulary matters), then the Architecture section to see the shape every CLI shares, then the Terminal I/O section for the platform mechanics. The AI-agent CLIs section is the payoff if you use those tools daily. When a real CLI is in front of you, the Reading a CLI Codebase section is the map. Cross-links:</p>
 <ul>
@@ -54,7 +54,7 @@
 
 <p><strong>If you've ever wanted to build a tool to automate your own workflow — or wondered how Claude Code and Codex actually work — this is the map.</strong> One architecture, one platform model, and the specific mechanics of interactive and AI-agent forms.</p>
 
-<h2>Definition — what a CLI is, and what it is not</h2>
+<h2 id="sec-definition-what-a-cli-is-and-what-it-is-not">Definition — what a CLI is, and what it is not</h2>
 
 <p>A <strong>command-line application</strong> is a program whose interface is the terminal: it reads arguments and standard input, writes to standard output and error, and exits with a status code. The family has a vocabulary worth getting exactly right:</p>
 
@@ -72,11 +72,11 @@
 
 <p><strong>Why TypeScript/Node dominates modern CLIs:</strong> Node ships with <code>process.argv</code>, <code>process.stdin/stdout/stderr</code>, and the stream model built in; the npm ecosystem provides every convenience layer; and the tooling (tsup, esbuild) compiles to a single distributable file. The dominant AI-agent CLIs — Claude Code, Codex, Aider, Continue — are all built this way, which is why this doc is Node-centric.</p>
 
-<h2>History — from batch commands to agent loops</h2>
+<h2 id="sec-history-from-batch-commands-to-agent-loops">History — from batch commands to agent loops</h2>
 
 <p>The CLI is older than the GUI and outlived it. Unix (1970s) established the shape — small tools, pipes, plain text — and the "do one thing well" philosophy that still governs CLI design. The GUI era pushed terminals to the margins, but developers kept them as the power tool. Two modern revolutions re-made the form: the <em>Node.js CLI ecosystem</em> (arg parsers, prompts, Ink) made building polished CLIs cheap, and the <em>AI-agent CLI</em> (2023–) turned the terminal into the interface for delegating work — a REPL that calls tools, streams tokens, and asks permission. The CLI didn't die; it became the platform for the newest kind of software.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
   <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
@@ -88,7 +88,7 @@
   </tbody>
 </table>
 
-<h2>Underlying theory — the three-pipe model</h2>
+<h2 id="sec-underlying-theory-the-three-pipe-model">Underlying theory — the three-pipe model</h2>
 
 <p>Every CLI is a transformation on three streams, and almost every design decision follows from that:</p>
 
@@ -101,7 +101,7 @@
 
 <p>The discipline follows directly: <strong>decide what's data (stdout) and what's narrative (stderr) before you write a line</strong>, and the CLI stays composable with everything else on the terminal.</p>
 
-<h2>Mental models — frames for thinking about terminal apps</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-terminal-apps">Mental models — frames for thinking about terminal apps</h2>
 
 <table>
   <thead><tr><th>Frame</th><th>What it does</th></tr></thead>
@@ -115,7 +115,7 @@
   </tbody>
 </table>
 
-<h2>Architecture — the shape every CLI shares</h2>
+<h2 id="sec-architecture-the-shape-every-cli-shares">Architecture — the shape every CLI shares</h2>
 
 <p>From a tiny script to Claude Code, the same skeleton appears:</p>
 
@@ -165,7 +165,7 @@ program.parse();
 
 <p>The pattern — entry → parse → route → config → act → output → exit — is the same for a one-file tool and a large CLI. Reading a real CLI means tracing this spine.</p>
 
-<h2>Terminal I/O — the mechanics of the platform</h2>
+<h2 id="sec-terminal-i-o-the-mechanics-of-the-platform">Terminal I/O — the mechanics of the platform</h2>
 
 <table>
   <thead><tr><th>Topic</th><th>The mechanics</th><th>What it enables</th></tr></thead>
@@ -192,7 +192,7 @@ program.parse();
 <p><strong>Shell integration — what your CLI owes its host.</strong> Two conventions separate a tool from a citizen: <em>completions</em> (let the shell suggest your flags and subcommands — Commander and oclif generate the completion script for bash/zsh/fish, so shipping <code>todo completion</code> costs nothing) and <em>pipe-friendly defaults</em> (when stdout isn't a TTY, output plain/JSON, not colored prose — the isTTY gate already covers this). The user-side half — tab completion, history, aliases — lives in <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a>; your job is the generation side.</p>
 
 <p><strong>The CLI-specific security surface.</strong> A CLI is only as safe as the way it spawns and stores: prefer <code>execFile</code>/<code>spawn</code> with an argument array over <code>exec</code> with string concatenation (never build a shell command from user input); never log env vars or secrets; and give config files that hold secrets <code>chmod 600</code> (read/write owner-only). The full threat model — what an attacker can actually reach through your tool — is <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>; these three habits are the CLI-shaped slice of it.</p>
-<h2>How AI-agent CLIs work — the REPL-with-tools form</h2>
+<h2 id="sec-how-ai-agent-clis-work-the-repl-with-tools-form">How AI-agent CLIs work — the REPL-with-tools form</h2>
 
 <p>Claude Code, Codex, Aider, and Continue share an architecture that extends the classic CLI shape with an agent loop. Every AI CLI is, underneath, a REPL where the "eval" step can call tools:</p>
 
@@ -227,7 +227,7 @@ const LEVELS = {
   risky:   ["delete_file", "run_command", "install"], // always ask
 };</pre>
 
-<h2>Publishing and distribution — getting your CLI into the world</h2>
+<h2 id="sec-publishing-and-distribution-getting-your-cli-into-the-world">Publishing and distribution — getting your CLI into the world</h2>
 
 <table>
   <thead><tr><th>Mechanism</th><th>How it works</th><th>When to use it</th></tr></thead>
@@ -251,7 +251,7 @@ const LEVELS = {
 
 <p>The publishing mechanics (npm lifecycle, versioning, registry) are the same as for any package — the versioning rules live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> §5b. The CLI-specific part is the <code>bin</code> mapping and the decision of npm vs. compiled binary.</p>
 
-<h2>Reading a CLI codebase — the contributor's lens</h2>
+<h2 id="sec-reading-a-cli-codebase-the-contributor-s-lens">Reading a CLI codebase — the contributor's lens</h2>
 
 <p>To read any CLI quickly, walk its spine: <code>bin/</code> (the entry) → <code>src/commands/</code> or the router (routing) → <code>src/utils</code>/<code>lib</code> (the real work) → tests. Concretely:</p>
 
@@ -265,7 +265,7 @@ const LEVELS = {
 
 <p>For an AI-agent CLI, add the same walk but for the loop: find where the model's tool-call requests are dispatched, where the permission check sits, and where a new tool would be registered. The extension seam is usually small and well-named — tools are the feature, so they're kept easy to add. The full social process for turning a reading into a merged contribution is <a href="./open-source.html">Open Source</a>.</p>
 
-<h2>Worked example — a task-list CLI, from zero to published</h2>
+<h2 id="sec-worked-example-a-task-list-cli-from-zero-to-published">Worked example — a task-list CLI, from zero to published</h2>
 
 <pre>Goal: a "todo" CLI with add / list / done / delete, colored output,
       then an interactive mode, then publish it.
@@ -303,7 +303,7 @@ const LEVELS = {
 
 <p>The same skeleton, scaled up with a TUI (Ink) and an agent loop (tool calling + permissions), is Claude Code. The task-list CLI is not a toy version of that architecture — it is the same architecture at minimum size.</p>
 
-<h2>Most common failure modes</h2>
+<h2 id="sec-most-common-failure-modes">Most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead>
@@ -318,7 +318,7 @@ const LEVELS = {
   </tbody>
 </table>
 
-<h2>Ecosystem — the tooling catalog</h2>
+<h2 id="sec-ecosystem-the-tooling-catalog">Ecosystem — the tooling catalog</h2>
 
 <table>
   <thead><tr><th>Category</th><th>Libraries</th><th>Decision metric</th></tr></thead>
@@ -333,11 +333,11 @@ const LEVELS = {
   </tbody>
 </table>
 
-<h2>The future — the terminal as the agent interface</h2>
+<h2 id="sec-the-future-the-terminal-as-the-agent-interface">The future — the terminal as the agent interface</h2>
 
 <p>The AI-agent CLI made the terminal relevant again, and the trend compounds: agent loops are becoming the default way developers delegate work, and the CLI is the natural interface because it is scriptable, inspectable, and composable. Three shifts follow. First, <strong>the permission system becomes the product</strong> — as agents gain more power, the quality of the allow/ask/deny boundary is what users trust. Second, <strong>CLIs must be agent-readable</strong> — tools that output structured data (JSON on stdout, clean errors) are the ones agents and pipelines can use, which is the same discipline this doc has been teaching. Third, <strong>building one becomes more accessible</strong> — the same AI that made agent CLIs popular can scaffold a CLI from a prompt, which lowers the entry barrier and raises the bar: the craft is now in the architecture and the safety boundary, not the typing.</p>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Print this. It is the entire doc in twelve lines:</p>
 
@@ -360,7 +360,7 @@ const LEVELS = {
 </table>
 
 <section class="cite">
-  <h2>Primary sources</h2>
+  <h2 id="sec-primary-sources">Primary sources</h2>
   <ol>
     <li>Raymond, Eric — <a href="http://www.catb.org/~esr/writings/taoup/">The Art of Unix Programming</a> — the "rule of silence" and the design philosophy this doc's three-pipe model descends from.</li>
     <li>Node.js documentation — <a href="https://nodejs.org/api/process.html">process (argv, stdin/stdout/stderr, exit)</a> — the platform primitives every CLI is built on.</li>
@@ -371,7 +371,7 @@ const LEVELS = {
 </section>
 
 <section class="teacher">
-  <h2>Ask your teacher</h2>
+  <h2 id="sec-ask-your-teacher">Ask your teacher</h2>
   <p>Three follow-ups to deepen this:</p>
   <ul>
     <li>"Walk me through the codebase of one AI-agent CLI (Claude Code or similar) from its bin entry to its tool-calling loop — where exactly is the permission boundary?"</li>

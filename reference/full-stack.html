@@ -47,7 +47,7 @@
   <p><strong>Neighbors on the shelf:</strong> <a href="./backend-engineering.html">Backend Engineering</a> (the server loop) · <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> (the frontend loop, including the state taxonomy) · <a href="./api-design.html">API Design</a> (the contract) · <a href="./system-design.html">System Design</a> (the architecture, and the data-ownership rules) · <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> (server vs client components) · <a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> (the test levels) · <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (the auth seam) · <a href="./glossary.html">Glossary</a></p>
 </blockquote>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read the Definition (what full-stack thinking is and isn't — the boundary vocabulary matters), then the Full Request Journey — the single frame this doc is built on — then the two core decision tools: Where Does This Belong and the Three Shapes of Data. The worked example ties it together. Cross-links:</p>
 <ul>
@@ -60,7 +60,7 @@
 
 <p><strong>If you've ever shipped a feature end to end and hit the question "wait — where is this supposed to live?" — this is the map.</strong> One journey, two decision tables, and the discipline of tracing across the boundary.</p>
 
-<h2>Definition — what full-stack thinking is, and what it is not</h2>
+<h2 id="sec-definition-what-full-stack-thinking-is-and-what-it-is-not">Definition — what full-stack thinking is, and what it is not</h2>
 
 <p><strong>Full-stack thinking is the discipline of making decisions at the seam between frontend and backend.</strong> It is not "knowing both sides" — that is two skills, not one. It is knowing where the boundary is, what belongs on each side, and how to move the boundary when the feature demands it.</p>
 
@@ -76,7 +76,7 @@
 
 <p>The questions this doc answers are the ones neither side answers alone: <strong>"Should this data be fetched on the server or the client?" "Should this validation happen client-side, server-side, or both?" "Should this state live in the database, the API cache, or the component?" "How do I trace a bug from the UI to the database?" "How do I test the full flow?"</strong> Every one of those is a seam question.</p>
 
-<h2>History — the boundary keeps moving</h2>
+<h2 id="sec-history-the-boundary-keeps-moving">History — the boundary keeps moving</h2>
 
 <p><strong>The full-stack boundary has moved three times, and each move redefined what "full-stack" means:</strong></p>
 
@@ -88,7 +88,7 @@
 
 <p><strong>The lesson for this doc:</strong> the seam is not a fixed wall. It has drifted toward the browser, away from it, and is now drawn feature by feature. Full-stack thinking is the skill of drawing it correctly for the feature in front of you. (The frontend loop's own evolution is mapped in <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> §1c; the Next.js-specific line is <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> §1b.)</p>
 
-<h2>The full request journey — the frame everything hangs on</h2>
+<h2 id="sec-the-full-request-journey-the-frame-everything-hangs-on">The full request journey — the frame everything hangs on</h2>
 
 <p>The single most important mental model in full-stack thinking: <strong>trace the full request journey.</strong> Every feature is a round trip, and bugs can live at any point in it:</p>
 
@@ -123,7 +123,7 @@
 
 <p>The skill to build: <strong>the symptom points at a layer; the trace confirms it.</strong> That's neither a frontend skill nor a backend skill — it's the skill of living at the seam.</p>
 
-<h2>Where does this belong? — the central question</h2>
+<h2 id="sec-where-does-this-belong-the-central-question">Where does this belong? — the central question</h2>
 
 <p>Every piece of logic, every piece of state, every validation rule needs a home. Full-stack developers answer this more than any other question:</p>
 
@@ -144,7 +144,7 @@
 
 <p><strong>The rule:</strong> the server is the source of truth for domain state; the client is the source of truth for UI state; the database is the source of truth for persistent data; everything else is a cache. The server-side half of this ownership question — who writes what, in a system of services — is <a href="./system-design.html">System Design</a> §7 (data ownership, single-writer). This doc is the per-feature version of the same question.</p>
 
-<h2>State across the boundary — who owns what, and how the copies sync</h2>
+<h2 id="sec-state-across-the-boundary-who-owns-what-and-how-the-copies-sync">State across the boundary — who owns what, and how the copies sync</h2>
 
 <p>The client-side state taxonomy (UI state, server data, cache, form state, URL state, derived state) is fully mapped in <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> §5a — including the rule that server data belongs in a query/cache layer, not a plain <code>useState</code>. This doc adds the part that doc stops short of: <strong>what happens at the boundary when a piece of data has two homes.</strong></p>
 
@@ -169,7 +169,7 @@
   <li><strong>Invalidate</strong> — after a mutation, mark the cached copy stale so the next read refetches. The middle path: fast UI, correct data, more machinery (cache keys, tags).</li>
 </ul>
 
-<h2>The three shapes of data — same thing, three forms</h2>
+<h2 id="sec-the-three-shapes-of-data-same-thing-three-forms">The three shapes of data — same thing, three forms</h2>
 
 <p>The same data has three different shapes as it crosses the stack, and the transformations between them are where full-stack bugs live:</p>
 
@@ -186,7 +186,7 @@
 
 <p><strong>Who owns each transformation:</strong> the database → API shaping is the server's job (the handler builds the response shape — see <a href="./api-design.html">API Design</a>); the API → component shaping is where a query layer (React Query/SWR) or a selector normalizes nested JSON into flat state; the component → database shaping happens on write, when a form flattens back into a payload. A bug report that says "data looks wrong in the UI but the database is fine" is almost always one of these transformations doing the wrong thing — which is why tracing the journey (§2) starts at the symptom and walks the shapes.</p>
 
-<h2>Tracing and testing across the boundary</h2>
+<h2 id="sec-tracing-and-testing-across-the-boundary">Tracing and testing across the boundary</h2>
 
 <p>The test levels that cross the seam — integration, contract, and end-to-end — are already fully mapped in <a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> §2, including the rule to use the lowest level that produces trustworthy evidence. The full-stack-specific part is knowing which tests <em>you</em> own, because neither the frontend nor the backend team owns them alone:</p>
 
@@ -204,7 +204,7 @@
 
 <p><strong>The full-stack developer owns the tests that cross the boundary.</strong> Contract tests (provider/consumer agreement — see <a href="./api-design.html">API Design</a> and <a href="./software-testing-and-debugging.html">Software Testing</a>) catch the "frontend and backend evolved independently" failure; E2E tests catch the journey breaks; performance tests catch a one-side-optimization that made the other side worse.</p>
 
-<h2>The security seam — the client is untrusted</h2>
+<h2 id="sec-the-security-seam-the-client-is-untrusted">The security seam — the client is untrusted</h2>
 
 <p>Security's full treatment lives in <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> (the IAM section for tokens/sessions/cookies) and <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a> §10 for the frontend-adjacent parts. The full-stack rule that ties them together is short: <strong>the client is untrusted; the server is the enforcement point.</strong></p>
 
@@ -220,7 +220,7 @@
 
 <p>The client hides for UX; the server enforces for security. Both are needed; neither is sufficient alone — anyone can call your API directly, so the client's UI hiding is decoration, and the server's validation is the actual gate.</p>
 
-<h2>Worked example — tracing one feature across the seam</h2>
+<h2 id="sec-worked-example-tracing-one-feature-across-the-seam">Worked example — tracing one feature across the seam</h2>
 
 <pre>Feature: "Add to cart." One journey, five seam decisions.
 
@@ -256,7 +256,7 @@ it back. Same as the table in §2 — this feature is that table
 made concrete.
 </pre>
 
-<h2>Most common failure modes — the seam anti-patterns</h2>
+<h2 id="sec-most-common-failure-modes-the-seam-anti-patterns">Most common failure modes — the seam anti-patterns</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Fix</th></tr></thead>
@@ -275,7 +275,7 @@ made concrete.
   </tbody>
 </table>
 
-<h2>Principles</h2>
+<h2 id="sec-principles">Principles</h2>
 
 <table>
   <thead><tr><th>Principle</th><th>Why</th></tr></thead>
@@ -291,7 +291,7 @@ made concrete.
   </tbody>
 </table>
 
-<h2>Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Print this. It is the entire doc in ten lines:</p>
 
@@ -312,7 +312,7 @@ made concrete.
 </table>
 
 <section class="cite">
-  <h2>Primary sources</h2>
+  <h2 id="sec-primary-sources">Primary sources</h2>
   <ol>
     <li>Fowler, Martin — <a href="https://martinfowler.com/bliki/TwoHardThings.html">TwoHardThings</a> — cache invalidation named as the full-stack hard problem this doc's sync mechanisms (§4) exist to solve.</li>
     <li>React Query documentation — <a href="https://tanstack.com/query/latest">TanStack Query</a> — the optimistic/invalidate/refetch patterns as implemented practice.</li>
@@ -322,7 +322,7 @@ made concrete.
 </section>
 
 <section class="teacher">
-  <h2>Ask your teacher</h2>
+  <h2 id="sec-ask-your-teacher">Ask your teacher</h2>
   <p>Three follow-ups to deepen this:</p>
   <ul>
     <li>"Take the 'add to cart' worked example and show me the same feature where the answer to 'where does this live?' is different — when would the cart move to client-only or database-only?"</li>

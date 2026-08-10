@@ -24,7 +24,7 @@
   <p>Survey depth, not tutorials. Each section: what the camp optimizes for, what you will see in code, and when it wins or loses.</p>
 </section>
 
-<h2>0. How to use this map</h2>
+<h2 id="sec-how-to-use-this-map">0. How to use this map</h2>
 
 <table>
   <thead><tr><th>Camp</th><th>Unit of work</th><th>Default runtime</th><th>JS load strategy</th></tr></thead>
@@ -49,7 +49,7 @@
 
 <p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
-<h2>1. Camp A — CMS and classic server-rendered apps</h2>
+<h2 id="sec-camp-a-cms-and-classic-server-rendered-apps">1. Camp A — CMS and classic server-rendered apps</h2>
 
 <p>The oldest industrial pattern: the server owns the document. PHP (WordPress, Laravel), Rails, Django, ASP.NET MVC, and similar stacks render HTML on each request. JavaScript is optional sugar for forms, carousels, and admin widgets. The CMS side of this camp — what WordPress is, how it works, and how to choose it — has its own full doc: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a>. This section keeps only the JS-learner classification; the platform mechanics live there.</p>
 
@@ -76,7 +76,7 @@
 
 <p><strong>Reading tip for a JS learner:</strong> do not confuse "there is a <code>script</code> tag" with "this is a React app." Trace who owns the first paint: if the server sent full HTML of the page content, you are in Camp A (or B), even if a React widget mounts later.</p>
 
-<h2>2. Camp B — HTML-first and islands</h2>
+<h2 id="sec-camp-b-html-first-and-islands">2. Camp B — HTML-first and islands</h2>
 
 <p>HTML-first frameworks treat the document as the product and JavaScript as a precision tool. The modern flagship is <strong>Astro</strong>: ship zero JS by default; opt into "islands" of interactivity (React, Preact, Svelte, Vue, Solid) only where needed. Related family: <strong>HTMX</strong> / Alpine / server-driven UI — keep logic on the server, swap HTML fragments over the wire.</p>
 
@@ -115,7 +115,7 @@ const posts = await getPosts();
 
 <p>Related names you will hear: <strong>Enhance</strong>, <strong>11ty</strong> + islands, <strong>Fresh</strong> (Deno), partial hydration experiments across the ecosystem. The shared slogan: <em>default to HTML; earn your JavaScript.</em></p>
 
-<h2>3. Camp C — Client SPAs</h2>
+<h2 id="sec-camp-c-client-spas">3. Camp C — Client SPAs</h2>
 
 <p>Single-Page Applications: the browser downloads an app shell; client-side routing swaps views; the server is mostly an API. This is the model Create React App trained a generation on, and it still powers huge product UIs.</p>
 
@@ -142,7 +142,7 @@ const posts = await getPosts();
 
 <p><strong>Important 2026 nuance:</strong> SPA is not dead. "SPA as the default starter" is dead. Many production apps remain SPAs; new React guidance pushes Next.js, React Router framework mode, or Expo for apps that need routing + data + deployment conventions.</p>
 
-<h2>4. Camp D — Meta-frameworks (the industrial default for new React)</h2>
+<h2 id="sec-camp-d-meta-frameworks-the-industrial-default-for-new-react">4. Camp D — Meta-frameworks (the industrial default for new React)</h2>
 
 <p>A meta-framework is a framework <em>around</em> a UI library: routing, data loading, rendering strategy, bundling, and often deployment. For React, that means <strong>Next.js</strong> first, then Remix / React Router framework mode, and mobile-adjacent <strong>Expo</strong>. Outside React: Nuxt (Vue), SvelteKit, Angular's modern CLI+SSR path, SolidStart, Qwik City.</p>
 
@@ -170,7 +170,7 @@ const posts = await getPosts();
 
 <p>Deep dive for the React path you are on: <a href="./nextjs-deep-dive.html">Next.js Deep Dive</a>.</p>
 
-<h2>5. Camp E — The other major UI libraries (signals world)</h2>
+<h2 id="sec-camp-e-the-other-major-ui-libraries-signals-world">5. Camp E — The other major UI libraries (signals world)</h2>
 
 <p>Not everything is React. By 2026 the non-React mainstream largely standardized on <strong>signals</strong> (or signal-like runes) for fine-grained updates:</p>
 
@@ -191,7 +191,7 @@ const posts = await getPosts();
   <p><strong>C++ analogy.</strong> React re-render ≈ recomputing a pure function of state and diffing the result. Signals ≈ dirty-flagging dependent nodes in a graph and updating only those nodes. Both can implement the same UI; the debugging stories differ.</p>
 </blockquote>
 
-<h2>5b. Mental models — how camp practitioners actually reason</h2>
+<h2 id="sec-mental-models-how-camp-practitioners-actually-reason">5b. Mental models — how camp practitioners actually reason</h2>
 
 <p>Each camp trains a different mental model. If you only know the React re-render model, you will misread code in other camps. Here is how practitioners in each camp actually think:</p>
 
@@ -239,7 +239,7 @@ const posts = await getPosts();
 
 <p><strong>Transfer trap:</strong> bringing React's "re-render" mental model to signals frameworks causes over-subscription (treating signals like state, reading in render). Bringing signals "dirty flag" model to React causes missing memoization. Learn the camp's native model first.</p>
 
-<h2>6. Camp F — WASM and non-JS UI engines</h2>
+<h2 id="sec-camp-f-wasm-and-non-js-ui-engines">6. Camp F — WASM and non-JS UI engines</h2>
 
 <p>WebAssembly lets languages like Rust, C++, C#, and Zig run in the browser (and on the edge) at near-native speed. Frontend use cases cluster around:</p>
 <ul>
@@ -252,7 +252,7 @@ const posts = await getPosts();
 
 <p><strong>When it wins:</strong> algorithmic bulk that would jank on the main thread in plain JS. <strong>When it loses:</strong> ordinary forms and CRUD — the toolchain tax is not worth it.</p>
 
-<h2>6b. Identifying the camp from a repository</h2>
+<h2 id="sec-identifying-the-camp-from-a-repository">6b. Identifying the camp from a repository</h2>
 
 <p>The fastest way to identify a camp is not to read every file &mdash; it is to read the <em>sources of truth</em>: dependencies, config, folder shape, and the HTML the server actually sends. Work top-down:</p>
 
@@ -292,7 +292,7 @@ const posts = await getPosts();
   <li><strong>Mental-model boundary:</strong> React&rsquo;s re-render model applies only inside client components; the marketing pages behave more like static / HTML-first output.</li>
 </ol>
 
-<h2>6c. Cross-camp dimensions &mdash; rendering, routing, state, data</h2>
+<h2 id="sec-cross-camp-dimensions-rendering-routing-state-data">6c. Cross-camp dimensions &mdash; rendering, routing, state, data</h2>
 
 <p>The camps differ along four dimensions the others share. Knowing where a codebase sits on each is the whole of "reading it."</p>
 
@@ -338,7 +338,7 @@ const posts = await getPosts();
   </tbody>
 </table>
 
-<h2>6d. Choosing a camp &mdash; constraint-based selection</h2>
+<h2 id="sec-choosing-a-camp-constraint-based-selection">6d. Choosing a camp &mdash; constraint-based selection</h2>
 
 <p>Do not choose a camp because it is fashionable. Choose it from constraints: content-to-interactivity ratio, SEO needs, performance budget, team skill, data ownership, and deployment.</p>
 
@@ -359,7 +359,7 @@ const posts = await getPosts();
 
 <p>Where team skill and hiring pull two ways between otherwise valid options, pick the camp you can staff and hire into.</p>
 
-<h2>6e. Hybrid patterns</h2>
+<h2 id="sec-hybrid-patterns">6e. Hybrid patterns</h2>
 
 <p>Real codebases are often deliberate hybrids, not poor design. Name the primary camp first, then the embedded secondary camp.</p>
 
@@ -381,7 +381,7 @@ const posts = await getPosts();
 
 <p>When a repo seems confusing, assume a hybrid until proven otherwise: identify the primary camp, then the embedded secondary camp, then read each <em>within its own</em> mental model.</p>
 
-<h2>6f. Operations &mdash; SEO, accessibility, performance, security, deployment</h2>
+<h2 id="sec-operations-seo-accessibility-performance-security-deployment">6f. Operations &mdash; SEO, accessibility, performance, security, deployment</h2>
 
 <h3>Per-camp operating profile</h3>
 <table>
@@ -411,7 +411,7 @@ const posts = await getPosts();
 
 <p>Camp choice changes operations. A static islands site and a streaming RSC app have very different hosting, caching, and observability needs.</p>
 
-<h2>7. The TypeScript shift</h2>
+<h2 id="sec-the-typescript-shift">7. The TypeScript shift</h2>
 
 <p>TypeScript is no longer "nice to have" in industrial frontend. Stack Overflow surveys have shown JavaScript as the most-used language for years running, with TypeScript as the typed layer most professional teams adopt for app code. For the full JS-vs-everything story across backend/mobile/embedded/AI, see <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>. Practical reality in 2026:</p>
 <ul>
@@ -422,7 +422,7 @@ const posts = await getPosts();
 
 <p>When you do add TS later: start with <code>strict</code>, type function boundaries and data from APIs, leave local inference alone. The cert does not require TypeScript; work code often will.</p>
 
-<h2>8. The AI-era layer (tooling, not a UI camp)</h2>
+<h2 id="sec-the-ai-era-layer-tooling-not-a-ui-camp">8. The AI-era layer (tooling, not a UI camp)</h2>
 
 <p>AI did not invent a new rendering model. It changed <em>how code is produced and reviewed</em>:</p>
 <ul>
@@ -435,7 +435,7 @@ const posts = await getPosts();
 
 <p><strong>AI does not remove camp differences; it makes recognition more important.</strong> Generated code can look plausible in the wrong camp: React idioms pasted into Svelte, invented APIs, or over-generated components that hide the real rendering model. The human&rsquo;s job in review is to re-identify the camp, check the constraints, and verify the idiom actually matches.</p>
 
-<h2>9. Market gravity (who hires which camp)</h2>
+<h2 id="sec-market-gravity-who-hires-which-camp">9. Market gravity (who hires which camp)</h2>
 
 <table>
   <thead><tr><th>Employer shape</th><th>Common stack gravity</th></tr></thead>
@@ -451,7 +451,7 @@ const posts = await getPosts();
 
 <p>HackerRank's Developer Skills Report and industry surveys consistently put JavaScript at the center of hiring screens; framework keywords rotate (React stays dominant; Next.js appears more in postings each year; Angular holds enterprise niches). For income streams that use these skills, not just stack fashion, read <a href="./frontend-income-markets.html">Frontend income markets</a>.</p>
 
-<h2>3b. Migration paths between camps</h2>
+<h2 id="sec-migration-paths-between-camps">3b. Migration paths between camps</h2>
 
 <p>Teams rarely stay in one camp forever. Common migrations and their friction points:</p>
 
@@ -508,7 +508,7 @@ const posts = await getPosts();
 
 <p><strong>Anti-pattern:</strong> Big-bang rewrites. Every successful migration in the table above is incremental, route-by-route, or island-by-island. The camp boundaries in the survey table (§0) are centers of gravity — not walls.</p>
 
-<h2>10. How the camps relate to your React mental model</h2>
+<h2 id="sec-how-the-camps-relate-to-your-react-mental-model">10. How the camps relate to your React mental model</h2>
 
 <table>
   <thead><tr><th>Camp</th><th>Does the re-render box model apply?</th></tr></thead>
@@ -531,7 +531,7 @@ const posts = await getPosts();
   <li><a href="./frontend-income-markets.html">Frontend income markets</a> &mdash; demand-side: jobs, freelance, AI annotation, Egypt remote context.</li>
 </ul>
 
-<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">11. Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The camp survey is only as useful as the tooling that makes its boundaries visible, testable, and migratable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -585,7 +585,7 @@ const posts = await getPosts();
 
 <p><strong>Selection heuristic:</strong> Start with Camp Identification + Framework Detection (the "minimum viable survey toolkit"). Add Migration Tooling when camp transition is decided. Add Bundle Analysis when performance budget exists. Add Island Tooling when HTML-first/Partial Hydration is target. Add AI-Assisted Translation when team knows source camp but not target. The tool serves the migration — not the reverse.</p>
 
-<h2>12. Principles &mdash; the invariants across every camp</h2>
+<h2 id="sec-principles-the-invariants-across-every-camp">12. Principles &mdash; the invariants across every camp</h2>
 
 <ol>
   <li><strong>Camps are centers of gravity.</strong> Real apps are hybrids; identify primary then secondary.</li>
@@ -598,7 +598,7 @@ const posts = await getPosts();
   <li><strong>The platform is shared.</strong> Every camp compiles down to HTML/CSS/JS/browser APIs.</li>
 </ol>
 
-<h2>13. Final checklist &mdash; reading a real repo</h2>
+<h2 id="sec-final-checklist-reading-a-real-repo">13. Final checklist &mdash; reading a real repo</h2>
 
 <table>
   <thead><tr><th>Question</th><th>If you cannot answer it&hellip;</th></tr></thead>

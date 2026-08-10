@@ -23,11 +23,11 @@
   <p>The other reference docs (<a href="./class-to-hooks-paradigm-shift.html">React paradigm</a>, <a href="./angular-evolution.html">Angular evolution</a>, <a href="./nextjs-deep-dive.html">Next.js deep dive</a>, <a href="./frontend-camps-survey.html">camps survey</a>) treat JS as a given. This doc steps back and asks: what is JS, why does it look the way it does, and what design bets made it the language that runs everywhere? Sibling to <a href="./what-is-state-prequel.html">what-is-state-prequel</a> (which covers programming theory broadly) and parent-context for <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a>. Its companion across-stacks doc (<a href="./javascript-across-stacks.html">javascript-across-stacks</a>) covers where JS runs and who fights it in each lane.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p>Reading order: standalone. One sitting. This doc is <em>not</em> a JS tutorial — the <a href="../lessons/0001-the-accidental-lingua-franca.html">lesson series</a> already are (from lesson 0001, the accidental lingua franca, to lesson 0022, the real world). This doc is not a React doc — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> already is. This doc <em>is</em> the missing piece: the language's history, design rationale, runtime model, and core semantics map — written so you can read any JS codebase without asking "why did they do it this way?" at the language level. Cross-cutting to <a href="./html-and-css.html">HTML & CSS</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
-<h2>1. The 10 days in May 1995</h2>
+<h2 id="sec-the-10-days-in-may-1995">1. The 10 days in May 1995</h2>
 
 <p>May 1995. Netscape Navigator 1.1 ships. The web is static HTML. Marc Andreessen wants the browser to be programmable — not just display documents, but react to the user. He tasks Brendan Eich, a 34-year-old systems programmer who joined Netscape that April, with building a scripting language for the browser. Constraints: must run in the browser, must be easy for non-programmers (designers, HTML authors), must ship in Netscape 2.0 by September.</p>
 
@@ -44,7 +44,7 @@
   <p><strong>Primary source → </strong>Brendan Eich, <cite>FAQ: Why is JS designed the way it is?</cite> (2011): "I wanted a Lisp-like language but had to use Java-like syntax to pass management approval. Under the <code>{ }</code> braces is a lambda-calculus heart beating in a C-shaped body."</p>
 </blockquote>
 
-<h2>2. Why a new language, not a Java applet or C++ extension</h2>
+<h2 id="sec-why-a-new-language-not-a-java-applet-or-c-extension">2. Why a new language, not a Java applet or C++ extension</h2>
 
 <p>The theory you asked for: why create a new language instead of extending Java or C++? The answer is <em>platform constraints</em>.</p>
 
@@ -58,7 +58,7 @@
   <p><strong>The pattern that repeats:</strong> A platform deserves a language designed for its constraints, not a hand-me-down from a different platform. This is the same theory that later justifies TypeScript (a JS uplift for large-team maintainability, not a replacement), Go (a C++ replacement designed for networked servers, not a general-purpose systems language), Rust (a C++ replacement that solves memory safety without GC). The constraint changed — the language changed.</p>
 </blockquote>
 
-<h2>3. The design: prototype model, not classes</h2>
+<h2 id="sec-the-design-prototype-model-not-classes">3. The design: prototype model, not classes</h2>
 
 <p>Eich chose prototypes over classes. The influence: <strong>Self</strong> (a Smalltalk descendant, prototype-based, from Sun Microsystems labs). In a prototype system, objects inherit directly from other objects — no class as a separate entity. You create an object, it becomes the prototype for others. <code>Object.create(proto)</code> is the primitive.</p>
 
@@ -78,7 +78,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 
 <p>ES6 <code>class</code> (2015) is <strong>syntax sugar over prototypes</strong> — not a full class system. It does not introduce private fields (those came later, 2022), does not change single inheritance, does not add multiple dispatch. It hides the delegation. When you read <code>class Dog extends Animal</code>, the prototype chain is still there underneath. Understanding the prototype model matters because the sugar leaks: <code>this</code> binding, method extraction, <code>Object.getPrototypeOf</code>, <code>__proto__</code> all expose the mechanism.</p>
 
-<h2>4. The design: first-class functions, closures, the lambda-calculus heart</h2>
+<h2 id="sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">4. The design: first-class functions, closures, the lambda-calculus heart</h2>
 
 <p>The Scheme/Lisp lineage. JavaScript functions are values — they can be assigned, passed, returned, created at runtime. This enables:</p>
 
@@ -94,7 +94,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   <p><strong>Primary source → </strong>Brendan Eich, <cite>JavaScript at 20</cite> (2015): "The lambda-calculus heart was there from day one. The C-shaped body was the compromise."</p>
 </blockquote>
 
-<h2>5. The design: single-threaded + event loop</h2>
+<h2 id="sec-the-design-single-threaded-event-loop">5. The design: single-threaded + event loop</h2>
 
 <p>JavaScript is single-threaded by design. One call stack. One thread of execution. The browser's DOM is single-threaded — two threads repainting the same DOM would race. The event loop is the concurrency model:</p>
 
@@ -123,7 +123,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 
 ---
 
-<h2>5b. Mental models — how developers actually reason about the event loop</h2>
+<h2 id="sec-mental-models-how-developers-actually-reason-about-the-event-loop">5b. Mental models — how developers actually reason about the event loop</h2>
 
 <p>Most JS bugs are not syntax bugs — they are <strong>mental-model bugs</strong> about when code runs. The same loop is the answer, but how a developer <em>imagines</em> the loop determines whether they predict correctly. The four most common mental models in practice:</p>
 
@@ -161,7 +161,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 
 ---
 
-<h2>6. The host environment, not the language</h2>
+<h2 id="sec-the-host-environment-not-the-language">6. The host environment, not the language</h2>
 
 <p>The biggest JS insight: JS is a <strong>guest</strong> in a host. The language spec (ECMAScript) defines the core — syntax, types, objects, functions, the event loop. The host provides <em>everything else</em>:</p>
 
@@ -178,7 +178,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 
 <p>This is why <code>window</code> doesn't exist in Node, <code>fs</code> doesn't exist in the browser, and "isomorphic" code breaks when it assumes a host global. The language is the same; the host changes. The lesson: when reading unfamiliar JS, <strong>identify the host first</strong>. <code>require</code> → Node/CommonJS. <code>import</code> + <code>Deno</code> → Deno. <code>window</code> → browser.</p>
 
-<h2>6b. The core semantics map — what ECMAScript itself defines</h2>
+<h2 id="sec-the-core-semantics-map-what-ecmascript-itself-defines">6b. The core semantics map — what ECMAScript itself defines</h2>
 
 <p>The host table above gives the <em>environment</em>. This section maps the <em>language</em> — the semantic model ECMAScript specifies independently of any host: types, equality, scope, <code>this</code>, prototypes, modules, iteration, errors, and memory. This is not a tutorial; the <a href="../lessons/0001-the-accidental-lingua-franca.html">lessons</a> walk the mechanics. This is the design system underneath: how each dimension behaves, so that when you read a program you can predict it. One sentence to hold the whole model:</p>
 
@@ -432,7 +432,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   <p><strong>What ECMAScript does <em>not</em> define:</strong> DOM, CSSOM, <code>fetch</code>, timers, <code>console</code>, the file system, network sockets, environment variables, browser storage, Web Workers, service workers. All of these are host facilities (§6). When code "doesn't run" in a new environment, the first question is which host API it assumed.</p>
 </blockquote>
 
-<h2>7. Standardization: ECMAScript, TC39, the ES6/2015 tipping point</h2>
+<h2 id="sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">7. Standardization: ECMAScript, TC39, the ES6/2015 tipping point</h2>
 
 <p>1996: Netscape hands JS to Ecma International → <strong>ECMAScript</strong> (the spec name; "JavaScript" is the trademark).</p>
 
@@ -472,7 +472,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   <p><strong>The web compatibility rule</strong> is the engine of all this conservatism: <em>old web code must not break.</em> It is why <code>typeof null === "object"</code> and <code>==</code> coercion survive, why features are almost always <em>additive</em> rather than breaking, and why a genuinely better design that breaks existing pages effectively cannot land. When JS surprises you, ask "what old code does this protect?" first.</p>
 </blockquote>
 
-<h2>8. The engines: V8, SpiderMonkey, JavaScriptCore</h2>
+<h2 id="sec-the-engines-v8-spidermonkey-javascriptcore">8. The engines: V8, SpiderMonkey, JavaScriptCore</h2>
 
 <p>Three engines, three lineages:</p>
 
@@ -484,7 +484,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 
 <p>Why engines matter for readers: JIT means performance characteristics are runtime-dependent. Micro-benchmarks lie. "JS is slow" is 20 years out of date — V8 compiles hot paths to machine code. But: JIT warm-up exists, deoptimization happens, and <code>eval</code>/<code>with</code> disable optimization. The engine is part of the platform; the language spec does not guarantee performance.</p>
 
-<h2>9. The WASM junction</h2>
+<h2 id="sec-the-wasm-junction">9. The WASM junction</h2>
 
 <p>WebAssembly (2017, cross-browser 1.0) is the <strong>partner</strong>, not a competitor. WASM is the compile target for C++/Rust/Go in the browser. JS is still the glue — WASM cannot directly touch the DOM (the <code>anyref</code> proposal is in progress). The 2023 WASM Component Model and GC proposal move toward direct host access, but as of 2026, JavaScript remains the required glue layer for any DOM interaction.</p>
 
@@ -492,7 +492,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   <p><strong>Reading code in 2026:</strong> if you see <code>import { something } from 'wasm-module'</code> — the heavy lifting is in Rust/C++, JS is the orchestration layer. This is the intended division.</p>
 </blockquote>
 
-<h2>10. What JS is not</h2>
+<h2 id="sec-what-js-is-not">10. What JS is not</h2>
 
 <ul>
   <li>Not React → <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a></li>
@@ -501,7 +501,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   <li>Not the lesson series → <a href="../lessons/0001-the-accidental-lingua-franca.html">lessons/</a> (those are the mechanics; this is the why)</li>
 </ul>
 
-<h2>11. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">11. Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The language is only as useful as the tooling that makes its semantics visible, testable, and migratable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -575,7 +575,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 
 ---
 
-<h2>12. Principles — the design bets that survive every change</h2>
+<h2 id="sec-principles-the-design-bets-that-survive-every-change">12. Principles — the design bets that survive every change</h2>
 
 <p>Everything above, compressed to the rules you can carry and re-derive the details from:</p>
 
@@ -594,7 +594,7 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   </tbody>
 </table>
 
-<h2>13. Worked examples — semantics and runtime in one trace</h2>
+<h2 id="sec-worked-examples-semantics-and-runtime-in-one-trace">13. Worked examples — semantics and runtime in one trace</h2>
 
 <p>Two small programs that exercise the model end to end. Run each mentally; the answer is the whole point.</p>
 
@@ -629,7 +629,7 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
 
 <p><strong>Why.</strong> Setting <code>dog.speak</code> created an <em>own</em> property that shadowed the delegated one; <code>delete</code> removed it and the chain walk resumed. Nothing was copied between objects at any point — lookup is delegation (§6b.5). This is also why <code>class</code> methods that you expect to "exist on the instance" actually live on the prototype.</p>
 
-<h2>14. Failure modes — where the model breaks in practice</h2>
+<h2 id="sec-failure-modes-where-the-model-breaks-in-practice">14. Failure modes — where the model breaks in practice</h2>
 
 <p>Most production JS bugs are not syntax errors; they are the model working exactly as specified against a wrong assumption. The table pairs each failure mode with the mental model that prevents it.</p>
 
@@ -650,7 +650,7 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
   </tbody>
 </table>
 
-<h2>15. The future — where the language is heading</h2>
+<h2 id="sec-the-future-where-the-language-is-heading">15. The future — where the language is heading</h2>
 
 <p>Proposals below are <strong>proposals, not guarantees</strong> — TC39 moves slowly and some never land. Watch them as signals of where the pressure is, not as a roadmap to bet on.</p>
 
@@ -668,7 +668,7 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
   </tbody>
 </table>
 
-<h2>16. Summary checklist</h2>
+<h2 id="sec-summary-checklist">16. Summary checklist</h2>
 
 <p>Run this before reading unfamiliar JS — it is the whole doc as a filter:</p>
 

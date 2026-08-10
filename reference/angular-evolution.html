@@ -24,7 +24,7 @@
   <p>The key contrast throughout: where React moved reactivity from instance fields into function call order (hooks), Angular moved it from a broadcast-driven cycle (zone.js) into fine-grained subscriptions (Signals). Same direction — narrower watching — different mechanism.</p>
 </section>
 
-<h2>0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
 
 <p><strong>Scope.</strong> This doc covers Angular's mental-model evolution: AngularJS, Angular 2+, and modern Angular (Signals, standalone, zoneless). Its purpose is to help you recognize which Angular era a codebase belongs to and understand why Angular's state and reactivity model changed.</p>
 
@@ -32,7 +32,7 @@
 
 <p><strong>Reading order.</strong> Read §2–§8 for the arc, §9–§11 for the mental models, §12–§15 for practical reading and migration, §16–§18 for the worked example, failure modes, and principles, then §19–§21 as reference. If you only have five minutes, read §3 (the constraint inversions) and §9 (mental models).</p>
 
-<h2>1. Definition — what Angular evolution is</h2>
+<h2 id="sec-definition-what-angular-evolution-is">1. Definition — what Angular evolution is</h2>
 
 <p>Angular's evolution is the history of a framework watching less. Each era kept the same ambition — declarative UI synced to state — and changed <em>how the framework finds out state changed</em>:</p>
 
@@ -44,7 +44,7 @@
 
 <p>The central thesis, held throughout: <strong>Angular and React moved in the same direction — narrower reactivity — but through different mechanisms.</strong> React narrowed developer bookkeeping (hooks → deps arrays → compiler); Angular narrowed framework watching (digest → broadcast → signal graph). Neither is "ahead"; each solved the cost of its own original design.</p>
 
-<h2>2. The three eras — a timeline</h2>
+<h2 id="sec-the-three-eras-a-timeline">2. The three eras — a timeline</h2>
 
 <p>Angular is not one framework. It is three frameworks with the same name — each rewriting the state and reactivity model from scratch. The eras:</p>
 
@@ -59,7 +59,7 @@
 
 <p>The pattern: each era widened the developer experience and narrowed what the framework had to watch. AngularJS watched everything in the $scope tree (expensive). Angular 2+ watched all components on every async event (less expensive but still broad). Signals watch only the signal's dependency graph (minimal). React's evolution (classes → hooks → compiler) has the same direction but a different mechanism: instead of narrowing the watcher, React narrowed the component's own awareness of what changed (from <code>this.setState</code> to deps arrays to compiler inference).</p>
 
-<h2>3. Evolution — the constraint inversions</h2>
+<h2 id="sec-evolution-the-constraint-inversions">3. Evolution — the constraint inversions</h2>
 
 <p>Each era solved a cost the previous era created. Reading the arc as inversions:</p>
 
@@ -81,7 +81,7 @@
   <p>AngularJS watched the whole scope tree → Angular 2+ watched the component tree after every async event → OnPush narrowed detection by reference checks → Signals narrowed detection to the dependency graph → zoneless removes the broadcast engine entirely.</p>
 </blockquote>
 
-<h2>4. Intersection with the rest of the shelf</h2>
+<h2 id="sec-intersection-with-the-rest-of-the-shelf">4. Intersection with the rest of the shelf</h2>
 
 <table>
   <thead><tr><th>Neighbor</th><th>Relationship</th></tr></thead>
@@ -94,7 +94,7 @@
   </tbody>
 </table>
 
-<h2>5. Underlying theory — what makes Angular's reactivity work</h2>
+<h2 id="sec-underlying-theory-what-makes-angular-s-reactivity-work">5. Underlying theory — what makes Angular's reactivity work</h2>
 
 <table>
   <thead><tr><th>Theory / mechanism</th><th>What it explains</th></tr></thead>
@@ -112,7 +112,7 @@
   </tbody>
 </table>
 
-<h2>6. Era 1 — AngularJS (2010–2016): dirty-checking and $scope</h2>
+<h2 id="sec-era-1-angularjs-20102016-dirty-checking-and-scope">6. Era 1 — AngularJS (2010–2016): dirty-checking and $scope</h2>
 
 <p>AngularJS was released in 2010 by Miško Hevery, solving the same problem as Backbone and Ember: make dynamic web apps manageable with structure. Its pitch was "Model-View-Whatever" — you put data in a <code>$scope</code> object, and Angular synced it to the HTML template automatically.</p>
 
@@ -155,7 +155,7 @@
 
 <p>The Angular team decided: the fix is a rewrite. Not a migration — a rewrite from zero, with TypeScript, a proper module system, and a completely different reactivity model.</p>
 
-<h2>7. Era 2 — Angular 2+ (2016–2023): classes, TypeScript, zone.js</h2>
+<h2 id="sec-era-2-angular-2-20162023-classes-typescript-zone-js">7. Era 2 — Angular 2+ (2016–2023): classes, TypeScript, zone.js</h2>
 
 <p>Angular 2 (2016) was a full rewrite. Same team, same company, same problem domain — but everything else new: TypeScript-first, class components with decorators, dependency injection, a proper module system (NgModules), and zone.js as the reactivity engine.</p>
 
@@ -216,7 +216,7 @@ export class ChildComponent {
 
 <p>The same tension existed in React's class era: <code>componentDidUpdate</code> + <code>setState</code> worked, but knowing when and why a component re-rendered required manual profiling. React's solution was hooks (narrow the reactivity to explicit deps arrays). Angular's solution was Signals (narrow the reactivity to explicit subscriptions).</p>
 
-<h2>8. Era 3 — Modern Angular (2023–present): Signals, standalone, zoneless</h2>
+<h2 id="sec-era-3-modern-angular-2023present-signals-standalone-zoneless">8. Era 3 — Modern Angular (2023–present): Signals, standalone, zoneless</h2>
 
 <p>Starting with Angular 16 (2023, developer preview) and stabilizing in 17 (2024), Angular introduced the changes that retroactively define "modern Angular": standalone components (no NgModules), Signals (fine-grained reactivity), and (in v18+) zoneless change detection. Signals' core primitives (<code>signal()</code>, <code>computed()</code>, <code>effect()</code>) have been stable since v17; the wider API surface (<code>effect()</code> with options, <code>linkedSignal()</code>, <code>toSignal()</code>, <code>toObservable()</code>) reached stable in v20.</p>
 
@@ -345,7 +345,7 @@ export class CounterComponent {
 
 <p>The zoneless path: experimental in v18 (2024), developer preview in v20, <strong>default for new applications in v21</strong>, and stable in v22 (with OnPush the default change-detection strategy for new components). This is the era's defining migration: remove zone.js, rely entirely on Signals for reactivity. The cost: all shared state must go through <code>signal()</code> or <code>signal()</code>-wrapped models. The payoff: zero-waste change detection — only the components that need to update, update.</p>
 
-<h2>9. Mental models — how to think in each era</h2>
+<h2 id="sec-mental-models-how-to-think-in-each-era">9. Mental models — how to think in each era</h2>
 
 <table>
   <thead><tr><th>Era</th><th>Core mental model</th><th>What "change" means</th><th>Debugging intuition</th></tr></thead>
@@ -362,7 +362,7 @@ export class CounterComponent {
   In modern Angular, ask: "Which signal changed, and what subscribed to it?"</p>
 </blockquote>
 
-<h2>10. The three eras through one lens — where state lives and who watches it</h2>
+<h2 id="sec-the-three-eras-through-one-lens-where-state-lives-and-who-watches-it">10. The three eras through one lens — where state lives and who watches it</h2>
 
 <p>The React doc's §3 expansion asked: <em>where does state live, who owns it, and how do you touch it?</em> The same lens for Angular:</p>
 
@@ -398,7 +398,7 @@ export class CounterComponent {
 
 <p>The pattern: <strong>wider detection → narrower detection.</strong> AngularJS detected by brute force (walk everything). Angular 2+ detected by broadcast + tree walk (add <code>OnPush</code> to narrow). Modern Angular detects by subscription (only the subscribers). React's direction is the same but starts from a different place: React always had narrow detection (only components that called <code>setState</code>). React's evolution (hooks deps arrays → compiler) is about <em>narrowing what you have to manually specify</em>, not narrowing the framework's watcher.</p>
 
-<h2>11. Why Angular didn't follow React's hooks path</h2>
+<h2 id="sec-why-angular-didn-t-follow-react-s-hooks-path">11. Why Angular didn't follow React's hooks path</h2>
 
 <p>React hooks and Angular Signals both solve "how does a component hold state and react to changes?" — but they solve it from opposite starting points:</p>
 
@@ -417,7 +417,7 @@ export class CounterComponent {
   <p><strong>Both frameworks narrowed reactivity. They narrowed different things.</strong> React narrowed from "re-render everything" to "only re-render if deps change" to "let the compiler figure it out." Angular narrowed from "check everything on any async event" to "only check components that subscribe to changed signals." The direction is the same; the mechanism is constrained by each framework's original design — React's functions vs Angular's classes. For React's side of this comparison, see <a href="./react-2024-and-beyond.html">React 2024 and beyond</a>.</p>
 </blockquote>
 
-<h2>12. Signals vs RxJS — which tool for which job</h2>
+<h2 id="sec-signals-vs-rxjs-which-tool-for-which-job">12. Signals vs RxJS — which tool for which job</h2>
 
 <p>Signals are not a replacement for RxJS. Signals are best for <strong>synchronous reactive state</strong>; RxJS is best for <strong>asynchronous stream composition</strong>. Modern Angular code often needs both — the skill is knowing the boundary.</p>
 
@@ -436,7 +436,7 @@ export class CounterComponent {
   </tbody>
 </table>
 
-<h2>13. Reading Angular at work</h2>
+<h2 id="sec-reading-angular-at-work">13. Reading Angular at work</h2>
 
 <p>Unlike React's class-to-hooks transition (where function components existed throughout but were second-class), Angular's eras are physically visible in the code — the file structure, imports, and syntax changed completely between versions:</p>
 
@@ -478,7 +478,7 @@ export class CounterComponent {
 
 <p>The good news: if you can read Angular 2-15 code, you can read modern Angular code. The class structure, decorators, DI, and TypeScript are the same. The differences are additive (Signals) not replacive (no "components are functions now" shock like React's hooks migration).</p>
 
-<h2>14. Lifecycle translation: AngularJS ↔ Angular 2+ ↔ React</h2>
+<h2 id="sec-lifecycle-translation-angularjs-angular-2-react">14. Lifecycle translation: AngularJS ↔ Angular 2+ ↔ React</h2>
 
 <p>Two tables. First: how AngularJS's component lifecycle maps to Angular 2+. Then: how Angular 2+ maps to React hooks — so you can read code in any of the three paradigms without re-learning the mental model from scratch.</p>
 
@@ -514,7 +514,7 @@ export class CounterComponent {
   <p><strong>The key insight for reading Angular code as a React developer:</strong> Angular's lifecycle methods are a biography ("at birth, at change, at destruction") — same as React's class components. React hooks replaced the biography with a synchronization model ("this effect syncs these values with this side effect"). Angular's Signals push in the same direction — <code>effect()</code> is closer to React's <code>useEffect</code> than <code>ngOnInit</code> + <code>ngOnDestroy</code> are. Modern Angular is converging on the same pattern React adopted in 2018 — synchronization, not biography. The difference: Angular kept the class and added Signals; React removed the class and added hooks.</p>
 </blockquote>
 
-<h2>15. Migration paths</h2>
+<h2 id="sec-migration-paths">15. Migration paths</h2>
 
 <p>AngularJS → Angular 2+ had effectively a 0% automated migration path — but the actual options and the later in-era migrations are worth knowing:</p>
 
@@ -534,7 +534,7 @@ export class CounterComponent {
   <p>Angular's eras are physically visible in code, but migrations should usually be incremental. The hardest migration is AngularJS to Angular because the mental model, template syntax, dependency injection, routing, and build system all changed. In-era upgrades run one major at a time via <code>ng update</code> (each major supports a single-version jump).</p>
 </blockquote>
 
-<h2>16. Worked example — a counter across the eras</h2>
+<h2 id="sec-worked-example-a-counter-across-the-eras">16. Worked example — a counter across the eras</h2>
 
 <p>The same counter in all three eras shows where state lives and how detection narrows.</p>
 
@@ -597,7 +597,7 @@ export class CounterComponent {
   );
 }</code></pre>
 
-<h2>17. Failure modes</h2>
+<h2 id="sec-failure-modes">17. Failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix</th></tr></thead>
@@ -616,7 +616,7 @@ export class CounterComponent {
   </tbody>
 </table>
 
-<h2>18. Principles</h2>
+<h2 id="sec-principles">18. Principles</h2>
 
 <table>
   <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
@@ -633,7 +633,7 @@ export class CounterComponent {
   </tbody>
 </table>
 
-<h2>19. Ecosystem and tooling catalog</h2>
+<h2 id="sec-ecosystem-and-tooling-catalog">19. Ecosystem and tooling catalog</h2>
 
 <table>
   <thead><tr><th>Category</th><th>Tools</th><th>Purpose</th></tr></thead>
@@ -669,7 +669,7 @@ export class CounterComponent {
   </tbody>
 </table>
 
-<h2>20. Where Angular stands now (2026)</h2>
+<h2 id="sec-where-angular-stands-now-2026">20. Where Angular stands now (2026)</h2>
 
 <p>Version/status facts verified mid-2026. Angular follows a predictable ~6-month major release cadence (two majors per year, e.g. May and November). Support window is 18 months per major: 6 months active + 12 months LTS.</p>
 
@@ -685,7 +685,7 @@ export class CounterComponent {
   <li><strong>The React contrast (2026):</strong> React adopted the compiler to solve the "deps array tax" problem. Angular adopted Signals to solve the "zone.js tax" problem. Both removed a manual bookkeeping burden. Both kept their component model (React's functions, Angular's classes). Neither is "ahead" — they solved different bottlenecks from different starting points.</li>
 </ul>
 
-<h2>21. Summary checklist</h2>
+<h2 id="sec-summary-checklist">21. Summary checklist</h2>
 
 <table>
   <thead><tr><th>Question</th><th>If you cannot answer…</th></tr></thead>
@@ -703,7 +703,7 @@ export class CounterComponent {
   </tbody>
 </table>
 
-<h2>22. Primary sources and further reading</h2>
+<h2 id="sec-primary-sources-and-further-reading">22. Primary sources and further reading</h2>
 
 <ol>
   <li><a href="https://angular.dev/guide/signals">Angular Signals Guide</a> — the official docs: <code>signal()</code>, <code>computed()</code>, <code>effect()</code>, and the mental model.</li>

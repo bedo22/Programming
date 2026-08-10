@@ -37,7 +37,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
   <p><em>Because "skip .NET" is the wrong advice for a library with an Egyptian audience.</em> The shelf's mission is exploration, not a single path: the reader who wants enterprise/government/banking work — the dominant formal-economy backend market in Egypt, the Gulf, and much of Eastern Europe — will hit C#/.NET in job listings, interviews, and offshoring contracts. The honest position is neither "become a .NET developer" nor "ignore it": it is <strong>literacy</strong> — the shelf's mental models (request loop, contracts, transactions, ORMs, DI) transfer 1:1, and C# is readable in a weekend once TypeScript is home. This doc teaches the translation, not the language. One scope note: <strong>this is not a C# course</strong> — no syntax drills, no framework tutorials; the depth lives in Microsoft Learn and the ASP.NET docs, linked below.</p>
 </section>
 
-<h2>How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: read this after <a href="./backend-engineering.html">Backend Engineering</a> §1 (the loop) and <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> (the data layer) — this doc assumes both are warm. Cross-links:</p>
 <ul>
@@ -51,7 +51,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p><strong>If a job listing you actually want says "C#/.NET", or a client's API is ASP.NET — this is the bridge.</strong> Read the Definition (what literacy means), the request-loop mapping, and the reading table; the worked example is where it clicks.</p>
 
-<h2>Definition — the enterprise lane, and what literacy means</h2>
+<h2 id="sec-definition-the-enterprise-lane-and-what-literacy-means">Definition — the enterprise lane, and what literacy means</h2>
 
 <p><strong>.NET is Microsoft's application platform:</strong> the <strong>C#</strong> language, the <strong>CLR</strong> runtime (like V8 is Node's runtime), <strong>ASP.NET Core</strong> for web (the .NET equivalent of Express/Fastify/Next), <strong>EF Core</strong> for data access (an ORM, like Prisma/Drizzle), and <strong>SQL Server</strong> as its natural database. It is not a "language" in the way the shelf uses the word — it is a <em>stack</em>, and its market position is what matters more than its syntax:</p>
 
@@ -67,7 +67,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p><strong>Literacy means three things, in this order:</strong> (1) you can <em>read</em> a C# codebase — follow an endpoint from controller to database; (2) you can <em>map</em> every concept onto mental models you already own — nothing here is new, only renamed; (3) you know <em>where the lane is</em> — when .NET appears in your professional life and what it signals. It does <em>not</em> mean writing production C# or chasing the ecosystem. If you later choose the lane deliberately, the shelf's backend/API/SQL docs are the curriculum; this doc is the map that makes them transferable.</p>
 
-<h2>Intersection with neighbors — the duplication boundaries</h2>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
 <table>
   <thead><tr><th>Neighbor doc</th><th>What it owns</th><th>What stays there vs. here</th></tr></thead>
@@ -80,7 +80,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
   </tbody>
 </table>
 
-<h2>The request loop, C# edition</h2>
+<h2 id="sec-the-request-loop-c-edition">The request loop, C# edition</h2>
 
 <p>The shelf's backend mental model — Request → Auth → Logic → Data → Response — is exactly what ASP.NET Core runs. Nothing here is new; everything is renamed:</p>
 
@@ -99,7 +99,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>Read any ASP.NET Core endpoint as: <em>middleware → controller → service → EF Core → SQL Server → response</em>. That is the entire bridge.</p>
 
-<h2>C# reading literacy — the TypeScript translation table</h2>
+<h2 id="sec-c-reading-literacy-the-typescript-translation-table">C# reading literacy — the TypeScript translation table</h2>
 
 <p>C# is not exotic if TypeScript is home — it is a sibling: both are statically-typed, class-first languages with async/await, generics, and modern nullability. The translation table covers what you will actually see while reading:</p>
 
@@ -132,7 +132,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>Read <code>async Task</code> methods as: <em>the work can wait without blocking a thread</em>. And treat <code>.Result</code> as a red flag worth flagging out loud — it is the C# equivalent of a memory-leaking long-lived <code>setInterval</code>: it works until it doesn't.</p>
 
-<h2>Reading LINQ — the query pipeline at a glance</h2>
+<h2 id="sec-reading-linq-the-query-pipeline-at-a-glance">Reading LINQ — the query pipeline at a glance</h2>
 
 <p>LINQ chains read like a fluent SQL query. When you meet one, translate it column by column with the shelf's <a href="./sql-and-postgresql.html">SQL</a>:</p>
 
@@ -150,7 +150,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
   </tbody>
 </table>
 
-<h2>EF Core — the ORM you already understand</h2>
+<h2 id="sec-ef-core-the-orm-you-already-understand">EF Core — the ORM you already understand</h2>
 
 <p><a href="./backend-engineering.html">Backend Engineering</a> §1e gives you the ORM-vs-raw-SQL decision; EF Core is a fully-featured instance of that decision. What you need to <em>read</em>:</p>
 
@@ -167,7 +167,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>The one genuinely new-looking piece is <strong>change tracking</strong>: EF Core watches the objects you loaded and writes back only what changed — an ORM convenience that Node ORMs emulate to varying degrees. When you read <code>context.SaveChanges()</code>, that is the "write the transaction" moment.</p>
 
-<h2>Dependency injection &amp; the framework shape</h2>
+<h2 id="sec-dependency-injection-the-framework-shape">Dependency injection &amp; the framework shape</h2>
 
 <p>ASP.NET Core is built around constructor injection: services register once, and the framework constructs everything for you. The three lifetimes map directly onto the shelf's statelessness discussion (<a href="./backend-engineering.html">Backend §7</a>, <a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a>):</p>
 
@@ -182,7 +182,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>Reading any .NET service layer: follow the constructor. Whatever the class asks for, the framework provides — and the lifetime labels tell you whether shared state is a deliberate choice or an accident waiting to happen (a singleton holding per-request state is the .NET classic bug, the same class of bug as a module-level cache in a serverless function).</p>
 
-<h2>The .NET market map — where the lane actually is</h2>
+<h2 id="sec-the-net-market-map-where-the-lane-actually-is">The .NET market map — where the lane actually is</h2>
 
 <p>For a learner in Egypt (or similar markets), the practical question is: when does .NET actually appear in your professional life?</p>
 
@@ -198,7 +198,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>The strategic line, from the shelf's own <a href="./javascript-across-stacks.html">positioning</a>: <strong>.NET wins where Microsoft enterprise contracts exist; Node wins where JavaScript teams exist.</strong> Neither claim is wrong; they describe different markets. If the enterprise market is the one you want, the shelf's backend/API/SQL docs are the transferable curriculum — the mental models move; only the syntax changes.</p>
 
-<h2>Decoding the version — what ".NET" means in a listing</h2>
+<h2 id="sec-decoding-the-version-what-net-means-in-a-listing">Decoding the version — what ".NET" means in a listing</h2>
 
 <p>A job listing that just says ".NET" is ambiguous, because the ecosystem has been through three names for the same product line. Reading the listing correctly is part of the literacy:</p>
 
@@ -214,7 +214,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>One rule of thumb: <strong>even number = Long-Term Support, odd number = latest features</strong>. If a codebase targets <code>net8.0</code>, it is the modern line — read it with this doc; if it says <code>net48</code>, expect legacy patterns and an older <code>ASP.NET</code> shape.</p>
 
-<h2>SQL Server — the T-SQL dialect</h2>
+<h2 id="sec-sql-server-the-t-sql-dialect">SQL Server — the T-SQL dialect</h2>
 
 <p>.NET shops default to SQL Server, and T-SQL is the <a href="./sql-and-postgresql.html">SQL</a> you know with a different accent. The reading differences, in one table:</p>
 
@@ -233,7 +233,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>The shared 90% — SELECT anatomy, JOINs, GROUP BY, window functions (T-SQL supports them well), transactions — is exactly what <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> teaches. Read any T-SQL query as the same language with these six renames.</p>
 
-<h2>When NOT to pick .NET</h2>
+<h2 id="sec-when-not-to-pick-net">When NOT to pick .NET</h2>
 
 <p>Literacy is not advocacy. The lane map has a mirror side — the cases where .NET is the wrong tool, and where "why is this .NET?" is the correct reaction:</p>
 
@@ -246,7 +246,7 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <p>The signal to look for: <strong>existing Microsoft enterprise contracts, compliance regimes, and ten-year maintenance horizons.</strong> That is where .NET earned its place — and where reading it pays.</p>
 
-<h2>Worked example — reading a .NET codebase</h2>
+<h2 id="sec-worked-example-reading-a-net-codebase">Worked example — reading a .NET codebase</h2>
 
 <p>A real-shaped ASP.NET Core endpoint, read with the shelf's eyes. The endpoint: <code>GET /api/shipments/{id}</code> — the same shipment-tracking world as <a href="./sql-and-postgresql.html">SQL §Worked example</a>:</p>
 
@@ -303,7 +303,7 @@ public record ShipmentDto(long Id, string TrackingNumber, string Status);</pre>
 
 <p>Read end to end: <em>route binds → controller asks service → EF Core translates LINQ to the SQL you learned → SQL Server answers → DTO out.</em> Every concept in this file has a home in the shelf — <a href="./backend-engineering.html">Backend §1</a> (the loop), §1e (the ORM), <a href="./api-design.html">API Design</a> (the contract), <a href="./sql-and-postgresql.html">SQL</a> (the query underneath). That is the entire point of the doc: <strong>nothing here is new; it is all renamed.</strong></p>
 
-<h2>The literacy pitfalls — failure modes</h2>
+<h2 id="sec-the-literacy-pitfalls-failure-modes">The literacy pitfalls — failure modes</h2>
 
 <table>
   <thead><tr><th>Pitfall</th><th>What it is</th><th>The correct stance</th></tr></thead>
@@ -316,7 +316,7 @@ public record ShipmentDto(long Id, string TrackingNumber, string Status);</pre>
   </tbody>
 </table>
 
-<h2>Summary — the lane map</h2>
+<h2 id="sec-summary-the-lane-map">Summary — the lane map</h2>
 
 <p>Print this. It is the whole doc in nine lines:</p>
 
