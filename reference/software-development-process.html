@@ -30,7 +30,7 @@
   <p>The Rhythm is how you build a feature; this doc is how the feature gets prioritized, sprinted, shipped, and maintained. They're at different scales, and both are needed.</p>
 </blockquote>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful <em>after</em> you understand the feature-scale rhythm (<a href="./how-developers-think-frontend.html">The Rhythm</a>) — that gives you the micro-process; this doc gives you the macro-process it sits within. Cross-links:</p>
 <ul>
@@ -40,9 +40,9 @@
   <li>Architecture: <a href="./system-design.html">System Design</a> — methodology informs architecture; architecture constrains methodology.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
 </ul>
-<p><strong>If you've ever wondered what a "sprint" or a "stand-up" or a "backlog" actually is — and why your team does them — this doc answers that.</strong> Read §1 (Definition) and §2 (the SDLC phases) first. Then §3–§6 for the Agile frameworks. §9e–§9r for the practical layer: choosing a process, measuring it, security, operations, and more. Then §9d for the AI frontier (AI-augmented SDLC + Agent Development Lifecycle).</p>
+<p><strong>If you've ever wondered what a "sprint" or a "stand-up" or a "backlog" actually is — and why your team does them — this doc answers that.</strong> Read <a href="#sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is">§1</a> (Definition) and <a href="#sec-the-sdlc-the-six-phases">§2</a> (the SDLC phases) first. Then <a href="#sec-the-agile-manifesto-4-values-12-principles-2001">§3</a>–<a href="#sec-xp-lean-devops-the-rest-of-the-landscape">§6</a> for the Agile frameworks. <a href="#sec-how-to-choose-a-process-the-practical-question">§9e</a>–<a href="#sec-regulated-and-safety-critical-environments">§9r</a> for the practical layer: choosing a process, measuring it, security, operations, and more. Then <a href="#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">§9d</a> for the AI frontier (AI-augmented SDLC + Agent Development Lifecycle).</p>
 
-<h2 id="sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is">1. Definition — what the SDLC is, what a methodology is, what Agile is</h2>
+<h2 id="sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is">Definition — what the SDLC is, what a methodology is, what Agile is</h2>
 
 <h3>The SDLC — the phases</h3>
 <p>The <strong>Software Development Life Cycle (SDLC)</strong> is the sequence of phases a software system goes through from birth to retirement: <strong>Requirements → Design → Implementation → Testing → Deployment → Maintenance</strong> (<a href="https://en.wikipedia.org/wiki/Software_development_process">Wikipedia</a>). The SDLC describes <em>what happens</em> — the phases, the deliverables, the transitions. It doesn't prescribe <em>how</em> you navigate them.</p>
@@ -55,12 +55,12 @@
 
 <h3>What this doc is NOT</h3>
 <ul>
-  <li><strong>Not The Rhythm.</strong> The Rhythm (L7) is the <em>micro-process</em> — how an individual builds one feature (Model → View → Flow, minutes to hours). This doc is the <em>macro-process</em> — how a team navigates the SDLC (sprints, backlogs, ceremonies, weeks to months). They're at different scales; §7 explains how they connect.</li>
+  <li><strong>Not The Rhythm.</strong> The Rhythm (L7) is the <em>micro-process</em> — how an individual builds one feature (Model → View → Flow, minutes to hours). This doc is the <em>macro-process</em> — how a team navigates the SDLC (sprints, backlogs, ceremonies, weeks to months). They're at different scales; <a href="#sec-the-macro-micro-connection-how-this-doc-relates-to-the-rhythm">§7</a> explains how they connect.</li>
   <li><strong>Not just project management.</strong> Agile includes project management practices (sprints, backlogs, stand-ups), but it also encompasses development practices (TDD, pair programming, CI), team organization (self-organizing, cross-functional), and a philosophy (the 4 values + 12 principles). Project management is one slice, not the whole.</li>
   <li><strong>Not a framework.</strong> Agile is the philosophy; Scrum, Kanban, and XP are the frameworks. Saying "we do Agile" is like saying "we do science" — it tells you the philosophy, not the specific practices.</li>
 </ul>
 
-<h2 id="sec-history-from-waterfall-to-agile-to-ai-agents-1970present">1b. History — from Waterfall to Agile to AI agents (1970–present)</h2>
+<h2 id="sec-history-from-waterfall-to-agile-to-ai-agents-1970present">History — from Waterfall to Agile to AI agents (1970–present)</h2>
 
 <p>The software development process has a 55-year lineage, driven by a recurring theme: <em>humans are bad at predicting what software should do, so processes that embrace change beat processes that resist it</em>.</p>
 
@@ -83,7 +83,7 @@
 
 <p><strong>The pattern:</strong> each methodology was a response to a failure of the previous one. Waterfall failed because requirements change. Spiral responded by making change explicit. Agile responded by embracing change. DevOps responded by automating the deployment bottleneck. AI-augmentation responds to the writing bottleneck. The ADLC responds to the emergence of a new type of software entirely. <em>The SDLC phases don't change; how you navigate them does — and what you're building is starting to change too.</em></p>
 
-<h2 id="sec-evolution-constraint-inversions-across-the-process">1c. Evolution — constraint inversions across the process</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-process">Evolution — constraint inversions across the process</h2>
 
 <table>
   <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
@@ -98,12 +98,12 @@
 
 <p><strong>The meta-pattern:</strong> each inversion <em>tightens the feedback loop</em>. Waterfall's feedback loop: months (discover the bug after deployment). Spiral's: weeks (discover in the next cycle). Agile's: days (discover in the next stand-up or sprint review). DevOps': minutes (discover in CI). AI-augmented's: seconds (discover from the AI's output). The tighter the loop, the faster you learn — this is the same principle as The Rhythm's hot-reload insight (L15).</p>
 
-<h2 id="sec-intersection-with-neighbors-the-macro-process">1d. Intersection with neighbors — the macro-process</h2>
+<h2 id="sec-intersection-with-neighbors-the-macro-process">Intersection with neighbors — the macro-process</h2>
 
 <table>
   <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
   <tbody>
-    <tr><td><a href="./how-developers-think-frontend.html">The Rhythm</a> <em>(micro-process)</em></td><td>The Rhythm is the feature-scale loop; this doc is the project-scale process. A sprint (this doc) contains multiple features, each built with the Model→View→Flow rhythm.</td><td>The context: why you're building this feature, who prioritized it, what "done" means at the sprint level. See §7.</td></tr>
+    <tr><td><a href="./how-developers-think-frontend.html">The Rhythm</a> <em>(micro-process)</em></td><td>The Rhythm is the feature-scale loop; this doc is the project-scale process. A sprint (this doc) contains multiple features, each built with the Model→View→Flow rhythm.</td><td>The context: why you're building this feature, who prioritized it, what "done" means at the sprint level. See <a href="#sec-the-macro-micro-connection-how-this-doc-relates-to-the-rhythm">§7</a>.</td></tr>
     <tr><td><a href="./cs-and-software-engineering.html">CS &amp; SE</a> <em>(umbrella)</em></td><td>This doc is the process layer within the discipline. SE is the discipline; this is how the discipline organizes its work.</td><td>The process context for the engineering principles (DRY, SOLID, KISS) — they're applied <em>within</em> a sprint, using a methodology.</td></tr>
     <tr><td><a href="./problem-solving.html">Problem-Solving</a> <em>(thinking skill)</em></td><td>Pólya's four phases are used within both scales: the macro (sprint-level: plan the sprint, execute, review at retrospective) and the micro (feature-level: understand, plan, execute, look back).</td><td>The cadence: sprints and retrospectives are Pólya's Phase 4 (Look back) institutionalized at the team level.</td></tr>
     <tr><td><a href="./system-design.html">System Design</a> <em>(architecture)</em></td><td>Methodology informs architecture; architecture constrains methodology. Agile teams favor evolutionary architecture (design emerges over sprints); Waterfall teams favor upfront architecture.</td><td>The process context: how architecture decisions get made (sprint planning vs upfront design).</td></tr>
@@ -113,7 +113,7 @@
 
 <p><strong>The boundary rule:</strong> if you're asking "how do I build this feature?", that's The Rhythm. If you're asking "how does the team prioritize, plan, and ship features?", that's this doc. If you're asking "what makes the solution good?", that's CS &amp; SE (evaluation). If you're asking "how do I think about the problem?", that's Problem-Solving. Four scales, one discipline.</p>
 
-<h2 id="sec-underlying-theory-empirical-process-control-and-lean">1e. Underlying theory — empirical process control and Lean</h2>
+<h2 id="sec-underlying-theory-empirical-process-control-and-lean">Underlying theory — empirical process control and Lean</h2>
 
 <h3>Empirical process control theory — Scrum's foundation</h3>
 <p>Scrum is based on <strong>empirical process control theory</strong>, which distinguishes two types of process:</p>
@@ -131,7 +131,7 @@
   <p><strong>How the theories connect:</strong> empirical process control says "inspect and adapt" (the loop). Lean says "limit WIP and improve flow" (the constraint). Agile combines both: inspect and adapt <em>at a sustainable pace</em>, with limited WIP so the team isn't overloaded. The Rhythm (L7) inherits both at the feature scale: cycle through threads (inspect and adapt), one feature at a time (limit WIP).</p>
 </blockquote>
 
-<h2 id="sec-mental-models-adaptive-vs-predictive-empirical-vs-defined">1f. Mental models — adaptive vs predictive, empirical vs defined</h2>
+<h2 id="sec-mental-models-adaptive-vs-predictive-empirical-vs-defined">Mental models — adaptive vs predictive, empirical vs defined</h2>
 
 <table>
   <thead><tr><th>Dimension</th><th>Predictive (Waterfall)</th><th>Adaptive (Agile)</th></tr></thead>
@@ -151,7 +151,7 @@
 <h3>Pull vs push — Kanban's mental model</h3>
 <p>A second mental model: <strong>push-based</strong> (Scrum) vs <strong>pull-based</strong> (Kanban). In push, work is assigned at sprint planning (pushed to the team). In pull, the team pulls work as capacity permits (no required timeboxes, continuous flow). Push optimizes for cadence and predictability; pull optimizes for flow and utilization. Most teams use a hybrid — "Scrumban" — pulling work within a loose cadence.</p>
 
-<h2 id="sec-the-sdlc-the-six-phases">2. The SDLC — the six phases</h2>
+<h2 id="sec-the-sdlc-the-six-phases">The SDLC — the six phases</h2>
 
 <p>Every methodology — Waterfall, Agile, Spiral, DevOps — navigates the same six phases. The difference is the order, the cadence, and the emphasis. Understanding the phases is the prerequisite for understanding the methodologies.</p>
 
@@ -161,7 +161,7 @@
     <tr><td><strong>1. Requirements</strong></td><td>What should the software do? Who uses it? What are the constraints? Gathered from stakeholders, users, business needs.</td><td>User stories, acceptance criteria, a product backlog (in Agile) or a requirements spec (in Waterfall).</td></tr>
     <tr><td><strong>2. Design</strong></td><td>How will the software be structured? Architecture, data models, API design, component structure, UI/UX.</td><td>Architecture diagrams, data models, API contracts, wireframes, component designs.</td></tr>
     <tr><td><strong>3. Implementation</strong></td><td>Write the code. Build the features. This is where The Rhythm (L7) operates — Model → View → Flow for each feature.</td><td>Working code. The feature itself.</td></tr>
-    <tr><td><strong>4. Testing</strong></td><td>Does it work? Unit tests, integration tests, end-to-end tests, user acceptance testing, edge-case checking (Problem-Solving §10).</td><td>Test results, bug reports, a "definition of done" checklist.</td></tr>
+    <tr><td><strong>4. Testing</strong></td><td>Does it work? Unit tests, integration tests, end-to-end tests, user acceptance testing, edge-case checking (<a href="./problem-solving.html#sec-polya-s-heuristic-dictionary-the-moves">Problem-Solving §10</a>).</td><td>Test results, bug reports, a "definition of done" checklist.</td></tr>
     <tr><td><strong>5. Deployment</strong></td><td>Ship it to users. In DevOps: automated via CI/CD. In Waterfall: a one-time release event.</td><td>Running software in production. Versioned releases.</td></tr>
     <tr><td><strong>6. Maintenance</strong></td><td>Fix bugs, add features, refactor, monitor. Often the majority of a system's lifetime — the phase that's most underestimated.</td><td>Patches, updates, new versions, monitoring dashboards, incident reports.</td></tr>
   </tbody>
@@ -171,7 +171,7 @@
   <p><strong>How Waterfall vs Agile navigates these phases:</strong> Waterfall does them <em>once</em>, sequentially — finish all Requirements, then all Design, then all Implementation, etc. Agile does them <em>every sprint</em> — a little Requirements (backlog refinement), a little Design (sprint planning), Implementation (the sprint), Testing (during the sprint), Deployment (at sprint review/end), Maintenance (ongoing). The phases are the same; the navigation is different. That's the entire Agile/Waterfall distinction in one sentence.</p>
 </blockquote>
 
-<h2 id="sec-the-agile-manifesto-4-values-12-principles-2001">3. The Agile Manifesto — 4 values, 12 principles (2001)</h2>
+<h2 id="sec-the-agile-manifesto-4-values-12-principles-2001">The Agile Manifesto — 4 values, 12 principles (2001)</h2>
 
 <p>In February 2001, 17 software developers met at a ski lodge in Snowbird, Utah, and wrote the <strong>Manifesto for Agile Software Development</strong> (<a href="https://agilemanifesto.org/">agilemanifesto.org</a>). It's not a framework or a process — it's a <em>statement of values</em> that the frameworks (Scrum, Kanban, XP) implement.</p>
 
@@ -204,7 +204,7 @@
 </ol>
 <p><strong>Principle 12 is the metacognition of Agile</strong> — it's Schoenfeld's metacognition (L13) at the team level: inspect your own process, adapt. The sprint retrospective is where principle 12 happens. And principle 10 — "simplicity, the art of maximizing the amount of work not done" — is YAGNI (L16) in manifesto form.</p>
 
-<h2 id="sec-scrum-the-most-widely-adopted-agile-framework">4. Scrum — the most widely adopted Agile framework</h2>
+<h2 id="sec-scrum-the-most-widely-adopted-agile-framework">Scrum — the most widely adopted Agile framework</h2>
 
 <p>Scrum is a lightweight framework that implements the Agile philosophy. It was formalized by Ken Schwaber and Jeff Sutherland in 1995, based on empirical process control theory. The <a href="https://www.scrumguides.org/scrum-guide.html">Scrum Guide</a> defines it precisely: 3 accountabilities (roles), 5 events (ceremonies), 3 artifacts (<a href="https://en.wikipedia.org/wiki/Scrum_(software_development)">Wikipedia</a>).</p>
 
@@ -249,7 +249,7 @@
   <p><strong>Scrum in one sentence:</strong> every 2 weeks, the team picks the highest-priority work from the backlog, builds it using whatever micro-process they choose (The Rhythm), inspects daily, demonstrates the result, and reflects on how to improve — then repeats. The macro-process (Scrum) provides the cadence; the micro-process (The Rhythm) provides the execution within each unit of work.</p>
 </blockquote>
 
-<h2 id="sec-kanban-flow-not-timeboxes">5. Kanban — flow, not timeboxes</h2>
+<h2 id="sec-kanban-flow-not-timeboxes">Kanban — flow, not timeboxes</h2>
 
 <p>Kanban is the alternative to Scrum's sprint model. Where Scrum uses fixed-length timeboxes (sprints), Kanban uses <strong>continuous flow</strong> — work is pulled as capacity permits, with no required fixed iterations. It was adapted from the Toyota Production System by David Anderson in the 2000s (<a href="https://en.wikipedia.org/wiki/Kanban_(development)">Wikipedia</a>).</p>
 
@@ -278,7 +278,7 @@
 
 <p><strong>Scrumban</strong> — the hybrid most teams use in practice: loose sprint cadence (2-week rhythm) with Kanban's WIP limits and pull-based work. The ceremonies are lighter; the flow is visible. This is what you'll most likely encounter at work.</p>
 
-<h2 id="sec-xp-lean-devops-the-rest-of-the-landscape">6. XP, Lean, DevOps — the rest of the landscape</h2>
+<h2 id="sec-xp-lean-devops-the-rest-of-the-landscape">XP, Lean, DevOps — the rest of the landscape</h2>
 
 <h3>XP — Extreme Programming (Kent Beck, 1999)</h3>
 <p>XP focuses on <strong>engineering practices</strong> — the things that make Agile <em>work</em>, not just the ceremonies. While Scrum tells you <em>how to organize</em> (sprints, roles), XP tells you <em>how to code</em>:</p>
@@ -312,7 +312,7 @@
 </ul>
 <p><strong>DevOps is the set of practices that made Agile's "working software" promise real</strong> — you can't deliver working software frequently if deployment is a manual, risky, once-a-quarter event. DevOps makes deployment routine.</p>
 
-<h2 id="sec-the-macro-micro-connection-how-this-doc-relates-to-the-rhythm">7. The macro/micro connection — how this doc relates to The Rhythm</h2>
+<h2 id="sec-the-macro-micro-connection-how-this-doc-relates-to-the-rhythm">The macro/micro connection — how this doc relates to The Rhythm</h2>
 
 <p>This is the key structural insight: <strong>The Rhythm (L7) is the micro-process; this doc is the macro-process. They operate at different scales, and both are needed.</strong></p>
 
@@ -367,7 +367,7 @@
 
 <p><strong>The lineage is the same:</strong> Boehm's spiral model (1986) named the iterative pattern; XP (1999) operationalized it in code ("make it work, make it right, make it fast"); Agile (2001) popularized it at the sprint scale; The Rhythm (L7) applies it at the feature scale. They're the same pattern at different scales — the spiral made visible at the project level (sprints) and at the feature level (rounds).</p>
 
-<h2 id="sec-principles-the-shared-constants">8. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <p>Across every methodology, certain principles don't change. These are the constants that survive from Waterfall to Agile to DevOps to AI:</p>
 <table>
@@ -384,7 +384,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-worked-example-a-scrum-sprint-end-to-end">9. Worked example — a Scrum sprint end-to-end</h2>
+<h2 id="sec-worked-example-a-scrum-sprint-end-to-end">Worked example — a Scrum sprint end-to-end</h2>
 
 <p>Let's trace a single 2-week sprint from start to finish, showing how the SDLC phases and the Agile ceremonies map to each other.</p>
 
@@ -412,7 +412,7 @@
   <p><strong>The full cycle in one paragraph:</strong> Plan what to build (Requirements + Design) → build it with The Rhythm (Implementation) → test during, not after (Testing) → demonstrate to stakeholders (Review = Phase 4) → reflect on the process (Retrospective = metacognition) → deploy (Deployment) → fix bugs in the next sprint (Maintenance) → repeat. All six SDLC phases, every 2 weeks. That's Agile.</p>
 </blockquote>
 
-<h2 id="sec-the-most-common-failure-modes">9b. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>The fix</th></tr></thead>
   <tbody>
@@ -428,7 +428,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-ecosystem-tools-certifications-and-books">9c. Ecosystem — tools, certifications, and books</h2>
+<h2 id="sec-ecosystem-tools-certifications-and-books">Ecosystem — tools, certifications, and books</h2>
 <table>
   <thead><tr><th>Category</th><th>Resource</th><th>What it gives you</th></tr></thead>
   <tbody>
@@ -441,19 +441,19 @@
     <tr><td rowspan="7"><strong>Books</strong></td><td><em>Scrum: The Art of Doing Twice the Work in Half the Time</em> — Jeff Sutherland</td><td>The co-creator of Scrum tells the story. Accessible, practical, motivating.</td></tr>
     <tr><td><em>Extreme Programming Explained</em> — Kent Beck</td><td>The XP origin. "Make it work, make it right, make it fast." The engineering practices.</td></tr>
     <tr><td><em>The Phoenix Project</em> / <em>The DevOps Handbook</em></td><td>DevOps in narrative form (Phoenix Project is a novel) and reference form (Handbook). How CI/CD transforms delivery.</td></tr>
-    <tr><td><em>Accelerate</em> — Forsgren, Humble, Kim</td><td>The evidence behind the DORA metrics (§9f): what actually correlates with delivery performance.</td></tr>
-    <tr><td><em>Continuous Delivery</em> — Humble &amp; Farley</td><td>Foundational CI/CD thinking; the mechanics behind the release-strategy ideas in §9i.</td></tr>
-    <tr><td><em>Team Topologies</em> — Skelton &amp; Pais</td><td>Team design and organizational flow; the deep-dive behind §9m.</td></tr>
-    <tr><td><em>Kanban</em> — David Anderson · <em>User Story Mapping</em> — Jeff Patton</td><td>The core Kanban reference, and the discovery/requirements practice from §3.</td></tr>
-    <tr><td rowspan="3"><strong>Metrics &amp; frameworks</strong></td><td>DORA metrics</td><td>The standard delivery-performance metrics (deployment frequency, lead time for changes, change failure rate, MTTR) from §9f.</td></tr>
+    <tr><td><em>Accelerate</em> — Forsgren, Humble, Kim</td><td>The evidence behind the DORA metrics (<a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a>): what actually correlates with delivery performance.</td></tr>
+    <tr><td><em>Continuous Delivery</em> — Humble &amp; Farley</td><td>Foundational CI/CD thinking; the mechanics behind the release-strategy ideas in <a href="#sec-release-strategies-and-environments">§9i</a>.</td></tr>
+    <tr><td><em>Team Topologies</em> — Skelton &amp; Pais</td><td>Team design and organizational flow; the deep-dive behind <a href="#sec-team-topology-and-organizational-constraints-conway-s-law">§9m</a>.</td></tr>
+    <tr><td><em>Kanban</em> — David Anderson · <em>User Story Mapping</em> — Jeff Patton</td><td>The core Kanban reference, and the discovery/requirements practice from <a href="#sec-the-agile-manifesto-4-values-12-principles-2001">§3</a>.</td></tr>
+    <tr><td rowspan="3"><strong>Metrics &amp; frameworks</strong></td><td>DORA metrics</td><td>The standard delivery-performance metrics (deployment frequency, lead time for changes, change failure rate, MTTR) from <a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a>.</td></tr>
     <tr><td>SPACE framework</td><td>Developer productivity and well-being beyond output: satisfaction, performance, activity, communication, efficiency.</td></tr>
-    <tr><td>Cumulative flow diagrams</td><td>The Kanban visual for diagnosing bottlenecks (§9f).</td></tr>
+    <tr><td>Cumulative flow diagrams</td><td>The Kanban visual for diagnosing bottlenecks (<a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a>).</td></tr>
     <tr><td rowspan="2"><strong>Communities</strong></td><td>Scrum Alliance, Agile Alliance</td><td>The two main Agile organizations. Conferences, resources, certifications.</td></tr>
     <tr><td>r/agile, r/scrum · DevOps Institute</td><td>Practical questions, war stories, and DevOps/Agile adoption troubleshooting.</td></tr>
   </tbody>
 </table>
 
-<h2 id="sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">9d. The future — AI-augmented SDLC and the Agent Development Lifecycle</h2>
+<h2 id="sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">The future — AI-augmented SDLC and the Agent Development Lifecycle</h2>
 
 <p>AI is changing the software development process in two distinct ways. Understanding the difference is critical — they're often confused but they're fundamentally different.</p>
 
@@ -499,7 +499,7 @@
 </ul>
 <p><strong>The ADLC is too young (2024–present) for a standalone reference</strong> — it lacks the 55-year history and stable theory the SDLC has. For now, it's a chapter in the bigger story. In 2–3 years, when patterns consolidate, it may warrant its own reference.</p>
 
-<h2 id="sec-how-to-choose-a-process-the-practical-question">9e. How to choose a process — the practical question</h2>
+<h2 id="sec-how-to-choose-a-process-the-practical-question">How to choose a process — the practical question</h2>
 
 <p>Every methodology is a tool, not a religion. The mature question isn't "which Agile framework should we adopt?" — it's <em>"what are our constraints, and which process fits them?"</em> The table is a starting guide, not a rule:</p>
 
@@ -518,7 +518,7 @@
 
 <p><strong>The decision inputs:</strong> uncertainty level, requirement stability, regulatory constraints, team maturity, release cadence, and how much support/operations work the team carries. There is no universal best — only the best fit for <em>your</em> constraint set.</p>
 
-<h2 id="sec-process-metrics-how-to-know-the-process-is-working">9f. Process metrics — how to know the process is working</h2>
+<h2 id="sec-process-metrics-how-to-know-the-process-is-working">Process metrics — how to know the process is working</h2>
 
 <p>A process you can't measure is a process you can't improve. Metrics fall into five buckets:</p>
 
@@ -545,7 +545,7 @@
   <p><strong>The velocity warning:</strong> velocity (story points per sprint) is useful for a team's <em>own</em> planning — forecasting how much it can likely take on next sprint. It is a <em>poor</em> metric for comparing teams or measuring productivity: different teams size differently, and any metric used for evaluation gets gamed.</p>
 </blockquote>
 
-<h2 id="sec-quality-security-and-compliance-the-safety-gates">9g. Quality, security, and compliance — the safety gates</h2>
+<h2 id="sec-quality-security-and-compliance-the-safety-gates">Quality, security, and compliance — the safety gates</h2>
 
 <p>Speed without safety isn't agility — it's recklessness. Modern SDLCs increasingly include <strong>"shift-left" security</strong>: security checks happen during design and implementation, not only after deployment.</p>
 
@@ -560,7 +560,7 @@
 
 <p>In regulated environments (finance, health, government), the SDLC also includes <strong>compliance gates</strong>: change approval records, evidence collection, privacy review, and sign-off before release. These add ceremony — but they're the constraints the process must serve. <em>Security and compliance belong in the Definition of Done.</em></p>
 
-<h2 id="sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">9h. Operations and incident management — the SDLC doesn't end at deploy</h2>
+<h2 id="sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn't end at deploy</h2>
 
 <p>Deployment is not the end. Production software needs monitoring, alerting, incident response, rollback plans, and support processes — a whole operational layer the SDLC phases barely hint at.</p>
 
@@ -579,7 +579,7 @@
 
 <p><strong>The full treatment</strong> of this layer — choosing targets, designing alerts, running incidents, postmortem craft, runbooks — lives in <a href="./observability-and-operations.html">Observability &amp; Operations</a>.</p>
 
-<h2 id="sec-release-strategies-and-environments">9i. Release strategies and environments</h2>
+<h2 id="sec-release-strategies-and-environments">Release strategies and environments</h2>
 
 <p>Deployment is not just "ship it." Teams move work through environments and choose how much risk each release carries:</p>
 
@@ -596,7 +596,7 @@
 
 <p><strong>The safer the release mechanism, the more frequently the team can ship.</strong> This is the DevOps insight at the release level: deployment risk is managed by mechanics (canaries, flags, rollback), not by releasing less often.</p>
 
-<h2 id="sec-testing-strategy-the-test-pyramid">9j. Testing strategy — the test pyramid</h2>
+<h2 id="sec-testing-strategy-the-test-pyramid">Testing strategy — the test pyramid</h2>
 
 <p>Testing is not a single phase; it's a strategy with different speeds and scopes:</p>
 
@@ -612,7 +612,7 @@
 
 <p><strong>Watch the flaky test.</strong> A test that fails intermittently gets ignored, and an ignored test is worse than no test — it trains the team to skip the suite. A healthy strategy balances speed, coverage, and realism, and <em>pays down</em> flaky and out-of-date tests rather than accumulating them.</p>
 
-<h2 id="sec-branching-and-integration-strategy">9k. Branching and integration strategy</h2>
+<h2 id="sec-branching-and-integration-strategy">Branching and integration strategy</h2>
 
 <p>Process and version control are connected. The branching model either supports the delivery cadence or fights it:</p>
 
@@ -624,7 +624,7 @@
 
 <p><strong>The rule:</strong> long-lived branches increase merge risk and delay feedback. Choose a branching strategy that supports the team's delivery cadence — don't let the branch model become an unintended waterfall between code and integration.</p>
 
-<h2 id="sec-estimation-and-planning-forecasts-not-promises">9l. Estimation and planning — forecasts, not promises</h2>
+<h2 id="sec-estimation-and-planning-forecasts-not-promises">Estimation and planning — forecasts, not promises</h2>
 
 <p>Estimates answer "how big is this?" — and they are forecasts, not commitments. Common practices:</p>
 
@@ -637,7 +637,7 @@
 
 <p><strong>The rule:</strong> estimates are for planning and forecasting, not for deadlines or performance metrics. The moment an estimate becomes a target, people pad it — and the estimate stops being useful.</p>
 
-<h2 id="sec-team-topology-and-organizational-constraints-conway-s-law">9m. Team topology and organizational constraints (Conway's Law)</h2>
+<h2 id="sec-team-topology-and-organizational-constraints-conway-s-law">Team topology and organizational constraints (Conway's Law)</h2>
 
 <p>Process cannot be separated from organization. <strong>Conway's Law</strong>: organizations design systems that mirror their communication structure — team boundaries become system boundaries.</p>
 
@@ -650,7 +650,7 @@
 
 <p><strong>The operational reading:</strong> when many teams depend on one team or one service, process friction becomes architectural friction. A good process design considers the <em>shape of the organization</em>, not just the shape of the sprints.</p>
 
-<h2 id="sec-remote-and-distributed-teams">9n. Remote and distributed teams</h2>
+<h2 id="sec-remote-and-distributed-teams">Remote and distributed teams</h2>
 
 <p>Face-to-face conversation (Manifesto principle #6) is valuable — but modern teams often work remotely. Distributed teams compensate deliberately:</p>
 
@@ -663,13 +663,13 @@
 
 <p>The principle survives: Agile values working software <em>over</em> comprehensive documentation — but in a distributed team, documentation is what makes working software possible. The trade-off shifts; the values don't.</p>
 
-<h2 id="sec-documentation-and-knowledge-management">9o. Documentation and knowledge management</h2>
+<h2 id="sec-documentation-and-knowledge-management">Documentation and knowledge management</h2>
 
 <p>Agile does not mean no documentation. What it means: document what earns its keep.</p>
 
 <ul>
   <li><strong>Architecture Decision Records (ADRs)</strong> — one page per significant decision: the context, the decision, the alternatives rejected.</li>
-  <li><strong>Runbooks</strong> — operational procedures for known scenarios (see §9h).</li>
+  <li><strong>Runbooks</strong> — operational procedures for known scenarios (see <a href="#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a>).</li>
   <li><strong>API docs and onboarding guides</strong> — the surfaces new engineers touch first.</li>
   <li><strong>Docs as code</strong> — documentation lives in the repository, reviewed like code, kept next to what it describes.</li>
   <li><strong>Living documentation</strong> — generated or maintained alongside the code so it stays true; dead docs are worse than no docs.</li>
@@ -677,7 +677,7 @@
 
 <p>The test for any documentation: <em>would a future engineer (or your future self, in three months) be lost without it?</em> If yes, it earns its place.</p>
 
-<h2 id="sec-product-outcome-orientation-shipping-is-not-success">9p. Product outcome orientation — shipping is not success</h2>
+<h2 id="sec-product-outcome-orientation-shipping-is-not-success">Product outcome orientation — shipping is not success</h2>
 
 <p>A mature process asks not only "did we deliver?" but "did this improve the outcome?"</p>
 
@@ -688,9 +688,9 @@
   <li><strong>Discovery experiments</strong> — validate the problem before building the solution (see The Rhythm's model-first instinct at the product scale).</li>
 </ul>
 
-<p>This is the value bucket from §9f made real: a fast process that ships the wrong thing is still a failure — just a faster one.</p>
+<p>This is the value bucket from <a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a> made real: a fast process that ships the wrong thing is still a failure — just a faster one.</p>
 
-<h2 id="sec-retirement-and-decommissioning">9q. Retirement and decommissioning</h2>
+<h2 id="sec-retirement-and-decommissioning">Retirement and decommissioning</h2>
 
 <p>The SDLC runs from birth to retirement, but most phase lists stop at Maintenance. The last phase matters:</p>
 
@@ -704,7 +704,7 @@
 
 <p>Retirement is a phase like any other: it deserves planning, a Definition of Done, and the same discipline as building the system did.</p>
 
-<h2 id="sec-regulated-and-safety-critical-environments">9r. Regulated and safety-critical environments</h2>
+<h2 id="sec-regulated-and-safety-critical-environments">Regulated and safety-critical environments</h2>
 
 <p>The rest of this doc mostly assumes product/startup/web development. In <strong>regulated, safety-critical, or high-compliance environments</strong> (medical devices, aviation, banking, government), the SDLC tightens:</p>
 
@@ -717,9 +717,9 @@
 
 <p>Agile can still be used — but it often becomes <strong>hybrid</strong>: iterative development inside, formal gates at the boundaries. The constraint isn't an excuse to abandon Agile; it's an additional constraint the process must serve.</p>
 
-<h2 id="sec-worked-example-a-kanban-support-flow-end-to-end">9s. Worked example — a Kanban support flow end-to-end</h2>
+<h2 id="sec-worked-example-a-kanban-support-flow-end-to-end">Worked example — a Kanban support flow end-to-end</h2>
 
-<p>The Scrum sprint walked through in §9 shows timeboxed, push-based work. Kanban is the other common shape — let's trace a single support ticket through a real Kanban board, to make the flow practices (§5) concrete.</p>
+<p>The Scrum sprint walked through in <a href="#sec-worked-example-a-scrum-sprint-end-to-end">§9</a> shows timeboxed, push-based work. Kanban is the other common shape — let's trace a single support ticket through a real Kanban board, to make the flow practices (<a href="#sec-kanban-flow-not-timeboxes">§5</a>) concrete.</p>
 
 <div class="callout">
 <pre style="margin:0; font-size:.85rem; line-height:1.5; overflow-x:auto;">
@@ -743,9 +743,9 @@
 
 <p>The board is the whole process: it <em>is</em> the state of the work. If the "Code Review" column fills to its limit of 2, a bottleneck is visible before it becomes a crisis — that's the inspection-and-adaptation loop in visual form. The ticket moved <strong>not on a scheduled sprint but as capacity, pull by pull</strong> — which is exactly the difference from Scrum's timeboxed push.</p>
 
-<p>Contrast with the Scrum example in §9: there the batch is chosen in Sprint Planning and locked for two weeks; here the priority can change at any time, work arrives continuously, and there are no sprint reviews because the flow <em>is</em> constantly visible. Same SDLC phases underneath (design the fix, implement, test, deploy, maintain) — different navigation.</p>
+<p>Contrast with the Scrum example in <a href="#sec-worked-example-a-scrum-sprint-end-to-end">§9</a>: there the batch is chosen in Sprint Planning and locked for two weeks; here the priority can change at any time, work arrives continuously, and there are no sprint reviews because the flow <em>is</em> constantly visible. Same SDLC phases underneath (design the fix, implement, test, deploy, maintain) — different navigation.</p>
 
-<h2 id="sec-summary-the-process-checklist">10. Summary — the process checklist</h2>
+<h2 id="sec-summary-the-process-checklist">Summary — the process checklist</h2>
 
 <p>Next time you join a team or start a project, use this checklist to understand the process you're operating within:</p>
 
@@ -760,10 +760,10 @@
     <tr><td>How does <strong>deployment</strong> work? (manual? CI/CD? how often?) How do you <strong>roll back</strong>?</td><td>If deployment is manual and rare, the feedback loop is months. If nothing is reversible, every release is gambling. Advocate for CI/CD and a safe rollback (feature flags, canary, blue-green).</td></tr>
     <tr><td>Is the team <strong>protecting the sprint</strong>? (no mid-sprint additions?)</td><td>If stakeholders add work mid-sprint, the timebox is broken. Protect it — or switch to Kanban (which is designed for continuous flow).</td></tr>
     <tr><td>Is there <strong>technical debt</strong>? Is refactoring prioritized?</td><td>If every sprint is 100% new features and 0% refactoring, debt is accumulating. Advocate for ~20% refactoring time.</td></tr>
-    <tr><td><strong>What metrics show the process is healthy?</strong> (lead time, deployment frequency, escaped defects?)</td><td>Without metrics (§9f), problems are invisible until they surface as a crisis. Pick a handful of flow/delivery/quality signals and watch them.</td></tr>
-    <tr><td><strong>How are production incidents handled?</strong> (alerting, on-call, postmortems?)</td><td>If something breaks and nobody notices or debriefs, the SDLC stops at deploy. Operations (§9h) is part of the loop, not downstream of it.</td></tr>
-    <tr><td><strong>How does user feedback return to the backlog?</strong></td><td>If shipped work never informs the plan, you're optimizing delivery toward the wrong target. Outcomes, not just outputs (§9p).</td></tr>
-    <tr><td>How does <strong>AI</strong> fit in? (Copilot for code? AI for testing? Building agents?) What's the <strong>AI usage policy</strong>?</td><td>Understand whether you're in an AI-augmented SDLC (AI assists you) or an ADLC (you're building agents). Set explicit guardrails so AI output is treated as untrusted input (§9d). The evaluation skill matters in both.</td></tr>
+    <tr><td><strong>What metrics show the process is healthy?</strong> (lead time, deployment frequency, escaped defects?)</td><td>Without metrics (<a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a>), problems are invisible until they surface as a crisis. Pick a handful of flow/delivery/quality signals and watch them.</td></tr>
+    <tr><td><strong>How are production incidents handled?</strong> (alerting, on-call, postmortems?)</td><td>If something breaks and nobody notices or debriefs, the SDLC stops at deploy. Operations (<a href="#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a>) is part of the loop, not downstream of it.</td></tr>
+    <tr><td><strong>How does user feedback return to the backlog?</strong></td><td>If shipped work never informs the plan, you're optimizing delivery toward the wrong target. Outcomes, not just outputs (<a href="#sec-product-outcome-orientation-shipping-is-not-success">§9p</a>).</td></tr>
+    <tr><td>How does <strong>AI</strong> fit in? (Copilot for code? AI for testing? Building agents?) What's the <strong>AI usage policy</strong>?</td><td>Understand whether you're in an AI-augmented SDLC (AI assists you) or an ADLC (you're building agents). Set explicit guardrails so AI output is treated as untrusted input (<a href="#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">§9d</a>). The evaluation skill matters in both.</td></tr>
   </tbody>
 </table>
 
