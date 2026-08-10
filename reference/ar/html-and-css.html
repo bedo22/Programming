@@ -23,11 +23,11 @@
   <p>معظم الدروس تعلم "اختصار flexbox" أو "CSS Grid في 15 دقيقة". HTML و CSS يبدأ بـ <em>ما هو عقد المنصة الذي تتلاعب به كل قاعدة CSS؟</em> إنه انضباط مستقل بتاريخه وخوارزمياته وأوضاع فشله — ليس "تنسيقاً" كزينة، ليس "Tailwind ضد CSS-in-JS" كدين، ليس "HTML الدلالي" كقائمة تحقق. يلتقط هذا المستند إياه كاهتمام هندسي من الدرجة الأولى: ركيزة العرض التصريحية، المتدرجة، القابلة للوصول افتراضياً، التي قرارات UI/UX تتحقق عليها، وحلقة المطور تنفذ ضدها، و JavaScript تتلاعب بها. إذا صححت يوماً إزاحة تخطيط، أو حرب تحديدية، أو كسر الوضع الداكن، أو قارئ شاشة يقرأ "زر" على <code><div></code> — فهذه هي الطبقة التي فاتتك.</p>
 </section>
 
-<h2>٠. كيف تستخدم هذا المستند</h2>
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذا المستند</h2>
 
 <p>ترتيب القراءة: مستقل. روابط تقاطعية:</p>
 <ul>
-  <li>أعلى إلى <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> — UI/UX يقرر ما <em>يجب أن يكون</em> الشيء المعروض؛ HTML و CSS هي الركيزة التي يعرض <em>عليها</em>. مصفوفة رؤية الحالة (§9 في UI/UX) تُرسم مباشرة إلى حالات HTML (<code>aria-busy</code>، <code>aria-invalid</code>) وحالات CSS (<code>:hover</code>، <code>:focus-visible</code>، <code>[data-loading]</code>).</li>
+  <li>أعلى إلى <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> — UI/UX يقرر ما <em>يجب أن يكون</em> الشيء المعروض؛ HTML و CSS هي الركيزة التي يعرض <em>عليها</em>. مصفوفة رؤية الحالة (<a href="./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns">§9 في UI/UX</a>) تُرسم مباشرة إلى حالات HTML (<code>aria-busy</code>، <code>aria-invalid</code>) وحالات CSS (<code>:hover</code>، <code>:focus-visible</code>، <code>[data-loading]</code>).</li>
   <li>أسفل إلى <a href="./how-developers-think-frontend.html">كيف يفكر المطورون عند بناء ميزة واجهة أمامية</a> — حلقة المطور تبني المكونات باستخدام عناصر HTML وقواعد CSS كعناصر أولية. قرارات الحلقة "الشكل" (API المكون، شكل الحالة) مقيدة بما تجعل المنصة قابلاً للتعبير.</li>
   <li>تقاطعي مع <a href="./javascript-the-language.html">JavaScript: اللغة</a> — JS تتلاعب بـ DOM (شجرة HTML في الذاكرة) و CSSOM (ورقة أنماط CSS في الذاكرة). هذا المستند يشرح ما <em>هاتان الشجرتان</em> وكيف يحل التدرج قبل أن تلمسها JS.</li>
   <li>تقاطعي مع <a href="./system-design.html">التصميم المعماري</a> — استراتيجية العرض (SSR، RSC، Islands، SPA) هي قرار حول <em>من يصدر HTML الأولي ومتى يصل CSS</em>. عقد المنصة (تحليل HTML، حظر CSS، تحميل الخطوط) هو الحقيقة الأساسية التي تفاوض كل استراتيجية معها.</li>
@@ -46,7 +46,7 @@
 
 ---
 
-<h2>١. تعريف — ما <em>هو</em> HTML و CSS وما <em>ليس</em> به</h2>
+<h2 id="sec-definition-what-html-css-is-and-what-it-is-not">تعريف — ما <em>هو</em> HTML و CSS وما <em>ليس</em> به</h2>
 
 <h3>ما هو</h3>
 
@@ -80,7 +80,7 @@
 
 ---
 
-<h2>٢. تاريخ — من مستندات SGML إلى المعيار الحي</h2>
+<h2 id="sec-history-from-sgml-docs-to-the-living-standard">تاريخ — من مستندات SGML إلى المعيار الحي</h2>
 
 <table>
   <thead><tr><th>الفترة</th><th>الإنجاز</th><th>شخصيات / أعمال رئيسية</th><th>ما تغير</th></tr></thead>
@@ -144,7 +144,7 @@
 
 ---
 
-<h2>٣. تطور — انعكاسات القيود عبر المنصة</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-platform">تطور — انعكاسات القيود عبر المنصة</h2>
 
 <p>الفكرة الأساسية — <em>مستند تصريحي يعرض في كل مكان</em> — لم تتغير. ما تغير هو القيد السائد، وميزة المنصة التي امتصته:</p>
 
@@ -170,7 +170,7 @@
 
 ---
 
-<h2>٤. تقاطع مع الجيران — حيث تحد ممارسات أخرى</h2>
+<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">تقاطع مع الجيران — حيث تحد ممارسات أخرى</h2>
 
 <table>
   <thead><tr><th>الممارسة</th><th>DNA مشترك</th><th>أين تختلف</th></tr></thead>
@@ -220,7 +220,7 @@
 
 ---
 
-<h2>٥. النظرية الأساسية — الخوارزميات التي تشغلها المنصة</h2>
+<h2 id="sec-underlying-theory-the-algorithms-the-platform-runs">النظرية الأساسية — الخوارزميات التي تشغلها المنصة</h2>
 
 <table>
   <thead><tr><th>النظرية / الخوارزمية</th><th>المواصفة / المنشأ</th><th>ما تفعله المنصة بها</th></tr></thead>
@@ -273,7 +273,7 @@
   </tbody>
 </table>
 
-<h2>٥ب. النماذج العقلية — كيف يفكر مهندسو المنصة فعلياً</h2>
+<h2 id="sec-mental-models-how-platform-engineers-actually-reason">النماذج العقلية — كيف يفكر مهندسو المنصة فعلياً</h2>
 
 <p>الخوارزميات أعلاه هي الحواجز الواقية. النماذج العقلية هي كيف تتنقل بداخلها. كل نموذج يضغط الخوارزميات لسياق قرار محدد:</p>
 
@@ -335,8 +335,6 @@
 
 ---
 
-<h2>٦. الإيقاع، لا الخوارزمية</h2>
-
 <p>مثل <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a>، <a href="./system-design.html">التصميم المعماري</a>، و <a href="./api-design.html">تصميم API</a>، HTML و CSS هو <strong>إيقاع</strong>، لا خوارزمية منظمة. يفشل اختبارات الخوارزمية الثلاثة:</p>
 
 <ul>
@@ -351,9 +349,290 @@
   <p><strong>اختراق الإيقاع "رموز التصميم → خصائص CSS المخصصة".</strong> رموز التصميم (صيغة W3C DTCG) تترجم إلى خصائص CSS المخصصة. تدرج المنصة + التوريث + البديل + كتابة <code>@property</code> <em>هو</em> وقت تشغيل الرموز. تغيير رمز = تغيير متغير CSS واحد = انتشار فوري لكل مكون. لا خطوة بناء، لا إعادة نشر. مضاعف سرعة — مفيد حين يكون نظام الرموز حياً، خطير حين تصبح الرموز بيروقراطية تمنع الانحراف لكل مكون.</p>
 </blockquote>
 
+<h2 id="sec-practical-surface-the-controls-the-platform-hands-you">السطح العملي — أدوات التحكم التي تمنحك إياها المنصة</h2>
+
+<p>نظرية <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">القسم السابق</a> هي الركيزة؛ هذا القسم هو سطح التحكم الملموس الذي تمدّ يدك إليه كل يوم. يربط الحاجات العملية الأكثر شيوعاً ببدائية المنصة التي تجيب عنها، فتفضّل المدمج في المنصة قبل أن تخترع حلاً التفافياً. أي شيء يملكه مستند شقيق بعمق أكبر يُربط بدلاً من إعادة طرحه هنا.</p>
+
 ---
 
-<h2>٧. المنهجيات / الأطر المسماة</h2>
+<h2 id="sec-html-platform-primitives-the-kitchen-it-ships-with">بدائيات HTML في المنصة — المطبخ الذي تأتي به</h2>
+
+<p>HTML الدلالي هو واجهة برمجة إمكانية الوصول (انظر <a href="#sec-definition-what-html-css-is-and-what-it-is-not">التعريف</a>). هذه هي الخريطة العملية لما تعطيك إياه المنصة قبل أي CSS أو JS.</p>
+
+<table>
+  <thead><tr><th>الفئة</th><th>العناصر / الـ APIs</th><th>لماذا تهم</th></tr></thead>
+  <tbody>
+    <tr><td><strong>بيانات وصفية للمستند</strong></td><td><code>html</code>، <code>head</code>، <code>meta charset</code>، <code>title</code>، <code>meta viewport</code>، <code>meta theme-color</code>، <code>link</code>، <code>script</code></td><td>التحليل، المنفذ، التنسيق، تحميل الموارد. الرأس هو عقد المستند مع المنصة.</td></tr>
+    <tr><td><strong>المعالم (Landmarks)</strong></td><td><code>header</code>، <code>nav</code>، <code>main</code>، <code>aside</code>، <code>footer</code>، <code>section</code>، <code>article</code></td><td>التنقل بالمعالم؛ أهداف قفز لقارئ الشاشة؛ مخطط المستند.</td></tr>
+    <tr><td><strong>دلالات النص</strong></td><td><code>p</code>، <code>h1</code>–<code>h6</code>، <code>strong</code>، <code>em</code>، <code>mark</code>، <code>time</code>، <code>code</code>، <code>abbr</code>، <code>blockquote</code></td><td>معنى + خطافات تنسيق + بنية قراءة بلا تخمين.</td></tr>
+    <tr><td><strong>القوائم</strong></td><td><code>ul</code>، <code>ol</code>، <code>dl</code>، <code>li</code>، <code>dt</code>، <code>dd</code></td><td>دلالات التجميع، قوائم معدودة، أزواج مصطلح/تعريف — لا "نقاط".</td></tr>
+    <tr><td><strong>الجداول</strong></td><td><code>table</code>، <code>thead</code>، <code>tbody</code>، <code>caption</code>، <code>th</code>، <code>td</code>، <code>scope</code></td><td>بيانات جدولية بترابط رؤوس؛ جزء من عقد AOM للجدول.</td></tr>
+    <tr><td><strong>النماذج</strong></td><td><code>form</code>، <code>label</code>، <code>input</code>، <code>select</code>، <code>textarea</code>، <code>button</code>، <code>fieldset</code>، <code>legend</code>، <code>output</code></td><td>تفاعل أصلي، تحقق، تركيز، لوحة مفاتيح، إرسال (<a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs">النماذج والتحقق</a>).</td></tr>
+    <tr><td><strong>الوسائط</strong></td><td><code>img</code>، <code>picture</code>، <code>video</code>، <code>audio</code>، <code>figure</code>، <code>figcaption</code>، <code>track</code></td><td>وسائط متجاوبة وميسرة، ترجمات، توجيه فني (<a href="#sec-media-and-responsive-images">الوسائط والصور المتجاوبة</a>).</td></tr>
+    <tr><td><strong>الكشف والحوارات</strong></td><td><code>details</code>، <code>summary</code>، <code>dialog</code>، Popover API</td><td>طي/فتح أصلي وطبقات فوقية قبل أي JS — بلوحة مفاتيح وتركيز مشمولين.</td></tr>
+    <tr><td><strong>حدود البرمجة</strong></td><td><code>script</code>، <code>noscript</code>، <code>template</code></td><td>حقن السلوك، مهرب التحسين التدريجي، أجزاء صياغة خاملة.</td></tr>
+  </tbody>
+</table>
+
+<h3>جدول قرار اختيار العنصر</h3>
+
+<table>
+  <thead><tr><th>الحاجة</th><th>استخدم</th><th>لا</th></tr></thead>
+  <tbody>
+    <tr><td>نقرة تنفذ إجراءً</td><td><code>button</code></td><td><code>div</code>/<code>span</code> مع <code>onClick</code></td></tr>
+    <tr><td>نقرة تنقّل</td><td><code>a</code> مع <code>href</code></td><td>زر <code>button</code> يزيّف التنقل</td></tr>
+    <tr><td>طي/فتح محتوى</td><td><code>details</code> / <code>summary</code></td><td>أكورديون مخصص بلا دعم لوحة مفاتيح</td></tr>
+    <tr><td>طبقة فوقية عابرة</td><td><code>dialog</code> أو Popover API</td><td>مودال مخصص بلا إدارة تركيز</td></tr>
+    <tr><td>بيانات جدولية</td><td><code>table</code></td><td>شبكة من <code>div</code>s</td></tr>
+    <tr><td>شبكة تخطيط</td><td>CSS Grid</td><td><code>table</code></td></tr>
+    <tr><td>ضوابط نموذج مترابطة</td><td><code>fieldset</code> + <code>legend</code></td><td>إدخالات بلا تسميات</td></tr>
+    <tr><td>قائمة عناصر</td><td><code>ul</code> / <code>ol</code></td><td>عدة <code>div</code> أشقاء</td></tr>
+    <tr><td>أزواج تعريف</td><td><code>dl</code></td><td><code>div</code>s منسقة</td></tr>
+    <tr><td>توكيد مقابل أهمية قوية</td><td><code>em</code> / <code>strong</code></td><td><code>span</code> منسق وحده</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong><code>div</code> مع <code>onClick</code> ليس زراً.</strong> إنه التزام: لا لوحة مفاتيح، لا دور، لا اسم، لا تركيز، لا ارتباط بالنموذج حتى تبنيه كله بيدك. فضّل عنصر المنصة؛ اتجه إلى ARIA فقط عند فجوة دلالية (إمكانية الوصول مغطاة في <a href="./ui-ux-web-design.html">UI/UX وتصميم الويب</a>).</p>
+</blockquote>
+
+---
+
+<h2 id="sec-units-math-and-sizing">الوحدات، الحساب، والتحجيم</h2>
+
+<table>
+  <thead><tr><th>الوحدة</th><th>المعنى</th><th>استخدمها لـ</th></tr></thead>
+  <tbody>
+    <tr><td><code>px</code></td><td>بكسل CSS المطلق</td><td>الحدود، التحكم الدقيق، الخطوط الرفيعة</td></tr>
+    <tr><td><code>rem</code></td><td>حجم خط الجذر</td><td>الطباعة، التباعد، واجهة قابلة للتحجيم</td></tr>
+    <tr><td><code>em</code></td><td>حجم الخط المحلي</td><td>تحجيم نسبي للمكوّن — انتبه للتراكم</td></tr>
+    <tr><td><code>ch</code></td><td>عرض محرف <code>0</code></td><td>طول السطر، محاذاة أحادية العرض</td></tr>
+    <tr><td><code>%</code></td><td>نسبة إلى الكتلة الحاوية</td><td>تخطيط مرن</td></tr>
+    <tr><td><code>vw</code>/<code>vh</code></td><td>عرض/ارتفاع المنفذ</td><td>تخطيط ملء الشاشة (انتبه لشريط أدوات الجوال)</td></tr>
+    <tr><td><code>svh</code>/<code>lvh</code>/<code>dvh</code></td><td>ارتفاع منفذ صغير/كبير/ديناميكي</td><td>ارتفاع كامل آمِن لشريط عنوان الجوال</td></tr>
+    <tr><td><code>cqw</code>/<code>cqh</code></td><td>وحدات استعلام الحاوية</td><td>تحجيم نسبي للمكوّن تحت <code>@container</code></td></tr>
+    <tr><td><code>fr</code></td><td>مسار شبكي كسري</td><td>توزيع مسارات الشبكة</td></tr>
+  </tbody>
+</table>
+
+<p>فضل <code>rem</code> للنص والتباعد القابلين للتحجيم، <code>px</code> للحدود والتفاصيل الرفيعة، <code>%</code>/<code>fr</code>/<code>clamp()</code> للتخطيط المرن. استخدم <code>dvh</code> (مع بديل <code>vh</code>) للارتفاع الكامل في الجوال ليعيش شريط العنوان.</p>
+
+<h3>الدوال الحسابية</h3>
+
+<table>
+  <thead><tr><th>الدالة</th><th>استخدمها لـ</th></tr></thead>
+  <tbody>
+    <tr><td><code>calc()</code></td><td>حسابات وحدات مختلطة</td></tr>
+    <tr><td><code>min()</code></td><td>حد أعلى (تحجيم طرحي)</td></tr>
+    <tr><td><code>max()</code></td><td>حد أدنى</td></tr>
+    <tr><td><code>clamp()</code></td><td>طباعة/تباعد مرن بين حدين</td></tr>
+    <tr><td><code>round()</code>/<code>mod()</code></td><td>الالتقاط وحسابات تخطيط متقدمة</td></tr>
+  </tbody>
+</table>
+
+<pre><code>font-size: clamp(1rem, 0.5rem + 1vw, 1.25rem);
+padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
+
+---
+
+<h2 id="sec-responsive-strategy-and-layout-patterns">استراتيجية الاستجابة وأنماط التخطيط</h2>
+
+<p>الاستجابة حكم حول مكان الحد الفاصل، لا مجموعة بكسل ثابتة. اختر الأداة التي تطابق السياق.</p>
+
+<table>
+  <thead><tr><th>الحاجة</th><th>استخدم</th></tr></thead>
+  <tbody>
+    <tr><td>تغيير تخطيط على مستوى الصفحة/البيئة</td><td><code>@media</code></td></tr>
+    <tr><td>مكوّن يتكيف مع حاويته</td><td><code>@container</code></td></tr>
+    <tr><td>طباعة/تباعد مرن</td><td><code>clamp()</code></td></tr>
+    <tr><td>صور مرنة</td><td><code>max-width: 100%</code>، <code>srcset</code>، <code>sizes</code></td></tr>
+    <tr><td>قفزة شريط عنوان الجوال</td><td><code>dvh</code>/<code>svh</code>/<code>lvh</code></td></tr>
+    <tr><td>سلوك لمس مقابل تحويم</td><td><code>@media (hover: hover)</code> و <code>(pointer: coarse)</code></td></tr>
+    <tr><td>تباعد النتوء / مؤشر الرئيسية</td><td><code>env(safe-area-inset-*)</code></td></tr>
+  </tbody>
+</table>
+
+<h3>مكتبة أنماط التخطيط</h3>
+
+<table>
+  <thead><tr><th>النمط</th><th>أفضل أداة</th></tr></thead>
+  <tbody>
+    <tr><td>رصة عمودية</td><td>عمود Flex + <code>gap</code></td></tr>
+    <tr><td>عنقود أفقي</td><td>صف Flex + <code>wrap</code> + <code>gap</code></td></tr>
+    <tr><td>تخطيط شريط جانبي</td><td>مناطق مسماة في Grid أو flex</td></tr>
+    <tr><td>شبكة بطاقات</td><td>Grid + <code>auto-fit</code> + <code>minmax()</code></td></tr>
+    <tr><td>توسيط</td><td><code>place-items</code> في Grid أو توسيط flex</td></tr>
+    <tr><td>تداخل</td><td>تراص Grid (نفس الخلية / عناصر متطابقة)</td></tr>
+    <tr><td>رأس/تذييل لاصق</td><td>صفوف Grid + <code>position: sticky</code></td></tr>
+    <tr><td>كائن الوسائط</td><td>Grid أو flex</td></tr>
+    <tr><td>امتداد كامل داخل حاوية نص</td><td>Grid بأعمدة مسماة</td></tr>
+    <tr><td>شبيه بالفسيفساء (Masonry)</td><td>أعمدة CSS أو grid، <code>masonry</code> بحذر</td></tr>
+    <tr><td>جدول بيانات على الشاشات الصغيرة</td><td>تمرير أفقي، تحويل صفوف، أو تراص</td></tr>
+  </tbody>
+</table>
+
+<p>ابدأ بالجوال أولاً (أصغر منفذ كأساس، ثم حسّن صعوداً) — هذا هو عقد التحسين التدريجي مطبقاً على التخطيط.</p>
+
+---
+<h2 id="sec-forms-and-validation-platform-behavior-not-styled-inputs">النماذج والتحقق — سلوك المنصة، لا إدخالات منسقة</h2>
+
+<p>النموذج سلوك منصة أصلي: الإرسال، التركيز، التحقق، الملء التلقائي، وإمكانية لوحة المفاتيح كلها مدمجة. نسّقه، لا تعِد بناءه.</p>
+
+<table>
+  <thead><tr><th>الحاجة</th><th>استخدم</th></tr></thead>
+  <tbody>
+    <tr><td>نص قصير</td><td><code>input type="text"</code></td></tr>
+    <tr><td>بريد إلكتروني</td><td><code>input type="email"</code></td></tr>
+    <tr><td>هاتف</td><td><code>input type="tel"</code></td></tr>
+    <tr><td>رابط</td><td><code>input type="url"</code></td></tr>
+    <tr><td>رقم</td><td><code>input type="number"</code> أو نص مع <code>inputmode="numeric"</code></td></tr>
+    <tr><td>بحث</td><td><code>input type="search"</code></td></tr>
+    <tr><td>تاريخ</td><td><code>input type="date"</code></td></tr>
+    <tr><td>تاريخ + وقت</td><td><code>input type="datetime-local"</code></td></tr>
+    <tr><td>ملف</td><td><code>input type="file"</code></td></tr>
+    <tr><td>اختيار واحد</td><td>مجموعة أزرار راديو</td></tr>
+    <tr><td>اختيار متعدد</td><td>خانات اختيار</td></tr>
+    <tr><td>اختيارات كثيرة</td><td><code>select</code> أو combobox</td></tr>
+    <tr><td>نص طويل</td><td><code>textarea</code></td></tr>
+    <tr><td>إرسال</td><td><code>button type="submit"</code></td></tr>
+    <tr><td>إعادة تعيين</td><td>تجنبها إلا إذا كانت مفيدة فعلاً</td></tr>
+  </tbody>
+</table>
+
+<h3>قائمة تحقق النموذج</h3>
+<ul>
+  <li>كل إدخال له <code>label</code> حقيقي (النقرة تستهدفه، والاسم يأتي منه).</li>
+  <li>جمّع الحقول المترابطة بـ <code>fieldset</code> + <code>legend</code>.</li>
+  <li>استخدم الأنواع الصحيحة (<code>email</code>، <code>tel</code>، <code>url</code>، <code>number</code>، <code>search</code>، <code>date</code>، <code>password</code>) — لوحة مفاتيح الشاشة الصحيحة، والتحقق الصحيح.</li>
+  <li>استخدم قيم <code>autocomplete</code> (<code>email</code>، <code>name</code>، <code>country</code>، …) للملء التلقائي.</li>
+  <li>استخدم <code>required</code>، <code>min</code>/<code>max</code>، <code>minlength</code>/<code>maxlength</code>، <code>pattern</code> حيث يفيد.</li>
+  <li>استخدم <code>inputmode</code> و <code>enterkeyhint</code> للوحات مفاتيح الجوال.</li>
+  <li>لا تعطّل التكبير أبداً، ولا تكتم تحقق حقل لم يلمسه المستخدم: تحقق عند <code>blur</code>/<code>submit</code>، واستخدم <code>:user-invalid</code> للأخطاء بعد التفاعل — مطابق في <a href="./ui-ux-web-design.html">نماذج UI/UX</a>.</li>
+  <li>اربط الأخطاء بالحقل عبر <code>aria-describedby</code>.</li>
+  <li>احفظ إدخال المستخدم بعد فشل التحقق.</li>
+</ul>
+
+---
+
+<h2 id="sec-media-and-responsive-images">الوسائط والصور المتجاوبة</h2>
+
+<table>
+  <thead><tr><th>التقنية</th><th>استخدمها لـ</th></tr></thead>
+  <tbody>
+    <tr><td><code>srcset</code> + <code>sizes</code></td><td>تبديل الدقة</td></tr>
+    <tr><td><code>picture</code></td><td>التوجيه الفني وتبديل الصيغة (AVIF/WebP)</td></tr>
+    <tr><td><code>loading="lazy"</code></td><td>صور أسفل الطية</td></tr>
+    <tr><td><code>fetchpriority="high"</code></td><td>صورة البطل LCP</td></tr>
+    <tr><td><code>decoding="async"</code></td><td>فك ترميز غير حرج</td></tr>
+    <tr><td><code>aspect-ratio</code></td><td>منع انزياح التخطيط (CLS)</td></tr>
+    <tr><td><code>object-fit</code></td><td>سلوك القص/الملاءمة</td></tr>
+  </tbody>
+</table>
+
+<p>الفيديو: <code>controls</code> للضوابط الأصلية، <code>track</code> للترجمات/التعليقات، <code>preload</code> لاستراتيجية التحميل، <code>poster</code> كصورة نائبة، كتم/تشغيل تلقائي فقط للفيديو المحيطي الآمن. أعطِ أبعاداً دائماً (أو <code>aspect-ratio</code>) لتجنب CLS؛ حمّل الوسائط غير الحرجة بتكاسل؛ قدم <code>alt</code> للصور المعلوماتية و <code>alt=""</code> للزخرفية؛ ضع المحتوى ذا المعنى في HTML لا في صور الخلفية. التفاعل بين البودكاست/الصوت والترجمات يعيش في <a href="./ui-ux-web-design.html">UI/UX وتصميم الويب</a>.</p>
+
+---
+
+<h2 id="sec-typography-and-font-loading">الطباعة وتحميل الخطوط</h2>
+
+<p>الطباعة على الويب عقد تحميل + التفاف + تفاف — تحكم فيها تصريحياً.</p>
+
+<table>
+  <thead><tr><th>خاصية/ميزة</th><th>استخدمها لـ</th></tr></thead>
+  <tbody>
+    <tr><td>رصة <code>font-family</code> مع بدائل ويب</td><td>المرونة عندما يفشل خط</td></tr>
+    <tr><td><code>font-display: swap</code></td><td>تجنب النص غير المرئي (FOIT)</td></tr>
+    <tr><td><code>font-display: optional</code></td><td>تخطي انزياح التخطيط الذي يسببه الخط للخطوط غير الحرجة</td></tr>
+    <tr><td>تحميل مسبق <code>preload</code> لملفات الخط</td><td>تبديل نص حرج أسرع (بما يتوافق مع LCP)</td></tr>
+    <tr><td>الخطوط المتغيرة</td><td>أوزان/أنماط كثيرة من ملف واحد</td></tr>
+    <tr><td><code>font-optical-sizing</code></td><td>تعديلات بصرية عند الأحجام</td></tr>
+    <tr><td><code>text-rendering</code></td><td>بعناية، غالباً الافتراضي</td></tr>
+  </tbody>
+</table>
+
+<pre><code>--text-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+--text-title: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);</code></pre>
+
+<ul>
+  <li>نص الجسم ≥ 16px؛ ارتفاع السطر ~1.4–1.6؛ طول السطر ~45–75 محرفاً.</li>
+  <li>تجنب الأحرف الكبيرة كلها للنص الطويل؛ برّر فقط مع وصل مضبوط.</li>
+  <li>أبقِ تحجيم النص والتفاف مرنين — لا تُعلّقه أبداً عند عرض ثابت (انظر <a href="./ui-ux-web-design.html">UI/UX وتصميم الويب</a> لقرارات النسب/التباين).</li>
+</ul>
+
+---
+<h2 id="sec-color-systems-and-theming">أنظمة الألوان والتنسيق</h2>
+
+<table>
+  <thead><tr><th>الطبقة</th><th>مثال</th><th>الغرض</th></tr></thead>
+  <tbody>
+    <tr><td><strong>بدائية</strong></td><td><code>blue-500</code>، <code>gray-900</code></td><td>لوحة خام</td></tr>
+    <tr><td><strong>دلالية</strong></td><td><code>color-bg</code>، <code>color-text-muted</code>، <code>color-border</code></td><td>المعنى، لا الدرجة اللونية</td></tr>
+    <tr><td><strong>مكوّن</strong></td><td><code>button-bg</code>، <code>input-border</code></td><td>استخدام محدد النطاق</td></tr>
+    <tr><td><strong>حالة</strong></td><td><code>button-bg-hover</code>، <code>input-border-focus</code></td><td>التفاعل</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>الوضع</th><th>خطاف المنصة</th></tr></thead>
+  <tbody>
+    <tr><td>فاتح / داكن</td><td><code>prefers-color-scheme</code>، <code>color-scheme</code></td></tr>
+    <tr><td>تباين عالٍ</td><td><code>forced-colors</code></td></tr>
+    <tr><td>شفافية مخفضة</td><td><code>prefers-reduced-transparency</code></td></tr>
+    <tr><td>تنوع رؤية الألوان</td><td>لا تعتمد أبداً على اللون وحده</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>استخدم رموزاً دلالية، لا hex خام (انظر <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">"رموز لا أرقام سحرية"</a>)؛ رموز التصميم تنشأ في <a href="./ui-ux-web-design.html">UI/UX</a> وتعمل على خصائص مخصصة هنا.</li>
+  <li>حقق تباين WCAG AA؛ لا توصل باللون وحده.</li>
+  <li>اختبر الوضع الداكن مع الصور والظلال وألوان العلامة؛ واختبر وضع الألوان المفروضة.</li>
+  <li>اضبط بـ OKLCH/OKLAB لتوحيد إدراكي؛ قدم بدائل لمخرجات النطاق الواسع.</li>
+</ul>
+
+---
+
+<h2 id="sec-motion-and-transitions">الحركة والانتقالات</h2>
+
+<table>
+  <thead><tr><th>الأداة</th><th>استخدمها لـ</th></tr></thead>
+  <tbody>
+    <tr><td><code>transition</code></td><td>تغييرات حالة بسيطة</td></tr>
+    <tr><td><code>animation</code> / <code>@keyframes</code></td><td>حركة متعددة الخطوات أو متكررة</td></tr>
+    <tr><td>View Transitions</td><td>تحولات العنصر/الصفحة</td></tr>
+    <tr><td>FLIP</td><td>حركة فعالة بمساعدة JS</td></tr>
+    <tr><td><code>transform</code> / <code>opacity</code></td><td>حركة صديقة للمكمّل (compositor)</td></tr>
+    <tr><td><code>prefers-reduced-motion</code></td><td>تعطيل الحركة غير الأساسية</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>حرّك <code>transform</code>/<code>opacity</code>، لا خصائص التخطيط.</li>
+  <li>أبقِ المدد قصيرة للتغذية الراجعة؛ استخدم تسارعاً يطابق معنى الكائن.</li>
+  <li>احترم <code>prefers-reduced-motion</code>؛ لا تشغّل تلقائياً حركة مشتتة أبداً.</li>
+  <li>استخدم الحركة لشرح تغير الحالة — كمعنى، لا كزخرفة (المبدأ 8).</li>
+</ul>
+
+---
+
+<h2 id="sec-core-web-vitals-platform-knobs">مؤشرات الويب الأساسية ↔ مفاتيح المنصة</h2>
+
+<p>الأداء ميزة منصة تقوم بتهيئتها (<a href="#sec-principles-the-shared-constants">المبادئ</a>). كل مؤشر ويب أساسي يطابق ضوابط HTML/CSS محددة؛ المفاتيح هنا، وسير عمل القياس واستراتيجية العرض يعيش في <a href="./system-design.html">التصميم المعماري</a>.</p>
+
+<table>
+  <thead><tr><th>المؤشر</th><th>صلته بـ HTML/CSS</th></tr></thead>
+  <tbody>
+    <tr><td><strong>LCP</strong></td><td>صورة البطل (<code>fetchpriority="high"</code>، <code>preload</code>)، CSS حرج، تحميل الخط (<code>font-display: swap</code>)</td></tr>
+    <tr><td><strong>CLS</strong></td><td><code>aspect-ratio</code> والأبعاد على الوسائط، تبديل الخطوط، المحتوى المحقون، المساحة المحجوزة</td></tr>
+    <tr><td><strong>INP</strong></td><td>ضغط الخيط الرئيسي من CSS/JS ثقيل؛ مهام طويلة؛ حرّك خصائص المكمّل فقط</td></tr>
+  </tbody>
+</table>
+
+<p><strong>مملوك في مكان آخر — حدود محترمة:</strong> منهجية قياس الأداء و CWV مملوكة لـ <a href="./system-design.html">التصميم المعماري</a>؛ استراتيجية عرض المتصفح (SSR/RSC/Islands، البث، التميؤ) مملوكة لـ <a href="./system-design.html">التصميم المعماري</a> و <a href="./frontend-camps-survey.html">مسح معسكرات الواجهة الأمامية</a>؛ عمق التفاعل/التركيز/النموذج لـ <a href="./javascript-the-language.html">مستندات JavaScript</a>؛ سير عمل اختبار إمكانية الوصول لـ <a href="./ui-ux-web-design.html">UI/UX وتصميم الويب</a>. هذا المستند يملك ضوابط المنصة التي تحقق تلك الأنظمة فعلياً.</p>
+
+---
+---
+
+<h2 id="sec-methodologies-named-frameworks">المنهجيات / الأطر المسماة</h2>
 
 <p>توجد مقاربات تأليف مسماة متعددة. لا واحدة قانونية؛ كل تحزم الإيقاع لسياق مختلف.</p>
 
@@ -421,7 +700,7 @@
 
 ---
 
-<h2>٨. المبادئ — الثوابت المشتركة</h2>
+<h2 id="sec-principles-the-shared-constants">المبادئ — الثوابت المشتركة</h2>
 
 <p>عبر كل منهجية، ثماني مبادئ تصمد (مستخلصة من مواصفات HTML/CSS، WCAG، وثوابت المنصة):</p>
 
@@ -438,7 +717,7 @@
 
 ---
 
-<h2>٩. مثال مُفصل — "مكوّن بطاقة ينجو من المحتوى، RTL، الوضع الداكن، وقارئ الشاشة"</h2>
+<h2 id="sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader">مثال مُفصل — "مكوّن بطاقة ينجو من المحتوى، RTL، الوضع الداكن، وقارئ الشاشة"</h2>
 
 <p>مشكلة بطاقة واقعية، مشية من النهاية للنهاية عبر الإيقاع.</p>
 
@@ -473,7 +752,7 @@
 <p>لماذا هذه العناصر:</p>
 <ul>
   <li><code><article></code> — تكوين مستقل (قارئ الشاشة: "مقالة").</li>
-  <li><code><header></code> + <code><h2></code> — بنية عناوين لهيكل المستند.</li>
+  <li><code>&lt;header&gt;</code> + <code>&lt;h2&gt;</code> — بنية عناوين لهيكل المستند.</li>
   <li><code><img alt=""></code> — صورة زخرفية (alt="" يزيل من AOM). إذا معلوماتية، alt يصف المحتوى.</li>
   <li><code><button type="button"></code> — قابل للتشغيل بلوحة مفاتيح، لا يرسل شيئاً (لا نموذج).</li>
   <li><code><a href></code> — رابط حقيقي، يعمل بلا JS، يظهر في دوّار الروابط.</li>
@@ -608,7 +887,7 @@
 </code></pre>
 <ul>
   <li>شارة: <code>aria-label</code> يعطيها اسماً (إلا "جديد" غامض).</li>
-  <li>عنوان: <code><h2></code> في <code><article></code> = تسلسل عناوين سليم.</li>
+  <li>عنوان: <code>&lt;h2&gt;</code> في <code>&lt;article&gt;</code> = تسلسل عناوين سليم.</li>
   <li>صورة: <code>alt=""</code> = مخفية من AOM (زخرفية). إذا معلوماتية، <code>alt="صورة لـ..."</code>.</li>
   <li>زر: <code><button></code> أصلي = لوحة مفاتيح + دور + تركيز + اسم من نص.</li>
   <li>رابط: <code><a href></code> أصلي = يظهر في دوّار الروابط، يعمل بلا JS.</li>
@@ -619,7 +898,7 @@
 <table>
   <thead><tr><th>الجانب</th><th>ساذجة (div soup + فئات أدوات)</th><th>مصممة (HTML دلالي + رموز + ميزات منصة)</th></tr></thead>
   <tbody>
-    <tr><td>HTML</td><td><code><div class="card"><div class="title">...<div onclick>...</td><td><code><article><header><h2>...<button>...</td></tr>
+    <tr><td>HTML</td><td><code><div class="card"><div class="title">...<div onclick>...</td><td><code>&lt;article&gt;&lt;header&gt;&lt;h2&gt;...&lt;button&gt;...</td></tr>
     <tr><td>شجرة AOM</td><td>divs عامة، لا أدوار، لا عناوين، onclick ليس لوحة مفاتيح</td><td>مقالة → عنوان → زر/رابط. قابل للتشغيل بالكامل.</td></tr>
     <tr><td>وضع داكن</td><td>ألوان مبرمجة؛ اختراق <code>filter: invert</code> يكسر صور</td><td>تبديل رموز؛ OKLCH تحفظ العلامة التجارية؛ صور سليمة</td></tr>
     <tr><td>RTL</td><td><code>direction: rtl</code> يدوي + تجاوزات هامش</td><td>خصائص منطقية + انعكاس flex/grid أصلي</td></tr>
@@ -642,7 +921,7 @@
 
 ---
 
-<h2>١٠. أكثر أوضاع الفشل شيوعاً</h2>
+<h2 id="sec-the-most-common-failure-modes">أكثر أوضاع الفشل شيوعاً</h2>
 
 <table>
   <thead><tr><th>وضع الفشل</th><th>ما يبدو عليه</th><th>لماذا يحدث</th></tr></thead>
@@ -742,7 +1021,7 @@
 
 ---
 
-<h2>١١. النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
 
 <p>المنصة جيدة فقط بقدر الأدوات التي تجعل أولياتها مرئية، قابلة للاختبار، وقابلة للمشاركة. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
 
@@ -816,8 +1095,6 @@
 
 ---
 
-<h2>١٢. المستقبل — أين يتجه HTML و CSS</h2>
-
 <table>
   <thead><tr><th>إشارة (2024–2026)</th><th>ما يعنيه للمنصة</th></tr></thead>
   <tbody>
@@ -870,7 +1147,7 @@
 
 ---
 
-<h2>١٣. ملخص — قائمة تحقق المنصة</h2>
+<h2 id="sec-summary-the-platform-checklist">ملخص — قائمة تحقق المنصة</h2>
 
 <p>قبل شحن أي HTML/CSS، تحقق:</p>
 

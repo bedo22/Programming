@@ -12,7 +12,7 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 
 ## Per-doc status (41 EN / 18 twins, measured 2026-08-10, Tier 0; corrected at v11)
 
-### Twins — ✅ AR-OK (9)
+### Twins — ✅ AR-OK (10)
 | doc | EN h2 | AR h2 |
 |---|---|---|
 | cs-and-software-engineering | 23 | 23 |
@@ -24,15 +24,13 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 | design-thinking | 20 | 20 |
 | api-design | 25 | 25 |
 | ui-ux-web-design | 18 | 18 |
-| design-thinking | 20 | 20 |
-| api-design | 25 | 25 |
+| html-and-css | 23 | 23 |
 
-### Twins — ⏳ LAGGING (9, ordered by gap size)
+### Twins — ⏳ LAGGING (8, ordered by gap size)
 | doc | EN h2 | AR h2 | gap | tier |
 |---|---|---|---|---|
 | class-to-hooks-paradigm-shift | 35 | 19 | 16 | T2 |
 | software-development-process | 34 | 19 | 15 | T2 |
-| html-and-css | 26 | 18 | 8 | T1 |
 | system-design | 24 | 16 | 8 | T2 |
 | angular-evolution | 23 | 10 | 13 | T3 |
 | javascript-the-language | 19 | 12 | 7 | T3 |
@@ -49,6 +47,7 @@ algorithms-and-data-structures, backend-engineering, beyond-the-browser, data-mo
 - **T0 · anchors + bootstrap** — ✅ done (v10): ids on all EN h2s + AR parity twins; AGENTS.md + this ledger; anchor-ref conversion deferred to each doc's own pass.
 - **T0.5 · surgical fills + per-doc passes** — ✅ done (v11): problem-solving § two-sum + version-control § debugging across time translated; both twins de-numbered, id-anchored, all visible `§`-refs remapped to anchor links (incl. cross-doc: 3 Testing & Debugging anchors, 2 Problem-Solving anchors, bisect-cell + stale api-design §1d→§4 fixes); orphan §7b refs fixed (doc has no 7b); version-control AR ratio 0.36 → 0.55.
 - **T1 · lettered fills** — what-is-state-prequel (first), ui-ux, design-thinking, api-design, html-and-css, how-developers-think-frontend.
+- **T1.4 · html-and-css — ✅ done (v16)**: 10 sections translated (6 practical-surface intro (was missing — AR §6 was the interlude promoted to an h2), 6b platform primitives 9-row + 10-row decision table + div≠button callout, 6c units 9-row + math functions 5-row + verbatim clamp pre, 6d responsive 7-row + layout patterns 11-row + mobile-first para, 6e forms 15-row + 9-item checklist, 6f media 7-row + video para, 6g typography 7-row + verbatim pre + 3 bullets, 6h color 4+4 tables + 4 bullets, 6i motion 6-row + 4 bullets, 6j CWV 3-row + owned-elsewhere para); **v10 anchor-pass regression root-caused + repaired**: EN code-sample h2s (`<code><h2>` in §9 tail list + step-6 table) had giant id-attrs swallowing ~7KB of visible content — restored as escaped `&lt;h2&gt;` samples (no refs targeted them); same author-original unclosed samples escaped in AR; AR interlude «٦. الإيقاع» h2 DEMOTED (EN has it as an unheaded standalone para) and missing §6 practical-surface inserted; author-invented «١٢. المستقبل» h2 DEMOTED (EN keeps its future table inside §11) + ملخص renumbered ١٣→١٢; both twins' «§9 in UI/UX» cross-ref text → real links to ui-ux worked-example anchor; EN §1.3/§5×3/§6e/§6f/§7/§8/§6h/§6i remapped, AR cross-doc prefix fix (`../javascript-the-language` → `./` — twin exists); de-numbered both, AR id pass 23/23; gates green (h2 23/23 visible, h3 17/17, pre 7/7, ids identical, zero stray § (all inside links), ratio 0.84).
 - **T1.0 · what-is-state-prequel — ✅ done (v12)**: 8 sections translated (3b definition+2 tables, 3c state-changes w/ verbatim pre, 5b mental-models table, 6b lifecycle/ownership, 6c derived/cache/config w/ React setCount pre, 6d identity vs state, 6e failure modes, 6f principles) + §5 examples+test para, §6 lifetime-table 5 rows (DB/URL/cookie·localStorage/server session/cache), stateful-vs-stateless paras, continue-reading para replacing 2 stale §7 refs; ENIAC-bullet factual sync; stale refs fixed („باقي §0“, §1, §4, §6) + tanwin-order normalization; both twins de-numbered (h2+h3), AR id pass 15/15 identical, all visible §/&sect; remapped (EN: von-Neumann + types links, 4 §-links, 9c/10b cross-doc); gates green (h2 15/15, h3 8/8, zero visible-§, ids identical, tags balanced, ratio 0.80 in calibrated band) — pending-only: 2 cross-doc frags into class-to-hooks AR twin (T2).
 - **T1.1 · ui-ux-web-design — ✅ done (v13)**: 3 sections translated (8b common interface patterns: 12 decision-table rows + state-matrix 15 rows + forms/IA/loading/visual-fundamentals/motion; 8c research methods 10-row + usability metrics + severity/triage + a11y testing workflow; 8d dark patterns 9-row + permission UX + localization/i18n + inclusive design 10-row); pre-existing drift fixed: AR §9 was missing Steps 5–6 (token mapping w/ verbatim tokens.json pre + naive-vs-designed table) — inserted; de-numbered both twins (h2+h3), AR h2 id pass 18/18 identical to EN, EN §9×2 + §8b remapped to anchors, AR reversed-token (٩§) → anchor; gates green (h2 18/18, h3 28/28, zero visible-§, ids identical, tags balanced, ratio 0.80).
 - **T1.2 · design-thinking — ✅ done (v14)**: 4 sections translated (8b synthesis: affinity/empathy/journey/POV-madlib tables; 8c ideation + prototype taxonomy: HMW/Crazy 8s/Worst-idea/roleplay/scale-matrix + concierge/Wizard-of-Oz/painted-door/concept-video; 8d desirability testing + handoff artifacts + layered-handoff callout; 8e room & org: HiPPO/buyer-vs-user/extractive research); AR §9 REPLACED by EN's full worked example (5 stages + verbatim insight pre + artifacts para) — flagged revert option if the old condensed table was intentional; pre-existing drift fixed: AR §10 academic-critique para upgraded to h3+3 bullets+thread (Norman year corrected 2023→2019), AR §12 future table +co-design row + heading subtitle «— أين يتجه»; stale EN §1d×2 → system-design #sec-intersection-with-neighbors (doc has no 1d) + §3b/§6/§7/§9/§10/§12 remapped; de-numbered both twins (h2 numeric; AR latin-letter suffixes 8b-8e too), AR h2 id pass 20/20; gates green (h2 20/20, h3 15/15, ids identical, zero visible-§, tags balanced, ratio 0.79) — pending: 2 cross-doc frags → system-design AR twin (T2).
@@ -63,7 +62,9 @@ Per-doc gates (translate-to-arabic skill): visible h2 parity, name parity, zero 
 ## Known follow-ups
 
 - `income-stream-landscape.html` + (legacy `s0`–`s8` ids were **not found** in what-is-state twins at v12 — line can be dropped; income-stream-landscape still carries them) — kept (links may target them); rename during their own pass.
-- EN `html-and-css.html` has **3 unclosed `</h2>`** in the a11y sections (`heading-structure…`, `proper-heading-hierarchy…`, `a11y-tree…`) — pre-existing at HEAD, id-backed now; repair during its T1 fill.
+- **v16 html-and-css**: the 3 „unclosed `</h2>`“ were **v10 anchor-pass corruption** of code-sample text (giant id blobs swallowing visible content, `a11y-tree` section id was also one) — fixed by escaping the sample tags (`&lt;h2&gt;`); also escaped AR's author-original unclosed samples. **Shelf-wide `<code><h2` scan pending in final pass** (this was the only doc carrying code-sample h2s so far: EN 3 sites + AR 3 sites, all fixed).
 - **v12 pair hygiene**: what-is-state EN+AR de-numbered (h2/h3), AR twin got full 15-id set, all visible `§`/`&sect;` remapped (4 new links: §1→theories, §5→distinction, §6→lifetime, §6c→derived + cross-doc 9c/10b → class-to-hooks anchors); **PENDING** `ar/what-is-state-prequel.html` → `./class-to-hooks-paradigm-shift.html#sec-…` (10b/9c ids) — land at T2; EN ratio 0.80 (in calibrated band), version-control 0.55 stays flagged until its own density audit.
 - EN `problem-solving.html` still holds `§`-style pointers *inside* `<pre>` sample code (e.g., code comments) — house rule exempts pre content; visible prose is zero-`§`.
 - design-thinking AR §9 has its own worked example vs EN's — parity decision pending.
+- EN html-and-css (v16) remapped «§5 "State lives in attributes" / "Tokens over magic numbers"» quotes keep the §-link text only outside quotes — cosmetic, fine.
+- AR html-and-css (v16) — interlude & future-table demotions are content-preserving (no text lost); revert = re-add h2s if ever wanted.

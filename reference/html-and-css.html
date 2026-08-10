@@ -23,11 +23,11 @@
   <p>Most tutorials teach "the flexbox shortcut" or "CSS Grid in 15 minutes." HTML & CSS starts at <em>what is the platform contract that every CSS rule manipulates?</em> It is a distinct discipline with its own history, algorithms, and failure modes — not "styling" as decoration, not "Tailwind vs CSS-in-JS" as a religion, not "semantic HTML" as a checklist. This doc captures it as a first-class engineering concern: the declarative, cascading, accessible-by-default rendering substrate that UI/UX decisions materialize on, the Developer Loop executes against, and JavaScript manipulates. If you've ever debugged a layout shift, a specificity war, a dark-mode breakage, or a screen reader that reads "button" on a <code><div></code> — this is the layer you missed.</p>
 </section>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone. Cross-links:</p>
 <ul>
-  <li>Upstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — UI/UX decides what the rendered thing <em>should be</em>; HTML & CSS is the substrate it renders <em>on</em>. The state visibility matrix (§9 in UI/UX) maps directly to HTML states (<code>aria-busy</code>, <code>aria-invalid</code>) and CSS states (<code>:hover</code>, <code>:focus-visible</code>, <code>[data-loading]</code>).</li>
+  <li>Upstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — UI/UX decides what the rendered thing <em>should be</em>; HTML & CSS is the substrate it renders <em>on</em>. The state visibility matrix (<a href="./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns">§9 in UI/UX</a>) maps directly to HTML states (<code>aria-busy</code>, <code>aria-invalid</code>) and CSS states (<code>:hover</code>, <code>:focus-visible</code>, <code>[data-loading]</code>).</li>
   <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — the developer loop builds components using HTML elements and CSS rules as primitives. The loop's "shape" decisions (component API, state shape) are constrained by what the platform makes expressible.</li>
   <li>Cross-cutting to <a href="./javascript-the-language.html">JavaScript: The Language</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them.</li>
   <li>Cross-cutting to <a href="./system-design.html">System Design</a> — rendering strategy (SSR, RSC, Islands, SPA) is a decision about <em>who emits the initial HTML and when CSS arrives</em>. The platform contract (HTML parsing, CSS blocking, font loading) is the ground truth every strategy negotiates with.</li>
@@ -45,7 +45,7 @@
 </blockquote>
 
 ---
-<h2 id="sec-definition-what-html-css-is-and-what-it-is-not">1. Definition — what HTML & CSS <em>is</em> and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-html-css-is-and-what-it-is-not">Definition — what HTML & CSS <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
 
@@ -78,7 +78,7 @@
 </table>
 
 ---
-<h2 id="sec-history-from-sgml-docs-to-the-living-standard">2. History — from SGML docs to the living standard</h2>
+<h2 id="sec-history-from-sgml-docs-to-the-living-standard">History — from SGML docs to the living standard</h2>
 
 <table>
   <thead><tr><th>Period</th><th>Milestone</th><th>Key Figures / Works</th><th>What shifted</th></tr></thead>
@@ -141,7 +141,7 @@
 </table>
 
 ---
-<h2 id="sec-evolution-constraint-inversions-across-the-platform">3. Evolution — constraint inversions across the platform</h2>
+<h2 id="sec-evolution-constraint-inversions-across-the-platform">Evolution — constraint inversions across the platform</h2>
 
 <p>The core idea — <em>a declarative document that renders everywhere</em> — did not change. What changed is the dominant constraint, and the platform feature that absorbed it:</p>
 
@@ -162,7 +162,7 @@
 <p>The pattern repeats: when the dominant constraint changes (no layout → separation → flexible 1D → flexible 2D → component-responsive → collision-free cascade → ergonomic authoring → declarative interaction), the old feature's ergonomics become friction and a new platform feature absorbs the constraint.</p>
 
 ---
-<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">4. Intersection with neighbors — where it borders other practices</h2>
+<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">Intersection with neighbors — where it borders other practices</h2>
 
 <table>
   <thead><tr><th>Practice</th><th>Shared DNA</th><th>Where they diverge</th></tr></thead>
@@ -211,7 +211,7 @@
 </table>
 
 ---
-<h2 id="sec-underlying-theory-the-algorithms-the-platform-runs">5. Underlying theory — the algorithms the platform runs</h2>
+<h2 id="sec-underlying-theory-the-algorithms-the-platform-runs">Underlying theory — the algorithms the platform runs</h2>
 
 <table>
   <thead><tr><th>Theory / Algorithm</th><th>Spec / Origin</th><th>What the platform does with it</th></tr></thead>
@@ -269,7 +269,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-mental-models-how-platform-engineers-actually-reason">5b. Mental models — how platform engineers actually reason</h2>
+<h2 id="sec-mental-models-how-platform-engineers-actually-reason">Mental models — how platform engineers actually reason</h2>
 
 <p>The theories above are the guardrails. The mental models are how you navigate inside them. Each model compresses the theories for a specific decision context:</p>
 
@@ -346,13 +346,13 @@
 </blockquote>
 
 ---
-<h2 id="sec-practical-surface-the-controls-the-platform-hands-you">6. Practical surface — the controls the platform hands you</h2>
+<h2 id="sec-practical-surface-the-controls-the-platform-hands-you">Practical surface — the controls the platform hands you</h2>
 
-<p>The theory in §5 is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
+<p>The theory in <a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
 
-<h2 id="sec-html-platform-primitives-the-kitchen-it-ships-with">6b. HTML platform primitives — the kitchen it ships with</h2>
+<h2 id="sec-html-platform-primitives-the-kitchen-it-ships-with">HTML platform primitives — the kitchen it ships with</h2>
 
-<p>Semantic HTML is the accessibility API (§1.3). This is the working map of what the platform gives you before any CSS or JS.</p>
+<p>Semantic HTML is the accessibility API (<a href="#sec-definition-what-html-css-is-and-what-it-is-not"><a href="#sec-definition-what-html-css-is-and-what-it-is-not">§1.3</a></a>). This is the working map of what the platform gives you before any CSS or JS.</p>
 
 <table>
   <thead><tr><th>Category</th><th>Elements / APIs</th><th>Why it matters</th></tr></thead>
@@ -362,8 +362,8 @@
     <tr><td><strong>Text semantics</strong></td><td><code>p</code>, <code>h1</code>–<code>h6</code>, <code>strong</code>, <code>em</code>, <code>mark</code>, <code>time</code>, <code>code</code>, <code>abbr</code>, <code>blockquote</code></td><td>Meaning + styling hooks + reading structure without guesswork.</td></tr>
     <tr><td><strong>Lists</strong></td><td><code>ul</code>, <code>ol</code>, <code>dl</code>, <code>li</code>, <code>dt</code>, <code>dd</code></td><td>Grouping semantics, counted lists, term/definition pairs — not "bullets."</td></tr>
     <tr><td><strong>Tables</strong></td><td><code>table</code>, <code>thead</code>, <code>tbody</code>, <code>caption</code>, <code>th</code>, <code>td</code>, <code>scope</code></td><td>Tabular data with header association; part of the <code>table</code> AOM contract.</td></tr>
-    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (§6e).</td></tr>
-    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (§6f).</td></tr>
+    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (<a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs"><a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs">§6e</a></a>).</td></tr>
+    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (<a href="#sec-media-and-responsive-images"><a href="#sec-media-and-responsive-images">§6f</a></a>).</td></tr>
     <tr><td><strong>Disclosure & dialog</strong></td><td><code>details</code>, <code>summary</code>, <code>dialog</code>, Popover API</td><td>Native expand/collapse and overlays before any JS — keyboard and focus included.</td></tr>
     <tr><td><strong>Scripting boundary</strong></td><td><code>script</code>, <code>noscript</code>, <code>template</code></td><td>Behavior injection, progressive-enhancement escape hatch, inert markup fragments.</td></tr>
   </tbody>
@@ -391,7 +391,7 @@
   <p><strong>A <code>div</code> with <code>onClick</code> is not a button.</strong> It is a liability: no keyboard, no role, no name, no focus, no form association until you hand-roll all of it. Prefer the platform control; reach for ARIA only when semantics gap (accessibility is covered in <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>).</p>
 </blockquote>
 
-<h2 id="sec-units-math-and-sizing">6c. Units, math, and sizing</h2>
+<h2 id="sec-units-math-and-sizing">Units, math, and sizing</h2>
 
 <table>
   <thead><tr><th>Unit</th><th>Meaning</th><th>Use for</th></tr></thead>
@@ -426,7 +426,7 @@
 <pre><code>font-size: clamp(1rem, 0.5rem + 1vw, 1.25rem);
 padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
-<h2 id="sec-responsive-strategy-and-layout-patterns">6d. Responsive strategy and layout patterns</h2>
+<h2 id="sec-responsive-strategy-and-layout-patterns">Responsive strategy and layout patterns</h2>
 
 <p>Responsiveness is a judgment of where the boundary lives, not a fixed pixel set. Pick the tool that matches the context.</p>
 
@@ -464,7 +464,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 <p>Start mobile-first (smallest viewport base, enhance upward) — this is the progressive-enhancement contract applied to layout.</p>
 
-<h2 id="sec-forms-and-validation-platform-behavior-not-styled-inputs">6e. Forms and validation — platform behavior, not styled inputs</h2>
+<h2 id="sec-forms-and-validation-platform-behavior-not-styled-inputs">Forms and validation — platform behavior, not styled inputs</h2>
 
 <p>A form is native platform behavior: submission, focus, validation, autofill, and keyboard accessibility come built in. Style it, don't rebuild it.</p>
 
@@ -502,7 +502,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
   <li>Preserve user input after a validation failure.</li>
 </ul>
 
-<h2 id="sec-media-and-responsive-images">6f. Media and responsive images</h2>
+<h2 id="sec-media-and-responsive-images">Media and responsive images</h2>
 
 <table>
   <thead><tr><th>Technique</th><th>Use for</th></tr></thead>
@@ -519,7 +519,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 <p>Video: <code>controls</code> for native controls, <code>track</code> for captions/subtitles, <code>preload</code> for load strategy, <code>poster</code> as a placeholder, muted/autoplay only for safe ambient video. Always give dimensions (or <code>aspect-ratio</code>) to avoid CLS; lazy-load non-critical media; provide <code>alt</code> for informative images and <code>alt=""</code> for decorative ones; put meaningful content in HTML, not background images. Podcast/audio and captions interplay lives in <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>.</p>
 
-<h2 id="sec-typography-and-font-loading">6g. Typography and font loading</h2>
+<h2 id="sec-typography-and-font-loading">Typography and font loading</h2>
 
 <p>Typography on the web is a loading + wrapping + wrapping contract — control it declaratively.</p>
 
@@ -545,7 +545,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
   <li>Keep type scaling and wrapping fluid — never captured at a fixed width (see <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> for proportion/contrast decisions).</li>
 </ul>
 
-<h2 id="sec-color-systems-and-theming">6h. Color systems and theming</h2>
+<h2 id="sec-color-systems-and-theming">Color systems and theming</h2>
 
 <table>
   <thead><tr><th>Layer</th><th>Example</th><th>Purpose</th></tr></thead>
@@ -568,13 +568,13 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </table>
 
 <ul>
-  <li>Use semantic tokens, not raw hex (see §5 "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
+  <li>Use semantic tokens, not raw hex (see <a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
   <li>Meet WCAG AA contrast; don't communicate by color alone.</li>
   <li>Test dark mode with images, shadows, brand colors; test forced-colors mode.</li>
   <li>Adjust with OKLCH/OKLAB for perceptual uniformity; provide fallbacks for wide-gamut output.</li>
 </ul>
 
-<h2 id="sec-motion-and-transitions">6i. Motion and transitions</h2>
+<h2 id="sec-motion-and-transitions">Motion and transitions</h2>
 
 <table>
   <thead><tr><th>Tool</th><th>Use for</th></tr></thead>
@@ -595,9 +595,9 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
   <li>Use motion to explain state change — as meaning, not decoration (Principle 8).</li>
 </ul>
 
-<h2 id="sec-core-web-vitals-platform-knobs">6j. Core Web Vitals ↔ platform knobs</h2>
+<h2 id="sec-core-web-vitals-platform-knobs">Core Web Vitals ↔ platform knobs</h2>
 
-<p>Performance is a platform feature you configure (§8). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>.</p>
+<p>Performance is a platform feature you configure (<a href="#sec-principles-the-shared-constants"><a href="#sec-principles-the-shared-constants">§8</a></a>). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>.</p>
 
 <table>
   <thead><tr><th>Metric</th><th>HTML/CSS relevance</th></tr></thead>
@@ -611,7 +611,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 <p><strong>Owned elsewhere — boundaries respected:</strong> performance and CWV measurement methodology is owned by <a href="./system-design.html">System Design</a>; browser-rendering strategy (SSR/RSC/Islands, streaming, hydration) is owned by <a href="./system-design.html">System Design</a> and <a href="./frontend-camps-survey.html">Frontend Camps Survey</a>; interaction/focus/model depth by the <a href="./javascript-the-language.html">JavaScript</a> docs; accessibility testing workflow by <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a>. This doc owns the platform controls that make those systems actual.</p>
 
 ---
-<h2 id="sec-methodologies-named-frameworks">7. Methodologies / named frameworks</h2>
+<h2 id="sec-methodologies-named-frameworks">Methodologies / named frameworks</h2>
 
 <p>Multiple named authoring approaches exist. None is canonical; each packages the rhythm for a different context.</p>
 
@@ -678,7 +678,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 <p>All nine share the same DNA: <em>write semantic HTML → let the cascade resolve → scope styles to components → encode decisions as tokens → validate in browser → iterate</em>. The differences are authoring ergonomics, scoping mechanism, and where the token source lives.</p>
 
 ---
-<h2 id="sec-principles-the-shared-constants">8. Principles — the shared constants</h2>
+<h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
 <p>Across every methodology, eight principles hold (synthesized from the HTML/CSS specs, WCAG, and platform invariants):</p>
 
@@ -694,7 +694,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </ol>
 
 ---
-<h2 id="sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader">9. Worked example — "A Card Component That Survives Content, RTL, Dark Mode, and a Screen Reader"</h2>
+<h2 id="sec-worked-example-a-card-component-that-survives-content-rtl-dark-mode-and-a-screen-reader">Worked example — "A Card Component That Survives Content, RTL, Dark Mode, and a Screen Reader"</h2>
 
 <p>A realistic card problem, walked end-to-end through the rhythm.</p>
 
@@ -729,7 +729,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 <p>Why these elements:</p>
 <ul>
   <li><code><article></code> — self-contained composition (screen reader: "article").</li>
-  <li><code><header></code> + <code><h2 id="sec-heading-structure-for-document-outline-decorative-image-alt-removes-from-aom-if-informative-alt-describes-content-keyboard-operable-submits-nothing-no-form-real-link-works-without-js-appears-in-link-rotor-step-2-css-layout-with-grid-intrinsic-content-aware-step-3-container-queries-component-owns-its-responsive-logic-the-card-adapts-to-its-own-width-not-the-viewport-in-a-sidebar-narrow-it-stacks-in-main-wide-it-s-horizontal-no-media-query-needed-step-4-dark-mode-rtl-reduced-motion-zero-extra-css-dark-mode-tokens-swap-via-media-prefers-color-scheme-dark-oklch-preserves-perceptual-lightness-no-vibrating-brand-colors-rtl-logical-properties-margin-inline-start-padding-inline-end-border-inline-start-mirror-automatically-flex-grid-honor-dir-rtl-on-the-badge-stays-leading-footer-actions-reverse-reduced-motion-media-prefers-reduced-motion-reduce-zeros-motion-tokens-transitions-become-instant-no-vestibular-triggers-high-contrast-forced-colors-media-forced-colors-active-disables-backgrounds-shadows-system-colors-take-over-border-1px-solid-canvastext-ensures-visibility-step-5-screen-reader-verification-aom-diff-badge-aria-label-gives-it-a-name-otherwise-new-is-ambiguous-heading-in-proper-heading-hierarchy-image-alt-hidden-from-aom-decorative-if-informative-alt-photo-of-button-native-keyboard-role-focus-name-from-text-link-native-appears-in-link-rotor-works-without-js-step-6-naive-vs-designed-comparison-aspectnaive-div-soup-utility-classes-designed-semantic-html-tokens-platform-features-html-a11y-treegeneric-divs-no-roles-no-headings-onclick-not-keyboardarticle-heading-button-link-fully-operable-dark-modehardcoded-colors-filter-invert-hack-breaks-imagestoken-swap-oklch-preserves-brand-images-untouched-rtlmanual-direction-rtl-margin-overrideslogical-properties-native-flex-grid-mirroring-responsiveviewport-media-queries-breaks-in-sidebarcontainer-query-adapts-to-parent-width-reduced-motionanimations-still-run-vestibular-triggermotion-tokens-zeroed-instant-transitions-high-contrastbackgrounds-shadows-invisible-border-goneforced-colors-media-query-preserves-borders-maintenancemagic-numbers-everywhere-drift-guaranteedsingle-token-file-change-propagates-everywhere-artifacts-produced-semantic-html-template-the-aom-contract-css-module-with-grid-layout-container-query-logical-properties-token-file-css-custom-properties-oklch-light-dark-reduced-motion-forced-colors-focus-visible-ring-spec-consistent-across-all-interactive-elements-container-query-breakpoint-map-per-component-not-global-aom-verification-checklist-run-in-voiceover-nvda-axe-10-the-most-common-failure-modes"></code> — heading structure for document outline.</li>
+  <li><code><header></code> + <code>&lt;h2&gt;</code> — heading structure for document outline.</li>
   <li><code><img alt=""></code> — decorative image (alt="" removes from AOM). If informative, alt describes content.</li>
   <li><code><button type="button"></code> — keyboard operable, submits nothing (no form).</li>
   <li><code><a href></code> — real link, works without JS, appears in link rotor.</li>
@@ -864,7 +864,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </code></pre>
 <ul>
   <li>Badge: <code>aria-label</code> gives it a name (otherwise "New" is ambiguous).</li>
-  <li>Heading: <code><h2 id="sec-in-proper-heading-hierarchy-image-alt-hidden-from-aom-decorative-if-informative-alt-photo-of-button-native-keyboard-role-focus-name-from-text-link-native-appears-in-link-rotor-works-without-js-step-6-naive-vs-designed-comparison-aspectnaive-div-soup-utility-classes-designed-semantic-html-tokens-platform-features-html-a11y-treegeneric-divs-no-roles-no-headings-onclick-not-keyboardarticle-heading-button-link-fully-operable-dark-modehardcoded-colors-filter-invert-hack-breaks-imagestoken-swap-oklch-preserves-brand-images-untouched-rtlmanual-direction-rtl-margin-overrideslogical-properties-native-flex-grid-mirroring-responsiveviewport-media-queries-breaks-in-sidebarcontainer-query-adapts-to-parent-width-reduced-motionanimations-still-run-vestibular-triggermotion-tokens-zeroed-instant-transitions-high-contrastbackgrounds-shadows-invisible-border-goneforced-colors-media-query-preserves-borders-maintenancemagic-numbers-everywhere-drift-guaranteedsingle-token-file-change-propagates-everywhere-artifacts-produced-semantic-html-template-the-aom-contract-css-module-with-grid-layout-container-query-logical-properties-token-file-css-custom-properties-oklch-light-dark-reduced-motion-forced-colors-focus-visible-ring-spec-consistent-across-all-interactive-elements-container-query-breakpoint-map-per-component-not-global-aom-verification-checklist-run-in-voiceover-nvda-axe-10-the-most-common-failure-modes"></code> in <code><article></code> = proper heading hierarchy.</li>
+  <li>Heading: <code>&lt;h2&gt;</code> in <code><article></code> = proper heading hierarchy.</li>
   <li>Image: <code>alt=""</code> = hidden from AOM (decorative). If informative, <code>alt="Photo of..."</code>.</li>
   <li>Button: native <code><button></code> = keyboard + role + focus + name from text.</li>
   <li>Link: native <code><a href></code> = appears in link rotor, works without JS.</li>
@@ -875,7 +875,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 <table>
   <thead><tr><th>Aspect</th><th>Naive (div soup + utility classes)</th><th>Designed (semantic HTML + tokens + platform features)</th></tr></thead>
   <tbody>
-    <tr><td>HTML</td><td><code><div class="card"><div class="title">...<div onclick>...</td><td><code><article><header><h2 id="sec-a11y-treegeneric-divs-no-roles-no-headings-onclick-not-keyboardarticle-heading-button-link-fully-operable-dark-modehardcoded-colors-filter-invert-hack-breaks-imagestoken-swap-oklch-preserves-brand-images-untouched-rtlmanual-direction-rtl-margin-overrideslogical-properties-native-flex-grid-mirroring-responsiveviewport-media-queries-breaks-in-sidebarcontainer-query-adapts-to-parent-width-reduced-motionanimations-still-run-vestibular-triggermotion-tokens-zeroed-instant-transitions-high-contrastbackgrounds-shadows-invisible-border-goneforced-colors-media-query-preserves-borders-maintenancemagic-numbers-everywhere-drift-guaranteedsingle-token-file-change-propagates-everywhere-artifacts-produced-semantic-html-template-the-aom-contract-css-module-with-grid-layout-container-query-logical-properties-token-file-css-custom-properties-oklch-light-dark-reduced-motion-forced-colors-focus-visible-ring-spec-consistent-across-all-interactive-elements-container-query-breakpoint-map-per-component-not-global-aom-verification-checklist-run-in-voiceover-nvda-axe-10-the-most-common-failure-modes">...<button>...</td></tr>
+    <tr><td>HTML</td><td><code><div class="card"><div class="title">...<div onclick>...</td><td><code>&lt;article&gt;&lt;header&gt;&lt;h2&gt;...&lt;button&gt;...</td></tr>
     <tr><td>A11y tree</td><td>Generic divs, no roles, no headings, onclick not keyboard</td><td>Article → heading → button/link. Fully operable.</td></tr>
     <tr><td>Dark mode</td><td>Hardcoded colors; <code>filter: invert</code> hack breaks images</td><td>Token swap; OKLCH preserves brand; images untouched</td></tr>
     <tr><td>RTL</td><td>Manual <code>direction: rtl</code> + margin overrides</td><td>Logical properties + native flex/grid mirroring</td></tr>
@@ -897,7 +897,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </ul>
 
 ---
-<h2 id="sec-the-most-common-failure-modes">10. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What it looks like</th><th>Why it happens</th></tr></thead>
@@ -980,12 +980,12 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>Magic numbers drift</strong></td>
       <td>Hardcoded <code>px</code>/<code>hex</code> everywhere; a "small spacing" change means an audit</td>
-      <td>No token layer. Fix: hoist to custom properties (§5 "Tokens over magic numbers").</td>
+      <td>No token layer. Fix: hoist to custom properties (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> "Tokens over magic numbers").</td>
     </tr>
     <tr>
       <td><strong>Utility soup</strong></td>
       <td>Markup becomes <code>&lt;div class="pt-4 flex gap-2 text-sm text-muted item-center"&gt;</code>; semantics gone</td>
-      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (§7 Methodologies).</td>
+      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (<a href="#sec-methodologies-named-frameworks"><a href="#sec-methodologies-named-frameworks">§7</a></a> Methodologies).</td>
     </tr>
     <tr>
       <td><strong>Sticky misuse: doesn't stick</strong></td>
@@ -1000,7 +1000,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>CSS-only overreach</strong></td>
       <td>Tabs, accordions, form validation logic forced into <code>:nth-child</code> and selectors</td>
-      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (§5 "State lives in attributes").</td>
+      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> "State lives in attributes").</td>
     </tr>
     <tr>
       <td><strong>Unused / undelivered CSS</strong></td>
@@ -1010,12 +1010,12 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>Dark mode inverted media hack</strong></td>
       <td><code>filter: invert() hue-rotate(...)</code> breaks images, brand colors, shadows</td>
-      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (§6h).</td>
+      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (<a href="#sec-color-systems-and-theming"><a href="#sec-color-systems-and-theming">§6h</a></a>).</td>
     </tr>
     <tr>
       <td><strong>Animation overuse</strong></td>
       <td>Entry animations everywhere; vestibular discomfort; heavy main-thread load</td>
-      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (§6i).</td>
+      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (<a href="#sec-motion-and-transitions"><a href="#sec-motion-and-transitions">§6i</a></a>).</td>
     </tr>
     <tr>
       <td><strong>Token bureaucracy</strong></td>
@@ -1040,7 +1040,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">11. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>The platform is only as good as the tooling that makes its primitives visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -1165,7 +1165,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </table>
 
 ---
-<h2 id="sec-summary-the-platform-checklist">12. Summary — the platform checklist</h2>
+<h2 id="sec-summary-the-platform-checklist">Summary — the platform checklist</h2>
 
 <p>Before any HTML/CSS ships, verify:</p>
 
