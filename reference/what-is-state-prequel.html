@@ -25,7 +25,7 @@
 
 <p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
-<h2 id="sec-when-did-programming-appear">1. When did "programming" appear?</h2>
+<h2 id="sec-when-did-programming-appear">When did "programming" appear?</h2>
 
 <p>Two words people use loosely that we have to separate first: <strong>algorithm</strong> and <strong>program</strong>.</p>
 
@@ -42,17 +42,17 @@
   <li><strong>1843 — Ada Lovelace</strong> wrote the first <em>algorithm intended for a machine</em> (Babbage's Analytical Engine, a mechanical, theoretical machine never completed in her lifetime). She wrote a plan for computing Bernoulli numbers. Crucially: she wrote an <em>algorithm for a machine that did not yet exist</em> — a program with no computer to run on. She is called the first programmer because she was the first to think through what a machine — once built — would have to be told step by step. Programming as an <em>idea</em> tied to a machine starts here, even though no machine ran it.</li>
   <li><strong>1936 — Alan Turing</strong> published "On Computable Numbers," defining the Turing machine — the mathematical model of "anything that can compute." This proved which problems are solvable by any machine at all. It is the theory under programming, not programming itself.</li>
   <li><strong>1941 — Konrad Zuse's Z3</strong> was one of the earliest working programmable computers — generally credited as such, though not every history grants it the "first" title (some point to earlier relay machines or to ENIAC's successors) (electromechanical, in Germany) — the first time an algorithm became a program that actually <em>ran</em>. Limited, but real.</li>
-  <li><strong>1945-46 — ENIAC</strong> in the US was the first widely-known general-purpose electronic computer. Its "first" status is debated — some histories reserve the claim for other early machines, and the stored-program credit is contested (see §2.4). It began, famously, as a machine reprogrammed by rewiring cables, not by changing stored software. It was programmed by women rewiring cables between panels — "soft" instructions didn't exist yet; the program was a physical configuration. The first <em>programmers</em> in the modern sense were the "ENIAC girls."</li>
+  <li><strong>1945-46 — ENIAC</strong> in the US was the first widely-known general-purpose electronic computer. Its "first" status is debated — some histories reserve the claim for other early machines, and the stored-program credit is contested (see <a href="#sec-the-four-theories-underneath-what-makes-programming-possible-at-all">the von Neumann architecture</a>). It began, famously, as a machine reprogrammed by rewiring cables, not by changing stored software. It was programmed by women rewiring cables between panels — "soft" instructions didn't exist yet; the program was a physical configuration. The first <em>programmers</em> in the modern sense were the "ENIAC girls."</li>
   <li><strong>1957 — Fortran</strong> was the first widely-used high-level programming language. For the first time you wrote <code>X = Y + Z</code> on punch cards and a compiler turned it into machine code. This is when "programming" starts to mean what you do today: typing text that becomes instructions.</li>
 </ul>
 
 <p>So: the <em>algorithm</em> as a concept is older than mathematics itself; the <em>word</em> "algorithm" is ~1,200 years old (from Al-Khwarizmi); the <em>idea of programming a machine</em> is from the 1840s (Lovelace); the <em>practice</em> of running programs on real machines from the 1940s (Zuse, then ENIAC); and what you'd recognize as programming today from the 1950s (Fortran). The 70 years since Fortran are variations on one theme: tell a machine how to transform inputs into outputs.</p>
 
-<h2 id="sec-the-four-theories-underneath-what-makes-programming-possible-at-all">2. The four theories underneath — what makes programming possible at all</h2>
+<h2 id="sec-the-four-theories-underneath-what-makes-programming-possible-at-all">The four theories underneath — what makes programming possible at all</h2>
 
 <p>The last section told you <em>when</em> things happened. This section tells you <em>what</em> the ideas are that make programming work. Four theories, all worked out between 1936 and 1948 — and they are not historical footnotes. The code you write today directly radiates from them. If you skip this section, "variable," "function," "type," and "state" will feel like arbitrary labels from a language spec. They aren't. Every strange term in the subsections below will be defined on first use — but be patient: the first two subsections are the most abstract, and they pay off in the last two, which connect directly to the hardware and to JS.</p>
 
-<h3>2.1 The Turing machine (Alan Turing, 1936) — what is "computable"?</h3>
+<h3>The Turing machine (Alan Turing, 1936) — what is "computable"?</h3>
 
 <p><strong>The problem Turing was solving.</strong> In 1928, the German mathematician David Hilbert asked the <em>Entscheidungsproblem</em> (German for "decision problem"): given a fixed set of axioms (like the rules of arithmetic) and a mathematical statement (like "there are infinitely many prime numbers"), is there a general, mechanical procedure that can decide, for any statement, whether it is provable or not? In 1936, Alan Turing and Alonzo Church working independently proved the answer is <strong>no</strong> — no such general procedure can exist. But to prove that, Turing first had to define what "general procedure" meant in a mathematically precise way. He did it by inventing a machine that is so simple you can understand every part of it in a few minutes — and 90 years later, it remains the foundation of everything we call "computing."</p>
 
@@ -71,7 +71,7 @@
   <li><strong>"State" is the Turing word.</strong> When we say "the button is in the <em>loading</em> state," we are using the exact word Turing chose for his control-box register — a finite set of configurations, one active at a time, with defined transitions between them. The React mental model (UI = f(state)) is Turing's architecture with a rendering system attached.</li>
 </ul>
 
-<h3>2.2 The lambda calculus (Alonzo Church, 1936) — the other way to compute</h3>
+<h3>The lambda calculus (Alonzo Church, 1936) — the other way to compute</h3>
 
 <p><strong>The same problem, a different direction.</strong> Church was working on the same <em>Entscheidungsproblem</em> at the same time as Turing, but his background was logic and mathematics, not physics and mechanics. He invented the <strong>lambda calculus</strong> — a formal system where everything is a function, there are no machines, no tapes, no memory, no state. Only pure functions that take arguments and return results. Zero side effects, zero mutation, zero "write to memory." Just transformation.</p>
 
@@ -109,7 +109,7 @@
   <li><strong>FP is not a fashion.</strong> When people dismiss FP as "academic" or "impractical," they are dismissing a model of computation that Church proved equivalent to the one behind every real machine. The difference is organization, not capacity. React adopting hooks was not "trendy" — it was choosing one of the two equivalent models over the other, for concrete engineering reasons (the three problems from the main doc's intro: reuse, lifecycles, and <code>bind</code>).</li>
 </ul>
 
-<h3>2.3 The Halting Problem (Turing, 1936) — the boundary of what machines can know</h3>
+<h3>The Halting Problem (Turing, 1936) — the boundary of what machines can know</h3>
 
 <p><strong>The question.</strong> Can you write a program that reads <em>any other program</em> + its input, and correctly answers "does this program halt or run forever?"</p>
 
@@ -143,7 +143,7 @@ function D(P) {
   <p><strong>What this means for you.</strong> There is no tool, no static analyzer, no AI, no "sufficiently smart compiler" that can catch <em>all</em> infinite loops, all deadlocks, all "will this function terminate?" questions. The boundary is mathematically proven, not engineering-limited. Every linter, type checker, and IDE warning is a <em>sound but incomplete</em> approximation — it catches some bugs, misses others, and sometimes flags correct code. You will always need human judgment at the edge.</p>
 </blockquote>
 
-<h3>2.4 The von Neumann architecture (John von Neumann, 1945) — the hardware that made computation real</h3>
+<h3>The von Neumann architecture (John von Neumann, 1945) — the hardware that made computation real</h3>
 
 <p><strong>From mathematical model to physical machine.</strong> The Turing machine is an abstraction with an infinite tape that doesn't exist in the physical world. To actually build a working computer, someone had to design the engineering layout. That design was described in 1945 in "First Draft of a Report on the EDVAC," written by John von Neumann, a mathematician and physicist working as a consultant on the EDVAC project at the University of Pennsylvania. The architecture it described is so universal that we barely notice it as an invention — but every CPU in every laptop, phone, server, and embedded device today is still a "von Neumann machine."</p>
 
@@ -164,7 +164,7 @@ function D(P) {
   <li><strong>Why functional code feels inefficient (and why the React Compiler existed).</strong> When React moved from classes (mutate the instance field) to hooks (call <code>setCount(count + 1)</code> which returns a new value and asks the component to re-run from scratch), it moved away from the von Neumann mutation model and toward the lambda-calculus purity model. But the hardware underneath is STILL von Neumann: the CPU is sequential, mutable, address-based. The functional layer sits on top of this with an efficiency tax — React has to call the entire component again, diff the output, and only apply the minimal DOM changes. This is why manual optimization (<code>useMemo</code>, <code>useCallback</code>, <code>React.memo</code>) was necessary: the functional pattern is mathematically clean but doesn't map naturally to the sequential mutation machine. The React Compiler (see the main paradigm-shift doc) is the automatic version of these optimizations — it lets you write functional code and have the compiler translate it efficiently to von Neumann execution. <strong>The compiler exists because the lambda calculus and the von Neumann machine are equivalent but not identical.</strong></li>
 </ul>
 
-<h3>2.5 Information theory (Claude Shannon, 1948) — why "bits" and "types" exist</h3>
+<h3>Information theory (Claude Shannon, 1948) — why "bits" and "types" exist</h3>
 
 <p><strong>The fourth question: what IS information?</strong> Turing asked "what can be computed?" Von Neumann asked "how do we build the machine?" In 1948, Claude Shannon, an American mathematician and electrical engineer, asked a different question: "what is information itself, and how can we measure it?" Before his paper "A Mathematical Theory of Communication" (1948), "information" was an informal, everyday word — "this letter contains information." After it, information was a <em>quantifiable quantity</em>, measured in bits. This is the theory that made the internet, digital media, compression, and modern communication possible.</p>
 
@@ -185,7 +185,7 @@ function D(P) {
   <li><strong>Why entropy matters for optimization.</strong> When React talks about "performance" and "re-renders," the underlying information theory says: a component that produces the same output for the same input is like a low-entropy source — predictable, compressible, optimizable. Memoization (<code>useMemo</code>, <code>React.memo</code>) is compression for computation: skip the work when the input hasn't changed, because the output would be the same. The React Compiler automates this by analyzing which computations produce pure output — which is Shannon's information measure applied to function calls.</li>
 </ul>
 
-<h3>2.6 The four theories — recap table</h3>
+<h3>The four theories — recap table</h3>
 
 <table>
   <thead><tr><th>Theory</th><th>Year</th><th>The core idea</th><th>What it proves</th><th>Where you feel it in this doc</th></tr></thead>
@@ -216,14 +216,14 @@ function D(P) {
       <td>1948</td>
       <td>All information can be encoded in bits. Bits need a type to be interpreted. Entropy measures predictability.</td>
       <td>Types exist. Serialization is possible. Compression is Shannon's theorem applied.</td>
-      <td>Why §3 (types) exists. Why serialization is a fundamental activity. Why variables ≠ values. Memoization is information compression for computation.</td>
+      <td>Why <a href="#sec-types">types</a> exist. Why serialization is a fundamental activity. Why variables ≠ values. Memoization is information compression for computation.</td>
     </tr>
   </tbody>
 </table>
 
 <p>The rest of this doc (primitives, types, state, lifetime) and the main paradigm-shift doc (OOP, hooks, compiler, RSC) are elaborations on these four foundations. When you read "state" in the main doc, mentally replace it with "Turing's state register." When you read "function" in the hooks sections, think "lambda calculus pure function (Church, 1936)." When you read "variable" anywhere, think "von Neumann memory address with a name." When you read "type" in the next section, think "Shannon's proof that bits cannot interpret themselves."</p>
 
-<h2 id="sec-the-two-primitives-data-and-operations">3. The two primitives — data and operations</h2>
+<h2 id="sec-the-two-primitives-data-and-operations">The two primitives — data and operations</h2>
 
 <p>Strip away all the paradigms (OOP, FP, procedural, declarative) and programming has just two building blocks:</p>
 
@@ -282,7 +282,7 @@ function D(P) {
 
 <p>Everything else — types, classes, modules, hooks, components — is a way of <em>organizing</em> variables and functions. Classes bundle variables with the functions that operate on them. Modules group related functions and variables under a namespace. Hooks are functions backed by hidden storage (React's state-slot array). The two atoms (data via variables, operations via functions) never go away.</p>
 
-<h2 id="sec-what-state-is-a-definition-you-can-test">3b. What "state" is — a definition you can test</h2>
+<h2 id="sec-what-state-is-a-definition-you-can-test">What "state" is — a definition you can test</h2>
 
 <p>The title of this doc asks a question we&rsquo;ve been circling. Here is the answer, up front, so everything after it is applying one idea instead of hunting for it:</p>
 
@@ -314,17 +314,17 @@ function D(P) {
     <tr><td>Constant</td><td>A fixed value that never changes</td><td>Usually not state (it cannot change over time)</td></tr>
     <tr><td>Input</td><td>A value entering a function or system</td><td>Not state by itself</td></tr>
     <tr><td>Output</td><td>A value produced by a function or system</td><td>Not state by itself</td></tr>
-    <tr><td>Derived value</td><td>Computed from other values each time</td><td>Derived, not primary state (&sect;6c)</td></tr>
-    <tr><td>Cache</td><td>A rebuildable stored result</td><td>Secondary/optimization state (&sect;6c)</td></tr>
+    <tr><td>Derived value</td><td>Computed from other values each time</td><td>Derived, not primary state (<a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration</a>)</td></tr>
+    <tr><td>Cache</td><td>A rebuildable stored result</td><td>Secondary/optimization state (<a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration</a>)</td></tr>
     <tr><td>Configuration</td><td>Environment-provided settings</td><td>Usually external state, not program state</td></tr>
     <tr><td>Event</td><td>Something that happened</td><td>Not state — but it changes state</td></tr>
     <tr><td>State</td><td>Persistent value affecting future behavior</td><td><strong>Yes</strong></td></tr>
   </tbody>
 </table>
 
-<p>This test is the spine of the whole reference shelf. &sect;5 sharpens it into lifetimes and reachability; &sect;6c separates the state-like pretenders (derived, cache, config); &sect;6e collects the ways even careful developers misapply in practice.</p>
+<p>This test is the spine of the whole reference shelf. <a href="#sec-the-key-distinction-variables-state">The key distinction</a> sharpens it into lifetimes and reachability; <a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration</a> separates the state-like pretenders (derived, cache, config); <a href="#sec-failure-modes-where-the-model-breaks">Failure modes</a> collects the ways even careful developers misapply in practice.</p>
 
-<h2 id="sec-state-changes-one-step-at-a-time">3c. State changes — one step at a time</h2>
+<h2 id="sec-state-changes-one-step-at-a-time">State changes — one step at a time</h2>
 
 <p>State is not a snapshot; state <em>moves</em>. A step is one event producing a new state:</p>
 
@@ -352,7 +352,7 @@ function D(P) {
 
 <p>Why draw this at all? Because it makes impossible states <em>unrepresentable</em>: "submitting while already submitted" cannot exist if it is not on the diagram. React&rsquo;s same story is told in the companion doc&rsquo;s temporal rule — a render is a snapshot, and only a setter moves state. Here, the takeaway is the vocabulary: a <strong>state</strong> is a configuration; a <strong>transition</strong> is an event applied to it; <strong>transition logic</strong> is what a reducer or a controller encodes.</p>
 
-<h2 id="sec-types">4. Types — the contract on a value</h2>
+<h2 id="sec-types">Types — the contract on a value</h2>
 
 <p>Every value has a <strong>type</strong> — number, string, boolean, object, function, etc. The type tells the machine how to interpret the bits at that memory location, and which operations are valid: <code>+</code> works on numbers; <code>.length</code> works on strings and arrays; <code>()</code> calls a function. Attempting the wrong operation on the wrong type is a type error.</p>
 
@@ -360,7 +360,7 @@ function D(P) {
 
 <p>In dynamically-typed JS, variables don't have types; <em>values</em> do — a variable is just a name binding to whatever value you assigned it last. <code>let x = 5;</code> — x is bound to a number value. <code>x = "hello";</code> — x is re-bound to a string value. In statically-typed C, a variable's type is fixed at compile time by the declaration: <code>int x; x = "hello";</code> won't compile. JS swapped compile-time type safety for run-time flexibility — a trade-off that made rapid iteration easier and a whole class of bugs harder to catch.</p>
 
-<h2 id="sec-the-key-distinction-variables-state">5. The key distinction — variables ≠ state</h2>
+<h2 id="sec-the-key-distinction-variables-state">The key distinction — variables ≠ state</h2>
 
 <p>Here is the distinction this whole doc leans on. People say "state is data in memory," and that is true but it is not the part that matters. <strong>State IS normal variables.</strong> There is no special "state" cell type in memory. What we call "state" is a <em>role</em> a variable plays, not a different kind of thing. The label just says <em>this particular normal variable matters across events</em>.</p>
 
@@ -409,7 +409,7 @@ function D(P) {
 
 <p>So the test for "is this variable state?" is not "does it live in memory?" (everything does) — it is <em>"does the next event / call / render depend on the value this variable had after the previous one?"</em> If yes, it's state. If no, it's just a temporary scratch variable.</p>
 
-<h2 id="sec-mental-models-how-developers-actually-reason-about-state">5b. Mental models — how developers actually reason about state</h2>
+<h2 id="sec-mental-models-how-developers-actually-reason-about-state">Mental models — how developers actually reason about state</h2>
 
 <p>Before any framework is involved, the developer's mental model of state determines how they design code. The same runtime program is "obviously correct" or "obviously broken" depending on which of three mental models the developer carries.</p>
 
@@ -451,7 +451,7 @@ function D(P) {
 
 <p><strong>Stale-closure is a mental-model bug, not a runtime bug.</strong> When a closure captures a value and the developer thinks "this is current," they are mentally treating a snapshot as live. The runtime is correct — it stored what it was told to store — but the developer's model assumed freshness. Closing this gap is what the class-to-hooks paradigm shift <em>is</em>.</p>
 
-<h2 id="sec-lifetime">6. Lifetime — the property that makes a variable into state</h2>
+<h2 id="sec-lifetime">Lifetime — the property that makes a variable into state</h2>
 
 <p>The single word that distinguishes state from a regular variable is <strong>lifetime</strong>: how long does the value have to live, and across what?</p>
 
@@ -468,7 +468,7 @@ function D(P) {
     <tr><td>URL / search params</td><td>Across navigation / sharing</td><td>Yes</td><td><code>?filter=active</code> survives a page refresh</td></tr>
     <tr><td>Cookie / localStorage</td><td>Across browser sessions</td><td>Yes</td><td>Theme, session token</td></tr>
     <tr><td>Server session</td><td>Server-side, tied to a client</td><td>Yes (the classic "server keeps the state")</td><td>Login token, session cart</td></tr>
-    <tr><td>Cache / derived copy</td><td>Until invalidated</td><td>Yes — but it is rebuildable state (&sect;6c)</td><td>Memoized value, API response</td></tr>
+    <tr><td>Cache / derived copy</td><td>Until invalidated</td><td>Yes — but it is rebuildable state (<a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration</a>)</td><td>Memoized value, API response</td></tr>
   </tbody>
 </table>
 
@@ -476,7 +476,7 @@ function D(P) {
 
 <p><strong>Stateful vs stateless.</strong> These words read as opposites but describe two answers to one question: <em>does this unit keep state between interactions?</em> A unit is <strong>stateful</strong> when it does (a component with <code>useState</code>, a server process with in-memory counters), and <strong>stateless</strong> when it does not (<code>add(a,b)</code>, an HTTP handler that touches nothing but its input). The subtle case that trips people up is <strong>externally stateful</strong>: a unit that is itself stateless but leans on state stored elsewhere — an HTTP handler that is stateless per request yet reads the session cookie and the database. &ldquo;Stateless&rdquo; never means &ldquo;no state exists anywhere&rdquo;; it means <em>this</em> unit isn&rsquo;t the one keeping it.</p>
 
-<h2 id="sec-state-lifecycle-and-ownership-who-creates-it-who-kills-it">6b. State lifecycle and ownership — who creates it, who kills it</h2>
+<h2 id="sec-state-lifecycle-and-ownership-who-creates-it-who-kills-it">State lifecycle and ownership — who creates it, who kills it</h2>
 
 <p>Asking "is it state?" is the first question. The second is "whose state is it?" Every piece of state needs an owner — something responsible for creating it, keeping it reachable, and destroying it. Ownership is the discipline that keeps state from turning into dumped globals.</p>
 
@@ -486,8 +486,8 @@ function D(P) {
   <thead><tr><th>Stage</th><th>Question</th></tr></thead>
   <tbody>
     <tr><td>Initialization</td><td>What is the starting value, and who sets it?</td></tr>
-    <tr><td>Storage</td><td>Where does the value actually live? (stack, closure, field, DB — &sect;6)</td></tr>
-    <tr><td>Reachability</td><td>Who can see it, and who can write it? (&sect;5)</td></tr>
+    <tr><td>Storage</td><td>Where does the value actually live? (stack, closure, field, DB — <a href="#sec-lifetime">Lifetime</a>)</td></tr>
+    <tr><td>Reachability</td><td>Who can see it, and who can write it? (<a href="#sec-the-key-distinction-variables-state">The key distinction</a>)</td></tr>
     <tr><td>Updating</td><td>Through what event does it change? Direct assignment or a setter?</td></tr>
     <tr><td>Reads</td><td>Who reads it, and how do they learn it changed?</td></tr>
     <tr><td>Resetting</td><td>When does it go back to a fresh state?</td></tr>
@@ -507,7 +507,7 @@ function D(P) {
 
 <p>This is the why behind React&rsquo;s &ldquo;lift state up&rdquo; rule: the nearest common owner of several pieces of state is where that state should live. It is also the pattern the whole shelf shares — system-design&rsquo;s &ldquo;one database owns the row&rdquo; is the same sentence with bigger nouns.</p>
 
-<h2 id="sec-derived-state-cache-and-configuration-the-things-that-look-like-state">6c. Derived state, cache, and configuration — the things that look like state</h2>
+<h2 id="sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration — the things that look like state</h2>
 
 <p>Once you can identify state, the next skill is identifying <em>false state</em> — values people store as state that should just be computed, cached, or read from the environment.</p>
 
@@ -517,7 +517,7 @@ function D(P) {
     <tr><td><strong>Derived state</strong></td><td>A value computed from other state on every read</td><td>Compute it; don't store it. If you open the shelf, the trigger is "the other state changed."</td></tr>
     <tr><td><strong>Cache</strong></td><td>A stored result of a computation that could be recomputed</td><td>State, but rebuildable — losing it is an annoyance, not a bug. Invalidating it is the hard part.</td></tr>
     <tr><td><strong>Configuration</strong></td><td>Settings that arrive from outside (env vars, theme, flags)</td><td>External state; load it, don't let the program mutate it.</td></tr>
-    <tr><td><strong>Constant</strong></td><td>A value that never changes at runtime</td><td>Not changeable — &sect;3b's test catches it (it cannot change over time).</td></tr>
+    <tr><td><strong>Constant</strong></td><td>A value that never changes at runtime</td><td>Not changeable — <a href="#sec-what-state-is-a-definition-you-can-test">state-definition test</a>'s test catches it (it cannot change over time).</td></tr>
   </tbody>
 </table>
 
@@ -528,9 +528,9 @@ const [count, setCount] = useState(0);   <span class="comment-line">// duplicate
 ...
 setCount(items.length);                  <span class="comment-line">// must be kept in sync forever</span> </code></pre>
 
-<p>&mdash; breaks the moment one spot updates <code>items</code> without updating <code>count</code>. The fix: <code>const count = items.length</code> — derived in render, never owned. &sect;10b of the paradigm doc makes this the rule; here it is the principle.</p>
+<p>&mdash; breaks the moment one spot updates <code>items</code> without updating <code>count</code>. The fix: <code>const count = items.length</code> — derived in render, never owned. <a href="./class-to-hooks-paradigm-shift.html#sec-derived-state-compute-during-render-don-t-store">Derived state</a> of the paradigm doc makes this the rule; here it is the principle.</p>
 
-<h2 id="sec-identity-vs-state-and-immutable-vs-mutable-state">6d. Identity vs state, and immutable vs mutable state</h2>
+<h2 id="sec-identity-vs-state-and-immutable-vs-mutable-state">Identity vs state, and immutable vs mutable state</h2>
 
 <p><strong>Identity</strong> is the thing that persists: "which entity is this?" <strong>State</strong> is the changeable information about that entity. A user keeps her identity while her email and preferences change; an order keeps its id while its status passes paid → shipped → delivered. Confusing the two is where most "where do I put this?" arguments come from.</p>
 
@@ -553,7 +553,7 @@ setCount(items.length);                  <span class="comment-line">// must be k
 
 <p>Immutable state is still state. The phrase means state is changed by producing new values, not that state disappears. React&rsquo;s <code>useState</code> / <code>setCount</code> is immutable state: <code>count + 1</code> yields a new value and the old render&rsquo;s snapshot stays intact until the next one.</p>
 
-<h2 id="sec-failure-modes-where-the-model-breaks">6e. Failure modes — where the model breaks</h2>
+<h2 id="sec-failure-modes-where-the-model-breaks">Failure modes — where the model breaks</h2>
 
 <p>Every pattern in this prequel has a known way to go wrong, and they&rsquo;re worth cataloguing here so you meet them as "oh, that one," not as a mystery.</p>
 
@@ -562,24 +562,24 @@ setCount(items.length);                  <span class="comment-line">// must be k
   <tbody>
     <tr><td>Global state as default</td><td>Everything &ldquo;shared&rdquo; becomes everything coupled</td><td>Ownership (6b)</td></tr>
     <tr><td>Storing derived state</td><td>Two sources of truth drift apart</td><td>Derive in render (6c)</td></tr>
-    <tr><td>Mutable snapshot confusion</td><td>Mutating a prop/SP copy instead of the real state</td><td>Immutable updates (6d, paradigm &sect;9c)</td></tr>
-    <tr><td>Reset forgotten</td><td>Identity stays but state stays stale (the old value lingers)</td><td>Implementation: force remount with <code>key</code> (paradigm &sect;9c)</td></tr>
-    <tr><td>&ldquo;Stateless&rdquo; lie</td><td>A unit claims statelessness but reads a session or DB</td><td>Name the external state (this doc, &sect;6)</td></tr>
-    <tr><td>Side-effect as state</td><td>Timers, listeners, subscriptions stored as ordinary data</td><td>Cleanup and destruction (this doc, &sect;6b)</td></tr>
+    <tr><td>Mutable snapshot confusion</td><td>Mutating a prop/SP copy instead of the real state</td><td>Immutable updates (6d, paradigm <a href="./class-to-hooks-paradigm-shift.html#sec-reconciliation-keys-and-component-identity">Reconciliation, keys, and component identity</a>)</td></tr>
+    <tr><td>Reset forgotten</td><td>Identity stays but state stays stale (the old value lingers)</td><td>Implementation: force remount with <code>key</code> (paradigm <a href="./class-to-hooks-paradigm-shift.html#sec-reconciliation-keys-and-component-identity">Reconciliation, keys, and component identity</a>)</td></tr>
+    <tr><td>&ldquo;Stateless&rdquo; lie</td><td>A unit claims statelessness but reads a session or DB</td><td>Name the external state (this doc, <a href="#sec-lifetime">Lifetime</a>)</td></tr>
+    <tr><td>Side-effect as state</td><td>Timers, listeners, subscriptions stored as ordinary data</td><td>Cleanup and destruction (this doc, <a href="#sec-state-lifecycle-and-ownership-who-creates-it-who-kills-it">State lifecycle and ownership</a>)</td></tr>
   </tbody>
 </table>
 
-<p>Debugging trick for all of them: for any suspicious value, run the &sect;3b test, then ask who owns it (&sect;6b), then where it lives (&sect;6), then how it changes (&sect;6d). The failure is almost always that those four answers are inconsistent with what the code actually does.</p>
+<p>Debugging trick for all of them: for any suspicious value, run <a href="#sec-what-state-is-a-definition-you-can-test">the state-definition test</a>, then ask who owns it (<a href="#sec-state-lifecycle-and-ownership-who-creates-it-who-kills-it">State lifecycle and ownership</a>), then where it lives (<a href="#sec-lifetime">Lifetime</a>), then how it changes (<a href="#sec-identity-vs-state-and-immutable-vs-mutable-state">Identity vs state</a>). The failure is almost always that those four answers are inconsistent with what the code actually does.</p>
 
-<h2 id="sec-principles-the-invariants-to-hold-onto">6f. Principles — the invariants to hold onto</h2>
+<h2 id="sec-principles-the-invariants-to-hold-onto">Principles — the invariants to hold onto</h2>
 
 <p><em>State is persistence with consequence, under one owner.</em> The whole prequel, compressed into rules you can judge code against:</p>
 
 <ol>
   <li><strong>State is a role, not a memory type.</strong> The same bytes are a scratch in one spot and state elsewhere, defined by lifetime &amp; reachability.</li>
-  <li><strong>Persists &rarr; future depends.</strong> No persistence, or no consequence, and it is not state &mdash; that is the &sect;3b test.</li>
+  <li><strong>Persists &rarr; future depends.</strong> No persistence, or no consequence, and it is not state &mdash; that is <a href="#sec-what-state-is-a-definition-you-can-test">the state-definition test</a>.</li>
   <li><strong>One owner per state.</strong> The owner defines init, updates, and destruction. Two "owners" is the seed of most state bugs.</li>
-  <li><strong>Minimize the shelf.</strong> Derive &sect;6c, lift &sect;6b, keep reachability narrow.</li>
+  <li><strong>Minimize the shelf.</strong> Derive <a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">derived state, cache, and config</a>, lift <a href="#sec-state-lifecycle-and-ownership-who-creates-it-who-kills-it">lifecycle and ownership</a>, keep reachability narrow.</li>
   <li><strong>Changes are events, transitions are explicit.</strong> Current state + event &rarr; next state; drawn as a machine when it matters.</li>
   <li><strong>Prefer immutable updates.</strong> New value, or you lose the old one and the ability to trace.</li>
   <li><strong>Lifetime is the contract with storage.</strong> It tells you whether the value survives calls, module load, page reload, or restarts &mdash; and who cleans up.</li>
@@ -587,7 +587,7 @@ setCount(items.length);                  <span class="comment-line">// must be k
 
 <p>From here, the class-to-hooks paradigm doc turns these rules into React&rsquo;s specific grammar: hook slots replace closure cells, the setter replaces raw assignment, and a render is a snapshot of immutable state. This prequel is the abstract layer those rules sit on.</p>
 
-<h2 id="sec-the-whole-rest-of-the-class-to-hooks-doc-in-one-sentence">7. The whole rest of the class-to-hooks doc, in one sentence</h2>
+<h2 id="sec-the-whole-rest-of-the-class-to-hooks-doc-in-one-sentence">The whole rest of the class-to-hooks doc, in one sentence</h2>
 
 <p>State is a thing that <em>persists</em> and that <em>the next event depends on</em>. The history of UI programming is the history of <em>where that state lives</em>: in a global variable, in a closure, in a class instance field, in a framework store, in a hook slot, in a server database. Each migration was a different answer to one question: <em>where does the state live, and who is responsible for keeping it alive across events?</em> React itself moved state roughly every 3-5 years — class instance (2013) → hook slot (2018) → client/server split (2022) → compiler-memoized hooks (2024) — and the <a href="./class-to-hooks-paradigm-shift.html">main paradigm-shift doc</a> is the inside of that story.</p>
 

@@ -16,7 +16,7 @@ Static HTML teaching shelf. English docs in `reference/<topic>.html`, Arabic RTL
 - **Cross-references are anchor links only**: in-doc `#sec-…`, sibling `./name.html#sec-…`. No `§13a`, no numeric pointer of any kind.
 - **Language-switch lines**: EN headers carry `./ar/<name>.html (العربية)`; AR headers carry `../<name>.html (English)`.
 - **Terminology**: the ONLY coinage source is `reference/ar/glossary.html` (`<dfn>` elements). Term absent → stop and report. Never invent.
-- AR twins: `lang="ar" dir="rtl"`, asset paths `../../assets/…`, headings mirror EN 1:1 (translated), h2 **visible** count parity (strip `<pre>` blocks before counting — phantom h2s mask real drift), AR/EN char ratio band ≈ 0.55–0.7.
+- AR twins: `lang="ar" dir="rtl"`, asset paths `../../assets/…`, headings mirror EN 1:1 (translated), h2 **visible** count parity (strip `<pre>` blocks before counting — phantom h2s mask real drift), AR/EN char ratio band ≈ 0.75–0.97 — **calibrated on the three AR-OK twins at v12** (cs-and-se 0.75, react-2024-and-beyond 0.84, glossary 0.97). The earlier 0.55–0.7 band came from one anomalous outlier (version-control 0.36 — a terse 20/21 twin that is now 0.55 after its v11 fill).
 
 ## Project state
 
