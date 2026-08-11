@@ -34,3 +34,8 @@ Deliverables (ONLY inside `/tmp/twin-terminal-applications/`):
 - No heading numerals, ever. No `§` left outside links after step 4.
 - h2 ids identical EN↔AR; phantom `<h2>` inside `<pre>` stay untouched.
 - Mojibake safety: verify with `python3 -c "open('/tmp/twin-terminal-applications/ar.html',encoding='utf-8').read()"` — never judge Arabic by terminal echo.
+
+## Resilience (provider hiccups — v34+)
+- Write each AR part to /tmp as soon as it is complete — NEVER hold the whole doc in one generation.
+- On `403 server_error` / `Stream ended without finish_reason`: pause ~60s, retry ONCE. If it recurs 3+ times: save every completed part, write a `STATUS:` line at the top of report.md (where you stopped, what remains), and STOP. The orchestrator resumes you; do not keep hammering.
+- Losing one stream costs one part — keep parts small (2–3 h2s) on docs > 20 h2.
