@@ -13,6 +13,9 @@
   <p class="kicker">Reference · Employment — the funnel from resume to onboarding</p>
   <h1>Hiring Process &amp; Interviews</h1>
   <p class="meta">The employee funnel the income docs point at but never walk through: the resume, cover letter, and application package, the screening call, the technical screen (live coding, take-homes, whiteboards) including the remote/async variant, the HR and behavioral interview (the "messy" questions decoded), the system design round, panel and culture-fit rounds and the reference check, presentation basics (dress, body language, how you talk), the questions you ask them, and the offer, negotiation, multiple-offer and rejection tail — each stage mapped to the shelf doc that owns its depth. Read this when you are applying, when an HR question stumps you, or when you hold an offer and have to decide.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/hiring-process-and-interviews.html">العربية</a>
+  </p>
 </header>
 
 <blockquote class="callout">
@@ -48,7 +51,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 <p>Reading order: read the Definition (what this doc is and is not), then the funnel in order — resume &amp; cover letter → screening → technical screen (including the remote/async variant) → HR/behavioral → system design → panel &amp; reference → offer → the multiple-offer/rejection tail. Read it as a <em>map of the room</em>, not a script: the behavioral table gives you answer <em>shapes</em>, never word-for-word answers. Cross-links:</p>
 <ul>
   <li>Positioning and rates: <a href="./frontend-income-markets.html">Frontend Income Markets</a> — what you're selling before you walk in.</li>
-  <li>Client-side equivalent: <a href="./freelance-web-practice.html">Freelance Web Practice</a> §Scoping — the same conversation, different buyer.</li>
+  <li>Client-side equivalent: <a href="./freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost">Freelance Web Practice §Scoping</a> — the same conversation, different buyer.</li>
   <li>Algorithmic content: <a href="./problem-solving.html">Problem-Solving</a>, <a href="./algorithms-and-data-structures.html">Algorithms &amp; Data Structures</a> — the Pólya loop and interview moves.</li>
   <li>Architecture content: <a href="./system-design.html">System Design</a> — the checklist the whiteboard samples.</li>
   <li>Honest fluency framing: <a href="./dotnet-and-the-enterprise-lane.html">.NET &amp; the Enterprise Lane</a> — "I can read C#; my depth is JS/TS".</li>
@@ -62,10 +65,10 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 <table>
   <thead><tr><th>Week</th><th>Focus</th></tr></thead>
   <tbody>
-    <tr><td>1</td><td>Resume, portfolio, story bank, company list — the raw material (§1, §2, §5)</td></tr>
-    <tr><td>2</td><td>Technical fundamentals and live-coding practice (§3 + the content docs)</td></tr>
-    <tr><td>3</td><td>System design / frontend system design, mock interviews (§6 + the content docs)</td></tr>
-    <tr><td>4</td><td>Behavioral practice, company research, negotiation prep (§5, §9, §10)</td></tr>
+    <tr><td>1</td><td>Resume, portfolio, story bank, company list — the raw material (<a href="#sec-the-resume-the-application-the-signal-gate">§1</a>, <a href="#sec-the-cover-letter-the-application-package">§2</a>, <a href="#sec-the-hr-behavioral-interview-the-messy-questions">§5</a>)</td></tr>
+    <tr><td>2</td><td>Technical fundamentals and live-coding practice (<a href="#sec-the-screening-call-the-technical-screen">§3</a> + the content docs)</td></tr>
+    <tr><td>3</td><td>System design / frontend system design, mock interviews (<a href="#sec-the-system-design-round">§6</a> + the content docs)</td></tr>
+    <tr><td>4</td><td>Behavioral practice, company research, negotiation prep (<a href="#sec-the-hr-behavioral-interview-the-messy-questions">§5</a>, <a href="#sec-questions-to-ask-them-the-two-way-interview">§9</a>, <a href="#sec-the-offer-negotiation-and-onboarding">§10</a>)</td></tr>
   </tbody>
 </table>
 
@@ -79,8 +82,8 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
     <tr><td>Anxiety</td><td>Practice under realistic conditions; breathe; slow down</td></tr>
     <tr><td>Blank mind</td><td>Restate the problem, use a concrete example, simplify</td></tr>
     <tr><td>Imposter syndrome</td><td>An evidence list — projects, skills, outcomes — re-read before the call</td></tr>
-    <tr><td>Fear of failure</td><td>Treat interviews as data collection, not judgment (§11's rule, early)</td></tr>
-    <tr><td>Overthinking</td><td>Start brute force, communicate, iterate — the §3 playbook step three</td></tr>
+    <tr><td>Fear of failure</td><td>Treat interviews as data collection, not judgment (<a href="#sec-multiple-offers-counter-offers-rejection">§11</a>'s rule, early)</td></tr>
+    <tr><td>Overthinking</td><td>Start brute force, communicate, iterate — the <a href="#sec-the-screening-call-the-technical-screen">§3</a> playbook step three</td></tr>
   </tbody>
 </table>
 
@@ -124,12 +127,12 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
     <tr><td>Online job boards</td><td>Monster, Indeed, LinkedIn</td><td>Global visibility → applications per role exploded → the resume became the first filter</td></tr>
     <tr><td>ATS era</td><td>Machine parsing, keyword scoring</td><td>Resumes are read by software first; structure and keywords stopped being optional</td></tr>
     <tr><td>Skills-based screening</td><td>HackerRank, LeetCode, take-homes</td><td>Proof of skill replaced credential checking; the technical screen became the gate</td></tr>
-    <tr><td>Remote &amp; global</td><td>Async rounds, recorded interviews, time-zone negotiation</td><td>Written communication and autonomy became filters (§4)</td></tr>
+    <tr><td>Remote &amp; global</td><td>Async rounds, recorded interviews, time-zone negotiation</td><td>Written communication and autonomy became filters (<a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a>)</td></tr>
     <tr><td>AI-assisted</td><td>AI resume screening, AI coding screens, AI interviews</td><td>Volume scales again; the human premium shifts to evaluation and judgment (the AI-era section below)</td></tr>
   </tbody>
 </table>
 
-<p><strong>Why this matters for you:</strong> every new filter lands on the candidate <em>before</em> the expensive stages, so the resume gets thinner, the screen gets earlier, and your written communication gets more heavily weighted. The doc's §1, §3, and §4 rules are responses to exactly these three shifts.</p>
+<p><strong>Why this matters for you:</strong> every new filter lands on the candidate <em>before</em> the expensive stages, so the resume gets thinner, the screen gets earlier, and your written communication gets more heavily weighted. The doc's <a href="#sec-the-resume-the-application-the-signal-gate">§1</a>, <a href="#sec-the-screening-call-the-technical-screen">§3</a>, and <a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a> rules are responses to exactly these three shifts.</p>
 
 <h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">Intersection with neighbors — the duplication boundaries</h2>
 
@@ -153,27 +156,27 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 <table>
   <thead><tr><th>Format</th><th>What it evaluates</th><th>How to behave</th><th>Section</th></tr></thead>
   <tbody>
-    <tr><td>Recruiter screen</td><td>Basic fit, salary range, availability, communication</td><td>Clear, honest, concise; have a range ready</td><td>§3</td></tr>
-    <tr><td>Hiring-manager screen</td><td>Team fit, experience relevance, motivation</td><td>Show you understand the role and the product</td><td>§3</td></tr>
-    <tr><td>Live coding</td><td>Problem-solving, communication, code quality</td><td>Think out loud, clarify, start simple</td><td>§3</td></tr>
-    <tr><td>Pair programming</td><td>Collaboration, receptiveness, debugging</td><td>Treat the interviewer as a teammate, not a judge</td><td>§3</td></tr>
-    <tr><td>Take-home</td><td>Code quality, product sense, time management</td><td>Follow the prompt, write a README, add tests</td><td>§3</td></tr>
-    <tr><td>Code review exercise</td><td>Review skill, empathy, attention to detail</td><td>Find bugs, suggest improvements kindly</td><td>§3</td></tr>
-    <tr><td>System design</td><td>Architecture, trade-offs, communication</td><td>Clarify, estimate, design iteratively</td><td>§6</td></tr>
-    <tr><td>Behavioral</td><td>Risk, self-awareness, teamwork</td><td>STAR, answer the risk not the costume</td><td>§5</td></tr>
-    <tr><td>Panel / culture</td><td>Cross-team fit, values</td><td>Answer each interviewer's axis</td><td>§7</td></tr>
-    <tr><td>Offer call</td><td>Compensation alignment</td><td>Negotiate range + total comp, get it in writing</td><td>§10</td></tr>
+    <tr><td>Recruiter screen</td><td>Basic fit, salary range, availability, communication</td><td>Clear, honest, concise; have a range ready</td><td><a href="#sec-the-screening-call-the-technical-screen">§3</a></td></tr>
+    <tr><td>Hiring-manager screen</td><td>Team fit, experience relevance, motivation</td><td>Show you understand the role and the product</td><td><a href="#sec-the-screening-call-the-technical-screen">§3</a></td></tr>
+    <tr><td>Live coding</td><td>Problem-solving, communication, code quality</td><td>Think out loud, clarify, start simple</td><td><a href="#sec-the-screening-call-the-technical-screen">§3</a></td></tr>
+    <tr><td>Pair programming</td><td>Collaboration, receptiveness, debugging</td><td>Treat the interviewer as a teammate, not a judge</td><td><a href="#sec-the-screening-call-the-technical-screen">§3</a></td></tr>
+    <tr><td>Take-home</td><td>Code quality, product sense, time management</td><td>Follow the prompt, write a README, add tests</td><td><a href="#sec-the-screening-call-the-technical-screen">§3</a></td></tr>
+    <tr><td>Code review exercise</td><td>Review skill, empathy, attention to detail</td><td>Find bugs, suggest improvements kindly</td><td><a href="#sec-the-screening-call-the-technical-screen">§3</a></td></tr>
+    <tr><td>System design</td><td>Architecture, trade-offs, communication</td><td>Clarify, estimate, design iteratively</td><td><a href="#sec-the-system-design-round">§6</a></td></tr>
+    <tr><td>Behavioral</td><td>Risk, self-awareness, teamwork</td><td>STAR, answer the risk not the costume</td><td><a href="#sec-the-hr-behavioral-interview-the-messy-questions">§5</a></td></tr>
+    <tr><td>Panel / culture</td><td>Cross-team fit, values</td><td>Answer each interviewer's axis</td><td><a href="#sec-panel-rounds-culture-fit-the-reference-check">§7</a></td></tr>
+    <tr><td>Offer call</td><td>Compensation alignment</td><td>Negotiate range + total comp, get it in writing</td><td><a href="#sec-the-offer-negotiation-and-onboarding">§10</a></td></tr>
   </tbody>
 </table>
 
-<h2 id="sec-the-resume-the-application-the-signal-gate">1. The resume &amp; the application — the signal gate</h2>
+<h2 id="sec-the-resume-the-application-the-signal-gate">The resume &amp; the application — the signal gate</h2>
 
 <p>The resume is not a biography; it is a <strong>filter for the next filter</strong>. Recruiters spend seconds, not minutes, and an automated system (ATS) may read it before a human. Three rules:</p>
 
 <ol>
   <li><strong>One page until you have a decade of relevant work.</strong> Recruiters skim; a two-page entry-level resume is a self-inflicted skip.</li>
   <li><strong>Outcomes, not duties.</strong> "Built the checkout flow" is a duty; "Rebuilt the checkout flow: 41% fewer abandoned carts in two months" is a signal. Numbers, when honest, are the strongest signal an early-career resume has.</li>
-  <li><strong>Tailor to the JD.</strong> If the posting names TypeScript and testing, those words should appear in your resume <em>because they're true</em> — this is alignment, not keyword-stuffing. The shelf's rule from <a href="./freelance-web-practice.html">Freelance Web Practice</a> §Portfolio applies 1:1: <strong>a portfolio is a case study, not a gallery</strong> — three case studies with measurable outcomes beat a wallpaper store of screenshots.</li>
+  <li><strong>Tailor to the JD.</strong> If the posting names TypeScript and testing, those words should appear in your resume <em>because they're true</em> — this is alignment, not keyword-stuffing. The shelf's rule from <a href="./freelance-web-practice.html#sec-marketing-and-reporting-nobody-visits-to-40-inquiries">Freelance Web Practice §Portfolio</a> applies 1:1: <strong>a portfolio is a case study, not a gallery</strong> — three case studies with measurable outcomes beat a wallpaper store of screenshots.</li>
 </ol>
 
 <p>What belongs on an entry-level frontend resume, in order: one line of identity and contact, one line of positioning ("frontend developer, JavaScript/React/TypeScript"), skills grouped by honesty level (<em>fluent</em> vs <em>used</em> vs <em>seen</em> — the .NET doc's honest-framing principle), 2–3 case-study projects with outcomes, and education/certs. Your <a href="./version-control-ci-cd-deployment.html">GitHub</a> is a second resume: clean commit history, a README that explains <em>why</em> the project exists, and a live link. A repo with no README is a wall of walls.</p>
@@ -195,11 +198,11 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 
 <p><strong>Junior-specific guidance:</strong> everything you lack in tenure, compensate with proof you can ship. Before applying: 2–3 case studies with a live demo, README, and one measured outcome; a clear positioning line; and practice explaining those projects out loud until they're 60-second stories. If you have no referrals, apply thoughtfully and follow up — quality of application, not volume, is the junior's only leverage.</p>
 
-<h2 id="sec-the-cover-letter-the-application-package">2. The cover letter &amp; the application package</h2>
+<h2 id="sec-the-cover-letter-the-application-package">The cover letter &amp; the application package</h2>
 
 <p>The cover letter is optional at most startups and expected at enterprises, agencies, and anywhere a human reads before an ATS does. When it's required, three short paragraphs, no more: who you are and what you build; <em>why this company</em> (the same specific thing you'd say to "why our company" — one concrete feature or problem, not a template); and what you'd bring that the JD didn't ask for. It is a filter too: a template letter with the company name swapped in reads as "applied to a hundred of these".</p>
 
-<p>The rest of the package is your <strong>portfolio and public identity</strong>: the portfolio is a case study, not a gallery (<a href="./freelance-web-practice.html">Freelance Web Practice</a> §Portfolio — three projects with outcomes beat a wallpaper store); LinkedIn is the resume's public copy, so keep it consistent with the resume rather than a second, contradictory story; and the <a href="./version-control-ci-cd-deployment.html">GitHub</a> profile is checked by engineers — clean commit history, a README that explains <em>why</em>, and a live link. One ATS reality: machines parse text, so keep the resume's structure standard (headings, dates, plain text) — a clever two-column layout that scans well for humans can parse to gibberish for the filter that reads it first.</p>
+<p>The rest of the package is your <strong>portfolio and public identity</strong>: the portfolio is a case study, not a gallery (<a href="./freelance-web-practice.html#sec-marketing-and-reporting-nobody-visits-to-40-inquiries">Freelance Web Practice §Portfolio</a> — three projects with outcomes beat a wallpaper store); LinkedIn is the resume's public copy, so keep it consistent with the resume rather than a second, contradictory story; and the <a href="./version-control-ci-cd-deployment.html">GitHub</a> profile is checked by engineers — clean commit history, a README that explains <em>why</em>, and a live link. One ATS reality: machines parse text, so keep the resume's structure standard (headings, dates, plain text) — a clever two-column layout that scans well for humans can parse to gibberish for the filter that reads it first.</p>
 
 <p><strong>The ATS checklist — a machine reads it first:</strong></p>
 <ul>
@@ -226,15 +229,15 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 
 <p><strong>The case-study structure</strong> (write one per flagship project, 3–5 paragraphs): 1) the problem, 2) the constraints, 3) your approach, 4) the key decisions and trade-offs, 5) the outcome with a number, 6) what you'd improve. That last point is the senior tell — a project without a "what I'd do differently" reads as a project you've stopped thinking about.</p>
 
-<h2 id="sec-the-screening-call-the-technical-screen">3. The screening call &amp; the technical screen</h2>
+<h2 id="sec-the-screening-call-the-technical-screen">The screening call &amp; the technical screen</h2>
 
-<p>The screening call is a sanity check, not a test: do you speak the stack's language, do you know what you applied for, are your salary expectations in range, and can you communicate in the interview's working language. Have answers ready for <em>what do you do</em>, <em>why this role</em>, and a range, not a single number, when asked about salary — the shelf's own advice (<a href="./frontend-income-markets.html">Frontend Income Markets</a> §Caveats) is to negotiate with a range.</p>
+<p>The screening call is a sanity check, not a test: do you speak the stack's language, do you know what you applied for, are your salary expectations in range, and can you communicate in the interview's working language. Have answers ready for <em>what do you do</em>, <em>why this role</em>, and a range, not a single number, when asked about salary — the shelf's own advice (<a href="./frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets">Frontend Income Markets §Caveats</a>) is to negotiate with a range.</p>
 
 <p>The technical screen takes three forms — live coding, a take-home, or a video call with questions. The <strong>behavior</strong> is the same in all three:</p>
 
 <ul>
   <li><strong>Think out loud.</strong> The interviewer is evaluating your debugging and judgment, not just your syntax memory. Silence reads as "stuck and hiding it". Say what you're weighing, even when you don't know yet: <em>"I could use a hash map here, but let me trace the edge case where the input has duplicates."</em></li>
-  <li><strong>Plan before you code.</strong> State the approach in one or two sentences, sketch the input/output, then write. This is Pólya's phase two applied to an interview — <a href="./problem-solving.html">Problem-Solving</a> §Pólya's four phases is the whole method.</li>
+  <li><strong>Plan before you code.</strong> State the approach in one or two sentences, sketch the input/output, then write. This is Pólya's phase two applied to an interview — <a href="./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases">Problem-Solving §Pólya's four phases</a> is the whole method.</li>
   <li><strong>Correctness first, optimization second.</strong> A working solution you can explain and test beats a half-finished "optimal" one. The complexity budget in <a href="./algorithms-and-data-structures.html">Algorithms &amp; Data Structures</a> shows why: O(n²) is fine for the n in the problem; say <em>why</em> it's fine.</li>
   <li><strong>Trace a concrete example by hand</strong> before running — it catches bugs early and shows the interviewer how you debug, which is the point.</li>
   <li><strong>Never fake fluency.</strong> If you don't know something, say what you <em>do</em> know and how you'd find the rest. The honest-framing line from <a href="./dotnet-and-the-enterprise-lane.html">.NET &amp; the Enterprise Lane</a> is the template for the whole funnel, not just .NET.</li>
@@ -258,7 +261,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   <tbody>
     <tr><td>Collaboration</td><td>Ask questions, share your thinking, let the interviewer drive sometimes</td></tr>
     <tr><td>Receptiveness</td><td>Accept hints gracefully; a hint you take is progress, not a failure</td></tr>
-    <tr><td>Debugging</td><td>Read the error, form a hypothesis, test it — the §3 trace habit in real time</td></tr>
+    <tr><td>Debugging</td><td>Read the error, form a hypothesis, test it — the <a href="#sec-the-screening-call-the-technical-screen">§3</a> trace habit in real time</td></tr>
     <tr><td>Communication</td><td>Explain what you're doing before you do it</td></tr>
     <tr><td>Calmness</td><td>Slow down when stuck; speed is not the signal, composure under a live bug is</td></tr>
   </tbody>
@@ -305,7 +308,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
     <tr><td>Startup</td><td>Fast, practical, take-home or build-with-the-team</td><td>Shipping, ownership, versatility</td></tr>
     <tr><td>Enterprise</td><td>Structured, multiple rounds, heavy behavioral</td><td>Stability, process, communication</td></tr>
     <tr><td>Agency</td><td>Portfolio-first, speed, client communication</td><td>Delivery, adaptability</td></tr>
-    <tr><td>Remote product company</td><td>Async screens, take-home, system design</td><td>Written communication, autonomy (§4)</td></tr>
+    <tr><td>Remote product company</td><td>Async screens, take-home, system design</td><td>Written communication, autonomy (<a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a>)</td></tr>
     <tr><td>FAANG / big tech</td><td>LeetCode, system design, behavioral</td><td>Algorithms, scale, structured answers</td></tr>
   </tbody>
 </table>
@@ -327,13 +330,13 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   </tbody>
 </table>
 
-<h2 id="sec-the-remote-async-interview-time-zones-recorded-rounds-english">4. The remote &amp; async interview — time zones, recorded rounds, English</h2>
+<h2 id="sec-the-remote-async-interview-time-zones-recorded-rounds-english">The remote &amp; async interview — time zones, recorded rounds, English</h2>
 
 <p>If you're targeting <a href="./frontend-income-markets.html">global remote</a>, the funnel changes shape: rounds happen across time zones, technical screens are often <em>async</em> (a recorded round, a timed assessment, or a written answer), and the working language may be English you rarely speak day to day. Three mechanics most candidates get wrong:</p>
 
 <ul>
   <li><strong>Own the time-zone math.</strong> The recruiter's "10am" is your job to convert and confirm — write it down in your local time, check it the night before, and arrive early. "Which time zone was that?" during the call is a small signal that you're not used to global work, which is precisely the job you're applying for.</li>
-  <li><strong>Async recorded rounds reward narration in writing.</strong> There's no interviewer to rescue a silence, so your reasoning has to survive on the page: state assumptions, name the trade-off you chose and why, and note what you'd do next. A recorded round where you solve silently is a silent rejection. (The "think out loud" rule from §3 becomes "explain in the text".)</li>
+  <li><strong>Async recorded rounds reward narration in writing.</strong> There's no interviewer to rescue a silence, so your reasoning has to survive on the page: state assumptions, name the trade-off you chose and why, and note what you'd do next. A recorded round where you solve silently is a silent rejection. (The "think out loud" rule from <a href="#sec-the-screening-call-the-technical-screen">§3</a> becomes "explain in the text".)</li>
   <li><strong>English clarity beats English speed.</strong> Slow, plain, correct sentences read as competent; fast, tangled, accented ones read as anxious. Pause, keep sentences short, and if you miss a word, ask for it plainly. The market doc says English is a filter for remote work — treat every async written answer as a writing sample, because that's literally what it is.</li>
 </ul>
 
@@ -356,7 +359,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 
 <p>None of these is "the interview" — each one is a small way the interview can silently become about <em>you</em> instead of your answers. Eliminate them before the call, not during it.</p>
 
-<h2 id="sec-the-hr-behavioral-interview-the-messy-questions">5. The HR &amp; behavioral interview — the "messy" questions</h2>
+<h2 id="sec-the-hr-behavioral-interview-the-messy-questions">The HR &amp; behavioral interview — the "messy" questions</h2>
 
 <p>This is the room the intro asks about: "where do you see yourself in five years", "why our company", "why should we hire you", "what's your biggest weakness", leadership and teamwork, "what if a coworker struggles", "what if you need a holiday while the team is busy", how you'd handle your boss, your coworkers, your clients. It feels like small talk with landmines. Here is the lens that makes it legible: <strong>HR is doing risk assessment on you</strong> — the same discipline <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> applies to systems, applied to a new dependency (you). Three risks are being priced:</p>
 
@@ -405,11 +408,11 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   </tbody>
 </table>
 
-<p><strong>No work history?</strong> The stories come from wherever real work happened: a project, coursework, freelance, open source, a hackathon, volunteering. What makes a story evidence is the <em>result</em>, not the employer. If none of your stories has a number yet, go get one — build the thing that produces it. That's the §1 rule aimed at the behavioral round.</p>
+<p><strong>No work history?</strong> The stories come from wherever real work happened: a project, coursework, freelance, open source, a hackathon, volunteering. What makes a story evidence is the <em>result</em>, not the employer. If none of your stories has a number yet, go get one — build the thing that produces it. That's the <a href="#sec-the-resume-the-application-the-signal-gate">§1</a> rule aimed at the behavioral round.</p>
 
-<h2 id="sec-the-system-design-round">6. The system design round</h2>
+<h2 id="sec-the-system-design-round">The system design round</h2>
 
-<p>When the funnel reaches architecture, the shelf's own framing is the correct mindset: the 45-minute whiteboard (URL shortener, rate limiter, chat) is a <strong>sample of the discipline, not the discipline</strong> — <a href="./system-design.html">System Design</a> §The discipline is the week-long work, not the 45-minute exercise. In the interview, the evaluators are watching for process, not a perfect diagram:</p>
+<p>When the funnel reaches architecture, the shelf's own framing is the correct mindset: the 45-minute whiteboard (URL shortener, rate limiter, chat) is a <strong>sample of the discipline, not the discipline</strong> — <a href="./system-design.html#sec-definition-what-system-design-is-and-what-it-is-not">System Design §The discipline</a> is the week-long work, not the 45-minute exercise. In the interview, the evaluators are watching for process, not a perfect diagram:</p>
 
 <ol>
   <li><strong>Estimate before you design.</strong> Rough numbers for users, writes, reads, storage — the back-of-envelope discipline the System Design doc's capacity sections teach.</li>
@@ -437,19 +440,19 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   </tbody>
 </table>
 
-<p>The <em>behavior</em> stays identical to §6: estimate, name constraints, verbalize trade-offs, design iteratively. Only the units change — components instead of services, render cost instead of read amplification. Same sample-of-the-discipline mindset; the content lives in the docs above.</p>
+<p>The <em>behavior</em> stays identical to <a href="#sec-the-system-design-round">§6</a>: estimate, name constraints, verbalize trade-offs, design iteratively. Only the units change — components instead of services, render cost instead of read amplification. Same sample-of-the-discipline mindset; the content lives in the docs above.</p>
 
-<h2 id="sec-panel-rounds-culture-fit-the-reference-check">7. Panel rounds, culture fit &amp; the reference check</h2>
+<h2 id="sec-panel-rounds-culture-fit-the-reference-check">Panel rounds, culture fit &amp; the reference check</h2>
 
 <p>Bigger firms add two rounds that smaller ones skip, and both feel like "not really an interview" — which is exactly why they filter people who only prepped for technical rounds.</p>
 
-<p><strong>Panel rounds.</strong> Several people, one session: the engineering manager weighs delivery, a senior weighs code quality, a product person weighs communication. They're not each testing everything — each owns one axis. The senior's question set and the PM's question set need <em>different</em> answers even though the room is the same; listen for who's asking and answer to their axis (the §6 contract habit — same skill, new room).</p>
+<p><strong>Panel rounds.</strong> Several people, one session: the engineering manager weighs delivery, a senior weighs code quality, a product person weighs communication. They're not each testing everything — each owns one axis. The senior's question set and the PM's question set need <em>different</em> answers even though the room is the same; listen for who's asking and answer to their axis (the <a href="#sec-the-system-design-round">§6</a> contract habit — same skill, new room).</p>
 
-<p><strong>Culture fit.</strong> Often disguised as "let's meet the team over coffee" or "a chat with your future coworkers". It is not off-the-clock: it's the three risks from §5 priced socially — would I dread this person in review, in a deadline, in a disagreement. The answers are the same STAR discipline, one notch lighter. Two mistakes to avoid: treating it as a real test (answers become guarded) and treating it as truly off-the-record (complaining about a past boss to your future coworkers is a self-rejection). It's a conversation where you are <em>also</em> evaluating: do these people want what you want? Both parties filtering is the point.</p>
+<p><strong>Culture fit.</strong> Often disguised as "let's meet the team over coffee" or "a chat with your future coworkers". It is not off-the-clock: it's the three risks from <a href="#sec-the-hr-behavioral-interview-the-messy-questions">§5</a> priced socially — would I dread this person in review, in a deadline, in a disagreement. The answers are the same STAR discipline, one notch lighter. Two mistakes to avoid: treating it as a real test (answers become guarded) and treating it as truly off-the-record (complaining about a past boss to your future coworkers is a self-rejection). It's a conversation where you are <em>also</em> evaluating: do these people want what you want? Both parties filtering is the point.</p>
 
 <p><strong>The reference check.</strong> Near the offer, they call a past manager or peer. This one you control: choose references who can speak to a specific outcome (not "he's nice"), tell them you're using them so they're not surprised, and warn them the call is coming. A reference who says "I had no idea" is a worse signal than a reference you never listed. Honest framing applies backward too — never invent a reference, because the call is exactly how it's caught.</p>
 
-<h2 id="sec-presentation-dress-body-language-how-you-talk">8. Presentation — dress, body language, how you talk</h2>
+<h2 id="sec-presentation-dress-body-language-how-you-talk">Presentation — dress, body language, how you talk</h2>
 
 <p>The shelf is not a finishing school, and this section stays deliberately small. The whole of it is one heuristic: <strong>mirror the company's baseline, plus ten percent.</strong> A bank or enterprise (the <a href="./dotnet-and-the-enterprise-lane.html">.NET lane</a>) means a button-down or a neat sweater; a startup or agency means a clean, plain shirt — never a full suit at a modern tech startup, which signals you misread the culture. When in doubt, one notch above the recruiter's own level.</p>
 
@@ -460,15 +463,15 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   <li><strong>In a technical round, the senior's body language is thinking out loud.</strong> Silence is the only posture that fails. Narrate your weighing of options even when you're not sure — that narration <em>is</em> the evidence of judgment.</li>
 </ul>
 
-<h2 id="sec-questions-to-ask-them-the-two-way-interview">9. Questions to ask them — the two-way interview</h2>
+<h2 id="sec-questions-to-ask-them-the-two-way-interview">Questions to ask them — the two-way interview</h2>
 
 <p>Every round ends with "do you have any questions for us?" — and "no" is the only wrong answer, because it signals you weren't evaluating <em>them</em>. A candidate who asks nothing reads as someone who'd take any job; a candidate with three sharp questions reads as someone who is choosing. You are also filtering, so ask what you actually need to decide:</p>
 
 <ul>
-  <li><strong>The compounding question:</strong> "What would 'great' look like for this role in six months?" — it forces the manager to define success, and it reads as a candidate who plans to stay. (Same question, one more rung down the funnel, is your onboarding anchor — §10.)</li>
+  <li><strong>The compounding question:</strong> "What would 'great' look like for this role in six months?" — it forces the manager to define success, and it reads as a candidate who plans to stay. (Same question, one more rung down the funnel, is your onboarding anchor — <a href="#sec-the-offer-negotiation-and-onboarding">§10</a>.)</li>
   <li><strong>Process questions:</strong> "How is code reviewed here?" / "How is feedback given when something ships wrong?" — these price the work environment you'll actually live in, and the <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> review habit is the exact thing they'll describe.</li>
   <li><strong>Honest-framing questions:</strong> "What's the thing the team most needs to improve right now?" — a senior-framed question that also tells you whether the team can talk about its own debt (a huge signal).</li>
-  <li><strong>Not this:</strong> anything the JD already answered, salary as the first question in round one (keep it to the screening range, §3), or a "gotcha" that makes you look like you're interrogating back.</li>
+  <li><strong>Not this:</strong> anything the JD already answered, salary as the first question in round one (keep it to the screening range, <a href="#sec-the-screening-call-the-technical-screen">§3</a>), or a "gotcha" that makes you look like you're interrogating back.</li>
 </ul>
 
 <p>One rule governs all of it: ask what you'll actually use. A rehearsed question you don't care about the answer to is as hollow as a rehearsed answer.</p>
@@ -484,10 +487,10 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
     <tr><td>Pressure to accept immediately</td><td>Low leverage or high churn</td></tr>
     <tr><td>Refusal to give a salary range</td><td>Possible lowballing</td></tr>
     <tr><td>Negative talk about past employees</td><td>Blame culture</td></tr>
-    <tr><td>Unrealistic take-home</td><td>Disrespect for your time (§3)</td></tr>
+    <tr><td>Unrealistic take-home</td><td>Disrespect for your time (<a href="#sec-the-screening-call-the-technical-screen">§3</a>)</td></tr>
     <tr><td>No onboarding plan</td><td>Sink-or-swim culture</td></tr>
     <tr><td>High turnover</td><td>Systemic problem, not individual exits</td></tr>
-    <tr><td>Ghosting after a final round</td><td>Poor communication culture (§11)</td></tr>
+    <tr><td>Ghosting after a final round</td><td>Poor communication culture (<a href="#sec-multiple-offers-counter-offers-rejection">§11</a>)</td></tr>
   </tbody>
 </table>
 
@@ -507,9 +510,9 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 
 <p>Spend the same time researching them as you'd spend preparing your own stories — the questions you ask are half of the interview, and an informed question reads as engagement while a generic one reads as form-filling.</p>
 
-<h2 id="sec-the-offer-negotiation-and-onboarding">10. The offer, negotiation, and onboarding</h2>
+<h2 id="sec-the-offer-negotiation-and-onboarding">The offer, negotiation, and onboarding</h2>
 
-<p>An offer is not the end of the funnel; it is the last filter — compensation alignment. The shelf's rule from <a href="./frontend-income-markets.html">Frontend Income Markets</a> §Caveats: <strong>negotiate with a range, not a single number.</strong> Anchor from the market data you gathered (the income docs' boards and peer anecdotes), and compare <strong>total compensation</strong>, not base alone — equity, bonus, benefits, remote flexibility, and growth all change the real number. Two more rules:</p>
+<p>An offer is not the end of the funnel; it is the last filter — compensation alignment. The shelf's rule from <a href="./frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets">Frontend Income Markets §Caveats</a>: <strong>negotiate with a range, not a single number.</strong> Anchor from the market data you gathered (the income docs' boards and peer anecdotes), and compare <strong>total compensation</strong>, not base alone — equity, bonus, benefits, remote flexibility, and growth all change the real number. Two more rules:</p>
 
 <ul>
   <li><strong>Say yes or no, not maybe.</strong> Once you have an offer, you are past the interview phase; ghosting or endless delay burns the goodwill you just earned.</li>
@@ -548,7 +551,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   </tbody>
 </table>
 
-<p>Every phrase is honest, calm, and range-based — no ultimatums, no invented offers. A counter works when the only issue was compensation and trust survives the ask; if the reasons you were looking are bigger than money, no counter fixes them (the §11 rule, one stage early).</p>
+<p>Every phrase is honest, calm, and range-based — no ultimatums, no invented offers. A counter works when the only issue was compensation and trust survives the ask; if the reasons you were looking are bigger than money, no counter fixes them (the <a href="#sec-multiple-offers-counter-offers-rejection">§11</a> rule, one stage early).</p>
 
 <p>Then <strong>onboarding</strong> — the first 90 days. This is where offers succeed or quietly die, and it is the phase no doc on the shelf owns. The 90-day shape: first days, read and set up (the <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a> doc is your friend — the repo will expect you to run things); first weeks, ship something small and take the team's code review as a gift, not a threat (the <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> doc's review habit); first months, ask the question that compounds — "what would 'great' look like for this role in six months?" — and then do that. Ask questions early and in writing; a candidate who asks "what does great look like" reads as someone who plans to stay. The phased shape:</p>
 
@@ -570,15 +573,15 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   <li>What does good communication look like in this team?</li>
 </ul>
 
-<h2 id="sec-multiple-offers-counter-offers-rejection">11. Multiple offers, counter-offers &amp; rejection</h2>
+<h2 id="sec-multiple-offers-counter-offers-rejection">Multiple offers, counter-offers &amp; rejection</h2>
 
 <p>Two situations the funnel only reaches if it's going well — and one it always reaches eventually.</p>
 
-<p><strong>Multiple offers.</strong> The best position to negotiate from is a real alternative, but handle it honestly: tell each recruiter where you are in their timeline and when you need an answer from them, rather than silently running three funnels in parallel. Compare on total comp (the §10 rule), growth, and ownership — not the delta on base alone. If you're using offer B to push offer A, say so plainly and once; invented competing offers are the fastest way to get a "congratulations, go with them".</p>
+<p><strong>Multiple offers.</strong> The best position to negotiate from is a real alternative, but handle it honestly: tell each recruiter where you are in their timeline and when you need an answer from them, rather than silently running three funnels in parallel. Compare on total comp (the <a href="#sec-the-offer-negotiation-and-onboarding">§10</a> rule), growth, and ownership — not the delta on base alone. If you're using offer B to push offer A, say so plainly and once; invented competing offers are the fastest way to get a "congratulations, go with them".</p>
 
 <p><strong>Counter-offers.</strong> When your current employer counter-offers to keep you, the honest framing is: <strong>you just told them you were leaving.</strong> The classic advice is that most people who accept a counter leave within a year anyway — the reasons you started looking don't disappear because they raised the number. The exception is when the real blocker was purely compensation and they fixed exactly that; the rule is to decide on the <em>original</em> reasons, not the flattery of being wanted.</p>
 
-<p><strong>Rejection.</strong> The funnel rejects most candidates most of the time — that is its design, not a verdict on you. Treat it as a data point: ask the one question that's actually answerable ("what would have made this a yes?") and mine the pattern across rejections rather than over-reading any single one. One rejection is noise; three pointing at the same thing (say, "no real project depth") is a signal with a fix — go build the case study the §1 rules describe. And when the process goes silent (ghosting): one polite follow-up, then move on. The funnel is a filter; a filter that ghosts you wasn't going to be a good manager anyway.</p>
+<p><strong>Rejection.</strong> The funnel rejects most candidates most of the time — that is its design, not a verdict on you. Treat it as a data point: ask the one question that's actually answerable ("what would have made this a yes?") and mine the pattern across rejections rather than over-reading any single one. One rejection is noise; three pointing at the same thing (say, "no real project depth") is a signal with a fix — go build the case study the <a href="#sec-the-resume-the-application-the-signal-gate">§1</a> rules describe. And when the process goes silent (ghosting): one polite follow-up, then move on. The funnel is a filter; a filter that ghosts you wasn't going to be a good manager anyway.</p>
 
 <p><strong>The thank-you and follow-up mechanics</strong> — small, low-cost, and consistently skipped:</p>
 
@@ -599,7 +602,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   <tbody>
     <tr><td>Company A</td><td>Resume</td><td>No response</td><td>Resume / portfolio issue?</td></tr>
     <tr><td>Company B</td><td>Technical</td><td>Struggled to explain</td><td>Practice thinking out loud</td></tr>
-    <tr><td>Company C</td><td>Behavioral</td><td>Too vague</td><td>Build the STAR story bank (§5)</td></tr>
+    <tr><td>Company C</td><td>Behavioral</td><td>Too vague</td><td>Build the STAR story bank (<a href="#sec-the-hr-behavioral-interview-the-messy-questions">§5</a>)</td></tr>
   </tbody>
 </table>
 
@@ -612,10 +615,10 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 <table>
   <thead><tr><th>Signal</th><th>What it changes</th></tr></thead>
   <tbody>
-    <tr><td>AI resume screening</td><td>Resumes must be clear, parseable, and evidence-based — the §1 rules get stricter, not softer</td></tr>
+    <tr><td>AI resume screening</td><td>Resumes must be clear, parseable, and evidence-based — the <a href="#sec-the-resume-the-application-the-signal-gate">§1</a> rules get stricter, not softer</td></tr>
     <tr><td>AI coding screens</td><td>AI may assist or evaluate; disclosure policies matter — know the company's rules before the round</td></tr>
-    <tr><td>AI-assisted take-homes</td><td>Companies may ask about AI usage; honesty matters (§3's rule, one stage later)</td></tr>
-    <tr><td>AI interviews</td><td>Recorded or automated interviews reward clear narration — the §4 written-reasoning rule goes live</td></tr>
+    <tr><td>AI-assisted take-homes</td><td>Companies may ask about AI usage; honesty matters (<a href="#sec-the-screening-call-the-technical-screen">§3</a>'s rule, one stage later)</td></tr>
+    <tr><td>AI interviews</td><td>Recorded or automated interviews reward clear narration — the <a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a> written-reasoning rule goes live</td></tr>
     <tr><td>Human premium</td><td>Judgment, communication, debugging, and evaluation become more valuable — the things AI is worst at</td></tr>
     <tr><td>Portfolio importance</td><td>Proof of real work matters more when AI can generate code — the case study is your counter-evidence</td></tr>
   </tbody>
@@ -625,7 +628,7 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
 
 <h2 id="sec-worked-example-one-funnel-end-to-end">Worked example — one funnel, end to end</h2>
 
-<p>Let's run one candidate, Amina, through the whole funnel to see the shape of each stage. She's a JS/React learner following the shelf, applying to a local product company that uses TypeScript, React, and a REST backend — and running one remote application in parallel for the §4 async round.</p>
+<p>Let's run one candidate, Amina, through the whole funnel to see the shape of each stage. She's a JS/React learner following the shelf, applying to a local product company that uses TypeScript, React, and a REST backend — and running one remote application in parallel for the <a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a> async round.</p>
 
 <pre>1 · Resume + cover letter: one page, "frontend developer ·
      JavaScript/React/TypeScript". Three projects with outcomes — "cut
@@ -680,18 +683,18 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
     <tr><td>Faking a skill</td><td>Desperation, or "listing everything" on the resume</td><td>The honest-framing line: "I can read C#; my depth is JS/TS" — say what you have</td></tr>
     <tr><td>Tutorial-repo portfolio</td><td>Copying projects with no README, no outcomes</td><td>The case-study-not-gallery rule: three projects with measured results</td></tr>
     <tr><td>Rambling behavioral answers</td><td>Answering the costume, not the risk</td><td>STAR, 30 seconds, answer the question asked</td></tr>
-    <tr><td>"No questions for us" at the end of every round</td><td>Not evaluating them — reads as desperate or disengaged</td><td>Ask the compounding question, process questions, and one honest-framing question (§9)</td></tr>
-    <tr><td>Solving an async round in silence</td><td>Treating a recorded round like a live one</td><td>Write your reasoning, assumptions, and next steps into the answer (§4)</td></tr>
-    <tr><td>Missing the time zone</td><td>Not owning the remote logistics</td><td>Convert, confirm in writing, check the night before (§4)</td></tr>
-    <tr><td>Treating culture fit as off-the-record</td><td>Complaining to future coworkers</td><td>It's still an interview: same STAR discipline, one notch lighter (§7)</td></tr>
-    <tr><td>A reference who's surprised</td><td>Not warning your references</td><td>Tell them you're using them, name the outcome you want praised (§7)</td></tr>
-    <tr><td>Accepting a counter-offer from the company you tried to leave</td><td>Letting flattery override the original reasons</td><td>Decide on the reasons you started looking; a raise rarely changes them (§11)</td></tr>
-    <tr><td>Reading one rejection as a verdict</td><td>Over-interpreting a single filter result</td><td>Mine the pattern across rejections; one is noise, three pointing at the same thing is a signal with a fix (§11)</td></tr>
+    <tr><td>"No questions for us" at the end of every round</td><td>Not evaluating them — reads as desperate or disengaged</td><td>Ask the compounding question, process questions, and one honest-framing question (<a href="#sec-questions-to-ask-them-the-two-way-interview">§9</a>)</td></tr>
+    <tr><td>Solving an async round in silence</td><td>Treating a recorded round like a live one</td><td>Write your reasoning, assumptions, and next steps into the answer (<a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a>)</td></tr>
+    <tr><td>Missing the time zone</td><td>Not owning the remote logistics</td><td>Convert, confirm in writing, check the night before (<a href="#sec-the-remote-async-interview-time-zones-recorded-rounds-english">§4</a>)</td></tr>
+    <tr><td>Treating culture fit as off-the-record</td><td>Complaining to future coworkers</td><td>It's still an interview: same STAR discipline, one notch lighter (<a href="#sec-panel-rounds-culture-fit-the-reference-check">§7</a>)</td></tr>
+    <tr><td>A reference who's surprised</td><td>Not warning your references</td><td>Tell them you're using them, name the outcome you want praised (<a href="#sec-panel-rounds-culture-fit-the-reference-check">§7</a>)</td></tr>
+    <tr><td>Accepting a counter-offer from the company you tried to leave</td><td>Letting flattery override the original reasons</td><td>Decide on the reasons you started looking; a raise rarely changes them (<a href="#sec-multiple-offers-counter-offers-rejection">§11</a>)</td></tr>
+    <tr><td>Reading one rejection as a verdict</td><td>Over-interpreting a single filter result</td><td>Mine the pattern across rejections; one is noise, three pointing at the same thing is a signal with a fix (<a href="#sec-multiple-offers-counter-offers-rejection">§11</a>)</td></tr>
     <tr><td>Wearing a suit to a startup</td><td>Misreading the culture</td><td>Mirror the company's baseline + 10%; one notch above the recruiter</td></tr>
     <tr><td>Fizzling after the offer</td><td>Treating the first 90 days as a victory lap</td><td>Ship small, ask "what does great look like", take review as a gift</td></tr>
-    <tr><td>Treating a take-home as a hobby project</td><td>No timebox, no README, no tests</td><td>The take-home checklist: read the prompt, timebox, commit clean, explain (§3)</td></tr>
-    <tr><td>Grinding alone instead of filtering back</td><td>Forgetting you're also interviewing them</td><td>Research, ask questions, watch the red flags (§9)</td></tr>
-    <tr><td>Memorized interview answers</td><td>Scripts break under follow-up</td><td>Phrases, shapes, and STAR stories you can re-tell — never word-for-word (§10)</td></tr>
+    <tr><td>Treating a take-home as a hobby project</td><td>No timebox, no README, no tests</td><td>The take-home checklist: read the prompt, timebox, commit clean, explain (<a href="#sec-the-screening-call-the-technical-screen">§3</a>)</td></tr>
+    <tr><td>Grinding alone instead of filtering back</td><td>Forgetting you're also interviewing them</td><td>Research, ask questions, watch the red flags (<a href="#sec-questions-to-ask-them-the-two-way-interview">§9</a>)</td></tr>
+    <tr><td>Memorized interview answers</td><td>Scripts break under follow-up</td><td>Phrases, shapes, and STAR stories you can re-tell — never word-for-word (<a href="#sec-the-offer-negotiation-and-onboarding">§10</a>)</td></tr>
     <tr><td>Silent AI use against policy</td><td>Misreading the era's honesty rule</td><td>Answer AI questions honestly; use AI as a reviewer, not a ghostwriter (the AI-era section)</td></tr>
   </tbody>
 </table>
@@ -736,11 +739,11 @@ security-and-threat-modeling.html         this doc only maps to it.</pre>
   <thead><tr><th>Category</th><th>Tools</th><th>Decision metric</th></tr></thead>
   <tbody>
     <tr><td>Job discovery</td><td>LinkedIn, Wellfound, Otta, We Work Remotely, local boards</td><td>Signal quality, remote availability, response rate — the income docs own the market data</td></tr>
-    <tr><td>Salary research</td><td>levels.fyi, Glassdoor, Payscale, local peer data</td><td>Market alignment for the §10 range</td></tr>
+    <tr><td>Salary research</td><td>levels.fyi, Glassdoor, Payscale, local peer data</td><td>Market alignment for the <a href="#sec-the-offer-negotiation-and-onboarding">§10</a> range</td></tr>
     <tr><td>Interview practice</td><td>Pramp, interviewing.io, LeetCode mock, peer mocks</td><td>Realistic pressure and feedback quality over question count</td></tr>
-    <tr><td>Portfolio hosting</td><td>GitHub Pages, Vercel, Netlify</td><td>Live demos, speed, professionalism (§2)</td></tr>
-    <tr><td>Resume tooling</td><td>Plain markdown/PDF, ATS-friendly templates</td><td>Parseability first, then looks (§2)</td></tr>
-    <tr><td>Interview tracking</td><td>Notion, Obsidian, a spreadsheet</td><td>Tracking applications, stages, and the rejection pattern (§11)</td></tr>
+    <tr><td>Portfolio hosting</td><td>GitHub Pages, Vercel, Netlify</td><td>Live demos, speed, professionalism (<a href="#sec-the-cover-letter-the-application-package">§2</a>)</td></tr>
+    <tr><td>Resume tooling</td><td>Plain markdown/PDF, ATS-friendly templates</td><td>Parseability first, then looks (<a href="#sec-the-cover-letter-the-application-package">§2</a>)</td></tr>
+    <tr><td>Interview tracking</td><td>Notion, Obsidian, a spreadsheet</td><td>Tracking applications, stages, and the rejection pattern (<a href="#sec-multiple-offers-counter-offers-rejection">§11</a>)</td></tr>
     <tr><td>AI prep</td><td>ChatGPT/Claude for mock questions and review</td><td>Practice and review, never deception (the AI-era section)</td></tr>
   </tbody>
 </table>
