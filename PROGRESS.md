@@ -12,7 +12,7 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 
 ## Per-doc status (41 EN / 18 twins, measured 2026-08-10, Tier 0; corrected at v11)
 
-### Twins — ✅ AR-OK (11)
+### Twins — ✅ AR-OK (18)
 | doc | EN h2 | AR h2 |
 |---|---|---|
 | cs-and-software-engineering | 23 | 23 |
@@ -26,11 +26,18 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 | ui-ux-web-design | 18 | 18 |
 | html-and-css | 23 | 23 |
 | how-developers-think-frontend | 25 | 25 |
+| system-design | 24 | 24 |
+| software-development-process | 34 | 34 |
+| class-to-hooks-paradigm-shift | 35 | 35 |
+| angular-evolution | 23 | 23 |
+| javascript-across-stacks | 19 | 19 |
+| frontend-camps-survey | 21 | 21 |
+| javascript-the-language | 19 | 19 |
 
 > **Hygiene NOTE (v18 gate battery):** parity ✔ ≠ hygiene ✔. The debt inventory is EMPTY as of v30:
 > cs-and-se (v27: 46 numerals + 178 §-tokens resolved; v27-fix retargeted §10 → look-back), glossary (v28: 297 §-tokens → 232 cross-doc fold patterns, per-doc legacy-number maps recovered from v6/v10 history + ~35 content-verified deviations), react-2024 (v29: 54 numerals + §1–§8 + dotted 4.1–4.4 → parent anchor + c2h cross-doc), problem-solving + ui-ux (v30: last h2/h3 numeral residues). Full shelf: 18/18 twins ALL GATES GREEN (v-sk7: boundary class B gains U+2018/U+2019 — the `§9b’s` possessive case).
 
-### Twins — ⏳ LAGGING (2, ordered by gap size)
+### Twins — ⏳ LAGGING (empty)
 | doc | EN h2 | AR h2 | gap | tier |
 |---|---|---|---|---|
 *(none — all 18 docs have matching twins; 18/18 twins green)*
