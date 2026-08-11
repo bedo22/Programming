@@ -14,6 +14,9 @@
   <p class="kicker">Reference · Building CLIs — the terminal as a development platform</p>
   <h1>Building CLIs &amp; Terminal Applications</h1>
   <p class="meta">For: the developer who uses the terminal daily and wants to build <em>for</em> it — argument parsers, interactive prompts, spinners, and the AI-agent CLIs that are remaking the form.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/terminal-applications.html">العربية</a>
+  </p>
 </header>
 
 <blockquote class="callout">
@@ -46,7 +49,7 @@
 <p>Reading order: read the Definition (what a CLI is and isn't — the vocabulary matters), then the Architecture section to see the shape every CLI shares, then the Terminal I/O section for the platform mechanics. The AI-agent CLIs section is the payoff if you use those tools daily. When a real CLI is in front of you, the Reading a CLI Codebase section is the map. Cross-links:</p>
 <ul>
   <li>Using the terminal (the prerequisite): <a href="./terminal-and-deployment-substrate.html">Terminal &amp; Deployment Substrate</a>.</li>
-  <li>The runtime (Node, streams, event loop): <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §3b — how JS actually behaves on a server/CLI.</li>
+  <li>The runtime (Node, streams, event loop): <a href="./javascript-across-stacks.html#sec-the-node-runtime-how-js-actually-behaves-on-a-server">JavaScript Across Stacks §3b</a> — how JS actually behaves on a server/CLI.</li>
   <li>Servers (the sibling platform): <a href="./backend-engineering.html">Backend Engineering</a>.</li>
   <li>Contributing to a CLI once you can read one: <a href="./open-source.html">Open Source</a>.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
@@ -249,7 +252,7 @@ const LEVELS = {
   </tbody>
 </table>
 
-<p>The publishing mechanics (npm lifecycle, versioning, registry) are the same as for any package — the versioning rules live in <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> §5b. The CLI-specific part is the <code>bin</code> mapping and the decision of npm vs. compiled binary.</p>
+<p>The publishing mechanics (npm lifecycle, versioning, registry) are the same as for any package — the versioning rules live in <a href="./version-control-ci-cd-deployment.html#sec-semver-and-releases-naming-the-snapshots-you-ship">Version Control, CI/CD §5b</a>. The CLI-specific part is the <code>bin</code> mapping and the decision of npm vs. compiled binary.</p>
 
 <h2 id="sec-reading-a-cli-codebase-the-contributor-s-lens">Reading a CLI codebase — the contributor's lens</h2>
 

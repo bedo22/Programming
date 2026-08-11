@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بناء أدوات سطر الأوامر وتطبيقات الطرفية — الطرفية كمنصة تطوير</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · بناء أدوات CLI — الطرفية كمنصة تطوير</p>
+  <h1>بناء أدوات سطر الأوامر وتطبيقات الطرفية</h1>
+  <p class="meta">لمن: المطوّر الذي يستخدم الطرفية يوميًا ويريد أن يبني <em>من أجلها</em> — محللات الوسائط، والموجهات التفاعلية، ومؤشرات التقدم، وأدوات CLI الوكلاء الذكية التي تعيد تشكيل هذا الشكل.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../terminal-applications.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يقع هذا الدليل.</strong> وثيقة <a href="../terminal-and-deployment-substrate.html">الركيزة الطرفية والنشر (Terminal &amp; Deployment Substrate)</a> تعلّمك أن <em>تستخدم</em> الطرفية — التنقل، والأنابيب، وSSH، والتصحيح. هذه الوثيقة تعلّمك أن <em>تبني من أجلها</em>. الفرق حدّ منصة: لا DOM، ولا واجهات برمجة متصفح، وTTY بدل البكسلات، وتدفقات بدل الأحداث. أنت تعرف كيف تستخدم الطرفية وكيف تبني خوادم ويب بـ Node؛ هذا هو الوسط المفقود — Node في عملية طرفية.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│   TERMINAL &amp; DEPLOYMENT SUBSTRATE   ← you USE the terminal    │
+│   (shell, pipes, SSH, docker, deployment literacy)            │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│   BUILDING CLIs (THIS DOC)        ← you BUILD for the terminal│
+│   entry → args → routing → streams → TTY → prompts → output   │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│   BACKEND ENGINEERING   ← you build SERVERS (Node, HTTP)      │
+│   JAVASCRIPT ACROSS STACKS   ← Node is one stack JS runs in   │
+└───────────────────────────────────────────────────────────────┘
+   Terminal = use it. CLI = build for it. Server = build the
+   network side. Three platforms, one runtime, distinct rules.
+</pre>
+  <p><strong>جيران الرف:</strong> <a href="../terminal-and-deployment-substrate.html">الركيزة الطرفية والنشر</a> (استخدام الطرفية — الوثيقة الأم لهذا الدليل) · <a href="./javascript-across-stacks.html">جافاسكريبت عبر المكدسات</a> (Node كأحد مكدسات JS) · <a href="../backend-engineering.html">هندسة الخلفية</a> (الخوادم — منصة الأشقاء) · <a href="../open-source.html">المصدر المفتوح</a> (كيف تحصل مشاريع CLI على مساهمات — هذا الدليل يغذّي حالة المساهمة في CLI) · <a href="./glossary.html">المصطلحات</a></p>
+</blockquote>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ قسم التعريف (ما هي أداة CLI وما ليست إياه — المفردات مهمة)، ثم قسم البنية لترى الشكل الذي تتشاركه كل أداة CLI، ثم قسم الإدخال/الإخراج الطرفي لآليات المنصة. قسم أدوات CLI الوكلاء الذكية هو المردود إن كنت تستخدم هذه الأدوات يوميًا. وحين تكون أداة CLI حقيقية أمامك، فإن قسم قراءة قاعدة كود CLI هو الخريطة. روابط متقاطعة:</p>
+<ul>
+  <li>استخدام الطرفية (الشرط المسبق): <a href="../terminal-and-deployment-substrate.html">الركيزة الطرفية والنشر</a>.</li>
+  <li>بيئة التشغيل (Node والتدفقات وحلقة الأحداث): <a href="./javascript-across-stacks.html#sec-the-node-runtime-how-js-actually-behaves-on-a-server">جافاسكريبت عبر المكدسات §٣ب</a> — كيف تتصرف JS فعلاً على خادم/أداة CLI.</li>
+  <li>الخوادم (منصة الأشقاء): <a href="../backend-engineering.html">هندسة الخلفية</a>.</li>
+  <li>المساهمة في أداة CLI بعد أن تعرف كيف تقرأ واحدة: <a href="../open-source.html">المصدر المفتوح</a>.</li>
+  <li>مرجع: <a href="./glossary.html">المصطلحات</a>.</li>
+</ul>
+
+<p><strong>إن أردت يومًا بناء أداة لأتمتة سير عملك — أو تساءلت كيف تعمل Claude Code وCodex فعلاً — فهذه هي الخريطة.</strong> بنية واحدة، ونموذج منصة واحد، والآليات المحددة للصيغ التفاعلية وصيغ الوكلاء الذكية.</p>
+
+<h2 id="sec-definition-what-a-cli-is-and-what-it-is-not">التعريف — ما هي أداة CLI وما ليست إياه</h2>
+
+<p><strong>تطبيق سطر الأوامر</strong> برنامج واجهته هي الطرفية: يقرأ الوسائط والإدخال القياسي، ويكتب إلى المخرجات القياسية والخطأ القياسي، ويخرج برمز حالة. للعائلة مفردات تستحق الضبط الدقيق:</p>
+
+<table>
+  <thead><tr><th>المصطلح</th><th>ما هو</th><th>مثال</th></tr></thead>
+  <tbody>
+    <tr><td><strong>CLI</strong></td><td>برنامج تُدار به الوسائط والخيارات والإدخال القياسي؛ ينفّذ أمرًا ويخرج</td><td><code>git status</code>, <code>npm install</code></td></tr>
+    <tr><td><strong>TUI</strong></td><td>واجهة تفاعلية كاملة الشاشة مرسومة في الطرفية (مفاتيح، لوحات، إعادة رسم)</td><td><code>htop</code>, <code>lazygit</code></td></tr>
+    <tr><td><strong>REPL</strong></td><td>حلقة القراءة–التقييم–الطباعة: جلسة تفاعلية مستمرة</td><td><code>node</code> وحدها، صدفة قاعدة بيانات، أداة وكيل</td></tr>
+    <tr><td><strong>GUI</strong></td><td>بكسلات ونوافذ — الطرفية مجرد مضيف</td><td>VS Code، أي تطبيق سطح مكتب</td></tr>
+  </tbody>
+</table>
+
+<p><strong>الطرفية كمنصة:</strong> لعملية الطرفية ثلاثة أنابيب (<code>stdin</code>، <code>stdout</code>، <code>stderr</code>)، وبيئة، ووسائط، ورمز إرجاع. وعندما تكون موصولة بطرفية، يكون لها أيضًا <strong>TTY</strong> — الجهاز الذي يوصّل ضغطات مفاتيحك ويفهم رموز الهروب للألوان وحركة المؤشر. كل ما هو تفاعلي في الطرفية هو محادثة مع ذلك الـTTY.</p>
+
+<p><strong>لماذا تهيمن TypeScript/Node على أدوات CLI الحديثة:</strong> توفر Node <code>process.argv</code> و<code>process.stdin/stdout/stderr</code> ونموذج التدفقات مدمجًا؛ ويمنحك نظام npm البيئي كل طبقة تسهيل؛ والأدوات (tsup، esbuild) تُجمِّع في ملف واحد قابل للتوزيع. أدوات CLI الوكلاء الذكية المهيمنة — Claude Code وCodex وAider وContinue — مبنية كلها بهذه الطريقة، ولهذا هذا الدليل متمركز حول Node.</p>
+
+<h2 id="sec-history-from-batch-commands-to-agent-loops">التاريخ — من الأوامر الدفعية إلى حلقات الوكلاء</h2>
+
+<p>أداة CLI أقدم من الواجهة الرسومية وطالتها عمرًا. أسست يونكس (سبعينيات القرن العشرين) الشكل — أدوات صغيرة، وأنابيب، ونصًا صريحًا — وفلسفة «افعل شيئًا واحدًا جيدًا» التي ما زالت تحكم تصميم CLI. دفع عصر الواجهات الرسومية الطرفية إلى الهامش، لكن المطوّرين أبقوها كأداة القوة. ثورتان حديثتان أعادتا تشكيل الصيغة: <em>النظام البيئي لأدوات CLI في Node.js</em> (محللات الوسائط، والموجهات، وInk) جعل بناء أدوات CLI مصقولة رخيصًا، و<em>أداة CLI الوكيل الذكية</em> (2023–) حوّلت الطرفية إلى واجهة تفويض العمل — REPL يستدعي الأدوات، ويبث الرموز، ويطلب الإذن. لم تمت أداة CLI؛ أصبحت المنصة لأحدث نوع من البرمجيات.</p>
+
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">التقاطع مع الجيران — حدود الازدواجية</h2>
+
+<table>
+  <thead><tr><th>الوثيقة المجاورة</th><th>ما تملكه</th><th>ما يبقى هناك مقابل هنا</th></tr></thead>
+  <tbody>
+    <tr><td><a href="../terminal-and-deployment-substrate.html">الركيزة الطرفية والنشر</a></td><td>استخدام الصدفة، والأنابيب، والعمليات، وSSH، وDocker</td><td>هناك: <em>تشغيل</em> الطرفية. هنا: <em>برمجتها</em>. وثيقة الركيزة تسمّي الأوامر المرئية للمستخدم؛ هذه الوثيقة تسمّي البرنامج الذي ينفّذها.</td></tr>
+    <tr><td><a href="./javascript-across-stacks.html">جافاسكريبت عبر المكدسات</a></td><td>Node كمكدس — حلقة الأحداث، والتدفقات، وبيئة التشغيل</td><td>هناك: <em>كيف تتصرف بيئة التشغيل</em>. هنا: <em>ماذا تبني بها</em> — شكل CLI فوق تلك البيئة.</td></tr>
+    <tr><td><a href="../backend-engineering.html">هندسة الخلفية</a></td><td>خوادم HTTP، ودورة حياة الطلب، والمهام الخلفية</td><td>هناك: <em>الخوادم</em>. هنا: <em>تطبيقات الطرفية</em>. بيئة تشغيل واحدة، واجهة متعاكسة — لا طلب/استجابة، ولا منافذ، عملية تبدأ وتخرج.</td></tr>
+    <tr><td><a href="../open-source.html">المصدر المفتوح</a></td><td>التراخيص، والمساهمة، ورحلة المساهم</td><td>هناك: <em>المشاركة في</em> أي قاعدة كود. هنا: <em>قراءة وبناء</em> نوع CLI. هذه الوثيقة هي العدسة التقنية؛ تلك الوثيقة هي الاجتماعية.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-underlying-theory-the-three-pipe-model">النظرية الأساسية — نموذج الأنابيب الثلاثة</h2>
+
+<p>كل أداة CLI تحويلٌ على ثلاثة تدفقات، ويكاد كل قرار تصميمي يتبع من ذلك:</p>
+
+<ul>
+  <li><strong><code>stdin</code> هو قناة الإدخال.</strong> تأتي الوسائط والخيارات من سطر الأوامر؛ ويمكن أيضًا أن تُدفق البيانات عبر الأنبوب. أداة CLI جيدة البناء تقرأ البيانات من أيٍّ من الاثنين — «تعمل مع ملف أو أنبوب» خاصية تصميمية، لا مصادفة.</li>
+  <li><strong><code>stdout</code> هو قناة البيانات.</strong> وهو للمخرجات <em>القابلة للبرمجة</em> — ما ستستهلكه أداة أخرى. إذا كان آلة قد تحلّله، أبقِه نظيفًا: نصًا صريحًا أو JSON، بلا ضجيج تقدم، وبلا ألوان عند التوصيل بأنبوب.</li>
+  <li><strong><code>stderr</code> هو قناة الإنسان.</strong> الأخطاء والتحذيرات والسجلات والتقدم. هو منفصل كي يبقى تمرير stdout نظيفًا — ولهذا «السجلات تذهب إلى stderr» قاعدة، لا اختيار أسلوب.</li>
+  <li><strong>رمز الخروج هو العقد.</strong> <code>0</code> يعني النجاح؛ والرمز غير الصفري هو إشارة الخطأ القابلة للقراءة آليًا، طريقة CLI في إرجاع قيمة منطقية إلى مستدعيها.</li>
+</ul>
+
+<p>يتبع الانضباط مباشرة: <strong>قرر ما هو بيانات (stdout) وما هو سرد (stderr) قبل أن تكتب سطرًا واحدًا</strong>، وستبقى أداة CLI قابلة للتركيب مع كل شيء آخر في الطرفية.</p>
+
+<h2 id="sec-mental-models-frames-for-thinking-about-terminal-apps">النماذج الذهنية — أطر للتفكير في تطبيقات الطرفية</h2>
+
+<table>
+  <thead><tr><th>الإطار</th><th>ماذا يفعل</th></tr></thead>
+  <tbody>
+    <tr><td>«ثلاثة أنابيب، رمز خروج واحد»</td><td>كل أداة CLI تحويل تدفقات؛ التصميم يتبع من أي تدفق يحمل ماذا</td></tr>
+    <tr><td>«البرامج تتركّب»</td><td>أداة CLI مكوّن في خط أنابيب شخص آخر — لا تلوّث stdout أبدًا</td></tr>
+    <tr><td>«TTY أم لا»</td><td>الميزات التفاعلية (الألوان، مؤشرات الدوران، الموجهات) موجودة فقط عندما يكون TTY حاضرًا؛ اكشفه، لا تفترضه</td></tr>
+    <tr><td>«الطرفية محادثة»</td><td>TUIs وREPLs لا تطبع صفحة — ترسم وتستجيب وتعيد الرسم</td></tr>
+    <tr><td>«الإعداد سُلَّم»</td><td>الخيارات تلغي متغيرات البيئة التي تلغي ملف الإعداد الذي يلغي القيم الافتراضية — كل درجة لجمهور مختلف</td></tr>
+    <tr><td>«أدوات CLI الوكلاء هي REPLs بأدوات»</td><td>أحدث صيغة هي حلقة قراءة–استدعاء أداة–بث؛ وكل ما عدا ذلك في هذه الوثيقة ما زال ساريًا</td></tr>
+  </tbody>
+</table><h2 id="sec-architecture-the-shape-every-cli-shares">البنية — الشكل الذي تتشاركه كل أداة CLI</h2>
+
+<p>من سكربت صغير إلى Claude Code، يظهر الهيكل العظمي نفسه:</p>
+
+<ol>
+  <li><strong>نقطة الدخول.</strong> سطر shebang (<code>#!/usr/bin/env node</code>) إضافةً إلى حقل <code>bin</code> في <code>package.json</code> يربطان اسم أمر بملف JS. وظيفة ذلك الملف الوحيدة هي استدعاء الموجّه.</li>
+  <li><strong>تحليل الوسائط.</strong> Commander أو Yargs أو oclif أو clipanion يحوّلون <code>process.argv</code> إلى خيارات مهيكلة. هذا يتكفل بالخيارات (<code>--format json</code>)، والوسائط الموضعية، و<code>--help</code> مجانًا.</li>
+  <li><strong>توجيه الأوامر.</strong> يوزع المحلل إلى معالج أمر فرعي — <code>git add</code> و<code>git commit</code> مساران مختلفان، لا برنامج واحد. يستقبل كل معالج الخيارات المحللة.</li>
+  <li><strong>الإعداد.</strong> سُلَّم الإعداد: الخيارات ← متغيرات البيئة ← ملف الإعداد ← القيم الافتراضية. اقرأ فقط بقدر ما يحتاجه الأمر.</li>
+  <li><strong>التنفيذ والمخرجات.</strong> يؤدي المعالج عمله، ويكتب البيانات إلى stdout والسرد إلى stderr، ويعيد رمز خروج. تُلتقط الأخطاء في المستوى الأعلى ليخرج البرنامج بنظافة برمز غير صفري.</li>
+</ol>
+
+<pre>#!/usr/bin/env node
+// package.json "bin": { "todo": "./bin/todo.js" }
+import { Command } from "commander";
+const program = new Command();
+program
+  .name("todo")
+  .description("A tiny task list")
+  .argument("&lt;action&gt;", "add | list | done | delete")
+  .option("--json", "machine-readable output")
+  .action(async (action, opts) =&gt; {
+    try {
+      const result = await handle(action, opts);   // route
+      process.stdout.write(format(result, opts));  // data → stdout
+    } catch (err) {
+      process.stderr.write(String(err));           // narrative → stderr
+      process.exit(1);                              // failure code
+    }
+  });
+program.parse();
+</pre>
+
+<p><strong>رموز الخروج مفردات صغيرة، لا قيمة منطقية واحدة.</strong> تتحكم في <code>0</code> و<code>1</code>؛ وتتحكم الصدفة في بضعة أخرى يمكن لأداة CLI أن ترثها أو تعيّنها:</p>
+
+<table>
+  <thead><tr><th>الرمز</th><th>المعنى</th><th>من يعيّنه</th></tr></thead>
+  <tbody>
+    <tr><td><code>0</code></td><td>النجاح</td><td>أداة CLI الخاصة بك، عمدًا</td></tr>
+    <tr><td><code>1</code></td><td>خطأ عام</td><td>أداة CLI الخاصة بك — الافتراضي لـ«شيء فشل»</td></tr>
+    <tr><td><code>2</code></td><td>خطأ استخدام (وسائط سيئة)</td><td>محلل الوسائط لديك (يفعلها Commander)</td></tr>
+    <tr><td><code>126</code> / <code>127</code></td><td>غير قابل للتنفيذ / الأمر غير موجود</td><td>الصدفة، عند إطلاق عمليات فرعية</td></tr>
+    <tr><td><code>128 + N</code></td><td>قُتل بالإشارة N</td><td>نظام التشغيل، عندما تنهي إشارةٌ العملية</td></tr>
+  </tbody>
+</table>
+
+<p><strong>رسائل الخطأ تتبع انضباط الأنابيب نفسه للمخرجات:</strong> سطر واحد إلى <code>stderr</code> يسمّي الفشل وتلميح «ماذا تفعل بعد ذلك» («<code>Error: no such file — run "todo add" first</code>»). لا تكتب أخطاء إلى <code>stdout</code> أبدًا، وأبقِ السطر الواحد مستقرًا — السكربت الذي يفحص «هل فشل؟» يبحث في رمز الخروج، أما الإنسان الذي يصطدم بخطأ فيريد الإجراء التالي، لا تتبع الاستدعاءات.</p>
+
+<p>النمط — دخول ← تحليل ← توجيه ← إعداد ← تنفيذ ← مخرجات ← خروج — هو نفسه لملف أداة واحدة أو أداة CLI كبيرة. قراءة أداة CLI حقيقية تعني تتبع هذا العمود الفقري.</p>
+
+<h2 id="sec-terminal-i-o-the-mechanics-of-the-platform">الإدخال/الإخراج الطرفي — آليات المنصة</h2>
+
+<table>
+  <thead><tr><th>الموضوع</th><th>الآليات</th><th>ما يفعله</th></tr></thead>
+  <tbody>
+    <tr><td>التدفقات</td><td><code>process.stdin/stdout/stderr</code> تدفقات Node؛ اربطها بـ <code>.pipe()</code> أو التكرار اللاتزامني</td><td>قراءة البيانات المدفوعة، وبث المخرجات دون تخزين مؤقت</td></tr>
+    <tr><td>كشف TTY</td><td><code>process.stdout.isTTY</code> صحيح فقط عند الاتصال بطرفية</td><td>أظهر الألوان/مؤشرات الدوران تفاعليًا فقط؛ أخرج نصًا صريحًا عند التوصيل بأنبوب</td></tr>
+    <tr><td>رموز هروب ANSI</td><td>تسلسلات مثل <code>\x1b[32m</code> (أخضر)، <code>\x1b[2K</code> (مسح السطر)</td><td>الألوان وحركة المؤشر؛ المكتبات (chalk, picocolors) تجرّدها</td></tr>
+    <tr><td>الموجهات التفاعلية</td><td>Inquirer وprompts و@clack/prompts تقرأ ضغطات المفاتيح من TTY وتصيِّر واجهة سؤال</td><td>تسلسلات موجهة — اختر خيارًا، تأكيد، تحديد متعدد</td></tr>
+    <tr><td>مؤشرات الدوران والتقدم</td><td>ora وcli-progress تحرّكان الإطارات على السطر نفسه</td><td>المهام الطويلة تبلغ عن حياتها دون إغراق stdout</td></tr>
+    <tr><td>Ink</td><td>React للطرفية — المكونات تصيِّر TUI إطارًا بإطار</td><td>TUIs كاملة بنموذج React: الحالة، والمصالحة، ومعالجة المفاتيح</td></tr>
+  </tbody>
+</table>
+
+<p><strong>القاعدة الواحدة التي تربطها كلها:</strong> كل أثر تفاعلي (لون، مؤشر دوران، موجه، TUI) يعمل عبر TTY ويجب تخطيه أو خفضه عندما يكون <code>isTTY</code> خاطئًا. أداة CLI ترمّز الألوان حرفيًا تكسر الأنابيب والسجلات. المكتبات أعلاه كلها تتعامل مع هذا — ولهذا تستخدمها بدلاً من كتابة رموز الهروب يدويًا.</p>
+
+<p><strong>الإشارات — طريقة نظام التشغيل في مقاطعتك.</strong> ثلاث تهم مؤلفي CLI: <code>SIGINT</code> (Ctrl+C — المستخدم يريد التوقف)، <code>SIGTERM</code> (kill/الإيقاف — النظام يريد التوقف)، و<code>SIGPIPE</code> (قارئ مخرجاتك أغلق الأنبوب — الطرف المصب مات، فتوقف عن الكتابة). الأوليان هما خطاف الإيقاف اللطيف: فرّغ المخازن المؤقتة، وأغلق الملفات/الاتصالات، واحفظ الحالة، ثم اخرج. الثالث هو الذي يقتل الأدوات الساذجة بصمت — أداة CLI تكتب إلى أنبوب مغلق تحصل على إشارة أنبوب مكسور، والسلوك الاحترافي هو التوقف بنظافة لا الانهيار بضجيج.</p>
+
+<pre>process.on("SIGINT", () =&gt; {
+  process.stderr.write("\nInterrupted — saving state...\n");
+  saveState();                 // flush, close, persist
+  process.exit(0);             // deliberate, not a crash
+});</pre>
+
+<p><strong>التكامل مع الصدفة — ما تدين به أداة CLI لمضيفها.</strong> عرفانان يفصلان الأداة عن المواطن: <em>الإكمال</em> (دع الصدفة تقترح خياراتك وأوامرك الفرعية — يولّد Commander وoclif سكربت الإكمال لـ bash/zsh/fish، فشحن <code>todo completion</code> لا يكلف شيئًا) و<em>القيم الافتراضية الصديقة للأنابيب</em> (حين لا يكون stdout طرفية، أخرج نصًا صريحًا أو JSON لا نثرًا ملونًا — بوابة isTTY تغطي هذا أصلًا). النصف الخاص بالمستخدم — إكمال التبويب، والتاريخ، والأسماء المستعارة — يعيش في <a href="../terminal-and-deployment-substrate.html">الركيزة الطرفية والنشر</a>؛ وظيفتك هي جانب التوليد.</p>
+
+<p><strong>سطح الأمان الخاص بأدوات CLI.</strong> أداة CLI آمنة بقدر أمان طريقة استدعائها وتخزينها: فضّل <code>execFile</code>/<code>spawn</code> بمصفوفة وسائط على <code>exec</code> بدمج سلاسل (لا تبني أمر صدفة من إدخال مستخدم أبدًا)؛ لا تسجّل متغيرات البيئة أو الأسرار أبدًا؛ وامنح ملفات الإعداد التي تحمل أسرارًا <code>chmod 600</code> (قراءة/كتابة للمالك فقط). نموذج التهديدات الكامل — ما يمكن للمهاجم الوصول إليه فعلاً عبر أداتك — في <a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a>؛ هذه العادات الثلاث هي شريحة CLI منه.</p>
+
+<h2 id="sec-how-ai-agent-clis-work-the-repl-with-tools-form">كيف تعمل أدوات CLI الوكلاء الذكية — صيغة REPL مع أدوات</h2>
+
+<p>Claude Code وCodex وAider وContinue تتشارك بنية تمدّد الشكل الكلاسيكي لأداة CLI بحلقة وكيل. كل أداة CLI ذكية هي، في العمق، REPL حيث تستطيع خطوة «التقييم» استدعاء الأدوات:</p>
+
+<pre>LOOP:
+  read   → get the user's next instruction (typed or streamed)
+  plan   → the model decides what to do, possibly calling tools
+  tool   → execute a tool call (read file, run command, edit code)
+  stream → stream the model's response tokens to the TTY
+  permit → ask the user before destructive or expensive actions
+  repeat → persist history, then loop
+</pre>
+
+<p>الأنظمة الفرعية الخمسة الجديرة بالفهم (كل واحد مكان يمكنك المساهمة فيه):</p>
+
+<table>
+  <thead><tr><th>النظام الفرعي</th><th>ماذا يفعل</th><th>أين يعيش التعقيد</th></tr></thead>
+  <tbody>
+    <tr><td>استدعاء الأدوات</td><td>استدعاءات دوال مهيكلة يمكن للنموذج طلبها — خط التماس التوسعة في أداة CLI</td><td>تصميم المخطط، والتحقق من الوسائط، وأخطاء الإرجاع التي يفهمها النموذج</td></tr>
+    <tr><td>نظام الأذونات</td><td>اسمح/ارفض/اسأل لكل استدعاء أداة — حد الأمان</td><td>السياسات الافتراضية، والقوائم المسموحة، ومجموعة «اسأل دائمًا»</td></tr>
+    <tr><td>البث</td><td>تصيير استجابة النموذج رمزًا برمز إلى TTY</td><td>أنابيب SSE/التدفق، والضغط العكسي، والإلغاء</td></tr>
+    <tr><td>إدارة السياق</td><td>ما يستطيع النموذج رؤيته — الملفات المقروءة، وفهرس قاعدة الكود، وتاريخ المحادثة</td><td>الاقتطاع، والملاءمة، والتحكم بالتكلفة</td></tr>
+    <tr><td>استمرارية الجلسة</td><td>التاريخ عبر التشغيلات — استئناف محادثة</td><td>التسلسل، وترقيم إصدارات تنسيق السياق</td></tr>
+  </tbody>
+</table>
+
+<p><strong>حد الأذونات هو سطح الأمان.</strong> كل ما لا يفعله إنسان بلا تفكير — حذف ملفات، تثبيت حزم، تشغيل أوامر عشوائية، إنفاق مال — يجب أن يسأل عنه الوكيل. هذا أهم قرار معماري في الصيغة كلها، والأكثر استحقاقًا للقراءة بعناية في قاعدة كود حقيقية. التنفيذ سُلَّم بسيط: أدوات مصنّفة بالمخاطر، والحد مرسوم بين «اسمح تلقائيًا» و«اسأل دائمًا».</p>
+
+<pre>// tool permission levels — where the ask/no-ask line is drawn
+const LEVELS = {
+  safe:    ["read_file", "list_files", "search"],     // auto-allow
+  write:   ["write_file", "create_file"],             // allow or confirm
+  risky:   ["delete_file", "run_command", "install"], // always ask
+};</pre>
+
+<h2 id="sec-publishing-and-distribution-getting-your-cli-into-the-world">النشر والتوزيع — إيصال أداة CLI إلى العالم</h2>
+
+<table>
+  <thead><tr><th>الآلية</th><th>كيف تعمل</th><th>متى تستخدمها</th></tr></thead>
+  <tbody>
+    <tr><td><code>npm publish</code></td><td>حزمة بمدخل <code>bin</code>؛ تُثبَّت عالميًا أو عبر <code>npx</code></td><td>الافتراضي لأدوات JS؛ <code>npx my-tool</code> يشغّلها دون تثبيت عالمي</td></tr>
+    <tr><td>التوزيع الثنائي</td><td>pkg وbun compile وdeno compile يحزمون بيئة التشغيل في ملف تنفيذي أصلي</td><td>حين لا ينبغي أن يحتاج المستخدم Node، أو لبدء تشغيل سريع وتوزيع بملف واحد</td></tr>
+    <tr><td>العناية عبر المنصات</td><td>فواصل المسارات، ونهايات الأسطر، واقتباس الصدفة، وقواعد الحالة تختلف لكل نظام تشغيل</td><td>أي شيء يستدعي عمليات فرعية أو يلمس ملفات — انظر الجدول أدناه</td></tr>
+    <tr><td>التحديث الذاتي</td><td>افحص سجلًا/مغذيًا واطلب التحديث، أو استخدم أداة مثل <code>update-notifier</code></td><td>أدوات مخصصة للتشغيل المنتظم، حيث تكون الإصدارات القديمة عبء دعم</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>الاهتمام</th><th>Unix</th><th>Windows</th><th>العادة</th></tr></thead>
+  <tbody>
+    <tr><td>فواصل المسارات</td><td><code>/</code></td><td><code>\</code></td><td><code>path.join()</code>، لا دمج سلاسل أبدًا</td></tr>
+    <tr><td>نهايات الأسطر</td><td><code>\n</code></td><td><code>\r\n</code></td><td><code>os.EOL</code> للأسطر الجديدة التي تكتبها؛ طبّع في الاختبارات</td></tr>
+    <tr><td>الصدفة للعمليات الفرعية</td><td><code>bash</code>, <code>zsh</code>, <code>fish</code></td><td><code>cmd.exe</code>, PowerShell</td><td>مرّر مصفوفات وسائط، لا سلسلة صدفة أبدًا؛ تختفي اختلافات الاقتباس</td></tr>
+    <tr><td>حساسية حالة الأحرف</td><td>حساسة</td><td>غير حساسة</td><td>اختبر على الاثنين؛ لا تعتمد على الحالة لتمييز الملفات</td></tr>
+  </tbody>
+</table>
+
+<p>آليات النشر (دورة حياة npm، والترقيم، والسجل) هي نفسها لأي حزمة — قواعد الترقيم في <a href="./version-control-ci-cd-deployment.html#sec-semver-and-releases-naming-the-snapshots-you-ship">التحكم بالإصدارات وCI/CD §٥ب</a>. الجزء الخاص بأدوات CLI هو تعيين <code>bin</code> وقرار npm مقابل الثنائي المُجمَّع.</p>
+
+<h2 id="sec-reading-a-cli-codebase-the-contributor-s-lens">قراءة قاعدة كود أداة CLI — عين المساهم</h2>
+
+<p>لقراءة أي أداة CLI بسرعة، امشِ على عمودها الفقري: <code>bin/</code> (الدخول) ← <code>src/commands/</code> أو الموجّه (التوجيه) ← <code>src/utils</code>/<code>lib</code> (العمل الحقيقي) ← الاختبارات. بالتحديد:</p>
+
+<ol>
+  <li><strong>ابدأ بحقل <code>bin</code></strong> في <code>package.json</code> لتجد ملف الدخول، ثم إعداد محلل الوسائط — ذلك يسمّي كل أمر وخيار تدعمه الأداة.</li>
+  <li><strong>تتبّع أمرًا واحدًا من النهاية إلى النهاية</strong> من معالج مساره حتى المخرجات — هذا يعلّمك عادات المخرجات في المشروع (أين تُكتب stdout/stderr، وكيف تخرج الأخطاء).</li>
+  <li><strong>جد نقاط التفاعل</strong> — فحوصات TTY، والموجهات، واستخدام مؤشرات الدوران — لترى أين تكون الأداة «تفاعلية» وأين لا تكون.</li>
+  <li><strong>لإضافة أمر أو خيار:</strong> سجّله في المحلل، واكتب المعالج، وأضف اختبارًا. اتبع ملف الأمر القائم كقالب — النمط يُكرَّر، لا يُختلق.</li>
+  <li><strong>الاختبارات سلوك أولاً:</strong> معظم مجموعات اختبار CLI تشغّل الثنائي (أو موجّهه) بوسائط تجريبية وتؤكد على stdout ورمز الخروج والملفات المكتوبة. اختبر بنفس الطريقة التي ستُستخدم بها ميزتك.</li>
+</ol>
+
+<p>لأداة CLI وكيل ذكية، أضف المشي نفسه لكن من أجل الحلقة: جد أين تُوزَّع طلبات استدعاء الأدوات النموذجية، وأين يقع فحص الأذونات، وأين سيُسجَّل عندها أداة جديدة. خط التماس التوسعة عادة صغير وحسن التسمية — الأدوات هي الميزة، فتُبقى سهلة الإضافة. العملية الاجتماعية الكاملة لتحويل قراءة إلى مساهمة مدمجة في <a href="../open-source.html">المصدر المفتوح</a>.</p>
+
+<h2 id="sec-worked-example-a-task-list-cli-from-zero-to-published">مثال عملي — أداة CLI لقائمة مهام، من الصفر إلى النشر</h2>
+
+<pre>Goal: a "todo" CLI with add / list / done / delete, colored output,
+      then an interactive mode, then publish it.
+
+1 · Skeleton (parse + route + exit):
+     bin/todo.js with the Commander setup from the Architecture
+     section — a single <action> argument and handlers that return.
+
+2 · Add real behavior (data → stdout, narrative → stderr):
+     storage = a JSON file in ~/.todo.json
+     add "Buy milk"      → append, write file, "Added" to stderr
+     list                → print the items to stdout (clean, no color)
+     done 1              → mark item 1 done, write file
+     delete 1            → remove item 1
+     errors (missing file, bad id) → message to stderr, exit 1.
+
+3 · Add color, but TTY-gated:
+     list --json  → plain JSON on stdout (for pipelines)
+     list         → colored when process.stdout.isTTY, plain otherwise
+     (this is the "three pipes" principle in practice)
+
+4 · Add an interactive mode:
+     todo add         → an @clack/prompts text input instead of an arg
+     todo done        → a select prompt listing open items
+     still TTY-gated — a piped "done" keeps the argument path.
+
+5 · Add tests (behavior-first):
+     run the router with fixture args; assert stdout content and
+     exit code; use a temp HOME so the JSON file doesn't touch yours.
+
+6 · Publish:
+     npm publish → now "npx todo add Buy milk" works for anyone.
+     Cross-platform check: file path via path.join, not string concat.
+</pre>
+
+<p>الهيكل العظمي نفسه، مكبّرًا بـ TUI (Ink) وحلقة وكيل (استدعاء أدوات + أذونات)، هو Claude Code. أداة CLI لقائمة المهام ليست نسخة لعبة من تلك البنية — إنها البنية نفسها عند الحد الأدنى من الحجم.</p><h2 id="sec-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
+
+<table>
+  <thead><tr><th>الفشل</th><th>السبب</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td>تلويث stdout</td><td>كتابة التقدم/السجلات إلى قناة البيانات</td><td>السرد يذهب إلى stderr؛ stdout يبقى نظيفًا وقابلًا للتحليل</td></tr>
+    <tr><td>الألوان في خط أنابيب</td><td>افتراض أن TTY حاضر دائمًا</td><td>بوّب على <code>isTTY</code> أو استخدم مكتبات تفعل</td></tr>
+    <tr><td>دفن الأخطاء</td><td>ابتلاع الاستثناءات، والخروج بـ 0 عند الفشل</td><td>التقاط في المستوى الأعلى، ورسالة إلى stderr، ورمز خروج غير صفري</td></tr>
+    <tr><td>مسارات مكتوبة حرفيًا</td><td><code>~/todo.json</code> أو <code>path + "/" + name</code></td><td><code>os.homedir()</code>، <code>path.join</code>، واحترم <code>HOME</code></td></tr>
+    <tr><td>تخزين كل شيء مؤقتًا</td><td>جمع كل المخرجات في الذاكرة قبل الطباعة</td><td>بثّ أثناء التقدم — بثّ stdout، واقرأ stdin تدريجيًا</td></tr>
+    <tr><td>تصميم تفاعلي فقط</td><td>ميزات تفترض أن إنسانًا يراقب</td><td>لكل مسار تفاعلي مكافئ غير تفاعلي (خيار أو أنبوب)</td></tr>
+    <tr><td>نسيان رمز الخروج</td><td>سكربتات «تعمل» لكنها لا تشير إلى الفشل أبدًا</td><td>رمز الخروج هو عقد أداة CLI مع مستدعيها — عيّنه عمدًا</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-ecosystem-the-tooling-catalog">النظام البيئي — كتالوج الأدوات</h2>
+
+<table>
+  <thead><tr><th>الفئة</th><th>المكتبات</th><th>معيار القرار</th></tr></thead>
+  <tbody>
+    <tr><td>تحليل الوسائط</td><td>Commander, Yargs, oclif, clipanion</td><td>Commander لمعظم الحالات؛ oclif لأدوات CLI الكبيرة القائمة على الإضافات؛ clipanion للأولوية لـ TypeScript</td></tr>
+    <tr><td>الألوان</td><td>chalk, picocolors, kleur</td><td>الأصغر الذي ينجز المهمة (picocolors نحو 1KB)</td></tr>
+    <tr><td>مؤشرات الدوران/التقدم</td><td>ora, cli-spinners, cli-progress</td><td>ora لمؤشر دوران واحد؛ cli-progress لأشرطة العمليات المجمعة</td></tr>
+    <tr><td>الموجهات</td><td>Inquirer, prompts, @clack/prompts</td><td>@clack لموجهات حديثة بسيطة؛ Inquirer لأقصى الميزات</td></tr>
+    <tr><td>React للطرفية</td><td>Ink</td><td>حين تكون الواجهة معقدة بما يكفي لتستحق مكونات</td></tr>
+    <tr><td>التجميع</td><td>tsup, esbuild, unbuild</td><td>مخرجات ملف واحد وبناءات سريعة للتوزيع</td></tr>
+    <tr><td>الاختبار</td><td>vitest, jest + مساعدات spawn</td><td>سلوك أولاً: شغّل الموجّه، وأكد على stdout ورمز الخروج</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-the-future-the-terminal-as-the-agent-interface">المستقبل — الطرفية كواجهة الوكلاء</h2>
+
+<p>أعادت أداة CLI الوكيل الذكية الاعتبار للطرفية، والاتجاه يتضاعف: حلقات الوكلاء تصبح الطريقة الافتراضية التي يفوض بها المطورون العمل، وأداة CLI هي الواجهة الطبيعية لأنها قابلة للبرمجة النصية، والفحص، والتركيب. ثلاثة تحولات تتبع. أولًا، <strong>نظام الأذونات يصبح المنتج</strong> — كلما اكتسب الوكلاء قوة أكبر، صارت جودة حد الاسمح/اسأل/ارفض هي ما يثق به المستخدمون. ثانيًا، <strong>يجب أن تكون أدوات CLI قابلة للقراءة من الوكلاء</strong> — الأدوات التي تُخرج بيانات مهيكلة (JSON على stdout، وأخطاء نظيفة) هي التي يستطيع الوكلاء وخطوط الأنابيب استخدامها، وهذا هو الانضباط نفسه الذي تعلّمه هذه الوثيقة. ثالثًا، <strong>يصبح بناء واحدة أيسر وصولًا</strong> — الذكاء الاصطناعي نفسه الذي جعل أدوات CLI الوكلاء شائعة يمكنه أن يهيكل أداة CLI من موجه، ما يخفض حاجز الدخول ويرفع السقف: الحِرفة الآن في البنية وحد الأمان، لا في الكتابة.</p>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الملخص — قائمة التحقق الذهنية الكاملة</h2>
+
+<p>اطبع هذه. إنها الوثيقة كلها في اثني عشر سطرًا:</p>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>كل أداة CLI ثلاثة أنابيب + رمز خروج: البيانات ← stdout، السرد ← stderr، 0 = النجاح.</td></tr>
+    <tr><td>2</td><td>البنية دائمًا دخول ← تحليل ← توجيه ← إعداد ← تنفيذ ← مخرجات ← خروج.</td></tr>
+    <tr><td>3</td><td>رموز الخروج مفردات: 0 نجاح، 1 عام، 2 استخدام؛ الأخطاء إلى stderr، لا stdout أبدًا.</td></tr>
+    <tr><td>4</td><td>تعامل مع الإشارات: SIGINT/SIGTERM تفرّغ وتخرج بنظافة؛ SIGPIPE يعني توقف عن الكتابة، لا تنهار.</td></tr>
+    <tr><td>5</td><td>الميزات التفاعلية تعيش على TTY — اكشفه (isTTY) واخفض الأداء بدونه بلطف.</td></tr>
+    <tr><td>6</td><td>استخدم المكتبات للألوان والموجهات ومؤشرات الدوران؛ لا تكتب رموز الهروب يدويًا أبدًا.</td></tr>
+    <tr><td>7</td><td>الإعداد سُلَّم: الخيارات تلغي متغيرات البيئة التي تلغي ملف الإعداد الذي يلغي القيم الافتراضية.</td></tr>
+    <tr><td>8</td><td>شحّن الإكمال؛ عامل الصدفة كمضيفك، لا فكرة لاحقة.</td></tr>
+    <tr><td>9</td><td>الأمان: execFile على exec، ولا تسجّل الأسرار أبدًا، وchmod 600 للإعدادات التي تحملها.</td></tr>
+    <tr><td>10</td><td>عبر المنصات: path.join، os.EOL، مصفوفات وسائط لا سلاسل صدفة.</td></tr>
+    <tr><td>11</td><td>أدوات CLI الوكلاء الذكية REPLs بأدوات: اقرأ ← خطط ← استدعِ أداة ← بثّ ← اسمح ← كرّر.</td></tr>
+    <tr><td>12</td><td>حد الأذونات هو سطح الأمان لأي أداة CLI وكيل.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2 id="sec-primary-sources">المصادر الأولية</h2>
+  <ol>
+    <li>Raymond, Eric — <a href="http://www.catb.org/~esr/writings/taoup/">The Art of Unix Programming</a> — «قاعدة الصمت» وفلسفة التصميم التي ينحدر منها نموذج الأنابيب الثلاثة في هذه الوثيقة.</li>
+    <li>توثيق Node.js — <a href="https://nodejs.org/api/process.html">process (argv, stdin/stdout/stderr, exit)</a> — البدائيات المنصاتية التي تُبنى عليها كل أداة CLI.</li>
+    <li>توثيق Node.js — <a href="https://nodejs.org/api/stream.html">Streams</a> — نموذج الإدخال/الإخراج للطرفية.</li>
+    <li>Commander.js — <a href="https://github.com/tj/commander.js">التوثيق</a> — مكتبة تحليل الوسائط المهيمنة، وتعرض نمط التحليل ← التوجيه عمليًا.</li>
+    <li>Ink — <a href="https://github.com/vadimdemedes/ink">React للطرفية</a> — نموذج TUI فوق تدفقات Node.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2 id="sec-ask-your-teacher">اسأل معلمك</h2>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«امشِ معي عبر قاعدة كود أداة CLI وكيل ذكية (Claude Code أو ما يشابهها) من مدخل bin إلى حلقة استدعاء الأدوات — أين يقع حد الأذونات تحديدًا؟»</li>
+    <li>«خذ أداة CLI لقائمة المهام في المثال العملي وأرني ما الذي يتغير عند إضافة TUI بـ Ink، أو حلقة وكيل باستدعاء أدوات.»</li>
+    <li>«أي من مهاراتي الحالية ينتقل إلى بناء أداة CLI، وما أصغر أداة حقيقية يجب أن أبنيها أولًا لأثبت النمط؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · بناء أدوات CLI — الطرفية كمنصة تطوير</span>
+  <span>الوثيقة الأم: <a href="../terminal-and-deployment-substrate.html">الركيزة الطرفية والنشر</a> · بيئة التشغيل: <a href="./javascript-across-stacks.html">JS عبر المكدسات</a> · الشقيقة: <a href="../backend-engineering.html">هندسة الخلفية</a> · المساهمة: <a href="../open-source.html">المصدر المفتوح</a> · المصطلحات: <a href="./glossary.html">مصطلحات مشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>
