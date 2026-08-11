@@ -42,4 +42,4 @@ Deliverables (ONLY inside `/tmp/twin-algorithms-and-data-structures/`):
 
 ## Fold pre-check + ratio policy (v40+)
 - BEFORE the first pipeline run: verify every fold old-string — `python3 -c "import json;m=json.load(open('map.json'));en=open('en.html').read();ar=open('ar.html').read();print([o for o,_ in m['FOLDS'] if o not in en and o not in ar] or 'all folds match')"`. Fix any phantom old BEFORE running twin-pipeline; a strict-folds failure mid-run costs most when it cascades into re-translation.
-- A ratio FLAG with a recorded exception is a VALID terminal state — NEVER pad/rewrite to hit the band. Report the density reasoning and stop.
+- A ratio FLAG with a recorded exception is a VALID terminal state — NEVER pad/rewrite to hit the band. Density reasoning = run `python3 ~/.agents/skills/translate-to-arabic/scripts/density-audit.py en.html ar.html`, paste the per-section table into report.md, eyeball ONLY flagged outliers, then stop.
