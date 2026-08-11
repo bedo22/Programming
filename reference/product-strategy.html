@@ -13,7 +13,10 @@
   <p class="kicker">Reference · The business-decision layer — should we solve this, why now, and what outcome proves it worked?</p>
   <h1>Product Strategy</h1>
   <p class="meta">What product strategy is (choosing which problems deserve investment), how it differs from design thinking and product management, the Three Lenses of desirability/feasibility/viability, how strategy evolved from feature delivery to outcome management, the mental models that govern prioritization, the artifacts that carry strategic decisions, and how AI shifts the premium from generating options to selecting them. Read this before committing engineering capacity to a product opportunity.</p>
-</header>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>Language:</strong> English · <a href="./ar/product-strategy.html">العربية</a>
+        </p>
+      </header>
 
 <blockquote class="callout">
   <p><strong>Where this fits.</strong> This doc is the <em>business-decision layer</em> — the missing layer above Design Thinking:</p>
@@ -29,7 +32,7 @@
   <p>Strategy selects the opportunity; the rest of the shelf executes it. Without this layer, teams ship well-built features that move no business metric.</p>
 </blockquote>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful alongside <a href="./design-thinking.html">Design Thinking</a> (upstream) and <a href="./software-development-process.html">Software Development Process</a> (downstream). Cross-links:</p>
 <ul>
@@ -40,9 +43,9 @@
   <li>Experience: <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> — interaction design, accessibility, and state visibility.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
 </ul>
-<p><strong>If you've ever wondered why a well-engineered feature failed to move the needle, how to decide between building and buying, or how to prioritize when every stakeholder insists their request is urgent, this doc answers that.</strong> Read §1 (Definition and Three Lenses) first, then §1c–§1f for the mental models, then §3 (business viability, and its §3b pricing and §3c moat subsections) and §4 (prioritization, plus §4b portfolios) for the economics, §5 for roadmapping and §5b distribution, §6a for the deprecation record, then §9–§10 for measurement, failure modes, and the tooling catalog.</p>
+<p><strong>If you've ever wondered why a well-engineered feature failed to move the needle, how to decide between building and buying, or how to prioritize when every stakeholder insists their request is urgent, this doc answers that.</strong> Read <a href="#sec-definition-the-three-lenses">§1</a> (Definition and Three Lenses) first, then <a href="#sec-evolution-the-constraint-inversions">§1c</a>–<a href="#sec-mental-models-how-senior-strategists-think">§1f</a> for the mental models, then <a href="#sec-business-viability-product-economics">§3</a> (business viability, and its <a href="#sec-value-capture-pricing-and-packaging">§3b</a> pricing and <a href="#sec-competitive-strategy-and-moats">§3c</a> moat subsections) and <a href="#sec-prioritization-investment-allocation">§4</a> (prioritization, plus <a href="#sec-portfolio-strategy-and-the-three-horizons">§4b</a> portfolios) for the economics, <a href="#sec-strategic-roadmapping-now-next-later">§5</a> for roadmapping and <a href="#sec-distribution-and-go-to-market">§5b</a> distribution, <a href="#sec-the-artifacts-of-strategy">§6a</a> for the deprecation record, then <a href="#sec-measurement-product-analytics">§9</a>–<a href="#sec-product-strategy-tooling-catalog-with-decision-metrics">§10</a> for measurement, failure modes, and the tooling catalog.</p>
 
-<h2 id="sec-definition-the-three-lenses">1. Definition — the Three Lenses</h2>
+<h2 id="sec-definition-the-three-lenses">Definition — the Three Lenses</h2>
 
 <p><strong>Product strategy</strong> is the disciplined process of deciding which problems to solve, for whom, in what order, and with what resources — based on evidence that the solution will be desirable to users, feasible to build, and viable for the business. It is not a plan for shipping features; it is a framework for allocating scarce resources to the highest-value opportunities under uncertainty.</p>
 
@@ -67,7 +70,7 @@
   <li><strong>Not a technical architecture guide.</strong> Feasibility, decomposition, and contracts belong to <a href="./system-design.html">System Design</a>.</li>
 </ul>
 
-<h2 id="sec-history-from-project-delivery-to-outcome-management">1b. History — from project delivery to outcome management</h2>
+<h2 id="sec-history-from-project-delivery-to-outcome-management">History — from project delivery to outcome management</h2>
 
 <p>Product strategy evolved as the constraint shifted from "can we build it?" to "should we build it, and in what order?":</p>
 
@@ -86,7 +89,7 @@
 
 <p><strong>The recurring theme:</strong> the constraint keeps moving upstream. First it was "can we deliver on time?" Then "can we build the right thing?" Now it is "can we choose the right thing to build, and prove it worked?"</p>
 
-<h2 id="sec-evolution-the-constraint-inversions">1c. Evolution — the constraint inversions</h2>
+<h2 id="sec-evolution-the-constraint-inversions">Evolution — the constraint inversions</h2>
 
 <table>
   <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
@@ -101,7 +104,7 @@
 
 <p><strong>The meta-pattern:</strong> strategy keeps moving earlier in the decision chain and later in the feedback chain. The best teams decide less by authority and more by evidence, and they learn faster than the market changes.</p>
 
-<h2 id="sec-intersection-with-neighbors-the-decision-boundary">1d. Intersection with neighbors — the decision boundary</h2>
+<h2 id="sec-intersection-with-neighbors-the-decision-boundary">Intersection with neighbors — the decision boundary</h2>
 
 <table>
   <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
@@ -116,7 +119,7 @@
 
 <p><strong>The boundary rule:</strong> if the question is "what is the user's problem?", start in Design Thinking. If the question is "should the business solve this problem, and in what order?", that is this doc. If the question is "how do we build and ship it?", that is the rest of the shelf.</p>
 
-<h2 id="sec-underlying-theory-strategy-as-choice-under-uncertainty">1e. Underlying theory — strategy as choice under uncertainty</h2>
+<h2 id="sec-underlying-theory-strategy-as-choice-under-uncertainty">Underlying theory — strategy as choice under uncertainty</h2>
 
 <p>Product strategy is a decision system under uncertainty. Four ideas underpin it:</p>
 
@@ -130,7 +133,7 @@
 
 <p>These are not financial abstractions; they are the math of resource allocation. Every sprint, every hire, every API integration is an investment decision. The question is whether you are making it deliberately or by default.</p>
 
-<h2 id="sec-mental-models-how-senior-strategists-think">1f. Mental models — how senior strategists think</h2>
+<h2 id="sec-mental-models-how-senior-strategists-think">Mental models — how senior strategists think</h2>
 
 <ul>
   <li><strong>Outcomes over outputs.</strong> Shipping 10 features is an output. Increasing retention by 2% is an outcome. The first is activity; the second is progress. Measure the second.</li>
@@ -141,7 +144,7 @@
   <li><strong>The roadmap is a portfolio of bets.</strong> Each item is a hypothesis with a confidence level, an expected payoff, and a cost. The roadmap is not a promise; it is a plan for learning.</li>
 </ul>
 
-<h2 id="sec-product-discovery-opportunity-selection">2. Product discovery &amp; opportunity selection</h2>
+<h2 id="sec-product-discovery-opportunity-selection">Product discovery &amp; opportunity selection</h2>
 
 <p>Discovery is not just user research; it is the intersection of user evidence, business evidence, and technical evidence. The process:</p>
 
@@ -150,12 +153,12 @@
   <li><strong>Assess market opportunity</strong>: how many users have this problem? How much would they pay? Is the market growing or shrinking?</li>
   <li><strong>Assess strategic fit</strong>: does this align with our core strategy, capabilities, and brand? Does it open a new market or strengthen an existing one?</li>
   <li><strong>Assess technical feasibility</strong> (with <a href="./system-design.html">System Design</a>): can we build it? What are the constraints? What is the build-vs-buy calculus?</li>
-  <li><strong>Score the opportunity</strong>: use a framework (§4) to compare it against other opportunities. The goal is not precision; it is comparability.</li>
+  <li><strong>Score the opportunity</strong>: use a framework (<a href="#sec-prioritization-investment-allocation">§4</a>) to compare it against other opportunities. The goal is not precision; it is comparability.</li>
 </ol>
 
 <p>The output of discovery is not a PRD; it is a decision: pursue, pivot, or kill. A good discovery process kills bad ideas early, when they are cheap.</p>
 
-<h2 id="sec-business-viability-product-economics">3. Business viability &amp; product economics</h2>
+<h2 id="sec-business-viability-product-economics">Business viability &amp; product economics</h2>
 
 <p>Viability asks: will this generate sustainable value? The key metrics:</p>
 
@@ -175,7 +178,7 @@
 
 <p><strong>A model-specific caveat:</strong> the "LTV/CAC &gt; 3" heuristic assumes a subscription model with recurring revenue. For usage-based pricing or marketplaces, watch the <strong>payback period</strong> instead — the months needed to recover CAC from gross margin. A marketplace with a 2-month payback can spend aggressively; a subscription with LTV/CAC of 5 but a 24-month payback still needs heavy upfront capital.</p>
 
-<h2 id="sec-value-capture-pricing-and-packaging">3b. Value capture — pricing and packaging</h2>
+<h2 id="sec-value-capture-pricing-and-packaging">Value capture — pricing and packaging</h2>
 
 <p>Unit economics tell you <em>whether</em> a model can work; pricing tells you <em>how</em> it captures value. Pricing is the exchange rate of value — it dictates the entire shape of the product (who it serves, how it sells, what it must prove). The strategic options:</p>
 
@@ -191,7 +194,7 @@
 
 <p><strong>The strategic question is not "what can we charge?"</strong> It is "which capture mechanism makes the product <em>better</em>?" Usage-based pricing can lower the entry barrier but makes revenue unpredictable and pushes you to optimize for consumption. Freemium turns the product into a sales engine but demands conversion discipline. Packing is part of positioning: the tiers you offer say what you believe different types of users are worth.</p>
 
-<h2 id="sec-competitive-strategy-and-moats">3c. Competitive strategy and moats</h2>
+<h2 id="sec-competitive-strategy-and-moats">Competitive strategy and moats</h2>
 
 <p>TAM/SAM/SOM described opportunity size, but it ignored competition. A product without a moat is a feature waiting to be copied by an incumbent. Strategy must identify which moat the investment is building:</p>
 
@@ -210,7 +213,7 @@
   <p><strong>Moat question to add to every product decision:</strong> if a well-funded incumbent copied this today, what stops them from taking the market? The answer — network effects, data, switching costs, brand — is the actual strategy. If there is no answer, the "strategy" is a feature waiting to be commoditized.</p>
 </blockquote>
 
-<h2 id="sec-prioritization-investment-allocation">4. Prioritization &amp; investment allocation</h2>
+<h2 id="sec-prioritization-investment-allocation">Prioritization &amp; investment allocation</h2>
 
 <p>Prioritization is the daily work of strategy. The frameworks:</p>
 
@@ -229,7 +232,7 @@
 
 <p><strong>When cost of delay is unquantifiable:</strong> if delay can't be priced in dollars (exploratory work), don't abandon WSJF — switch to relative scoring (1–10) comparing each candidate against the others in the portfolio. The ordering still captures "this matters more than that," which is all the framework needs.</p>
 
-<h2 id="sec-portfolio-strategy-and-the-three-horizons">4b. Portfolio strategy and the Three Horizons</h2>
+<h2 id="sec-portfolio-strategy-and-the-three-horizons">Portfolio strategy and the Three Horizons</h2>
 
 <p>Prioritization picks the next bet; portfolio strategy balances <em>all</em> the bets a business runs at maturity levels.</p>
 
@@ -246,7 +249,7 @@
   <p><strong>The portfolio insight:</strong> strategy isn't just picking the next feature — it's balancing the portfolio so the company survives today (H1) while inventing tomorrow (H3). A portfolio that funds only H1 dies with its market; one that funds only H3 never ships. The killer of H3 is stealth: it dies quietly because nobody defends small exploratory bets against the urgent demands of H1.</p>
 </blockquote>
 
-<h2 id="sec-strategic-roadmapping-now-next-later">5. Strategic roadmapping — Now / Next / Later</h2>
+<h2 id="sec-strategic-roadmapping-now-next-later">Strategic roadmapping — Now / Next / Later</h2>
 
 <p>The strategic roadmap communicates direction, not dates. The Now/Next/Later framework (<a href="https://www.prodpad.com/blog/now-next-later-roadmap/">ProdPad</a>):</p>
 
@@ -265,7 +268,7 @@
 
 <p><strong>Fence the "Later" column:</strong> "Later" should be framed explicitly as <em>options we are monitoring, not commitments we are making.</em> Sales teams will happily sell a "Later" feature to close a deal today; without an explicit "not a commitment" framing, the roadmap leaks — and the team is forced to build whatever the loudest customer bought.</p>
 
-<h2 id="sec-distribution-and-go-to-market">5b. Distribution and go-to-market</h2>
+<h2 id="sec-distribution-and-go-to-market">Distribution and go-to-market</h2>
 
 <p>A great product with no distribution strategy fails. Which motion you choose shapes the product itself — its UX, its pricing, and what it must prove on day one:</p>
 
@@ -279,9 +282,9 @@
   </tbody>
 </table>
 
-<p><strong>The GTM question is a strategy question, not a marketing one:</strong> can the product reach its users without a sales force? If yes, PLG and freemium dominate. If no, the cost of sales is a fixed cost baked into the unit economics — and the CAC/LTV math in §3 must absorb it.</p>
+<p><strong>The GTM question is a strategy question, not a marketing one:</strong> can the product reach its users without a sales force? If yes, PLG and freemium dominate. If no, the cost of sales is a fixed cost baked into the unit economics — and the CAC/LTV math in <a href="#sec-business-viability-product-economics">§3</a> must absorb it.</p>
 
-<h2 id="sec-the-artifacts-of-strategy">6. The artifacts of strategy</h2>
+<h2 id="sec-the-artifacts-of-strategy">The artifacts of strategy</h2>
 
 <p>Strategy lives in documents, but the documents are not the strategy — they are the record of decisions. The key artifacts:</p>
 
@@ -299,9 +302,9 @@
 
 <p><strong>The test of a good artifact:</strong> can someone who was not in the room read it and understand what was decided, why, and what happens next? If not, the artifact is a ritual, not a tool.</p>
 
-<h3>6a. The deprecation record — killing is strategy too</h3>
+<h3>The deprecation record — killing is strategy too</h3>
 
-<p>"Strategy is what you will not do" covers <em>features</em> — but killing an <em>existing</em> product is the hardest strategic act, because the hard call is rarely made. The Zombie Product — kept alive because nobody wants the meeting — drains capacity from H1/H2 priorities (§4b).</p>
+<p>"Strategy is what you will not do" covers <em>features</em> — but killing an <em>existing</em> product is the hardest strategic act, because the hard call is rarely made. The Zombie Product — kept alive because nobody wants the meeting — drains capacity from H1/H2 priorities (<a href="#sec-portfolio-strategy-and-the-three-horizons">§4b</a>).</p>
 
 <p>The fix is a <strong>Deprecation Record</strong>, analogous to an ADR (see <a href="./system-design.html">System Design</a>):</p>
 
@@ -315,7 +318,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-stakeholders-decision-governance">7. Stakeholders &amp; decision governance</h2>
+<h2 id="sec-stakeholders-decision-governance">Stakeholders &amp; decision governance</h2>
 
 <p>Strategy fails when decision rights are unclear. The governance questions:</p>
 
@@ -328,7 +331,7 @@
 
 <p><strong>The HIPPO problem:</strong> the Highest Paid Person's Opinion overrides data. The fix is not to ignore leadership; it is to make the evidence standard explicit. If the HIPPO wants to override the data, they must state their evidence or accept the risk explicitly.</p>
 
-<h2 id="sec-build-vs-buy-vs-partner-the-strategic-matrix">8. Build vs. buy vs. partner — the strategic matrix</h2>
+<h2 id="sec-build-vs-buy-vs-partner-the-strategic-matrix">Build vs. buy vs. partner — the strategic matrix</h2>
 
 <p>Every capability can be built, bought, or accessed via partnership/API. The decision matrix:</p>
 
@@ -343,7 +346,7 @@
 
 <p><strong>The strategic question:</strong> does this capability differentiate us? If yes, build it. If no, buy or partner. The worst outcome is building a commodity that a vendor already sells better and cheaper.</p>
 
-<h2 id="sec-measurement-product-analytics">9. Measurement &amp; product analytics</h2>
+<h2 id="sec-measurement-product-analytics">Measurement &amp; product analytics</h2>
 
 <p>Strategy without measurement is opinion. The measurement stack:</p>
 
@@ -369,7 +372,7 @@
   </tbody>
 </table>
 
-<h2 id="sec-worked-example-from-opportunity-to-outcome">9a. Worked example — from opportunity to outcome</h2>
+<h2 id="sec-worked-example-from-opportunity-to-outcome">Worked example — from opportunity to outcome</h2>
 
 <pre>
 Opportunity: users abandon the onboarding flow at step 3 (payment setup)
@@ -404,7 +407,7 @@ Result: abandonment drops to 22%. Outcome achieved. Next bet: onboarding email s
 
 <p>The point is not the specific numbers; it is the discipline. Every step has a decision, a metric, and a feedback loop. Nothing is shipped without a hypothesis about the outcome it will move.</p>
 
-<h2 id="sec-failure-modes-the-traps">9b. Failure modes — the traps</h2>
+<h2 id="sec-failure-modes-the-traps">Failure modes — the traps</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>Why it happens</th><th>Fix</th></tr></thead>
@@ -417,11 +420,11 @@ Result: abandonment drops to 22%. Outcome achieved. Next bet: onboarding email s
     <tr><td><strong>Framework worship</strong></td><td>Using RICE or WSJF scores as absolute truth instead of conversation starters.</td><td>Use frameworks to structure debate, not to replace judgment.</td></tr>
     <tr><td><strong>False-precision economics</strong></td><td>A spreadsheet that says LTV = $1,247.32 based on three customers.</td><td>Use ranges, state assumptions, and update as you learn.</td></tr>
     <tr><td><strong>Strategy by consensus</strong></td><td>Every stakeholder gets a veto, so nothing is decided.</td><td>Clarify decision rights. Consultation is not veto power.</td></tr>
-    <tr><td><strong>The Zombie Product</strong></td><td>A product kept alive because nobody wants the meeting where it dies — silently draining capacity from H1/H2 bets (§4b).</td><td>Write the Deprecation Record (§6a): maintenance cost vs. value delivered, evidence that would keep it alive, migration path, communication plan.</td></tr>
+    <tr><td><strong>The Zombie Product</strong></td><td>A product kept alive because nobody wants the meeting where it dies — silently draining capacity from H1/H2 bets (<a href="#sec-portfolio-strategy-and-the-three-horizons">§4b</a>).</td><td>Write the Deprecation Record (<a href="#sec-the-artifacts-of-strategy">§6a</a>): maintenance cost vs. value delivered, evidence that would keep it alive, migration path, communication plan.</td></tr>
   </tbody>
 </table>
 
-<h2 id="sec-the-ai-era-shift-strategy-becomes-the-premium-skill">9c. The AI-era shift — strategy becomes the premium skill</h2>
+<h2 id="sec-the-ai-era-shift-strategy-becomes-the-premium-skill">The AI-era shift — strategy becomes the premium skill</h2>
 
 <p>AI changes product strategy in two fundamental ways:</p>
 
@@ -432,7 +435,7 @@ Result: abandonment drops to 22%. Outcome achieved. Next bet: onboarding email s
 
 <p>The AI-era product strategist asks: "What can AI generate, and what must a human decide?" AI generates options; humans decide which options are worth pursuing. AI generates code; humans decide whether the code solves the right problem. AI generates metrics; humans decide which metrics matter.</p>
 
-<h2 id="sec-the-complete-mental-checklist">9d. The complete mental checklist</h2>
+<h2 id="sec-the-complete-mental-checklist">The complete mental checklist</h2>
 
 <p>If you remember only one image, remember this: <strong>product strategy is the discipline of choosing what to build, in what order, and knowing whether it worked.</strong></p>
 
@@ -452,9 +455,9 @@ Result: abandonment drops to 22%. Outcome achieved. Next bet: onboarding email s
 
 <p>The maturity test is not "do we have a roadmap?" It is "do we know why we are building this, what outcome it should move, and what evidence would change our mind?"</p>
 
-<h2 id="sec-product-strategy-tooling-catalog-with-decision-metrics">10. Product strategy — tooling catalog with decision metrics</h2>
+<h2 id="sec-product-strategy-tooling-catalog-with-decision-metrics">Product strategy — tooling catalog with decision metrics</h2>
 
-<p>Strategy is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, using the same format as System Design's <a href="./system-design.html">tooling catalog</a> (§13 there):</p>
+<p>Strategy is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, using the same format as System Design's <a href="./system-design.html">tooling catalog</a> (<a href="./system-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics">§13</a> there):</p>
 
 <table>
   <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
@@ -493,7 +496,7 @@ Result: abandonment drops to 22%. Outcome achieved. Next bet: onboarding email s
 </table>
 
 <blockquote class="callout">
-  <p><strong>The anti-tooling clause:</strong> before adopting a tool, ask whether it makes a <em>strategic decision</em> visible, testable, and reversible. If it only produces charts nobody reads, it's decoration — the §9 measurement frameworks already punish that.</p>
+  <p><strong>The anti-tooling clause:</strong> before adopting a tool, ask whether it makes a <em>strategic decision</em> visible, testable, and reversible. If it only produces charts nobody reads, it's decoration — the <a href="#sec-measurement-product-analytics">§9</a> measurement frameworks already punish that.</p>
 </blockquote>
 
 <section class="cite">
