@@ -12,6 +12,9 @@
 <header class="lesson-head">
   <p class="kicker">Reference · Backend engineering — the mental model behind the code</p>
   <h1>Backend Engineering</h1>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/backend-engineering.html">العربية</a>
+  </p>
   <p class="meta">The request-per-request mental loop (Request → Process → Respond), why the server thinks in stateless requests while the browser thinks in persistent state, middleware chains, authentication vs. authorization, ORMs vs. raw SQL, background jobs, caching, transactions, and server-side state management — with concrete worked examples. Read this before you implement your first non-trivial server feature.</p>
 </header>
 
@@ -25,8 +28,8 @@
   <p>Loop siblings this doc consumes and supplies:</p>
   <ul>
     <li><a href="./api-design.html">API Design</a> — the contract layer the server implements. This doc is what happens <em>behind</em> the contract: parsing, auth, data, response shaping.</li>
-    <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — the vault this doc reads and writes; the schema is designed there, consumed here (ORM choices, transactions, §1e, §5).</li>
-    <li><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — the discipline this doc's checks execute inside: the threat model is drawn there, the authorization checks and injection-safe access run here (§1d, §1e, §7).</li>
+    <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — the vault this doc reads and writes; the schema is designed there, consumed here (ORM choices, transactions, <a href="#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>).</li>
+    <li><a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — the discipline this doc's checks execute inside: the threat model is drawn there, the authorization checks and injection-safe access run here (<a href="#sec-authentication-vs-authorization-identity-then-permission">§1d</a>, <a href="#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="#sec-state-the-identity-and-session-decision">§7</a>).</li>
     <li><a href="./how-developers-think-frontend.html">How Developers Think (The Rhythm)</a> — the sibling micro-loop; the server is its upstream data source.</li>
     <li><a href="./software-testing-and-debugging.html">Software Testing &amp; Debugging</a> — the verification layer; a request is a testable unit.</li>
     <li><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — shipping a server is not shipping a bundle: deploy, restart, and data migration are first-class.</li>
@@ -40,7 +43,7 @@
   <p>Most tutorials teach backend <em>syntax</em> — how to write a route, how to call an ORM method. Almost none teach the <em>thinking process</em> that precedes it: how an experienced engineer answers "what does this request do to the data, and when?" before writing a line. The frontend micro-loop is now well mapped (<em>The Rhythm</em>). The backend has no equivalent map — engineers transfer the React mental model to the server and it silently breaks them: they hold state in memory that should be in the database, they treat each request as if the previous one left everything in place, they write queries without thinking about transactional boundaries. This doc is the missing map. If you've ever written an endpoint that worked in Postman and fell apart under load or concurrency, this is the layer you missed.</p>
 </section>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: a sibling to <a href="./how-developers-think-frontend.html">The Rhythm</a> — read that first if you haven't. This doc is most useful once you own the language basics (<a href="./javascript-the-language.html">the language</a>, or an equivalent runtime), the <a href="./api-design.html">API contract</a>, and where this service meets the rest of the <a href="./system-design.html">system</a>. Cross-links:</p>
 <ul>
@@ -52,13 +55,13 @@
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary.</li>
 </ul>
 
-<p><strong>If you've ever written an endpoint that worked in Postman and fell apart in production — this is the map.</strong> Read §1 (the mental model), §1b (the request lifecycle), §2 (the rounds), and §6 (the worked example) first. Then the theory (§1c evolution, §5 transactions), the failure modes (§9), and the tooling catalog (§8) when you've shipped a real feature.</p>
+<p><strong>If you've ever written an endpoint that worked in Postman and fell apart in production — this is the map.</strong> Read <a href="#sec-the-backend-mental-model-one-request-at-a-time">§1</a> (the mental model), <a href="#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a> (the request lifecycle), <a href="#sec-the-three-rounds-how-a-server-feature-actually-gets-built">§2</a> (the rounds), and <a href="#sec-worked-example-trace-the-loop-end-to-end">§6</a> (the worked example) first. Then the theory (<a href="#sec-evolution-the-constraint-inversions">§1c</a> evolution, <a href="#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a> transactions), the failure modes (<a href="#sec-the-most-common-failure-modes">§9</a>), and the tooling catalog (<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">§8</a>) when you've shipped a real feature.</p>
 
-<h2 id="sec-definition-what-backend-engineering-is-and-is-not">0b. Definition — what backend engineering is and is not</h2>
+<h2 id="sec-definition-what-backend-engineering-is-and-is-not">Definition — what backend engineering is and is not</h2>
 
 <p>Backend engineering is the mental model that says: every server feature is a <em>loop</em> of one disposable request. The scaffold your framework gives you is 20%. The discipline is the long tail. It is <em>not</em> a toolchain, a set of APIs, or a database pattern — it is the thinking process that precedes every line of code. This doc is the map for that process.</p>
 
-<h2 id="sec-history-the-constraint-inversions">0c. History — the constraint inversions</h2>
+<h2 id="sec-history-the-constraint-inversions">History — the constraint inversions</h2>
 
 <p>Backend engineering evolved through constraint inversions, the same pattern that shaped every discipline on this shelf:</p>
 
@@ -74,7 +77,7 @@
 
 <p>The pattern: every inversion pushed the loop toward smaller, stateless, asynchronous units. The request is the atom; state lives in deliberate external places.</p>
 
-<h2 id="sec-intersection-with-the-other-shelves">0d. Intersection with the other shelves</h2>
+<h2 id="sec-intersection-with-the-other-shelves">Intersection with the other shelves</h2>
 
 <p>Backend engineering is the micro-loop that lives <em>inside</em> the macro layers:</p>
 
@@ -82,7 +85,7 @@
 <thead><tr><th>Neighbor doc</th><th>What belongs here</th><th>What belongs next door</th></tr></thead>
 <tbody>
 <tr><td>API Design</td><td>Parsing, authN, response shaping, DTOs, idempotency keys</td><td>The contract spec, OpenAPI, versioning policy</td></tr>
-<tr><td>Security &amp; Threat Modeling</td><td>Authorization checks in the handler, injection-safe data access, session vs. token choice (§1d, §1e, §7)</td><td>The threat model, STRIDE, IAM theory, cryptography, the OWASP taxonomy</td></tr>
+<tr><td>Security &amp; Threat Modeling</td><td>Authorization checks in the handler, injection-safe data access, session vs. token choice (<a href="#sec-authentication-vs-authorization-identity-then-permission">§1d</a>, <a href="#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="#sec-state-the-identity-and-session-decision">§7</a>)</td><td>The threat model, STRIDE, IAM theory, cryptography, the OWASP taxonomy</td></tr>
 <tr><td>Data Modeling &amp; Databases</td><td>Reading and writing the schema, ORM call patterns, transaction boundaries</td><td>Designing the schema itself — keys, constraints, indexes, migrations</td></tr>
 <tr><td>System Design</td><td>One service's data ownership, one request's consistency</td><td>Services, data partitioning, CAP, failure domains at scale</td></tr>
 <tr><td>The Rhythm</td><td>The server-side of the loop (Request → Process → Respond)</td><td>Frontend state, components, a11y, hot-reload</td></tr>
@@ -94,7 +97,7 @@
 
 <p><strong>Key rule:</strong> if the topic is "how a request becomes a row" or "what happens inside one handler", it belongs here. If it's "how the service fits into the fleet" or "how the UI calls the endpoint", it belongs next door.</p>
 
-<h2 id="sec-underlying-theory-the-invariants-to-trust">0e. Underlying theory — the invariants to trust</h2>
+<h2 id="sec-underlying-theory-the-invariants-to-trust">Underlying theory — the invariants to trust</h2>
 
 <table>
 <thead><tr><th>Invariant</th><th>What it means</th><th>Why it matters</th></tr></thead>
@@ -108,7 +111,7 @@
 </tbody>
 </table>
 
-<h2 id="sec-mental-models-frames-for-thinking-about-the-server">0f. Mental models — frames for thinking about the server</h2>
+<h2 id="sec-mental-models-frames-for-thinking-about-the-server">Mental models — frames for thinking about the server</h2>
 
 <table>
 <thead><tr><th>Frame</th><th>Core question</th><th>Key insight</th></tr></thead>
@@ -123,11 +126,11 @@
 </tbody>
 </table>
 
-<h2 id="sec-rhythm-not-algorithm-the-update-the-loop-discipline">0g. Rhythm, not algorithm — the update-the-loop discipline</h2>
+<h2 id="sec-rhythm-not-algorithm-the-update-the-loop-discipline">Rhythm, not algorithm — the update-the-loop discipline</h2>
 
 <p>Backend work is not a fixed algorithm; it is a <em>rhythm</em> of three rounds. The skeleton is fast. The deepen is thoughtful. The polish is obsessive. The same three rounds apply whether you're writing a single route or a full service. The only difference from <em>The Rhythm</em> is that the "hot reload" is a curl or a test.</p>
 
-<h2 id="sec-the-backend-mental-model-one-request-at-a-time">1. The backend mental model — one request at a time</h2>
+<h2 id="sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</h2>
 
 <p>Backend work is a <em>loop</em>, not a toolchain. The scaffold your framework generates is the easy 20%; the mental model is the long tail.</p>
 
@@ -154,9 +157,9 @@
   </tbody>
 </table>
 
-<p><strong>The signature backend bug is scope confusion:</strong> putting truth in a module-level <code>Map</code> (lost on restart, invisible to other instances) or in a process-global mutable variable that two requests touch concurrently — then wondering why an endpoint "sometimes" returns stale data. The golden rule: <strong>if two requests must see the same value, it is a database row, not a variable.</strong> In-memory state is only ever a cache with a known invalidation story (§4).</p>
+<p><strong>The signature backend bug is scope confusion:</strong> putting truth in a module-level <code>Map</code> (lost on restart, invisible to other instances) or in a process-global mutable variable that two requests touch concurrently — then wondering why an endpoint "sometimes" returns stale data. The golden rule: <strong>if two requests must see the same value, it is a database row, not a variable.</strong> In-memory state is only ever a cache with a known invalidation story (<a href="#sec-caching-the-three-layers-where-latency-hides">§4</a>).</p>
 
-<h2 id="sec-the-request-lifecycle-the-timeline-inside-the-brackets">1b. The request lifecycle — the timeline inside the brackets</h2>
+<h2 id="sec-the-request-lifecycle-the-timeline-inside-the-brackets">The request lifecycle — the timeline inside the brackets</h2>
 
 <p>An experienced backend dev reads a handler as a <em>timeline</em>, not a block. The route you wrote is a fraction of what actually runs:</p>
 
@@ -186,7 +189,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>Result-shaping rule:</strong> shape the response at the handler boundary, never by default-serializing your ORM entity (see <a href="./api-design.html">API Design §10</a>). Serializing the entity couples your API to your storage schema: rename a column and you break the public contract.</p>
 
-<h2 id="sec-evolution-the-constraint-inversions">1c. Evolution — the constraint inversions</h2>
+<h2 id="sec-evolution-the-constraint-inversions">Evolution — the constraint inversions</h2>
 
 <p>Like every discipline on this shelf, backend engineering evolved through constraint inversions — moments when a constraint changed and the old approach stopped being sufficient:</p>
 
@@ -195,15 +198,15 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
   <tbody>
     <tr><td><strong>Stateful → Stateless</strong></td><td>Server held session state in memory; users stuck to "their" server (sticky sessions)</td><td>Servers are disposable; identity travels with the client (cookies, then signed JWTs / opaque tokens)</td><td>The constraint: scaling out. If state lives in memory, adding a server breaks the session. Stateless auth let any instance serve anyone. Sessions still exist — but they live in token claims or external stores (Redis), not instance memory.</td></tr>
     <tr><td><strong>Monolith → Service</strong></td><td>One process, one database</td><td>Many deployable services, each owning its data</td><td>Team and scaling pressure (see <a href="./system-design.html">System Design</a>). The loop doesn't change — each service still runs Request → Process → Respond — but the data you may <em>not</em> touch now has a hard boundary.</td></tr>
-    <tr><td><strong>Synchronous → Asynchronous</strong></td><td>Every side effect ran inside the request: email, image processing, notifications</td><td>Heavy or optional work is queued; the request answers fast; the worker catches up</td><td>The constraint: response time is a product feature. A 20 ms reply said "200" and e-mailed later. This added a second actor to reason about — the worker (§3).</td></tr>
-    <tr><td><strong>Manual SQL → ORM → conscious choice</strong></td><td>Hand-written SQL everywhere</td><td>ORMs abstract the database; then leaks surface (N+1, migration drift)</td><td>The constraint: developer velocity vs. correctness. The mature position is neither — know both and pick per query (§1e).</td></tr>
+    <tr><td><strong>Synchronous → Asynchronous</strong></td><td>Every side effect ran inside the request: email, image processing, notifications</td><td>Heavy or optional work is queued; the request answers fast; the worker catches up</td><td>The constraint: response time is a product feature. A 20 ms reply said "200" and e-mailed later. This added a second actor to reason about — the worker (<a href="#sec-background-work-queues-jobs-and-why-you-defer">§3</a>).</td></tr>
+    <tr><td><strong>Manual SQL → ORM → conscious choice</strong></td><td>Hand-written SQL everywhere</td><td>ORMs abstract the database; then leaks surface (N+1, migration drift)</td><td>The constraint: developer velocity vs. correctness. The mature position is neither — know both and pick per query (<a href="#sec-data-access-orms-vs-raw-sql">§1e</a>).</td></tr>
     <tr><td><strong>Server-ful → Serverless</strong></td><td>You manage the process; it runs forever</td><td>The runtime scales your functions to zero when idle</td><td>The constraint: cost and ops. Serverless makes the request the only unit — but reintroduces the state problem: an in-memory cache is now a cold-start gamble. Statelessness stops being a choice and becomes the contract.</td></tr>
   </tbody>
 </table>
 
 <p><strong>The pattern:</strong> every inversion pushed the loop toward the same shape — <em>smaller, stateless, asynchronous units.</em> The request is the atom; state lives in deliberate external places; work that doesn't belong in the response is deferred. Learn that shape once and every framework — Express, FastAPI, Go's net/http — is just notation for it.</p>
 
-<h2 id="sec-authentication-vs-authorization-identity-then-permission">1d. Authentication vs. authorization — identity, then permission</h2>
+<h2 id="sec-authentication-vs-authorization-identity-then-permission">Authentication vs. authorization — identity, then permission</h2>
 
 <p>The two words are routinely conflated. They are different layers with different failure modes:</p>
 
@@ -244,7 +247,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The practical rule:</strong> the auth decision is mostly a <em>business decision</em> — how much do you want to own credential security, and how fast do you need to ship — not an engineering showcase. Passwords and 2FA are a compliance surface (see <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a>); a managed provider moves that surface into someone else's SLA. For a small product or a client build, managed auth is rarely the wrong answer; for a large organization, identity is a product and the provider choice is strategic. The <a href="./security-and-threat-modeling.html">Security doc</a> covers what still lands on your plate either way: your app's own authorization, account-takeover recovery, audit logging, and the seam where "logged in" meets "your user's data is now in your system."</p>
 
-<h2 id="sec-data-access-orms-vs-raw-sql">1e. Data access — ORMs vs. raw SQL</h2>
+<h2 id="sec-data-access-orms-vs-raw-sql">Data access — ORMs vs. raw SQL</h2>
 
 <p>The ORM is a shorthand for "the entity is a class." Raw SQL is a shorthand for "the database is the system." Both are patterns; neither is a default religion:</p>
 
@@ -265,7 +268,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 <ul>
   <li><strong>ORMs win</strong> for everyday single-resource reads/writes, schema evolution, and consistent validation.</li>
   <li><strong>Raw SQL wins</strong> for analytics, bulk operations, and anything the ORM would express <em>wrong</em> — when you catch yourself shaping the query to fit the ORM instead of the data, drop to SQL.</li>
-  <li><strong>The wire format is never the entity</strong> (§1b result-shaping). The database row is not the API payload.</li>
+  <li><strong>The wire format is never the entity</strong> (<a href="#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a> result-shaping). The database row is not the API payload.</li>
 </ul>
 
 <h3>The connection layer — pooling</h3>
@@ -283,7 +286,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The rules:</strong> set a hard <code>max_connections</code> budget — pool size × instances must fit, or queries queue instead of failing fast; transaction mode breaks session features (prepared statements, session-scoped settings), so know which your driver uses; and treat pool exhaustion as a signal worth alerting on — it is the first thing to die under load spikes.</p>
 
-<h2 id="sec-the-three-rounds-how-a-server-feature-actually-gets-built">2. The three rounds — how a server feature actually gets built</h2>
+<h2 id="sec-the-three-rounds-how-a-server-feature-actually-gets-built">The three rounds — how a server feature actually gets built</h2>
 
 <p><em>The Rhythm</em>'s rounds apply here too, with a server-specific spine. The loop per feature is the same Skeleton → Deepen → Polish cycle:</p>
 
@@ -298,9 +301,9 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The feedback-loop difference:</strong> the frontend sees its result in <em>milliseconds</em> (hot reload). The backend sees its result only when it <em>receives a request</em> — so your "hot reload" is a script, a one-off client call, or a test that hits the route. Senior devs treat a curled request / minimal integration test with exactly the seriousness the frontend gives Fast Refresh: the tighter the loop, the faster the learning.</p>
 
-<h2 id="sec-background-work-queues-jobs-and-why-you-defer">3. Background work — queues, jobs, and why you defer</h2>
+<h2 id="sec-background-work-queues-jobs-and-why-you-defer">Background work — queues, jobs, and why you defer</h2>
 
-<p>The asynchronous inversion (§1c) made deferred work a first-class part of the loop. Mental model: <strong>a request answers fast; heavy or optional work is queued.</strong></p>
+<p>The asynchronous inversion (<a href="#sec-evolution-the-constraint-inversions">§1c</a>) made deferred work a first-class part of the loop. Mental model: <strong>a request answers fast; heavy or optional work is queued.</strong></p>
 
 <table>
   <thead><tr><th>Pattern</th><th>What it is</th><th>When to reach for it</th><th>Beware</th></tr></thead>
@@ -315,7 +318,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>And the queue must be durable</strong> — a broker (BullMQ/Redis, SQS, RabbitMQ, Kafka), never "a list in memory on one process." Same rule as state above: if more than one worker can exist, the queue is external.</p>
 
-<h2 id="sec-caching-the-three-layers-where-latency-hides">4. Caching — the three layers where latency hides</h2>
+<h2 id="sec-caching-the-three-layers-where-latency-hides">Caching — the three layers where latency hides</h2>
 
 <p>Cache turns a slow read into a fast answer. Mental model: three layers, each with its own invalidation story — and <strong>invalidation is the actual engineering</strong>:</p>
 
@@ -324,7 +327,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
   <tbody>
     <tr><td><strong>Browser / client</strong></td><td>GET responses via HTTP headers (<code>Cache-Control</code>, ETag)</td><td>Careful response headers; the server is not involved</td><td>Stale data served fresh-looking when later responses forget headers</td></tr>
     <tr><td><strong>Shared / edge (Redis, CDN)</strong></td><td>Expensive identical responses served to many</td><td>TTL; explicit key invalidation on write</td><td>Any write must invalidate the key, or cache and DB start disagreeing</td></tr>
-    <tr><td><strong>In-process / instance</strong></td><td>Per-process memo of expensive compute</td><td>TTL, explicit evict, process restart</td><td>Not shared across instances; this is a cache with an invalidation story, never truth (§1, §4)</td></tr>
+    <tr><td><strong>In-process / instance</strong></td><td>Per-process memo of expensive compute</td><td>TTL, explicit evict, process restart</td><td>Not shared across instances; this is a cache with an invalidation story, never truth (<a href="#sec-the-backend-mental-model-one-request-at-a-time">§1</a>, <a href="#sec-caching-the-three-layers-where-latency-hides">§4</a>)</td></tr>
   </tbody>
 </table>
 
@@ -339,17 +342,17 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 <table>
   <thead><tr><th>Use</th><th>How</th><th>This doc's home</th></tr></thead>
   <tbody>
-    <tr><td><strong>Cache-aside</strong></td><td>TTL keys; read cache → miss → DB → write cache; invalidate on write (<code>SET key val EX 300</code>)</td><td>§4 — the invalidation rule applies verbatim</td></tr>
-    <tr><td><strong>Session store</strong></td><td>Session id → data (<code>GET</code>/<code>SET</code> with TTL), reachable from every instance</td><td>§7 — stateless servers, shared state outside the process</td></tr>
-    <tr><td><strong>Queue / job broker</strong></td><td>BullMQ-style lists (<code>LPUSH</code>/<code>BRPOP</code>) — durable work waiting for workers</td><td>§3 — "the queue must be durable", never a list in memory</td></tr>
-    <tr><td><strong>Rate limiting</strong></td><td>Atomic <code>INCR</code> + expiry window per key per user</td><td>§1d — the guardrail between the user and the loop</td></tr>
-    <tr><td><strong>Pub/sub</strong></td><td><code>PUBLISH</code>/<code>SUBSCRIBE</code> channels for real-time fan-out</td><td>§3 — background work's notification side</td></tr>
+    <tr><td><strong>Cache-aside</strong></td><td>TTL keys; read cache → miss → DB → write cache; invalidate on write (<code>SET key val EX 300</code>)</td><td><a href="#sec-caching-the-three-layers-where-latency-hides">§4</a> — the invalidation rule applies verbatim</td></tr>
+    <tr><td><strong>Session store</strong></td><td>Session id → data (<code>GET</code>/<code>SET</code> with TTL), reachable from every instance</td><td><a href="#sec-state-the-identity-and-session-decision">§7</a> — stateless servers, shared state outside the process</td></tr>
+    <tr><td><strong>Queue / job broker</strong></td><td>BullMQ-style lists (<code>LPUSH</code>/<code>BRPOP</code>) — durable work waiting for workers</td><td><a href="#sec-background-work-queues-jobs-and-why-you-defer">§3</a> — "the queue must be durable", never a list in memory</td></tr>
+    <tr><td><strong>Rate limiting</strong></td><td>Atomic <code>INCR</code> + expiry window per key per user</td><td><a href="#sec-authentication-vs-authorization-identity-then-permission">§1d</a> — the guardrail between the user and the loop</td></tr>
+    <tr><td><strong>Pub/sub</strong></td><td><code>PUBLISH</code>/<code>SUBSCRIBE</code> channels for real-time fan-out</td><td><a href="#sec-background-work-queues-jobs-and-why-you-defer">§3</a> — background work's notification side</td></tr>
   </tbody>
 </table>
 
-<p>Data structures in one line each: <strong>string</strong> (values, counters, TTL), <strong>hash</strong> (a record: session fields), <strong>list</strong> (FIFO queues), <strong>set</strong> (uniqueness: "is this user in the cohort?"), <strong>sorted set</strong> (leaderboards, rate-limit windows, <em>by-score</em> range queries). Persistence (RDB snapshots / AOF log) is a durability option, not a promise — treat Redis as a cache and queue, never as the source of truth your database should be; the write-through discipline is the database's job. For the data-store selection decision and where it sits beside Postgres: <a href="./data-modeling-and-databases.html">Data Modeling</a> §Ecosystem. Hosted faces: Upstash, Supabase Redis, any PaaS's managed Redis — the <a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a> eras apply.</p>
+<p>Data structures in one line each: <strong>string</strong> (values, counters, TTL), <strong>hash</strong> (a record: session fields), <strong>list</strong> (FIFO queues), <strong>set</strong> (uniqueness: "is this user in the cohort?"), <strong>sorted set</strong> (leaderboards, rate-limit windows, <em>by-score</em> range queries). Persistence (RDB snapshots / AOF log) is a durability option, not a promise — treat Redis as a cache and queue, never as the source of truth your database should be; the write-through discipline is the database's job. For the data-store selection decision and where it sits beside Postgres: <a href="./data-modeling-and-databases.html">Data Modeling §Ecosystem</a>. Hosted faces: Upstash, Supabase Redis, any PaaS's managed Redis — the <a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a> eras apply.</p>
 
-<h2 id="sec-transactions-and-concurrency-the-row-changed-since-i-read-it">5. Transactions and concurrency — "the row changed since I read it"</h2>
+<h2 id="sec-transactions-and-concurrency-the-row-changed-since-i-read-it">Transactions and concurrency — "the row changed since I read it"</h2>
 
 <p>Two requests hitting the same record is the normal form of failure under load, and it is the most under-taught topic in backend code. Two concepts make it legible:</p>
 
@@ -367,7 +370,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p>But note the scope: reads do not need transactions; writes do. A read-only endpoint that starts a transaction is usually noise. If a read feeds a later write, those must be in the same transaction. See <a href="./api-design.html">API Design</a> for idempotency keys on the write side of the contract.</p>
 
-<h2 id="sec-worked-example-trace-the-loop-end-to-end">6. Worked example — trace the loop end to end</h2>
+<h2 id="sec-worked-example-trace-the-loop-end-to-end">Worked example — trace the loop end to end</h2>
 
 <p>One mini-feature, all three rounds: the user adds an item to a cart.</p>
 
@@ -400,16 +403,16 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 <h3>Round 3 (Polish) — the edges</h3>
 <ul>
   <li><strong>Idempotency:</strong> a double-click sends two identical payloads — an <code>Idempotency-Key</code> header dedupes the side effect.</li>
-  <li><strong>Concurrency:</strong> two tabs add the same SKU with a stale stock value — optimistic locking catches it (§5).</li>
-  <li><strong>Cache invalidation:</strong> the cart write evicts the cached cart keys (§4).</li>
+  <li><strong>Concurrency:</strong> two tabs add the same SKU with a stale stock value — optimistic locking catches it (<a href="#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>).</li>
+  <li><strong>Cache invalidation:</strong> the cart write evicts the cached cart keys (<a href="#sec-caching-the-three-layers-where-latency-hides">§4</a>).</li>
   <li><strong>Observability:</strong> log <code>userId</code>, timing, and status on every read and write.</li>
 </ul>
 
 <p>That is the whole loop: three rounds, each one deeper, the same Request → Process → Respond model. The Rhythm's rounds — minus the hot-reload luxuries — with the source of truth replaced by "the database decides."</p>
 
-<h2 id="sec-state-the-identity-and-session-decision">7. State — the identity and session decision</h2>
+<h2 id="sec-state-the-identity-and-session-decision">State — the identity and session decision</h2>
 
-<p>Where identity lives is a <strong>state</strong> decision that shapes every handler, so it deserves its own section and terminates the loop backward to §1:</p>
+<p>Where identity lives is a <strong>state</strong> decision that shapes every handler, so it deserves its own section and terminates the loop backward to <a href="#sec-the-backend-mental-model-one-request-at-a-time">§1</a>:</p>
 
 <table>
   <thead><tr><th>Approach</th><th>State lives</th><th>Trade-off</th></tr></thead>
@@ -422,7 +425,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>Rule to live by:</strong> choose based on which you need to revoke. Sessions revoke instantly because a server-side record is looked up per request; a stateless JWT is only revocable before it <em>expires</em> (short lifetime, or a token-blocklist/refresh-token boundary). If "log this user out now" is a requirement (account security, admin bans), you need a server-side record that can be checked or invalidated — a session store, or a token-blocklist/refresh-token revoke. If revocation isn't a business need, stateless claims win. Read both sides in <a href="./api-design.html">API Design</a> before choosing.</p>
 
-<h2 id="sec-crud-the-shape-of-most-web-apps">7b. CRUD — the shape of most web apps</h2>
+<h2 id="sec-crud-the-shape-of-most-web-apps">CRUD — the shape of most web apps</h2>
 
 <p>Four verbs built a third of the web. "It's just CRUD" is said dismissively; the professional version of CRUD is where the loop's discipline shows — every handler is a <em>request → validate → authorize → mutate → respond</em> sequence, and the five steps below are where most real bugs live.</p>
 
@@ -435,7 +438,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <h3>Read — the query is the contract</h3>
 <ul>
-  <li>Fix the resource shape by what the consumers need (the API Design "design the response" rule), then fetch for it — the N+1 trap in §1e is this decision done wrong.</li>
+  <li>Fix the resource shape by what the consumers need (the API Design "design the response" rule), then fetch for it — the N+1 trap in <a href="#sec-data-access-orms-vs-raw-sql">§1e</a> is this decision done wrong.</li>
   <li>Pagination is a default, not a feature: <code>limit/offset</code> or cursor keys; sort and filter as explicit, whitelisted query params.</li>
   <li>Reads are the one verb where caching is almost always a win — but invalidate on write, or the cache is a lie.</li>
 </ul>
@@ -455,11 +458,11 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 </ul>
 
 <h3>The ownership check</h3>
-<p>The CRUD authorization rule from §1d, applied verb: <strong>every handler that touches a user's data checks "is this theirs?"</strong> — even admin routes (ownership or role). The IDOR test is the checklist: fetch record 123 with user B's token, and the handler must fail. This one rule, applied per resource, is the entire difference between "we had a data breach" and "we had a login page."</p>
+<p>The CRUD authorization rule from <a href="#sec-authentication-vs-authorization-identity-then-permission">§1d</a>, applied verb: <strong>every handler that touches a user's data checks "is this theirs?"</strong> — even admin routes (ownership or role). The IDOR test is the checklist: fetch record 123 with user B's token, and the handler must fail. This one rule, applied per resource, is the entire difference between "we had a data breach" and "we had a login page."</p>
 
 <p><strong>If your whole API is CRUD over a database, the abstraction is thin:</strong> Express + an ORM route-generator (or tools like Fastify + Drizzle, NestJS modules, Django's generic views, PostgREST) cover it. The part that is never "just CRUD" is the loop around it — validation, ownership, idempotency, events (see <a href="./api-design.html">API Design</a> and <a href="./data-modeling-and-databases.html">Data Modeling</a>).</p>
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">8. Ecosystem — tooling catalog with decision metrics</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
 <p>Same format as the other reference shelf catalog tables — a quick map of category, representative tools, the trigger that justifies adding one, the decision metric that tells you it's working:</p>
 
@@ -513,7 +516,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>The tool filter</strong> applies to every category above: does the tool make a <em>decision</em> visible, testable, or reversible? Anti-tooling clause: before adopting role-based access control because a framework shipped it, ask whether ownership or admin, not roles, is what the data requires. The right tool is invisible — you notice it is wrong when a decision is forced through a shape it never had.</p>
 
-<h2 id="sec-observability-see-the-loop-not-just-run-it">8b. Observability — see the loop, not just run it</h2>
+<h2 id="sec-observability-see-the-loop-not-just-run-it">Observability — see the loop, not just run it</h2>
 
 <p>Backend engineering is invisible until it fails. The loop is observable when you put these signals on every request:</p>
 
@@ -533,7 +536,7 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>What to do with the signals once they exist</strong> — targets, alerts, incidents, postmortems — is the operational discipline: see <a href="./observability-and-operations.html">Observability &amp; Operations</a>.</p>
 
-<h2 id="sec-error-handling-the-error-is-part-of-the-contract">8c. Error handling — the error is part of the contract</h2>
+<h2 id="sec-error-handling-the-error-is-part-of-the-contract">Error handling — the error is part of the contract</h2>
 
 <p>Backend engineering is not just happy-path code. The error contract is part of the API:</p>
 
@@ -548,23 +551,23 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
 
 <p><strong>Rule:</strong> the error response is part of the contract. Never leak internal stack traces to the client. Use requestId for correlation. The error boundary middleware (last in the chain) catches everything.</p>
 
-<h2 id="sec-the-most-common-failure-modes">9. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>What happens</th><th>Fix / mental model</th></tr></thead>
   <tbody>
-    <tr><td><strong>Scope confusion</strong></td><td>Truth kept in code memory instead of durable storage — lost on restart, invisible to other instances, "sometimes" stale.</td><td>If two requests must see the same value, it's a database. In-memory state is a cache with an eviction story (§1, §4).</td></tr>
-    <tr><td><strong>Forgotten authorization</strong></td><td>Identity works but a route fetches a record by ID without ownership checks (IDOR).</td><td>Authz per resource, next to the field it guards (§1d).</td></tr>
-    <tr><td><strong>N+1 queries</strong></td><td>ORM lazy-loads a query per row; 200 orders → 201 queries.</td><td>Eager load / join the aggregation; count queries on a big load (§1e).</td></tr>
-    <tr><td><strong>Broken transaction</strong></td><td>Multi-write endpoint partially written when a step fails; orphaned rows.</td><td>Multi-write moves go in a transaction; the atomic unit is your boundary (§5).</td></tr>
-    <tr><td><strong>Middleware misorder</strong></td><td>Protected route runs unauthenticated, or body parsing runs behind auth; CORS misconfigured.</td><td>Read the chain as a timeline: parse → auth → route → error (§1b).</td></tr>
-    <tr><td><strong>Endpoint leaks internals</strong></td><td>The ORM entity (column names) becomes the API payload — a schema change becomes a breaking API change.</td><td>Shape responses at the boundary with an explicit DTO/serialization schema; never serialize entities (§1b).</td></tr>
-    <tr><td><strong>Cache and DB drift</strong></td><td>Cache returns a stale value after a write touches the same key.</td><td>Every write invalidates; cache-aside discipline (§4).</td></tr>
-    <tr><td><strong>Queue jobs not retryable / not idempotent</strong></td><td>Deferred work lost on crash, or double-notification on retry.</td><td>At-least-once delivery plus an idempotent worker (§3).</td></tr>
+    <tr><td><strong>Scope confusion</strong></td><td>Truth kept in code memory instead of durable storage — lost on restart, invisible to other instances, "sometimes" stale.</td><td>If two requests must see the same value, it's a database. In-memory state is a cache with an eviction story (<a href="#sec-the-backend-mental-model-one-request-at-a-time">§1</a>, <a href="#sec-caching-the-three-layers-where-latency-hides">§4</a>).</td></tr>
+    <tr><td><strong>Forgotten authorization</strong></td><td>Identity works but a route fetches a record by ID without ownership checks (IDOR).</td><td>Authz per resource, next to the field it guards (<a href="#sec-authentication-vs-authorization-identity-then-permission">§1d</a>).</td></tr>
+    <tr><td><strong>N+1 queries</strong></td><td>ORM lazy-loads a query per row; 200 orders → 201 queries.</td><td>Eager load / join the aggregation; count queries on a big load (<a href="#sec-data-access-orms-vs-raw-sql">§1e</a>).</td></tr>
+    <tr><td><strong>Broken transaction</strong></td><td>Multi-write endpoint partially written when a step fails; orphaned rows.</td><td>Multi-write moves go in a transaction; the atomic unit is your boundary (<a href="#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>).</td></tr>
+    <tr><td><strong>Middleware misorder</strong></td><td>Protected route runs unauthenticated, or body parsing runs behind auth; CORS misconfigured.</td><td>Read the chain as a timeline: parse → auth → route → error (<a href="#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a>).</td></tr>
+    <tr><td><strong>Endpoint leaks internals</strong></td><td>The ORM entity (column names) becomes the API payload — a schema change becomes a breaking API change.</td><td>Shape responses at the boundary with an explicit DTO/serialization schema; never serialize entities (<a href="#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a>).</td></tr>
+    <tr><td><strong>Cache and DB drift</strong></td><td>Cache returns a stale value after a write touches the same key.</td><td>Every write invalidates; cache-aside discipline (<a href="#sec-caching-the-three-layers-where-latency-hides">§4</a>).</td></tr>
+    <tr><td><strong>Queue jobs not retryable / not idempotent</strong></td><td>Deferred work lost on crash, or double-notification on retry.</td><td>At-least-once delivery plus an idempotent worker (<a href="#sec-background-work-queues-jobs-and-why-you-defer">§3</a>).</td></tr>
   </tbody>
 </table>
 
-<h2 id="sec-summary-the-complete-mental-checklist">10. Summary — the complete mental checklist</h2>
+<h2 id="sec-summary-the-complete-mental-checklist">Summary — the complete mental checklist</h2>
 
 <p>Before you write your next endpoint, run this. If you can answer each row, you're ready to code; if not, sketch until you can.</p>
 
@@ -574,21 +577,21 @@ app.use(errorHandler);               // 5. LAST — catches anything thrown down
   </thead>
   <tbody>
     <tr><td>What does this request take in, and what shape must the response be?</td><td>Write the envelope first — that's Round 1 (Skeleton)</td></tr>
-    <tr><td>What is the source of truth — which database rows?</td><td>Trace every value in the handler; anything that survives goes to a row (§1)</td></tr>
-    <tr><td>Which of those values must survive two requests?</td><td>If it must → DB/token, not a variable (§1)</td></tr>
-    <tr><td>Who may do this — authn done, authz per record?</td><td>Authn once in middleware; ownership checked per request (§1d)</td></tr>
-    <tr><td>Does this write more than one row that must move or not together?</td><td>Wrap it in a transaction (§5)</td></tr>
-    <tr><td>Is any repeated read being slow?</td><td>Cache with an invalidation story — cache-aside (§4)</td></tr>
-    <tr><td>Is any work the client doesn't watch finish still inline?</td><td>Queue it; make it retryable and idempotent (§3)</td></tr>
-    <tr><td>Does the wire shape leak the entity or the schema?</td><td>Shape it at the boundary (§1b)</td></tr>
-    <tr><td>Can you trace this request across logs and metrics?</td><td>Emit request ID, timing, and status (§8b)</td></tr>
-    <tr><td>Does the error contract say what a 4xx vs 5xx returns?</td><td>The error is part of the contract (§8c)</td></tr>
+    <tr><td>What is the source of truth — which database rows?</td><td>Trace every value in the handler; anything that survives goes to a row (<a href="#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td></tr>
+    <tr><td>Which of those values must survive two requests?</td><td>If it must → DB/token, not a variable (<a href="#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td></tr>
+    <tr><td>Who may do this — authn done, authz per record?</td><td>Authn once in middleware; ownership checked per request (<a href="#sec-authentication-vs-authorization-identity-then-permission">§1d</a>)</td></tr>
+    <tr><td>Does this write more than one row that must move or not together?</td><td>Wrap it in a transaction (<a href="#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>)</td></tr>
+    <tr><td>Is any repeated read being slow?</td><td>Cache with an invalidation story — cache-aside (<a href="#sec-caching-the-three-layers-where-latency-hides">§4</a>)</td></tr>
+    <tr><td>Is any work the client doesn't watch finish still inline?</td><td>Queue it; make it retryable and idempotent (<a href="#sec-background-work-queues-jobs-and-why-you-defer">§3</a>)</td></tr>
+    <tr><td>Does the wire shape leak the entity or the schema?</td><td>Shape it at the boundary (<a href="#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a>)</td></tr>
+    <tr><td>Can you trace this request across logs and metrics?</td><td>Emit request ID, timing, and status (<a href="#sec-observability-see-the-loop-not-just-run-it">§8b</a>)</td></tr>
+    <tr><td>Does the error contract say what a 4xx vs 5xx returns?</td><td>The error is part of the contract (<a href="#sec-error-handling-the-error-is-part-of-the-contract">§8c</a>)</td></tr>
   </tbody>
 </table>
 
 <p>Print this table. Put it on your wall. Run it before every server feature. The first rows are "know where the truth lives"; the last rows are "know what the request does." That's the entire method.</p>
 
-<p><strong>Now available:</strong> this doc's spine (definition, history, intersection with the other shelves, underlying theory, and mental models — §0b–0g), plus observability (§8b) and the error contract (§8c) when you ship the endpoint. The review asked for these; they round out the doc to match the shelf's house structure.</p>
+<p><strong>Now available:</strong> this doc's spine (definition, history, intersection with the other shelves, underlying theory, and mental models — <a href="#sec-definition-what-backend-engineering-is-and-is-not">§0b–0g</a>), plus observability (<a href="#sec-observability-see-the-loop-not-just-run-it">§8b</a>) and the error contract (<a href="#sec-error-handling-the-error-is-part-of-the-contract">§8c</a>) when you ship the endpoint. The review asked for these; they round out the doc to match the shelf's house structure.</p>
 
 <hr>
 

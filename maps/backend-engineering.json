@@ -1,0 +1,29 @@
+{
+ "WANT": {
+  "1": "sec-the-backend-mental-model-one-request-at-a-time",
+  "1b": "sec-the-request-lifecycle-the-timeline-inside-the-brackets",
+  "1c": "sec-evolution-the-constraint-inversions",
+  "1d": "sec-authentication-vs-authorization-identity-then-permission",
+  "1e": "sec-data-access-orms-vs-raw-sql",
+  "2": "sec-the-three-rounds-how-a-server-feature-actually-gets-built",
+  "3": "sec-background-work-queues-jobs-and-why-you-defer",
+  "4": "sec-caching-the-three-layers-where-latency-hides",
+  "5": "sec-transactions-and-concurrency-the-row-changed-since-i-read-it",
+  "6": "sec-worked-example-trace-the-loop-end-to-end",
+  "7": "sec-state-the-identity-and-session-decision",
+  "8": "sec-ecosystem-tooling-catalog-with-decision-metrics",
+  "8b": "sec-observability-see-the-loop-not-just-run-it",
+  "8c": "sec-error-handling-the-error-is-part-of-the-contract",
+  "9": "sec-the-most-common-failure-modes"
+ },
+ "FOLDS": [
+  [
+   "Data Modeling</a> §Ecosystem",
+   "Data Modeling §Ecosystem</a>"
+  ],
+  [
+   "§0b–0g",
+   "<a href=\"#sec-definition-what-backend-engineering-is-and-is-not\">§0b–0g</a>"
+  ]
+ ]
+}
