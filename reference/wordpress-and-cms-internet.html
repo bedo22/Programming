@@ -13,7 +13,10 @@
   <p class="kicker">Reference · WordPress &amp; CMS — the ecosystem that runs most of the web</p>
   <h1>WordPress &amp; the CMS Internet</h1>
   <p class="meta">How the other 60% of the web actually works: why WordPress won (the plugin and theme economies), how it works under the hood (PHP, MySQL, the Loop, hooks, template hierarchy), the modern stack (Gutenberg blocks, the REST API, WPGraphQL, headless WordPress as a content API for React), the managed and no-code landscape (Shopify, Webflow, Wix, Squarespace, Bubble, headless CMSes), a when-to-choose-what decision matrix, migration paths, and the freelancer's reality — clients who want "a website I can edit myself". Read this alongside <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (which places WordPress in Camp A) and <a href="./freelance-web-practice.html">Freelance Web Practice</a> (which delivers these projects).</p>
-</header>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>Language:</strong> English · <a href="./ar/wordpress-and-cms-internet.html">العربية</a>
+        </p>
+      </header>
 
 <blockquote class="callout">
   <p><strong>Where this fits.</strong> The rest of this shelf teaches the product-engineering world: greenfield apps, custom frameworks, teams. This doc covers the world most web work actually happens in — the CMS internet. It is not a competitor to the engineering docs; it is the other half of the map:</p>
@@ -46,7 +49,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
-<p>Reading order: read this after <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (so you've seen where WordPress sits in the landscape) and after <a href="./backend-engineering.html">Backend Engineering</a> §1 (so you understand the request loop WordPress runs on). Freelancers should read it together with <a href="./freelance-web-practice.html">Freelance Web Practice</a>. Cross-links:</p>
+<p>Reading order: read this after <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (so you've seen where WordPress sits in the landscape) and after <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a> (so you understand the request loop WordPress runs on). Freelancers should read it together with <a href="./freelance-web-practice.html">Freelance Web Practice</a>. Cross-links:</p>
 <ul>
   <li>Camp A of <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> — the classification; this doc is the depth.</li>
   <li>Loop mechanics: <a href="./backend-engineering.html">Backend Engineering</a> — PHP is just another server runtime; auth, caching, and CRUD patterns transfer.</li>
@@ -104,7 +107,7 @@ freelance-web-practice.html  (delivering this world for clients)</pre>
 <thead><tr><th>Neighbor doc</th><th>What belongs here</th><th>What belongs next door</th></tr></thead>
 <tbody>
 <tr><td>Frontend Camps Survey</td><td>WordPress/CMS ecosystem in depth: mechanics, platform landscape, decisions</td><td>The six-camp map, the JS learner's lens on who owns first paint (Camp A)</td></tr>
-<tr><td>Backend Engineering</td><td>WordPress as a runtime: the Loop, hooks, wpdb, caching layers, WP-CLI</td><td>The generic request loop, authn/authz mechanics, transactions, connection pooling (§1–§7)</td></tr>
+<tr><td>Backend Engineering</td><td>WordPress as a runtime: the Loop, hooks, wpdb, caching layers, WP-CLI</td><td>The generic request loop, authn/authz mechanics, transactions, connection pooling (<a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>–<a href="./backend-engineering.html#sec-state-the-identity-and-session-decision">§7</a>)</td></tr>
 <tr><td>API Design</td><td>WP-REST/WPGraphQL as content contracts; headless architecture decisions</td><td>Contract design, versioning, rate limits, idempotency — the rules are universal</td></tr>
 <tr><td>Data Modeling &amp; Databases</td><td>Custom post types, taxonomies, meta as a content schema; when CPTs suffice</td><td>Normalization, indexing, migrations, EXPLAIN — the underlying craft</td></tr>
 <tr><td>Security &amp; Threat Modeling</td><td>WordPress's specific attack surface: plugin supply chain, patching discipline, hardcoded credentials in configs</td><td>Threat modeling, OWASP classes, crypto, IAM — the general discipline</td></tr>
