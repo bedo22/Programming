@@ -59,10 +59,11 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 *(none — all 18 docs have matching twins; 18/18 twins green)*
 
 ### EN-only — 🔴 no twin (7)
-beyond-the-browser, full-stack, income-stream-landscape, open-source, product-shapes, product-strategy, recurring-fear-of-replacement, wordpress-and-cms-internet.
+beyond-the-browser, full-stack, income-stream-landscape, open-source, product-shapes, product-strategy, recurring-fear-of-replacement.
 
 > **Coverage policy FLIPPED (v44):** the old Tier-C line (career/income docs stay EN-only) is void — shelf owner is an Egyptian local-market profile (Arabic interviews, local companies, Arabic client market). ALL docs get twins.
-> **AFK integration (v47):** watchdog `plans/wave-watch.sh` (detached, 120s poll, logs DONE lines to /tmp/waves/LOG) plus Orca automation `wave-integrate` (cron */20, precheck `plans/wave-precheck.sh`, pi agent, v48+ numbering). Main session scans /tmp/waves/LOG as its FIRST tool call each turn.
+> **Orchestration model v2 (v50):** watchdog+pager `plans/wave-watch.sh` (detached, 120s poll) — DETECTION (free) logs DONE/FAILED to /tmp/waves/LOG and WAKE-injects a message into the MAIN pi session (orca-ide terminal send, debounced 30 min/doc), so the orchestrator with full context does integration + judgment + respawns. The wave-integrate automation (v47) was REMOVED (its stateless agent couldn't judge; race risk on tags). Fallback if the main pane is ever closed: `orca-ide automations create --name wave-integrate --trigger '*/20 * * * *' --provider pi --repo name:Programming --precheck 'bash plans/wave-precheck.sh' --prompt <integration protocol, v50+ numbering>`.
+> Legacy: watchdog `plans/wave-watch.sh` (detached, 120s poll, logs DONE lines to /tmp/waves/LOG) plus Orca automation `wave-integrate` (cron */20, precheck `plans/wave-precheck.sh`, pi agent, v48+ numbering). Main session scans /tmp/waves/LOG as its FIRST tool call each turn.
 > W4 (local-market cluster): frontend-income-markets, hiring-process-and-interviews, wordpress-and-cms-internet, freelance-web-practice — briefs 13–16. W5: product-strategy, product-shapes, recurring-fear-of-replacement, open-source. W6: beyond-the-browser, full-stack, income-stream-landscape.
 
 ## Tiers & gates
