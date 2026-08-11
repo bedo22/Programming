@@ -14,6 +14,9 @@
   <p class="kicker">Reference · Product Shapes — the triage layer over the whole shelf</p>
   <h1>Product Shapes — the recurring archetypes of web work, and the decisions each one demands</h1>
   <p class="meta">For: the developer who gets a project brief and needs to know — before writing code — what kind of product this is, what its dominant constraint is, and which shelf docs to lean on.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/product-shapes.html">العربية</a>
+  </p>
 </header>
 
 <blockquote class="callout">
@@ -48,7 +51,7 @@
 
 <p>Reading order: read the Definition (what a shape is and is not), then the taxonomy table to see all twelve shapes at once, then the selection guide — and when a real brief arrives, jump straight to that shape's link map. Read this doc <em>before</em> you scope or quote a project; the shape determines what the honest scope even is. Cross-links:</p>
 <ul>
-  <li>Upstream (what shapes you sell): <a href="./frontend-income-markets.html">Frontend Income Markets</a> §7 — the market view of the same archetypes, from "who pays" instead of "what's built".</li>
+  <li>Upstream (what shapes you sell): <a href="./frontend-income-markets.html#sec-products-templates-and-unknown-options">Frontend Income Markets §7</a> — the market view of the same archetypes, from "who pays" instead of "what's built".</li>
   <li>Downstream (how a shape becomes a deliverable): <a href="./freelance-web-practice.html">Freelance Web Practice</a> — scoping, pricing, delivery, handoff.</li>
   <li>Sibling (which discipline answers the shape's hard questions): <a href="./system-design.html">System Design</a>, <a href="./api-design.html">API Design</a>, <a href="./payments-and-commerce.html">Payments &amp; Commerce</a>, <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a>.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
@@ -190,86 +193,86 @@
 
 <p>Each map names the 2–3 decisions that <em>actually differ by shape</em> and points to the discipline doc that owns the rest. The discipline docs teach the full method; these maps say which sections to read <em>for this shape</em>.</p>
 
-<h3>1. Landing page / marketing site</h3>
+<h3>Landing page / marketing site</h3>
 <ul>
   <li><strong>What differs:</strong> performance budget, SEO structure, analytics/conversion setup. The design serves one action.</li>
   <li><strong>Owns the how:</strong> <a href="./html-and-css.html">HTML &amp; CSS</a> (rendering, Core Web Vitals, forms) · <a href="./ui-ux-web-design.html">UI/UX</a> (conversion design, accessibility) · <a href="./frontend-camps-survey.html">Camps</a> (Camp B HTML-first / Camp D SSG) · <a href="./product-strategy.html">Product Strategy</a> (what "conversion" means here).</li>
   <li><strong>Death mode:</strong> slow load or untracked traffic — performance is the product, and it must be measurable.</li>
 </ul>
 
-<h3>2. Dashboard / admin panel</h3>
+<h3>Dashboard / admin panel</h3>
 <ul>
   <li><strong>What differs:</strong> data-fetching strategy (poll vs. WebSocket vs. SSE), table virtualization, permission model, chart choice.</li>
   <li><strong>Owns the how:</strong> <a href="./system-design.html">System Design</a> (data flow, caching) · <a href="./api-design.html">API Design</a> (pagination, filtering) · <a href="./ui-ux-web-design.html">UI/UX</a> (state visibility, data density) · <a href="./security-and-threat-modeling.html">Security</a> (role-based access) · <a href="./frontend-camps-survey.html">Camps</a> (Camp C SPA).</li>
   <li><strong>Death mode:</strong> stale data or a slow table — every cell can be loading, empty, error, or stale, and the design must say which.</li>
 </ul>
 
-<h3>3. SaaS product</h3>
+<h3>SaaS product</h3>
 <ul>
   <li><strong>What differs:</strong> tenant isolation, auth provider, billing/subscription model, feature flags, onboarding.</li>
   <li><strong>Owns the how:</strong> <a href="./data-modeling-and-databases.html">Data Modeling</a> (multi-tenancy) · <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (subscriptions) · <a href="./backend-engineering.html">Backend Engineering</a> (auth, background jobs) · <a href="./api-design.html">API Design</a> (idempotency for billing) · <a href="./product-strategy.html">Product Strategy</a> (pricing, CAC/LTV).</li>
   <li><strong>Death mode:</strong> tenant data leak or billing bug — technical decisions are downstream of the pricing decision.</li>
 </ul>
 
-<h3>4. CRUD app / internal tool</h3>
+<h3>CRUD app / internal tool</h3>
 <ul>
   <li><strong>What differs:</strong> form design, validation timing, workflow states, role-based access, audit trail, bulk operations.</li>
   <li><strong>Owns the how:</strong> <a href="./backend-engineering.html">Backend Engineering</a> (the CRUD loop, transactions) · <a href="./api-design.html">API Design</a> (resource contracts, error envelopes) · <a href="./ui-ux-web-design.html">UI/UX</a> (form design, error affordances) · <a href="./data-modeling-and-databases.html">Data Modeling</a> (schema, constraints, migrations).</li>
   <li><strong>Death mode:</strong> the gap between "works in Postman" and "works in production" — validation and edge cases are where the complexity lives.</li>
 </ul>
 
-<h3>5. E-commerce site</h3>
+<h3>E-commerce site</h3>
 <ul>
   <li><strong>What differs:</strong> platform vs. custom, payment integration, inventory, shipping, cart persistence, checkout SEO.</li>
   <li><strong>Owns the how:</strong> <a href="./payments-and-commerce.html">Payments &amp; Commerce</a> (checkout, refunds, PCI, fraud) · <a href="./api-design.html">API Design</a> (idempotency) · <a href="./system-design.html">System Design</a> (inventory consistency) · <a href="./ui-ux-web-design.html">UI/UX</a> (checkout flow, trust).</li>
   <li><strong>Death mode:</strong> a double-charge or a lost order — the tolerance for error is near zero.</li>
 </ul>
 
-<h3>6. Content site / blog / docs</h3>
+<h3>Content site / blog / docs</h3>
 <ul>
   <li><strong>What differs:</strong> content model, SEO structure, search, reading experience. The technology should disappear.</li>
   <li><strong>Owns the how:</strong> <a href="./wordpress-and-cms-internet.html">WordPress &amp; CMS</a> (content modeling, editing) · <a href="./html-and-css.html">HTML &amp; CSS</a> (semantic HTML, typography, performance) · <a href="./ui-ux-web-design.html">UI/UX</a> (readability, navigation) · <a href="./frontend-camps-survey.html">Camps</a> (Camp A CMS / Camp B HTML-first).</li>
   <li><strong>Death mode:</strong> an unmaintainable content model — the reader never notices the tech, and the editor can't edit.</li>
 </ul>
-<h3>7. Booking / scheduling system</h3>
+<h3>Booking / scheduling system</h3>
 <ul>
   <li><strong>What differs:</strong> time-zone handling, conflict detection, recurring bookings, buffers, reminders.</li>
   <li><strong>Owns the how:</strong> <a href="./data-modeling-and-databases.html">Data Modeling</a> (the slot model, constraints) · <a href="./backend-engineering.html">Backend Engineering</a> (transactions, background jobs for reminders) · <a href="./api-design.html">API Design</a> (booking contracts, idempotency) · <a href="./system-design.html">System Design</a> (consistency).</li>
   <li><strong>Death mode:</strong> a double-booked slot or a wrong time zone — the data model must be right before any UI.</li>
 </ul>
 
-<h3>8. Portfolio / personal site</h3>
+<h3>Portfolio / personal site</h3>
 <ul>
   <li><strong>What differs:</strong> design bar, simplicity, near-perfect performance. The smallest shape with the highest design ceiling.</li>
   <li><strong>Owns the how:</strong> <a href="./html-and-css.html">HTML &amp; CSS</a> (platform, performance) · <a href="./ui-ux-web-design.html">UI/UX</a> (visual design, motion) · <a href="./frontend-camps-survey.html">Camps</a> (SSG / hand-coded HTML).</li>
   <li><strong>Death mode:</strong> fast but generic — the design is the entire value proposition.</li>
 </ul>
 
-<h3>9. API integration / automation</h3>
+<h3>API integration / automation</h3>
 <ul>
   <li><strong>What differs:</strong> error handling, retry/backoff, webhook verification, data mapping, rate-limit compliance, monitoring.</li>
   <li><strong>Owns the how:</strong> <a href="./api-design.html">API Design</a> (contracts, error envelopes) · <a href="./backend-engineering.html">Backend Engineering</a> (background jobs, error handling) · <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (deployment, rollback) · <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a>.</li>
   <li><strong>Death mode:</strong> the happy path is easy and the error paths are the entire product — it fails catastrophically at 3 AM.</li>
 </ul>
 
-<h3>10. WordPress / CMS customization</h3>
+<h3>WordPress / CMS customization</h3>
 <ul>
   <li><strong>What differs:</strong> client editability is the primary requirement — the tech serves the content workflow, not the reverse.</li>
   <li><strong>Owns the how:</strong> <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> — the whole doc: mechanics, content modeling, Gutenberg/headless, workflow, migration, ops, the "I can edit myself" reality.</li>
   <li><strong>Death mode:</strong> a site the client can't edit — or one the client edits into breakage. Editability is a deliverable, not a feature.</li>
 </ul>
 
-<h3>11. Migration / redesign</h3>
+<h3>Migration / redesign</h3>
 <ul>
   <li><strong>What differs:</strong> migration strategy (big-bang vs. strangler fig), SEO preservation, data mapping, parallel-run testing, rollback.</li>
-  <li><strong>Owns the how:</strong> <a href="./system-design.html">System Design</a> §3b (migration paths) · <a href="./wordpress-and-cms-internet.html">WordPress &amp; CMS</a> (migration paths) · <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (deployment, rollback) · <a href="./api-design.html">API Design</a> (contract compatibility) · <a href="./data-modeling-and-databases.html">Data Modeling</a> (schema evolution).</li>
+  <li><strong>Owns the how:</strong> <a href="./system-design.html#sec-migration-paths-between-architectures">System Design §3b</a> (migration paths) · <a href="./wordpress-and-cms-internet.html">WordPress &amp; CMS</a> (migration paths) · <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD</a> (deployment, rollback) · <a href="./api-design.html">API Design</a> (contract compatibility) · <a href="./data-modeling-and-databases.html">Data Modeling</a> (schema evolution).</li>
   <li><strong>Death mode:</strong> SEO ranking drops overnight or data is lost — a successful migration is one nobody notices.</li>
 </ul>
 
-<h3>12. Performance optimization</h3>
+<h3>Performance optimization</h3>
 <ul>
   <li><strong>What differs:</strong> what to measure (LCP, CLS, INP), what to optimize (images, JS, CSS, fonts, server), and knowing when to stop.</li>
-  <li><strong>Owns the how:</strong> <a href="./html-and-css.html">HTML &amp; CSS</a> §6j (Core Web Vitals ↔ platform knobs) · <a href="./system-design.html">System Design</a> (caching, CDN) · <a href="./ui-ux-web-design.html">UI/UX</a> (perceived performance).</li>
+  <li><strong>Owns the how:</strong> <a href="./html-and-css.html#sec-core-web-vitals-platform-knobs">HTML &amp; CSS §6j</a> (Core Web Vitals ↔ platform knobs) · <a href="./system-design.html">System Design</a> (caching, CDN) · <a href="./ui-ux-web-design.html">UI/UX</a> (perceived performance).</li>
   <li><strong>Death mode:</strong> endless optimization — the discipline is knowing when the improvement stops being worth the cost.</li>
 </ul>
 

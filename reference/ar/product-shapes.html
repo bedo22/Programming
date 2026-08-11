@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>أشكال المنتجات — الأنماط المتكررة في العمل على الويب</title>
+  <link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · أشكال المنتجات — طبقة الفرز فوق الرف كله</p>
+  <h1>أشكال المنتجات — الأنماط المتكررة في العمل على الويب، والقرارات التي يستلزمها كل شكل</h1>
+  <p class="meta">لـ: المطوّر الذي يتسلم موجز مشروع ويحتاج أن يعرف — قبل كتابة أي كود — أيّ نوع من المنتجات هذا، وما قيده المهيمن، وأي وثائق الرف يعتمد عليها.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../product-shapes.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يقع هذا.</strong> يُنظَّم الرف حسب <em>التخصص</em> — التصميم، المعمارية، واجهات البرمجة، البيانات، الأمن، الاختبار، النشر. لكن العمل الذي تراه فعلًا يصل على هيئة <em>أشكال منتجات</em>: لوحات معلومات، صفحات هبوط، تطبيقات SaaS، متاجر إلكترونية، أنظمة حجز. هذه الوثيقة هي خريطة الربط بين الاثنين — اقرأها قبل أن تبدأ البناء، لتصل إلى التخصص الصحيح في الوقت الصحيح.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│   A PROJECT BRIEF ARRIVES: "a website I can edit myself,      │
+│   with a store" / "an internal tool for our ops team" /       │
+│   "a booking system for a clinic"                              │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│        SHAPE TRIAGE (THIS DOC)                                 │
+│   Which shape is this? What is the dominant constraint?        │
+│   What is the one decision that, if wrong, kills the project?  │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│        DISCIPLINE DOCS (THE HOW)                               │
+│   System Design · API Design · Payments · WordPress/CMS ·     │
+│   Data Modeling · Security · Testing · Freelance Web Practice  │
+└───────────────────────────────────────────────────────────────┘
+   The discipline docs teach you to build. This doc teaches you
+   to recognize what you're building before you start.
+</pre>
+  <p><strong>الجيران على الرف:</strong> <a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a> (عمل تحديد النطاق والتسعير والتسليم — هذه الوثيقة هي الفرز <em>التقني</em>، وتلك هي <em>التجارية</em>) · <a href="./frontend-camps-survey.html">مسح معسكرات الواجهة الأمامية</a> (أي مكدس يناسب أي شكل) · <a href="../product-strategy.html">Product Strategy</a> (عندما يصبح الشكل منتجًا باقتصاديات وحدة) · <a href="./wordpress-and-cms-internet.html">WordPress وإنترنت أنظمة إدارة المحتوى</a> (المنصة التي تُبنى عليها معظم أشكال العملاء فعلًا) · <a href="./payments-and-commerce.html">الدفع والتجارة</a> (أشكال المال) · <a href="./glossary.html">المصطلحات</a></p>
+</blockquote>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ التعريف (ما هو الشكل وما ليس هو)، ثم جدول التصنيف لترى الأشكال الاثني عشر دفعة واحدة، ثم دليل الاختيار — وعندما يصل موجز حقيقي، انتقل مباشرة إلى خريطة الربط الخاصة بذلك الشكل. اقرأ هذه الوثيقة <em>قبل</em> أن تحدّد النطاق أو تسعّر مشروعًا؛ فالشكل هو ما يحدد ما هو النطاق الصادق أصلًا. روابط متقاطعة:</p>
+<ul>
+  <li>أعلى المنبع (الأشكال التي تبيعها): <a href="./frontend-income-markets.html#sec-products-templates-and-unknown-options">أسواق دخل الواجهة الأمامية §7</a> — نظرة السوق إلى النماذج نفسها، من زاوية «من يدفع» بدلًا من «ما الذي يُبنى».</li>
+  <li>أسفل المنبع (كيف يصير الشكل منتجًا نهائيًا): <a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a> — تحديد النطاق والتسعير والتسليم وتسلُّم العمل.</li>
+  <li>أخ (أي تخصص يجيب عن أسئلة الشكل الصعبة): <a href="./system-design.html">التصميم المعماري</a>، <a href="./api-design.html">تصميم واجهات البرمجة</a>، <a href="./payments-and-commerce.html">الدفع والتجارة</a>، <a href="./wordpress-and-cms-internet.html">WordPress وإنترنت أنظمة إدارة المحتوى</a>.</li>
+  <li>مرجع: <a href="./glossary.html">المصطلحات</a>.</li>
+</ul>
+
+<p><strong>إن كنت قد بنيت يومًا صفحة هبوط بإفراط حتى صارت تطبيقًا كامل المكدس، أو بنيت SaaS بنقص ففاتك عزل المستأجرين — فهذه هي الخريطة.</strong> شكل واحد لكل مشروع، قيد مهيمن واحد، قرار واحد هو الأهم.</p>
+<h2 id="sec-definition-what-a-product-shape-is-and-what-it-is-not">التعريف — ما هو شكل المنتج وما ليس هو</h2>
+
+<p><strong>شكل المنتج</strong> هو نموذج أصلي متكرر في العمل على الويب، له قيد مهيمن خاص به — الخاصية الوحيدة التي إن أُسئ التعامل معها أغرقت المشروع. صفحة الهبوط مقيدة بـ<em>سرعة التحميل والتحويل</em>؛ ولوحة المعلومات بـ<em>كثافة البيانات والحالة</em>؛ ونظام الحجز بـ<em>حساب الوقت</em>. الشكل ليس التخصص: لوحة المعلومات ما زالت تحتاج واجهات برمجة وبيانات وأمنًا، لكن تلك هي <em>الكيفية</em> — الشكل يخبرك أيّ <em>كيفية</em> هي الأهم، وأي فشل يقتلك أولًا.</p>
+
+<p>نوعان من الأشكال يظهران في التصنيف أدناه. <strong>نماذج المنتج الأصلية</strong> (صفحة الهبوط، لوحة المعلومات، SaaS، CRUD، التجارة الإلكترونية، المحتوى، الحجز، ملف الأعمال) تجيب عن <em>«ماذا يجب أن يوجد؟»</em> — وهي الشيء الذي تبنيه. <strong>أشكال المهمة</strong> (تكامل API، تخصيص CMS، الترحيل، الأداء) تجيب عن <em>«ما الذي يجب تغييره بأمان؟»</em> — وهي العمل الذي تُوظَّف للقيام به <em>على</em> منتج قائم. أسئلة تحديد نطاق مختلفة، لكن آلية الفرز نفسها: سمِّ القيد، سمِّ نمط الهلاك، وجّه إلى الوثيقة المالكة.</p>
+
+<p><strong>ما ليس شكلًا:</strong> ليس اختيار تقنية (WordPress مقابل Next.js قرار معسكر، انظر <a href="./frontend-camps-survey.html">مسح معسكرات الواجهة الأمامية</a>)، وليس نموذج عمل (ذلك <a href="../product-strategy.html">Product Strategy</a>)، وليس مهارة (ذلك وثائق التخصصات). تتداخل الأشكال والمهارات — منتج SaaS عادةً لوحة معلومات تحت الغطاء — لكن <em>القيد المهيمن مختلف</em>، لذلك يختلف الفرز.</p>
+
+<table>
+  <thead><tr><th>يمكن تجاهله بأمان الآن</th><th>لماذا</th><th>متى يهم</th></tr></thead>
+  <tbody>
+    <tr><td>نقاشات تصنيف الأشكال («هل هذا تطبيق CRUD أم لوحة معلومات؟»)</td><td>التسمية أقل أهمية من القيد</td><td>عندما يتنافس قيدان فعلًا (انظر جدول التداخل)</td></tr>
+    <tr><td>التسوق لاختيار المكدس لكل شكل</td><td>معظم الأشكال تعمل جيدًا على المكدس الافتراضي نفسه؛ وثيقة المعسكرات تقرر</td><td>عندما يدفعك قيد إلى معسكر مختلف</td></tr>
+    <tr><td>كل قرار في كل وثيقة تخصص</td><td>كل شكل يضغط على قرارات قليلة فقط</td><td>عندما يكون القيد المهيمن للشكل صعبًا فعلًا</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-history-why-work-arrives-as-shapes-not-disciplines">التاريخ — لماذا يصل العمل على هيئة أشكال لا تخصصات</h2>
+
+<p>التخصصات هي كيف <em>نظّمت الصناعة المعرفة</em>؛ والأشكال هي كيف <em>يصل العمل فعلًا</em>. كانت مشاريع الويب الأولى صفحات تسويقية وكتالوجات — شكلين ما زالا يشكلان الجزء الأكبر من العمل منخفض الميزانية. ومع تصنّع الويب، تعددت الأشكال: وصلت لوحات المعلومات مع الأدوات الداخلية، ووصل SaaS مع الفوترة بالاشتراك، ووصلت أنظمة الحجز مع خدمات الجدولة. كل شكل جديد كان استجابة لحاجة تجارية، وكل شكل يحمل قيد الأعمال التي يخدمها — يجب ألا يُحصَّل الدفع مرتين، ويجب ألا يُحجز الموعد مرتين. جرّدت وثائق التخصصات المهارة الكامنة؛ وهذه الوثيقة تُبقي الواقع التجاري ملتصقًا بها.</p>
+
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">التقاطع مع الوثائق المجاورة — حدود الازدواج</h2>
+
+<table>
+  <thead><tr><th>الوثيقة المجاورة</th><th>ما تملكه</th><th>ما يبقى هناك مقابل هنا</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a></td><td>مكالمات تحديد النطاق، التسعير، العقود، التسليم، انجراف النطاق</td><td>هناك: <em>كيف تُدار المهمة التعاقدية</em>. هنا: <em>أي شكل طُلب منك بناؤه</em>. قائمة فحص النطاق هنا تغذي مكالمة تحديد النطاق لديهم.</td></tr>
+    <tr><td><a href="./frontend-camps-survey.html">مسح معسكرات الواجهة الأمامية</a></td><td>اختيار المكدس، استراتيجية العرض، اختيار المعسكر</td><td>هناك: <em>أي تقنية</em>. هنا: <em>أي شكل</em>. الشكل أولًا ثم المعسكر — القيد يختار المكدس.</td></tr>
+    <tr><td><a href="../product-strategy.html">Product Strategy</a></td><td>الجدوى، التسعير، CAC/LTV، اقتصاديات الوحدة</td><td>هناك: <em>هل هو عمل تجاري</em>. هنا: <em>هل هو شكل</em>. تتحول الأشكال إلى منتجات عندما تظهر أسئلة العمل التجاري.</td></tr>
+    <tr><td><a href="./system-design.html">التصميم المعماري</a> / <a href="./api-design.html">تصميم واجهات البرمجة</a> / <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a></td><td>المعرفة التخصصية التي يعتمد عليها كل شكل</td><td>هناك: المنهج الكامل. هنا: مؤشرات من سطر واحد إلى القسم الذي يجيب عن قيد كل شكل.</td></tr>
+    <tr><td><a href="./payments-and-commerce.html">الدفع والتجارة</a></td><td>الدفع، الاشتراكات، الاسترداد، الامتثال</td><td>هناك: الآليات. هنا: أي الأشكال <em>أشكال مال</em> وتوجَّه إليها.</td></tr>
+    <tr><td><a href="./wordpress-and-cms-internet.html">WordPress وإنترنت أنظمة إدارة المحتوى</a></td><td>المنصة، سطح التحرير، قابلية التحرير من العميل</td><td>هناك: المنصة نفسها. هنا: أي الأشكال <em>قابلة للتحرير من العميل</em> وتوجَّه إليها.</td></tr>
+  </tbody>
+</table>
+<h2 id="sec-underlying-theory-the-constraint-is-the-shape">النظرية الأساسية — القيد هو الشكل</h2>
+
+<p>لكل شكل خاصية واحدة تفشل <em>أولًا</em> وتفشل <em>بشكل مرئي</em>. تلك الخاصية هي قيده المهيمن، وهي تأتي من الغرض التجاري للشكل لا من تقنيته:</p>
+
+<ul>
+  <li><strong>القيد يحدد ترتيب القرارات.</strong> نموذج أذونات لوحة المعلومات يهم قبل مكتبة الرسوم البيانية؛ ومعالجة الوقت في نظام الحجز تهم قبل واجهته. أتقن القيد والباقي من القرارات ينزلق إلى وثائق التخصصات.</li>
+  <li><strong>القيد يحدد نمط الفشل.</strong> لكل شكل طريقة موت معيارية: صفحة هبوط بطيئة، لوحة معلومات قديمة، دفعة محصَّلة مرتين، فتحة محجوزة مرتين، ترحيل ضائع، تسريب بيانات مستأجر. سمِّ نمط الهلاك وستكون قد سميت القيد.</li>
+  <li><strong>الأشكال تتداخل.</strong> SaaS هو تطبيق CRUD مع تعدد مستأجرين وفوترة؛ وواجهة المتجر موقع محتوى مع دفع؛ ونظام الحجز تطبيق CRUD مع منطق تقويم. عندما تتداخل الأشكال، <em>القيد الخارجي</em> يهيمن.</li>
+</ul>
+
+<h2 id="sec-mental-models-frames-for-thinking-about-shapes">النماذج الذهنية — أُطر للتفكير في الأشكال</h2>
+
+<table>
+  <thead><tr><th>الإطار</th><th>ما يفعله</th></tr></thead>
+  <tbody>
+    <tr><td>«شكل واحد، قيد واحد»</td><td>اعثر على الخاصية الوحيدة التي تقتل المشروع؛ كل ما عداها يتبعها</td></tr>
+    <tr><td>«نمط الهلاك»</td><td>لأي شكل، سمِّ كيف يموت — ثم تحقق أن التصميم يمنع ذلك بالضبط</td></tr>
+    <tr><td>«الشكل أولًا، المكدس ثانيًا»</td><td>لا تختَر المكدس قبل تحديد الشكل أبدًا؛ القيد يختار المعسكر</td></tr>
+    <tr><td>«فرز، لا موسوعة»</td><td>اقرأ وثائق التخصصات <em>بعد</em> الفرز، وبالعمق الذي يطلبه الشكل فقط</td></tr>
+    <tr><td>«كلمات العميل هي الموجز»</td><td>«موقع أستطيع تحريره بنفسي، مع متجر» يطابق شكل CMS + دفع — لا تطبيق React مخصصًا</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-the-shape-taxonomy-twelve-archetypes-at-a-glance">تصنيف الأشكال — اثنا عشر نموذجًا أصليًا في لمحة</h2>
+
+<p>مرتبة تقريبًا حسب التكرار في العمل الحر. السؤال الكاشف هو جملة العميل التي تكشف الشكل غالبًا:</p>
+
+<table>
+  <thead><tr><th>الشكل</th><th>النوع</th><th>القيد المهيمن</th><th>السؤال الكاشف</th></tr></thead>
+  <tbody>
+    <tr><td><strong>صفحة الهبوط / موقع تسويقي</strong></td><td>نموذج منتج</td><td>سرعة التحميل، SEO، التحويل</td><td>«نحتاج صفحة يجدها الناس ويتفاعلون معها»</td></tr>
+    <tr><td><strong>لوحة المعلومات / لوحة الإدارة</strong></td><td>نموذج منتج</td><td>كثافة البيانات، الحالة اللحظية</td><td>«فريقنا يحتاج أن يرى بياناتنا ويتعامل معها»</td></tr>
+    <tr><td><strong>منتج SaaS</strong></td><td>نموذج منتج</td><td>تعدد المستأجرين، الفوترة، إعداد العملاء</td><td>«يسجّل العملاء ويدفعون شهريًا»</td></tr>
+    <tr><td><strong>تطبيق CRUD / أداة داخلية</strong></td><td>نموذج منتج</td><td>النماذج، التحقق، الأذونات</td><td>«نحتاج إدخال السجلات وتتبعها»</td></tr>
+    <tr><td><strong>متجر إلكتروني</strong></td><td>نموذج منتج</td><td>موثوقية الدفع، أمان المدفوعات</td><td>«نريد بيع أشياء عبر الإنترنت»</td></tr>
+    <tr><td><strong>موقع محتوى / مدونة / وثائق</strong></td><td>نموذج منتج</td><td>نموذج المحتوى، SEO، سهولة القراءة</td><td>«ننشر محتوى يقرؤه الناس»</td></tr>
+    <tr><td><strong>نظام حجز / جدولة</strong></td><td>نموذج منتج</td><td>المناطق الزمنية، كشف التعارض</td><td>«يحجز الناس مواعيد معنا»</td></tr>
+    <tr><td><strong>ملف أعمال / موقع شخصي</strong></td><td>نموذج منتج</td><td>التصميم، البساطة، الأداء</td><td>«أحتاج موقعي الخاص»</td></tr>
+    <tr><td><strong>تكامل API / أتمتة</strong></td><td>شكل مهمة</td><td>الموثوقية، معالجة الأخطاء، تعيين البيانات</td><td>«اربط أدواتنا بحيث تتحدث مع بعضها»</td></tr>
+    <tr><td><strong>تخصيص WordPress / CMS</strong></td><td>شكل مهمة</td><td>قيود المنصة، قابلية التحرير من العميل</td><td>«موقع أستطيع تحريره بنفسي»</td></tr>
+    <tr><td><strong>ترحيل / إعادة تصميم</strong></td><td>شكل مهمة</td><td>الحفاظ على SEO، سلامة البيانات، صفر توقف</td><td>«انقل موقعنا / أعد بناءه دون كسره»</td></tr>
+    <tr><td><strong>تحسين الأداء</strong></td><td>شكل مهمة</td><td>Core Web Vitals، تحسين قابل للقياس</td><td>«موقعنا بطيء — اجعله أسرع»</td></tr>
+  </tbody>
+</table>
+<h2 id="sec-shape-selection-guide-the-client-says-x-which-shape-is-this">دليل اختيار الشكل — «يقول العميل X، فأي شكل هذا؟»</h2>
+
+<p>معظم الموجزات تصل بكلمات العميل، لا باسم الشكل. طابِق الجملة مع الشكل:</p>
+
+<table>
+  <thead><tr><th>يقول العميل</th><th>الشكل</th><th>أول سؤال تُعيد طرحه</th></tr></thead>
+  <tbody>
+    <tr><td>«صفحة لجمع الاشتراكات»</td><td>صفحة هبوط</td><td>«ما الإجراء الوحيد الذي تريد من الزوار اتخاذه؟»</td></tr>
+    <tr><td>«مكان لفريقنا يتتبع X»</td><td>لوحة معلومات / أداة داخلية</td><td>«من يرى ماذا، وكم يجب أن تكون البيانات حديثة؟»</td></tr>
+    <tr><td>«يدفع لنا العملاء شهريًا»</td><td>SaaS</td><td>«كيف تعزل بيانات عميل عن بيانات آخر؟»</td></tr>
+    <tr><td>«بيع المنتجات عبر الإنترنت»</td><td>متجر إلكتروني</td><td>«من يملك المخزون، وماذا يحدث عند الدفع؟»</td></tr>
+    <tr><td>«مدونة / وثائق / مقالات»</td><td>موقع محتوى</td><td>«من يكتب المحتوى ويحرره؟»</td></tr>
+    <tr><td>«يحجز الناس معنا»</td><td>نظام حجز</td><td>«ما أصغر وحدة لفتحة قابلة للحجز — وفي أي منطقة زمنية؟»</td></tr>
+    <tr><td>«أستطيع تحريره بنفسي»</td><td>WordPress / CMS</td><td>«ما الذي تحتاج تحريره بالضبط — النص، الصور، أم التخطيط نفسه؟»</td></tr>
+    <tr><td>«انقل موقعنا إلى شيء عصري»</td><td>ترحيل / إعادة تصميم</td><td>«ما الذي يجب ألا ينكسر — SEO، البيانات، أم التوفر؟»</td></tr>
+    <tr><td>«اجعله أسرع»</td><td>تحسين الأداء</td><td>«ما الرقم البطيء — وكيف نقيسه اليوم؟»</td></tr>
+  </tbody>
+</table>
+
+<h3>عندما تتداخل الأشكال — القيد الخارجي ينتصر</h3>
+
+<table>
+  <thead><tr><th>الاقتران</th><th>الشكل المهيمن</th><th>لماذا</th></tr></thead>
+  <tbody>
+    <tr><td>SaaS + لوحة معلومات</td><td>SaaS</td><td>عزل المستأجرين والفوترة يفشلان بضرر أكبر من جمال الرسوم البيانية</td></tr>
+    <tr><td>تجارة إلكترونية + محتوى</td><td>التجارة الإلكترونية</td><td>الدفع المعطل يخسر المال؛ تدوينة بطيئة تخسر الانتباه</td></tr>
+    <tr><td>حجز + دفع</td><td>الحجز</td><td>تعارض الوقت هو الحساب الأصعب؛ والدفع يركب على فتحة مؤكدة</td></tr>
+    <tr><td>CMS + متجر</td><td>CMS</td><td>قابلية التحرير من العميل هي القيد الذي يسميه العميل أولًا</td></tr>
+    <tr><td>صفحة هبوط + لوحة معلومات خلف تسجيل دخول</td><td>كلاهما، منفصلان</td><td>قيدان مختلفان وصفحتان مختلفتان — ابنِهما شكلين لا شكلًا واحدًا</td></tr>
+    <tr><td>سوق + دفع</td><td>السوق</td><td>الثقة ثنائية الجانب (بائع/مشترٍ) وتدفق الدفعات يهيمنان — الدفعات مشكلة دفع أصعب من إتمام الدفع (<a href="./payments-and-commerce.html">الدفع والتجارة</a> §marketplaces)</td></tr>
+    <tr><td>محتوى + عضوية</td><td>العضوية</td><td>المصادقة وبوابة الدفع تهيمنان — تسريب الجدار المدفوع هو نمط الهلاك، لا جودة المقالات</td></tr>
+  </tbody>
+</table>
+
+<h3>دورة حياة الشكل — عندما يتغيّر شكل المشروع</h3>
+
+<p>المشاريع ليست مجمدة عند الفرز. نفس العميل، بعد ستة أشهر، يطلب شكلًا مختلفًا — ويجب أن يتغيّر النطاق والتسعيرة معه. تغيّر الشكل ← يجب أن تتغيّر التسعيرة (انظر <a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a> للجانب التجاري).</p>
+
+<table>
+  <thead><tr><th>التغيير</th><th>المحفّز</th><th>مخاطر إعادة تحديد النطاق</th></tr></thead>
+  <tbody>
+    <tr><td>صفحة هبوط ← SaaS</td><td>تظهر الحسابات والحالة («هل يستطيع المستخدمون تسجيل الدخول والحفظ؟»)</td><td>يظهر تعدد المستأجرين والفوترة من العدم — لم يكن الموقع محدَّد النطاق لهما</td></tr>
+    <tr><td>موقع محتوى ← تجارة إلكترونية</td><td>يقرر العميل البيع («هل نضيف متجرًا؟»)</td><td>حساب المال — موثوقية الدفع وأمان المدفوعات — يحل محل حساب الانتباه</td></tr>
+    <tr><td>أداة داخلية ← SaaS</td><td>يظهر عملاء آخرون («هل يستطيع شركاؤنا استخدامه أيضًا؟»)</td><td>تخطي عزل المستأجرين وإعداد العملاء لفريق واحد</td></tr>
+    <tr><td>CMS ← CMS بلا رأس</td><td>يكبر حجم التحرير أو الأداء فوق طاقة المنصة</td><td>يجب إعادة بناء سير عمل التحرير والمعاينة على المعمارية الجديدة</td></tr>
+    <tr><td>تطبيق CRUD ← لوحة معلومات</td><td>تتمركز التحليلات والأذونات («لنضِف التقارير»)</td><td>التجميع وأداء مسار القراءة والوصول القائم على الأدوار كانت خارج النطاق</td></tr>
+    <tr><td>← ترحيل</td><td>إعادة بناء المنصة — تُستبدل المنصة أو المكدس</td><td>الحفاظ (SEO، البيانات، التوفر) يصبح القيد المهيمن، لا الميزات الجديدة</td></tr>
+  </tbody>
+</table>
+<h2 id="sec-per-shape-link-maps-the-decisions-each-shape-stresses">خرائط الربط لكل شكل — القرارات التي يضغط عليها كل شكل</h2>
+
+<p>كل خريطة تسمي القرارات 2–3 التي <em>تختلف فعلًا حسب الشكل</em> وتشير إلى وثيقة التخصص التي تملك الباقي. وثائق التخصصات تعلّم المنهج الكامل؛ هذه الخرائط تقول أي الأقسام تقرأ <em>لهذا الشكل</em>.</p>
+
+<h3>صفحة الهبوط / موقع تسويقي</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> ميزانية الأداء، بنية SEO، إعداد التحليلات/التحويل. التصميم يخدم إجراءً واحدًا.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./html-and-css.html">HTML و CSS</a> (العرض، Core Web Vitals، النماذج) · <a href="./ui-ux-web-design.html">UI/UX</a> (تصميم التحويل، إمكانية الوصول) · <a href="./frontend-camps-survey.html">المعسكرات</a> (المعسكر B HTML أولًا / المعسكر D SSG) · <a href="../product-strategy.html">Product Strategy</a> (ماذا يعني «التحويل» هنا).</li>
+  <li><strong>نمط الهلاك:</strong> تحميل بطيء أو حركة مرور غير متتبَّعة — الأداء هو المنتج، ويجب أن يكون قابلًا للقياس.</li>
+</ul>
+
+<h3>لوحة المعلومات / لوحة الإدارة</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> استراتيجية جلب البيانات (الاستطلاع مقابل WebSocket مقابل SSE)، تخصيص الجداول، نموذج الأذونات، اختيار الرسوم البيانية.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./system-design.html">التصميم المعماري</a> (تدفق البيانات، التخزين المؤقت) · <a href="./api-design.html">تصميم واجهات البرمجة</a> (الترقيم، التصفية) · <a href="./ui-ux-web-design.html">UI/UX</a> (وضوح الحالة، كثافة البيانات) · <a href="./security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> (الوصول القائم على الأدوار) · <a href="./frontend-camps-survey.html">المعسكرات</a> (المعسكر C SPA).</li>
+  <li><strong>نمط الهلاك:</strong> بيانات قديمة أو جدول بطيء — كل خلية يمكن أن تكون جارٍ تحميلها أو فارغة أو خطأ أو قديمة، ويجب أن يقول التصميم أيها.</li>
+</ul>
+
+<h3>منتج SaaS</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> عزل المستأجرين، مزود المصادقة، نموذج الفوترة/الاشتراك، أعلام الميزات، إعداد العملاء.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> (تعدد المستأجرين) · <a href="./payments-and-commerce.html">الدفع والتجارة</a> (الاشتراكات) · <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> (المصادقة، المهام الخلفية) · <a href="./api-design.html">تصميم واجهات البرمجة</a> (التساوي الذاتي للفوترة) · <a href="../product-strategy.html">Product Strategy</a> (التسعير، CAC/LTV).</li>
+  <li><strong>نمط الهلاك:</strong> تسريب بيانات مستأجر أو خطأ فوترة — القرارات التقنية تابعة لقرار التسعير.</li>
+</ul>
+
+<h3>تطبيق CRUD / أداة داخلية</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> تصميم النماذج، توقيت التحقق، حالات سير العمل، الوصول القائم على الأدوار، سجل التدقيق، العمليات الجماعية.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> (حلقة CRUD، المعاملات) · <a href="./api-design.html">تصميم واجهات البرمجة</a> (عقود الموارد، مغلفات الأخطاء) · <a href="./ui-ux-web-design.html">UI/UX</a> (تصميم النماذج، إشارات الخطأ) · <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> (المخطط، القيود، الترحيلات).</li>
+  <li><strong>نمط الهلاك:</strong> الفجوة بين «يعمل في Postman» و«يعمل في الإنتاج» — التحقق والحالات الحدية هما حيث يعيش التعقيد.</li>
+</ul>
+
+<h3>متجر إلكتروني</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> منصة أم مخصص، تكامل الدفع، المخزون، الشحن، استمرارية السلة، SEO للدفع.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./payments-and-commerce.html">الدفع والتجارة</a> (الدفع، الاسترداد، PCI، الاحتيال) · <a href="./api-design.html">تصميم واجهات البرمجة</a> (التساوي الذاتي) · <a href="./system-design.html">التصميم المعماري</a> (اتساق المخزون) · <a href="./ui-ux-web-design.html">UI/UX</a> (تدفق الدفع، الثقة).</li>
+  <li><strong>نمط الهلاك:</strong> دفعة محصَّلة مرتين أو طلب ضائع — التسامح مع الخطأ قريب من الصفر.</li>
+</ul>
+
+<h3>موقع محتوى / مدونة / وثائق</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> نموذج المحتوى، بنية SEO، البحث، تجربة القراءة. يجب أن تختفي التقنية.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./wordpress-and-cms-internet.html">WordPress و CMS</a> (نمذجة المحتوى، التحرير) · <a href="./html-and-css.html">HTML و CSS</a> (HTML الدلالي، الطباعة، الأداء) · <a href="./ui-ux-web-design.html">UI/UX</a> (سهولة القراءة، التنقل) · <a href="./frontend-camps-survey.html">المعسكرات</a> (المعسكر A CMS / المعسكر B HTML أولًا).</li>
+  <li><strong>نمط الهلاك:</strong> نموذج محتوى غير قابل للصيانة — القارئ لا يلاحظ التقنية أبدًا، والمحرر لا يستطيع التحرير.</li>
+</ul>
+<h3>نظام حجز / جدولة</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> معالجة المناطق الزمنية، كشف التعارض، الحجوزات المتكررة، فترات العازل، التذكيرات.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> (نموذج الفتحات، القيود) · <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> (المعاملات، المهام الخلفية للتذكيرات) · <a href="./api-design.html">تصميم واجهات البرمجة</a> (عقود الحجز، التساوي الذاتي) · <a href="./system-design.html">التصميم المعماري</a> (الاتساق).</li>
+  <li><strong>نمط الهلاك:</strong> فتحة محجوزة مرتين أو منطقة زمنية خاطئة — يجب أن يكون نموذج البيانات صحيحًا قبل أي واجهة.</li>
+</ul>
+
+<h3>ملف أعمال / موقع شخصي</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> سقف التصميم، البساطة، أداء شبه مثالي. أصغر شكل بأعلى سقف تصميم.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./html-and-css.html">HTML و CSS</a> (المنصة، الأداء) · <a href="./ui-ux-web-design.html">UI/UX</a> (التصميم البصري، الحركة) · <a href="./frontend-camps-survey.html">المعسكرات</a> (SSG / HTML مكتوب يدويًا).</li>
+  <li><strong>نمط الهلاك:</strong> سريع لكنه عام — التصميم هو عرض القيمة كله.</li>
+</ul>
+
+<h3>تكامل API / أتمتة</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> معالجة الأخطاء، إعادة المحاولة/التراجع التدريجي، التحقق من الويب هوك، تعيين البيانات، الامتثال لحدود المعدل، المراقبة.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./api-design.html">تصميم واجهات البرمجة</a> (العقود، مغلفات الأخطاء) · <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> (المهام الخلفية، معالجة الأخطاء) · <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات، CI/CD</a> (النشر، التراجع) · <a href="./software-testing-and-debugging.html">الاختبار والتصحيح</a>.</li>
+  <li><strong>نمط الهلاك:</strong> المسار السعيد سهل ومسارات الأخطاء هي المنتج كله — يفشل فشلًا كارثيًا في الثالثة فجرًا.</li>
+</ul>
+
+<h3>تخصيص WordPress / CMS</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> قابلية التحرير من العميل هي المتطلب الأساسي — التقنية تخدم سير عمل المحتوى، لا العكس.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./wordpress-and-cms-internet.html">WordPress وإنترنت أنظمة إدارة المحتوى</a> — الوثيقة كلها: الآليات، نمذجة المحتوى، Gutenberg/بلا رأس، سير العمل، الترحيل، العمليات، حقيقة «أستطيع التحرير بنفسي».</li>
+  <li><strong>نمط الهلاك:</strong> موقع لا يستطيع العميل تحريره — أو يحرّره العميل حتى ينكسر. قابلية التحرير منتج نهائي، لا ميزة.</li>
+</ul>
+
+<h3>ترحيل / إعادة تصميم</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> استراتيجية الترحيل (big-bang مقابل شجرة الخانق)، الحفاظ على SEO، تعيين البيانات، اختبار التشغيل المتوازي، التراجع.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./system-design.html#sec-migration-paths-between-architectures">التصميم المعماري §3b</a> (مسارات الترحيل) · <a href="./wordpress-and-cms-internet.html">WordPress و CMS</a> (مسارات الترحيل) · <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات، CI/CD</a> (النشر، التراجع) · <a href="./api-design.html">تصميم واجهات البرمجة</a> (توافق العقود) · <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> (تطور المخطط).</li>
+  <li><strong>نمط الهلاك:</strong> هبوط ترتيب SEO بين ليلة وضحاها أو فقدان البيانات — الترحيل الناجح هو الذي لا يلاحظه أحد.</li>
+</ul>
+
+<h3>تحسين الأداء</h3>
+<ul>
+  <li><strong>ما يختلف:</strong> ماذا تقيس (LCP، CLS، INP)، ماذا تحسّن (الصور، JS، CSS، الخطوط، الخادم)، ومعرفة متى تتوقف.</li>
+  <li><strong>يملك الكيفية:</strong> <a href="./html-and-css.html#sec-core-web-vitals-platform-knobs">HTML و CSS §6j</a> (Core Web Vitals ↔ مقابض المنصة) · <a href="./system-design.html">التصميم المعماري</a> (التخزين المؤقت، CDN) · <a href="./ui-ux-web-design.html">UI/UX</a> (الأداء المُدرَك).</li>
+  <li><strong>نمط الهلاك:</strong> تحسين لا نهائي — الانضباط هو معرفة متى يتوقف التحسين عن استحقاق كلفته.</li>
+</ul>
+
+<h3>الآثار المترتبة على الشكل — البيانات، الأمن، الاختبار، المقياس</h3>
+
+<p>الأسئلة الأربعة نفسها لكل شكل، مجاب عنها في خلية واحدة وموجّهة إلى الوثيقة المالكة. اقرأ المنهج الكامل هناك؛ هنا المؤشر الذي يختلف حسب الشكل فقط.</p>
+
+<table>
+  <thead><tr><th>الشكل</th><th>نموذج البيانات</th><th>تركيز الأمن</th><th>تركيز الاختبار</th><th>مقياس النجاح الأساسي</th></tr></thead>
+  <tbody>
+    <tr><td>صفحة الهبوط</td><td>لا شيء — المحتوى يعيش في الصفحة (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a>: فقط إن وصل CMS/نموذج)</td><td>مدخلات النماذج، نصوص الطرف الثالث (<a href="./security-and-threat-modeling.html">الأمن</a> §forms)</td><td>العرض، النماذج، أحداث التحليلات (<a href="./software-testing-and-debugging.html">الاختبار</a> §front-end)</td><td>معدل التحويل، زمن التحميل</td></tr>
+    <tr><td>لوحة المعلومات</td><td>قراءات مجمَّعة، عروض غير مطبَّعة (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §read models)</td><td>وصول على مستوى الصف — «من يرى ماذا» (<a href="./security-and-threat-modeling.html">الأمن</a> §RBAC)</td><td>حالات الجدول: جارٍ التحميل/فارغ/خطأ/قديم (<a href="./software-testing-and-debugging.html">الاختبار</a> §state)</td><td>حداثة البيانات، زمن إنجاز المهمة</td></tr>
+    <tr><td>SaaS</td><td>تعدد المستأجرين — مخطط مشترك مقابل معزول (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §tenancy)</td><td>عزل المستأجرين، المصادقة، سلامة الفوترة (<a href="./security-and-threat-modeling.html">الأمن</a> §authz)</td><td>مصادر بيانات بنطاق مستأجر، تساوي ذاتي للفوترة (<a href="./software-testing-and-debugging.html">الاختبار</a> §integration)</td><td>التفعيل، الاحتفاظ، الإيراد لكل مستأجر</td></tr>
+    <tr><td>CRUD / أداة داخلية</td><td>مخطط الكيانات، القيود، الترحيلات (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §schema)</td><td>التحقق عند الحدود، الوصول القائم على الأدوار (<a href="./security-and-threat-modeling.html">الأمن</a> §input)</td><td>التحقق، حالات سير العمل، الحالات الحدية (<a href="./software-testing-and-debugging.html">الاختبار</a> §edge)</td><td>سجلات مُدخلة بشكل صحيح، إنتاجية سير العمل</td></tr>
+    <tr><td>متجر إلكتروني</td><td>المخزون، الطلبات، اتساق السلة (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §transactions)</td><td>أمان المدفوعات، PCI، الاحتيال (<a href="./security-and-threat-modeling.html">الأمن</a> §payments / <a href="./payments-and-commerce.html">الدفع والتجارة</a>)</td><td>حقن فشل الدفع، التساوي الذاتي، الاسترداد (<a href="./software-testing-and-debugging.html">الاختبار</a> §money)</td><td>معدل إتمام الطلبات، صفر دفعة مزدوجة</td></tr>
+    <tr><td>موقع المحتوى</td><td>نموذج المحتوى، التصنيفات، الحقول المنظمة (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §content)</td><td>وصول المحررين، الحقن في محتوى المستخدمين (<a href="./security-and-threat-modeling.html">الأمن</a> §injection)</td><td>HTML الدلالي، SEO، تدفق القراءة (<a href="./software-testing-and-debugging.html">الاختبار</a> §SEO)</td><td>القراء، التفاعل، الظهور في البحث</td></tr>
+    <tr><td>الحجز</td><td>نموذج الفتحات — المناطق الزمنية، القيود، فترات العازل (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §booking)</td><td>البيانات الشخصية (بيانات المرضى/العملاء)، المصادقة على الحجوزات (<a href="./security-and-threat-modeling.html">الأمن</a> §PII)</td><td>كشف التعارض، سباق الحجز المزدوج (<a href="./software-testing-and-debugging.html">الاختبار</a> §concurrency)</td><td>إتمام الحجز، صفر حجز مزدوج</td></tr>
+    <tr><td>ملف الأعمال</td><td>لا شيء — المحتوى في الترميز</td><td>نموذج/بريد مزعج فقط، إن وُجد نموذج تواصل (<a href="./security-and-threat-modeling.html">الأمن</a> §forms)</td><td>الانحدار البصري، ميزانية الأداء (<a href="./software-testing-and-debugging.html">الاختبار</a> §visual)</td><td>سرعة التحميل، جودة التصميم، الاستفسارات</td></tr>
+    <tr><td>تكامل API</td><td>تعيين نماذج البيانات الأجنبية إلى نماذجك (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §mapping)</td><td>معالجة الاعتمادات، التحقق من الويب هوك (<a href="./security-and-threat-modeling.html">الأمن</a> §webhooks)</td><td>مسارات الأخطاء، إعادة المحاولة، حدود المعدل (<a href="./software-testing-and-debugging.html">الاختبار</a> §integration)</td><td>موثوقية المزامنة، استرداد المهام الفاشلة</td></tr>
+    <tr><td>WordPress / CMS</td><td>أنواع المنشورات، الحقول، التصنيفات (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §content)</td><td>نظافة الإضافات/التحديثات، أدوار المحررين (<a href="./security-and-threat-modeling.html">الأمن</a> §platform)</td><td>سير عمل التحرير، التصدير/الاستيراد (<a href="./software-testing-and-debugging.html">الاختبار</a> §CMS)</td><td>العميل يحرّر دون كسر</td></tr>
+    <tr><td>الترحيل</td><td>تعيين المخطط، فحوصات سلامة البيانات (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §migration)</td><td>تدوير الاعتمادات، أمان التراجع (<a href="./security-and-threat-modeling.html">الأمن</a> §rollback)</td><td>تطابق التشغيل المتوازي، فحوصات SEO موضعية (<a href="./software-testing-and-debugging.html">الاختبار</a> §parity)</td><td>صفر توقف، صفر فقدان بيانات، SEO محفوظ</td></tr>
+    <tr><td>الأداء</td><td>ضبط الاستعلامات/مسار القراءة (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §indexes)</td><td>سطح أدنى — CDN، إعداد التخزين المؤقت (<a href="./security-and-threat-modeling.html">الأمن</a> §infra)</td><td>قياس قبل/بعد، بوابات الميزانية (<a href="./software-testing-and-debugging.html">الاختبار</a> §perf)</td><td>فارق Core Web Vitals، تحسين قابل للقياس</td></tr>
+  </tbody>
+</table>
+<h2 id="sec-principles-the-shared-constants-across-every-shape">المبادئ — الثوابت المشتركة عبر كل شكل</h2>
+
+<ul>
+  <li><strong>حدد الشكل قبل المكدس.</strong> كل بناء خاطئ يبدأ بفرز مفقود.</li>
+  <li><strong>سمِّ نمط الهلاك بصوت عالٍ.</strong> إن لم تستطع أن تقول كيف يموت هذا الشكل، فلم تجد قيده بعد.</li>
+  <li><strong>قيد مهيمن واحد لكل مشروع.</strong> عندما يتنافس اثنان، الخارجي ينتصر (انظر جدول التداخل).</li>
+  <li><strong>وجّه إلى الوثيقة المالكة.</strong> وثائق التخصصات تجيب فعلًا عن الأسئلة الصعبة؛ وثيقة الأشكال تشير إلى الصحيحة.</li>
+  <li><strong>كلمات العميل هي الموجز.</strong> «أستطيع تحريره بنفسي» قيد، لا تفضيل.</li>
+  <li><strong>النطاق يتبع الشكل.</strong> النطاق الصادق لصفحة هبوط أصغر من نطاق SaaS — سعّر وفق ذلك (<a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a> تملك الحساب).</li>
+</ul>
+
+<h2 id="sec-worked-example-one-brief-triaged-end-to-end">مثال عملي — موجز واحد، يُفرز من البداية إلى النهاية</h2>
+
+<p>الموجز: <em>«عيادتنا تحتاج موقعًا يستطيع فيه المرضى حجز المواعيد، وأحتاج أن أتمكن من تحديث المحتوى بنفسي.»</em></p>
+
+<pre>1 · Triage: which shape? "Patients book appointments" → booking shape.
+     "I need to update the content myself" → CMS/editability constraint.
+     Outer constraint wins: this is a BOOKING system the client must edit.
+
+2 · The death mode: a double-booked slot in the wrong time zone.
+     → The booking data model and conflict detection matter more
+       than the page design or the stack.
+
+3 · Which discipline docs answer the hard questions?
+     → WordPress &amp; the CMS Internet (the platform, client editability)
+     → Data Modeling (the slot model, time-zone handling, constraints)
+     → Backend Engineering (confirmation/reminder jobs)
+
+4 · The scope this shape demands:
+     → A bookable calendar (slots, buffers, time zones, conflict check)
+     → An editing surface the clinic can use without touching code
+     → A reminder path (email/SMS on booking and before the slot)
+     → Payments only if they said "and take a deposit" — they didn't.
+
+5 · What this shape does NOT demand:
+     → No tenant isolation (single clinic), no billing lifecycle,
+       no feature flags, no table virtualization. Skipping them is
+       correct, not lazy — they belong to other shapes.
+</pre>
+
+<p>الموجز نفسه، لو أُسيء فرزه على أنه «موقع فيه نموذج»، لأنتج موقعًا لا تستطيع العيادة تحريره وتقويمًا يحجز مرتين. الشكل ليس زينة — هو النطاق.</p>
+
+<h3>مثال عملي — الشكل الذي يختبئ خلف موجز أصغر</h3>
+
+<pre>1 · Triage: "a bakery wants to sell cakes online + post weekly menus"
+     → e-commerce (money) + content (the menus) nest.
+     Money shape dominates: a lost order loses revenue; a stale
+     menu loses an occasional reader. This is a SHOP first.
+
+2 · The death mode: a lost order or double-charge at checkout.
+     → Payments reliability and inventory matter more than the
+       menu design or the cake photography.
+
+3 · Which discipline docs answer the hard questions?
+     → Payments &amp; Commerce (checkout, refunds, order flow)
+     → Data Modeling (inventory, order lines, stock consistency)
+     → System Design (cart persistence, checkout consistency)
+
+4 · The scope this shape demands:
+     → A checkout that cannot double-charge or lose an order
+     → Inventory that cannot oversell (or a clear "no stock" path)
+     → A content area for weekly menus — the CMS, not the shop,
+       owns that, and it's the small part
+     → Order notifications/confirmation so nothing is silent
+
+5 · What this shape does NOT demand:
+     → No accounts, no subscriptions, no tenant isolation.
+       A bakery sells cakes, not seats. Skipping SaaS machinery
+       is correct — it belongs to another shape.
+</pre>
+
+<p>هنا، الإغراء في الفرز الخاطئ هو سماع «قوائم أسبوعية» وبناء موقع محتوى مع متجر مُلصق عليه. شكل المال ينتصر، والنطاق يتبعه: المتجر هو المنتج، والقوائم هي الزينة.</p>
+
+<h2 id="sec-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
+
+<table>
+  <thead><tr><th>الفشل</th><th>السبب</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td>الإفراط في هندسة صفحة هبوط</td><td>بناء تطبيق كامل المكدس لصفحة تحويل ثابتة</td><td>الشكل أولًا: إجراء واحد، ميزانية أداء، لا مصادقة، لا قاعدة بيانات</td></tr>
+    <tr><td>هندسة SaaS ناقصة</td><td>تخطي عزل المستأجرين والفوترة وإعداد العملاء</td><td>خريطة SaaS: تعدد المستأجرين ودورة حياة الاشتراك قبل التلميع</td></tr>
+    <tr><td>الخلط بين الترحيل وإعادة التصميم</td><td>إعادة البناء دون قيود SEO/البيانات/التوفر</td><td>خريطة الترحيل: الحفاظ هو القيد، لا الشكل الجديد</td></tr>
+    <tr><td>معاملة نظام الحجز كتطبيق CRUD</td><td>نماذج وسجلات، لكن لا كشف تعارض ولا معالجة مناطق زمنية</td><td>خريطة الحجز: نموذج الفتحات وحساب الوقت أولًا</td></tr>
+    <tr><td>بناء لوحة معلومات دون نموذج أذونات</td><td>عالجت كثافة البيانات وتجاهلت الوصول</td><td>خريطة لوحة المعلومات: «من يرى ماذا» قرار خصوصية بيانات</td></tr>
+    <tr><td>تسليم موقع لا يستطيع العميل تحريره</td><td>بناء مخصص حيث كان «أستطيع التحرير بنفسي» هو القيد</td><td>خريطة CMS: قابلية التحرير منتج نهائي، اختر المنصة وفق ذلك</td></tr>
+    <tr><td>قبول شكل لم تحدده</td><td>الموافقة على سعر قبل معرفة القيد</td><td>قائمة فحص النطاق — نفّذها قبل التسعيرة (<a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a>)</td></tr>
+  </tbody>
+</table>
+<h2 id="sec-the-freelancer-s-scoping-checklist-run-before-you-quote">قائمة الفحص الخاصة بالعامل الحر — نفّذها قبل أن تسعّر</h2>
+
+<p>خمسة أسئلة، تُجاب من الموجز قبل أي كود أو أي سعر:</p>
+
+<ol>
+  <li><strong>أي شكل هذا؟</strong> طابِق كلمات العميل مع التصنيف؛ وإن تداخل شكلان، سمِّ الخارجي.</li>
+  <li><strong>ما القيد المهيمن؟</strong> الخاصية الوحيدة التي إن أخطأت قتلت المشروع.</li>
+  <li><strong>أي وثائق التخصصات تجيب عن الأسئلة الصعبة؟</strong> وجّه الشكل إلى وثائقه المالكة؛ واقرأ بالعمق الذي يطلبه الشكل فقط.</li>
+  <li><strong>ما أنماط الفشل التي يجب مراقبتها؟</strong> سمِّ نمط الهلاك واجعل النطاق يمنع ذلك بالضبط.</li>
+  <li><strong>ما قدرة العميل على صيانة هذا بعد التسليم؟</strong> «أستطيع تحريره بنفسي» بند نطاق، لا أمنية (<a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a> تملك التسليم).</li>
+</ol>
+
+<h2 id="sec-ecosystem-the-shape-aware-tooling-catalog">النظام البيئي — كتالوج الأدوات الواعي بالأشكال</h2>
+
+<p>الأدوات تتغير أسرع من الأشكال؛ إليك ما يخدمه كل <em>نوع</em>، ليجد أي أداة جديدة مكانها في صفها:</p>
+
+<table>
+  <thead><tr><th>الفئة</th><th>أمثلة</th><th>مقياس القرار</th></tr></thead>
+  <tbody>
+    <tr><td>موقع / ثابت</td><td>Astro، Eleventy، HTML خام، استضافة Vercel/Netlify</td><td>أشكال صفحة الهبوط والمحتوى وملف الأعمال: ابنِ مرة، اخدِم بسرعة</td></tr>
+    <tr><td>ميتا-إطار / SPA</td><td>Next.js، SvelteKit، Remix</td><td>لوحة المعلومات وSaaS وCRUD المخصص: أشكال التطبيقات تحتاج حالة عميل</td></tr>
+    <tr><td>منصة CMS</td><td>WordPress، CMS بلا رأس، Sanity، Strapi</td><td>أشكال قابلية التحرير من العميل: سطح التحرير هو المنتج النهائي</td></tr>
+    <tr><td>التجارة</td><td>Shopify، WooCommerce، Stripe، Paddle</td><td>أشكال المال: موثوقية الدفع والامتثال أولًا</td></tr>
+    <tr><td>المصادقة والهوية</td><td>Auth0، Clerk، Supabase Auth</td><td>أشكال SaaS والأدوات الداخلية: نموذج الأذونات قرار بيانات</td></tr>
+    <tr><td>الجدولة</td><td>Cal.com، Calendly، نماذج فتحات مخصصة</td><td>شكل الحجز: كشف تعارض آمن للمناطق الزمنية، لا عدد ميزات</td></tr>
+    <tr><td>رسوم بيانية / جداول</td><td>AG Grid، TanStack Table، Chart.js، Recharts</td><td>شكل لوحة المعلومات: التخصيص ومعالجة القدَم يسبقان جمال الرسوم</td></tr>
+  </tbody>
+</table>
+
+<p>كل صف يطابق شكلًا أعلاه — الأداة مركبة، والشكل هو القاعدة. عندما تظهر أداة جديدة، اسأل أي شكل تخدم، وهل تحسّن قيده المهيمن؛ وإن لم يكن أيٌّ منهما، فهي ضجيج.</p>
+
+<h2 id="sec-the-future-ai-changes-which-shapes-appear-not-the-triage">المستقبل — الذكاء الاصطناعي يغيّر أيّ الأشكال تظهر، لا الفرز نفسه</h2>
+
+<p>يُفقد الذكاء الاصطناعي <em>كلفة بناء</em> الأشكال البسيطة أولًا: صفحات الهبوط ومواقع المحتوى وتطبيقات CRUD البسيطة يمكن الآن سقالتها بنموذج. الأشكال لا تختفي — لكن قيودها <em>الحدّية</em> تصير أحدّ. صفحة الهبوط لم تعد صعبة لأن بناؤها صعب؛ صارت صعبة لأن التحويل والسرعة قابلان للقياس، والسقف يرتفع. الأشكال المعقدة (SaaS، الحجز، الترحيل، الأداء) تنجو لأن قيودها — عزل المستأجرين، حساب الوقت، الحفاظ، القياس — هي بالضبط ما يكون الذكاء الاصطناعي أسوأ فيه. انضباط الفرز ينجو لأن أنماط الهلاك لا تتغير: الحجز المزدوج حجز مزدوج سواء بُني التقويم يدويًا أو يولّده الذكاء الاصطناعي. ينتقل الثمن من <em>كتابة الكود الذي يحتاجه الشكل</em> إلى <em>معرفة أي شكل هو الموجز وأين يقع الخطر الحقيقي</em> — وهو عمل هذه الوثيقة كله.</p>
+
+<p>يقدّم الذكاء الاصطناعي أيضًا <strong>أشكالًا ناشئة جديدة</strong>، لكل منها قيده ونمط هلاكه:</p>
+<ul>
+  <li><strong>منتج محادثة AI</strong> — إجابات مبنية على مصادر وسياسة أمان؛ نمط الهلاك هو هلوسة واثقة يثق بها المستخدم.</li>
+  <li><strong>منتج وكيل AI</strong> — حدود أذونات الأدوات وسجل تدقيق للإجراءات المتخذة؛ نمط الهلاك هو وكيل يتصرف بسلطة لم تُمنح له أبدًا.</li>
+  <li><strong>ميزة AI داخل SaaS</strong> — التقييم والثقة: لا تستطيع شحن ما لا تستطيع تقييمه، ولن يثق المستخدمون بصندوق أسود ببياناتهم (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> §PII / <a href="./security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a>).</li>
+</ul>
+
+<p>الذكاء الاصطناعي لا يزيل الأشكال — يغيّر أيها سلعة. يرخّص بناء الأشكال البسيطة؛ وتبقى قيود كل شكل.</p>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الخلاصة — قائمة الفحص الذهنية الكاملة</h2>
+
+<p>اطبع هذا. إنها الوثيقة كلها في اثني عشر سطرًا، سطر لكل شكل:</p>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>صفحة الهبوط — الأداء هو المنتج؛ إجراء واحد، حركة مرور قابلة للقياس.</td></tr>
+    <tr><td>2</td><td>لوحة المعلومات — كثافة البيانات والحالة؛ كل خلية تقول جارٍ التحميل/فارغ/خطأ/قديم، والأذونات قرار بيانات.</td></tr>
+    <tr><td>3</td><td>SaaS — عزل المستأجرين والفوترة وإعداد العملاء؛ القرارات التقنية تابعة لقرار التسعير.</td></tr>
+    <tr><td>4</td><td>CRUD / أداة داخلية — التحقق وحالات سير العمل؛ الفجوة بين Postman والإنتاج هي التعقيد.</td></tr>
+    <tr><td>5</td><td>التجارة الإلكترونية — موثوقية الدفع؛ دفعة مزدوجة أو طلب ضائع خسارة إيراد مباشرة.</td></tr>
+    <tr><td>6</td><td>موقع المحتوى — التقنية تختفي؛ نموذج المحتوى وSEO هما المنتج.</td></tr>
+    <tr><td>7</td><td>الحجز — حساب الوقت هو أصعب المشكلات؛ يجب أن يكون نموذج الفتحات صحيحًا قبل أي واجهة.</td></tr>
+    <tr><td>8</td><td>ملف الأعمال — أصغر شكل بأعلى سقف تصميم؛ السريع العام ما زال فشلًا.</td></tr>
+    <tr><td>9</td><td>تكامل API — مسارات الأخطاء هي المنتج؛ يجب أن ينجو من الثالثة فجرًا.</td></tr>
+    <tr><td>10</td><td>WordPress / CMS — قابلية التحرير منتج نهائي؛ يحرّر العميل أو يكون مكسورًا.</td></tr>
+    <tr><td>11</td><td>ترحيل / إعادة تصميم — الحفاظ هو القيد؛ النجاح هو ما لا يلاحظه أحد.</td></tr>
+    <tr><td>12</td><td>الأداء — لا ينتهي أبدًا؛ الانضباط هو معرفة متى تتوقف.</td></tr>
+  </tbody>
+</table>
+
+<p>والفرز الذي يسبقها كلها: <strong>سمِّ الشكل، سمِّ القيد، سمِّ نمط الهلاك، وجّه إلى الوثيقة المالكة، وحدّد النطاق على قدر الشكل.</strong></p>
+
+<section class="cite">
+  <h2 id="sec-primary-sources">المصادر الأولية</h2>
+  <ol>
+    <li>الرف نفسه — كل وثيقة تخصص مذكورة في خرائط الربط أعلاه. هذه الوثيقة جدول توجيه فوقها، لا مصدر معرفة جديدة.</li>
+    <li>Core Web Vitals — <a href="https://web.dev/articles/vitals">web.dev — Web Vitals</a>، القيد الذي يعرّف شكل الأداء.</li>
+    <li>عزل بيانات تعدد المستأجرين — <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/multitenant-saas">Microsoft Azure Architecture Center — multitenant SaaS patterns</a>، القيد الذي يعرّف شكل SaaS.</li>
+    <li>شجرة الخانق / أنماط الترحيل — <a href="https://martinfowler.com/bliki/StranglerFigApplication.html">Martin Fowler — StranglerFigApplication</a>، القيد الذي يعرّف شكل الترحيل.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2 id="sec-ask-your-teacher">اسأل معلّمك</h2>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«خذ آخر موجز مشروع حقيقي وصلني ومُرّ على فرزك معي: الشكل، القيد، نمط الهلاك، الوثائق المالكة — قبل أي كود.»</li>
+    <li>«أين تقع مهاراتي الحالية؟ أي شكلين أنا الأكثر استعدادًا لهما، وأي شكلين يجب أن أتجنبهما عمدًا حتى أقرأ وثائقهما المالكة؟»</li>
+    <li>«أعطني موجزًا حقيقيًا أُسيء فيه تحديد الشكل — كيف بدا الإفراط أو النقص في الهندسة، وماذا كلّف؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · أشكال المنتجات — طبقة الفرز فوق الرف كله</span>
+  <span>العمل التجاري: <a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a> · المكدس: <a href="./frontend-camps-survey.html">مسح المعسكرات</a> · الاستراتيجية: <a href="../product-strategy.html">Product Strategy</a> · المنصات: <a href="./wordpress-and-cms-internet.html">WordPress وإنترنت أنظمة إدارة المحتوى</a> · <a href="./payments-and-commerce.html">الدفع والتجارة</a> · المصطلحات: <a href="./glossary.html">مصطلحات مشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>
