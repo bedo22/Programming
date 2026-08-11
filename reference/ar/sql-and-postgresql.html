@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL وPostgreSQL — لغة الاستعلام والمحرّك</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · SQL وPostgreSQL — لغة الاستعلام والمحرّك</p>
+  <h1>SQL وPostgreSQL</h1>
+  <p class="meta">لغة الاستعلام التي تفتح كل مخطط: تشريح SELECT وترتيب التنفيذ، ومعالجة NULL، وJOIN بكل أشكالها، والتجميع وGROUP BY، والاستعلامات الفرعية وتعبيرات الجدول المشترك، والدوال النافذة، وكتابة البيانات (INSERT/UPDATE/DELETE/UPSERT)، والمعاملات في SQL، وميزات PostgreSQL الرابحة (JSONB والمصفوفات والبحث النصي الكامل وLISTEN/NOTIFY والأمان على مستوى الصف RLS والتقسيم والإضافات)، وقراءة الاستعلامات البطيئة بـ EXPLAIN ANALYZE، والاختلافات المهمة في MySQL/MariaDB بالنسبة لـ WordPress، وSQLite للتطوير المحلي — مع مثال عملي يحوّل مخطط تتبع الشحنات في الرف إلى استعلامات حقيقية. اقرأ هذا بعد <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> (تصمّم المستودع هناك؛ تفتحه هنا).</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../sql-and-postgresql.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يندرج هذا.</strong> <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> يعلّم كيف <em>تصمّم</em> المخطط — الجداول والمفاتيح والقيود والفهارس والهجرات. <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> يعلّم حلقة الطلب التي <em>تستدعي</em> قاعدة البيانات. لا يعلّم أيٌّ منهما اللغة نفسها. هذه الوثيقة هي الوسط المفقود — SQL التي تربط بينهما:</p>
+  <pre>SCHEMA DESIGN (data-modeling)          THE QUERY LAYER (this doc)
+tables, keys, constraints, indexes     SELECT, JOIN, GROUP BY, window functions
+migrations, isolation levels           BEGIN/COMMIT, UPSERT, EXPLAIN ANALYZE
+                                       |
+THE REQUEST LOOP (backend)             THE ENGINES
+the server calls these queries         PostgreSQL (shelf default) ← the depth
+ORMs vs raw SQL (§1e)                  MySQL/MariaDB (WordPress)
+N+1 problem (§1e)                      SQLite (local dev, tests)
+                                       hosted faces: Supabase, Neon, PlanetScale</pre>
+  <p>الجيران وكيف يقتسمون العمل:</p>
+  <ul>
+    <li><a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> — تملك تصميم المخطط واستراتيجية الفهارس وحلقة ضبط EXPLAIN كـ<em>مفهوم</em>. هذه الوثيقة تملك اللغة وتعرض الصياغة التي تدور حولها المفاهيم.</li>
+    <li><a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> — تملك قرار ORM مقابل SQL الخام (<a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>) ومشكلة N+1 والمعاملات كاهتمام خادمي. هذه الوثيقة تعرض SQL التي تحتها: JOIN التي تصلح N+1، وصياغة BEGIN/COMMIT.</li>
+    <li><a href="./api-design.html">تصميم واجهات البرمجة (API)</a> — تملك مفاتيح التساوي الذاتي. هذه الوثيقة توفّر جانبها في قاعدة البيانات: <code>INSERT ... ON CONFLICT</code>.</li>
+    <li><a href="../wordpress-and-cms-internet.html">WordPress وإنترنت CMS</a> — يعمل WordPress على MySQL/MariaDB؛ قسم الاختلافات هنا هو رفيقه في قواعد البيانات.</li>
+    <li><a href="./terminal-and-deployment-substrate.html">الطرفية وطبقة النشر</a> — الصدفة التي تعمل فيها <code>psql</code> و<code>pg_dump</code>؛ عمق إدارة قواعد البيانات يبقى عمدًا خارج هذا الرف.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا توجد هذه الوثيقة منفصلة</h3>
+  <p><em>لا تعلّم أي وثيقة أخرى على الرف كيف تستعلم من قاعدة بيانات.</em> وثيقة نمذجة البيانات تصمّم المخططات بل وتعرض استعلامين مثالين؛ ووثيقة الواجهة الخلفية تسمّي ORM والمعاملات — لكن لا أحد يعلّم اللغة نفسها: ما هو JOIN، ومتى تنطبق GROUP BY، وماذا تفعل الدالة النافذة، وكيف يجعل UPSERT الكتابة ذاتية التساوي. تلك الفجوة تهمّ كل جمهور على هذا الرف: المستقل الذي يصحّح استعلام <code>wp_postmeta</code> في WordPress، ومطوّر React الذي يربط استعلام Supabase بصفحة Next.js، ومهندس الواجهة الخلفية الذي يحسّن مشكلة N+1، ومصمّم الأنظمة الذي يشرح لماذا يوجد جدول الفهرس. SQL هي المهارة الأكثر قابلية للنقل في عمل الواجهة الخلفية — اللغة متطابقة بنحو ~90% عبر PostgreSQL وMySQL وSQLite. هذه الوثيقة تعلّمها مرة واحدة، محايدة تجاه المحرّك أولًا، مع PostgreSQL كمحرّك التوثيق (وهو افتراضي الرف) وقسم مخصص لاختلافات MySQL ذات الصلة بـ WordPress. ملاحظة نطاق واحدة: <strong>هذه ليست دورة إدارة قواعد بيانات</strong> — ضبط WAL و<code>pg_hba.conf</code> وإعداد الخادم تنتمي إلى المنصة، لا إلى هذا الرف.</p>
+</section>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ هذا بعد <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> (حتى تكون مفردات المخطط دافئة) وبجانب <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> (قرار ORM مقابل SQL الخام). روابط متقاطعة:</p>
+<ul>
+  <li>تصميم المخطط والمفاتيح والقيود والفهارس: <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> — هذه الوثيقة تستعلم مما تصمّمه تلك.</li>
+  <li>ORM مقابل SQL الخام ومشكلة N+1: <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>.</li>
+  <li>المعاملات والتزامن كاهتمام خادمي: <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>؛ مستويات العزل كاهتمام بالمخطط: <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> <a href="./data-modeling-and-databases.html#sec-isolation-levels-the-transaction-knob">مستويات العزل</a>.</li>
+  <li>الكتابة ذاتية التساوي في واجهات البرمجة: <a href="./api-design.html">تصميم واجهات البرمجة (API)</a> — قسم UPSERT هنا هو وجهها في SQL.</li>
+  <li>محرّك WordPress: <a href="../wordpress-and-cms-internet.html">WordPress وإنترنت CMS</a> — قسم اختلافات MySQL هنا.</li>
+  <li>مرجع: <a href="./glossary.html">المصطلحات</a>.</li>
+</ul>
+
+<p><strong>إذا كنت تستطيع تصميم مخطط لكنك تتجمّد أمام الاستعلام — أو حفظت «JOIN» دون أن تعرف ماذا يفعل المحرّك فعلًا — فهذه هي الخريطة.</strong> اقرأ التعريف (ما هو SQL وما ليس هو)، ثم أساسيات الاستعلام وJOIN قبل أي شيء آخر؛ والباقي عمق عند الحاجة.</p>
+
+<h2 id="sec-definition-what-sql-is-and-what-it-is-not">التعريف — ما هو SQL، وما ليس هو</h2>
+
+<p><strong>SQL لغة تصريحية.</strong> تقول <em>ماذا</em> تريد («كل الشحنات لهذا العميل، الأحدث أولًا»)، والمحرّك يقرر <em>كيف</em> يحصل عليها — أي الفهارس يسير فيها، وكيف يدمج، وبأي ترتيب يفعل الأشياء. هذا عكس كودك الإجرائي: في حلقة الطلب تكتب خطوات؛ في SQL تكتب الهدف. مهمة كاتب SQL الجيد هي صياغة الهدف بحيث يرى مخطط المحرّك المسار الرخيص (وهذا موضوع قسمي الفهرس وEXPLAIN).</p>
+
+<table>
+  <thead><tr><th>ما هو SQL</th><th>ما ليس هو SQL</th></tr></thead>
+  <tbody>
+    <tr><td>لغة مجموعات تصريحية — تصف مجموعة النتائج</td><td>لغة إجرائية — لا تصف الخطوات</td></tr>
+    <tr><td>معياري (SQL-92 وSQL:1999 وSQL:2003 وSQL:2016 وSQL:2023) مع لهجات من كل بائع</td><td>لهجة واحدة — كل محرّك يضيف مجموعة فائقة خاصة به (مثل <code>ON CONFLICT</code> في PostgreSQL و<code>ON DUPLICATE KEY</code> في MySQL)</td></tr>
+    <tr><td>اللغة نفسها عبر PostgreSQL وMySQL وSQLite وSQL Server — مشتركة بنحو ~90%</td><td>«مكدس» خلفي — SQL ليست Node ولا .NET؛ إنها ما يستدعيه كلاهما</td></tr>
+    <tr><td>عن المجموعات: WHERE يفلتر الصفوف، وJOIN يدمج المجموعات، وGROUP BY يطوي المجموعات، والدوال النافذة ترتّب داخل المجموعات</td><td>عن حلقات إجرائية — مشكلة N+1 تحدث تحديدًا حين تترجم الحلقات إلى استعلامات</td></tr>
+  </tbody>
+</table>
+
+<p><strong>SQL مقابل NoSQL:</strong> المحرّكات الارتباطية تمنحك ACID وJOIN والقيود؛ مخازن المستندات تمنحك مخططات مرنة وتوسعًا أفقيًا. موقف الرف (<a href="./data-modeling-and-databases.html">نمذجة البيانات</a> <a href="./data-modeling-and-databases.html#sec-definition-what-data-modeling-is-and-what-it-is-not">التعريف</a>، <a href="./data-modeling-and-databases.html#sec-beyond-the-relational-default-read-models-and-event-sourcing">ما بعد الافتراض الارتباطي</a>): الارتباطي افتراضيًا، ومخازن المستندات حين يكون المخطط متغيّرًا فعلًا — ويغطي JSONB في PostgreSQL معظم تلك الحالات دون مغادرة العالم الارتباطي. SQL لن تذهب إلى أي مكان؛ إنها اللغة المشتركة للبيانات.</p>
+
+<p><strong>المحرّكات الثلاثة التي ستستخدمها فعلًا — وأوجهها المستضافة:</strong></p>
+
+<table>
+  <thead><tr><th>المحرّك</th><th>أين يظهر في عالمك</th><th>الوجه المستضاف</th></tr></thead>
+  <tbody>
+    <tr><td><strong>PostgreSQL</strong></td><td>افتراضي الرف — أمثلة نمذجة البيانات والواجهة الخلفية وJSONB وpgvector</td><td>Supabase وNeon وAWS RDS — مشاريع <a href="./nextjs-deep-dive.html">Next.js</a> تصل إليه عادةً عبر Supabase</td></tr>
+    <tr><td><strong>MySQL / MariaDB</strong></td><td>WordPress — المحرّك تحت معظم المواقع على وجه الأرض (<a href="../wordpress-and-cms-internet.html">وثيقة WordPress</a>)</td><td>PlanetScale وAWS RDS</td></tr>
+    <tr><td><strong>SQLite</strong></td><td>التطوير المحلي والاختبارات والإنتاج منخفض الحركة — ملف واحد بلا خادم</td><td>— (يعمل داخل عمليتك؛ أمر <code>sqlite3</code> في طبقة الطرفية يفتحه)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>أصناف العبارات:</strong> DDL (المخطط: <code>CREATE TABLE</code>، <code>ALTER</code>) — أرض وثيقة نمذجة البيانات؛ DML (البيانات: <code>SELECT</code>، <code>INSERT</code>، <code>UPDATE</code>، <code>DELETE</code>) — صميم هذه الوثيقة؛ TCL (المعاملات: <code>BEGIN</code>، <code>COMMIT</code>، <code>ROLLBACK</code>)؛ DCL (الأذونات: <code>GRANT</code>). هذه الوثيقة تعلّم DML وما تحتاجه من TCL لإبقاء الكتابات آمنة.</p>
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">التقاطع مع الجيران — حدود الازدواجية</h2>
+
+<table>
+  <thead><tr><th>وثيقة الجار</th><th>ما تملكه</th><th>ما يبقى هناك مقابل هنا</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a></td><td>تصميم المخطط: المفاتيح والقيود والتطبيع و<em>استراتيجية</em> الفهارس وحلقة ضبط EXPLAIN كنظام ومستويات العزل</td><td>هناك: لماذا يتشكّل المخطط بهذا الشكل، وأي نوع فهارس لأي استعلام. هنا: صياغة الاستعلام التي تُمارسها، وقراءة EXPLAIN الملموسة</td></tr>
+    <tr><td><a href="./backend-engineering.html">هندسة الواجهة الخلفية</a></td><td>حلقة الطلب وقرار ORM مقابل SQL الخام وN+1 كنمط خادمي والمعاملات كاهتمام تزامن</td><td>هناك: متى تستخدم ORM، ولماذا تؤذي N+1، والعزل كمقبض. هنا: JOIN التي تصلح N+1، وصياغة <code>BEGIN</code>/<code>COMMIT</code>، وUPSERT</td></tr>
+    <tr><td><a href="./api-design.html">تصميم واجهات البرمجة (API)</a></td><td>العقود ومفاتيح التساوي الذاتي والترحيل بالمؤشر</td><td>هناك: دلالات HTTP. هنا: <code>INSERT ... ON CONFLICT</code> ككتابة ذاتية التساوي، واستعلامات الترحيل بالمفاتيح</td></tr>
+    <tr><td><a href="../wordpress-and-cms-internet.html">WordPress وإنترنت CMS</a></td><td>نظام إدارة المحتوى والثيمات والإضافات والحلقة</td><td>هناك: WordPress نفسه. هنا: اختلافات MySQL وأنماط استعلام <code>wp_postmeta</code>/<code>wp_options</code></td></tr>
+    <tr><td><a href="./system-design.html">التصميم المعماري</a></td><td>النسخ المتماثل والتقسيم كرافعة توسع ومخازن المتجهات كاعتماد نظامي</td><td>هناك: متى ولماذا. هنا: صياغة PostgreSQL — <code>PARTITION BY RANGE</code> وعوامل pgvector</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-query-fundamentals-the-select-anatomy">أساسيات الاستعلام — تشريح SELECT</h2>
+
+<p>كل استعلام جملة واحدة: <em>من هذه الجداول، فلتر إلى هذه الصفوف، شكّلْها في هذه الأعمدة.</em> أهم نموذج ذهني في SQL هو أن <strong>الترتيب الكتابي وترتيب التنفيذ مختلفان</strong>:</p>
+
+<pre>-- WRITTEN order (how you type it):
+SELECT   department, COUNT(*)
+FROM     employees
+WHERE    hired_at &gt; '2020-01-01'
+GROUP BY department
+HAVING   COUNT(*) &gt; 5
+ORDER BY department
+LIMIT    10;
+
+-- EXECUTION order (how the engine actually does it):
+-- 1. FROM        pick the source rows (joins happen here)
+-- 2. WHERE       filter rows            (cannot use aliases!)
+-- 3. GROUP BY    fold rows into groups
+-- 4. HAVING      filter groups          (cannot use aliases!)
+-- 5. SELECT      compute output columns (aliases born here)
+-- 6. ORDER BY    sort the output        (can use aliases)
+-- 7. LIMIT       cut the output</pre>
+
+<p>معظم أخطاء SQL أخطاء ترتيب: <code>WHERE</code> كان ينبغي أن تكون <code>HAVING</code>، أو اسم مستعار استُخدم قبل أن يوجد. احفظ ترتيب التنفيذ مرة واحدة وسيصبح الباقي مفردات.</p>
+
+<table>
+  <thead><tr><th>البند</th><th>ماذا يفعل</th><th>المزالق</th></tr></thead>
+  <tbody>
+    <tr><td><code>SELECT</code></td><td>يختار الأعمدة ويحسبها؛ <code>SELECT DISTINCT</code> يزيل تكرار الصفوف كاملة</td><td><code>SELECT *</code> في الإنتاج — انظر أنماط الفشل</td></tr>
+    <tr><td><code>FROM ... JOIN ...</code></td><td>يختار المصادر ويدمجها</td><td>نسيان مفتاح الدمج → حاصل ضرب ديكارتي</td></tr>
+    <tr><td><code>WHERE</code></td><td>يفلتر الصفوف <em>قبل</em> التجميع</td><td>فلترة خاصية مجموعة هنا بدلًا من HAVING</td></tr>
+    <tr><td><code>ORDER BY</code></td><td>يرتّب؛ <code>DESC</code> للأحدث أولًا؛ مفاتيح متعددة بترتيب أولوية</td><td>الترتيب يكلّف وقتًا ويحجب ترحيل LIMIT على المجموعات الكبيرة</td></tr>
+    <tr><td><code>LIMIT ... OFFSET ...</code></td><td>يقتطع الناتج؛ يرحّل بـ OFFSET</td><td>OFFSET العميقة تفحص وتتخطى — استخدم الترحيل بالمفاتيح بدلًا (انظر الدوال النافذة)</td></tr>
+  </tbody>
+</table>
+
+<h3>NULL — المصدر الأول لأخطاء SQL</h3>
+
+<p><code>NULL</code> ليست قيمة؛ إنها <em>غياب</em> قيمة، ولا تُقارن كقيمة. <code>NULL = NULL</code> ليست صحيحة — إنها <code>NULL</code> (غير معروفة). القواعد الثلاث التي تنهي الالتباس:</p>
+
+<pre>WHERE email IS NULL          -- the ONLY way to test for absence (never = NULL)
+WHERE email IS NOT NULL      -- its inverse
+WHERE score IS DISTINCT FROM 5   -- "not equal, counting NULL as a value" (PostgreSQL)
+
+SELECT COALESCE(nickname, full_name, 'Anonymous')  -- first non-NULL, left to right
+SELECT NULLIF(a, b)          -- NULL if a = b, else a   (handy for divide-by-zero)
+SELECT COUNT(*)              -- counts rows, including NULLs
+SELECT COUNT(email)          -- counts only non-NULL values — a subtle difference!</pre>
+
+<h3>CASE والتحويل النوعي</h3>
+
+<p><code>CASE</code> هي <code>if/else</code> الخاصة بـ SQL — تعبير يعيد قيمة لكل صف، ويُستخدم في أي موضع يُقبل فيه تعبير (SELECT وWHERE وORDER BY). التحويل النوعي بـ <code>::</code> (في PostgreSQL) أو <code>CAST(x AS type)</code> (المعياري) يحوّل الأنواع — وهو فخ أداء كلاسيكي حين يُطبَّق على أعمدة مفهرسة (انظر الأداء).</p>
+
+<pre>SELECT CASE WHEN total &gt; 1000 THEN 'large'
+            WHEN total &gt; 100  THEN 'medium'
+            ELSE 'small' END AS size
+FROM shipments;
+
+SELECT '42'::int,  total::numeric(10,2)   -- PostgreSQL cast syntax
+SELECT CAST('42' AS INT);                -- standard, works everywhere</pre>
+<h2 id="sec-joins-the-core-skill">JOIN — المهارة الجوهرية</h2>
+
+<p>البيانات الارتباطية تعيش في جداول منفصلة؛ JOIN تعيد تجميعها. JOIN هي <em>قاعدة اقتران</em>: لكل صف في اليسار، ابحث عن الصفوف المطابقة في اليمين بمفتاح. وكل ما عداه هو أي الصفوف تُبقى.</p>
+
+<pre>SELECT s.tracking_number, c.name AS customer
+FROM   shipments s
+JOIN   customers c ON c.id = s.customer_id;</pre>
+
+<table>
+  <thead><tr><th>نوع JOIN</th><th>ماذا يُبقي</th><th>النموذج الذهني</th></tr></thead>
+  <tbody>
+    <tr><td><strong>INNER JOIN</strong> (<code>JOIN</code> عادية)</td><td>الأزواج المطابقة فقط</td><td>التقاطع — «الطلبات التي لها عميل»</td></tr>
+    <tr><td><strong>LEFT JOIN</strong></td><td>كل صفوف اليسار + المطابقات؛ صفوف اليسار غير المطابقة تأخذ NULL في اليمين</td><td>«كل عميل، وطلباته إن وُجدت» — حصان العمل</td></tr>
+    <tr><td><strong>RIGHT JOIN</strong></td><td>مرآة LEFT — كل صفوف اليمين</td><td>نادر الاستخدام؛ اقلب الجداول واستخدم LEFT بدلًا</td></tr>
+    <tr><td><strong>FULL OUTER JOIN</strong></td><td>كل الصفوف من الجانبين</td><td>«الجانبان، مطابقان حيث أمكن» — لتقارير التسوية</td></tr>
+    <tr><td><strong>CROSS JOIN</strong></td><td>كل صف من الأول × كل صف من الآخر</td><td>الحاصل الضربي الديكارتي — خطأ في أغلب الأحيان؛ مقصود فقط لشبكات التوافيق</td></tr>
+    <tr><td><strong>Self-join</strong> (الانضمام الذاتي)</td><td>جدول منضم إلى نفسه (أسماء مستعارة مطلوبة)</td><td>التسلسلات الهرمية: <code>e.manager_id = m.id</code> — الموظفون ومديروهم في جدول واحد</td></tr>
+  </tbody>
+</table>
+
+<p><strong>كيف يدمج المحرّك (ولماذا قد يكون الاستعلام نفسه سريعًا أو بطيئًا):</strong> يختار المخطّط خوارزمية لكل JOIN. <strong>Nested loop</strong> — لكل صف في اليسار، افحص الجانب الأيمن (ممتاز حين يكون أحد الجانبين صغيرًا أو كان المفتاح مفهرسًا). <strong>Hash join</strong> — ابنِ جدول تجزئة لأحد الجانبين وافحص بالآخر (ممتاز للمساواة الكبيرة، الافتراضي للمجموعات الكبيرة). <strong>Merge join</strong> — الجانبان مرتّبان، سِرْ فيهما معًا (ممتاز حين يكون الجانبان مرتّبين مسبقًا بالمفتاح). لا تختارها أنت؛ أنت تشكّلها بإعطاء المخطّط ما يحتاجه — <strong>فهرسًا على مفتاح الدمج</strong>. فهرس مفقود على مفتاح الدمج هو الطريقة الكلاسيكية التي يفحص بها استعلام ذو مظهر جميل الجدول كاملًا سرًا.</p>
+
+<p><strong>JOIN مقابل الاستعلام الفرعي:</strong> أي شيء يفعله استعلام فرعي في FROM أو عبر فلتر مترابط، تعبّره JOIN عادةً بشكل أكثر قابلية للقراءة. الاستثناء: مضادات الدمج بنمط <code>NOT IN</code> وفحوصات الوجود، حيث يكون <code>EXISTS</code> أوضح وأسرع (انظر الاستعلامات الفرعية). قاعدة الإبهام: <strong>فضّل JOIN للدمج؛ وفضّل EXISTS للفحص.</strong></p>
+
+<p><strong>مشكلة N+1 — حيث تصطدم الحلقات والاستعلامات.</strong> النمط المضاد: جلب 50 طلبًا باستعلام واحد، ثم تشغيل 50 استعلامًا إضافيًا — واحد لكل طلب — لجلب كل عميل (هذا ما تفعله ORM بصمت حين تصل إلى علاقة غير محمّلة). الإصلاح JOIN واحدة (أو استعلام <code>IN</code> واحد)، والموطن الرسمي لهذا النمط هو <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>؛ وهذه هي SQL التي تصلحه:</p>
+
+<pre>-- N+1 (51 queries): the loop fetches customers one by one
+-- one JOIN (1 query):
+SELECT o.id, o.total, c.name
+FROM   orders o
+JOIN   customers c ON c.id = o.customer_id
+WHERE  o.created_at &gt; now() - interval '7 days';</pre>
+
+<p><strong>LATERAL — الاستعلام الفرعي المترابط كدمج.</strong> لا تستطيع JOIN عادية الإشارة إلى الصف الذي تُدمج منه؛ LATERAL تستطيع. وهذا يجعلها أداة «أعلى N لكل مجموعة» والمساعدات لكل صف التي لا يستطيع المخطّط التعبير عنها وإلّا:</p>
+
+<pre>-- each customer's 3 most recent orders
+SELECT c.name, recent.id, recent.total
+FROM   customers c
+CROSS JOIN LATERAL (
+  SELECT o.id, o.total FROM orders o
+  WHERE  o.customer_id = c.id
+  ORDER  BY o.created_at DESC LIMIT 3
+) recent;</pre>
+
+<p>اقرأها على أنها «لكل عميل، شغّل هذا الاستعلام الداخلي باستخدام معرّف العميل» — وهذا بالضبط كيف ينفّذها المحرّك. استخدم LATERAL حين يعيد استعلام فرعي مترابط مجموعة تريد الدمج معها؛ واستخدم دالة نافذة حين تُحسب «أعلى N لكل مجموعة» على القسم كله دفعة واحدة (قسم الدوال النافذة) — تفوز LATERAL حين تحتاج <em>أعمدة أخرى</em> من الاستعلام الداخلي.</p>
+
+<h2 id="sec-aggregation-folding-rows-into-groups">التجميع — طي الصفوف في مجموعات</h2>
+
+<p>التجميع هو شقيق WHERE على مستوى المجموعة: <strong>WHERE يفلتر الصفوف؛ GROUP BY تطويها في مجموعات؛ HAVING تفلتر المجموعات.</strong> كل عمود في SELECT يجب أن يكون إما دالة تجميع أو عمود GROUP BY — يفرض المحرّك ذلك، والخطأ صديقك.</p>
+
+<pre>SELECT   department, COUNT(*) AS headcount, AVG(salary) AS avg_salary
+FROM     employees
+WHERE    status = 'active'            -- row filter, before grouping
+GROUP BY department
+HAVING   AVG(salary) &gt; 50000           -- group filter, after grouping
+ORDER BY headcount DESC;</pre>
+
+<table>
+  <thead><tr><th>دالة التجميع</th><th>ماذا تفعل</th><th>ملاحظة</th></tr></thead>
+  <tbody>
+    <tr><td><code>COUNT(*)</code> / <code>COUNT(col)</code></td><td>الصفوف / القيم غير NULL</td><td>فرق NULL خطأ كلاسيكي بمقدار واحد</td></tr>
+    <tr><td><code>SUM</code> و<code>AVG</code> و<code>MIN</code> و<code>MAX</code></td><td>تجميعات عددية / مرتبة</td><td><code>SUM(NULL)</code> ← NULL؛ استخدم <code>COALESCE</code> للصفر</td></tr>
+    <tr><td><code>COUNT(DISTINCT col)</code></td><td>القيم الفريدة</td><td>مكلفة على المجموعات الكبيرة — تحتاج فرزًا أو تجزئة</td></tr>
+    <tr><td><code>FILTER (WHERE ...)</code></td><td>PostgreSQL: تجميع على مجموعة فرعية من الصفوف</td><td>مرور واحد بدل حيل CASE المتعددة: <code>COUNT(*) FILTER (WHERE status='failed')</code></td></tr>
+    <tr><td><code>GROUPING SETS</code> و<code>ROLLUP</code> و<code>CUBE</code></td><td>مستويات تجميع متعددة في استعلام واحد</td><td>المجاميع الفرعية للتقارير — اتجه إليها حين تريد لوحة قياس مجاميع بجانب صفوف كل مجموعة</td></tr>
+  </tbody>
+</table>
+
+<p><strong>فخ التجميع + JOIN:</strong> الدمج قبل التجميع قد يضاعف الصفوف (طلب واحد، بندان → <code>COUNT(*)</code> يقول 2). عُدّ من مفتاح الجانب المدمج نفسه أو استخدم <code>COUNT(DISTINCT o.id)</code>. حين يخالف تقرير استعلامًا بسيطًا، اشتبه في التوسّع (fan-out).</p>
+
+<p><strong>ROLLUP — مجاميع فرعية وإجمالي عام في استعلام واحد.</strong> لوحات القياس تريد صفوف كل مجموعة <em>و</em> المجاميع؛ يصدر ROLLUP كليهما، ويغنيك عن ثلاثة استعلامات وعن الجمع في العميل الذي ينجرف دائمًا:</p>
+
+<pre>SELECT carrier, COUNT(*)
+FROM   shipments
+GROUP BY ROLLUP (carrier);
+-- rows: one per carrier, then one NULL row = the grand total
+-- CUBE does the same for every combination of the grouping columns (ROLLUP's superset)</pre>
+<h2 id="sec-subqueries-and-ctes-composing-queries">الاستعلامات الفرعية وتعبيرات الجدول المشترك — تركيب الاستعلامات</h2>
+
+<p>يمكن أن يظهر استعلام داخل استعلام آخر في ثلاثة مواضع، بثلاثة معانٍ مختلفة:</p>
+
+<table>
+  <thead><tr><th>النوع</th><th>الشكل</th><th>استخدمه حين</th></tr></thead>
+  <tbody>
+    <tr><td><strong>استعلام فرعي قياسي</strong> (scalar)</td><td>يعيد قيمة واحدة، يُستخدم في تعبير</td><td><code>WHERE total &gt; (SELECT AVG(total) FROM orders)</code> — عتبة محسوبة واحدة</td></tr>
+    <tr><td><strong>جدول مشتق</strong> (في FROM)</td><td>يعيد مجموعة، له اسم مستعار، يُستعلم عنه كجدول</td><td>جمّع أولًا ثم فلتر/ادمج على الناتج — حصان العمل «استعلام فرعي في FROM»</td></tr>
+    <tr><td><strong>استعلام فرعي مترابط</strong> (correlated)</td><td>يشير إلى صف الاستعلام الخارجي</td><td>حسابات لكل صف — لكنه يعمل مرة لكل صف خارجي؛ أعد فحصه كـ JOIN أو دالة نافذة</td></tr>
+    <tr><td><strong>EXISTS / NOT EXISTS</strong></td><td>يختبر ما إذا كان أي صف يطابق</td><td>الطريقة السريعة والواضحة للفلترة ببيانات مرتبطة — غالبًا تتفوق على <code>IN</code> والاستعلامات الفرعية</td></tr>
+  </tbody>
+</table>
+
+<pre>-- EXISTS vs IN: same question, different engines
+SELECT * FROM customers c
+WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id);  -- stops at first match
+
+SELECT * FROM customers
+WHERE id IN (SELECT customer_id FROM orders);                      -- builds the full list first
+
+-- Derived table: the max per group, then joined back
+SELECT t.department, t.max_salary, e.name
+FROM   (SELECT department, MAX(salary) AS max_salary FROM employees GROUP BY department) t
+JOIN   employees e ON e.department = t.department AND e.salary = t.max_salary;</pre>
+
+<p><strong>تعبيرات الجدول المشترك (CTE) — بند <code>WITH</code>.</strong> تعبّر CTE عن نتيجة وسيطة بالاسم بحيث يُقرأ الاستعلام من الأعلى للأسفل كخط أنابيب. لا تعمل مرة واحدة بطريقة سحرية (حتى تُثبَّت في PostgreSQL، هي أقرب إلى وحدات ماكرو) — قوتها الفائقة هي <strong>قابلية القراءة</strong>، وحيلتها الفريدة هي <strong>التكرار</strong>:</p>
+
+<pre>WITH active_customers AS (
+  SELECT id, name FROM customers WHERE last_order_at &gt; now() - interval '90 days'
+)
+SELECT c.name, COUNT(o.id) AS orders
+FROM   active_customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name;
+
+-- Recursive CTE: walk a tree (categories, org charts, comment threads)
+WITH RECURSIVE tree AS (
+  SELECT id, name, 1 AS depth FROM categories WHERE parent_id IS NULL
+  UNION ALL
+  SELECT c.id, c.name, t.depth + 1 FROM categories c
+  JOIN tree t ON c.parent_id = t.id
+)
+SELECT * FROM tree;</pre>
+
+<h2 id="sec-window-functions-ranking-and-running-totals">الدوال النافذة — الترتيب والمجاميع الجارية</h2>
+
+<p>دوال التجميع تطوي الصفوف في نتيجة واحدة لكل مجموعة. <strong>الدوال النافذة تحسب قيمة بنمط التجميع لكنها تُبقي كل صف.</strong> هذا هو الفرق كله — ولهذا تحتاجها «أعلى N لكل مجموعة» (كانت GROUP BY ستطوي الصفوف التي تريد إبقاءها).</p>
+
+<pre>SELECT  name, department, salary,
+        ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rank_in_dept,
+        SUM(salary)   OVER (PARTITION BY department)                       AS dept_total,
+        AVG(salary)   OVER (PARTITION BY department ORDER BY hire_date)    AS running_avg
+FROM employees;</pre>
+
+<table>
+  <thead><tr><th>الدالة النافذة</th><th>ماذا تفعل</th><th>استخدام كلاسيكي</th></tr></thead>
+  <tbody>
+    <tr><td><code>ROW_NUMBER()</code></td><td>الموضع داخل القسم</td><td>أعلى N لكل مجموعة: رتّب الصفوف ثم فلتر <code>rank &lt;= 10</code> في استعلام خارجي</td></tr>
+    <tr><td><code>RANK()</code> / <code>DENSE_RANK()</code></td><td>ترتيب مع التعادلات (RANK يتخطى أرقامًا، DENSE_RANK لا)</td><td>لوحات المتصدرين</td></tr>
+    <tr><td><code>LAG(col)</code> / <code>LEAD(col)</code></td><td>قيمة الصف السابق / التالي في القسم</td><td>الفروق: <code>total - LAG(total)</code> = التغيّر منذ الشهر الماضي</td></tr>
+    <tr><td><code>SUM(...) OVER (ORDER BY ...)</code></td><td>مجموع تراكمي عبر النافذة المرتبة</td><td>المجاميع الجارية والأرصدة</td></tr>
+    <tr><td><code>NTILE(n)</code></td><td>يقسم القسم إلى n دلاء</td><td>النسب المئوية وتقسيم A/B</td></tr>
+    <tr><td><code>FIRST_VALUE</code> / <code>LAST_VALUE</code></td><td>حافّتا النافذة</td><td>«تاريخ أول شراء لكل عميل»</td></tr>
+  </tbody>
+</table>
+
+<p><strong>صياغة النافذة في سطر واحد:</strong> <code>FUNCTION OVER (PARTITION BY X ORDER BY Y)</code> — PARTITION BY ترسم المجموعات (مثل GROUP BY)، وORDER BY تحدّد الترتيب الذي تسير فيه الدالة داخل كل مجموعة. نافذة بلا قسمين وبلا ترتيب تحسب على المجموعة كلها.</p>
+
+<p><strong>الإطارات — النافذة داخل النافذة.</strong> افتراضيًا يجعل <code>ORDER BY</code> في نافذة الإطار «كل الصفوف حتى الصف الحالي شامله» (لهذا تعمل المجاميع الجارية). يمكنك تصغير الإطار صراحةً — الأداة وراء المتوسطات المتحركة و«آخر 7 أيام»:</p>
+
+<pre>-- running total (default frame: current row and everything before it)
+SUM(amount) OVER (ORDER BY date)
+
+-- moving average of the last 3 rows
+AVG(amount)  OVER (ORDER BY date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
+
+-- trailing 7-day sum
+SUM(amount)  OVER (ORDER BY date RANGE BETWEEN INTERVAL '7 days' PRECEDING AND CURRENT ROW)</pre>
+
+<p>اتجه إلى بند الإطار اللحظة التي يظهر فيها «نافذة آخر N صفوف» أو «آخر 7 أيام» — بدونه تحصل على المجموع الجاري كله، ويكون الرقم خاطئًا على نحو خفي.</p>
+
+<p><strong>أعلى N لكل مجموعة، مكتمل:</strong></p>
+
+<pre>SELECT * FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+  FROM employees
+) ranked
+WHERE rn &lt;= 3;</pre>
+
+<p><strong>الترحيل بالمفاتيح (قاتل OFFSET):</strong> <code>OFFSET 100000</code> يجعل المحرّك يسير في 100000 صف ويتخلص منها. الترحيل بنمط المؤشر — «أعطني الصفوف بعد هذا» — يستخدم الفهرس مباشرةً. <a href="./api-design.html">تصميم واجهات البرمجة (API)</a> تملك عقد المؤشر؛ هذا هو الاستعلام:</p>
+
+<pre>-- OFFSET (slow on deep pages):  SELECT * FROM events ORDER BY id LIMIT 20 OFFSET 100000;
+-- Keyset (fast, uses the index):
+SELECT * FROM events WHERE id &gt; :last_seen_id ORDER BY id LIMIT 20;</pre>
+<h2 id="sec-writing-data-insert-update-delete-upsert">كتابة البيانات — INSERT وUPDATE وDELETE وUPSERT</h2>
+
+<p>القراءات تهيمن على اللغة، لكن الكتابات هي حيث تعيش الصحة. الأفعال الأربعة، مع إضافات PostgreSQL التي تجعل الكتابات أكثر أمانًا:</p>
+
+<pre>INSERT INTO shipments (tracking_number, customer_id, status)
+VALUES ('TRK-1001', 42, 'pending')
+RETURNING id, tracking_number;          -- get the row back in one round trip
+
+UPDATE shipments SET status = 'in_transit'
+WHERE  id = 7;                          -- never UPDATE without WHERE
+
+DELETE FROM shipments WHERE id = 7;     -- never DELETE without WHERE
+TRUNCATE  shipments;                    -- wipe all rows instantly (no WHERE allowed)
+
+UPDATE shipments SET status = 'delivered'
+FROM   customers c                      -- UPDATE ... FROM: join in the update
+WHERE  shipments.customer_id = c.id AND c.plan = 'premium';</pre>
+
+<p><strong>UPSERT — الكتابة ذاتية التساوي.</strong> مفاتيح التساوي الذاتي في وثيقة تصميم واجهات البرمجة تحتاج قاعدة بيانات لا تخطئ في المحاولة الثانية. <code>INSERT ... ON CONFLICT</code> في PostgreSQL هو ذلك تمامًا: حاول الإدراج؛ إذا اصطدم قيد تفرد، افعل شيئًا آخر (حدّث، أو لا تفعل شيئًا):</p>
+
+<pre>-- The idempotent write: retry-safe, no "duplicate key" error on the second call
+INSERT INTO payment_events (idempotency_key, amount, status)
+VALUES (:key, :amount, 'captured')
+ON CONFLICT (idempotency_key) DO UPDATE SET status = EXCLUDED.status
+RETURNING id;
+
+INSERT INTO tags (name) VALUES ('sale')
+ON CONFLICT (name) DO NOTHING;          -- the "get-or-create" pattern
+
+-- MySQL spelling, for the WordPress-era mental model:
+-- INSERT INTO tags (name) VALUES ('sale') ON DUPLICATE KEY UPDATE name = name;</pre>
+
+<p><code>RETURNING</code> (في PostgreSQL) يعيد الصفوف المتأثرة — هدية المطوّر الكسول: رحلة ذهاب وإياب واحدة لإدراج وقراءة المعرّف المولّد، وهذا بالضبط ما يحتاجه معالج الطلب لبناء استجابته. (يدعمه SQLite أيضًا؛ مكافئ MySQL هو <code>LAST_INSERT_ID()</code> متابعةً.)</p>
+
+<h2 id="sec-transactions-in-sql-begin-commit-rollback">المعاملات في SQL — BEGIN وCOMMIT وROLLBACK</h2>
+
+<p>المعاملة دفعة عبارات تنجح أو تفشل معًا. كتابات حلقة الطلب متعددة الخطوات (خصم + إنشاء شحنة + إشعار) ذرّية فقط إذا وُضعت في غلاف:</p>
+
+<pre>BEGIN;                                  -- or START TRANSACTION
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;                                 -- both become visible together
+
+-- on any error instead:
+ROLLBACK;                               -- both vanish; the world never saw a half-write</pre>
+
+<p><strong>ACID عمليًا:</strong> <em>الذرّية</em> هي بالضبط ما تشتريه بـ BEGIN/COMMIT/ROLLBACK. <em>الاتساق</em> هو قيود المخطط وهي تؤدي عملها. <em>العزل</em> هو مقبض المستوى — موطنه في <a href="./data-modeling-and-databases.html">نمذجة البيانات — مستويات العزل</a> و<a href="./backend-engineering.html">هندسة الواجهة الخلفية — §5</a>؛ والسطر الواحد هنا: <em>READ COMMITTED</em> (افتراضي PostgreSQL، لقطة لكل عبارة) مقابل <em>REPEATABLE READ</em> (لقطة لكل معاملة — نفس SELECT مرتين ترى نفس البيانات). <em>المتانة</em> هي WAL، والتي تثق بالمنصة في إدارتها.</p>
+
+<table>
+  <thead><tr><th>نمط الفشل</th><th>ماذا يحدث</th><th>التجنّب</th></tr></thead>
+  <tbody>
+    <tr><td>معاملة محتجزة طويلًا</td><td>الأقفال تحجب كل كاتب آخر؛ يستنزف تجميع الاتصالات</td><td>أبقِ المعاملات قصيرة — لا استدعاءات واجهات برمجة ولا حلقات داخلها؛ ثبّت وتابع</td></tr>
+    <tr><td>طريق مسدود (deadlock)</td><td>معاملتان تحمل كلٌّ منهما قفلًا تريده الأخرى؛ المحرّك يقتل واحدة</td><td>اقفل الصفوف بالترتيب نفسه دائمًا (مثلًا بالمعرّف)؛ أعد المحاولة للمعاملة المقتولة</td></tr>
+    <tr><td>تراجعات يتيمة</td><td>ينهار التطبيق في منتصف معاملة</td><td>لهذا يوجد ROLLBACK عند قطع الاتصال — التجميع ينظّف؛ فقط لا تسرّب معاملة عبر الطلبات</td></tr>
+  </tbody>
+</table>
+
+<p><strong>نقاط الحفظ — تراجع جزءًا من المعاملة، لا كلها.</strong> كتابة طويلة (استورد عميلًا، ثم طلباته، ثم مدفوعاته) لا يجب أن تموت كليًا لأن صفًا واحدًا كان سيئًا. علّم نقطة، وعند الخطأ ارجع إليها فقط:</p>
+
+<pre>BEGIN;
+INSERT INTO customers (name) VALUES ('Lina') RETURNING id;   -- id = 10
+SAVEPOINT orders_done;
+INSERT INTO orders (customer_id, total) VALUES (10, 99);      -- fails (bad constraint)
+ROLLBACK TO SAVEPOINT orders_done;                            -- customer survives, order rolled back
+COMMIT;</pre>
+
+<p><strong>قفل الصفوف — ادّعِ الصفوف حتى لا يدّعي عاملان الصف نفسه.</strong> <code>SELECT ... FOR UPDATE</code> يقفل الصفوف المرتجعة حتى الالتزام، وبهذا يضمن صفّ انتظار ألا يلتقط عاملان الوظيفة نفسها:</p>
+
+<pre>SELECT * FROM jobs WHERE id = 42 FOR UPDATE;                  -- lock this row for the transaction
+SELECT * FROM jobs WHERE id = 42 FOR UPDATE SKIP LOCKED;     -- skip rows already locked by others
+SELECT * FROM jobs WHERE id = 42 FOR UPDATE NOWAIT;          -- error out instead of waiting</pre>
+
+<p>ثلاث كلمات، ثلاثة سلوكيات لصفّ الانتظار: العادي <em>ينتظر</em> القفل (وقد يصل إلى طريق مسدود)، و<em>SKIP LOCKED</em> يقفز إلى الصف الحر التالي (افتراضي عامل الطابور)، و<em>NOWAIT</em> يفشل سريعًا (أفضل من انتظار طويل حين يكون الصف لشخص آخر). عادة إعادة المحاولة في وثيقة <a href="../software-testing-and-debugging.html">اختبار البرمجيات والتصحيح</a> هي ما يجعل SKIP LOCKED آمنة على نطاق واسع.</p>
+
+<p><strong>الأقفال الاستشارية — قفل بشروطك أنت.</strong> للأقسام الحرجة على مستوى التطبيق غير المرتبطة بصف جدول (إعادة بناء مخبأ، إعادة تصنيف أسعار)، يتيح لك PostgreSQL قفل عدد صحيح اعتباطي:</p>
+
+<pre>SELECT pg_advisory_lock(12345);       -- session lock; release with pg_advisory_unlock(12345)
+SELECT pg_advisory_xact_lock(12345);  -- transaction lock; releases automatically on COMMIT/ROLLBACK</pre>
+
+<p>الشكل الجلسي يتبع الاتصال، فالقفل المسرَّب يبقى حتى يُغلق الاتصال؛ الشكل المعاملي يتبع المعاملة، وهو ما تريده معاملات حلقة الطلب القصيرة. استخدم أقفال الجداول نادرًا والأقفال الاستشارية نادرًا؛ نمط SKIP LOCKED لصف الانتظار يغطي معظم الحاجات الحقيقية.</p>
+<h2 id="sec-postgresql-features-why-the-shelf-defaults-to-it">ميزات PostgreSQL — لماذا يجعله الرف افتراضيًا</h2>
+
+<p>تختار وثيقة نمذجة البيانات PostgreSQL لسبب وجيه؛ هذا القسم هو الصياغة وراء ذلك الاختيار. كل ما هنا خاص بـ PostgreSQL (حتى يُنصّ على خلاف ذلك)، وكل ميزة تجيب عن حاجة حقيقية في الرف.</p>
+
+<h3>JSONB — مستندات داخل عالم ارتباطي</h3>
+
+<pre>CREATE TABLE events (
+  id   bigserial PRIMARY KEY,
+  meta jsonb NOT NULL DEFAULT '{}'
+);
+
+SELECT meta-&gt;&gt;'user_agent'                AS ua          -- -&gt;&gt; text, -&gt; json
+FROM   events
+WHERE  meta @&gt; '{"plan": "premium"}'      -- @&gt; containment: does meta contain this?
+ORDER BY (meta-&gt;&gt;'score')::numeric DESC;
+
+CREATE INDEX ON events USING GIN (meta);  -- GIN makes the @&gt; query use an index</pre>
+
+<p>يخزّن JSONB JSON ثنائيًا، مفهرسًا عبر GIN، مع احتواء <code>@&gt;</code> وعاملي وجود المفتاح <code>?</code>. قاعدة وثيقة نمذجة البيانات قائمة: JSONB للأشكال المتغيّرة فعلًا، لا كبديل عن أعمدة تستعلم عنها فعلًا. وهو يغطي أيضًا معظم حالات استخدام مخازن المستندات — سبب بقاء MongoDB «لاحقًا» على هذا الرف.</p>
+
+<h3>المصفوفات والبحث النصي الكامل وLISTEN/NOTIFY والأمان على مستوى الصف RLS والتقسيم</h3>
+
+<pre>-- Arrays as a column type
+CREATE TABLE posts (id bigserial PRIMARY KEY, tags text[] NOT NULL DEFAULT '{}');
+SELECT * FROM posts WHERE 'sale' = ANY(tags);
+SELECT * FROM posts WHERE tags @&gt; ARRAY['sale','new'];
+
+-- Full-text search without Elasticsearch
+CREATE INDEX ON posts USING GIN (to_tsvector('english', title || ' ' || body));
+SELECT * FROM posts
+WHERE to_tsvector('english', title || ' ' || body) @@ to_tsquery('sales &amp; report');
+
+-- LISTEN/NOTIFY — pub/sub inside the database (Supabase Realtime's engine)
+NOTIFY events_changed, 'shipment-1001';
+LISTEN events_changed;                   -- a waiting connection receives the payload
+
+-- Row-Level Security: multi-tenant enforcement in the engine, not the app
+CREATE POLICY tenant_isolation ON shipments
+  USING (tenant_id = current_setting('app.tenant_id'));
+ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
+
+-- Partitioning — the scaling lever from system-design, in syntax
+CREATE TABLE events_part (id bigint, created_at timestamptz)
+PARTITION BY RANGE (created_at);
+CREATE TABLE events_2026 PARTITION OF events_part
+  FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');</pre>
+
+<table>
+  <thead><tr><th>الميزة</th><th>السطر الواحد</th><th>الرابط مع الرف</th></tr></thead>
+  <tbody>
+    <tr><td><strong>المصفوفات</strong></td><td>أعمدة <code>text[]</code> أصلية مع عوامل <code>ANY</code>/الاحتواء</td><td>الوسوم والأذونات دون جدول دمج</td></tr>
+    <tr><td><strong>البحث النصي الكامل</strong></td><td><code>tsvector</code>/<code>tsquery</code> + فهرس GIN — بحث بلا خدمة بحث</td><td>إشارات «البحث» في التصميم المعماري، على نطاق صغير</td></tr>
+    <tr><td><strong>LISTEN/NOTIFY</strong></td><td>نشر/اشتراك داخل قاعدة البيانات</td><td>Supabase Realtime؛ واجهات لحظية بلا وسيط رسائل على نطاق صغير</td></tr>
+    <tr><td><strong>RLS</strong></td><td>رؤية الصفوف يفرضها المحرّك لكل مستخدم/مستأجر</td><td>قسم تعدد المستأجرين في نمذجة البيانات، مطبّقًا</td></tr>
+    <tr><td><strong>التقسيم</strong></td><td>جدول منطقي واحد، نطاقات مادية كثيرة</td><td>رافعات التوسع في التصميم المعماري</td></tr>
+    <tr><td><strong>DISTINCT ON</strong></td><td>الصف الأول لكل قيمة متميزة — «أحدث حدث لكل شحنة» في بند واحد</td><td>الأول-لكل-مجموعة دون دالة نافذة</td></tr>
+    <tr><td><strong>الأعمدة المولّدة</strong></td><td><code>GENERATED ALWAYS AS (expr) STORED</code> — عمود يحسبه المحرّك ويخزنه</td><td>مجاميع مشتقة لا يمكن أن تنحرف عن مزامنتها</td></tr>
+    <tr><td><strong>TABLESAMPLE</strong></td><td>عيّنة صفوف دون فحص كل شيء</td><td>الاختبارات والإحصاءات التقريبية وتصدير مجموعات فرعية</td></tr>
+    <tr><td><strong>الإضافات</strong></td><td>PostGIS (جغرافي) وpg_cron (مهام مجدولة) وpg_stat_statements (تحليلات الاستعلام) وpgvector (تضمينات)</td><td>pgvector هو اعتماد الذكاء الاصطناعي في <a href="./system-design.html">التصميم المعماري</a>، داخل Postgres</td></tr>
+  </tbody>
+</table>
+
+<pre>-- pgvector: the vector-store row from system-design, in syntax
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE TABLE documents (id bigserial PRIMARY KEY, content text, embedding vector(1536));
+CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops);
+SELECT content FROM documents ORDER BY embedding &lt;-&gt; :query_embedding LIMIT 5;   -- &lt;-&gt; = cosine distance
+
+-- DISTINCT ON: the most recent event per shipment (ORDER BY picks which row wins)
+SELECT DISTINCT ON (shipment_id) shipment_id, type, happened_at
+FROM   shipment_events
+ORDER  BY shipment_id, happened_at DESC;
+
+-- Generated column: total that can't drift out of sync with its inputs
+CREATE TABLE order_lines (
+  id        bigserial PRIMARY KEY,
+  price     numeric(10,2) NOT NULL,
+  quantity  integer NOT NULL,
+  total     numeric(10,2) GENERATED ALWAYS AS (price * quantity) STORED
+);
+
+-- TABLESAMPLE: a 1% slice for testing, without a full scan
+SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
+<h2 id="sec-performance-reading-and-fixing-slow-queries">الأداء — قراءة الاستعلامات البطيئة وإصلاحها</h2>
+
+<p>حلقة الضبط تنتمي إلى <a href="./data-modeling-and-databases.html#sec-indexing-strategies-the-read-path">نمذجة البيانات — الفهرسة</a> و<a href="./data-modeling-and-databases.html#sec-reading-explain-analyze-the-tuning-loop">قراءة EXPLAIN ANALYZE</a> — هذا القسم هو جانب الاستعلام من تلك الحلقة: ما الذي تبحث عنه، والأنماط المضادة التي تهزم المخطّط.</p>
+
+<pre>EXPLAIN ANALYZE SELECT ... -- run the query for real, show the plan + measured timings
+-- what to look for, in order:
+--   1. Seq Scan on a big table  → the WHERE/JOIN column needs an index
+--   2. "rows=..." wildly off    → stale statistics (ANALYZE) or a cast hiding the index
+--   3. Nested Loop with huge re-probes → the inner key is not indexed</pre>
+
+<table>
+  <thead><tr><th>النمط المضاد</th><th>لماذا هو بطيء</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td><code>SELECT *</code></td><td>يسحب كل عمود عبر الشبكة؛ يقتل الفهارس المغطّية</td><td>سمِّ الأعمدة التي يحتاجها الطلب فعلًا</td></tr>
+    <tr><td>دالة على عمود مفهرس: <code>WHERE DATE(created_at) = '2026-01-01'</code></td><td>الفهرس على <code>created_at</code>؛ الدالة تخفي القيمة</td><td>الصيغة النطاقية: <code>WHERE created_at &gt;= '2026-01-01' AND created_at &lt; '2026-01-02'</code></td></tr>
+    <tr><td>تحويل نوعي ضمني: مقارنة نص بعدد صحيح</td><td>القصة نفسها — لا يستطيع المخطّط استخدام الفهرس عبر التحويل</td><td>حوّل الوسيط، لا العمود</td></tr>
+    <tr><td>فهرس مفقود على مفتاح JOIN</td><td>Hash join تصبح جيدة، وnested loop تصبح فحصًا لكل صف</td><td>افهرس كل مفتاح أجنبي تدمج عليه (فهرسة نمذجة البيانات تقول نفس الشيء)</td></tr>
+    <tr><td>ترحيل <code>OFFSET</code> العميق</td><td>يسير في كل صف متخطًّى ويتخلص منه</td><td>الترحيل بالمفاتيح (قسم الدوال النافذة)</td></tr>
+    <tr><td>N+1 من ORM</td><td>حلقة استعلامات صغيرة بدل مجموعة واحدة</td><td>تحميل مبكر / JOIN واحدة (قسم JOIN)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>إيجاد البطيء منها:</strong> <code>pg_stat_statements</code> (إضافة) يتتبع الزمن الإجمالي وعدد الاستدعاءات لكل استعلام — قائمة «أبطأ 10 استعلامات». <strong>VACUUM وautovacuum:</strong> لا يستبدل PostgreSQL الصفوف في مكانها؛ تتراكم الصفوف الميتة حتى يستردها VACUUM. يعالج autovacuum هذا عادةً — مشاكل الإنتاج تحدث حين يُعطَّل أو يُغرق، ويظهر التضخّم كجداول تنمو بما يتجاوز المعقول. اعرف أنه موجود؛ واترك الضبط للمنصة.</p>
+
+<p><strong>تجميع الاتصالات (PgBouncer):</strong> ذاكرة PostgreSQL لكل اتصال تجعل مئات اتصالات التطبيق الخاملة مهدورة. يجلس PgBouncer في المقدمة ويعيد استخدام تجميع صغير. <em>وضع المعاملة</em> — يُحتجز الاتصال لمدة معاملة واحدة فقط، وهذا ما تريده حلقات الطلب بلا حالة؛ <em>وضع الجلسة</em> يثبّت اتصالًا لكل جلسة عميل، لازم للعبارات المجهّزة التي يجب أن تنجو. قاعدة الرف لانعدام الحالة (<a href="./backend-engineering.html#sec-state-the-identity-and-session-decision">هندسة الواجهة الخلفية — Serverless</a>) هي بالضبط القيد الذي يجعل وضع المعاملة الاختيار الافتراضي.</p>
+
+<h2 id="sec-mysql-mariadb-the-wordpress-engine">MySQL / MariaDB — محرّك WordPress</h2>
+
+<p><a href="../wordpress-and-cms-internet.html">WordPress</a> يعمل على MySQL/MariaDB. اللغة التي تعلمتها للتو متطابقة بنحو ~90%؛ هذا القسم هو الـ10% المختلفة، بالإضافة إلى شكل المخطط الذي ستستعلم عنه فعلًا كمستقل.</p>
+
+<table>
+  <thead><tr><th>الميزة</th><th>PostgreSQL</th><th>MySQL / MariaDB</th></tr></thead>
+  <tbody>
+    <tr><td>UPSERT</td><td><code>INSERT ... ON CONFLICT (k) DO UPDATE</code></td><td><code>INSERT ... ON DUPLICATE KEY UPDATE</code></td></tr>
+    <tr><td>JSON</td><td><code>JSONB</code> — ثنائي، مفهرس (GIN)</td><td><code>JSON</code> — نصي، فهرسة أضعف (MariaDB: <code>JSON</code> كاسم مستعار لـ <code>LONGTEXT</code> + <code>CHECK</code>)</td></tr>
+    <tr><td>المصفوفات</td><td>نوع عمود أصلي</td><td>غير مدعومة — استخدم JSON أو جدول دمج</td></tr>
+    <tr><td>البحث النصي الكامل</td><td><code>tsvector</code>/<code>tsquery</code> + GIN</td><td>فهرس <code>FULLTEXT</code> — أبسط وأضعف</td></tr>
+    <tr><td>الدوال النافذة / CTE</td><td>منذ 8.4 (2009)</td><td>منذ 8.0 (2018) — MySQL قديم من عصر WordPress قد يفتقر إليها كليًا</td></tr>
+    <tr><td>الأمان على مستوى الصف</td><td>أصلي</td><td>غير أصلي — فرضه في طبقة التطبيق</td></tr>
+    <tr><td>الحد</td><td><code>LIMIT n OFFSET m</code></td><td>نفسها — زائد صيغة الفاصلة المريحة <code>LIMIT m, n</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>مخطط WordPress — ما ستلمسه فعلًا:</strong> كل شيء يعيش في حفنة جداول ببادئة <code>wp_</code>، وكائن <code>wpdb</code> في المحرّك يصدر الاستعلامات. الجدولان اللذان لا يشبهان مخططًا عاديًا يستحقان ملاحظة ذهنية: <strong><code>wp_options</code></strong> مخزن ضخم للمفاتيح والقيم (إعدادات الموقع وخيارات الإضافات) — صف واحد لكل خيار، قيمه في عمود <code>LONGTEXT</code>؛ و<strong><code>wp_postmeta</code></strong> جدول كيان-سمة-قيمة — صف واحد لكل زوج بيانات وصفية للمنشور، ما يجعل استعلامات «منشورات ببيانات وصفية» دمجًا ضد جدول طويل (بالضبط شكل EAV الذي تحذّر منه وثيقة نمذجة البيانات، وسبب كون استخدام البيانات الوصفية الكثيف رائحة أداء).</p>
+
+<pre>-- "Find posts of type 'product' that have meta 'on_sale' = '1'"
+SELECT p.ID, p.post_title
+FROM   wp_posts p
+JOIN   wp_postmeta m ON m.post_id = p.ID
+WHERE  p.post_type = 'product' AND p.post_status = 'publish'
+  AND  m.meta_key = 'on_sale' AND m.meta_value = '1';
+
+-- "Count published posts per category"
+SELECT t.name, COUNT(*) AS post_count
+FROM   wp_terms t
+JOIN   wp_term_taxonomy tt ON tt.term_id = t.term_id
+JOIN   wp_term_relationships tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+JOIN   wp_posts p ON p.ID = tr.object_id
+WHERE  tt.taxonomy = 'category' AND p.post_status = 'publish'
+GROUP BY t.name;</pre>
+
+<h2 id="sec-sqlite-the-embedded-engine">SQLite — المحرّك المضمّن</h2>
+
+<p>SQLite ليس خادمًا — إنها مكتبة تقرأ وتكتب ملفًا واحدًا. إنها محرّك قاعدة البيانات الأكثر انتشارًا على وجه الأرض (كل هاتف ومتصفح يحمل واحدًا) ورفيقة التطوير المحلي في الرف: الاختبارات والنماذج الأولية ومخازن طبقة الطرفية المدعومة بملفات.</p>
+
+<table>
+  <thead><tr><th>متى تفوز SQLite</th><th>متى لا تفوز</th></tr></thead>
+  <tbody>
+    <tr><td>التطوير المحلي والاختبارات الآلية — صفر إعداد، وضع في الذاكرة</td><td>الكتابات المتزامنة — كاتب واحد في كل مرة (تطبيق به مستخدمون كثيرون يكتبون معًا سيتسلسل)</td></tr>
+    <tr><td>إنتاج صغير منخفض الحركة (أداة، لوحة قياس، تطبيق داخلي)</td><td>إنتاجية كتابة عالية — حد الكاتب الواحد هو السقف</td></tr>
+    <tr><td>قراءة/تصدير البيانات بأمر <code>sqlite3</code> على أي جهاز</td><td>النشر الموزّع — ملف واحد، جهاز واحد</td></tr>
+  </tbody>
+</table>
+
+<p>الخبر الجيد: SQL التي تعلمتها هنا هي SQL الخاصة بـ SQLite. تنطبق قاعدة النظام البيئي في <a href="./data-modeling-and-databases.html">نمذجة البيانات</a> — SQLite للمضمّن/المحلي، وPostgreSQL لكل ما هو غير تافه. مسار الترحيل هو تفريغ وتحميل (<code>.dump</code> في SQLite؛ <code>pg_dump</code> + <code>psql</code> في PostgreSQL) مع لمسات بسيطة على أسماء الأنواع.</p>
+<h2 id="sec-worked-example-the-query-layer-for-shipment-tracking">مثال عملي — طبقة الاستعلام لتتبع الشحنات</h2>
+
+<p>صمّم الرف هذا النظام مرتين: المخطط في <a href="./data-modeling-and-databases.html#sec-worked-example-design-the-schema-for-a-shipment-tracking-system">نمذجة البيانات — المثال العملي</a>، وواجهة البرمجة في <a href="./api-design.html">تصميم واجهات البرمجة (API)</a>. هنا طبقة الاستعلام التي تربطهما — SQL الفعلية وراء أربع نقاط نهاية، كلٌّ منها محسّنة بأدوات هذه الوثيقة.</p>
+
+<p><strong>1. نقطة نهاية التفاصيل — شحنة واحدة مع عميلها (LEFT JOIN، فهرس على المفتاح الأجنبي):</strong></p>
+
+<pre>SELECT s.tracking_number, s.status, s.estimated_delivery,
+       c.name AS customer_name, c.email
+FROM   shipments s
+LEFT JOIN customers c ON c.id = s.customer_id
+WHERE  s.tracking_number = :tracking_number;</pre>
+
+<p><strong>2. الخط الزمني — آخر 20 حدثًا، مرتّبة بالمفاتيح (ترحيل بالدوال النافذة، لا OFFSET):</strong></p>
+
+<pre>SELECT * FROM shipment_events
+WHERE  shipment_id = :id AND event_id &lt; :cursor   -- keyset: continue after the cursor
+ORDER BY event_id DESC
+LIMIT  20;</pre>
+
+<p><strong>3. لوحة القياس — عدّادات الحالة لكل ناقل هذا الأسبوع (GROUP BY + FILTER):</strong></p>
+
+<pre>SELECT carrier,
+       COUNT(*)                                            AS total,
+       COUNT(*) FILTER (WHERE status = 'delivered')       AS delivered,
+       COUNT(*) FILTER (WHERE status = 'in_transit')      AS in_transit,
+       COUNT(*) FILTER (WHERE status = 'exception')       AS exceptions
+FROM   shipments
+WHERE  created_at &gt;= now() - interval '7 days'
+GROUP BY carrier
+ORDER BY total DESC;</pre>
+
+<p><strong>4. معالج الويب هوك ذو التساوي الذاتي (UPSERT — آمن ضد وصول نفس الويب هوك مرتين):</strong></p>
+
+<pre>INSERT INTO shipment_events (shipment_id, status, payload, webhook_id)
+VALUES (:shipment_id, :status, :payload, :webhook_id)
+ON CONFLICT (webhook_id) DO NOTHING
+RETURNING id;</pre>
+
+<p><strong>مرحلة التحسين:</strong> مرّر كلًا منها عبر <code>EXPLAIN ANALYZE</code>. <code>Seq Scan</code> الدالّ على <code>shipment_events</code> في الاستعلام 2 يقول إن الفهرس مفقود؛ الإصلاح هو الفهرس الذي تفرضه وثيقة نمذجة البيانات أصلًا: <code>CREATE INDEX ON shipment_events (shipment_id, event_id DESC);</code> — الزوج يغطي WHERE وORDER BY في بنية واحدة. تلك هي الحلقة كلها: استعلام ← شرح ← فهرس ← إعادة شرح.</p>
+
+<h2 id="sec-query-recipes-the-patterns-production-actually-uses">وصفات استعلام — الأنماط التي يستخدمها الإنتاج فعلًا</h2>
+
+<p>ثلاثة أنماط تظهر في كل قاعدة كود حقيقية تقريبًا. كلٌّ منها وصفة صغيرة قابلة للحفظ تطوي الأقسام السابقة معًا.</p>
+
+<p><strong>الحذف الناعم — «محذوف» كطابع زمني، لا كإزالة.</strong> الحذف التدميري مخيف (مسارات تدقيق، أخطاء مفاتيح أجنبية، لا تراجع)؛ النمط هو تعليم الصف وفلترته في كل مكان:</p>
+
+<pre>ALTER TABLE orders ADD COLUMN deleted_at timestamptz;      -- NULL = live, timestamp = deleted
+UPDATE orders SET deleted_at = now() WHERE id = 42;        -- "delete"
+SELECT * FROM orders WHERE deleted_at IS NULL;             -- the live view (every read must add this)
+CREATE INDEX ON orders (customer_id) WHERE deleted_at IS NULL;   -- partial index: only live rows</pre>
+
+<p>الثمن انضباط — كل استعلام يحتاج فلتر <code>deleted_at IS NULL</code> أو تتسرّب الحذوفات إلى النتائج، وتصطدم قيود <code>UNIQUE</code> بالصفوف القديمة (عميل أعيد إنشاؤه يقاتل عميلًا محذوفًا ناعمًا). استخدمه حين تحتاج مسار تدقيق أو «تراجعًا»؛ للقمامة الخالصة، احذف حذفًا صلبًا. الفهرس الجزئي هو اصطلاح PostgreSQL الذي يُبقي جداول الحذف الناعم سريعة.</p>
+
+<p><strong>صفّ انتظار المهام — ادّعِ الصفوف حتى يحصل عامل واحد فقط على كل وظيفة.</strong> أعمال الواجهة الخلفية (رسائل البريد، تغيير حجم الصور، إعادة محاولات الويب هوك) تمر عبر جدول؛ يطالب العمال بالوظائف بـ <code>FOR UPDATE SKIP LOCKED</code> من قسم المعاملات:</p>
+
+<pre>-- worker picks exactly one unclaimed job, without fighting other workers:
+UPDATE job_queue SET status = 'processing', locked_at = now(), locked_by = :worker
+WHERE id = (
+  SELECT id FROM job_queue
+  WHERE status = 'pending'
+  ORDER BY created_at
+  FOR UPDATE SKIP LOCKED LIMIT 1
+)
+RETURNING *;</pre>
+
+<p>هذه هي بدائية صفّ الانتظار كلها: جدول وظائف، ومطالبة بـ <code>SKIP LOCKED</code> حتى لا يتصادم العمال المتزامنون، وعمود إعادة محاولة لعادة وثيقة <a href="../software-testing-and-debugging.html">اختبار البرمجيات والتصحيح</a>. أضف عدّادَي <code>attempts</code>/<code>max_attempts</code> و<code>RETURNING *</code> — وستحصل على الشكل نفسه لصفوف الانتظار المدعومة بـ Redis، دون النظام الثاني. هذا هو النمط وراء «لماذا وظيفتي عالقة في pending» — عادةً مات عامل بعد المطالبة، فأضف مهلة تعيد وضع الصفوف <code>processing</code> القديمة في الطابور.</p>
+<h2 id="sec-psql-copy-the-operator-s-quick-tools">psql وCOPY — أدوات المشغّل السريعة</h2>
+
+<p>وثيقة <a href="./terminal-and-deployment-substrate.html">الطرفية وطبقة النشر</a> تفتح قواعد البيانات بـ <code>psql</code>؛ هنا الأوامر الفوقية التي تجعلها REPL لا لعبة:</p>
+
+<table>
+  <thead><tr><th>الأمر</th><th>ماذا يفعل</th></tr></thead>
+  <tbody>
+    <tr><td><code>\d table_name</code></td><td>يصف جدولًا: الأعمدة والأنواع والفهارس والقيود — أسرع طريقة لتعلّم مخطط لم تكتبه</td></tr>
+    <tr><td><code>\dt</code> / <code>\di</code></td><td>يعرض الجداول / يعرض الفهارس</td></tr>
+    <tr><td><code>\l</code></td><td>يعرض قواعد البيانات</td></tr>
+    <tr><td><code>\du</code></td><td>يعرض الأدوار/المستخدمين</td></tr>
+    <tr><td><code>\timing</code></td><td>يبدّل توقيت كل استعلام — EXPLAIN الرجل الفقير</td></tr>
+    <tr><td><code>\x</code></td><td>يبدّل المخرجات العمودية الموسّعة — تتوقف الصفوف العريضة عن الالتفاف</td></tr>
+    <tr><td><code>\i file.sql</code></td><td>يشغّل ملف SQL — كيف تُطبَّق الهجرات يدويًا</td></tr>
+    <tr><td><code>\copy table FROM 'file.csv'</code></td><td>استيراد من جانب العميل — يعمل دون وصول الخادم إلى الملف</td></tr>
+  </tbody>
+</table>
+
+<p><strong>COPY — تحميل/تصدير جماعي دون حلقات INSERT.</strong> حلقة الطلب تُدرج الصفوف واحدًا تلو الآخر؛ حين يكون عندك ألف، COPY هي المسار الجماعي الأصلي للمحرّك:</p>
+
+<pre>COPY shipments FROM '/tmp/shipments.csv' WITH (FORMAT csv, HEADER true);   -- import
+COPY (SELECT * FROM shipments WHERE created_at &gt; '2026-01-01')
+  TO '/tmp/export.csv' WITH (FORMAT csv, HEADER true);                     -- export a query</pre>
+
+<p>COPY داخل التطبيق تعمل كـ <code>\copy</code> في psql (من جانب العميل، بلا مسار خادم). للهجرات الحقيقية بملايين الصفوف، تنطبق انضباطية الهجرة في وثيقة نمذجة البيانات — COPY إلى جدول مرحلي، تحقق، ثم تبديل.</p>
+
+<h2 id="sec-the-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
+
+<table>
+  <thead><tr><th>الفشل</th><th>كيف يبدو</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td><code>SELECT *</code> في الإنتاج</td><td>صفحات بطيئة وحمولات سمينة وفهارس متجاهلة</td><td>سمِّ الأعمدة التي تحتاجها</td></tr>
+    <tr><td>فهرس مفقود على مفتاح JOIN</td><td>EXPLAIN يعرض فحصًا؛ الزحف مع نمو الجداول</td><td>افهرس كل مفتاح أجنبي تدمج عليه — قاعدة نمذجة البيانات</td></tr>
+    <tr><td>N+1 من ORM</td><td>سجلات مليئة باستعلامات صف واحد متطابقة</td><td>حمّل مبكرًا أو اكتب JOIN (قسم JOIN)</td></tr>
+    <tr><td><code>= NULL</code></td><td>صفوف مفقودة بصمت من النتائج</td><td><code>IS NULL</code> — قواعد NULL في أساسيات الاستعلام</td></tr>
+    <tr><td>دالة أو تحويل على عمود مفهرس</td><td>الفهرس موجود والمخطّط يتجاهله</td><td>أعد الكتابة إلى صيغة نطاقية</td></tr>
+    <tr><td>معاملة مفتوحة عبر عمل</td><td>الكتّاب محجوبون؛ التجميع يستنزف؛ مهلات</td><td>معاملات قصيرة، ثبّت مبكرًا</td></tr>
+    <tr><td>ترحيل OFFSET عميق</td><td>الصفحة 10000 تزحف</td><td>الترحيل بالمفاتيح</td></tr>
+    <tr><td>استعلامات بلا وسائط</td><td>حقن SQL — الخطر الأول للبيانات في وثيقة <a href="../security-and-threat-modeling.html">الأمن</a></td><td>استعلامات بوسائط / عبارات مجهّزة دائمًا — لا تجمّع سلاسل أبدًا من مدخلات المستخدم في SQL</td></tr>
+    <tr><td>تضخّم من VACUUM ميت</td><td>حجم الجدول ينمو بعيدًا عن بياناته</td><td>اترك autovacuum يعمل؛ افحص <code>pg_stat_user_tables</code></td></tr>
+    <tr><td>توسّع قبل GROUP BY</td><td>العدّادات تتضاعف بعد JOIN</td><td><code>COUNT(DISTINCT ...)</code> أو جمّع قبل الدمج</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي — فهرس أدوات مع معايير قرار</h2>
+
+<table>
+  <thead><tr><th>الأداة</th><th>ما هي</th><th>معيار القرار</th></tr></thead>
+  <tbody>
+    <tr><td><strong>psql</strong></td><td>واجهة أوامر PostgreSQL — صديق طبقة الطرفية</td><td>متاحة دائمًا؛ تُملي ما تنقر عليه الواجهات الرسومية</td></tr>
+    <tr><td><strong>pgAdmin / DBeaver / TablePlus / DataGrip</strong></td><td>عملاء رسوميون، من المجاني إلى المدفوع</td><td>DBeaver مجاني لمحركات متعددة؛ DataGrip لأعمال SQL الثقيلة</td></tr>
+    <tr><td><strong>node-postgres (<code>pg</code>)</strong></td><td>المشغّل الخام لـ Node</td><td>استخدمه حين تريد SQL دون طبقة ORM — قرار <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> في هندسة الواجهة الخلفية</td></tr>
+    <tr><td><strong>Prisma / Drizzle / Knex</strong></td><td>طبقات بيانات TypeScript، من ORM إلى باني استعلامات</td><td>Drizzle: رفيع وSQL أولًا؛ Prisma: شامل ومثقل</td></tr>
+    <tr><td><strong>PgBouncer / Pgpool-II</strong></td><td>تجميعات اتصالات</td><td>وضع معاملات PgBouncer للحلقات بلا حالة</td></tr>
+    <tr><td><strong>pg_stat_statements / pgBadger</strong></td><td>تحليلات الاستعلام</td><td>stat_statements = قائمة الأبطأ؛ pgBadger = تقارير السجلات</td></tr>
+    <tr><td><strong>pg_dump / pg_restore / pg_basebackup</strong></td><td>نسخ احتياطي واستعادة</td><td>pg_dump منطقي/قابل للنقل؛ pg_basebackup مادي — عادةً تملك المنصة هذا</td></tr>
+    <tr><td><strong>Supabase / Neon / PlanetScale</strong></td><td>أوجه مستضافة من Postgres/MySQL</td><td>Supabase = Postgres + مصادقة + لحظية + pgvector — الاقتران مع <a href="./nextjs-deep-dive.html">Next.js</a>؛ PlanetScale = MySQL بلا خادم</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الملخص — قائمة التحقق الذهنية الكاملة</h2>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>SQL تصريحية — تقول ماذا، ويقرر المخطّط كيف؛ وظيفتك صياغة الهدف للفهرس.</td></tr>
+    <tr><td>2</td><td>ترتيب التنفيذ: FROM ← WHERE ← GROUP BY ← HAVING ← SELECT ← ORDER BY ← LIMIT. أخطاء الترتيب هي الصنف الأول.</td></tr>
+    <tr><td>3</td><td><code>NULL</code> لا تساوي شيئًا أبدًا، حتى NULL — استخدم <code>IS NULL</code> و<code>COALESCE</code> و<code>IS DISTINCT FROM</code>.</td></tr>
+    <tr><td>4</td><td>JOIN تقترن بالمفتاح؛ LEFT JOIN تُبقي اليسار؛ افهرس مفاتيح الدمج؛ JOIN واحدة تتفوق على N+1 استعلامًا.</td></tr>
+    <tr><td>5</td><td>WHERE يفلتر الصفوف، وGROUP BY تطوي المجموعات، وHAVING تفلتر المجموعات، والدوال النافذة ترتّب دون طيّ.</td></tr>
+    <tr><td>6</td><td>CTE تُقرأ من الأعلى للأسفل؛ CTE التكرارية تمشي الأشجار؛ EXISTS تتفوق على IN لفحوصات الوجود.</td></tr>
+    <tr><td>7</td><td>UPSERT (<code>ON CONFLICT</code>) هي الكتابة ذاتية التساوي؛ RETURNING هي الرحلة المجانية.</td></tr>
+    <tr><td>8</td><td>الكتابات ذرّية فقط داخل BEGIN/COMMIT؛ أبقِ المعاملات قصيرة؛ اقفل بترتيب متسق.</td></tr>
+    <tr><td>9</td><td>PostgreSQL تربح في JSONB والمصفوفات والبحث النصي الكامل وLISTEN/NOTIFY وRLS والتقسيم والإضافات — لهذا يجعله الرف افتراضيًا.</td></tr>
+    <tr><td>10</td><td>استعلام بطيء؟ EXPLAIN ANALYZE ← ابحث عن Seq Scan ← افهرس عمود WHERE/JOIN ← أعد الشرح.</td></tr>
+    <tr><td>11</td><td>يختلف MySQL في صياغة UPSERT وJSON والمصفوفات وتواريخ الميزات — محرّك WordPress، نفس اللغة.</td></tr>
+    <tr><td>12</td><td>SQLite ملف لا خادم — للتطوير المحلي والأحمال الصغيرة؛ SQL تنتقل معك.</td></tr>
+    <tr><td>13</td><td>وسّط كل شيء؛ مدخلات المستخدم في SQL هي حقن وثيقة الأمن، في صياغة.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<section class="cite">
+  <strong>المصادر الأساسية ←</strong>
+  <a href="https://www.postgresql.org/docs/current/queries.html">PostgreSQL — توثيق الاستعلامات</a> ·
+  <a href="https://www.postgresql.org/docs/current/sql-select.html">PostgreSQL — مرجع SELECT</a> ·
+  <a href="https://use-the-index-luke.com/">Use The Index, Luke — فهرسة SQL للمطوّرين</a> ·
+  <a href="https://dev.mysql.com/doc/refman/8.0/en/">MySQL 8.0 — الدليل المرجعي</a> ·
+  <a href="https://www.sqlite.org/lang.html">SQLite — مرجع لغة SQL</a> ·
+  <a href="https://supabase.com/docs">Supabase — Postgres والمصادقة واللحظية وpgvector</a> ·
+  <a href="https://developer.wordpress.org/advanced-administration/before-install/howto-install/">WordPress — نظرة على مخطط قاعدة البيانات</a>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«خذ استعلامي البطيء المفضّل وامشِ معي في EXPLAIN ANALYZE الخاص به — ماذا تفهرس أولًا، ولماذا؟»</li>
+    <li>«أرني حادثة إنتاج حقيقية أسقط فيها نظامًا JOIN أو معاملة خاطئة — ما كان الإصلاح؟»</li>
+    <li>«أين ترسم الخط بين استعلام JOIN وORM في كودك أنت — ومتى تكتب SQL خامًا؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · SQL وPostgreSQL — لغة الاستعلام والمحرّك</span>
+  <span>التصميم: <a href="./data-modeling-and-databases.html">نمذجة البيانات وقواعد البيانات</a> · التشغيل: <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> · العقود: <a href="./api-design.html">تصميم واجهات البرمجة (API)</a> · WordPress: <a href="../wordpress-and-cms-internet.html">WordPress وإنترنت CMS</a> · المصطلحات: <a href="./glossary.html">مصطلحات مشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

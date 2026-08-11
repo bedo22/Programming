@@ -13,6 +13,9 @@
   <p class="kicker">Reference · SQL &amp; PostgreSQL — the query language and the engine</p>
   <h1>SQL &amp; PostgreSQL</h1>
   <p class="meta">The query language that opens every schema: SELECT anatomy and execution order, NULL handling, JOINs in all their forms, aggregation and GROUP BY, subqueries and CTEs, window functions, writing data (INSERT/UPDATE/DELETE/UPSERT), transactions in SQL, the PostgreSQL features that win (JSONB, arrays, full-text, LISTEN/NOTIFY, RLS, partitioning, extensions), reading slow queries with EXPLAIN ANALYZE, the MySQL/MariaDB differences that matter for WordPress, and SQLite for local development — with a worked example that turns the shelf's shipment-tracking schema into real queries. Read this after <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> (you design the vault there; you open it here).</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/sql-and-postgresql.html">العربية</a>
+  </p>
 </header>
 
 <blockquote class="callout">
@@ -29,7 +32,7 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
   <p>Neighbors and how they split the work:</p>
   <ul>
     <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — owns schema design, index strategy, and the EXPLAIN tuning loop as a <em>concept</em>. This doc owns the language and shows the syntax the concepts are about.</li>
-    <li><a href="./backend-engineering.html">Backend Engineering</a> — owns the ORM-vs-raw-SQL decision (§1e), the N+1 problem, and transactions as a server concern. This doc shows the SQL underneath: the JOINs that fix N+1, the BEGIN/COMMIT syntax.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — owns the ORM-vs-raw-SQL decision (<a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>), the N+1 problem, and transactions as a server concern. This doc shows the SQL underneath: the JOINs that fix N+1, the BEGIN/COMMIT syntax.</li>
     <li><a href="./api-design.html">API Design</a> — owns idempotency keys. This doc provides their database side: <code>INSERT ... ON CONFLICT</code>.</li>
     <li><a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> — WordPress runs on MySQL/MariaDB; the differences section here is its database companion.</li>
     <li><a href="./terminal-and-deployment-substrate.html">Terminal &amp; the Deployment Substrate</a> — the shell where <code>psql</code> and <code>pg_dump</code> run; the database-administration depth deliberately stays outside this shelf.</li>
@@ -43,11 +46,11 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
 
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
-<p>Reading order: read this after <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> (so the schema vocabulary is warm) and alongside <a href="./backend-engineering.html">Backend Engineering</a> §1e (the ORM-vs-raw-SQL decision). Cross-links:</p>
+<p>Reading order: read this after <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> (so the schema vocabulary is warm) and alongside <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> (the ORM-vs-raw-SQL decision). Cross-links:</p>
 <ul>
   <li>Schema design, keys, constraints, indexes: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — this doc queries what that doc designs.</li>
-  <li>ORMs vs. raw SQL, the N+1 problem: <a href="./backend-engineering.html">Backend Engineering</a> §1e.</li>
-  <li>Transactions and concurrency as a server concern: <a href="./backend-engineering.html">Backend Engineering</a> §5; isolation levels as a schema concern: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> §Isolation levels.</li>
+  <li>ORMs vs. raw SQL, the N+1 problem: <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>.</li>
+  <li>Transactions and concurrency as a server concern: <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>; isolation levels as a schema concern: <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> <a href="./data-modeling-and-databases.html#sec-isolation-levels-the-transaction-knob">Isolation levels</a>.</li>
   <li>Idempotent writes in APIs: <a href="./api-design.html">API Design</a> — the UPSERT section here is their SQL face.</li>
   <li>WordPress's engine: <a href="./wordpress-and-cms-internet.html">WordPress &amp; the CMS Internet</a> — the MySQL differences section here.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
@@ -69,7 +72,7 @@ N+1 problem (§1e)                      SQLite (local dev, tests)
   </tbody>
 </table>
 
-<p><strong>SQL vs NoSQL:</strong> relational engines give you ACID, joins, and constraints; document stores give you flexible schemas and horizontal scale-out. The shelf's position (<a href="./data-modeling-and-databases.html">Data Modeling</a> §Definition, §Beyond the relational default): relational by default, document stores when the schema is genuinely variable — and PostgreSQL's JSONB covers most of those cases without leaving the relational world. SQL is not going anywhere; it is the lingua franca of data.</p>
+<p><strong>SQL vs NoSQL:</strong> relational engines give you ACID, joins, and constraints; document stores give you flexible schemas and horizontal scale-out. The shelf's position (<a href="./data-modeling-and-databases.html">Data Modeling</a> <a href="./data-modeling-and-databases.html#sec-definition-what-data-modeling-is-and-what-it-is-not">Definition</a>, <a href="./data-modeling-and-databases.html#sec-beyond-the-relational-default-read-models-and-event-sourcing">Beyond the relational default</a>): relational by default, document stores when the schema is genuinely variable — and PostgreSQL's JSONB covers most of those cases without leaving the relational world. SQL is not going anywhere; it is the lingua franca of data.</p>
 
 <p><strong>The three engines you will actually use — and their hosted faces:</strong></p>
 
@@ -181,7 +184,7 @@ JOIN   customers c ON c.id = s.customer_id;</pre>
 
 <p><strong>JOIN vs subquery:</strong> anything a subquery does in the FROM or via a correlated filter, a JOIN usually expresses more readably. The exception: <code>NOT IN</code>-style anti-joins and existence checks, where <code>EXISTS</code> is both clearer and faster (see Subqueries). The rule of thumb: <strong>prefer JOINs for combining; prefer EXISTS for testing.</strong></p>
 
-<p><strong>The N+1 problem — where loops and queries collide.</strong> The anti-pattern: fetch 50 orders with one query, then run 50 more queries — one per order — to fetch each customer (this is what ORMs silently do when you access an unloaded relation). The fix is one JOIN (or one <code>IN</code> query), and the shelf's home for the pattern is <a href="./backend-engineering.html">Backend Engineering</a> §1e; this is the SQL that fixes it:</p>
+<p><strong>The N+1 problem — where loops and queries collide.</strong> The anti-pattern: fetch 50 orders with one query, then run 50 more queries — one per order — to fetch each customer (this is what ORMs silently do when you access an unloaded relation). The fix is one JOIN (or one <code>IN</code> query), and the shelf's home for the pattern is <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>; this is the SQL that fixes it:</p>
 
 <pre>-- N+1 (51 queries): the loop fetches customers one by one
 -- one JOIN (1 query):
@@ -377,7 +380,7 @@ COMMIT;                                 -- both become visible together
 -- on any error instead:
 ROLLBACK;                               -- both vanish; the world never saw a half-write</pre>
 
-<p><strong>ACID in practice:</strong> <em>Atomicity</em> is exactly what BEGIN/COMMIT/ROLLBACK buy you. <em>Consistency</em> is the schema's constraints doing their job. <em>Isolation</em> is the level knob — the shelf's home is <a href="./data-modeling-and-databases.html">Data Modeling §Isolation levels</a> and <a href="./backend-engineering.html">Backend Engineering §5</a>; the one-liner for here: <em>READ COMMITTED</em> (PostgreSQL default, per-statement snapshot) vs <em>REPEATABLE READ</em> (per-transaction snapshot — the same SELECT twice sees the same data). <em>Durability</em> is the WAL, which you trust the platform to own.</p>
+<p><strong>ACID in practice:</strong> <em>Atomicity</em> is exactly what BEGIN/COMMIT/ROLLBACK buy you. <em>Consistency</em> is the schema's constraints doing their job. <em>Isolation</em> is the level knob — the shelf's home is <a href="./data-modeling-and-databases.html#sec-isolation-levels-the-transaction-knob">Data Modeling §Isolation levels</a> and <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">Backend Engineering §5</a>; the one-liner for here: <em>READ COMMITTED</em> (PostgreSQL default, per-statement snapshot) vs <em>REPEATABLE READ</em> (per-transaction snapshot — the same SELECT twice sees the same data). <em>Durability</em> is the WAL, which you trust the platform to own.</p>
 
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>Avoidance</th></tr></thead>
@@ -498,7 +501,7 @@ SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
 
 <h2 id="sec-performance-reading-and-fixing-slow-queries">Performance — reading and fixing slow queries</h2>
 
-<p>The tuning loop belongs to <a href="./data-modeling-and-databases.html">Data Modeling §Indexing</a> and §Reading EXPLAIN ANALYZE — this section is the query side of that loop: what to look for, and the anti-patterns that defeat the planner.</p>
+<p>The tuning loop belongs to <a href="./data-modeling-and-databases.html#sec-indexing-strategies-the-read-path">Data Modeling §Indexing</a> and <a href="./data-modeling-and-databases.html#sec-reading-explain-analyze-the-tuning-loop">Reading EXPLAIN ANALYZE</a> — this section is the query side of that loop: what to look for, and the anti-patterns that defeat the planner.</p>
 
 <pre>EXPLAIN ANALYZE SELECT ... -- run the query for real, show the plan + measured timings
 -- what to look for, in order:
@@ -512,7 +515,7 @@ SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
     <tr><td><code>SELECT *</code></td><td>Drags every column across the network; kills covering indexes</td><td>Name the columns the request actually needs</td></tr>
     <tr><td>Function on an indexed column: <code>WHERE DATE(created_at) = '2026-01-01'</code></td><td>The index is on <code>created_at</code>; the function hides the value</td><td>Range form: <code>WHERE created_at &gt;= '2026-01-01' AND created_at &lt; '2026-01-02'</code></td></tr>
     <tr><td>Implicit cast: comparing text to int</td><td>Same story — the planner cannot use the index through a cast</td><td>Cast the parameter, not the column</td></tr>
-    <tr><td>Missing index on a JOIN key</td><td>Hash join becomes fine, nested loop becomes a scan per row</td><td>Index every foreign key you join on (data-modeling §Indexing says the same)</td></tr>
+    <tr><td>Missing index on a JOIN key</td><td>Hash join becomes fine, nested loop becomes a scan per row</td><td>Index every foreign key you join on (data-modeling <a href="./data-modeling-and-databases.html#sec-indexing-strategies-the-read-path">Indexing</a> says the same)</td></tr>
     <tr><td>Deep <code>OFFSET</code> pagination</td><td>Walks and discards every skipped row</td><td>Keyset pagination (Window functions section)</td></tr>
     <tr><td>N+1 from the ORM</td><td>A loop of small queries instead of one set</td><td>Eager loading / one JOIN (JOINs section)</td></tr>
   </tbody>
@@ -520,7 +523,7 @@ SELECT * FROM events TABLESAMPLE SYSTEM (1);</pre>
 
 <p><strong>Finding the slow ones:</strong> <code>pg_stat_statements</code> (an extension) tracks every query's total time and call count — the "top 10 slowest queries" list. <strong>VACUUM and autovacuum:</strong> PostgreSQL does not overwrite rows in place; dead rows accumulate until VACUUM reclaims them. Autovacuum normally handles this — the production problems happen when it is disabled or overwhelmed, and bloat shows up as tables growing beyond reason. Know that it exists; leave the tuning to the platform.</p>
 
-<p><strong>Connection pooling (PgBouncer):</strong> PostgreSQL's per-connection memory makes hundreds of idle app connections wasteful. PgBouncer sits in front and reuses a small pool. <em>Transaction mode</em> — a connection is held only for the duration of one transaction, which is what stateless request loops want; <em>session mode</em> pins a connection per client session, needed for prepared statements that must survive. The shelf's statelessness rule (Backend §Serverless) is exactly the constraint that makes transaction mode the default choice.</p>
+<p><strong>Connection pooling (PgBouncer):</strong> PostgreSQL's per-connection memory makes hundreds of idle app connections wasteful. PgBouncer sits in front and reuses a small pool. <em>Transaction mode</em> — a connection is held only for the duration of one transaction, which is what stateless request loops want; <em>session mode</em> pins a connection per client session, needed for prepared statements that must survive. The shelf's statelessness rule (Backend <a href="./backend-engineering.html#sec-state-the-identity-and-session-decision">Serverless</a>) is exactly the constraint that makes transaction mode the default choice.</p>
 
 <h2 id="sec-mysql-mariadb-the-wordpress-engine">MySQL / MariaDB — the WordPress engine</h2>
 
@@ -574,7 +577,7 @@ GROUP BY t.name;</pre>
 
 <h2 id="sec-worked-example-the-query-layer-for-shipment-tracking">Worked example — the query layer for shipment tracking</h2>
 
-<p>The shelf has designed this system twice: the schema in <a href="./data-modeling-and-databases.html">Data Modeling §Worked example</a>, the API in <a href="./api-design.html">API Design</a>. Here is the query layer that connects them — the actual SQL behind four endpoints, each optimized with the tools from this doc.</p>
+<p>The shelf has designed this system twice: the schema in <a href="./data-modeling-and-databases.html#sec-worked-example-design-the-schema-for-a-shipment-tracking-system">Data Modeling §Worked example</a>, the API in <a href="./api-design.html">API Design</a>. Here is the query layer that connects them — the actual SQL behind four endpoints, each optimized with the tools from this doc.</p>
 
 <p><strong>1. The detail endpoint — one shipment with its customer (LEFT JOIN, index on the FK):</strong></p>
 
@@ -690,7 +693,7 @@ COPY (SELECT * FROM shipments WHERE created_at &gt; '2026-01-01')
   <tbody>
     <tr><td><strong>psql</strong></td><td>The PostgreSQL CLI — the terminal substrate's friend</td><td>Always available; scripts what the GUIs click</td></tr>
     <tr><td><strong>pgAdmin / DBeaver / TablePlus / DataGrip</strong></td><td>GUI clients, from free to paid</td><td>DBeaver free for multi-engine; DataGrip for heavy SQL work</td></tr>
-    <tr><td><strong>node-postgres (<code>pg</code>)</strong></td><td>The raw driver for Node</td><td>Use when you want SQL without an ORM layer — Backend §1e's decision</td></tr>
+    <tr><td><strong>node-postgres (<code>pg</code>)</strong></td><td>The raw driver for Node</td><td>Use when you want SQL without an ORM layer — Backend <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>'s decision</td></tr>
     <tr><td><strong>Prisma / Drizzle / Knex</strong></td><td>TypeScript data layers, ORM to query builder</td><td>Drizzle: thin and SQL-first; Prisma: batteries included, heavier</td></tr>
     <tr><td><strong>PgBouncer / Pgpool-II</strong></td><td>Connection pools</td><td>PgBouncer transaction mode for stateless loops</td></tr>
     <tr><td><strong>pg_stat_statements / pgBadger</strong></td><td>Query analytics</td><td>stat_statements = the top-slow list; pgBadger = log reports</td></tr>
