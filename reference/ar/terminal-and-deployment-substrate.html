@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الطرفية وطبقة النشر — البنية التي تقوم عليها كل وثيقة</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · الطرفية والنشر — الركيزة التي يعمل عليها كودك</p>
+  <h1>الطرفية وطبقة النشر</h1>
+  <p class="meta">الركيزة غير المرئية تحت كل وثيقة أخرى في هذه الرفوف: أوامر الطرفية التي تفتح لك الأبواب (أساسيات الصدفة، والتنقل، وإدارة العمليات، ومتغيرات البيئة، والأنابيب، والشبكات، والأذونات)، والنموذج الذهني لدوكر (الصور مقابل الحاويات، وملفات Dockerfile، وCompose، والمنافذ الشائعة، ولماذا الحاوية ليست جهازًا افتراضيًا)، ومعرفة Kubernetes (Pods وDeployments وServices)، وعصور السحابة الثلاثة (IaaS وPaaS وServerless) — كلٌّ منها مربوط بالوثيقة التي تملك عمقه في الرفوف. اقرأ هذا حين تقول وثيقة «شغّل هذا في طرفيتك»، أو حين لا يقلع خادمك، أو حين تحتاج إلى فهم أين يعمل كودك فعلًا.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../terminal-and-deployment-substrate.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يقع هذا.</strong> كل وثيقة في هذه الرفوف تفترض وجود طرفية. <a href="../backend-engineering.html">هندسة الخلفية</a> تقول إن الخادم يجب أن يكون بلا حالة؛ <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD والنشر</a> يشحن صور الحاويات؛ <a href="../wordpress-and-cms-internet.html">ووردبريس وإنترنت أنظمة إدارة المحتوى</a> يكتب عمليات عملائه بـWP-CLI. لا تتوقف أيٌّ منها لتعليم الأداة التي تحتها. هذه الوثيقة هي ذلك التوقف — طبقة البنية، ضحلة عمدًا:</p>
+  <pre>THE ENGINEERING CORE                 THE SUBSTRATE (this doc)
+system-design.html                   terminal-and-deployment-substrate.html  ← YOU ARE HERE
+api-design.html                           |— terminal survival kit (20% for 99%)
+backend-engineering.html                  |— Docker: images vs containers
+data-modeling-and-databases.html          |— Kubernetes: Pods/Deployments/Services
+security-and-threat-modeling.html         |— cloud: IaaS → PaaS → Serverless
+                                          |
+Depth stays in the core docs; this doc only maps to it:
+version-control-ci-cd-deployment.html (the artifact pipeline)
+backend-engineering.html (the statelessness contract)
+system-design.html (latency, edge, failure domains)</pre>
+  <p>الجيران وكيف يقسمون العمل:</p>
+  <ul>
+    <li><a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD والنشر</a> — يملك خط الأنابيب: البناء، والقطع الأثرية، واستراتيجيات الإصدار، وسلامة سلسلة التوريد. هذه الوثيقة تشرح ما <em>هي</em> القطعة الأثرية (حاوية) والأوامر التي تستخدمها محليًا.</li>
+    <li><a href="../backend-engineering.html">هندسة الخلفية</a> — يملك حلقة الطلب ولماذا يفرض البلا-خادم اللاحالة. هذه الوثيقة تمدّك بمهارات الطرفية لتشغيل ذلك الخادم وتصحيحه.</li>
+    <li><a href="./system-design.html">التصميم المعماري</a> — يملك زمن الاستجابة، والحوسبة الطرفية، ومجالات الفشل، ومتى تكون المنصة مبالغة. هذه الوثيقة تمدّك بخريطة العصور الثلاثة لأهداف النشر.</li>
+    <li><a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> — يملك التهديدات والأسرار. هذه الوثيقة تمدّك بآليات النظافة (أذونات الملفات، وقاعدة «لا تُشغّل sudo أبدًا على خادم»).</li>
+    <li><a href="./cs-and-software-engineering.html">علوم الحاسوب وهندسة البرمجيات</a> — يملك صفوف التاريخ (دوكر 2013، AWS 2006)؛ هذه الوثيقة لا تكررها.</li>
+  </ul>
+</blockquote>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا توجد هذه الوثيقة منفصلة</h3>
+  <p><em>لا تعلّم أي وثيقة أخرى في الرفوف الطرفية أو ما هي الحاوية.</em> يفترض المنهج أنك تستطيع تشغيل الأوامر، وقراءة سجل، وتصوّر هدف نشر — ولا يريك كيف أبدًا. ادّعت أدلة الدراسة التي روجعت مقابل هذه الرفوف أن هذه المواضيع مغطاة؛ وجد التدقيق أن نموذج دوكر الذهني (الصورة مقابل الحاوية) وعدة النجاة للطرفية كلها غائبان. تسد هذه الوثيقة تلك الفجوة بأصغر سطح ممكن: الـ~20% من الطرفية التي تحل 99% من مشاكل هندسة الويب، ونماذج الفقرة الواحدة لدوكر وKubernetes، وخريطة السحابة ذات العصور الثلاثة. ملاحظة نطاق واحدة: <strong>هذه ليست دورة مسؤول أنظمة أو ديفأوبس</strong> — جدول «تجاهل بأمان» في التعريف لا يقل أهمية عن البقية.</p>
+</section>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ هذه الوثيقة مبكرًا — فهي البنية الأساسية لكل ما عداها. تترافق مع <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD والنشر</a> (خط الأنابيب الذي يستهلك صور دوكر) و<a href="../backend-engineering.html">هندسة الخلفية</a> (الخادم الذي تشغّله بهذه الأوامر). الروابط المتقاطعة:</p>
+<ul>
+  <li>القطع الأثرية والترويج: <a href="./version-control-ci-cd-deployment.html">CI/CD والنشر</a> — «ابنِ مرةً وروّج كثيرًا» تعيش هناك؛ مفهوم الحاوية يعيش هنا.</li>
+  <li>عقد اللاحالة: <a href="../backend-engineering.html">هندسة الخلفية</a> — لماذا يحرّم البلا-خادم الحالة في الذاكرة.</li>
+  <li>زمن الاستجابة والحافة: <a href="./system-design.html">التصميم المعماري</a> — الفيزياء خلف شبكات CDN والحوسبة الطرفية.</li>
+  <li>التهديدات والأسرار: <a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> — حقن أوامر نظام التشغيل، ونظافة الأسرار.</li>
+  <li>التاريخ: <a href="./cs-and-software-engineering.html">علوم الحاسوب وهندسة البرمجيات</a> — دوكر 2013، AWS 2006، الانقلابات.</li>
+  <li>مرجع: <a href="./glossary.html">المصطلحات</a>.</li>
+</ul>
+
+<p><strong>إن بحثتَ يومًا عن «كيف أُنهي عملية على المنفذ 3000»، أو وقفتَ محتارًا أمام «docker run»، أو أومأتَ بالموافقة حين قال أحدهم «Pods وServices» — فهذه هي الخريطة.</strong> اقرأ التعريف (ما هذه الوثيقة وما ليست)، ثم أساسيات الصدفة وعدة النجاة، ثم دوكر والسحابة. الأمثلة العملية حيث يلتئم كل شيء.</p>
+
+<h2 id="sec-definition-the-substrate-and-what-it-is-not">التعريف — الركيزة، وما ليست عليه</h2>
+
+<p>الركيزة هي كل ما يعمل عليه كودك: نظام التشغيل، والطرفية التي تقوده، وصيغة الحاوية التي تحزمه، وعصور السحابة التي تستأجره. مهندسو الويب لا يديرون هذه الطبقة إداريًا؛ بل <strong>يشغّلونها</strong> — بما يكفي لفتح الأبواب أمام أنفسهم، وتشغيل كودهم، وفهم أهداف النشر التي يختارها تصميم أنظمتهم.</p>
+
+<table>
+  <thead><tr><th>ما هذه الوثيقة</th><th>ما ليست هذه الوثيقة</th></tr></thead>
+  <tbody>
+    <tr><td>عدة نجاة للطرفية — الـ20% التي تحل 99% من مشاكل هندسة الويب</td><td>منهج مسؤول أنظمة: ترجمة النواة، وترقيع نظام التشغيل، وإدارة حزم الخوادم</td></tr>
+    <tr><td>نماذج عقلية — الصورة مقابل الحاوية، وPods/Deployments/Services، وعصور السحابة الثلاثة</td><td>مسار مهني في ديفأوبس: تأليف مخططات Helm، وإدارة العناقيد، وتأليف Terraform/Pulumi، وتقسيم شبكات VPC</td></tr>
+    <tr><td>قواعد نظافة — الأذونات، والأسرار على القرص، و«لا تُشغّل خادم ويب بـsudo أبدًا»</td><td>شبكات عميقة: توجيه BGP، والجدران النارية اليدوية iptables/ufw، ودواخل شبكات الحاويات (Calico/Istio)</td></tr>
+    <tr><td>عادات تصحيح — السجلات قبل الإصلاحات، ابحث عن PID، ثم اقتله</td><td>تخصيص لينكس المكتبي، ومديرو النوافذ، وإتقان Vim/Emacs</td></tr>
+  </tbody>
+</table>
+
+<p><strong>قاعدة الحدود:</strong> إذا حدثت المهمة <em>أثناء تطوير أو نشر تطبيق ويب</em>، فهي من معرفتك. إذا كانت المهمة هي <em>إبقاء البنية التحتية حيّة كمهنة</em>، فهي من عمل SRE ومهندسي المنصات — والسحابة تفعل معظمها عنك على أي حال.</p>
+
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">التقاطع مع الجيران — حدود التكرار</h2>
+
+<table>
+  <thead><tr><th>الوثيقة المجاورة</th><th>ما تملكه</th><th>ما يبقى هناك مقابل هنا</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./version-control-ci-cd-deployment.html">CI/CD والنشر</a></td><td>خطوط الأنابيب، وأنواع القطع الأثرية، واستراتيجيات الإصدار، وسلامة سلسلة التوريد</td><td>هناك: صورة الحاوية الموقَّعة كقطعة أثرية لخط الأنابيب. هنا: ما <em>هي</em> الحاوية، والأوامر المحلية (<code>docker ps</code>، <code>logs</code>، <code>exec</code>).</td></tr>
+    <tr><td><a href="../backend-engineering.html">هندسة الخلفية</a></td><td>حلقة الطلب، واللاحالة، والتخزين المؤقت، وإعداد متغيرات البيئة</td><td>هناك: لماذا يجب أن تعيش الحالة في مخازن خارجية. هنا: آليات الطرفية (<code>export</code>، <code>source .env</code>، <code>lsof</code>/<code>kill</code>) لتشغيل الحلقة وتصحيحها.</td></tr>
+    <tr><td><a href="./system-design.html">التصميم المعماري</a></td><td>التوسع، ومجالات الفشل، وميزانيات زمن الاستجابة، والحافة، وتحذيرات المبالغة</td><td>هناك: هل تختار serverless أم K8s، ومتى تكون المنصة معقدة أكثر من اللازم. هنا: خريطة النظرة الواحدة للعصور الثلاثة وبدائيات K8s، فتصبح تلك القرارات أشياء حقيقية.</td></tr>
+    <tr><td><a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a></td><td>التهديدات، وSTRIDE، وإدارة الأسرار، وحقن أوامر نظام التشغيل</td><td>هناك: نموذج التهديد. هنا: الآليات — <code>chmod 600</code> على <code>.env</code>، ونظافة مفاتيح SSH، وعدم تشغيل التطبيق كجذر أبدًا.</td></tr>
+    <tr><td><a href="../wordpress-and-cms-internet.html">ووردبريس وإنترنت أنظمة إدارة المحتوى</a></td><td>عمليات WP-CLI على مواقع العملاء</td><td>هناك: أوامر ووردبريس المحددة. هنا: مهارات الطرفية التي تفترضها تلك الأوامر.</td></tr>
+  </tbody>
+</table>
+
+<p>ترتيب الاعتماد: لا يمكنك استخدام Git أو npm أو دوكر أو WP-CLI دون طرفية؛ ولا يمكنك التفكير في النشر دون خريطة السحابة؛ ولا يمكنك النشر دون حاويات. تعلّم هذه الطبقة مرة واحدة وبسطح ضحل، وستتوقف كل وثيقة أخرى عن الافتراض وتبدأ بالإحالة.</p>
+
+<h2 id="sec-the-terminal-the-universal-remote">الطرفية — جهاز التحكم الشامل</h2>
+
+<p><strong>الطرفية هي الواجهة الخام لكل أداة في هذه الرفوف.</strong> تخفي الواجهات الرسومية التعقيد خلف أزرار؛ تكشف الطرفية العمليات الأساسية — وكل أداة تعلّمها الرفوف (Git، وnpm، وNode، ودوكر، وcurl، وWP-CLI) مصممة طرفية-أولًا. حين توجد واجهة رسومية، فهي جلد فوق نفس الأمر. ما تعطيك إياه الطرفية ولا تستطيعه الواجهات الرسومية:</p>
+
+<table>
+  <thead><tr><th>القدرة</th><th>لماذا تهم</th></tr></thead>
+  <tbody>
+    <tr><td><strong>القابلية للبرمجة النصية</strong></td><td>أي شيء تفعله مرة، يمكنك تسلسله وتكراره — خط أنابيب CI الخاص بك هو حرفيًا سلسلة أوامر طرفية تعمل داخل حاوية لينكس</td></tr>
+    <tr><td><strong>الوصول عن بُعد</strong></td><td>الطريقة الوحيدة للدخول حين تكون الآلة خادمًا في قارة أخرى (<code>ssh</code>)</td></tr>
+    <tr><td><strong>الحقيقة</strong></td><td>السجلات وقوائم العمليات وأذونات الملفات تُظهر ما <em>هو</em> موجود، لا ما قررت واجهة رسومية عرضه</td></tr>
+    <tr><td><strong>الدقة</strong></td><td>أمر واحد يستهدف شيئًا واحدًا بالضبط — PID، أو سطرًا في ملف، أو منفذًا — بدل النقر عبر القوائم</td></tr>
+  </tbody>
+</table>
+
+<p><strong>لينكس هو المضيف الشامل.</strong> سواء نَشرتَ إلى AWS أو Vercel أو Raspberry Pi أو حاوية، فالبيئة دائمًا لينكس تقريبًا. ماك هو يونكس تحته (مشابه جدًا)؛ يستخدم مطورو ويندوز WSL لمحاكاته. لذا فإن عادات الطرفية التي تبنيها محليًا تنتقل إلى الإنتاج شبه دون تغيير — وهذا بالضبط لماذا «اشتغل في طرفيتي» هي أقرب ما يمكنك الوصول إليه إلى «اشتغل في الإنتاج».</p>
+<h2 id="sec-shell-fundamentals-the-environment-you-type-into">أساسيات الصدفة — البيئة التي تكتب فيها</h2>
+
+<p><strong>الطرفية مقابل الصدفة مقابل سطر الأوامر.</strong> <em>الطرفية</em> هي النافذة التي تنظر إليها (iTerm2 أو Windows Terminal أو GNOME Terminal)؛ <em>الصدفة</em> هي البرنامج داخلها الذي يفسر ما تكتبه (bash على معظم لينكس، وzsh على ماك منذ Catalina)؛ <em>سطر الأوامر</em> هو الواجهة حيث تكتب. الفرق يهم حين تعدّل إعداد الصدفة: أسماءك المستعارة وإضافات PATH تعيش في <code>~/.bashrc</code> على لينكس و<code>~/.zshrc</code> على ماك — ضعها في الملف الخاطئ ولن يحدث شيء.</p>
+
+<p><strong>الميزتان اللتان تجعلان الطرفية أسرع من واجهة رسومية:</strong> <em>إكمال التبويب</em> — اكتب <code>git ch</code> واضغط Tab ليُكمل إلى <code>git checkout</code> (اضغط Tab مرتين لعرض الخيارات) — و<em>تاريخ الأوامر</em> — سهما ↑/↓ يتنقلان عبر الأوامر السابقة، و<code>Ctrl+R</code> يبحث فيها. بدونهما تبدو الطرفية أبطأ من النقر؛ معهما تصبح أسرع بدراماتيكية. تعلّمهما قبل أي أمر.</p>
+
+<p><strong>المسارات.</strong> المسار <em>المطلق</em> يبدأ من الجذر: <code>/home/you/projects/my-app</code>. المسار <em>النسبي</em> يبدأ من حيث أنت: <code>./src/index.js</code> أو <code>../shared/utils.js</code>. <code>~</code> اختصار لمجلد منزلك، و<code>.</code> هو المجلد الحالي، و<code>..</code> هو الأصل — ولهذا يعمل <code>cd projects</code> من المنزل ولا يعمل من <code>/tmp</code>.</p>
+
+<p><strong>إعادة التوجيه والبدائل والسلسلة</strong> — العوامل الثلاثة التي تحول الأوامر إلى نصوص برمجية:</p>
+
+<pre>npm run build &gt; build.log 2&gt;&amp;1   # &gt; write output to a file (overwrite); 2&gt;&amp;1 folds errors in too
+echo "DB=..." &gt;&gt; .env          # &gt;&gt; append to a file instead of overwriting
+rm *.log                        # * matches any text: every .log file in this directory
+npm install &amp;&amp; npm run dev     # &amp;&amp; run the second only if the first succeeded
+npm test || echo "failed"       # || run the second only if the first failed
+cd src ; ls                      # ; run both, regardless of success</pre>
+
+<p><strong>الأسماء المستعارة والمساعدة المدمجة.</strong> <code>alias gs='git status'</code> يعرّف اختصارًا ستراه في إعدادات الآخرين. حين تصادف أمرًا لا تعرفه، توثّق الطرفية نفسها: <code>man lsof</code> هو الدليل الكامل، و<code>lsof --help</code> الملخص السريع.</p>
+
+<h2 id="sec-the-survival-kit-the-20-for-99">عدة النجاة — الـ20% التي تكفي 99%</h2>
+
+<p>ستة جداول صغيرة. هذه ليست «لطيفة أن تعرفها» — بل هي المجموعة التي تفتح 99% من مشاكل هندسة الويب: التنقل، وإيجاد ما يعمل، وتهيئة البيئة، والبحث في السجلات، واختبار النقاط النهائية، وعدم إطلاق النار على قدمك. درّب كلًا منها حتى يصبح رد فعل؛ هذا هو المنهج كله.</p>
+
+<h3>A. التنقل وإدارة الملفات — التحرك دون فأرة</h3>
+
+<table>
+  <thead><tr><th>الأمر</th><th>ماذا يفعل</th><th>سياق الرفوف</th></tr></thead>
+  <tbody>
+    <tr><td><code>pwd</code></td><td>أين أنا؟</td><td>أول ما يجب فحصه قبل أي أمر مدمر</td></tr>
+    <tr><td><code>ls -la</code></td><td>اعرض كل شيء، بما فيه الملفات المخفية (<code>.env</code>، <code>.git</code>) مع الأذونات</td><td>نظافة الأسرار: <a href="../security-and-threat-modeling.html">الأمن</a></td></tr>
+    <tr><td><code>cd ..</code> / <code>cd ~</code></td><td>مستوىً لأعلى / مجلد المنزل</td><td>التنقل في الخوادم عبر SSH</td></tr>
+    <tr><td><code>mkdir</code>, <code>cp</code>, <code>mv</code></td><td>أنشئ، انسخ، انقل</td><td>تافه — لكن <code>mv</code> هو أيضًا كيف «تعيد تسمية» ملفًا</td></tr>
+    <tr><td><code>rm -rf</code></td><td>احذف شجرة مجلدات قسريًا</td><td>أخطر أمر في العدة — انظر أنماط الفشل</td></tr>
+    <tr><td><code>cat</code> / <code>less</code></td><td>اطبع ملفًا / تصفّح ملفًا كبيرًا (سجلات)</td><td>قراءة سجلات الأخطاء حيث يبدأ كل تصحيح لخبير</td></tr>
+    <tr><td><code>head</code> / <code>tail -f</code></td><td>الأسطر الأولى / الأخيرة، <code>-f</code> يتابع المخرجات الجديدة مباشرة</td><td>قراءة السجلات مباشرة — الحركة الأكثر شيوعًا لتصحيح الخوادم</td></tr>
+    <tr><td><code>man</code> / <code>cmd --help</code></td><td>توثيق مدمج لأي أمر</td><td>انظر أساسيات الصدفة — الطرفية توثّق نفسها</td></tr>
+  </tbody>
+</table>
+
+<h3>ب. إدارة العمليات — فتح الأبواب أمام نفسك</h3>
+
+<table>
+  <thead><tr><th>الأمر</th><th>ماذا يفعل</th><th>سياق الرفوف</th></tr></thead>
+  <tbody>
+    <tr><td><code>lsof -i :3000</code></td><td>أي عملية تحمل المنفذ 3000؟ (يطبع الـPID)</td><td>إصلاح <code>EADDRINUSE</code> — انظر المثال العملي</td></tr>
+    <tr><td><code>kill -9 &lt;PID&gt;</code></td><td>اقتل تلك العملية قسريًا</td><td>خوادم التطوير الشبحية، والوظائف العالقة</td></tr>
+    <tr><td><code>ps aux | grep node</code></td><td>اعثر على عمليات Node قيد التشغيل</td><td>هل خادمي شغّال فعلًا؟</td></tr>
+    <tr><td><code>top</code> / <code>htop</code></td><td>ما الذي يستهلك المعالج/الذاكرة؟</td><td><a href="../backend-engineering.html">هندسة الخلفية</a> — تصحيح الأداء</td></tr>
+  </tbody>
+</table>
+
+<h3>ج. البيئة والمتغيرات</h3>
+
+<p><a href="../backend-engineering.html">هندسة الخلفية</a> تعامل الإعداد كمتغيرات بيئة (<code>process.env.DATABASE_URL</code>). الطرفية هي حيث تعيش وتُحمَّل:</p>
+
+<pre>export MY_VAR="secret"     # set for this session
+echo $MY_VAR               # print it — verify
+echo $PATH                 # the directories the shell searches for commands
+source .env                # load a .env file into the session (or use a dotenv loader)</pre>
+
+<table>
+  <thead><tr><th>المفهوم</th><th>ماذا يفعل</th><th>سياق الرفوف</th></tr></thead>
+  <tbody>
+    <tr><td><code>export</code></td><td>اجعل المتغير مرئيًا للبرامج التي تشغّلها</td><td>إعداد بلا ملفات إعداد — <a href="../backend-engineering.html">هندسة الخلفية §12-Factor</a></td></tr>
+    <tr><td><code>$PATH</code></td><td>المجلدات التي يُبحث فيها عند كتابة أمر</td><td>«command not found» = الأداة ليست في PATH (أو غير مثبتة)</td></tr>
+    <tr><td><code>which node</code></td><td>أين مثبَّت هذا الأمر؟</td><td>أول ما يجب فحصه حين يبدو إصدار ما خاطئًا</td></tr>
+    <tr><td><code>source .env</code></td><td>حمّل ملف dotenv في الجلسة الحالية</td><td>الأسرار تبقى خارج Git — <a href="./version-control-ci-cd-deployment.html">قسم أسرار CI/CD</a></td></tr>
+  </tbody>
+</table>
+
+<h3>د. الأنابيب والبحث — القوة العظمى</h3>
+
+<p>فلسفة يونكس: أدوات صغيرة يفعل كل منها شيئًا واحدًا جيدًا، تُسلسل بـ<code>|</code>. مخرجات اليسار تغذي مدخلات اليمين:</p>
+
+<pre>cat server.log | grep "ERROR"    # only the error lines of a huge log
+history | grep docker            # that complex command you typed yesterday
+ps aux | grep node               # find processes without a GUI task manager</pre>
+
+<p>وللعثور على ملفات لا أسطر: <code>find . -name "*.env"</code> يبحث في الشجرة من حيث أنت، مصفّيًا بالاسم — تعرف أنه موجود، لا أين.</p>
+
+<p>هذه العادة الواحدة — <em>ابحث في السجل بـgrep بدل التمرير فيه</em> — هي أكبر ترقية تصحيح في الرفوف. وهي بالضبط ما يصفه <a href="../software-testing-and-debugging.html">الاختبار والتصحيح</a>: الأدلة قبل الفرضية.</p>
+
+<h3>هـ. الشبكات والوصول عن بُعد</h3>
+
+<table>
+  <thead><tr><th>الأمر</th><th>ماذا يفعل</th><th>سياق الرفوف</th></tr></thead>
+  <tbody>
+    <tr><td><code>curl -I https://api.example.com</code></td><td>اجلب الرؤوس فقط — هل النقطة النهائية حيّة، وما الحالة التي تعيدها؟</td><td><a href="./api-design.html">تصميم API</a> — اختبار العقود دون Postman</td></tr>
+    <tr><td><code>curl -X POST -H "Content-Type: application/json" -d '{"id":1}' localhost:3000/api</code></td><td>مارس نقطة نهاية مباشرة</td><td>أسرع طريقة لاختبار خلفيتك الخاصة</td></tr>
+    <tr><td><code>ssh user@host</code></td><td>سجّل الدخول إلى خادم لينكس بعيد بأمان</td><td>خوادم العملاء — <a href="../freelance-web-practice.html">ممارسة العمل الحر على الويب</a></td></tr>
+    <tr><td><code>scp</code> / <code>rsync</code></td><td>انسخ الملفات إلى/من آلة بعيدة</td><td>نشر بناء ثابت، وسحب نسخة احتياطية</td></tr>
+  </tbody>
+</table>
+
+<p><strong>مفاتيح SSH ومفهوم «البعيد».</strong> <code>ssh user@host</code> يفتح نفقًا آمنًا: الأوامر التي تكتبها تُنفَّذ <em>على الخادم</em> لا على حاسبك — <code>ls</code> يعرض ملفات الخادم، و<code>exit</code> يعيدك. تسجيل الدخول بكلمة مرور يعمل لكنه ضعيف ومرهق؛ المعيار هو <em>زوج مفاتيح SSH</em> — مفتاحك <strong>الخاص</strong> يبقى على حاسبك، ومفتاحك <strong>العام</strong> يُثبَّت على الخادم (أو على GitHub، من أجل <code>git push</code> عبر SSH). بمجرد إعداد ذلك، لا يحتاج تسجيل الدخول كلمة مرور. الاختصارات تعيش في <code>~/.ssh/config</code>، حيث يمكنك تعريف <code>ssh prod</code> ليعني المضيف والمستخدم والمنفذ الكاملين. العمق — تدوير المفاتيح، وإعادة توجيه الوكيل — يخص <a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a>؛ هنا تحتاج النموذج والعادة.</p>
+
+<h3>و. الأذونات — خط الأساس الأمني</h3>
+
+<table>
+  <thead><tr><th>الأمر</th><th>ماذا يفعل</th><th>سياق الرفوف</th></tr></thead>
+  <tbody>
+    <tr><td><code>chmod +x script.sh</code></td><td>اجعل النص البرمجي قابلًا للتنفيذ</td><td>نصوص النشر، ومساعدات CI</td></tr>
+    <tr><td><code>chmod 600 .env</code></td><td>ملف الأسرار مقروء منك وحدك</td><td>نظافة الأسرار — <a href="../security-and-threat-modeling.html">الأمن</a></td></tr>
+    <tr><td><code>sudo &lt;cmd&gt;</code></td><td>شغّل أمرًا كجذر</td><td>فقط لعمليات التثبيت على مستوى النظام؛ انظر القاعدة أدناه</td></tr>
+  </tbody>
+</table>
+
+<p><strong>القاعدة التي تنقذ الخوادم:</strong> لا تشغّل خادم Node/Python الخاص بك بـ<code>sudo</code> أبدًا. إذا اخترق التطبيق، يرث المهاجم الجذر ويملك الجهاز كله. شغّله كمستخدم بلا امتيازات؛ مدير العمليات أو المنصة يقوم بالأجزاء المميزة.</p>
+
+<h2 id="sec-docker-the-deployment-unit">دوكر — وحدة النشر</h2>
+
+<p><strong>النموذج الذهني في جملة واحدة:</strong> <strong>الصورة</strong> هي المخطط (وصفة: نظام تشغيل أساسي + وقت تشغيل + كودك + إعداد)، تُبنى مرة واحدة وتُنسَّخ إصداراتها؛ <strong>الحاوية</strong> هي عملية قيد التشغيل نُشئت من تلك الصورة، تُشغَّل كما تشاء عدة مرات. لا «تعدّل حاوية قيد التشغيل» أبدًا — بل تعيد بناء الصورة وتشغّل واحدة جديدة. تلك الجملة هي النموذج الذهني كله؛ كل ما عداها أدوات.</p>
+
+<table>
+  <thead><tr><th></th><th>الصورة</th><th>الحاوية</th></tr></thead>
+  <tbody>
+    <tr><td><strong>النوع</strong></td><td>المخطط — تُبنى مرة واحدة</td><td>العملية الحية — تُشغَّل مرات كثيرة</td></tr>
+    <tr><td><strong>دورة الحياة</strong></td><td>غير قابلة للتغيير، مُنسَّخة الإصدارات (<code>v1.2.0</code>)</td><td>زائلة — تموت وتُستبدل، ولا تُرقَّع في مكانها أبدًا</td></tr>
+    <tr><td><strong>التشبيه</strong></td><td>وصفة</td><td>وجبة صُنعت منها</td></tr>
+  </tbody>
+</table>
+
+<p><strong>الحاوية ليست جهازًا افتراضيًا.</strong> الجهاز الافتراضي يحاكي حاسبًا كاملًا — نواته الخاصة، وجيجابايتات، ودقائق للإقلاع. الحاوية عملية <em>مغلفة ومعزولة</em> تشارك نواة لينكس للمضيف (عبر cgroups وnamespaces)، تبدأ في ميلي ثانية وتستهلك ما تحتاجه العملية فقط. الأجهزة الافتراضية تفترض العتاد؛ الحاويات تفترض نظام التشغيل. لهذا الحاويات هي وحدة النشر الافتراضية للويب الحديث، ولهذا يسرد جدول القطع الأثرية في وثيقة CI/CD <em>صور الحاويات الموقَّعة</em> كالخيار الحديث.</p>
+
+<p><strong>لماذا وُجد كل هذا — «اشتغل على جهازي».</strong> تطبيقك يعتمد على إصدار Node محدد، ومكتبات نظام تشغيل محددة، ومتغيرات بيئة محددة؛ جهاز زميلك وخادم الإنتاج لديهما إصدارات مختلفة. الصورة تجمّد التركيبة الرابحة — نفس نظام التشغيل الأساسي ووقت التشغيل والكود والإعداد في كل بيئة — فيتحول «اشتغل على جهازي» إلى «اشتغل في هذه الصورة»، والصورة متطابقة في كل مكان. هذا هو السبب الكامل للحاويات.</p>
+
+<p><strong>ملف Dockerfile — الوصفة التي تبني صورة.</strong> ملف Dockerfile وصفة خطوة بخطوة؛ كل سطر خطوة، والنتيجة صورة. نادرًا ما تكتب واحدًا من الصفر، لكنك ستقرؤها باستمرار، فتعرف التعليمات الأربع التي تعمل كل العمل:</p>
+
+<pre>FROM node:20-alpine        # the base image you build on top of
+WORKDIR /app               # the working directory inside the image
+COPY package*.json ./      # copy files from your machine into the image
+RUN npm ci                 # run a command during the build (install deps)
+COPY . .                   # copy the rest of the app
+CMD ["npm", "start"]       # the command that runs when the container starts</pre>
+
+<p><strong>Docker Compose — وصفة بيئتك المحلية كلها.</strong> <code>docker-compose.yml</code> ملف YAML يصف عدة حاويات وكيف تتصل — تطبيقك، وقاعدة بيانات، وكاشًا — فيرفع أمر واحد المكدس كله. هكذا تحصل على Postgres وRedis محليين للتطوير بدل تثبيتهما أصليًا على حاسبك:</p>
+
+<pre>services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: dev
+    ports:
+      - "5432:5432"          # host port : container port (see the ports table)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:</pre>
+
+<p><code>docker compose up</code> يشغّل كل ما يصفه الملف؛ <code>docker compose down</code> يوقفه ويزيله. حين تستنسخ مستودعًا فيه أحد هذه الملفات، لا تثبّت قاعدة بيانات يدويًا — تقرأ الملف لترى ما يحتاجه المشروع، ثم <code>docker compose up</code>. النموذج الذهني مثل نموذج Dockerfile: وصفة تصريحية تقرؤها وتشغّلها، لا تسلسلًا ترتجله.</p>
+
+<p><strong>تعيين المنافذ وتركيب وحدات التخزين — العلمان اللذان ستراهما في كل مكان.</strong> للحاوية نطاق شبكة خاص بها: <code>-p 3000:3000</code> (أو <code>ports:</code> في Compose) يعيّن المنفذ 3000 على جهازك إلى المنفذ 3000 داخل الحاوية — بدونه لا يستطيع متصفحك الوصول إلى خادم الويب في الحاوية. نظام ملفات الحاوية زائل — كل ما كُتب داخلها يُفقد عند توقفها — لذا <code>-v ./src:/app/src</code> (أو <code>volumes:</code>) يركّب مجلدًا من جهازك داخل الحاوية، وهكذا تطوّر <em>داخل</em> حاوية بملفاتك المتزامنة مباشرة.</p>
+
+<h3>المنافذ الشائعة — الأرقام خلف كل خدمة</h3>
+
+<p><em>المنفذ</em> رقم يعرّف خدمة واحدة على آلة. آلة واحدة تشغّل خدمات عدة في آنٍ — خادم الويب على 3000، وقاعدة البيانات على 5432، والكاش على 6379 — ونظام التشغيل يوجّه الحركة إلى الصحيح عبر رقم المنفذ. حين تلتقط خدمتان المنفذ نفسه تحصل على <code>EADDRINUSE</code> (مثال المنفذ الشبح أدناه).</p>
+
+<table>
+  <thead><tr><th>المنفذ</th><th>الخدمة</th><th>ما هي</th></tr></thead>
+  <tbody>
+    <tr><td>80</td><td>HTTP</td><td>حركة ويب غير مشفرة</td></tr>
+    <tr><td>443</td><td>HTTPS</td><td>حركة ويب مشفرة</td></tr>
+    <tr><td>22</td><td>SSH</td><td>تسجيل دخول عن بُعد</td></tr>
+    <tr><td>3000</td><td>خادم التطوير (اصطلاح)</td><td>خادم تطوير React/Next.js/Express</td></tr>
+    <tr><td>5432</td><td>PostgreSQL</td><td>منفذ Postgres الافتراضي</td></tr>
+    <tr><td>3306</td><td>MySQL</td><td>منفذ MySQL الافتراضي</td></tr>
+    <tr><td>6379</td><td>Redis</td><td>منفذ Redis الافتراضي</td></tr>
+    <tr><td>27017</td><td>MongoDB</td><td>منفذ MongoDB الافتراضي</td></tr>
+    <tr><td>8080</td><td>HTTP (بديل)</td><td>شائع لخوادم الويب عبر وكيل</td></tr>
+  </tbody>
+</table>
+
+<p><strong>الوصلة بخط الأنابيب:</strong> CI الخاص بك يشغّل الاختبارات، ويبني الصورة، ويوسمها، ويدفعها إلى سجل؛ استراتيجيات النشر (التدريجي، والأزرق-الأخضر، والكناري) هي فقط «أي نسخة من الصورة تستقبل الحركة». تبني <strong>مرة واحدة</strong> في CI وتروّج نفس الصورة بالضبط عبر التدريج إلى الإنتاج — لا تعيد البناء لكل بيئة أبدًا. هذه قاعدة «ابنِ مرةً وروّج كثيرًا»، وموطنها <a href="./version-control-ci-cd-deployment.html">CI/CD والنشر</a>؛ هذه الوثيقة تسمّي المفهوم فقط كي يقرأ خط الأنابيب كشيء حقيقي.</p>
+
+<p><strong>تشغيل مكدسك يومًا بيوم:</strong> <code>docker compose up</code> للبيئة المحلية، وثلاثة أوامر تصحيح، محفوظة:</p>
+
+<table>
+  <thead><tr><th>الأمر</th><th>ماذا يفعل</th></tr></thead>
+  <tbody>
+    <tr><td><code>docker ps</code></td><td>ما الحاويات قيد التشغيل الآن؟</td></tr>
+    <tr><td><code>docker logs &lt;container_id&gt;</code></td><td>اقرأ مخرجات حاوية — سجل أخطائك يعيش هنا</td></tr>
+    <tr><td><code>docker exec -it &lt;id&gt; /bin/sh</code></td><td>افتح صدفة داخل الحاوية لفحص نظام ملفاتها</td></tr>
+  </tbody>
+</table>
+
+<p><strong>تجاهل بأمان:</strong> ملفات Dockerfile متعددة المراحل مضبوطة لتطبيقات قديمة، والتحسين الدقيق لطبقات الصور، ودواخل شبكات الحاويات. إذا كنت تقرأ ملف Dockerfile بسيطًا وتشغّل compose، فلديك المعرفة التي تتطلبها هذه الرفوف.</p>
+
+<h2 id="sec-kubernetes-orchestration-literacy">Kubernetes — معرفة التنسيق</h2>
+
+<p>Kubernetes (K8s) هو «نظام تشغيل مركز البيانات»: يأخذ صور الحاويات ويقرر أين تعمل، وكم نسخة توجد، وكيف تصلها الحركة. شبه مؤكد أنك <strong>لن تدير عنقودًا أبدًا</strong> — المنصات المدارة وتحذيرات التصميم المعماري تكفل ذلك — لكن البدائيات تظهر باستمرار في إعلانات الوظائف ووثائق المنصات ومحادثات المعمارية. ثلاثة أسماء تكفي:</p>
+
+<table>
+  <thead><tr><th>البدائية</th><th>ما هي</th><th>نموذج ذهني في سطر</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Pod</strong></td><td>أصغر وحدة قابلة للنشر: حاوية واحدة أو بضع حاويات تشترك في هوية شبكية</td><td>«حاوية قيد التشغيل (أو اثنتان مترابطتان بإحكام)، بعنوان IP»</td></tr>
+    <tr><td><strong>Deployment</strong></td><td>الحالة المرغوبة التصريحية: كم نسخة Pod، وأي إصدار صورة، وكيف تُدرج التحديثات</td><td>«أريد 3 نسخ من الصورة v1.2.0، وأريدهن أن يُستبدلن دون توقف»</td></tr>
+    <tr><td><strong>Service</strong></td><td>اسم ثابت وموازن تحميل أمام مجموعة Pods</td><td>«الـPods تموت؛ هذا الاسم يستمر بالعمل أيهما أجاب»</td></tr>
+  </tbody>
+</table>
+
+<p>الصلة بين الثلاثة: <strong>Deployment ينشئ Pods</strong>، و<strong>Service يوجّه الحركة إلى الـPods الصحية</strong> خلفه — هذه السلسلة هي كل التوصيلات. حين تقول منصة «انشر Deployment مع Service»، يمكنك الآن أن ترى الشيء: ثلاث حاويات زائلة خلف عنوان ثابت. هذا هو معيار المعرفة كله. اللحظة التي يقترح فيها أحدهم تشغيل Kubernetes <em>بنفسك</em>، تذكّر تحذير الرفوف نفسه — <a href="./system-design.html">التصميم المعماري</a> يسرد «Kafka + Kubernetes + Istio لفريق CRUD من ثلاثة أشخاص» كمبالغة معيارية. إدارة العناقيد مهنة لا مهارة؛ أنت مرخّص أن تومئ وتؤجل.</p>
+
+<h2 id="sec-cloud-the-three-eras-of-renting-compute">السحابة — العصور الثلاثة لاستئجار الحوسبة</h2>
+
+<p>منذ أطلقت AWS خدمتَي S3 وEC2 في 2006 (<a href="./cs-and-software-engineering.html">تاريخ علوم الحاسوب وهندسة البرمجيات</a>)، أصبحت الحوسبة قابلة للاستئجار بالدقيقة بدل شرائها كعتاد. ثلاثة عصور من هذا الاستئجار تحدّد كل هدف نشر ستختار منه — كل عصر يستأجر طبقة أعلى في المكدس:</p>
+
+<table>
+  <thead><tr><th>العصر</th><th>تستأجر</th><th>تدير</th><th>أمثلة</th><th>القيد الذي يفرضه</th></tr></thead>
+  <tbody>
+    <tr><td><strong>IaaS</strong><br>البنية التحتية كخدمة</td><td>أجهزة افتراضية</td><td>نظام التشغيل ووقت التشغيل والتطبيق</td><td>AWS EC2 وDigitalOcean وAzure VMs</td><td>تحكم كامل، وعبء تشغيل كامل — أنت المسؤول</td></tr>
+    <tr><td><strong>PaaS / مُدار</strong><br>المنصة كخدمة</td><td>وقت التشغيل أو قاعدة البيانات</td><td>تطبيقك فقط (ومخططك)</td><td>Heroku وVercel وRender وAWS RDS وNeon وSupabase</td><td>ادفع الكود، تشغّله المنصة — الإعداد يحل محل الإدارة</td></tr>
+    <tr><td><strong>Serverless / الحافة</strong><br>التنفيذ كخدمة</td><td>التنفيذ نفسه</td><td>منطق دالتك فقط</td><td>AWS Lambda وCloudflare Workers وVercel Edge Functions</td><td>يصغر إلى الصفر عند الخمول — وكودك يجب أن يتحمّل ذلك</td></tr>
+  </tbody>
+</table>
+
+<p><strong>كيف تقيّد السحابة هندسة الخلفية:</strong> العصر البلا-خادم يفرض أن تكون حلقة الطلب <strong>بلا حالة</strong>. الطلب التالي قد يصيب حاوية مختلفة بدأت باردة — فلا يمكن أن تعيش الجلسات والكاش في الذاكرة المحلية. <a href="../backend-engineering.html">هندسة الخلفية</a> تصوغ العقد بدقة: «الكاش في الذاكرة أصبح رهان بدء بارد. اللاحالة تتوقف عن كونها خيارًا وتصبح العقد». يجب أن تعيش الحالة في قاعدة بيانات أو كاش خارجي (Redis). PaaS يخفيها عنك؛ Serverless يفرضها عليك؛ معرفة الفرق هو غرض خريطة العصور.</p>
+
+<p><strong>الحافة وجاذبية البيانات:</strong> قراءة قاعدة بيانات في us-east-1 من مستخدم في طوكيو تدفع عقوبة فيزيائية — سرعة الضوء — ولهذا تدفع شبكات CDN والحوسبة الطرفية العمل إلى حيث المستخدمون. النمط الحديث ينقل الحوسبة <em>إلى البيانات</em>. العمق (ميزانيات زمن الاستجابة، والاتساق عبر الحواف، وكائنات دائمة) يخص <a href="./system-design.html">التصميم المعماري</a>؛ عمل هذه الوثيقة فقط أن تجعل «الحافة» تعني «أقرب إلى المستخدم، لأن الفيزياء».</p>
+
+<h2 id="sec-where-does-your-code-run-one-map">أين يعمل كودك — خريطة واحدة</h2>
+
+<p>أقسام الطرفية ودوكر والسحابة ثلاث رؤى لسلم واحد. كل بيئة أدناه مكان يعمل فيه كودك، بمدخل مختلف، وفشل شائع مختلف، ورد فعل تصحيح مختلف — تعلّم السلم كي يحصل تقرير «يعمل محليًا» دائمًا على المتابعة: <em>أين؟</em></p>
+
+<table>
+  <thead><tr><th>البيئة</th><th>أين تعمل</th><th>كيف تدخل</th><th>الفشل الشائع</th><th>صَحِّح بـ</th></tr></thead>
+  <tbody>
+    <tr><td><strong>التطوير المحلي</strong></td><td>حاسبك</td><td><code>npm run dev</code> + المتصفح</td><td>تعارض منافذ، و<code>.env</code> ناقص</td><td><code>lsof</code>/<code>kill</code>، و<code>cat .env</code>، ووحدة تحكم المتصفح</td></tr>
+    <tr><td><strong>تطوير دوكر</strong></td><td>حاويات على حاسبك</td><td><code>docker compose up</code> + المتصفح</td><td>تعيين منافذ خاطئ، وحاوية قاعدة بيانات ميتة</td><td><code>docker ps</code>، و<code>docker logs</code>، و<code>docker exec</code></td></tr>
+    <tr><td><strong>التدريج</strong></td><td>خادم/حاوية سحابية</td><td>المتصفح؛ وSSH للخادم</td><td>متغيرات بيئة خاطئة، وأسرار ناقصة</td><td>SSH + سجلات <code>tail -f</code>، و<code>curl</code> لنقطة النهاية الصحية</td></tr>
+    <tr><td><strong>الإنتاج</strong></td><td>خادم/حاوية/CDN سحابية</td><td>المتصفح، ولوحة المراقبة</td><td>كل ما سبق، زائد الحركة والحجم</td><td>السجلات والمقاييس والآثار — مكدس المراقبة</td></tr>
+  </tbody>
+</table>
+
+<p>لاحظ منطق السلم: كل درجة لأعلى تُبقي نفس الكود، ونفس <em>الصورة</em>، لكن تغيّر من يشغّلها وكيف تراها. تلك هي العلاقة كلها بين هذه الوثيقة و<a href="./system-design.html">التصميم المعماري</a> — أنت تختار الدرجات؛ هذه الوثيقة تعطيك الخريطة.</p>
+
+<h2 id="sec-worked-example-the-ghost-port">مثال عملي — المنفذ الشبح</h2>
+
+<p>أكثر أخطاء التطوير المحلي شيوعًا في الوجود: <code>EADDRINUSE</code>. تعيد تشغيل خادمك فيكون المنفذ محجوزًا بعملية نسيتها. رد فعل الخبير، في أربعة أوامر:</p>
+
+<pre>$ npm run dev
+Error: listen EADDRINUSE: address already in use :::3000
+
+$ lsof -i :3000
+COMMAND  PID   USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+node     4821  me     21u  IPv4 12345      0t0  TCP *:3000 (LISTEN)
+
+$ kill -9 4821
+
+$ npm run dev      # works</pre>
+
+<p>هذا هو النمط كله، ويعمّم على كل جلسة تصحيح في الرفوف: <strong>اقرأ الخطأ ← اعثر على الدليل (سجل، عملية، منفذ) ← تصرّف على ما يسميه الدليل بالضبط ← تحقق</strong>. المبتدئ ينقر في الـIDE؛ الخبير يفتح الطرفية، ويلاحق السجل، ويبحث عن الخطأ بـgrep، ويجد الـPID، ويقتله. هذه هي العادة التي تصوغها <a href="../software-testing-and-debugging.html">الاختبار والتصحيح</a> رسميًا — الطرفية هي فقط حيث يعيش الدليل.</p>
+
+<h2 id="sec-worked-example-i-just-cloned-a-repo">مثال عملي — لقد استنسخت مستودعًا للتو</h2>
+
+<p>الطقس اليومي الآخر: زميل يسلّمك رابط مستودع وتحتاج تشغيله. السلم كله في جلسة واحدة — قراءة ملفات ومتغيرات بيئة وDocker Compose دفعة واحدة:</p>
+
+<pre>$ git clone https://github.com/team/project.git
+$ cd project
+$ cat README.md            # setup instructions usually live here
+$ cat package.json         # check the Node version and the start script
+$ npm install
+$ cp .env.example .env     # create your env file from the template
+$ npm run dev
+Error: connect ECONNREFUSED 127.0.0.1:5432
+$ docker compose up -d     # the database (port 5432, see the ports table) isn't running
+$ npm run dev              # works</pre>
+
+<p>النمط نفسه، درجة واحدة إلى أسفل السلم: الخطأ يسمّي عنوانًا (<code>127.0.0.1:5432</code>)، تقرأ <code>docker-compose.yml</code> في المستودع لترى ما يجب أن يملك ذلك المنفذ، تشغّله، تتحقق. ما الذي <em>تغيّر</em> بين المحاولة الأولى والثانية؟ لا شيء في الكود — فقط البيئة التي يعمل فيها الكود. تلك هي الركيزة.</p>
+
+<h2 id="sec-the-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
+
+<table>
+  <thead><tr><th>العَرَض</th><th>السبب</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td><code>command not found</code></td><td>الأداة غير مثبتة، أو ليست في <code>$PATH</code></td><td><code>echo $PATH</code>؛ ثبّت عبر npm/مدير حزم النظام؛ شغّل المسار الكامل أو <code>npx</code></td></tr>
+    <tr><td><code>permission denied</code></td><td>وضع الملف أو مستخدم خاطئ</td><td><code>chmod</code>/<code>chown</code>؛ تحقق أي مستخدم أنت (<code>whoami</code>)؛ استخدم <code>sudo</code> فقط لعمليات التثبيت على مستوى النظام</td></tr>
+    <tr><td>المنفذ قيد الاستخدام</td><td>عملية شبحية من تشغيل سابق</td><td><code>lsof -i :PORT</code> ثم <code>kill</code> — المثال العملي</td></tr>
+    <tr><td>عالق في Vim</td><td>أوامر محرر مجهولة</td><td><code>Esc</code>، ثم <code>i</code> للإدراج، ثم <code>:wq</code> للحفظ والخروج — أو فقط استخدم <code>nano &lt;file&gt;</code>، المحرر اللطيف، حتى ترتاح. ثم عد إلى VS Code؛ هذا هو كورس Vim كله</td></tr>
+    <tr><td>تعديل الإنتاج</td><td>لا إعداد محلي/تدريج</td><td>أبدًا. طوّر محليًا، واشحن عبر خط الأنابيب — <a href="./version-control-ci-cd-deployment.html">CI/CD</a> وُجد ليجعل هذا غير ضروري</td></tr>
+    <tr><td><code>sudo npm install</code> / <code>sudo node app.js</code></td><td>تشغيل أوامر التطبيق كجذر</td><td>لا تشغّل الخادم كجذر أبدًا؛ أصلح أذونات الملفات بدلًا من ذلك، ودع مدير العمليات أو المنصة تملك الامتيازات</td></tr>
+    <tr><td><code>rm -rf</code> في مجلد خاطئ</td><td>لا يوجد تراجع</td><td><code>pwd</code> قبل الأوامر المدمرة؛ أبقِ الكود في Git كي يكون نصف قطر الانفجار أمرًا واحدًا، لا مسيرتك المهنية</td></tr>
+    <tr><td>إعادة بناء الصور لكل بيئة</td><td>سوء فهم القطعة الأثرية</td><td>ابنِ مرة، وسِم، وروّج نفس الصورة — قسم دوكر وجدول القطع الأثرية في CI/CD</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الملخص — قائمة الفحص الذهنية الكاملة</h2>
+
+<p>اطبعها. إنها الوثيقة كلها في أحد عشر سطرًا:</p>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>الطرفية هي الواجهة الخام؛ لينكس هو المضيف الشامل. ~20% منها تحل 99% من المشاكل.</td></tr>
+    <tr><td>2</td><td>قبل أي شيء مدمر: <code>pwd</code>. لا <code>rm -rf</code> أبدًا دون أن تعرف أين أنت.</td></tr>
+    <tr><td>3</td><td>منفذ عالق؟ <code>lsof -i :3000</code> ← <code>kill -9 &lt;PID&gt;</code> ← أعد التشغيل.</td></tr>
+    <tr><td>4</td><td>الإعداد يعيش في متغيرات البيئة: <code>export</code>، و<code>source .env</code>، وإن غابت أداة فاشتبه في <code>$PATH</code>.</td></tr>
+    <tr><td>5</td><td>السجلات قبل الإصلاحات: <code>cat log | grep "ERROR"</code> يهزم التمرير في كل مرة.</td></tr>
+    <tr><td>6</td><td>اختبر النقاط النهائية بـ<code>curl</code>؛ واصِل الآلات البعيدة بـ<code>ssh</code>/<code>scp</code>.</td></tr>
+    <tr><td>7</td><td>لا تشغّل خادم ويب بـ<code>sudo</code> أبدًا. <code>chmod 600</code> لملفات أسرارك.</td></tr>
+    <tr><td>8</td><td>الصورة مخطط يُبنى مرة واحدة؛ الحاوية عملية تُشغَّل مرات كثيرة. الحاوية ليست جهازًا افتراضيًا.</td></tr>
+    <tr><td>9</td><td>الـPods تعمل، والـDeployments تعلن، والـServices تسمّي. تقرأ Kubernetes؛ لا تديره.</td></tr>
+    <tr><td>10</td><td>عصور السحابة الثلاثة: IaaS تستأجر آلات، وPaaS تستأجر أوقات تشغيل، وServerless يستأجر التنفيذ — والبلا-خادم يجعل اللاحالة عقدًا.</td></tr>
+    <tr><td>11</td><td>الحافة موجودة بسبب الفيزياء: تنتقل الحوسبة إلى البيانات حين يهم زمن الاستجابة.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<section class="cite">
+  <strong>المصادر الأولية ←</strong>
+  <a href="https://docs.docker.com/get-started/">دوكر — Get Started (الصور مقابل الحاويات)</a> ·
+  <a href="https://kubernetes.io/docs/concepts/">Kubernetes — Core Concepts (Pods وDeployments وServices)</a> ·
+  <a href="https://man7.org/linux/man-pages/">man7.org — صفحات دليل لينكس (lsof وchmod وssh…)</a> ·
+  <a href="https://tldr.inbrowser.app/">صفحات TLDR — ملخصات أوامر عملية</a> ·
+  <a href="https://aws.amazon.com/what-is-cloud-computing/">AWS — ما هي الحوسبة السحابية؟</a> ·
+  <a href="https://12factor.net/config">تطبيق العوامل الاثني عشر — الإعداد واللاحالة</a>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«امشِ معي عبر آخر مرة شُخِّص فيها انقطاع إنتاج من الطرفية — أي الأوامر أخبرتك بما هو الخطأ، وبأي ترتيب؟»</li>
+    <li>«أرِني ملف Dockerfile لمشروع حقيقي واشرح كل سطر — ثم أخبرني متى لن تلجأ إلى دوكر إطلاقًا.»</li>
+    <li>«إذا نشرت التطبيق نفسه على Heroku وVercel Functions وصندوق EC2، ما المختلف في كودي وإعدادي وتصحيحي على كلٍّ منها؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · الطرفية وطبقة النشر — البنية التي تقوم عليها كل وثيقة</span>
+  <span>المشهد: <a href="./system-design.html">التصميم المعماري</a> · التسليم: <a href="./version-control-ci-cd-deployment.html">CI/CD والنشر</a> · وقت التشغيل: <a href="../backend-engineering.html">هندسة الخلفية</a> · المصطلحات: <a href="./glossary.html">مصطلحات مشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>
