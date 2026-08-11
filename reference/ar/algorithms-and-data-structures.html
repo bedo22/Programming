@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخوارزميات وهياكل البيانات — عدة الحلول</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">الرف المرجعي · الويب الحقيقي</p>
+  <h1>الخوارزميات وهياكل البيانات — عدة الحلول</h1>
+  <p class="meta">لمن؟ للمطوّر الذي يجب أن يحل المشكلات أمام لوحة المفاتيح، لا أن يميّزها فقط.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../algorithms-and-data-structures.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يتناسب هذا.</strong> <a href="./problem-solving.html">Problem-Solving</a> يعلّم <em>متى</em> — مراحل بوليا، واختيار النموذج، وقراءة الإشارة. هذه الوثيقة تعلّم <em>ماذا وكيف</em>: ما خريطة التجزئة تحت الغطاء، وكيف يعمل BFS فعلًا، وقالب البحث الثنائي الذي لا يخطئ أبدًا بواحد. وثيقة رف واحدة لكل سؤال: Problem-Solving هو التفكير؛ وهذه هي عدة الحلول التي يمدّ إليها التفكير يده.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│               THE THINKING (Problem-Solving)                   │
+│   understand → plan → execute → look back                     │
+│   paradigm selection: "which family does this problem call?"  │
+└───────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│               THE TOOLKIT (this doc)                           │
+│   hash map, stack, queue, heap, trie, graph, tree             │
+│   BFS/DFS/Dijkstra/union-find, sort, binary search, DP        │
+│   ── what they are, how they work, the templates ──           │
+└───────────────────────────────────────────────────────────────┘
+   HackerRank doesn't test whether you recognize the problem;
+   it tests whether you can implement the solution, correctly,
+   the first time, in forty minutes.
+</pre>
+  <p><strong>الجيران على الرف:</strong> <a href="./problem-solving.html">Problem-Solving</a> (متى تستخدم ماذا — الوثيقة المرافقة) · <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> (نظرية التعقيد، جانب البرهان) · <a href="./javascript-the-language.html">JavaScript: The Language</a> (اللغة التي كُتبت بها القوالب) · <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> (الفهارس أشجار B؛ وخطط الاستعلام تحليل خوارزميات) · <a href="./system-design.html">System Design</a> (الهياكل نفسها على نطاق واسع)</p>
+</blockquote>
+
+<section class="recap">
+  <p><strong>لماذا توجد هذه الوثيقة منفصلة.</strong> كل شيء آخر على الرف يفترض أنك تستطيع التنفيذ؛ وProblem-Solving يتوقف عمدًا عند <em>اختيار</em> التقنية. بين «استخدم خريطة تجزئة للعدّ» و«العدّ صحيح من المحاولة الأولى، في O(n)، مع معالجة المصفوفة الفارغة» توجد مجموعة كاملة من القوالب والحالات الحدّية والمفاضلات — تلك المجموعة هي هذه الوثيقة. إنها عدة حلول لا كتابًا دراسيًا: كل هيكل يحصل على ما هو، ولماذا، ومتى، وقالب عمل. نظرية أصناف التعقيد تعيش في CS &amp; Software Engineering؛ وطرق تعليم التعرّف تعيش في Problem-Solving؛ والكود يعيش هنا.</p>
+</section>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<ul>
+  <li><strong>لاجتياز شاشة HackerRank/LeetCode:</strong> اقرأ <a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>–<a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a> (الهياكل + الرسم البياني + العودية + الفرز/البحث)، ثم دَرِّب القوالب حتى تُكتب من الذاكرة — قالب البحث الثنائي (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a>)، وقالب BFS (<a href="#sec-graphs-the-model-of-connections">§٦</a>)، وقالب النافذة المنزلقة (<a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>). ثم استخدم ورقة التذكّر (<a href="#sec-pattern-recognition-cheat-sheet-signal-technique">§١١</a>) لتدرّب <em>التعرّف</em>، وهي المهارة التي تفسد أولًا.</li>
+  <li><strong>لفهم قاعدة كود إنتاجية:</strong> <a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>–<a href="#sec-trees-and-heaps-the-hierarchies">§٤</a> هي الخريطة — معظم الكود الواقعي مصفوفات وخرائط تجزئة وأشجار، مستخدمةً جيدًا. الأنماط هنا (top-K، المؤشران، النافذة المنزلقة) تظهر في واجهات برمجة حقيقية أكثر مما تظهر في مسائل المقابلات.</li>
+  <li><strong>كمرجع:</strong> جدول أنماط الفشل (<a href="#sec-failure-modes-the-edge-case-checklist">§١٣</a>) هو قائمة الفحص التي تُشغَّل بعد حل أي شيء — أغلب العلامات المفقودة حالات حدّية، لا خوارزميات ناقصة.</li>
+  <li><strong>القاعدة:</strong> نفّذ أولًا، وحسّن بعد ذلك. إجابة O(n²) صحيحة تنجح؛ وإجابة O(n log n) خاطئة لا تنجح. القوة الغاشمة خطة صالحة للمرحلة 2 (قاعدة Problem-Solving، مطبَّقة هنا).</li>
+</ul>
+
+<h2 id="sec-complexity-the-quick-review">التعقيد — المراجعة السريعة</h2>
+
+<p>النظرية الكاملة تعيش في <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a>؛ والنسخة العملية:</p>
+
+<table>
+<thead><tr><th>الصنف</th><th>المعنى</th><th>القاعدة العملية التقريبية</th></tr></thead>
+<tbody>
+<tr><td><strong>O(1)</strong></td><td>ثابت — بحث تجزئة، فهرسة مصفوفة</td><td>فوري؛ الهدف المنشود للبحث</td></tr>
+<tr><td><strong>O(log n)</strong></td><td>تنصيف — بحث ثنائي، عمليات الأشجار المتوازنة</td><td>n = مليون ← ~20 خطوة. المفاجأة: شبه مجاني</td></tr>
+<tr><td><strong>O(n)</strong></td><td>مرور واحد</td><td>n = مليون ← مليون خطوة؛ أمر مقبول</td></tr>
+<tr><td><strong>O(n log n)</strong></td><td>الفرز، التقسيم والغزو</td><td>السقف الافتراضي للحلول «الجيدة»</td></tr>
+<tr><td><strong>O(n²)</strong></td><td>حلقات متداخلة</td><td>n = 1,000 ← مليون خطوة (مقبول)؛ n = 100,000 ← كارثة</td></tr>
+<tr><td><strong>O(2ⁿ), O(n!)</strong></td><td>أُسّي</td><td>فقط عند n ≤ 20 (بحث بالقوة الغاشمة، التباديل)</td></tr>
+</tbody>
+</table>
+
+<p><strong>التحليل المطفأ — الفكرة الوحيدة المفاجئة:</strong> عملية تكون مكلفة أحيانًا تُقاس <em>معدَّلةً على مدى استدعاءات كثيرة</em>. الدفع إلى مصفوفة ديناميكية هو «O(1) مطفأ»: معظم الإضافات O(1)، وإعادة الحجم العرضية (المضاعفة) O(n)، لكن المضاعفة تعني أن كل عنصر يُنسخ على الأكثر ~log n مرة — لذا يكون المتوسط ثابتًا. حين «يبدو» حل ما O(n²) لكنه ينجح، فغالبًا أنت تنظر إلى سلوك مطفأ (مثلًا سلسلة تُبنى بـ <code>+=</code> في حلقة، أو مسح بمؤشرين يدخل فيه كل عنصر مرة واحدة).</p>
+
+<p><strong>مفاضلة الفضاء والزمن:</strong> كل خدعة «سريعة» تقريبًا تشتري وقتًا بذاكرة — خرائط التجزئة تخزّن النتائج، وجداول البرمجة الديناميكية تخزّن الحالات، والمجاميع البادئة تحسب النطاقات مسبقًا. حين تقول المسألة «يجب أن تكون O(n)» وتعلق، السؤال الذي تسأله: «ما الذي يمكنني أن أتذكّره؟»</p>
+
+<h3>التعقيد في JavaScript — العمليات التي تكذب</h3>
+
+<table>
+<thead><tr><th>عملية JS</th><th>الكلفة</th><th>المصيدة</th></tr></thead>
+<tbody>
+<tr><td><code>Map</code>/<code>Set</code> <code>get/set/has/delete/add</code></td><td>O(1) متوسط</td><td>دلالات مفاتيح حقيقية — هذه هي الخريطة؛ الكائن العادي ليس كذلك</td></tr>
+<tr><td><code>arr[i]</code>, <code>arr.push/pop</code></td><td>O(1)</td><td>المسار السريع في قسم الـ 80% — استخدم نهاية المصفوفة</td></tr>
+<tr><td><code>arr.shift()</code>/<code>unshift()</code></td><td>O(n)</td><td>يعيد فهرسة المصفوفة كلها — استخدم مؤشر فهرس (<a href="#sec-graphs-the-model-of-connections">§٦</a>) أو قائمة انتظار حقيقية</td></tr>
+<tr><td><code>arr.sort()</code></td><td>O(n log n)</td><td>مستقر منذ ES2019 — الفرز الافتراضي؛ نفّذ quicksort فقط حين تكون المسألة هي الفرز</td></tr>
+<tr><td><code>arr.indexOf/includes/splice</code></td><td>O(n)</td><td>عضوية المصفوفة مسح — <code>Set</code> يجعلها O(1)</td></tr>
+<tr><td><code>obj[key]</code></td><td>O(1)، لكن…</td><td>الإكراه إلى سلسلة (<code>obj[1]</code> ≡ <code>obj["1"]</code>) وتسريب مفاتيح النموذج الأولي — الكائنات العادية ليست خرائط (<a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>)</td></tr>
+<tr><td><code>s += ch</code> في حلقة</td><td>O(n²) إجمالًا</td><td>السلاسل غير قابلة للتعديل؛ كل <code>+=</code> تنسخ — ابنِ مصفوفة واستخدم <code>join()</code></td></tr>
+<tr><td>حساب <code>BigInt</code></td><td>أبطأ من <code>Number</code></td><td>فقط فوق 2^53؛ خلط <code>BigInt</code> مع <code>Number</code> يرمي خطأً</td></tr>
+</tbody>
+</table><h2 id="sec-arrays-strings-and-hashing-the-80">المصفوفات والسلاسل والتجزئة — الـ 80%</h2>
+
+<p>معظم مسائل المقابلات — ومعظم كود الإنتاج — هي هذه الهياكل الثلاثة. أتقن هذا القسم وستجتاز غالبية المسائل السهلة وكثيرًا من المتوسطة.</p>
+
+<h3>خرائط التجزئة والمجموعات — كيف يعمل O(1) فعلًا</h3>
+
+<ul>
+  <li><strong>الدواخل:</strong> يُجزَّأ المفتاح إلى دلو؛ تُعالَج التصادمات بالتسلسل (قائمة لكل دلو) أو بالعنونة المفتوحة. ادعاء O(1) يعتمد على بقاء معامل التحميل (المفاتيح ÷ الأدلاء) منخفضًا — لهذا تتغيّر أحجام خرائط التجزئة <em>حين تمتلئ</em>.</li>
+  <li><strong>حين يتدهور O(1) إلى O(n):</strong> مفاتيح عدائية تُجزَّأ كلها في دلو واحد (هجوم معروف — بعض اللغات تعشّي التجزئة)، أو — في JS — الفخ الكلاسيكي باستخدام <em>كائن</em> كخريطة، فتحصل على تلوث النموذج الأولي أو مفاتيح مكرَهة إلى سلاسل (<code>obj[1]</code> و<code>obj["1"]</code> هما المفتاح نفسه). استخدم <code>Map</code>/<code>Set</code> لدلالات مفاتيح حقيقية.</li>
+  <li><strong>النمط الذي يربح المسائل:</strong> «count occurrences» (خريطة تكرارات)، و«هل رأيت هذا من قبل؟» (مجموعة seen)، و«بحث المكمِّل» (عائلة two-sum: خزّن <code>target - current</code> وتحقّق منه في المرة التالية).</li>
+</ul>
+
+<h3>المؤشران — القالب</h3>
+
+<pre><code>// sorted array: find the pair summing to target
+let lo = 0, hi = arr.length - 1;
+while (lo &lt; hi) {
+  const sum = arr[lo] + arr[hi];
+  if (sum === target) return [lo, hi];
+  sum &lt; target ? lo++ : hi--;
+}
+return null;</code></pre>
+
+<p><strong>متى ينطبق:</strong> مصفوفات مرتبة (مجاميع أزواج، إزالة التكرار، عائلات three-sum)، فحوصات المتناظرات، «عكس في المكان». الثابت: المؤشران يتحركان في اتجاه واحد فقط، فالعملكلّي O(n) — كل عنصر يُزار مرتين على الأكثر.</p>
+
+<h3>النافذة المنزلقة — القالب</h3>
+
+<pre><code>// longest substring with no repeating characters
+let seen = new Set(), left = 0, best = 0;
+for (let right = 0; right &lt; s.length; right++) {
+  while (seen.has(s[right])) seen.delete(s[left++]);
+  seen.add(s[right]);
+  best = Math.max(best, right - left + 1);
+}
+return best;</code></pre>
+
+<p><strong>متى ينطبق:</strong> عبارات «longest / contiguous / subarray» — أقصى مجموع لنافذة طولها k، سلسلة فرعية فيها على الأكثر k قيمة مميزة، أصغر نافذة. الشكل دائمًا: وسّع لليمين، وقلّص لليسار ما دام القيد منكسرًا، وسجّل الأفضل. O(n) مطفأ: اليسار واليمين يجتاز كلٌّ منهما مرة واحدة.</p>
+
+<h3>المجاميع البادئة</h3>
+
+<p>احسب مسبقًا <code>prefix[i] = sum of elements 0..i-1</code>، فكل مجموع سلسلة فرعية هو <code>prefix[j+1] - prefix[i]</code> في O(1). نمط الترقية: «استعلامات مجموع نطاقات» أو «مجاميع سلاسل فرعية تساوي k» تتحول إلى خريطة تجزئة لعدّادات البادئات — حركة «ما الذي يمكنني تذكّره؟» الكلاسيكية.</p>
+
+<h2 id="sec-stacks-queues-and-linked-lists-the-shapes">المكدسات وقوائم الانتظار والقوائم المترابطة — الأشكال</h2>
+
+<h3>المكدس — نمط المكدس الرتيب</h3>
+
+<p>المكدس هو «أول ما يُتراجع عنه»، و«الأزواج المتطابقة»، و— القوة الخارقة في المقابلات — <strong>المكدس الرتيب</strong>: أبقِ المكدس متزايدًا (أو متناقصًا) بالحذف (pop) ما دام العنصر الجديد يكسر الترتيب. يعطيك ذلك «العنصر الأكبر التالي» في O(n):</p>
+
+<pre><code>// next greater element for each position, -1 if none
+const out = new Array(nums.length).fill(-1), stack = [];
+for (let i = 0; i &lt; nums.length; i++) {
+  while (stack.length &amp;&amp; nums[stack[stack.length - 1]] &lt; nums[i])
+    out[stack.pop()] = nums[i];
+  stack.push(i);
+}
+return out;</code></pre>
+
+<p><strong>مسائل المكدس الكلاسيكية:</strong> أقواس صالحة (ادفع الفواتح، واحذف عند الغلّاقة، وتحقق من تطابق القمة)، وتقييم التعابير (مكدسان: قيم + معاملات)، ودرجات الحرارة اليومية، وأكبر مستطيل في المدرّج التكراري.</p>
+
+<h3>قائمة الانتظار — شريكة BFS</h3>
+
+<p>قائمة الانتظار «الأول داخلًا أول خارجًا» — شكل اجتياز العرض أولًا (BFS) وأي مسألة «معالجة بترتيب الوصول». في JS، مصفوفة مع <code>shift()</code> تكلف O(n)؛ لحلول الصحة-أولًا هذا مقبول، وللأداء استخدم مؤشر فهرس أو قائمة انتظار حقيقية.</p>
+
+<h3>القوائم المترابطة — نادرًا الإجابة، كثيرًا السؤال</h3>
+
+<ul>
+  <li><strong>قاعدة الصدق:</strong> في JS (ومعظم اللغات عالية المستوى)، المصفوفات تتغلب على القوائم المترابطة في كل شيء تقريبًا — محلية الكاش، والفهرسة، والذاكرة. مسائل القوائم المترابطة تُطرح لأنها تختبر انضباط المؤشرات والعودية، لا لأن كود الإنتاج يستخدمها كثيرًا.</li>
+  <li><strong>عمليات أساسية يجب حفظها:</strong> العكس (تكرارية: ثلاثة مؤشرات — prev، curr، next)، وكشف الحلقات (سلحفاة وأرنب فلويد: بطيء +1، سريع +2، يلتقيان إذا وُجدت حلقة فقط)، وإيجاد المنتصف (تقنية الأرنب نفسها)، ودمج قائمتين مرتبتين (نمط الرأس الوهمي).</li>
+  <li><strong>خدعة الرأس الوهمي:</strong> ابدأ كل خوارزمية قائمة كثيفة الإدراج بعقدة <code>dummy</code> قبل الرأس كي لا تحتاج حالتا «القائمة الفارغة» و«الإدراج من الأمام» معالجة خاصة. تزيل فئة كاملة من أخطاء الحالات الحدّية.</li>
+</ul>
+
+<h3>مثال محلول — كاش LRU</h3>
+
+<p>مسألة القوائم المترابطة الوحيدة التي هي <em>أيضًا</em> هيكل إنتاج حقيقي: كاش LRU (الأقل استخدامًا مؤخرًا) هو قائمة مترابطة مزدوجة للترتيب بالإضافة إلى خريطة تجزئة لبحث O(1) لكل عقدة. يجب أن يكونا <code>get</code> و<code>put</code> كلاهما O(1) — القائمة تعطي إزالة-ونقل-إلى-الأمام O(1)، والخريطة تعطي إيجاد O(1) — والإخراج هو «احذف الذيل». خدعة الرأس الوهمي تُبقي عمليات القائمة بلا حالات حدّية:</p>
+
+<pre><code>class LRUCache {
+  constructor(cap) {
+    this.cap = cap;
+    this.map = new Map();            // key → node, for O(1) lookup
+    this.head = { key: null, prev: null, next: null };  // most recent
+    this.tail = { key: null, prev: null, next: null };  // least recent
+    this.head.next = this.tail; this.tail.prev = this.head;
+  }
+  _remove(node) { node.prev.next = node.next; node.next.prev = node.prev; }
+  _insert(node) {                    // splice right after the head (most recent)
+    node.prev = this.head; node.next = this.head.next;
+    this.head.next.prev = node; this.head.next = node;
+  }
+  get(key) {
+    const node = this.map.get(key);
+    if (!node) return -1;
+    this._remove(node); this._insert(node);   // touch → most recent
+    return node.value;
+  }
+  put(key, value) {
+    if (this.map.has(key)) this._remove(this.map.get(key));
+    const node = { key, value, prev: null, next: null };
+    this.map.set(key, node);
+    this._insert(node);
+    if (this.map.size > this.cap) {      // evict the tail
+      this.map.delete(this.tail.prev.key);
+      this._remove(this.tail.prev);
+    }
+  }
+}</code></pre>
+
+<p><strong>الخلاصة:</strong> خريطة التجزئة وحدها لا تتتبع الحداثة، والقائمة وحدها لا تجد عقدة في O(1) — الزوجان هما بيت القصيد. تعرّف على «ذاكرة تخزين مؤقت بسعة محدودة» وستكون قد تعرّفت على هذا الشكل.</p>
+
+<h2 id="sec-trees-and-heaps-the-hierarchies">الأشجار والأكوام — التسلسلات الهرمية</h2>
+
+<h3>الأشجار الثنائية — الاجتيازات أولًا</h3>
+
+<p>الاجتيازات هي نحو (grammar) كل مسألة شجرة؛ الأنماط الأربعة، محفوظة:</p>
+
+<pre><code>// recursive in-order — the shape of all three
+function inorder(node, out = []) {
+  if (!node) return out;
+  inorder(node.left, out);
+  out.push(node.val);
+  inorder(node.right, out);
+  return out;
+}</code></pre>
+
+<ul>
+  <li><strong>الترتيب الأمامي</strong> (العقدة، اليسار، اليمين): نسخ/تسلسل شجرة، بادئة التعبير.</li>
+  <li><strong>الترتيب الداخلي</strong> (اليسار، العقدة، اليمين): شجرة بحث ثنائية (BST) بترتيب داخلي هي <em>مرتبة</em> — الحقيقة الأكثر استخدامًا في مسائل الأشجار (تحقق من BST بفحص أن الاجتياز الداخلي تصاعدي).</li>
+  <li><strong>الترتيب الخلفي</strong> (اليسار، اليمين، العقدة): أعمال الحذف/المعتمدة على الأطفال، وتقييم التعبيرات — احسب الأطفال أولًا ثم ادمج عند الأب.</li>
+  <li><strong>ترتيب المستويات (BFS)</strong> بقائمة انتظار: «zigzag»، و«right side view»، و«min depth» — أي شيء يُصاغ مستوىً بمستوى.</li>
+</ul>
+
+<p><strong>بدائل تكرارية:</strong> المقابلات كثيرًا ما تمنع مكدس العودية الضمني للأشجار العميقة — الترتيب الداخلي تكرارًا = مكدس تدفع عليه اليساريَّات وتحذف بين حركات اليمين؛ الترتيب الأمامي = ادفع اليمين ثم اليسار. النسخة العودية هي مرساة الذاكرة؛ اشتق التكرارية منها تحت الضغط.</p>
+
+<h3>شجرة البحث الثنائية وحقيقة الشجرة المتوازنة</h3>
+
+<p>إدراج/بحث/حذف شجرة البحث الثنائية O(log n) <em>حين تكون متوازنة</em>. غير المتوازنة (مدخلات مرتبة، إدراج ساذج) تتدهور إلى O(n) — قائمة مترابطة متنكّرة. هذا هو السبب كله في وجود أشجار AVL/الحمراء-السوداء (توازن ذاتي عند كل إدراج). في المقابلات: اعرف أن أشجار البحث الثنائية المتوازنة تعطيك عمليات مرتبة بحدود O(log n) — وأن <em>كود الإنتاج يستخدم هياكل مكتبة بدلًا منها</em>: <code>Map</code>/<code>Set</code> في JS، أو مصفوفة مرتبة + بحث ثنائي، وهي O(n) في الإدراج لكنها O(log n) في البحث ومقبولة لـ n صغير.</p>
+
+<h3>تري — مطابقة البادئات</h3>
+
+<p>الـ trie شجرة من الأحرف: كل عقدة تحمل خريطة لأحرف الأبناء وعلم «كلمة تنتهي هنا». الإدراج والبحث O(طول الكلمة).</p>
+
+<pre><code>class Trie {
+  constructor() { this.root = { children: {}, end: false }; }
+  insert(word) {
+    let node = this.root;
+    for (const ch of word) {
+      node.children[ch] ??= { children: {}, end: false };
+      node = node.children[ch];
+    }
+    node.end = true;
+  }
+  search(word) {
+    let node = this.root;
+    for (const ch of word) {
+      if (!node.children[ch]) return false;
+      node = node.children[ch];
+    }
+    return node.end;
+  }
+}</code></pre>
+
+<p><strong>متى يربح:</strong> الإكمال التلقائي (انزل إلى البادئة ثم عدّد الشجرة الفرعية)، والبحث عن كلمة على لوحة، واستعلامات «يبدأ بـ». البديل — خريطة تجزئة لكل بادئة — ينجح لكنه يهدر الذاكرة؛ الـ trie يشارك البادئات بنيويًا.</p>
+
+<h3>الكومة / قائمة الأولويات — نمط top-K</h3>
+
+<p>الكومة شجرة ثنائية بثابت واحد: الأب ≤ (كومة صغرى) أو ≥ (كومة كبرى) أبنائه. <code>push</code> و<code>pop</code> كلاهما O(log n)، و<code>peek</code> O(1). يعطي ذلك مكسبين كلاسيكيين:</p>
+
+<ul>
+  <li><strong>Top-K:</strong> «k أكبر/أصغر، k الأكثر تكرارًا، k الأقرب» — كومة صغرى بحجم k: ادفع كل عنصر؛ وحين تتجاوز الكومة k، احذف الأصغر. النتيجة: الـ k الأكبر في O(n log k) — لا فرز كامل مطلوب.</li>
+  <li><strong>صيانة الوسيط:</strong> كومتان — كبرى للنصف الأدنى، وصغرى للنصف الأعلى، معادلة التوازن بعد كل إدراج. الوسيط = <code>peek</code> للكومة الأكبر (أو متوسط القمتين). O(log n) لكل إدراج.</li>
+  <li><strong>دمج k قائمة مرتبة:</strong> ادفع رأس كل قائمة، واحذف الأصغر، وادفع خلفه — شكل «دمج k أشياء» القياسي.</li>
+</ul>
+
+<p>لا كومة مدمجة في JS — حركة المقابلة هي تنفيذ كومة ثنائية صغيرة (~25 سطرًا: <code>push</code>/<code>pop</code> مع صعود-غربلة/نزول-غربلة) مرة واحدة من الذاكرة، أو استخدام <code>Array.sort()</code> حين يكون n صغيرًا بما يكفي (الفرز كثيرًا ما يكون الإجابة الصحيحة الأكسل).</p>
+
+<pre><code>class MinHeap {
+  constructor() { this.a = []; }
+  size() { return this.a.length; }
+  peek() { return this.a[0]; }
+  push(v) {
+    this.a.push(v);
+    let i = this.a.length - 1;
+    while (i &gt; 0) {                 // sift-up: swap with parent
+      const p = (i - 1) &gt;&gt; 1;
+      if (this.a[p] &lt;= this.a[i]) break;
+      [this.a[p], this.a[i]] = [this.a[i], this.a[p]];
+      i = p;
+    }
+  }
+  pop() {
+    const top = this.a[0];
+    const last = this.a.pop();
+    if (this.a.length) {
+      this.a[0] = last;
+      let i = 0;
+      while (true) {                // sift-down: swap with smaller child
+        const l = 2 * i + 1, r = l + 1;
+        let m = i;
+        if (l &lt; this.a.length &amp;&amp; this.a[l] &lt; this.a[m]) m = l;
+        if (r &lt; this.a.length &amp;&amp; this.a[r] &lt; this.a[m]) m = r;
+        if (m === i) break;
+        [this.a[m], this.a[i]] = [this.a[i], this.a[m]];
+        i = m;
+      }
+    }
+    return top;
+  }
+}</code></pre>
+
+<p><strong>الثابتان اللذان يجب إبقاؤهما واضحين:</strong> صعود-غربلة عند <code>push</code> (العنصر الجديد يمشي نحو الجذر ما دام أصغر من أبيه)، ونزول-غربلة عند <code>pop</code> (العنصر الأخير المرقَّى يمشي نحو الأوراق ما دام أكبر من ابن). كومة كبرى: اقلب المقارنات. ولأجل «k الأكبر»، ادفع إلى كومة صغرى بحجم k — الجذر هو أصغر أعلى-k الحالي، فهو المرشَّح للإخراج.</p>
+
+<h2 id="sec-recursion-the-self-referential-move">العودية — الحركة ذاتية الإحالة</h2>
+
+<p>كل هيكل أعلاه محدود وملموس؛ العودية هي فكرة أن الدالة يمكن أن <em>تكون قالبها الخاص</em> — مسألة تُحل بحل نسخة أصغر من المسألة نفسها. أنت تستخدمها منذ اجتيازات الأشجار (<a href="#sec-trees-and-heaps-the-hierarchies">§٤</a>): <code>inorder(node)</code> تستدعي <code>inorder(node.left)</code>. معالجة مستقلة لأنها المحرك خلف DFS (<a href="#sec-graphs-the-model-of-connections">§٦</a>)، والتقسيم والغزو (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a>)، والبرمجة الديناميكية (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§٨</a>)، ولأن نمطي الفشل شائعان ورخيصا الإصلاح.</p>
+
+<p><strong>الشكل، دائمًا جزءان:</strong> <em>حالة أساسية</em> توقف العودية (أصغر مدخل، لا استدعاء آخر)، و<em>حالة عودية</em> تستدعي نفسها على مدخل أصغر بدقة. إذا فشلت الحالة العودية في الانكماش نحو الحالة الأساسية، ستحصل على عودية لا نهائية → فيض المكدس. هذا هو الانضباط كله.</p>
+
+<pre><code>// power(x, n): multiply x by power(x, n-1) — smaller input, base case at n === 0
+function power(x, n) {
+  if (n === 0) return 1;              // base case
+  return x * power(x, n - 1);         // recursive case, strictly smaller
+}</code></pre>
+
+<p><strong>كيف تكتب واحدة تحت الضغط:</strong> 1) حدّد أصغر <em>مدخل</em> واكتب إجابته كحالة أساسية؛ 2) ثِق بأن الاستدعاء العودي <em>ينجح</em> للمدخلات الأصغر («وثبة الإيمان» — لا تتعقّبه)؛ 3) اسأل: «بمعرفة إجابة حالة أصغر، كيف أبني إجابة هذه؟» الخطوة الأخيرة هي السؤال نفسه الذي تطرحه البرمجة الديناميكية — العودية مع كاش هي برمجة ديناميكية محفوظة (memoized)، لذا فالحل العودي النظيف يبعد مذكرةً واحدة عن حل برمجة ديناميكية (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§٨</a>).</p>
+
+<p><strong>متى تتخلى عن العودية:</strong> كل استدعاء يحرق إطار مكدس؛ السلاسل العميقة (شبكة من 10,000 خلية في DFS، قائمة طويلة جدًا) تُفيض مكدس الاستدعاءات — حد عودية، لا خطأ منطقي. مهران للنجاة: اجعلها <em>تكرارية</em> بمكدس صريح (تتحكم في الذاكرة)، أو استخدم BFS (<a href="#sec-graphs-the-model-of-connections">§٦</a>) الذي لا يتراجع أبدًا. أي شيء تكتبه عوديًا يمكنك كتابته بمكدس تدفع عليه — المكدس <em>هو</em> العودية. قاعدة عامة: العودية لأعماق الأشجار (آمنة، O(log n))؛ والمكدس الصريح لأعماق الرسوم البيانية (عشوائية).</p>
+
+<h3>التقسيم والغزو مقابل البرمجة الديناميكية — التمييز الذي يوضّح الاثنين</h3>
+
+<p>كلاهما يقسم مسألة إلى مسائل فرعية، ويحلها، ويدمجها. الفرق هو ما تتداخل عليه المسائل الفرعية:</p>
+
+<table>
+<thead><tr><th></th><th>التقسيم والغزو (Divide-and-conquer)</th><th>البرمجة الديناميكية</th></tr></thead>
+<tbody>
+<tr><td><strong>المسائل الفرعية</strong></td><td>منفصلة — كل واحدة تظهر مرة واحدة (نصفا merge sort لا يتداخلان)</td><td>متداخلة — المسألة الفرعية نفسها تتكرر (fib(5) تحتاج fib(3) مرتين)</td></tr>
+<tr><td><strong>الدمج</strong></td><td>ادمج النتائج المستقلة صعودًا في الشجرة (دمج نصفين مرتبين)</td><td>أعد استخدام الإجابة المحفوظة؛ لا إعادة حساب</td></tr>
+<tr><td><strong>شكل العمل</strong></td><td>كل مستوى يقسّم؛ الإجمالي بقريب O(n log n)</td><td>كل حالة تُحسب مرة واحدة؛ الإجمالي O(حالات · انتقال)</td></tr>
+<tr><td><strong>الكلاسيكي</strong></td><td>Merge sort، وquicksort، والبحث الثنائي، و«count inversions»</td><td>فيبوناتشي، وLCS، وتغيير العملة، ومسارات الشبكة</td></tr>
+<tr><td><strong>العلامة المميزة</strong></td><td>«اقسم نصفين، حلَّ كلًا، ادمج» — المسائل الفرعية مستقلة</td><td>«نفس المسألة الفرعية تُسأل مجددًا» — شجرة عودية تتكرر فيها العُقد</td></tr>
+</tbody>
+</table>
+
+<p><strong>الاختبار الحاسم:</strong> ارسم شجرة العودية لتكرارك. إذا ظهرت الحالة نفسها في فروع متعددة، فالعودية الساذجة تعيد حسابها — هذه إشارة البرمجة الديناميكية (أضف كاشًا). إذا ظهرت كل حالة مرة واحدة، فأنت أمام تقسيم وغزو، والكاش لا يشتري شيئًا.</p>
+
+<h2 id="sec-graphs-the-model-of-connections">الرسوم البيانية — نموذج الوصلات</h2>
+
+<h3>التمثيل أولًا</h3>
+
+<table>
+<thead><tr><th>التمثيل</th><th>الفضاء</th><th>«هل u موصولة بـ v؟»</th><th>التكرار عبر جيران u</th><th>متى</th></tr></thead>
+<tbody>
+<tr><td><strong>قائمة الجوار</strong> — <code>Map&lt;node, node[]&gt;</code></td><td>O(V + E)</td><td>O(الدرجة) — امسح القائمة</td><td>O(الدرجة)</td><td>الافتراضي. BFS/DFS/Dijkstra كلها تتكرر عبر الجيران باستمرار</td></tr>
+<tr><td><strong>مصفوفة الجوار</strong> — <code>bool[V][V]</code></td><td>O(V²)</td><td>O(1)</td><td>O(V) — امسح الصف</td><td>رسوم بيانية كثيفة، أو حين يكون «هل الحافة موجودة؟» هو الاستعلام الحار</td></tr>
+<tr><td><strong>قائمة الحواف</strong> — <code>[u, v, weight][]</code></td><td>O(E)</td><td>O(E) — مسح</td><td>—</td><td>خوارزميات اتحاد-بحث / بأسلوب Kruskal التي تفرز الحواف</td></tr>
+</tbody>
+</table>
+
+<p>الموزون مقابل غير الموزون لا يغيّر شيئًا في التمثيل — الأوزان تعيش على الحواف — لكنه يغيّر الخوارزمية: غير موزون → BFS لأقصر مسار؛ موزون → Dijkstra.</p>
+
+<h3>BFS — القالب</h3>
+
+<pre><code>// shortest path (unweighted) from start; dist of -1 = unreachable
+function bfs(graph, start, n) {
+  const dist = new Array(n).fill(-1);
+  dist[start] = 0;
+  const queue = [start];
+  for (let qi = 0; qi &lt; queue.length; qi++) {   // index pointer = O(1) shift
+    const u = queue[qi];
+    for (const v of graph[u] ?? []) {
+      if (dist[v] === -1) { dist[v] = dist[u] + 1; queue.push(v); }
+    }
+  }
+  return dist;
+}</code></pre>
+
+<p><strong>القواعد:</strong> الزيارة الأولى = أقصر مسافة (هذا ما يجعل BFS خوارزمية أقصر المسارات على الرسوم غير الموزونة)؛ علّم على الزيارة عند <em>الإدراج في قائمة الانتظار (enqueue)</em> لا عند الإخراج (dequeue)، وإلا أدخلت مكررات؛ قائمة الانتظار بمؤشر فهرس تتجنب <code>shift()</code> بـ O(n). «Rotting oranges» و«walls and gates» و«nearest 0» — كلها الشكل نفسه ببداية متعددة المصادر (أدرج كل المصادر أولًا).</p>
+
+<h3>DFS — عودي وتكراري</h3>
+
+<pre><code>// connected components: every node gets its component id
+function components(graph, n) {
+  const comp = new Array(n).fill(-1);
+  let id = 0;
+  function dfs(u) {
+    for (const v of graph[u] ?? []) if (comp[v] === -1) { comp[v] = id; dfs(v); }
+  }
+  for (let u = 0; u &lt; n; u++) if (comp[u] === -1) { comp[u] = id; dfs(u); id++; }
+  return comp;
+}</code></pre>
+
+<p><strong>متى يتفوق DFS على BFS:</strong> بلوغ الهدف (reachability)، وكشف الحلقات (موجّه: ثلاث حالات — غير مزار / قيد المعالجة / منجز — حافة إلى عقدة قيد المعالجة هي حافة رجعية)، والترتيب الطوبولوجي (أدناه)، وأي شيء عودي (إغراق الشبكة — «number of islands» هي هذه الحلقة مع dfs من نوع flood-fill). للشبكات العميقة، يمكن أن تفجّر العودية مكدس الاستدعاءات — النسخة التكرارية تستخدم مكدسًا صريحًا، ومجموعة مزارة عند الدفع.</p>
+
+<h3>الترتيب الطوبولوجي — DFS أو خوارزمية Kahn</h3>
+
+<p>ترتيب الاعتماديات: «أكمل كل المتطلبات الأساسية» أو «جدول المقررات». خوارزمية Kahn: عدّ درجات الدخول، وأدرج عُقد الدرجة صفر، وعالج، وأنقص الجيران؛ إذا كان العدّ المعالَج &lt; V، فهناك حلقة. نسخة DFS تراكم بالترتيب اللاحق ثم تنعكس. كلاهما O(V + E) وكلاهما يعمل أيضًا ككاشف حلقات — إجابة «هل يمكن فعله أصلًا؟» التي تسألها المسألة فعلًا.</p>
+
+<h3>Dijkstra — أقصر مسار موزون</h3>
+
+<p>ابن عم BFS الموزون: فكرة «أول تسوية = الأفضل» نفسها، لكن قائمة الانتظار تصبح قائمة أولويات مفتاحية بـ<em>المسافة</em>، وتتخطى الإدخالات البالية:</p>
+
+<pre><code>function dijkstra(graph, start, n) {
+  const dist = new Array(n).fill(Infinity); dist[start] = 0;
+  const pq = [[0, start]]; // binary heap of [dist, node]
+  while (pq.length) {
+    const [d, u] = heapPop(pq);
+    if (d &gt; dist[u]) continue;            // stale entry — skip
+    for (const [v, w] of graph[u] ?? []) {
+      if (d + w &lt; dist[v]) { dist[v] = d + w; heapPush(pq, [dist[v], v]); }
+    }
+  }
+  return dist;
+}</code></pre>
+
+<p><strong>القاعدة المهمة:</strong> Dijkstra يفشل مع الحواف السالبة (عقدة مُسوّاة بالفعل يمكن تحسينها لاحقًا) — هذه مهمة Bellman-Ford. و«أقصر مسار في شبكة» هو BFS فقط حين تكلف كل الحركات نفس الشيء؛ شبكة 0/1 يمكنها استخدام deque (حركات التكلفة صفر تُدفع للأمام).</p>
+
+<h3>اتحاد-بحث — ترابط دون بناء الرسم البياني</h3>
+
+<pre><code>class UnionFind {
+  constructor(n) { this.parent = Array.from({length: n}, (_, i) => i); this.rank = new Array(n).fill(0); }
+  find(x) { while (this.parent[x] !== x) { this.parent[x] = this.parent[this.parent[x]]; x = this.parent[x]; } return x; }
+  union(a, b) {
+    const ra = this.find(a), rb = this.find(b);
+    if (ra === rb) return;
+    if (this.rank[ra] &lt; this.rank[rb]) [ra, rb] = [rb, ra];
+    this.parent[rb] = ra;
+    if (this.rank[ra] === this.rank[rb]) this.rank[ra]++;
+  }
+}</code></pre>
+
+<p><strong>لماذا هو الرابح الخفي:</strong> «عدد المكونات المترابطة في شبكة»، و«دوائر الأصدقاء»، و«دمج الحسابات»، وKruskal MST — أي شيء عن الترابط <em>ينمو</em> حافةً حافة. ضغط المسارات (حلقة find التي تختصر الطريق إلى الجذر) + اتحاد بالرتبة يجعلان العمليتين شبه O(1) مطفأ — أسرع من إعادة تشغيل BFS بعد كل حافة جديدة.</p>
+
+<h2 id="sec-sorting-and-searching-the-preprocessing-moves">الفرز والبحث — حركات المعالجة المسبقة</h2>
+
+<h3>قائمة الفرز</h3>
+
+<table>
+<thead><tr><th>الفرز</th><th>الأسوأ</th><th>مستقر؟</th><th>متى يكون الإجابة</th></tr></thead>
+<tbody>
+<tr><td><strong>Merge sort</strong></td><td>O(n log n)</td><td>نعم</td><td>عند الحاجة إلى الاستقرار، والقوائم المترابطة (الدمج طبيعي على القوائم)، ونمط «count inversions»</td></tr>
+<tr><td><strong>Quick sort</strong></td><td>O(n²) أسوأ، O(n log n) متوسط</td><td>لا</td><td>الفرز الموضعي الافتراضي في معظم المكتبات (منها V8 — <code>sort()</code> في JS مزيج quicksort/timsort)</td></tr>
+<tr><td><strong>Heap sort</strong></td><td>O(n log n)</td><td>لا</td><td>مساحة إضافية O(1)؛ نادر الاختيار — نفس الصنف بثابت أسوأ</td></tr>
+<tr><td><strong>Counting / radix</strong></td><td>O(n + k)</td><td>يعتمد</td><td>أعداد صحيحة في نطاق معروف صغير (فرز مليون درجة في 0..100) — يتفوق على فرز المقارنات</td></tr>
+</tbody>
+</table>
+
+<p><strong>الاختصار الاحترافي:</strong> في JS استخدم <code>arr.sort((a, b) =&gt; a - b)</code> وامضِ قدمًا — تنفيذ quicksort في مقابلة مطلوب فقط حين تكون المسألة <em>هي</em> الفرز. المهارات المهمة للمقابلات هي وعي الاستقرار (هل ترتيب المتساويات يهم؟) و<em>الفرز كمعالجة مسبقة</em>: «k الأصغر»، و«دمج الفترات»، و«مجموعات anagram» (رتّب كل كلمة) — الفرز كثيرًا ما يكون الخطوة الأولى الكسولة التي تحول مسألة صعبة إلى خطية.</p>
+
+<h3>البحث الثنائي — القالب الذي لا يخطئ بواحد</h3>
+
+<pre><code>// first index where isGood(i) is true, else hi+1... pattern:
+let lo = 0, hi = arr.length;          // search space [lo, hi)
+while (lo &lt; hi) {
+  const mid = (lo + hi) &gt;&gt; 1;         // floor, no overflow in JS
+  if (isGood(mid)) hi = mid;          // good → keep mid
+  else lo = mid + 1;                  // bad → discard mid
+}
+return lo;                            // first good index</code></pre>
+
+<ul>
+  <li><strong>الثابت:</strong> النطاق <code>[lo, hi)</code> نصف المفتوح، «أول فهرس يقلب فيه المسند من خطأ إلى صواب». بحث عن قيمة: <code>isGood = arr[mid] &gt;= target</code> — الإجابة هي أول عنصر ≥ target (وهذا يعالج «الهدف موجود» و«موضع الإدراج» في واحد).</li>
+  <li><strong>الاشتقاقات</strong> (أول/آخر ظهور، السقف، نقطة الدوران) كلها تختزل إلى اختيار المسند — لا تعِد كتابة جسم الحلقة أبدًا، غيّر <code>isGood</code> فقط.</li>
+  <li><strong>النمط الخفي:</strong> البحث الثنائي ينجح مع أي <em>مسند رتيب</em>، لا المصفوفات المرتبة فقط — «أصغر سعة يمكنها الشحن في d أيام»، «أصغر مسافة زوجية في المرتبة k» — إذا كان فضاء الإجابات رتيبًا (هل أستطيع تحمل X؟ نعم ← نعم أيضًا لـ X أكبر)، ابحث عن الإجابة ثنائيًا.</li>
+</ul>
+
+<h2 id="sec-dynamic-programming-the-state-machine-of-optimization">البرمجة الديناميكية — آلة حالة التحسين</h2>
+
+<p>البرمجة الديناميكية أصعب العائلات لأنها تبدو كالعودية وهي في الحقيقة <em>تعداد محفوظ (cached enumeration)</em>. الإطار، مطبَّق في كل مرة:</p>
+
+<ol>
+  <li><strong>حدّد الحالة</strong> — وصف الحد الأدنى لمسألة فرعية: «dp[i] = أقصى ربح مع i عنصرًا»، «dp[r][c] = المسارات إلى الخلية (r, c)». الحالة أهم قرار منفرد؛ حالة خاطئة تعني إجابة خاطئة تبدو صحيحة.</li>
+  <li><strong>اكتب الانتقال</strong> — كيف تُبنى dp[i] من حالات أصغر: «dp[i] = max(dp[i-1], dp[i-2] + v[i])». إن لم تستطع كتابة الانتقال، فأنت لم تفهم التكرار بعد — عُد إلى تعريف الحالة.</li>
+  <li><strong>ضيِّع الحالات الأساسية</strong> — dp[0]، dp[1]، صف/عمود الشبكة الفارغ. الحالات الأساسية حيث يموت معظم أخطاء الإزاحة بواحد (off-by-one).</li>
+  <li><strong>اختر الحفظ أو الجدولة</strong> — memo = عودية + كاش (اكتب عودية القوة الغاشمة، أضف الكاش، انتهيت — أنظف طريق صحيح)؛ tabulation = ابنِ الجدول من الأسفل لأعلى، ويتجنب العودية وكثيرًا ما يحتاج مساحة أقل.</li>
+</ol>
+
+<h3>الأنماط (تعرّف على الشكل، وكيّف الحالة)</h3>
+
+<table>
+<thead><tr><th>النمط</th><th>شكل الحالة</th><th>المسائل النموذجية</th></tr></thead>
+<tbody>
+<tr><td><strong>تسلسل 1D</strong></td><td>dp[i] من dp[i-1]، dp[i-2]</td><td>صعود السلالم، house robber (dp[i] = max(تخطٍّ، أخذ))، تغيير العملة (dp[amount] = أقل عملات)</td></tr>
+<tr><td><strong>شبكة 2D</strong></td><td>dp[r][c] من dp[r-1][c] + dp[r][c-1]</td><td>المسارات الفريدة، أصغر مجموع مسار، أكبر مربع</td></tr>
+<tr><td><strong>تسلسلان</strong></td><td>dp[i][j] على كلا البادئتين</td><td>LCS، مسافة التحرير، المطابقة بالبدائل — عائلة «قارن الأطراف، قدّم واحدًا أو كليهما»</td></tr>
+<tr><td><strong>حقيبة الظهر</strong></td><td>dp[i][w] = الأفضل مع أول i عنصر ووزن w</td><td>مجموع مجموعة فرعية، تقسيم بمجاميع متساوية، 0/1 مقابل غير المحدود (اتجاه الحلقة يتغير!)</td></tr>
+<tr><td><strong>فترات</strong></td><td>dp[i][j] على السلسلة الفرعية i..j</td><td>ضرب سلسلة المصفوفات، انفجار البالونات، أطول سلسلة فرعية متناظرة</td></tr>
+<tr><td><strong>قناع بتات</strong> (متقدم)</td><td>dp[mask] على المجموعات الفرعية</td><td>TSP، مسائل التوزيع — n ≤ 20 فقط</td></tr>
+</tbody>
+</table>
+
+<p><strong>الترتيب الكسول تحت ضغط الوقت:</strong> 1) عودية القوة الغاشمة (صحيحة، بطيئة)، 2) أضف كاش memo (الآن O(n · حالات))، 3) إذا كانت الذاكرة هي القيد، حوّل إلى جدولة واضغط الجدول (أبقِ الصف/العمود الأخير فقط — معظم البرمجيات الديناميكية 1D و2D تحتاج صفًا أو صفين فقط). الخطوتان 1–2 غالبًا تكفيان للنجاح.</p>
+
+<p><strong>ملاحظة وظيفية (الحد الفاصل FP):</strong> البرمجة الديناميكية المحفوظة دوال نقية + كاش — فكرة «تذكّر الإجابة» نفسها التي يحصل عليها <a href="./what-is-state-prequel.html">حساب اللامدا</a> بالاستبدال. <code>reduce</code> هي حلقة الجدولة متنكّرة: <code>states.reduce((acc, x) =&gt; transition(acc, x), base)</code> هي برمجة ديناميكية 1D بمجمّع واحد. أسس FP على الرف (<a href="./what-is-state-prequel.html">What Is State</a>، و<a href="./javascript-the-language.html">JavaScript: The Language</a>) هي كل ما تحتاجه من FP هنا — لا حاجة إلى monads.</p><h2 id="sec-greedy-the-beautiful-lie">الجشع — الكذبة الجميلة</h2>
+
+<p>الجشع: خذ الحركة الأفضل محليًا وارجُ أن تكون مثالية عالميًا. حين ينجح يكون O(n) وأنيقًا؛ وحين لا ينجح يكون خاطئًا بإجابة تبدو معقولة. <strong>الاختبار هو حجة التبادل:</strong> «إذا اختلف حل مثالي عن حلّي، يمكنني مبادلة اختياري مكانه دون جعله أسوأ» — إن لم تستطع رسم تلك الحجة، فالجشع مقامرة، والبرمجة الديناميكية هي الإجابة الآمنة.</p>
+
+<ul>
+  <li><strong>جدولة الفترات</strong> — «أقصى اجتماعات غير متداخلة»: رتّب بوقت النهاية، وخذ دائمًا أول ما ينتهي والمتوافق. الجشع النموذجي وحجة التبادل التي يتعلمها الجميع أولًا.</li>
+  <li><strong>اختيار الأنشطة / القفزات</strong> — «jump game»: عند كل موضع، تذكّر أبعد مدى؛ الجشع ينجح لأن المجموعة القابلة للوصول تنمو فقط.</li>
+  <li><strong>ترميز هوفمان</strong> — ادمج دائمًا الأصغرين؛ تخرج رموز البادئة المثلى من تلقاء نفسها.</li>
+  <li><strong>العلامة المميزة:</strong> مسائل مصاغة «قلّل عدد X» أو «عظّم Y بهذه الموارد» حيث توجد حجة ترتيب بسيطة. عند الشك، برمجة ديناميكية.</li>
+</ul>
+
+<h2 id="sec-bit-manipulation-and-math-the-trick-drawer">التلاعب بالبتات والرياضيات — درج الحِيَل</h2>
+
+<ul>
+  <li><strong>خصائص XOR:</strong> a ^ a = 0، وa ^ 0 = a، وXOR إبدالية/تجميعية → «العدد الوحيد الذي يظهر مرة واحدة بين أزواج» هو <code>arr.reduce((a, b) =&gt; a ^ b)</code>. XOR أيضًا يبادل متغيرين ويجد العددين الفريدين (اجمع الكل بـ XOR، ثم انشق على بت مضبوط).</li>
+  <li><strong>حِيَل البتات:</strong> <code>n &amp; (n - 1)</code> يمسح أدنى بت مضبوط (→ عدّ البتات بحلقته)، <code>n &amp; -n</code> يعزل أدنى بت مضبوط (→ خدعة الانشقاق أعلاه)، <code>x &gt;&gt; 1</code> قسمة على 2 (منتصف البحث الثنائي).</li>
+  <li><strong>الأقنعة:</strong> قناع البتات مجموعة أعداد صحيحة صغيرة — «المجموعات الفرعية لعناصر n» = تكرر 0..2ⁿ-1 واختبر <code>mask &amp; (1 &lt;&lt; i)</code>. فقط لـ n ≤ 20.</li>
+  <li><strong>أساسيات الرياضيات:</strong> القاسم المشترك الأكبر عبر إقليدس (<code>while (b) [a, b] = [b, a % b]</code>)، والحساب النمطي (قواعد a mod m؛ الرفع النمطي بالتربيع المتكرر)، ومنخل إراتوستينس للأعداد الأولية حتى n في O(n log log n)، والتوافقيات (n اختر k عبر مثلث باسكال / الصيغة الضربية).</li>
+</ul>
+
+<h2 id="sec-pattern-recognition-cheat-sheet-signal-technique">ورقة تذكّر التعرف على الأنماط — الإشارة ← التقنية</h2>
+
+<p>الرفيق لجداول التعرف في Problem-Solving <a href="./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog">§7b</a> — النسخة التشغيلية، الإشارة أولًا:</p>
+
+<table>
+<thead><tr><th>إذا قالت المسألة…</th><th>مدّ يدك إلى…</th><th>لماذا</th></tr></thead>
+<tbody>
+<tr><td>«count / seen before / unique / complement» — عدّ / رأيتُ من قبل / فريد / مكمّل</td><td>خريطة تجزئة أو مجموعة</td><td>عضوية O(1) — الخطوة الأولى الافتراضية</td></tr>
+<tr><td>«sorted + pair/triplet sum / palindrome in place» — مرتب + مجموع زوج/ثلاثي / متناظر في المكان</td><td>المؤشران</td><td>O(n) على مدخلات مرتبة؛ كل مؤشر يتحرك مرة واحدة</td></tr>
+<tr><td>«longest / contiguous / subarray / substring» — الأطول / المتصل / مصفوفة فرعية / سلسلة فرعية</td><td>النافذة المنزلقة</td><td>قيد النافذة المتصلة، O(n) مطفأ</td></tr>
+<tr><td>«k largest / k most frequent / median of stream» — الـ k الأكبر / الـ k الأكثر تكرارًا / وسيط دفق</td><td>كومة (top-K، كومتان)</td><td>O(log k) لكل عنصر، بلا فرز كامل</td></tr>
+<tr><td>«matching / parentheses / undo / next greater» — مطابقة / أقواس / تراجع / التالي الأكبر</td><td>مكدس (رتيب)</td><td>بنية LIFO تطابق التداخل</td></tr>
+<tr><td>«shortest path / levels / nearest» (غير موزون) — أقصر مسار / مستويات / الأقرب</td><td>BFS</td><td>الزيارة الأولى = أقصر مسافة</td></tr>
+<tr><td>«reachable / cycles / components / flood fill» — قابل للبلوغ / حلقات / مكونات / تعبئة فيضان</td><td>DFS</td><td>يستكشف كل شيء؛ خدعة الحالات الثلاث تجد الحلقات</td></tr>
+<tr><td>«shortest path» (موزون)، «cheapest flight» — أقصر مسار / أرخص رحلة</td><td>Dijkstra</td><td>قائمة أولويات بالمسافة، تسوية-مرة</td></tr>
+<tr><td>«connected components growing / edges added one by one» — مكونات مترابطة تنمو / حواف تُضاف واحدة واحدة</td><td>اتحاد-بحث</td><td>شبه O(1) لكل اتحاد — يتفوق على إعادة تشغيل BFS</td></tr>
+<tr><td>«prerequisites / ordering / dependencies» — متطلبات أساسية / ترتيب / اعتماديات</td><td>ترتيب طوبولوجي</td><td>Kahn أو ترتيب لاحق DFS؛ يعمل أيضًا ككشف حلقات</td></tr>
+<tr><td>«sorted / find insert position / monotonic answer» — مرتب / إيجاد موضع إدراج / إجابة رتيبة</td><td>بحث ثنائي</td><td>أيضًا لمسائل «قلّل الأقصى X» ذات المسند الرتيب</td></tr>
+<tr><td>«minimize cost / maximize value / choose subsets» — قلّل الكلفة / عظّم القيمة / اختر مجموعات فرعية</td><td>برمجة ديناميكية أو جشع</td><td>جشع إذا صمدت حجة التبادل، وإلا برمجة ديناميكية — حالات، انتقال، أساس</td></tr>
+<tr><td>«prefix / words sharing prefixes / autocomplete» — بادئة / كلمات تتشارك بادئات / إكمال تلقائي</td><td>تري</td><td>المشاركة البنيوية تتفوق على تخزين كل بادئة</td></tr>
+<tr><td>«appears once / bit tricks / subsets of small n» — يظهر مرة واحدة / حِيَل بتات / مجموعات فرعية لـ n صغير</td><td>تلاعب بالبتات</td><td>مطابقات XOR؛ أقنعة لـ n ≤ 20</td></tr>
+<tr><td>«range sum / range queries, point updates» — مجموع نطاق / استعلامات نطاق وتحديثات نقطية</td><td>مجاميع بادئة، ثم شجرة قطع/فينويك للتحديثات</td><td>البادئة = استعلامات O(1)؛ فينويك = تحديثات O(log n)</td></tr>
+</tbody>
+</table>
+
+<p><strong>تذكير بترتيب القراءة:</strong> لا تبدأ البرمجة قبل التصنيف أبدًا. إذا لم تناسب المسألة أي صف، فالقوة الغاشمة تصنيف شرعي — نفّذها، ثم ابحث عن ترقية «ما الذي يمكنني تذكّره؟» (قاعدة المرحلة 3 في Problem-Solving).</p>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الخلاصة — قائمة الفحص الذهنية الكاملة</h2>
+
+<p>الوثيقة في اثني عشر سطرًا:</p>
+
+<table>
+<thead><tr><th>#</th><th>السطر</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>المصفوفات وخرائط التجزئة والأشجار هي 80% من الكود الحقيقي — أتقن <a href="#sec-arrays-strings-and-hashing-the-80">§٢</a> وردّ فعل «ما الذي يمكنني تذكّره؟».</td></tr>
+<tr><td>2</td><td>O(1) لخريطة التجزئة يعتمد على معامل التحميل؛ استخدم <code>Map</code>/<code>Set</code>، لا كائنًا عاديًا أبدًا (<a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>).</td></tr>
+<tr><td>3</td><td>المؤشران والنافذة المنزلقة والمجاميع البادئة: الحركات المصفوفية الثلاث التي تجعل «الأطول / الزوج / النطاق» خطية (<a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>).</td></tr>
+<tr><td>4</td><td>المكدس الرتيب = «التالي الأكبر» في O(n)؛ خدعة الرأس الوهمي تقتل فئة كاملة من أخطاء القوائم (<a href="#sec-stacks-queues-and-linked-lists-the-shapes">§٣</a>).</td></tr>
+<tr><td>5</td><td>الاجتيازات أولًا؛ BFS = أقصر مسار على الرسوم غير الموزونة، وDFS بثلاث حالات = كشف الحلقات (<a href="#sec-trees-and-heaps-the-hierarchies">§٤</a>، <a href="#sec-graphs-the-model-of-connections">§٦</a>).</td></tr>
+<tr><td>6</td><td>اتحاد-بحث للترابط، وترتيب طوبولوجي للترتيب، وDijkstra لأقصر مسار موزون (<a href="#sec-graphs-the-model-of-connections">§٦</a>).</td></tr>
+<tr><td>7</td><td>البحث الثنائي محرك مسند رتيب، لا خدعة مصفوفة مرتبة — نطاق نصف مفتوح، فهرس أول-جيد (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a>).</td></tr>
+<tr><td>8</td><td>الفرز معالجة مسبقة: «k الأصغر» و«دمج الفترات» و«مجموعات anagram» كلها تصبح خطية بعد فرز واحد (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a>).</td></tr>
+<tr><td>9</td><td>البرمجة الديناميكية = تعداد محفوظ: حالة، انتقال، أساس — ثم احفظ قبل أن تجدول (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§٨</a>).</td></tr>
+<tr><td>10</td><td>الجشع بلا حجة تبادل مقامرة؛ عند الشك، برمجة ديناميكية (<a href="#sec-greedy-the-beautiful-lie">§٩</a>).</td></tr>
+<tr><td>11</td><td>صنّف قبل البرمجة — ورقة الغش ترسم الإشارة إلى التقنية؛ القوة الغاشمة تصنيف احتياطي صالح (<a href="#sec-pattern-recognition-cheat-sheet-signal-technique">§١١</a>).</td></tr>
+<tr><td>12</td><td>شغّل جدول أنماط الفشل بعد كل حل: حافات بحجم ≤ 2، مدخلات كلها سالبة، فيض، تعديل أثناء التكرار (<a href="#sec-failure-modes-the-edge-case-checklist">§١٣</a>).</td></tr>
+</tbody>
+</table>
+
+<h2 id="sec-failure-modes-the-edge-case-checklist">أنماط الفشل — قائمة فحص الحالات الحدّية</h2>
+
+<p>قائمة الفحص التي تُشغَّل بعد أي حل، قبل أن تسمّيه منجزًا. أغلب العلامات المفقودة هنا، لا في خوارزميات ناقصة:</p>
+
+<table>
+<thead><tr><th>العرض</th><th>السبب</th><th>الإصلاح</th></tr></thead>
+<tbody>
+<tr><td>إزاحة بواحد في البحث الثنائي / حدود الحلقة</td><td>أخطأت في تذكّر الثابت، أو كتبت <code>&lt;=</code> بدل <code>&lt;</code> بالعادة</td><td>نطاق نصف مفتوح <code>[lo, hi)</code> + مسند «فهرس أول-جيد» (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a>) — لا تعِد كتابة الحلقة، بل <code>isGood</code> فقط</td></tr>
+<tr><td>تعطل مدخل فارغ، أو عنصر واحد، أو مصفوفة طولها 1</td><td>الحالات الحدّية لم تُشغَّل كحالات اختبار</td><td>شغّل محور حجم المدخلات أولًا: <code>[]</code>، <code>[1]</code>، الطول 2 — معظم الأخطاء تعيش عند الحجم ≤ 2</td></tr>
+<tr><td>مدخلات كلها سالبة تكسر حل «max» / «sum»</td><td>بادأت الإجابة بـ 0 أو تجاهلت السوالب</td><td>ابدأ <code>best = -Infinity</code>؛ لأقصى-مجموع فرعي، Kadane يعالج السوالب فقط إذا قارنت بالعنصر لا بالصفر</td></tr>
+<tr><td><code>obj[1]</code> و<code>obj["1"]</code> يتصادمان / مفاتيح النموذج الأولي تتسرب</td><td>استخدام كائن عادي كخريطة</td><td><code>Map</code>/<code>Set</code> لدلالات مفاتيح حقيقية (<a href="#sec-arrays-strings-and-hashing-the-80">§٢</a>) — لا كائن عادي للبحث أبدًا</td></tr>
+<tr><td>انتهاء المهلة فيما يفترض أن يكون O(n)</td><td><code>shift()</code> في حلقة، أو <code>+=</code> سلسلة في حلقة، أو <code>sort()</code> داخل الحلقة</td><td>قائمة انتظار بمؤشر فهرس بدل <code>shift()</code>، ومصفوفة + <code>join()</code> بدل <code>+=</code>، وأخرج الفرز من الحلقة (<a href="#sec-stacks-queues-and-linked-lists-the-shapes">§٣</a>، <a href="#sec-sorting-and-searching-the-preprocessing-moves">§٧</a>)</td></tr>
+<tr><td>فيض مكدس العودية (BFS/DFS على رسم كبير)</td><td>DFS عودي عميق على سلسلة طويلة</td><td>مكدس صريح، أو BFS بقائمة انتظار — الاجتياز التكراري آمن فضاءً بـ O(n) (<a href="#sec-graphs-the-model-of-connections">§٦</a>)</td></tr>
+<tr><td>جشع «يبدو صحيحًا لكنه خاطئ»</td><td>لا حجة تبادل (<a href="#sec-greedy-the-beautiful-lie">§٩</a>)</td><td>عند الشك، برمجة ديناميكية — الجشع بلا الحجة مقامرة</td></tr>
+<tr><td>عمل مكرر على مسائل فرعية متداخلة</td><td>عودية قوة غاشمة بلا حفظ</td><td>عودية محفوظة أولًا (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§٨</a>) — خزّنها قبل تحسين أي شيء آخر</td></tr>
+<tr><td>أخطاء تعديل — حذف/تحديث أثناء التكرار</td><td>تعديل المصفوفة داخل حلقة <code>for</code> يُزحزح الفهارس</td><td>كرر بالعكس، أو اجمع ثم طبّق بعد ذلك؛ أو <code>filter()</code> الآمنة</td></tr>
+<tr><td>فيض أعداد صحيحة / دقة (مال، n كبير)</td><td>أرقام JS ثنائيات IEEE؛ المجاميع قد تفقد الدقة</td><td>اشتغل بوحدات سنتات/أعداد صحيحة؛ استخدم <code>BigInt</code> فوق 2^53؛ قارن بـ epsilon</td></tr>
+</tbody>
+</table>
+
+<p>شغّل هذا الجدول، ثم جدول أنماط الفشل في <a href="./problem-solving.html">Problem-Solving</a> — قائمتا الفحص تغطيان الكود والتفكير، بهذا الترتيب.</p>
+
+<hr>
+
+<section class="cite">
+  <strong>المصادر الأولية ←</strong>
+  <a href="https://www.cs.cornell.edu/home/kleinber/tgps/algorithm-design.html">Kleinberg &amp; Tardos — تصميم الخوارزميات (إطار المفاضلة)</a> ·
+  <a href="https://www.manning.com/books/algorithmic-thinking">التفكير الخوارزمي (قوالب عمل لا نظرية)</a> ·
+  <a href="https://bigocheatsheet.com/">ورقة غش O الكبير (جدول البحث خلف §١)</a> ·
+  <a href="https://www.hackerrank.com/">HackerRank (الشاشة التي تدرّب عليها هذه الوثيقة)</a> ·
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">MDN — Map/Set (دلالات المفاتيح الحقيقية)</a>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«خذ آخر خطأ حقيقي أصلحته — أي هيكل كان يُساء استخدامه، وما الذي جعله الهيكل الصحيح واضحًا؟»</li>
+    <li>«أرني قالب البحث الثنائي لديك والإزاحة بواحد التي جعلتك تتحول إلى النطاقات نصف المفتوحة — أين ما زلت تزل؟»</li>
+    <li>«أي نمط في ورقة الغش وصلت إليه خطأً أولًا، في عمل حقيقي — وما الإشارة التي كانت سترشدك إلى الصواب أبكر؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · الخوارزميات وهياكل البيانات — عدة الحلول التي يمدّ إليها التفكير يده</span>
+  <span>التفكير: <a href="./problem-solving.html">Problem-Solving</a> · البرهان: <a href="./cs-and-software-engineering.html">CS &amp; Software Engineering</a> · الكود: <a href="./javascript-the-language.html">JavaScript: The Language</a> · على نطاق واسع: <a href="./system-design.html">System Design</a> · المسرد: <a href="./glossary.html">المصطلحات المشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

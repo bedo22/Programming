@@ -13,6 +13,9 @@
   <p class="kicker">Reference Shelf · The Real Web</p>
   <h1>Algorithms &amp; Data Structures — the toolkit</h1>
   <p class="meta">For: the developer who must solve problems at a keyboard, not just recognize them.</p>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>Language:</strong> English · <a href="./ar/algorithms-and-data-structures.html">العربية</a>
+        </p>
 </header>
 
 <blockquote class="callout">
@@ -45,9 +48,9 @@
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <ul>
-  <li><strong>To pass a HackerRank/LeetCode screen:</strong> read §2–§7 (structures + graph + recursion + sort/search), then drill the templates until they're typed from memory — the binary search template (§7), the BFS template (§6), the sliding-window template (§2). Then use the cheat sheet (§11) to practice <em>recognition</em>, which is the skill that decays first.</li>
-  <li><strong>To understand a production codebase:</strong> §2–§4 are the map — most real-world code is arrays, hash maps, and trees, used well. The patterns here (top-K, two pointers, sliding window) appear in real APIs more often than in interview problems.</li>
-  <li><strong>As reference:</strong> the failure-modes table (§13) is the checklist to run after solving anything — most lost marks are edge cases, not missing algorithms.</li>
+  <li><strong>To pass a HackerRank/LeetCode screen:</strong> read <a href="#sec-arrays-strings-and-hashing-the-80">§2</a>–<a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a> (structures + graph + recursion + sort/search), then drill the templates until they're typed from memory — the binary search template (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a>), the BFS template (<a href="#sec-graphs-the-model-of-connections">§6</a>), the sliding-window template (<a href="#sec-arrays-strings-and-hashing-the-80">§2</a>). Then use the cheat sheet (<a href="#sec-pattern-recognition-cheat-sheet-signal-technique">§11</a>) to practice <em>recognition</em>, which is the skill that decays first.</li>
+  <li><strong>To understand a production codebase:</strong> <a href="#sec-arrays-strings-and-hashing-the-80">§2</a>–<a href="#sec-trees-and-heaps-the-hierarchies">§4</a> are the map — most real-world code is arrays, hash maps, and trees, used well. The patterns here (top-K, two pointers, sliding window) appear in real APIs more often than in interview problems.</li>
+  <li><strong>As reference:</strong> the failure-modes table (<a href="#sec-failure-modes-the-edge-case-checklist">§13</a>) is the checklist to run after solving anything — most lost marks are edge cases, not missing algorithms.</li>
   <li><strong>The rule:</strong> implement first, optimize after. A correct O(n²) answer passes; a wrong O(n log n) answer doesn't. Brute force is a valid Phase 2 plan (Problem-Solving's rule, applied here).</li>
 </ul>
 
@@ -78,10 +81,10 @@
 <tbody>
 <tr><td><code>Map</code>/<code>Set</code> <code>get/set/has/delete/add</code></td><td>O(1) average</td><td>Real key semantics — this is the map; a plain object is not</td></tr>
 <tr><td><code>arr[i]</code>, <code>arr.push/pop</code></td><td>O(1)</td><td>Fast path of the 80% section — use the end of the array</td></tr>
-<tr><td><code>arr.shift()</code>/<code>unshift()</code></td><td>O(n)</td><td>Reindexes the whole array — use an index pointer (§6) or a real queue</td></tr>
+<tr><td><code>arr.shift()</code>/<code>unshift()</code></td><td>O(n)</td><td>Reindexes the whole array — use an index pointer (<a href="#sec-graphs-the-model-of-connections">§6</a>) or a real queue</td></tr>
 <tr><td><code>arr.sort()</code></td><td>O(n log n)</td><td>Stable since ES2019 — the default sort; implement quicksort only when the problem is sorting</td></tr>
 <tr><td><code>arr.indexOf/includes/splice</code></td><td>O(n)</td><td>Membership on an array is a scan — a <code>Set</code> makes it O(1)</td></tr>
-<tr><td><code>obj[key]</code></td><td>O(1), but…</td><td>String coercion (<code>obj[1]</code> ≡ <code>obj["1"]</code>) and prototype-key leakage — plain objects are not maps (§2)</td></tr>
+<tr><td><code>obj[key]</code></td><td>O(1), but…</td><td>String coercion (<code>obj[1]</code> ≡ <code>obj["1"]</code>) and prototype-key leakage — plain objects are not maps (<a href="#sec-arrays-strings-and-hashing-the-80">§2</a>)</td></tr>
 <tr><td><code>s += ch</code> in a loop</td><td>O(n²) total</td><td>Strings are immutable; each <code>+=</code> copies — build an array and <code>join()</code></td></tr>
 <tr><td><code>BigInt</code> arithmetic</td><td>Slower than <code>Number</code></td><td>Only above 2^53; mixing <code>BigInt</code> with <code>Number</code> throws</td></tr>
 </tbody>
@@ -299,7 +302,7 @@ function inorder(node, out = []) {
 
 <h2 id="sec-recursion-the-self-referential-move">Recursion — the self-referential move</h2>
 
-<p>Every structure above is finite and concrete; recursion is the idea that a function can <em>be its own template</em> — a problem solved by solving a smaller version of the same problem. You've been using it since the tree traversals (§4): <code>inorder(node)</code> calls <code>inorder(node.left)</code>. A standalone treatment because it is the engine behind DFS (§6), divide-and-conquer (§7), and DP (§8), and because the two failure modes are common and cheap to fix.</p>
+<p>Every structure above is finite and concrete; recursion is the idea that a function can <em>be its own template</em> — a problem solved by solving a smaller version of the same problem. You've been using it since the tree traversals (<a href="#sec-trees-and-heaps-the-hierarchies">§4</a>): <code>inorder(node)</code> calls <code>inorder(node.left)</code>. A standalone treatment because it is the engine behind DFS (<a href="#sec-graphs-the-model-of-connections">§6</a>), divide-and-conquer (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a>), and DP (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§8</a>), and because the two failure modes are common and cheap to fix.</p>
 
 <p><strong>The shape, always two parts:</strong> a <em>base case</em> that stops the recursion (smallest input, no further call), and a <em>recursive case</em> that calls itself on a strictly smaller input. If the recursive case ever fails to shrink toward the base case, you get infinite recursion → stack overflow. That's the whole discipline.</p>
 
@@ -309,9 +312,9 @@ function power(x, n) {
   return x * power(x, n - 1);         // recursive case, strictly smaller
 }</code></pre>
 
-<p><strong>How to write one under pressure:</strong> 1) identify the <em>smallest</em> input and write its answer as the base case; 2) trust that the recursive call <em>works</em> for smaller inputs (the "leap of faith" — don't trace it); 3) ask "given the answer for a smaller instance, how do I build the answer for this one?" The last step is the same question DP asks — recursion with a cache is memoized DP, so a clean recursive solution is one memo away from a DP solution (§8).</p>
+<p><strong>How to write one under pressure:</strong> 1) identify the <em>smallest</em> input and write its answer as the base case; 2) trust that the recursive call <em>works</em> for smaller inputs (the "leap of faith" — don't trace it); 3) ask "given the answer for a smaller instance, how do I build the answer for this one?" The last step is the same question DP asks — recursion with a cache is memoized DP, so a clean recursive solution is one memo away from a DP solution (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§8</a>).</p>
 
-<p><strong>When to abandon recursion:</strong> every call burns a stack frame; deep chains (a grid of 10,000 cells in DFS, a very long list) overflow the call stack — a recursion limit, not a logic error. Two escapes: make it <em>iterative</em> with an explicit stack (you control the memory), or use BFS (§6), which never recurses. Anything you can write recursively you can write with a stack you push onto — the stack <em>is</em> the recursion. Rule of thumb: recursion for tree depth (safe, O(log n)); explicit stack for graph depth (arbitrary).</p>
+<p><strong>When to abandon recursion:</strong> every call burns a stack frame; deep chains (a grid of 10,000 cells in DFS, a very long list) overflow the call stack — a recursion limit, not a logic error. Two escapes: make it <em>iterative</em> with an explicit stack (you control the memory), or use BFS (<a href="#sec-graphs-the-model-of-connections">§6</a>), which never recurses. Anything you can write recursively you can write with a stack you push onto — the stack <em>is</em> the recursion. Rule of thumb: recursion for tree depth (safe, O(log n)); explicit stack for graph depth (arbitrary).</p>
 
 <h3>Divide-and-conquer vs DP — the distinction that clarifies both</h3>
 
@@ -500,7 +503,7 @@ return lo;                            // first good index</code></pre>
 
 <h2 id="sec-pattern-recognition-cheat-sheet-signal-technique">Pattern recognition cheat sheet — signal → technique</h2>
 
-<p>The companion to <a href="./problem-solving.html">Problem-Solving</a> §7b's recognition tables — the operational version, signal first:</p>
+<p>The companion to <a href="./problem-solving.html">Problem-Solving</a> <a href="./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog">§7b</a>'s recognition tables — the operational version, signal first:</p>
 
 <table>
 <thead><tr><th>If the problem says…</th><th>Reach for…</th><th>Why</th></tr></thead>
@@ -532,18 +535,18 @@ return lo;                            // first good index</code></pre>
 <table>
 <thead><tr><th>#</th><th>The line</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Arrays, hash maps, and trees are 80% of real code — master §2 and the "what could I remember?" reflex.</td></tr>
-<tr><td>2</td><td>Hash map O(1) depends on the load factor; use <code>Map</code>/<code>Set</code>, never a plain object (§2).</td></tr>
-<tr><td>3</td><td>Two pointers, sliding window, prefix sums: the three array moves that make "longest / pair / range" linear (§2).</td></tr>
-<tr><td>4</td><td>Monotonic stack = "next greater" in O(n); the dummy-head trick kills a whole class of list bugs (§3).</td></tr>
-<tr><td>5</td><td>Traversals first; BFS = shortest path on unweighted graphs, three-state DFS = cycle detection (§4, §6).</td></tr>
-<tr><td>6</td><td>Union-find for connectivity, topological sort for ordering, Dijkstra for weighted shortest path (§6).</td></tr>
-<tr><td>7</td><td>Binary search is a monotonic-predicate engine, not a sorted-array trick — half-open range, first-good-index (§7).</td></tr>
-<tr><td>8</td><td>Sorting is preprocessing: "k smallest", "merge intervals", "anagram groups" all become linear after one sort (§7).</td></tr>
-<tr><td>9</td><td>DP = cached enumeration: state, transition, base — then memoize before you tabulate (§8).</td></tr>
-<tr><td>10</td><td>Greedy without an exchange argument is a gamble; when in doubt, DP (§9).</td></tr>
-<tr><td>11</td><td>Classify before coding — the cheat sheet maps signal to technique; brute force is a valid fallback classification (§11).</td></tr>
-<tr><td>12</td><td>Run the failure-modes table after every solution: edges at size ≤ 2, all-negative inputs, overflow, mutation while iterating (§13).</td></tr>
+<tr><td>1</td><td>Arrays, hash maps, and trees are 80% of real code — master <a href="#sec-arrays-strings-and-hashing-the-80">§2</a> and the "what could I remember?" reflex.</td></tr>
+<tr><td>2</td><td>Hash map O(1) depends on the load factor; use <code>Map</code>/<code>Set</code>, never a plain object (<a href="#sec-arrays-strings-and-hashing-the-80">§2</a>).</td></tr>
+<tr><td>3</td><td>Two pointers, sliding window, prefix sums: the three array moves that make "longest / pair / range" linear (<a href="#sec-arrays-strings-and-hashing-the-80">§2</a>).</td></tr>
+<tr><td>4</td><td>Monotonic stack = "next greater" in O(n); the dummy-head trick kills a whole class of list bugs (<a href="#sec-stacks-queues-and-linked-lists-the-shapes">§3</a>).</td></tr>
+<tr><td>5</td><td>Traversals first; BFS = shortest path on unweighted graphs, three-state DFS = cycle detection (<a href="#sec-trees-and-heaps-the-hierarchies">§4</a>, <a href="#sec-graphs-the-model-of-connections">§6</a>).</td></tr>
+<tr><td>6</td><td>Union-find for connectivity, topological sort for ordering, Dijkstra for weighted shortest path (<a href="#sec-graphs-the-model-of-connections">§6</a>).</td></tr>
+<tr><td>7</td><td>Binary search is a monotonic-predicate engine, not a sorted-array trick — half-open range, first-good-index (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a>).</td></tr>
+<tr><td>8</td><td>Sorting is preprocessing: "k smallest", "merge intervals", "anagram groups" all become linear after one sort (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a>).</td></tr>
+<tr><td>9</td><td>DP = cached enumeration: state, transition, base — then memoize before you tabulate (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§8</a>).</td></tr>
+<tr><td>10</td><td>Greedy without an exchange argument is a gamble; when in doubt, DP (<a href="#sec-greedy-the-beautiful-lie">§9</a>).</td></tr>
+<tr><td>11</td><td>Classify before coding — the cheat sheet maps signal to technique; brute force is a valid fallback classification (<a href="#sec-pattern-recognition-cheat-sheet-signal-technique">§11</a>).</td></tr>
+<tr><td>12</td><td>Run the failure-modes table after every solution: edges at size ≤ 2, all-negative inputs, overflow, mutation while iterating (<a href="#sec-failure-modes-the-edge-case-checklist">§13</a>).</td></tr>
 </tbody>
 </table>
 
@@ -554,14 +557,14 @@ return lo;                            // first good index</code></pre>
 <table>
 <thead><tr><th>Symptom</th><th>Cause</th><th>The fix</th></tr></thead>
 <tbody>
-<tr><td>Off-by-one on binary search / loop bounds</td><td>Misremembered the invariant, or wrote <code>&lt;=</code> vs <code>&lt;</code> by habit</td><td>Half-open range <code>[lo, hi)</code> + "first good index" predicate (§7) — never rewrite the loop, only <code>isGood</code></td></tr>
+<tr><td>Off-by-one on binary search / loop bounds</td><td>Misremembered the invariant, or wrote <code>&lt;=</code> vs <code>&lt;</code> by habit</td><td>Half-open range <code>[lo, hi)</code> + "first good index" predicate (<a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a>) — never rewrite the loop, only <code>isGood</code></td></tr>
 <tr><td>Empty input, single element, or array length 1 crashes</td><td>The edge cases weren't run as test cases</td><td>Run the input-size axis first: <code>[]</code>, <code>[1]</code>, length 2 — most bugs live at size ≤ 2</td></tr>
 <tr><td>All-negative input breaks a "max" / "sum" solution</td><td>Initialized the answer to 0 or skipped negatives</td><td>Initialize <code>best = -Infinity</code>; for max-subarray, Kadane handles negatives only if you compare against the element, not 0</td></tr>
-<tr><td><code>obj[1]</code> and <code>obj["1"]</code> collide / prototype keys leak in</td><td>Using a plain object as a map</td><td><code>Map</code>/<code>Set</code> for real key semantics (§2) — never a plain object for lookups</td></tr>
-<tr><td>Timeout on what should be O(n)</td><td><code>shift()</code> in a loop, string <code>+=</code> in a loop, or a <code>sort()</code> inside the loop</td><td>Index-pointer queue instead of <code>shift()</code>, array + <code>join()</code> instead of <code>+=</code>, hoist the sort (§3, §7)</td></tr>
-<tr><td>Recursion stack overflow (BFS/DFS on a big graph)</td><td>Deep recursive DFS on a long chain</td><td>Explicit stack, or BFS with a queue — iterative traversal is O(n) space-safe (§6)</td></tr>
-<tr><td>"Feels right but wrong" greedy</td><td>No exchange argument (§9)</td><td>When in doubt, DP — greedy without the argument is a gamble</td></tr>
-<tr><td>Duplicate work on overlapping subproblems</td><td>Recursive brute force without memoization</td><td>Memoized recursion first (§8) — cache it before optimizing anything else</td></tr>
+<tr><td><code>obj[1]</code> and <code>obj["1"]</code> collide / prototype keys leak in</td><td>Using a plain object as a map</td><td><code>Map</code>/<code>Set</code> for real key semantics (<a href="#sec-arrays-strings-and-hashing-the-80">§2</a>) — never a plain object for lookups</td></tr>
+<tr><td>Timeout on what should be O(n)</td><td><code>shift()</code> in a loop, string <code>+=</code> in a loop, or a <code>sort()</code> inside the loop</td><td>Index-pointer queue instead of <code>shift()</code>, array + <code>join()</code> instead of <code>+=</code>, hoist the sort (<a href="#sec-stacks-queues-and-linked-lists-the-shapes">§3</a>, <a href="#sec-sorting-and-searching-the-preprocessing-moves">§7</a>)</td></tr>
+<tr><td>Recursion stack overflow (BFS/DFS on a big graph)</td><td>Deep recursive DFS on a long chain</td><td>Explicit stack, or BFS with a queue — iterative traversal is O(n) space-safe (<a href="#sec-graphs-the-model-of-connections">§6</a>)</td></tr>
+<tr><td>"Feels right but wrong" greedy</td><td>No exchange argument (<a href="#sec-greedy-the-beautiful-lie">§9</a>)</td><td>When in doubt, DP — greedy without the argument is a gamble</td></tr>
+<tr><td>Duplicate work on overlapping subproblems</td><td>Recursive brute force without memoization</td><td>Memoized recursion first (<a href="#sec-dynamic-programming-the-state-machine-of-optimization">§8</a>) — cache it before optimizing anything else</td></tr>
 <tr><td>Mutation bugs — deleting/updating while iterating</td><td>Modifying the array inside a <code>for</code> loop shifts indices</td><td>Iterate backward, or collect and apply after; or <code>filter()</code> which is safe</td></tr>
 <tr><td>Integer overflow / precision (money, large n)</td><td>JS numbers are IEEE doubles; sums can lose precision</td><td>Work in cents/integer units; use <code>BigInt</code> when > 2^53; compare with epsilon</td></tr>
 </tbody>
