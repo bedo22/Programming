@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.NET والمسار المؤسسي — إلمام قرائي، لا دورة C#</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · .NET والمسار المؤسسي — إلمام قرائي، لا دورة C#</p>
+  <h1>.NET والمسار المؤسسي</h1>
+  <p class="meta">أين يعيش C#/.NET في السوق (المؤسسات، البنوك، الحكومة، مراكز الاستعانة بمصادر خارجية — مصر، الخليج، أوروبا الشرقية)، والإلمام الذي تحتاجه لتتنقل فيه دون أن تصبح مطوّر .NET: حلقة طلب ASP.NET Core مرسّمة واحدًا لواحد على هندسة الخلفية، وجدول ترجمة قراءة من TypeScript إلى C#، وEF Core بصفته الـ ORM الذي تفهمه بالفعل، وأعمار حقن التبعيات الثلاثة، وفروق T-SQL عن PostgreSQL، ومثال عملي يقرأ نقطة نهاية حقيقية من أولها إلى آخرها. اقرأ هذا عندما تذكر لائحة وظيفة أو عقد ما .NET — لتجري المقابلة وتتكامل، لا لتتعلم من جديد.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../dotnet-and-the-enterprise-lane.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يقع هذا.</strong> تعلّم هذه الرفوف نظام JavaScript/TypeScript/React بعمق. و.NET هو أكبر عالم خلفية <em>آخر</em> — وبالنسبة لمتعلم في مصر (أو أسواق مشابهة) ليس غريبًا: لوحات الوظائف المؤسسية، والبنوك، والحكومة، والاستعانة بمصادر خارجية من الاتحاد الأوروبي والولايات المتحدة تعمل عليه بكثافة. هذه الوثيقة هي نقطة التقاطع: ما يكفي لقراءة كود C#، وتعيين ASP.NET Core على نماذج ذهنية تملكها بالفعل، ومواصلة محادثة .NET — دون كسر نواة JS لهذه الرفوف:</p>
+  <pre>THE JS CORE (the shelf's depth)        THE .NET LANE (this doc — literacy)
+javascript-the-language.html           What it is: C#, ASP.NET Core, EF Core
+backend-engineering.html  ← the loop   How it maps: middleware → controller → service
+api-design.html           ← contracts  How it differs: DI lifetimes, records, LINQ
+system-design.html        ← boundaries When it matters: Egypt enterprise/offshoring
+sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL</pre>
+  <p>الجيران وكيف يتقاسموا العمل:</p>
+  <ul>
+    <li><a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — يملك جدول التموضع (متى يفوز Node، ومتى يفوز .NET، ولماذا). تضيف هذه الوثيقة <em>إلمام القراءة</em> على جانب .NET من ذلك الجدول.</li>
+    <li><a href="../backend-engineering.html">هندسة الخلفية</a> — تملك حلقة الطلب، والمصادقة، والتخزين المؤقت، والمعاملات. ASP.NET Core هو تلك الحلقة بزي مختلف؛ ترسم هذه الوثيقة التطابق قسمًا لقسم.</li>
+    <li><a href="../sql-and-postgresql.html">SQL وPostgreSQL</a> — تملك لغة الاستعلام. T-SQL (SQL Server) لهجة؛ تسرد هذه الوثيقة الفروق فقط.</li>
+    <li><a href="./api-design.html">API Design</a> — العقود مستقلة عن اللغة؛ ينتج ASP.NET Core عقود REST نفسها بوسمات (attributes).</li>
+  </ul>
+</blockquote>
+<section class="recap">
+  <h3 style="margin-top:0">لماذا توجد هذه الوثيقة</h3>
+  <p><em>لأن «تخطَّ .NET» نصيحة خاطئة لمكتبة بجمهور مصري.</em> مهمة هذه الرفوف هي الاستكشاف، لا مسار واحد: القارئ الذي يريد عملًا مؤسسيًا/حكوميًا/بنكيًا — سوق الخلفية المهيمن في الاقتصاد الرسمي في مصر والخليج ومعظم أوروبا الشرقية — سيصطدم بـ C#/.NET في لوائح الوظائف والمقابلات وعقود الاستعانة بمصادر خارجية. الموقف الصادق ليس «صِر مطوّر .NET» ولا «تجاهله»: إنه <strong>الإلمام القرائي</strong> — نماذج الرفوف الذهنية (حلقة الطلب، العقود، المعاملات، الـ ORMs، حقن التبعيات) تنتقل واحدًا لواحد، وقراءة C# ممكنة في عطلة نهاية أسبوع واحدة بعدما تستقر TypeScript في بيتك. تعلّم هذه الوثيقة الترجمة، لا اللغة. ملاحظة نطاق واحدة: <strong>هذه ليست دورة C#</strong> — لا تدريبات نحوية، ولا دروس أطر عمل؛ العمق موجود في Microsoft Learn ووثائق ASP.NET، المربوطة أدناه.</p>
+</section>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ هذه بعد <a href="../backend-engineering.html">هندسة الخلفية</a> <a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a> (الحلقة) وبعد <a href="../sql-and-postgresql.html">SQL وPostgreSQL</a> (طبقة البيانات) — تفترض هذه الوثيقة أن كليهما دافئ. الروابط المتقاطعة:</p>
+<ul>
+  <li>التموضع — متى يفوز كل مكدس: <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (صف .NET في جدول تموضعه).</li>
+  <li>حلقة الطلب بعمق: <a href="../backend-engineering.html">هندسة الخلفية</a> — كل مفهوم ASP.NET Core هنا يطابق قسمًا هناك.</li>
+  <li>طبقة البيانات: <a href="../sql-and-postgresql.html">SQL وPostgreSQL</a> — T-SQL لهجة من اللغة نفسها.</li>
+  <li>العقود: <a href="./api-design.html">API Design</a> — ماذا تنتج وسمات <code>[ApiController]</code> فعليًا.</li>
+  <li>خرائط المسار الوظيفي: <a href="../frontend-income-markets.html">Frontend Income Markets</a> <a href="../frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets">§التوظيف المحلي</a> — أين يقع السوق المصري.</li>
+  <li>مرجع: <a href="./glossary.html">المسرد</a>.</li>
+</ul>
+
+<p><strong>إذا قالت لائحة وظيفة تريدها فعلًا «C#/.NET»، أو كانت API عميلك ASP.NET — فهذا هو الجسر.</strong> اقرأ التعريف (ماذا يعني الإلمام)، وتعيين حلقة الطلب، وجدول القراءة؛ والمثال العملي هو المكان الذي يقع فيه الأمر في مكانه.</p>
+
+<h2 id="sec-definition-the-enterprise-lane-and-what-literacy-means">التعريف — المسار المؤسسي، وماذا يعني الإلمام</h2>
+
+<p><strong>.NET منصة تطبيقات مايكروسوفت:</strong> لغة <strong>C#</strong>، ووقت تشغيل <strong>CLR</strong> (مثل V8 هو وقت تشغيل Node)، و<strong>ASP.NET Core</strong> للويب (معادل .NET لـ Express/Fastify/Next)، و<strong>EF Core</strong> للوصول إلى البيانات (ORM، مثل Prisma/Drizzle)، و<strong>SQL Server</strong> بصفته قاعدة بياناته الطبيعية. ليست «لغة» بالمعنى الذي تستخدمه هذه الرفوف للكلمة — إنها <em>مكدس</em>، وموضعها السوقي أهم من نحوها:</p>
+
+<table>
+  <thead><tr><th>قطاع السوق</th><th>الخلفيات المهيمنة</th><th>لماذا</th></tr></thead>
+  <tbody>
+    <tr><td>المؤسسات / البنوك / الحكومة (الولايات المتحدة، الاتحاد الأوروبي، الخليج، مصر)</td><td><strong>C#/.NET</strong>، Java/Spring</td><td>الأنظمة القديمة، عقود مايكروسوفت المؤسسية، الامتثال، دورات صيانة طويلة</td></tr>
+    <tr><td>الشركات الناشئة / المتنامية</td><td>Node/TypeScript، Python، Go</td><td>سرعة التكرار، لغة واحدة عبر المكدس، حوض التوظيف</td></tr>
+    <tr><td>العمل الحر / الوكالات / الأعمال الصغيرة</td><td>Node، PHP/WordPress، Python</td><td>ميزانيات العملاء، النظام البيئي CMS، السرعة — <a href="../wordpress-and-cms-internet.html">إنترنت CMS</a></td></tr>
+    <tr><td>مراكز الاستعانة بمصادر خارجية / الاستعانة (مصر، الهند، أوروبا الشرقية)</td><td><strong>C#/.NET</strong>، Java، Node</td><td>تستعين شركات الاتحاد الأوروبي والولايات المتحدة بأنظمتها المؤسسية خارجيًا — وتلك الأنظمة .NET</td></tr>
+  </tbody>
+</table>
+
+<p><strong>الإلمام يعني ثلاثة أشياء، بهذا الترتيب:</strong> (1) تستطيع <em>قراءة</em> قاعدة كود C# — تتبع نقطة نهاية من المتحكم إلى قاعدة البيانات؛ (2) تستطيع <em>تعيين</em> كل مفهوم على نماذج ذهنية تملكها بالفعل — لا شيء هنا جديد، أُعيدت تسميته فقط؛ (3) تعرف <em>أين يقع المسار</em> — متى يظهر .NET في حياتك المهنية وماذا يشير إليه. لا يعني كتابة C# للإنتاج أو مطاردة النظام البيئي. إذا اخترت المسار لاحقًا عن قصد، فوثائق الرف الخاصة بالخلفية/API/SQL هي المنهج؛ هذه الوثيقة هي الخريطة التي تجعلها قابلة للنقل.</p>
+
+<h2 id="sec-intersection-with-neighbors-the-duplication-boundaries">التقاطع مع الجيران — حدود الازدواجية</h2>
+
+<table>
+  <thead><tr><th>الوثيقة المجاورة</th><th>ما تملكه</th><th>ما يبقى هناك مقابل هنا</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./javascript-across-stacks.html">JavaScript Across Stacks</a></td><td>جدول التموضع التنافسي — .NET بصفته مسارًا منافسًا، نماذج التزامن، متى يفوز كل منهما</td><td>هناك: نظرية المسارات. هنا: كيف <em>تقرأ</em> جانب .NET حين تهبط فيه</td></tr>
+    <tr><td><a href="../backend-engineering.html">هندسة الخلفية</a></td><td>حلقة الطلب، الوسيط، المصادقة، التخزين المؤقت، المعاملات، انعدام الحالة</td><td>هناك: الحلقة نفسها. هنا: كتابة ASP.NET Core لكل مفهوم</td></tr>
+    <tr><td><a href="../sql-and-postgresql.html">SQL وPostgreSQL</a></td><td>لغة الاستعلام وPostgreSQL</td><td>هناك: SQL نفسه. هنا: فروق لهجة T-SQL القليلة ومكان SQL Server في شِركات .NET</td></tr>
+    <tr><td><a href="./api-design.html">API Design</a></td><td>تصميم العقود، الإصدارات، التساوي الذاتي</td><td>هناك: الانضباط. هنا: وسوم C# التي تنفذه</td></tr>
+    <tr><td><a href="../frontend-income-markets.html">Frontend Income Markets</a></td><td>سياق توظيف مصر، أسواق العمل، الأسعار</td><td>هناك: بيانات المسار الوظيفي. هنا: إلمام المكدس الذي تشير إليه تلك البيانات</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-the-request-loop-c-edition">حلقة الطلب، طبعة C#</h2>
+
+<p>النموذج الذهبي لحلقة الطلب في الرف — Request ← Auth ← Logic ← Data ← Response — هو بالضبط ما يشغّله ASP.NET Core. لا شيء هنا جديد؛ كل شيء أُعيدت تسميته:</p>
+
+<table>
+  <thead><tr><th>مفهوم هندسة الخلفية (القسم)</th><th>كتابة ASP.NET Core</th><th>ما هو</th></tr></thead>
+  <tbody>
+    <tr><td>سلسلة الوسيط (<a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>، <a href="../backend-engineering.html#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a>)</td><td><code>UseAuthentication()</code>، <code>UseAuthorization()</code>، أصناف وسيط مخصصة</td><td>خط الأنابيب: كل طلب يتدفق عبر السلسلة بالترتيب — نفس النموذج الذهني لوسيط Express</td></tr>
+    <tr><td>توجيه طلب إلى معالج (<a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td><td><code>[ApiController]</code> + <code>[Route("api/shipments")]</code> + طرق الإجراءات</td><td>صنف واحد لكل مورد؛ كل طريقة نقطة نهاية — مثل ملف موجه بدوال معالج</td></tr>
+    <tr><td>استخراج المعاملات والتحقق من صحتها (<a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td><td>ربط النماذج + <code>[FromBody]</code>، <code>[FromQuery]</code>، التعليقات التوضيحية للبيانات</td><td>تتحول أجسام الطلبات إلى كائنات مكتوبة تلقائيًا؛ يعمل التحقق عند الربط</td></tr>
+    <tr><td>عقد الاستجابة (<a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>، و<a href="./api-design.html">API Design</a>)</td><td><code>ActionResult&lt;T&gt;</code>، <code>Problem()</code> (RFC 9457)، مساعدات الحالة</td><td><code>return Ok(dto)</code>، <code>NotFound()</code>، <code>Problem()</code> — الحالات والأغلفة نفسها التي يصفها وثيقة تصميم API لديك</td></tr>
+    <tr><td>المصادقة مقابل التفويض (<a href="../backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a>)</td><td>وسوم <code>[Authorize]</code> + وسيط JWT bearer</td><td>الوسم = بوابة إذن؛ الوسيط = هوية؛ الانقسام هو نفسه كما في <a href="../backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a> من Backend Engineering</td></tr>
+    <tr><td>طبقة منطق الأعمال (<a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td><td>الخدمات (اصطلاح «طبقة الخدمات»)</td><td>تبقى المتحكمات نحيفة؛ تحمل الخدمات منطق حلقة الطلب — البنية نفسها التي تستخدمها معالجات Node لديك</td></tr>
+    <tr><td>انعدام الحالة وقيد بلا خادم (<a href="../terminal-and-deployment-substrate.html#sec-cloud-the-three-eras-of-renting-compute">Substrate §Cloud</a>)</td><td>Azure Functions، ASP.NET Core محوَّل للحاويات</td><td>القواعد نفسها: الحالة تعيش خارج المعالِج؛ بدء التشغيل البارد هو نفس المقامرة</td></tr>
+  </tbody>
+</table>
+
+<p>اقرأ أي نقطة نهاية ASP.NET Core هكذا: <em>الوسيط ← المتحكم ← الخدمة ← EF Core ← SQL Server ← الاستجابة</em>. هذا هو الجسر كله.</p>
+
+<h2 id="sec-c-reading-literacy-the-typescript-translation-table">إلمام قراءة C# — جدول الترجمة من TypeScript</h2>
+
+<p>C# ليس غريبًا إذا كانت TypeScript وطنًا — إنه شقيق: كلاهما مكتوبا الأنماط وبلغة أصناف أولًا، مع async/await وأنواع عامة (generics) ومعالجة حديثة للقيم الخالية. يغطي جدول الترجمة ما ستراه فعلًا أثناء القراءة:</p>
+
+<table>
+  <thead><tr><th>TypeScript تعرفه</th><th>C# ستقرأه</th><th>ملاحظات</th></tr></thead>
+  <tbody>
+    <tr><td><code>interface User { id: number }</code></td><td><code>record User(int Id, string Name)</code> أو <code>class</code> بخصائص</td><td>الـ records عادة حاملات بيانات غير قابلة للتغيير؛ خصائص PascalCase هي القاعدة</td></tr>
+    <tr><td><code>async/await</code>، <code>Promise&lt;T&gt;</code></td><td><code>async Task&lt;T&gt;</code></td><td>Task ≈ Promise — الفكرة نفسها، محرك مختلف (انظر ملاحظة async أدناه)</td></tr>
+    <tr><td><code>Array.map/filter/reduce</code></td><td>LINQ: <code>.Select(...)</code>، <code>.Where(...)</code>، <code>.Aggregate(...)</code></td><td>LINQ برمجة وظيفية بنكهة SQL — حدسك في <a href="../sql-and-postgresql.html">SQL</a> ينتقل مباشرة</td></tr>
+    <tr><td><code>const x = ...</code> / <code>let y = ...</code></td><td><code>var</code> (نوع مستنتج)، <code>readonly</code></td><td><code>var</code> ليست كتابة ديناميكية — يُستنتج النوع وقت الترجمة</td></tr>
+    <tr><td><code>null</code> / السلسلة الاختيارية <code>?.</code></td><td><code>null</code>، تعليقات القابلية للعدم <code>?</code>، دمج القيم الخالية <code>??</code></td><td>العادات نفسها: <code>??</code> هو COALESCE، <code>?.</code> هي السلسلة الاختيارية — قواعد NULL من SQL تنطبق على كودك أيضًا</td></tr>
+    <tr><td><code>type</code> / الأنواع العامة <code>&lt;T&gt;</code></td><td>الأنواع العامة <code>&lt;T&gt;</code>، الواجهات، الأصناف المجردة</td><td>الشكل نفسه؛ احتفالية أثقل (كلمات مفتاحية أكثر) لكن لا شيء جديد مفهوميًا</td></tr>
+    <tr><td>حقن التبعيات يدويًا</td><td><code>IServiceCollection</code>، حقن المُنشئ</td><td>يسلّم الإطار الخدمات إلى المنشئات — اقرأها «الإطار يقوم بالحقن عنك»</td></tr>
+  </tbody>
+</table>
+
+<p><strong>قاعدة عامة للقراءة:</strong> حين تقابل اصطلاح C# غير معروف، اسأل «ما معادله في TypeScript/JavaScript؟» — يوجد واحد، وعادة هو الفكرة نفسها بكلمة مختلفة.</p>
+
+<p><strong>المكان الوحيد الذي تعض فيه «نفس الكلمة، معنى مختلف» فعلًا: <code>async</code>.</strong> تعمل JavaScript على حلقة أحداث بخيط واحد؛ يعمل C# على تجمع خيوط مشترك. <code>await</code> الذي تكتبه يبدو متطابقًا، لكن المحرك تحته ليس كذلك — وتظهر فروق المصيدة اللحظة التي تقرأ فيها كود خدمة حقيقي:</p>
+
+<table>
+  <thead><tr><th>JavaScript / Node</th><th>C# / .NET</th></tr></thead>
+  <tbody>
+    <tr><td>حلقة الأحداث: خيط واحد يتخلل I/O</td><td>تجمع الخيوط: يُستعار خيط عامل بينما تعمل مهمة Task</td></tr>
+    <tr><td><code>await</code> يعيد التحكم إلى حلقة الأحداث</td><td><code>await</code> يعيد الخيط إلى التجمع؛ يستأنف العمل على خيط من التجمع</td></tr>
+    <tr><td>لا sync-over-async؛ الحجب يوقف الحلقة كلها</td><td><code>.Result</code> / <code>.Wait()</code> يحجبان خيط تجمع — الجمود الكلاسيكي في تطبيقات الويب</td></tr>
+    <tr><td><code>setTimeout</code> / <code>setInterval</code></td><td><code>Task.Delay</code> — الفكرة نفسها، بكتابة مختلفة فقط</td></tr>
+  </tbody>
+</table>
+
+<p>اقرأ طرق <code>async Task</code> هكذا: <em>يمكن للعمل أن ينتظر دون حجب خيط</em>. وعامل <code>.Result</code> كعلامة خطر تستحق إعلانها بصوت عالٍ — إنه معادل C# لـ <code>setInterval</code> طويل العمر يسرب الذاكرة: يعمل حتى لا يعمل.</p>
+<h2 id="sec-reading-linq-the-query-pipeline-at-a-glance">قراءة LINQ — خط أنابيب الاستعلام في لمحة</h2>
+
+<p>تُقرأ سلاسل LINQ كاستعلام SQL سلس. حين تقابل واحدة، ترجمها عمودًا بعمود مع <a href="../sql-and-postgresql.html">SQL</a> الخاص بالرف:</p>
+
+<table>
+  <thead><tr><th>LINQ ستقرأه</th><th>ترجمة SQL / JS</th></tr></thead>
+  <tbody>
+    <tr><td><code>.Where(predicate)</code></td><td><code>WHERE</code> / <code>Array.filter</code></td></tr>
+    <tr><td><code>.Select(x =&gt; ...)</code></td><td><code>SELECT</code> / <code>Array.map</code> — إسقاط</td></tr>
+    <tr><td><code>.OrderBy(...)</code> / <code>.ThenBy(...)</code></td><td><code>ORDER BY</code> / <code>sort</code> — مفاتيح متعددة</td></tr>
+    <tr><td><code>.FirstOrDefault()</code> / <code>.SingleOrDefault()</code></td><td><code>LIMIT 1</code> — أول صف، أو <code>null</code></td></tr>
+    <tr><td><code>.Any(predicate)</code></td><td><code>EXISTS</code> — «هل يوجد واحد؟»</td></tr>
+    <tr><td><code>.Count()</code></td><td><code>COUNT(*)</code> / <code>length</code></td></tr>
+    <tr><td><code>.Include(...)</code> / <code>.ThenInclude(...)</code></td><td>JOIN مبكر في EF Core — جذب جدول مرتبط مقدمًا</td></tr>
+    <tr><td><code>.ToList()</code> / <code>.AsNoTracking()</code></td><td>«نفّذ الاستعلام الآن» / «قراءة فقط — تجاوَز تتبع التغييرات»</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-ef-core-the-orm-you-already-understand">EF Core — الـ ORM الذي تفهمه بالفعل</h2>
+
+<p><a href="../backend-engineering.html">هندسة الخلفية</a> <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> يمنحك قرار الـ ORM مقابل SQL الخام؛ EF Core مثال كامل المواصفات على ذلك القرار. ما تحتاجه <em>لتقرأ</em>:</p>
+
+<table>
+  <thead><tr><th>مفهوم الـ ORM (من <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> في Backend / وثيقة SQL)</th><th>كتابة EF Core</th><th>ما الذي تراقبه</th></tr></thead>
+  <tbody>
+    <tr><td>تعيين المخطط</td><td><code>DbContext</code> + خصائص <code>DbSet&lt;T&gt;</code></td><td>كل DbSet جدول؛ الصنف هو شكل الصف</td></tr>
+    <tr><td>الترحيلات</td><td><code>dotnet ef migrations add</code> / <code>database update</code></td><td>قواعد ترحيل <a href="../data-modeling-and-databases.html">نمذجة البيانات</a> تنطبق دون تغيير</td></tr>
+    <tr><td>الاستعلام</td><td>LINQ: <code>context.Shipments.Where(s =&gt; s.CustomerId == id)</code></td><td>يتعامل LINQ-to-SQL إلى لغة الاستعلام التي تعرفها بالفعل؛ نموذج WHERE/JOIN نفسه ينطبق</td></tr>
+    <tr><td>مصيدة N+1</td><td>التحميل الكسول (معطّل افتراضيًا) مقابل <code>.Include(...)</code></td><td>خصائص التنقل غير المضمّنة = مشكلة N+1 من <a href="../sql-and-postgresql.html#sec-joins-the-core-skill">SQL §JOINs</a>، بثوب LINQ</td></tr>
+    <tr><td>منفذ الهروب الخام</td><td><code>FromSqlRaw</code> / <code>ExecuteSqlRaw</code></td><td>القواعد نفسها لـ SQL الخام في Node: بارامتر أو تُحقن</td></tr>
+  </tbody>
+</table>
+
+<p>القطعة الوحيدة الجديدة الشكل حقًا هي <strong>تتبع التغييرات</strong>: يراقب EF Core الكائنات التي حمّلتها ويكتب فقط ما تغيّر — راحة ORM تحاكيها ORMs في Node بدرجات متفاوتة. حين تقرأ <code>context.SaveChanges()</code>، فهذه هي لحظة «اكتب المعاملة».</p>
+
+<h2 id="sec-dependency-injection-the-framework-shape">حقن التبعيات وشكل الإطار</h2>
+
+<p>ASP.NET Core مبني حول حقن المُنشئ: تُسجَّل الخدمات مرة واحدة، ويبني الإطار كل شيء عنك. ترتبط الأعمار الثلاثة مباشرة بنقاش انعدام الحالة في الرف (<a href="../backend-engineering.html#sec-state-the-identity-and-session-decision">Backend §7</a>، <a href="../terminal-and-deployment-substrate.html#sec-cloud-the-three-eras-of-renting-compute">Substrate §Cloud</a>):</p>
+
+<table>
+  <thead><tr><th>العمر</th><th>ما يعنيه</th><th>ترجمة الرف</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Singleton</strong></td><td>نسخة واحدة لعمر المعالِج</td><td>مثل ثابت على مستوى الوحدة — جيد للإعداد عديم الحالة، خطير للحالة (قاعدة الذاكرة داخل المعالِج في بلا خادم)</td></tr>
+    <tr><td><strong>Scoped</strong></td><td>نسخة واحدة لكل طلب HTTP</td><td>سياق نطاق الطلب — العمر الطبيعي لـ DbContext ولأي شيء مربوط بطلب واحد</td></tr>
+    <tr><td><strong>Transient</strong></td><td>نسخة جديدة عند كل حقن</td><td>مساعدات عديمة الحالة رخيصة — مثل استيراد دالة نقية</td></tr>
+  </tbody>
+</table>
+
+<p>قراءة أي طبقة خدمات .NET: تتبع المُنشئ. كل ما يطلبه الصنف يوفره الإطار — وتخبرك تسميات الأعمار ما إذا كانت الحالة المشتركة اختيارًا متعمدًا أم حادثًا في الانتظار (مفرد يحمل حالة لكل طلب هو الخطأ الكلاسيكي في .NET، وهو نفس صنف الخطأ كذاكرة تخزين مؤقت على مستوى الوحدة داخل دالة بلا خادم).</p>
+
+<h2 id="sec-the-net-market-map-where-the-lane-actually-is">خريطة سوق .NET — أين يقع المسار فعلًا</h2>
+
+<p>بالنسبة لمتعلم في مصر (أو أسواق مشابهة)، السؤال العملي هو: متى يظهر .NET فعلًا في حياتك المهنية؟</p>
+
+<table>
+  <thead><tr><th>أين يظهر .NET</th><th>كيف يبدو</th><th>ماذا يعني لك</th></tr></thead>
+  <tbody>
+    <tr><td><strong>لوائح الوظائف المؤسسية</strong> (البنوك، الحكومة، بائعو ERP/CRM، التأمين)</td><td>«مطوّر C#/.NET»، «ASP.NET Core + SQL Server»، غالبًا مع بديل Java/Spring مدرج</td><td>الخلفية المهيمنة في الاقتصاد الرسمي في مصر والخليج — إذا استهدفت هذه الوظائف، .NET لغة ثانية، <em>بعد</em> أن تتصلب نواتك JS</td></tr>
+    <tr><td><strong>عقود الاستعانة بمصادر خارجية</strong> (بائعو الاتحاد الأوروبي والولايات المتحدة بفِرق تسليم مصرية)</td><td>قد تُوضع على قاعدة كود .NET لعميل مؤسسي أجنبي</td><td>الإلمام يكفي للإسهام على الحواف (الواجهة، الاختبارات، تكامل API)؛ الطلاقة قرار منفصل</td></tr>
+    <tr><td><strong>أعمال التكامل</strong> (أي عميل خلفيته .NET)</td><td>تستهلك واجهات REST الخاصة بهم — التي ينتجها ASP.NET Core</td><td>معرفتك في <a href="./api-design.html">API Design</a> هي المهارة كلها؛ .NET غير ذي صلة أبعد من قراءة وثائقهم</td></tr>
+    <tr><td><strong>الشركات الناشئة، العمل الحر، الوكالات</strong></td><td>Node، Python، PHP/WordPress</td><td>المسارات التي تخدمها هذه الرفوف غالبًا — نادرًا ما يظهر .NET</td></tr>
+  </tbody>
+</table>
+
+<p>الخط الاستراتيجي، من <a href="./javascript-across-stacks.html">التموضع</a> الخاص بالرف: <strong>.NET يفوز حيث توجد عقود مايكروسوفت المؤسسية؛ Node يفوز حيث توجد فِرق JavaScript.</strong> لا ادعاء منهما خطأ؛ يصفان سوقين مختلفين. إذا كان السوق المؤسسي هو الذي تريده، فوثائق الرف للخلفية/API/SQL هي المنهج القابل للنقل — النماذج الذهنية تنتقل؛ يتغير النحو فقط.</p>
+
+<h2 id="sec-decoding-the-version-what-net-means-in-a-listing">فك شفرة الإصدار — ماذا يعني «.NET» في لائحة وظيفة</h2>
+
+<p>لائحة وظيفة تقول فقط «.NET» غامضة، لأن النظام البيئي مر بثلاثة أسماء لنفس خط الإنتاج. قراءة اللائحة صحيحًا جزء من الإلمام:</p>
+
+<table>
+  <thead><tr><th>ما تقوله اللائحة</th><th>ما هو فعلًا</th></tr></thead>
+  <tbody>
+    <tr><td><code>.NET Framework 4.8</code> / «ASP.NET»</td><td>الكلاسيكي الخاص بنظام Windows (2002–2019، مجمّد عند 4.8). البنوك والأنظمة الحكومية القديمة ما زالت تعمل عليه — ستقرؤه كإرث، لا تكتبه</td></tr>
+    <tr><td><code>.NET Core 2.x / 3.1</code></td><td>إعادة الكتابة عبر المنصات (2016–2020). علامة عصر الترحيل غالبًا الآن</td></tr>
+    <tr><td><code>.NET 5 / 6 / 8</code></td><td>.NET الحديث — أُعيدت تسمية Core بإسقاط «Core». الدعم طويل الأمد (LTS) بالأرقام الزوجية (6، 8)؛ 8 هو الحالي، و10 هو الخط الزوجي التالي</td></tr>
+    <tr><td>«.NET» بلا رقم</td><td>غامض بحكم التعريف — اسأل عن الرقم في المقابلة. «أي .NET؟» سؤال مقابلة حقيقي، ليس خدعة</td></tr>
+  </tbody>
+</table>
+
+<p>قاعدة إبهام واحدة: <strong>الرقم الزوجي = دعم طويل الأمد، والفردي = أحدث الميزات</strong>. إذا استهدفت قاعدة كود <code>net8.0</code>، فهي الخط الحديث — اقرأها بهذه الوثيقة؛ إذا قالت <code>net48</code>، فتوقع أنماط إرث وشكل ASP.NET أقدم.</p>
+
+<h2 id="sec-sql-server-the-t-sql-dialect">SQL Server — لهجة T-SQL</h2>
+
+<p>تفتح شِركات .NET افتراضيًا على SQL Server، وT-SQL هي <a href="../sql-and-postgresql.html">SQL</a> التي تعرفها بلكنة مختلفة. فروق القراءة، في جدول واحد:</p>
+
+<table>
+  <thead><tr><th>PostgreSQL (الرف)</th><th>SQL Server / T-SQL</th></tr></thead>
+  <tbody>
+    <tr><td><code>LIMIT n OFFSET m</code></td><td><code>TOP n</code> (أو <code>OFFSET ... FETCH NEXT n ROWS</code>)</td></tr>
+    <tr><td><code>now()</code>، <code>interval '7 days'</code></td><td><code>GETDATE()</code>، <code>DATEADD(day, -7, GETDATE())</code></td></tr>
+    <tr><td><code>bigserial</code> زيادة تلقائية</td><td><code>IDENTITY(1,1)</code></td></tr>
+    <tr><td><code>ON CONFLICT ... DO UPDATE</code></td><td><code>MERGE</code> (أو <code>INSERT ... WHERE NOT EXISTS</code>)؛ لا UPSERT مباشر حتى الإصدارات الحديثة</td></tr>
+    <tr><td>مصفوفات <code>text[]</code>، <code>JSONB</code></td><td>لا مصفوفات؛ <code>JSON</code> بدعم أضعف — منطقة راحة SQL Server هي البيانات العلائقية المنظمة</td></tr>
+    <tr><td><code>ILIKE</code>، تعبيرات نمطية <code>~</code></td><td><code>LIKE</code> (عدم حساسية الحالة يعتمد على الترتيب)، لا تعبيرات نمطية أصلية</td></tr>
+    <tr><td><code>pg_dump</code> / <code>psql</code></td><td><code>sqlcmd</code>، SSMS، <code>BACKUP DATABASE</code></td></tr>
+  </tbody>
+</table>
+
+<p>الـ 90% المشتركة — تشريح SELECT، وJOINs، وGROUP BY، والدوال النافذة (يدعمها T-SQL جيدًا)، والمعاملات — هو بالضبط ما يعلّمه <a href="../sql-and-postgresql.html">SQL وPostgreSQL</a>. اقرأ أي استعلام T-SQL كاللغة نفسها بهذه التحويلات الستة.</p>
+
+<h2 id="sec-when-not-to-pick-net">متى لا تختار .NET</h2>
+
+<p>الإلمام ليس دعوة. لخريطة المسار وجه معكوس — الحالات التي يكون فيها .NET الأداة الخاطئة، وحيث «لماذا هذا .NET؟» هو رد الفعل الصحيح:</p>
+
+<ul>
+  <li><strong>الأعمال الصغيرة / عمل العملاء:</strong> موقع WordPress، صفحة هبوط، متجر صغير — <a href="../wordpress-and-cms-internet.html">إنترنت CMS</a> موجود لأن المؤسسات تشتري أكثر من حاجتها. .NET عبء، لا قدرة.</li>
+  <li><strong>تكرار الشركة الناشئة:</strong> لغة واحدة عبر المكدس، نشر سريع، فِرق صغيرة — يفوز Node/TS بحوض التوظيف وسرعة التكرار.</li>
+  <li><strong>فريق من شخص واحد / العمل الحر:</strong> وزن النظام البيئي (Visual Studio، Azure، ملفات الحلول، طقوس المشروع) ضريبة يدفعها مطور فردي بلا مقابل.</li>
+  <li><strong>عمل الواجهة في الحافة / بلا خادم:</strong> مسار <a href="../nextjs-deep-dive.html">Next.js</a> في الرف — Next.js، Vercel، Supabase — ليس له فصل .NET.</li>
+</ul>
+
+<p>الإشارة التي تبحث عنها: <strong>عقود مايكروسوفت المؤسسية القائمة، وأنظمة الامتثال، وآفاق صيانة تمتد عشر سنوات.</strong> هناك كسب .NET مكانه — وهناك يدفع قراءته ثمنها.</p>
+<h2 id="sec-worked-example-reading-a-net-codebase">مثال عملي — قراءة قاعدة كود .NET</h2>
+
+<p>نقطة نهاية ASP.NET Core بشكلها الواقعي، تُقرأ بعيون الرف. نقطة النهاية: <code>GET /api/shipments/{id}</code> — نفس عالم تتبع الشحنات كما في <a href="../sql-and-postgresql.html#sec-worked-example-the-query-layer-for-shipment-tracking">SQL §المثال العملي</a>:</p>
+
+<pre>// 0. The entry point — Program.cs: the first file you open
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext&lt;AppDbContext&gt;(o =&gt;
+    o.UseSqlServer(builder.Configuration.GetConnectionString("Shipments")));
+builder.Services.AddScoped&lt;IShipmentService, ShipmentService&gt;();   // DI registration
+var app = builder.Build();
+app.UseAuthentication();   // middleware pipeline: runs in this order, wraps the request
+app.UseAuthorization();
+app.MapControllers();      // route attributes now work
+app.Run();
+
+// 1. The controller — thin, like a Node route handler with validation
+[ApiController]
+[Route("api/shipments")]
+public class ShipmentsController : ControllerBase
+{
+    private readonly IShipmentService _svc;          // ← DI hands the service in
+
+    public ShipmentsController(IShipmentService svc) =&gt; _svc = svc;
+
+    [HttpGet("{id:long}")]                            // GET /api/shipments/42
+    public async Task&lt;ActionResult&lt;ShipmentDto&gt;&gt; Get(long id)
+    {
+        var shipment = await _svc.GetByIdAsync(id);   // ← the request-loop logic lives here
+        return shipment is null ? NotFound() : Ok(shipment);
+    }
+}
+
+// 2. The service — the request loop, in the "service layer" convention
+public class ShipmentService : IShipmentService
+{
+    private readonly AppDbContext _db;                // ← EF Core's DbContext (scoped)
+
+    public async Task&lt;ShipmentDto?&gt; GetByIdAsync(long id) =&gt;
+        await _db.Shipments                          // a DbSet — the table
+            .Where(s =&gt; s.Id == id)                  // WHERE — LINQ translates to SQL
+            .Select(s =&gt; new ShipmentDto(s.Id, s.TrackingNumber, s.Status))
+            .SingleOrDefaultAsync();                 // one row, or null → NotFound
+}
+
+// 3. The DTO — the API contract (api-design: the response shape is a deliberate artifact)
+public record ShipmentDto(long Id, string TrackingNumber, string Status);</pre>
+
+<p><strong>أين تبدأ القراءة — الملفات الثلاثة الأولى:</strong></p>
+
+<ul>
+  <li><code>Program.cs</code> — نقطة الدخول: تسجيلات حقن التبعيات وخط أنابيب الوسيط، بالترتيب الذي تعمل به.</li>
+  <li><code>appsettings.json</code> — الإعدادات: سلسلة الاتصال، وأعلام الميزات، وإعدادات التسجيل.</li>
+  <li><code>*.csproj</code> — بيان الاعتماديات (<code>package.json</code> الخاص بـ .NET)؛ يخبرك سطر <code>&lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;</code> بأي نسخة من القصة تقرأ.</li>
+</ul>
+
+<p>اقرأ من أولها إلى آخرها: <em>يربط التوجيه ← يطلب المتحكم من الخدمة ← يترجم EF Core LINQ إلى SQL الذي تعلمته ← يجيب SQL Server ← يخرج DTO.</em> لكل مفهوم في هذا الملف بيت في الرف — <a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">Backend §1</a> (الحلقة)، <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> (الـ ORM)، <a href="./api-design.html">API Design</a> (العقد)، <a href="../sql-and-postgresql.html">SQL</a> (الاستعلام تحته). هذا هو بيت القصيد من الوثيقة: <strong>لا شيء هنا جديد؛ كل شيء أُعيدت تسميته.</strong></p>
+
+<h2 id="sec-the-literacy-pitfalls-failure-modes">مصائد الإلمام — أنماط الفشل</h2>
+
+<table>
+  <thead><tr><th>المصيدة</th><th>ما هي</th><th>الموقف الصحيح</th></tr></thead>
+  <tbody>
+    <tr><td>«C# مجرد Java»</td><td>رفض المسار بدافع نخبوية لغوية</td><td>احكم بموضع السوق لا بالنحو — خريطة المسار هي الحجة</td></tr>
+    <tr><td>تعلم .NET قبل النواة JS</td><td>تقسيم أساس ما زال يتماسك</td><td>أنهِ قاعدة JS/TS/React؛ الإلمام أولًا، والطلاقة لاحقًا، بهذا الترتيب</td></tr>
+    <tr><td>معاملة الإلمام كطلاقة</td><td>ادعاء .NET في مقابلة بعد مرور قراءة واحدة</td><td>قل ما تملكه: «أقرأ C#؛ عمقي الخلفي في JS/TS» — التأطير الصادق يفوز</td></tr>
+    <tr><td>مطاردة النظام البيئي</td><td>Blazor، MAUI، XAML، عمق Azure</td><td>لا حاجة لأي منها للتكامل؛ خريطة حلقة الطلب هي الـ 20%</td></tr>
+    <tr><td>نقل العادات حرفيًا</td><td>جلب اصطلاحات JS تقاتل الإطار</td><td>اقرأ شكل الإطار (حقن التبعيات، records، LINQ) وتكيَّف — النماذج الذهنية تنتقل، والاصطلاحات لا تنتقل</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-summary-the-lane-map">الملخص — خريطة المسار</h2>
+
+<p>اطبع هذا. إنه الوثيقة كلها في تسعة أسطر:</p>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>.NET = C# + CLR + ASP.NET Core + EF Core + SQL Server: مكدس، وموضعه السوقي أهم من نحوه.</td></tr>
+    <tr><td>2</td><td>المسار: المؤسسات، البنوك، الحكومة، الاستعانة بمصادر خارجية (مصر، الخليج، أوروبا الشرقية). لا الشركات الناشئة، لا العمل الحر، لا إنترنت CMS.</td></tr>
+    <tr><td>3</td><td>الحلقة متطابقة: الوسيط ← المتحكم ← الخدمة ← EF Core ← SQL Server ← الاستجابة. لا شيء جديد، أُعيدت تسميته فقط.</td></tr>
+    <tr><td>4</td><td>TypeScript ← C# ترجمة لا تحويل: records، Task/async، LINQ، <code>??</code> — جدول واحد، بلا مفاجآت.</td></tr>
+    <tr><td>5</td><td>EF Core هو قرار الـ ORM من <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e في Backend</a>؛ <code>.Include</code> هو مصيدة N+1 بثوب LINQ.</td></tr>
+    <tr><td>6</td><td>أعمار الحقن: singleton = معالِج، scoped = طلب، transient = جديد — قواعد انعدام الحالة تنطبق.</td></tr>
+    <tr><td>7</td><td>T-SQL هو SQL الذي تعرفه بستة تحويلات: TOP، GETDATE، IDENTITY، MERGE، لا مصفوفات، الترتيب.</td></tr>
+    <tr><td>8</td><td>لا تختَر .NET للمواقع الصغيرة أو الشركات الناشئة أو العمل الفردي؛ ولا ترفضه حيث تشغّله المؤسسات.</td></tr>
+    <tr><td>9</td><td>الإلمام قبل الطلاقة: اقرأ الكود، وعيّن المفاهيم، واعرف المسار — ثم قرر إن كنت تريده أصلًا.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<section class="cite">
+  <strong>المصادر الأولية ←</strong>
+  <a href="https://learn.microsoft.com/en-us/aspnet/core/">Microsoft Learn — وثائق ASP.NET Core</a> ·
+  <a href="https://learn.microsoft.com/en-us/dotnet/csharp/">Microsoft Learn — وثائق C#</a> ·
+  <a href="https://learn.microsoft.com/en-us/ef/core/">Microsoft Learn — وثائق EF Core</a> ·
+  <a href="https://learn.microsoft.com/en-us/sql/t-sql/">Microsoft Learn — مرجع T-SQL</a> ·
+  <a href="https://roadmap.sh/aspnet-core">roadmap.sh — خارطة طريق ASP.NET Core</a>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«مرّني على قاعدة كود .NET عملت عليها — أين كانت الوسائط، والخدمات، واستعلامات EF Core، وما الذي كان مصائد؟»</li>
+    <li>«متى رأيت شركة تختار .NET بدل Node — ومتى رأيت العكس؟ ما الذي حسم الأمر؟»</li>
+    <li>«إذا أردت السوق المؤسسي المصري، فما المسار الصادق من حيث أساسي JS/TS الآن إلى مقابلة .NET؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · .NET والمسار المؤسسي — إلمام قرائي، لا دورة C#</span>
+  <span>التموضع: <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> · الحلقة: <a href="../backend-engineering.html">هندسة الخلفية</a> · البيانات: <a href="../sql-and-postgresql.html">SQL وPostgreSQL</a> · العقود: <a href="./api-design.html">API Design</a> · المسرد: <a href="./glossary.html">المصطلحات المشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

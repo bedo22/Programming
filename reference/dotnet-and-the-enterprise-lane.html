@@ -13,6 +13,7 @@
   <p class="kicker">Reference · .NET &amp; the Enterprise Lane — reading literacy, not a C# course</p>
   <h1>.NET &amp; the Enterprise Lane</h1>
   <p class="meta">Where C#/.NET lives in the market (enterprise, banking, government, offshoring hubs — Egypt, the Gulf, Eastern Europe), and the literacy you need to navigate it without becoming a .NET developer: the ASP.NET Core request loop mapped 1:1 onto Backend Engineering, a TypeScript→C# reading translation table, EF Core as the ORM you already understand, dependency injection's three lifetimes, the T-SQL differences from PostgreSQL, and a worked example that reads a real endpoint end to end. Read this when a job listing or a contract mentions .NET — to interview and integrate, not to retrain.</p>
+  <p class="meta" style="margin-bottom: 0"><strong>Language:</strong> English · <a href="./ar/dotnet-and-the-enterprise-lane.html">العربية</a></p>
 </header>
 
 <blockquote class="callout">
@@ -39,13 +40,13 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
-<p>Reading order: read this after <a href="./backend-engineering.html">Backend Engineering</a> §1 (the loop) and <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> (the data layer) — this doc assumes both are warm. Cross-links:</p>
+<p>Reading order: read this after <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a> (the loop) and <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> (the data layer) — this doc assumes both are warm. Cross-links:</p>
 <ul>
   <li>Positioning — when each stack wins: <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (the .NET row of its positioning table).</li>
   <li>The loop in depth: <a href="./backend-engineering.html">Backend Engineering</a> — every ASP.NET Core concept here maps to a section there.</li>
   <li>The data layer: <a href="./sql-and-postgresql.html">SQL &amp; PostgreSQL</a> — T-SQL is a dialect of the same language.</li>
   <li>Contracts: <a href="./api-design.html">API Design</a> — what ASP.NET Core's <code>[ApiController]</code> attributes actually produce.</li>
-  <li>Career maps: <a href="./frontend-income-markets.html">Frontend Income Markets</a> §Local employment — where the Egyptian market sits.</li>
+  <li>Career maps: <a href="./frontend-income-markets.html">Frontend Income Markets</a> <a href="./frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets">§Local employment</a> — where the Egyptian market sits.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a>.</li>
 </ul>
 
@@ -85,14 +86,14 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 <p>The shelf's backend mental model — Request → Auth → Logic → Data → Response — is exactly what ASP.NET Core runs. Nothing here is new; everything is renamed:</p>
 
 <table>
-  <thead><tr><th>Backend Engineering concept (§)</th><th>ASP.NET Core spelling</th><th>What it is</th></tr></thead>
+  <thead><tr><th>Backend Engineering concept (section)</th><th>ASP.NET Core spelling</th><th>What it is</th></tr></thead>
   <tbody>
-    <tr><td>The middleware chain (§1, §1b)</td><td><code>UseAuthentication()</code>, <code>UseAuthorization()</code>, custom middleware classes</td><td>The pipeline: every request flows through the chain in order — same mental model as Express middleware</td></tr>
-    <tr><td>Routing a request to a handler (§1)</td><td><code>[ApiController]</code> + <code>[Route("api/shipments")]</code> + action methods</td><td>One class per resource; each method is an endpoint — like a router file with handler functions</td></tr>
-    <tr><td>Extracting parameters and validating (§1)</td><td>Model binding + <code>[FromBody]</code>, <code>[FromQuery]</code>, data annotations</td><td>Request bodies become typed objects automatically; validation runs on binding</td></tr>
-    <tr><td>The response contract (§1, and <a href="./api-design.html">API Design</a>)</td><td><code>ActionResult&lt;T&gt;</code>, <code>Problem()</code> (RFC 9457), status helpers</td><td><code>return Ok(dto)</code>, <code>NotFound()</code>, <code>Problem()</code> — the same statuses and envelopes your API-design doc prescribes</td></tr>
-    <tr><td>Authn vs authz (§1d)</td><td><code>[Authorize]</code> attributes + JWT bearer middleware</td><td>Attribute = permission gate; middleware = identity; the split is the same as Backend §1d</td></tr>
-    <tr><td>Business logic layer (§1)</td><td>Services (the "service layer" convention)</td><td>Controllers stay thin; services hold the request-loop logic — the same structure as your Node handlers</td></tr>
+    <tr><td>The middleware chain (<a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>, <a href="./backend-engineering.html#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§1b</a>)</td><td><code>UseAuthentication()</code>, <code>UseAuthorization()</code>, custom middleware classes</td><td>The pipeline: every request flows through the chain in order — same mental model as Express middleware</td></tr>
+    <tr><td>Routing a request to a handler (<a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td><td><code>[ApiController]</code> + <code>[Route("api/shipments")]</code> + action methods</td><td>One class per resource; each method is an endpoint — like a router file with handler functions</td></tr>
+    <tr><td>Extracting parameters and validating (<a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td><td>Model binding + <code>[FromBody]</code>, <code>[FromQuery]</code>, data annotations</td><td>Request bodies become typed objects automatically; validation runs on binding</td></tr>
+    <tr><td>The response contract (<a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>, and <a href="./api-design.html">API Design</a>)</td><td><code>ActionResult&lt;T&gt;</code>, <code>Problem()</code> (RFC 9457), status helpers</td><td><code>return Ok(dto)</code>, <code>NotFound()</code>, <code>Problem()</code> — the same statuses and envelopes your API-design doc prescribes</td></tr>
+    <tr><td>Authn vs authz (<a href="./backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a>)</td><td><code>[Authorize]</code> attributes + JWT bearer middleware</td><td>Attribute = permission gate; middleware = identity; the split is the same as Backend <a href="./backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a></td></tr>
+    <tr><td>Business logic layer (<a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">§1</a>)</td><td>Services (the "service layer" convention)</td><td>Controllers stay thin; services hold the request-loop logic — the same structure as your Node handlers</td></tr>
     <tr><td>Statelessness &amp; serverless constraint (<a href="./terminal-and-deployment-substrate.html">Substrate §Cloud</a>)</td><td>Azure Functions, containerized ASP.NET Core</td><td>Same rules: state lives outside the process; cold starts are the same gamble</td></tr>
   </tbody>
 </table>
@@ -152,10 +153,10 @@ sql-and-postgresql.html   ← the data   The DB: SQL Server, T-SQL vs PostgreSQL
 
 <h2 id="sec-ef-core-the-orm-you-already-understand">EF Core — the ORM you already understand</h2>
 
-<p><a href="./backend-engineering.html">Backend Engineering</a> §1e gives you the ORM-vs-raw-SQL decision; EF Core is a fully-featured instance of that decision. What you need to <em>read</em>:</p>
+<p><a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> gives you the ORM-vs-raw-SQL decision; EF Core is a fully-featured instance of that decision. What you need to <em>read</em>:</p>
 
 <table>
-  <thead><tr><th>ORM concept (from Backend §1e / SQL doc)</th><th>EF Core spelling</th><th>What to watch for</th></tr></thead>
+  <thead><tr><th>ORM concept (from Backend <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> / SQL doc)</th><th>EF Core spelling</th><th>What to watch for</th></tr></thead>
   <tbody>
     <tr><td>The schema mapping</td><td><code>DbContext</code> + <code>DbSet&lt;T&gt;</code> properties</td><td>Each DbSet is a table; the class is the row shape</td></tr>
     <tr><td>Migrations</td><td><code>dotnet ef migrations add</code> / <code>database update</code></td><td>The <a href="./data-modeling-and-databases.html">data-modeling</a> migration rules apply unchanged</td></tr>
@@ -301,7 +302,7 @@ public record ShipmentDto(long Id, string TrackingNumber, string Status);</pre>
   <li><code>*.csproj</code> — the dependency manifest (the <code>package.json</code> of .NET); the <code>&lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;</code> line tells you which version of the story you are reading.</li>
 </ul>
 
-<p>Read end to end: <em>route binds → controller asks service → EF Core translates LINQ to the SQL you learned → SQL Server answers → DTO out.</em> Every concept in this file has a home in the shelf — <a href="./backend-engineering.html">Backend §1</a> (the loop), §1e (the ORM), <a href="./api-design.html">API Design</a> (the contract), <a href="./sql-and-postgresql.html">SQL</a> (the query underneath). That is the entire point of the doc: <strong>nothing here is new; it is all renamed.</strong></p>
+<p>Read end to end: <em>route binds → controller asks service → EF Core translates LINQ to the SQL you learned → SQL Server answers → DTO out.</em> Every concept in this file has a home in the shelf — <a href="./backend-engineering.html">Backend §1</a> (the loop), <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> (the ORM), <a href="./api-design.html">API Design</a> (the contract), <a href="./sql-and-postgresql.html">SQL</a> (the query underneath). That is the entire point of the doc: <strong>nothing here is new; it is all renamed.</strong></p>
 
 <h2 id="sec-the-literacy-pitfalls-failure-modes">The literacy pitfalls — failure modes</h2>
 
@@ -327,7 +328,7 @@ public record ShipmentDto(long Id, string TrackingNumber, string Status);</pre>
     <tr><td>2</td><td>The lane: enterprise, banking, government, offshoring (Egypt, Gulf, Eastern Europe). Not startups, not freelance, not the CMS internet.</td></tr>
     <tr><td>3</td><td>The loop is identical: middleware → controller → service → EF Core → SQL Server → response. Nothing new, only renamed.</td></tr>
     <tr><td>4</td><td>TypeScript → C# is a translation, not a conversion: records, Task/async, LINQ, <code>??</code> — one table, no surprises.</td></tr>
-    <tr><td>5</td><td>EF Core is the ORM decision from Backend §1e; <code>.Include</code> is the N+1 trap wearing LINQ.</td></tr>
+    <tr><td>5</td><td>EF Core is the ORM decision from Backend <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>; <code>.Include</code> is the N+1 trap wearing LINQ.</td></tr>
     <tr><td>6</td><td>DI lifetimes: singleton = process, scoped = request, transient = fresh — the statelessness rules apply.</td></tr>
     <tr><td>7</td><td>T-SQL is the SQL you know with six renames: TOP, GETDATE, IDENTITY, MERGE, no arrays, collations.</td></tr>
     <tr><td>8</td><td>Do not pick .NET for small sites, startups, or solo work; do not dismiss it where enterprises run it.</td></tr>
