@@ -12,6 +12,9 @@
   <p class="kicker">Reference Shelf · The Real Web</p>
   <h1>Payments &amp; Commerce — the money that moves the web</h1>
   <p class="meta">For: the developer who must make money move, not lose the money in motion.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/payments-and-commerce.html">العربية</a>
+  </p>
 </header>
 
 <blockquote class="callout">
@@ -103,8 +106,8 @@
 <table>
 <thead><tr><th>Topic</th><th>Where it lives</th><th>This doc's boundary</th></tr></thead>
 <tbody>
-<tr><td>Webhooks, async work, retries</td><td>Backend Engineering §3 and the events patterns</td><td>Only the payment-state machine and webhook-as-source-of-truth — the money-specific failure cases</td></tr>
-<tr><td>Transactions, concurrency, idempotency</td><td>Backend Engineering §5</td><td>Only the payment-specific applications: idempotency keys on charges, double-charge protection</td></tr>
+<tr><td>Webhooks, async work, retries</td><td>Backend Engineering <a href="./backend-engineering.html#sec-background-work-queues-jobs-and-why-you-defer">§3</a> and the events patterns</td><td>Only the payment-state machine and webhook-as-source-of-truth — the money-specific failure cases</td></tr>
+<tr><td>Transactions, concurrency, idempotency</td><td>Backend Engineering <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a></td><td>Only the payment-specific applications: idempotency keys on charges, double-charge protection</td></tr>
 <tr><td>Secrets, auth, threat modeling</td><td>Security &amp; Threat Modeling</td><td>Only PCI scope and payment-specific fraud — the rest is theirs</td></tr>
 <tr><td>Auth exchanges, tokens, sessions</td><td>API Design</td><td>The checkout flow's session/redirect dance is theirs; the money state machine is here</td></tr>
 <tr><td>Orders, invoices, ledger rows</td><td>Data Modeling &amp; Databases</td><td>One example: the money model — <code>order → payment → ledger</code> — but the schema discipline is theirs</td></tr>
@@ -228,7 +231,7 @@ Customer → card data → PSP → ① AUTHORIZATION request → card network �
 
 <h3>Idempotency — the double-charge guard</h3>
 
-<p>The rule from Backend Engineering §5, applied to money: <strong>a retry must not become a second charge.</strong></p>
+<p>The rule from Backend Engineering <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>, applied to money: <strong>a retry must not become a second charge.</strong></p>
 <ul>
   <li>Every charge carries an <code>idempotency_key</code> — a per-operation unique string (an order id, a UUID you generated per attempt). The provider promises: same key → same charge, forever. Retry-safe by construction.</li>
   <li>Generate the key per logical operation, <em>not</em> per HTTP request — a client that retries the checkout request must reuse the key, or it's a double charge with extra steps.</li>
@@ -240,7 +243,7 @@ Customer → card data → PSP → ① AUTHORIZATION request → card network �
 <p>Every payment outcome your code needs to trust — <em>paid, failed, refunded, disputed, subscription renewed</em> — arrives as a webhook event, hours or days after the synchronous request. Three rules:</p>
 <ul>
   <li><strong>Never reconcile from the synchronous response.</strong> It tells you the request was accepted; it cannot tell you about capture failures, disputes, or chargebacks that arrive later. The webhook is the ledger.</li>
-  <li><strong>Verify signatures and dedupe.</strong> Verify the webhook signature (the provider's secret-based HMAC) on every event, and dedupe by event id — providers retry on failure, and your handler must be idempotent (the Backend Engineering §3 rule, money edition).</li>
+  <li><strong>Verify signatures and dedupe.</strong> Verify the webhook signature (the provider's secret-based HMAC) on every event, and dedupe by event id — providers retry on failure, and your handler must be idempotent (the Backend Engineering <a href="./backend-engineering.html#sec-background-work-queues-jobs-and-why-you-defer">§3</a> rule, money edition).</li>
   <li><strong>Handle it as a state transition, not a notification.</strong> The payment lifecycle is a state machine (below). The webhook says "transition to this state"; your database records the transition and the <em>timestamp it happened at the provider</em>, not when your handler ran.</li>
 </ul>
 
@@ -413,7 +416,7 @@ Customer → card data → PSP → ① AUTHORIZATION request → card network �
 <tr><td><strong>Trusting the synchronous response</strong></td><td>Customer "paid" per API, never got access — capture failed or the webhook never reconciled</td><td>The webhook is the source of truth; the success page is optimism</td></tr>
 <tr><td><strong>Double charges</strong></td><td>Retry (network timeout, double-click) → two charges</td><td>Idempotency keys on every charge, generated per logical operation</td></tr>
 <tr><td><strong>No webhook dedup/signature check</strong></td><td>Duplicate events, or a forged event granting access</td><td>Verify signatures; key by event id; handlers are idempotent state transitions</td></tr>
-<tr><td><strong>Webhook endpoint down / not retried</strong></td><td>Paid customers never activated; silent revenue leak</td><td>Retry policy + a reconciliation sweep; webhook monitoring (the Backend Engineering §3 rules, money edition)</td></tr>
+<tr><td><strong>Webhook endpoint down / not retried</strong></td><td>Paid customers never activated; silent revenue leak</td><td>Retry policy + a reconciliation sweep; webhook monitoring (the Backend Engineering <a href="./backend-engineering.html#sec-background-work-queues-jobs-and-why-you-defer">§3</a> rules, money edition)</td></tr>
 <tr><td><strong>No reconciliation</strong></td><td>Payout amounts don't match records; nobody knows</td><td>Weekly compare of app state vs. provider state — the audit is a product</td></tr>
 <tr><td><strong>Storing card data (or logs of it)</strong></td><td>PCI scope explosion; a breach of card numbers is a catastrophic event</td><td>Tokenization everywhere; never persist PANs; hosted/embedded surfaces only</td></tr>
 <tr><td><strong>Client-trusted amounts</strong></td><td>Price edited in the request, discount applied client-side</td><td>Amounts computed server-side from the catalog; the client never states its own price</td></tr>
