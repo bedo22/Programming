@@ -13,6 +13,7 @@
   <p class="kicker">Reference · Evidence about behavior — from a unit test to finding the fault</p>
   <h1>Testing &amp; Debugging</h1>
   <p class="meta">What testing is (a disciplined way to produce evidence about software behavior) and what debugging is (the disciplined search for a fault when the evidence says behavior is wrong). Covers how testing differs from debugging, verification, validation, and QA, the history from debugging to continuous and AI-era testing, the levels and techniques that build useful confidence, test doubles and TDD, how to choose a test strategy without worshipping the pyramid, non-functional testing, production verification, and the debugging toolbox. Read this to understand what evidence your code needs before the delivery pipeline should trust it — and what to do when that evidence fails.</p>
+        <p class="meta" style="margin-bottom: 0"><strong>Language:</strong> English · <a href="./ar/software-testing-and-debugging.html">العربية</a></p>
 </header>
 
 <blockquote class="callout">
@@ -28,7 +29,7 @@
   <p>Testing produces evidence; CI/CD consumes it. A pipeline without meaningful tests automates the wrong question.</p>
 </blockquote>
 
-<h2 id="sec-how-to-use-this-doc">0. How to use this doc</h2>
+<h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful alongside <a href="./software-development-process.html">The Process</a> and <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a>. Cross-links:</p>
 <ul>
@@ -38,9 +39,9 @@
   <li>Quality: <a href="./cs-and-software-engineering.html">CS &amp; SE</a> — quality attributes and trade-offs that testing evaluates.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared terms.</li>
 </ul>
-<p><strong>If you've ever wondered why unit tests are not enough, when mocks hurt more than they help, what TDD really buys you, or how a team knows a deployment is healthy after release, this doc answers that.</strong> Read §1–§3 first, then §4–§8 for the practical toolbox, §9 for production verification and §10 for debugging (the evidence when a test fails), then §11–§15 for the AI frontier, a worked example, the tooling map, failure modes, and the checklist.</p>
+<p><strong>If you've ever wondered why unit tests are not enough, when mocks hurt more than they help, what TDD really buys you, or how a team knows a deployment is healthy after release, this doc answers that.</strong> Read <a href="#sec-definition-what-testing-is-and-what-it-is-not">§1</a>–<a href="#sec-testing-techniques-how-to-choose-inputs-that-matter">§3</a> first, then <a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">§4</a>–<a href="#sec-testing-metrics-how-to-know-whether-the-evidence-is-useful">§8</a> for the practical toolbox, <a href="#sec-production-verification-testing-does-not-stop-at-deployment">§9</a> for production verification and <a href="#sec-debugging-the-evidence-when-a-test-fails">§10</a> for debugging (the evidence when a test fails), then <a href="#sec-ai-era-testing-generated-code-and-nondeterministic-systems">§11</a>–<a href="#sec-the-complete-mental-checklist">§15</a> for the AI frontier, a worked example, the tooling map, failure modes, and the checklist.</p>
 
-<h2 id="sec-definition-what-testing-is-and-what-it-is-not">1. Definition — what testing is, and what it is <em>not</em></h2>
+<h2 id="sec-definition-what-testing-is-and-what-it-is-not">Definition — what testing is, and what it is <em>not</em></h2>
 
 <p><strong>Software testing</strong> is the discipline of producing useful evidence about a software system by observing or checking its behavior under selected conditions. A test is not just code that runs — it is a claim about expected behavior paired with an observation that can confirm or refute it. Testing sits inside the wider <em>verification and validation</em> (V&amp;V) practice framed by <a href="https://standards.ieee.org/standard/1012-2016.html">IEEE 1012</a>.</p>
 
@@ -58,7 +59,7 @@
   <li><strong>Not only for QA teams.</strong> Developers, designers, testers, operators, and AI tools all produce and consume testing evidence.</li>
 </ul>
 
-<h2 id="sec-history-from-debugging-to-continuous-and-ai-era-testing">1b. History — from debugging to continuous and AI-era testing</h2>
+<h2 id="sec-history-from-debugging-to-continuous-and-ai-era-testing">History — from debugging to continuous and AI-era testing</h2>
 
 <p>Testing evolved from an afterthought into an engineering feedback system:</p>
 
@@ -79,7 +80,7 @@
 
 <p><strong>The recurring theme:</strong> testing keeps moving earlier, closer to the change, and later, closer to production reality. Modern testing is not one phase; it is a chain of evidence from design intent to runtime behavior.</p>
 
-<h2 id="sec-evolution-the-constraint-inversions">1c. Evolution — the constraint inversions</h2>
+<h2 id="sec-evolution-the-constraint-inversions">Evolution — the constraint inversions</h2>
 
 <table>
   <thead><tr><th>Inversion</th><th>Before</th><th>After</th><th>What changed</th></tr></thead>
@@ -94,7 +95,7 @@
 
 <p><strong>The meta-pattern:</strong> testing keeps shortening the distance between a change and trustworthy feedback. The goal is not more tests; it is better evidence sooner.</p>
 
-<h2 id="sec-intersection-with-neighbors-evidence-at-every-boundary">1d. Intersection with neighbors — evidence at every boundary</h2>
+<h2 id="sec-intersection-with-neighbors-evidence-at-every-boundary">Intersection with neighbors — evidence at every boundary</h2>
 
 <table>
   <thead><tr><th>Neighbor</th><th>Relationship</th><th>What this doc gives it</th></tr></thead>
@@ -109,7 +110,7 @@
 
 <p><strong>The boundary rule:</strong> if the question is "what should the software do?", start in Problem-Solving. If the question is "how do we know it does it?", that is this doc. If the question is "how is that knowledge enforced and shipped?", that is CI/CD &amp; Deployment.</p>
 
-<h2 id="sec-underlying-theory-oracles-isolation-determinism-and-risk">1e. Underlying theory — oracles, isolation, determinism, and risk</h2>
+<h2 id="sec-underlying-theory-oracles-isolation-determinism-and-risk">Underlying theory — oracles, isolation, determinism, and risk</h2>
 
 <p>A useful test contains four ideas:</p>
 
@@ -145,7 +146,7 @@
 
 <p><strong>The rule:</strong> a test's evidence is only as trustworthy as the data and environment it ran against. If you cannot reproduce the same outcome twice, you do not have evidence, you have noise.</p>
 
-<h2 id="sec-mental-models-how-senior-engineers-think-about-tests">1f. Mental models — how senior engineers think about tests</h2>
+<h2 id="sec-mental-models-how-senior-engineers-think-about-tests">Mental models — how senior engineers think about tests</h2>
 
 <ul>
   <li><strong>Tests are executable questions.</strong> A good test asks one precise question: "given this state, should this happen?" If a test needs a paragraph to explain, it is probably asking too many questions.</li>
@@ -155,7 +156,7 @@
   <li><strong>Tests are design pressure.</strong> If a unit is painful to test, the pain often reveals hidden coupling, unclear boundaries, or too many responsibilities. TDD uses that pressure deliberately.</li>
 </ul>
 
-<h2 id="sec-testing-levels-from-one-unit-to-the-whole-system">2. Testing levels — from one unit to the whole system</h2>
+<h2 id="sec-testing-levels-from-one-unit-to-the-whole-system">Testing levels — from one unit to the whole system</h2>
 
 <table>
   <thead><tr><th>Level</th><th>What it checks</th><th>Typical strengths</th><th>Typical risks</th></tr></thead>
@@ -173,7 +174,7 @@
 
 <p><strong>The practical rule:</strong> use the lowest level that can produce trustworthy evidence for the question being asked. Do not use an end-to-end test to prove a pure calculation, and do not use a mocked unit test to prove a deployment is healthy.</p>
 
-<h2 id="sec-testing-techniques-how-to-choose-inputs-that-matter">3. Testing techniques — how to choose inputs that matter</h2>
+<h2 id="sec-testing-techniques-how-to-choose-inputs-that-matter">Testing techniques — how to choose inputs that matter</h2>
 
 <table>
   <thead><tr><th>Technique</th><th>What it does</th><th>When it earns its keep</th></tr></thead>
@@ -190,7 +191,7 @@
 
 <p>The strongest suites mix techniques. Example tests are readable; property tests hunt beyond imagination; exploratory tests expose assumptions that nobody wrote down.</p>
 
-<h2 id="sec-test-doubles-mocks-stubs-fakes-and-spies">4. Test doubles — mocks, stubs, fakes, and spies</h2>
+<h2 id="sec-test-doubles-mocks-stubs-fakes-and-spies">Test doubles — mocks, stubs, fakes, and spies</h2>
 
 <p>A <strong>test double</strong> replaces a collaborator so the test can control behavior, speed, and failure modes. The names are not interchangeable:</p>
 
@@ -206,7 +207,7 @@
 
 <p><strong>The design rule:</strong> double the collaborator at a boundary you own, not deep inside someone else's implementation. Mocking every dependency makes tests fast but evasive; using real collaborators everywhere makes tests slow and brittle. The senior move is to test domain logic directly and isolate infrastructure at narrow seams.</p>
 
-<h2 id="sec-test-driven-development-tests-as-design-pressure">5. Test-Driven Development — tests as design pressure</h2>
+<h2 id="sec-test-driven-development-tests-as-design-pressure">Test-Driven Development — tests as design pressure</h2>
 
 <p>TDD is not "write all tests first." It is a small loop:</p>
 
@@ -218,7 +219,7 @@
 
 <p>The benefit is not moral purity; it is feedback. TDD forces the developer to state the behavior before writing the implementation, keep changes small, and notice when the design resists being tested. It works best for logic with clear oracles: rules, transformations, calculations, state transitions. It works less naturally for exploratory UI, integration-heavy code, or behavior whose oracle is still unknown.</p>
 
-<h2 id="sec-test-strategy-what-to-automate-and-what-not-to">6. Test strategy — what to automate, and what not to</h2>
+<h2 id="sec-test-strategy-what-to-automate-and-what-not-to">Test strategy — what to automate, and what not to</h2>
 
 <p>The test pyramid says: many fast low-level tests, fewer medium-level tests, very few broad end-to-end tests. It is useful because broad tests are expensive, brittle, and slow. But it is not a religion. The right strategy starts with risk and feedback time:</p>
 
@@ -253,9 +254,9 @@ Test strategy
   Ownership:                     (who maintains which suite)
 </pre>
 
-<p>Tighten the template to your risk model (its "risk" rows should come straight from the §1e risk analysis) — and let the <em>weakest</em> rows tell you what to improve next.</p>
+<p>Tighten the template to your risk model (its "risk" rows should come straight from the <a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">§1e</a> risk analysis) — and let the <em>weakest</em> rows tell you what to improve next.</p>
 
-<h2 id="sec-non-functional-testing-proving-the-qualities-that-users-feel">7. Non-functional testing — proving the qualities that users feel</h2>
+<h2 id="sec-non-functional-testing-proving-the-qualities-that-users-feel">Non-functional testing — proving the qualities that users feel</h2>
 
 <table>
   <thead><tr><th>Quality</th><th>What testing asks</th><th>Typical checks</th></tr></thead>
@@ -270,7 +271,7 @@ Test strategy
 
 <p>These qualities cannot be bolted on at release time. The testable budget must be defined early: how fast, how accessible, how available, how compatible? Otherwise the team only discovers the quality target after production violates it.</p>
 
-<h2 id="sec-testing-metrics-how-to-know-whether-the-evidence-is-useful">8. Testing metrics — how to know whether the evidence is useful</h2>
+<h2 id="sec-testing-metrics-how-to-know-whether-the-evidence-is-useful">Testing metrics — how to know whether the evidence is useful</h2>
 
 <p>Metrics measure the evidence system itself, not just the product. Watch the trend, not the single number:</p>
 
@@ -292,7 +293,7 @@ Test strategy
 
 <p><strong>Do not optimize one metric alone.</strong> Coverage without risk analysis becomes vanity. Pass rate without trust becomes decoration. Speed without correctness becomes noise. The metrics that matter are the ones that tell you whether the evidence can be believed — and whether it arrives in time to act on it.</p>
 
-<h2 id="sec-production-verification-testing-does-not-stop-at-deployment">9. Production verification — testing does not stop at deployment</h2>
+<h2 id="sec-production-verification-testing-does-not-stop-at-deployment">Production verification — testing does not stop at deployment</h2>
 
 <p>Production is the only environment with real data shape, real traffic, real third-party behavior, and real operational constraints. Verification therefore continues after deployment:</p>
 
@@ -307,13 +308,13 @@ Test strategy
 
 <p>This does not replace pre-production testing; it completes it. The delivery doc explains the deployment mechanics; this doc's rule is simpler: <strong>ship only when you can observe whether the ship worked.</strong></p>
 
-<h2 id="sec-debugging-the-evidence-when-a-test-fails">10. Debugging — the evidence when a test fails</h2>
+<h2 id="sec-debugging-the-evidence-when-a-test-fails">Debugging — the evidence when a test fails</h2>
 
 <p>Testing and debugging are often treated as the same activity, but they are two directions through the same loop:</p>
 
 <ul>
   <li><strong>Testing</strong> asks "does the evidence show this behaves as intended?" It is forward-looking — run checks, confirm behavior, collect evidence.</li>
-  <li><strong>Debugging</strong> starts where testing ends: it asks "why does the evidence say the behavior is wrong?" and works <em>backward</em> from the failed evidence to the fault — the inverted four-phase loop from <a href="./problem-solving.html">Problem-Solving §9</a>. This doc owns the team-scale <em>tooling</em> that finds and proves the fault; that doc owns the <em>thinking loop</em>.</li>
+  <li><strong>Debugging</strong> starts where testing ends: it asks "why does the evidence say the behavior is wrong?" and works <em>backward</em> from the failed evidence to the fault — the inverted four-phase loop from <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Problem-Solving §9</a>. This doc owns the team-scale <em>tooling</em> that finds and proves the fault; that doc owns the <em>thinking loop</em>.</li>
 </ul>
 
 <table>
@@ -339,14 +340,14 @@ Test strategy
     <tr><td><strong>Breakpoints / state inspection</strong></td><td>Pause execution at a suspected point and inspect live state when the output can be inspected directly.</td></tr>
     <tr><td><strong>Compare expected vs actual</strong></td><td>Clarify the mismatch — write down what <em>should</em> happen at a step, then the actual value; the gap names the wrong assumption.</td></tr>
     <tr><td><strong>Rubber duck</strong></td><td>Explain the code aloud to expose hidden assumptions — often the assumption itself is the fault.</td></tr>
-    <tr><td><strong>Isolate the dependency</strong></td><td>On async, race, or state-heavy failures: make the test deterministic (control time, randomness, concurrency) or double the collaborator (§4; §1e's isolation and determinism).</td></tr>
-    <tr><td><strong>Production observability</strong></td><td>For failures that only reproduce under real traffic: logs, metrics, traces, and error dashboards (§9) provide evidence that pre-production tests cannot.</td></tr>
+    <tr><td><strong>Isolate the dependency</strong></td><td>On async, race, or state-heavy failures: make the test deterministic (control time, randomness, concurrency) or double the collaborator (<a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">§4</a>; <a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">§1e</a>'s isolation and determinism).</td></tr>
+    <tr><td><strong>Production observability</strong></td><td>For failures that only reproduce under real traffic: logs, metrics, traces, and error dashboards (<a href="#sec-production-verification-testing-does-not-stop-at-deployment">§9</a>) provide evidence that pre-production tests cannot.</td></tr>
   </tbody>
 </table>
 
-<p><strong>Cross-doc handoff.</strong> This is the engineering practice of debugging — the tools and evidence. The thinking loop underneath it (observe → hypothesize → predict → test → conclude, and the &ldquo;don't guess, explore hypotheses&rdquo; anti-pattern) is <a href="./problem-solving.html">Problem-Solving §9</a>; the way version history enables the search (git bisect, blame, revert) is <a href="./version-control-ci-cd-deployment.html">Version Control &amp; CI/CD</a>. Three docs, one loop: this doc owns the tools, Problem-Solving owns the thinking, Version Control owns the timeline.</p>
+<p><strong>Cross-doc handoff.</strong> This is the engineering practice of debugging — the tools and evidence. The thinking loop underneath it (observe → hypothesize → predict → test → conclude, and the &ldquo;don't guess, explore hypotheses&rdquo; anti-pattern) is <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Problem-Solving §9</a>; the way version history enables the search (git bisect, blame, revert) is <a href="./version-control-ci-cd-deployment.html">Version Control &amp; CI/CD</a>. Three docs, one loop: this doc owns the tools, Problem-Solving owns the thinking, Version Control owns the timeline.</p>
 
-<h2 id="sec-ai-era-testing-generated-code-and-nondeterministic-systems">11. AI-era testing — generated code and nondeterministic systems</h2>
+<h2 id="sec-ai-era-testing-generated-code-and-nondeterministic-systems">AI-era testing — generated code and nondeterministic systems</h2>
 
 <p>AI changes testing in two directions at once:</p>
 
@@ -389,7 +390,7 @@ Test strategy
 
 <p><strong>Review AI-generated tests as specifications.</strong> The question is not "does this test pass?" but "does this test express the behavior we actually want?"</p>
 
-<h2 id="sec-worked-example-a-feature-tested-from-unit-to-production">12. Worked example — a feature tested from unit to production</h2>
+<h2 id="sec-worked-example-a-feature-tested-from-unit-to-production">Worked example — a feature tested from unit to production</h2>
 
 <pre>
 Feature: users can apply a discount code at checkout
@@ -409,7 +410,7 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
 
 <p>The point is not to build every possible test. The point is to place each question at the cheapest level that can answer it reliably.</p>
 
-<h2 id="sec-tooling-ecosystem-how-the-concepts-land-in-practice">13. Tooling ecosystem — how the concepts land in practice</h2>
+<h2 id="sec-tooling-ecosystem-how-the-concepts-land-in-practice">Tooling ecosystem — how the concepts land in practice</h2>
 
 <p>Tools change; the concepts above do not. Treat this as a map of categories, not a recommendation list:</p>
 
@@ -426,15 +427,15 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
     <tr><td><strong>Accessibility</strong></td><td>axe, Lighthouse</td><td>Automated a11y checks (manual still required)</td></tr>
     <tr><td><strong>Performance</strong></td><td>k6, JMeter, Lighthouse</td><td>Load and client performance</td></tr>
     <tr><td><strong>Security</strong></td><td>OWASP ZAP, dependency scanners</td><td>Vulnerability detection</td></tr>
-    <tr><td><strong>Mocking / service virtualization</strong></td><td>MSW, WireMock</td><td>Boundary control (§4)</td></tr>
-    <tr><td><strong>Test data</strong></td><td>Factories, fixtures, Testcontainers</td><td>Deterministic data (§1e)</td></tr>
-    <tr><td><strong>Observability</strong></td><td>Sentry, Datadog, Grafana, OpenTelemetry</td><td>Production evidence (§9)</td></tr>
+    <tr><td><strong>Mocking / service virtualization</strong></td><td>MSW, WireMock</td><td>Boundary control (<a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">§4</a>)</td></tr>
+    <tr><td><strong>Test data</strong></td><td>Factories, fixtures, Testcontainers</td><td>Deterministic data (<a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">§1e</a>)</td></tr>
+    <tr><td><strong>Observability</strong></td><td>Sentry, Datadog, Grafana, OpenTelemetry</td><td>Production evidence (<a href="#sec-production-verification-testing-does-not-stop-at-deployment">§9</a>)</td></tr>
   </tbody>
 </table>
 
-<p>Choose the smallest set that covers your strategy (§6), and change tools without changing the evidence model.</p>
+<p>Choose the smallest set that covers your strategy (<a href="#sec-test-strategy-what-to-automate-and-what-not-to">§6</a>), and change tools without changing the evidence model.</p>
 
-<h2 id="sec-the-most-common-failure-modes">14. The most common failure modes</h2>
+<h2 id="sec-the-most-common-failure-modes">The most common failure modes</h2>
 
 <table>
   <thead><tr><th>Failure</th><th>Why it happens</th><th>Fix</th></tr></thead>
@@ -449,7 +450,7 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
   </tbody>
 </table>
 
-<h2 id="sec-the-complete-mental-checklist">15. The complete mental checklist</h2>
+<h2 id="sec-the-complete-mental-checklist">The complete mental checklist</h2>
 
 <p>If you remember only one image, remember this: <strong>a test is a question with an oracle; a suite is a strategy for producing evidence at the right speed and scope.</strong></p>
 
