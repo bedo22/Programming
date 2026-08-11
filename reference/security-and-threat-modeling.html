@@ -13,6 +13,9 @@
   <p class="kicker">Reference · Security — adversarial thinking, trust boundaries, and saying no</p>
   <h1>Security &amp; Threat Modeling</h1>
   <p class="meta">How to think like an attacker: the CIA triad, the STRIDE threat model, trust boundaries and data-flow mapping, defense in depth and least privilege, identity and access management (authn vs. authz, RBAC/ABAC, OAuth 2.1 and OIDC theory), cryptography (hashing vs. encryption, KMS, key rotation), the OWASP Top 10 attack taxonomy, the AI-era attack surface, and the security checklist to gate every design and PR review — with a worked STRIDE walkthrough of a file-upload endpoint. Read this alongside <a href="./system-design.html">System Design</a> (trust boundaries and blast radius), <a href="./api-design.html">API Design</a> (token mechanics), and <a href="./backend-engineering.html">Backend Engineering</a> (authorization checks in the request loop).</p>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>Language:</strong> English · <a href="./ar/security-and-threat-modeling.html">العربية</a>
+        </p>
 </header>
 
 <blockquote class="callout">
@@ -33,9 +36,9 @@
   +----------------------------------------+</pre>
   <p>Neighbors and where the <em>mechanics</em> live (this doc owns the mindset, not the plumbing):</p>
   <ul>
-    <li><a href="./api-design.html">API Design</a> — how the identity exchange works on the wire: OAuth grants, JWT vs. opaque tokens, token expiry and refresh, rate limiting, idempotency (§8h, §10).</li>
-    <li><a href="./backend-engineering.html">Backend Engineering</a> — authorization checks in the request loop (IDOR, §1d), SQL injection and ORM bypass risks (§1e), session vs. stateless identity (§7).</li>
-    <li><a href="./system-design.html">System Design</a> — trust boundaries and blast radius as architecture (§5d), mTLS between services, network blind spots.</li>
+    <li><a href="./api-design.html">API Design</a> — how the identity exchange works on the wire: OAuth grants, JWT vs. opaque tokens, token expiry and refresh, rate limiting, idempotency (<a href="./api-design.html#sec-security-browser-contracts">§8h</a>, <a href="./api-design.html#sec-security-browser-contracts">§10</a>).</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — authorization checks in the request loop (IDOR, <a href="./backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a>), SQL injection and ORM bypass risks (<a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>), session vs. stateless identity (<a href="./backend-engineering.html#sec-state-the-identity-and-session-decision">§7</a>).</li>
+    <li><a href="./system-design.html">System Design</a> — trust boundaries and blast radius as architecture (<a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§5d</a>), mTLS between services, network blind spots.</li>
     <li><a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — Row-Level Security and tenant isolation as schema decisions (Multi-tenancy section).</li>
     <li><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — supply-chain integrity, SBOMs, secret scanning, least-privilege pipelines (Pipeline security section).</li>
     <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
@@ -49,10 +52,10 @@
 
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
-<p>Reading order: read this after <a href="./system-design.html">System Design</a> §5d (so you've seen trust boundaries drawn) and after <a href="./backend-engineering.html">Backend Engineering</a> §1d (so you've seen authorization checks). Most readers come back when a feature needs a design review, a dependency gets compromised, or a "quick endpoint" needs hardening. Cross-links:</p>
+<p>Reading order: read this after <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§5d</a> (so you've seen trust boundaries drawn) and after <a href="./backend-engineering.html">Backend Engineering</a> <a href="./backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a> (so you've seen authorization checks). Most readers come back when a feature needs a design review, a dependency gets compromised, or a "quick endpoint" needs hardening. Cross-links:</p>
 <ul>
   <li>Wraps <a href="./api-design.html">API Design</a> — the identity exchange is its mechanics, the threat model is here.</li>
-  <li>Wraps <a href="./backend-engineering.html">Backend Engineering</a> — every handler is an attack surface; §1d/§1e are where the checks execute.</li>
+  <li>Wraps <a href="./backend-engineering.html">Backend Engineering</a> — every handler is an attack surface; <a href="./backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a>/<a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a> are where the checks execute.</li>
   <li>Wraps <a href="./system-design.html">System Design</a> — trust boundaries and blast radius are the architecture side of this doc's mindset.</li>
   <li>Wraps <a href="./data-modeling-and-databases.html">Data Modeling &amp; Databases</a> — RLS and tenant isolation are the vault's enforcement.</li>
   <li>Wraps <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — the supply chain is an attack surface; the pipeline is where scans live.</li>
@@ -99,13 +102,13 @@
 <table>
 <thead><tr><th>Topic</th><th>Owner doc</th><th>What this doc does</th></tr></thead>
 <tbody>
-<tr><td>How to write an <code>Authorization</code> header, OAuth grants, token expiry</td><td><a href="./api-design.html">API Design</a> (§8h, §10)</td><td>The theory of identity: bearer tokens, JWT claims, revocation strategy</td></tr>
-<tr><td>How to parameterize a SQL query, ORM bypass risks</td><td><a href="./backend-engineering.html">Backend Engineering</a> (§1e)</td><td>The injection attack itself: what it exploits, why parameterization defeats it</td></tr>
-<tr><td>Authorization checks in the request loop (IDOR)</td><td><a href="./backend-engineering.html">Backend Engineering</a> (§1d)</td><td>Broken access control as a class of attack; why "logged in" ≠ "allowed"</td></tr>
+<tr><td>How to write an <code>Authorization</code> header, OAuth grants, token expiry</td><td><a href="./api-design.html">API Design</a> (<a href="./api-design.html#sec-security-browser-contracts">§8h</a>, <a href="./api-design.html#sec-security-browser-contracts">§10</a>)</td><td>The theory of identity: bearer tokens, JWT claims, revocation strategy</td></tr>
+<tr><td>How to parameterize a SQL query, ORM bypass risks</td><td><a href="./backend-engineering.html">Backend Engineering</a> (<a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>)</td><td>The injection attack itself: what it exploits, why parameterization defeats it</td></tr>
+<tr><td>Authorization checks in the request loop (IDOR)</td><td><a href="./backend-engineering.html">Backend Engineering</a> (<a href="./backend-engineering.html#sec-authentication-vs-authorization-identity-then-permission">§1d</a>)</td><td>Broken access control as a class of attack; why "logged in" ≠ "allowed"</td></tr>
 <tr><td>How to configure a CI/CD secret scanner, SBOM, SLSA</td><td><a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a> (Pipeline security)</td><td>The supply-chain threat model: what is actually at risk when a dependency is compromised</td></tr>
 <tr><td>How to design a multi-tenant database</td><td><a href="./data-modeling-and-databases.html">Data Modeling</a> (Multi-tenancy)</td><td>Tenant isolation failure modes and Row-Level Security as a control</td></tr>
-<tr><td>Trust boundaries as architecture, mTLS, blast radius</td><td><a href="./system-design.html">System Design</a> (§5d)</td><td>Threat modeling a new feature: STRIDE and trust-boundary mapping</td></tr>
-<tr><td>Browser-side contracts (CSP, cookies, CSRF)</td><td><a href="./api-design.html">API Design</a> (§8h)</td><td>Why the browser is a hostile environment: XSS and CSRF as classes</td></tr>
+<tr><td>Trust boundaries as architecture, mTLS, blast radius</td><td><a href="./system-design.html">System Design</a> (<a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§5d</a>)</td><td>Threat modeling a new feature: STRIDE and trust-boundary mapping</td></tr>
+<tr><td>Browser-side contracts (CSP, cookies, CSRF)</td><td><a href="./api-design.html">API Design</a> (<a href="./api-design.html#sec-security-browser-contracts">§8h</a>)</td><td>Why the browser is a hostile environment: XSS and CSRF as classes</td></tr>
 </tbody>
 </table>
 
@@ -178,7 +181,7 @@
 <table>
 <thead><tr><th>Threat</th><th>Asset</th><th>Likelihood</th><th>Impact</th><th>Risk</th><th>Treatment</th><th>Owner</th><th>Review</th></tr></thead>
 <tbody>
-<tr><td>SQL injection</td><td>User database</td><td>Medium</td><td>High</td><td>High</td><td>Parameterized queries (Backend §1e) + scanner in CI</td><td>Backend lead</td><td>Quarterly</td></tr>
+<tr><td>SQL injection</td><td>User database</td><td>Medium</td><td>High</td><td>High</td><td>Parameterized queries (Backend <a href="./backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>) + scanner in CI</td><td>Backend lead</td><td>Quarterly</td></tr>
 <tr><td>Credential stuffing</td><td>Auth service</td><td>High</td><td>Medium</td><td>High</td><td>Rate limiting + MFA + breach monitoring</td><td>Security owner</td><td>Quarterly</td></tr>
 <tr><td>Dependency compromise</td><td>Production deps</td><td>Medium</td><td>High</td><td>High</td><td>SCA scanning, pinning, blast-radius review (checklist row 7)</td><td>Platform lead</td><td>Monthly</td></tr>
 <tr><td>Leaked secrets</td><td>Deploy pipeline</td><td>Low</td><td>Critical</td><td>High</td><td>Secret scanning, managed secrets, rotation</td><td>Platform lead</td><td>Monthly</td></tr>
@@ -236,7 +239,7 @@
 
 <p>The same failure seen from the attack side is <strong>broken access control</strong> (OWASP A01) — and its most common form is <strong>IDOR</strong>: a valid user reaching a resource that isn't theirs because an ownership check was missing. The attack class is the OWASP section's job; the prevention lives in <a href="./backend-engineering.html">Backend Engineering §1d</a> (the ownership check in the request loop) and <a href="./backend-engineering.html">§7b</a> (the CRUD check per resource). Cross-reference both when you design an authorization model: the model you choose decides <em>how</em> you express the check; the per-request ownership check decides whether the model is <em>enforced</em>.</p>
 
-<p>The wire-level mechanics — OAuth 2.1 flows, OIDC claims, JWT vs. opaque tokens, refresh boundaries, mTLS and SPIFFE for service-to-service — are <a href="./api-design.html">API Design's</a> job (§8h, §10). What belongs here: the mental model that <strong>authentication is a gate and authorization is a per-request decision, and the two must never be merged into "has a valid token"</strong>.</p>
+<p>The wire-level mechanics — OAuth 2.1 flows, OIDC claims, JWT vs. opaque tokens, refresh boundaries, mTLS and SPIFFE for service-to-service — are <a href="./api-design.html">API Design's</a> job (<a href="./api-design.html#sec-security-browser-contracts">§8h</a>, <a href="./api-design.html#sec-security-browser-contracts">§10</a>). What belongs here: the mental model that <strong>authentication is a gate and authorization is a per-request decision, and the two must never be merged into "has a valid token"</strong>.</p>
 
 <h2 id="sec-cryptography-data-protection">Cryptography &amp; data protection</h2>
 
