@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غوص عميق في Next.js — مرجع</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · إطار فوق React (ميتا-إطار)</p>
+  <h1>غوص عميق في Next.js</h1>
+  <p class="meta">RSC وApp Router والتخزين المؤقت وTurbopack وأنماط عصر الذكاء الاصطناعي — كلها مربوطة بنموذج الدالة+الخطافات. اقرأها بعد وثيقة التحوّل النموذجي، وقبل أن تفترض أن كل ملف React مكوّن عميل.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../nextjs-deep-dive.html">English</a>
+  </p>
+</header>
+
+<section class="recap">
+  <h3 style="margin-top:0">لماذا توجد هذه الوثيقة</h3>
+  <p>بعد أن وضعت React تطبيق Create React App في حالة الغروب (فبراير 2025)، توجّه وثائق React الرسمية بالتطبيقات الجديدة نحو إطار عمل. وفي إعلانات الوظائف وأعمال React الجديدة، غالبًا ما يكون هذا الإطار هو <strong>Next.js</strong> (من Vercel). هذه الوثيقة ليست درسًا تعليميًا يحل محل nextjs.org — إنها خريطة لمتعلم JS قادم من خلفية C++ يفهم الدوال والإغلاقات والخطافات بالفعل، ويحتاج إلى قراءة كود Next دون أن يغرق.</p>
+  <p>متطلبات مسبقة في مساحة العمل هذه: <a href="./class-to-hooks-paradigm-shift.html">التحوّل من الكلاسات إلى الخطافات</a> (خاصة <a href="./class-to-hooks-paradigm-shift.html#sec-era-4-the-react-compiler-and-beyond">§١٨.٢</a> RSC و<a href="./class-to-hooks-paradigm-shift.html#sec-era-4-the-react-compiler-and-beyond">§١٨.١</a> المترجم)، وقاعدة نموذج صندوق إعادة العرض في <a href="./class-to-hooks-paradigm-shift.html">التحوّل من الكلاسات إلى الخطافات</a> <a href="./class-to-hooks-paradigm-shift.html#sec-the-stale-closure-problem-and-why-it-isn-t-one">§٧</a>. سياق الخريطة: <a href="./frontend-camps-survey.html">frontend camps survey</a> <a href="./frontend-camps-survey.html#sec-camp-e-the-other-major-ui-libraries-signals-world">§٥</a>. تفاصيل المنصة بعد الخطافات (React 19، والمترجم، وأمن RSC) تعيش في <a href="./react-2024-and-beyond.html">React 2024 وما بعدها</a>؛ هذه الوثيقة هي طبقة الإطار فوقه.</p>
+</section>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a> ← <a href="./react-2024-and-beyond.html">React 2024 وما بعدها</a> (المترجم، RSC، المؤسسة) ← هذا الدليل ← <a href="./frontend-camps-survey.html">frontend camps survey</a> (خريطة المعسكرات الأوسع). حيث تشرح وثائق React <em>في أي عملية</em> يعمل الكود، تشرح هذه الوثيقة <em>كيف ينظّم Next ذلك في تطبيق قابل للنشر</em> — التوجيه، واصطلاحات الملفات، وجلب البيانات، والتخزين المؤقت، وسلسلة الأدوات. النطاق المحدود: ليست درسًا يحل محل nextjs.org، وليست إعادة تدريس لـRSC (<a href="./react-2024-and-beyond.html#sec-react-server-components-split-rendering-across-two-processes">§٢</a>/<a href="./react-2024-and-beyond.html#sec-react-server-components-split-rendering-across-two-processes">§٤</a> في React 2024 وما بعدها)، وليست المقارنة الكاملة للمعسكرات (<a href="./frontend-camps-survey.html#sec-camp-e-the-other-major-ui-libraries-signals-world">§٥</a> من camps survey).</p>
+
+<p><strong>إن كانت هذه قراءتك الأولى،</strong> اقرأ <a href="#sec-definition-what-next-js-is-and-is-not">§١</a> (الخريطة الذهنية)، <a href="#sec-server-components-vs-client-components">§٤</a> (الخادم مقابل العميل)، <a href="#sec-caching-mental-model-including-cache-components">§٦</a> (التخزين المؤقت — الجزء الذي يربك الجميع)، و<a href="#sec-what-you-will-actually-read-at-work-the-checklist">§١٩</a> (قائمة القراءة). عُد لاحقًا للأجزاء التاريخية (<a href="#sec-history-the-10-year-line">§١ب</a>–<a href="#sec-mental-models-six-that-cover-90-of-next-reading">§١و</a>)، والمثال العملي (<a href="#sec-worked-example-a-product-page-with-reviews-and-streaming">§١٤</a>)، وأنماط الفشل (<a href="#sec-failure-modes">§١٥</a>) حين يطرح عليك كود حقيقي سؤالًا.</p>
+
+<h2 id="sec-definition-what-next-js-is-and-is-not">التعريف — ما هو Next.js (وما ليس هو)</h2>
+
+<p><strong>هو:</strong> إطار React من فئة ميتا-أطر العمل (meta-framework) — التوجيه، واستراتيجيات التصيير، واصطلاحات جلب البيانات، والتجميع، وتحسينات الإنتاج حول React.</p>
+<p><strong>ليس:</strong> بديلًا عن نموذج مكونات React. مكونات العميل ما زالت تستخدم نفس الخطافات والإغلاقات وصناديق كل تصيير التي درستها. يقرر Next <em>أين</em> يعمل الكود و<em>كيف</em> تحمّل المسارات بياناتها؛ وما زالت React تقرر كيف تتحدث الواجهة من الحالة.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>الطبقة</th>
+      <th>من يملكها</th>
+      <th>نموذجك الذهني</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>تحديث الواجهة من الحالة</td>
+      <td>React</td>
+      <td>دالة + خطافات، نموذج صندوق إعادة العرض</td>
+    </tr>
+    <tr>
+      <td>URL ← شجرة مكونات</td>
+      <td>Next App Router</td>
+      <td>مسارات نظام الملفات تحت <code>app/</code></td>
+    </tr>
+    <tr>
+      <td>عملية الخادم مقابل المتصفح</td>
+      <td>RSC + <code>"use client"</code></td>
+      <td>Reactان اثنتان (بيانات مقابل حالة)</td>
+    </tr>
+    <tr>
+      <td>التخزين المؤقت / إعادة التحقق</td>
+      <td>نموذج تخزين Next</td>
+      <td>دلالات HTTP + تخزين الإطار</td>
+    </tr>
+    <tr>
+      <td>التجميع / HMR / بناء الإنتاج</td>
+      <td>Turbopack / Webpack</td>
+      <td>أدوات — نادرًا ما تُحرَّر يدويًا</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>قاعدة هذه الوثيقة كلها: <strong>مهمة مَن هذه؟</strong> التوجيه والبيانات والتخزين المؤقت والتجميع = Next. تحديثات الواجهة المدفوعة بالحالة = React. أبقِ الاثنين منفصلين ويختفي معظم غرابة Next الظاهرية.</p>
+
+<h2 id="sec-history-the-10-year-line">التاريخ — خط العشر سنوات</h2>
+
+<p>ميزات Next إجابات عن مشكلات محددة ظهرت بالترتيب. معرفة الخط تجعل مواقف تصميم App Router مفهومة (لماذا اصطلاحات الملفات؟ انظر 2022).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>السنة</th>
+      <th>المحطة</th>
+      <th>ما الذي تغيّر</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2016</td>
+      <td>Next.js 1.0 (Vercel؛ Guillermo Rauch، Arunoda Susiripala)</td>
+      <td>SSR لـReact دون خادم مخصص. Pages Router.</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>
+        Next.js 9.3 — <code>getStaticProps</code> /
+        <code>getServerSideProps</code>
+      </td>
+      <td>
+        أصبح جلب البيانات طرقًا صريحة، لا افتراضات SSR ضمنية.
+      </td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>التجديد الثابت التزايدي (ISR)</td>
+      <td>
+        صفحات ثابتة تُعاد التحقق في الخلفية. طُمست خطوط الثابت/الديناميكي عمدًا.
+      </td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>Next.js 13 — App Router (تجريبي)</td>
+      <td>
+        مجلد <code>app/</code>، ومكونات خادم React، وتخطيطات متداخلة، ودفق.
+      </td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>Next.js 14 — App Router مستقر، وإجراءات الخادم مستقرة</td>
+      <td>
+        <code>"use server"</code>، وإجراءات النماذج، ومسارات متوازية ومقترضة.
+      </td>
+    </tr>
+    <tr>
+      <td>2024</td>
+      <td>
+        Next.js 15 — دعم React 19، وTurbopack dev مستقر، و<code>next.config.ts</code>
+      </td>
+      <td>
+        واجهات الطلبات (<code>cookies()</code>، <code>headers()</code>) أصبحت لازمنية؛ اتجاه <code>use cache</code> يظهر.
+      </td>
+    </tr>
+    <tr>
+      <td>2025–26</td>
+      <td>
+        Cache Components، والتصيير المسبق الجزئي، وتكامل مترجم React
+      </td>
+      <td>
+        التخزين المؤقت أصبح صريحًا وتركيبيًا؛ قشرة ثابتة + فتحات ديناميكية؛ تحسين العميل أولًا بالمترجم.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-evolution-constraint-inversions">التطور — انقلابات القيود</h2>
+
+<p>كل تخصص على هذه الرفوف يركب انقلابات القيود — يتغير قيدٌ ما ويصير النهج القديم غير كافٍ. Next كثيف بها بشكل غير معتاد:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>الانقلاب</th>
+      <th>قبل</th>
+      <th>بعد</th>
+      <th>ما الذي تغيّر</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>ثابت ← ديناميكي</strong></td>
+      <td>HTML مُصيَّر مسبقًا وقت البناء</td>
+      <td>مُصيَّر على الخادم لكل طلب (SSR)</td>
+      <td>
+        المحتوى أصبح مخصصًا/فوريًا؛ تصيير وقت البناء لم يعد يواكب.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>SSR ← دفق</strong></td>
+      <td>HTML كامل يُرسل بعد تحميل كل البيانات</td>
+      <td>القشرة تُرسل فورًا، والبيانات تتدفق عبر Suspense</td>
+      <td>
+        أدرك المستخدمون انتظارًا طويلًا؛ القشرة تتيح للأجزاء البطيئة الوصول لاحقًا.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>ترطيب كامل ← ترطيب جزئي</strong></td>
+      <td>شجرة React كاملة تُرطَّب في المتصفح</td>
+      <td>
+        الجزر التفاعلية فقط تُرطَّب؛ مكونات الخادم تشحن صفر JS
+      </td>
+      <td>
+        حجم الحزمة أصبح عنق الزجاجة؛ RSC تزيل JS للواجهات غير التفاعلية.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Webpack ← Turbopack</strong></td>
+      <td>مجمّع مبني على JS</td>
+      <td>مجمّع مبني على Rust</td>
+      <td>سرعة البناء أصبحت عنق زجاجة في تجربة المطور.</td>
+    </tr>
+    <tr>
+      <td><strong>تخزين ضمني ← تخزين صريح</strong></td>
+      <td>
+        الإطار يخزّن <code>fetch()</code> افتراضيًا (مربك)
+      </td>
+      <td>
+        <code>use cache</code>، <code>cacheLife</code>،
+        <code>cacheTag</code>، Cache Components
+      </td>
+      <td>
+        لم يستطع المطورون فهم ما هو مخزَّن؛ الصريح يتفوق على الضمني.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>افتراضي CRA ← افتراضي إطار</strong></td>
+      <td><code>create-react-app</code> كنقطة بداية</td>
+      <td>وثائق React توصي بأطر (Next، React Router، Expo)</td>
+      <td>
+        اصطدمت SPAs العميلة فقط بجدران SEO والأداء وجلب البيانات (<a href="./react-2024-and-beyond.html#sec-react-19-2-and-the-framework-routing-era">§٧</a> في React 2024 وما بعدها).
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-intersection-with-neighbors-where-it-borders-other-practices">التقاطع مع الجيران — حيث يلامس ممارسات أخرى</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>الممارسة</th>
+      <th>الحمض النووي المشترك</th>
+      <th>أين يختلفان</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a href="./react-2024-and-beyond.html">React 2024 وما بعدها</a> (نموذج المكونات)
+      </td>
+      <td>الخطافات، والإغلاقات، وصناديق كل تصيير، وإدارة الحالة</td>
+      <td>
+        React تملك <em>كيف تتحدث الواجهة من الحالة</em>. Next يملك
+        <em>أين يعمل الكود وكيف تحمّل المسارات بياناتها</em>.
+      </td>
+    </tr>
+    <tr>
+      <td><a href="./system-design.html">System Design</a></td>
+      <td>
+        استراتيجية التصيير (SSR/RSC/Islands)، وميزانيات زمن الاستجابة، والتخزين المؤقت
+      </td>
+      <td>
+        تصميم النظام يقرر <em>هل</em> نستخدم SSR/RSC/edge. Next
+        <em>تنفيذ</em> لذلك القرار.
+      </td>
+    </tr>
+    <tr>
+      <td><a href="./api-design.html">API Design</a></td>
+      <td>إجراءات الخادم، ومعالجات المسارات، ونقاط نهاية REST</td>
+      <td>
+        تصميم API يحدد <em>العقد</em>؛ معالجات مسارات Next وإجراءات الخادم طريقة واحدة لتنفيذه.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="./ui-ux-web-design.html">UI/UX وتصميم الويب</a>
+      </td>
+      <td>حالات التحميل، والدفق، والهياكل العظمية، والواجهة التفاؤلية</td>
+      <td>
+        UI/UX يقرر <em>ما يراه المستخدم أثناء التحميل</em>؛ Next يوفر <code>loading.tsx</code> وSuspense والدفق كآلية.
+      </td>
+    </tr>
+    <tr>
+      <td><a href="./html-and-css.html">HTML وCSS</a></td>
+      <td>
+        ما يُرسل إلى المتصفح، وCSS الحرجة، وتحميل الخطوط
+      </td>
+      <td>
+        HTML وCSS هما <em>عقد المنصة</em>؛ Next يقرر متى وكيف يولَّد ذلك HTML/CSS ويُسلَّم.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="./frontend-camps-survey.html">Frontend Camps Survey</a>
+      </td>
+      <td>جزر Astro، ومحمّلات Remix، وSvelteKit، وQwik</td>
+      <td>
+        Next معسكر واحد؛ الاستطلاع يقارن بينها، وهذه الوثيقة تتعمق في Next فقط.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="./javascript-across-stacks.html">JS Across Stacks</a>
+      </td>
+      <td>وقت تشغيل Node، ووقت تشغيل الحافة، وبلا خادم</td>
+      <td>
+        عبر المكدسات يغطي <em>أين يعمل JS</em>؛ Next
+        <em>مستهلك</em> لتلك الأوقات (Node لـSSR، والحافة للوسيط).
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-underlying-theory-the-models-next-builds-on">النظرية الأساسية — النماذج التي يبني عليها Next</h2>
+
+<p>Next لم يخترع هذه؛ بل حوّلها إلى منتج. حين يكون سلوك Next محيرًا، يكون أحد هذه النماذج غالبًا تحته.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>النظرية</th>
+      <th>الأصل</th>
+      <th>ما يأخذه Next منها</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>مكونات خادم React</td>
+      <td>دان أبراموف، "The Two Reacts" (2024)</td>
+      <td>
+        <code>UI = f(data)</code> على الخادم، و<code>UI = f(state)</code> على العميل — عمليتان، نموذج ذهني واحد (<a href="./react-2024-and-beyond.html#sec-react-server-components-split-rendering-across-two-processes">§٢</a> في React 2024 وما بعدها).
+      </td>
+    </tr>
+    <tr>
+      <td>React Fiber / المصالحة</td>
+      <td>React 16+ (2017)</td>
+      <td>
+        دفق SSR وSuspense والتصيير المتزامن — المجدول الذي يتيح لـNext تبادل التصيير والبيانات.
+      </td>
+    </tr>
+    <tr>
+      <td>دلالات التخزين المؤقت لـHTTP</td>
+      <td>
+        RFC 9111 — <code>Cache-Control</code>، <code>ETag</code>،
+        <code>stale-while-revalidate</code>
+      </td>
+      <td>
+        طبقات تخزين Next تبني على بدائيات تخزين HTTP؛ <code>revalidate</code> هي <code>stale-while-revalidate</code> بصيغة إطار.
+      </td>
+    </tr>
+    <tr>
+      <td>دفق HTML / النقل المجزأ</td>
+      <td>ترميز HTTP/1.1 المجزأ (chunked)، وأطر HTTP/2</td>
+      <td>
+        يرسل Next القشرة أولًا ثم يدفق حدود Suspense — تسليم HTML مجزأ.
+      </td>
+    </tr>
+    <tr>
+      <td>معمارية الجزر (Islands)</td>
+      <td>
+        Jason Miller (Preact)، 2019؛ انظر
+        <a href="./react-2024-and-beyond.html">React 2024 وما بعدها</a> <a href="./react-2024-and-beyond.html#sec-preact-the-structural-branch-that-asks-what-if-react-were-3-5-kb">§٩</a>
+      </td>
+      <td>
+        ترطيب الأجزاء التفاعلية فقط؛ RSC + مكونات العميل في Next مجموعة شاملة لهذه الفكرة.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-mental-models-six-that-cover-90-of-next-reading">النماذج الذهنية — ستة تغطي 90% من قراءة Next</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>النموذج</th>
+      <th>الفكرة الأساسية</th>
+      <th>متى تلجأ إليه</th>
+      <th>ما يغني عنه</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>"أي React أنا فيها؟"</td>
+      <td>
+        كل ملف مكوّن خادم (لا خطافات، يعمل على الخادم) أو مكوّن عميل (خطافات، يعمل في المتصفح). اسأل أولًا.
+      </td>
+      <td>قراءة أي ملف في <code>app/</code>.</td>
+      <td>افتراض أن كل شيء React عميلة.</td>
+    </tr>
+    <tr>
+      <td>"ثابت أم ديناميكي؟"</td>
+      <td>
+        المسار ثابت ما لم يستخدم واجهات ديناميكية (<code>cookies()</code>، <code>headers()</code>، <code>searchParams</code>، <code>fetch</code> غير مخزَّن).
+      </td>
+      <td>تصحيح "لماذا تصل هذه الصفحة إلى الخادم كل مرة؟"</td>
+      <td>
+        التخمين. ابحث عن الإشارات الديناميكية قبل لوم المضيف.
+      </td>
+    </tr>
+    <tr>
+      <td>"أين يعمل هذا الكود؟"</td>
+      <td>
+        مكونات الخادم يمكنها استخدام DB/fs/أسرار؛ مكونات العميل يمكنها استخدام <code>window</code>/DOM/خطافات.
+      </td>
+      <td>تقرير ما إذا تضيف <code>"use client"</code>.</td>
+      <td>وضع كل شيء في مكونات عميل "لأمان".</td>
+    </tr>
+    <tr>
+      <td>"أي طبقة تخزين؟"</td>
+      <td>
+        أربع طبقات — تذكّر الطلب، وتخزين البيانات، وتخزين المسار الكامل، وتخزين الموجّه — لكل منها عمر وإبطال مختلفان.
+      </td>
+      <td>تصحيح بيانات قديمة أو ضربات خادم غير متوقعة.</td>
+      <td>افتراض وجود تخزين واحد. هناك أربعة.</td>
+    </tr>
+    <tr>
+      <td>"ترطيب أم لا؟"</td>
+      <td>
+        مكونات الخادم تشحن صفر JS؛ مكونات العميل تُرطَّب. الحد الفاصل هو <code>"use client"</code>.
+      </td>
+      <td>
+        تحسين حجم الحزمة؛ فهم لماذا لا يُعاد تصيير مكوّن أبدًا.
+      </td>
+      <td>افتراض أن كل المكونات تُرطَّب.</td>
+    </tr>
+    <tr>
+      <td>"الشجرة تقرر، لا الملف"</td>
+      <td>
+        ملف بلا <code>"use client"</code> مكوّن خادم <em>ما لم</em> يستورده مكوّن عميل — عندها ينضم إلى حزمة العميل من تلك النقطة فما دون.
+      </td>
+      <td>
+        تصحيح "لماذا يتسرب استيرادي الحصري للخادم إلى العميل؟"
+      </td>
+      <td>
+        التفكير أن <code>"use client"</code> خاص بالملف. إنه خاص بالشجرة من هناك فما دون.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+      ---
+<h2 id="sec-pages-router-vs-app-router">Pages Router مقابل App Router</h2>
+
+<p>كانت لـNext نظاما توجيه متعاقبان. ستصادف الاثنين في البرية.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Pages Router (<code>pages/</code>)</th>
+      <th>App Router (<code>app/</code>)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>العصر</td>
+      <td>Next الكلاسيكي (منشور على نطاق واسع)</td>
+      <td>الافتراضي الحالي للتطبيقات الجديدة</td>
+    </tr>
+    <tr>
+      <td>واجهات البيانات</td>
+      <td>
+        <code>getServerSideProps</code>، <code>getStaticProps</code>
+      </td>
+      <td>
+        مكونات خادم لازمنية، وتخزين <code>fetch</code>، وإجراءات خادم
+      </td>
+    </tr>
+    <tr>
+      <td>التخطيطات</td>
+      <td><code>_app</code> مخصص / HOCs متداخلة</td>
+      <td>ملفات <code>layout.tsx</code> متداخلة تحفظ الحالة</td>
+    </tr>
+    <tr>
+      <td>RSC</td>
+      <td>لا (شجرة React عميلة بعد خصائص البيانات)</td>
+      <td>نعم — مكونات خادم افتراضيًا</td>
+    </tr>
+    <tr>
+      <td>اصطلاحات الملفات</td>
+      <td><code>pages/about.js</code> ← <code>/about</code></td>
+      <td><code>app/about/page.tsx</code> ← <code>/about</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>نصيحة قراءة:</strong> إذا رأيت <code>getServerSideProps</code> فأنت في Pages Router. إذا رأيت <code>async function Page()</code> في أعلى ملف مسار بلا <code>"use client"</code> فأنت في مكونات خادم App Router. لا تخلط النموذجين.</p>
+
+<h2 id="sec-app-router-file-conventions-the-vocabulary">اصطلاحات ملفات App Router (المفردات)</h2>
+
+<p>تحت <code>app/</code>، أسماء الملفات مميزة:</p>
+<ul>
+  <li>
+    <code>page.tsx</code> — واجهة شريحة مسار (مطلوب لكي يوجد ذلك الـURL).
+  </li>
+  <li>
+    <code>layout.tsx</code> — يلفّ الصفحات؛ <strong>لا يُعاد تركيبه</strong> عند التنقل بين المسارات الفرعية (الحالة في التخطيط تبقى).
+  </li>
+  <li>
+    <code>loading.tsx</code> — بديل Suspense للشريحة أثناء تحميل محتوى الخادم.
+  </li>
+  <li>
+    <code>error.tsx</code> — حد أخطاء للشريحة (يجب أن يكون مكوّن عميل).
+  </li>
+  <li><code>not-found.tsx</code> — واجهة 404 للشريحة.</li>
+  <li>
+    <code>route.ts</code> — معالجات HTTP (نقاط نهاية بنمط REST) بدلًا من صفحة.
+  </li>
+  <li>
+    <code>template.tsx</code> — مثل التخطيط لكنه <em>يُعاد تركيبه</em> عند التنقل (أندر).
+  </li>
+  <li><code>default.tsx</code> — بدائل المسارات المتوازية (متقدم).</li>
+</ul>
+
+<pre><code>app/
+  layout.tsx          <span class="comment-line">// root shell (html/body, nav)</span>
+  page.tsx            <span class="comment-line">// /</span>
+  blog/
+    layout.tsx        <span class="comment-line">// wraps all /blog/*</span>
+    page.tsx          <span class="comment-line">// /blog</span>
+    [slug]/
+      page.tsx        <span class="comment-line">// /blog/:slug  (dynamic)</span>
+      loading.tsx
+</code></pre>
+
+<p>الشرائح الديناميكية: <code>[id]</code>، واللاقطة الشاملة <code>[...slug]</code>، واللاقطة الشاملة الاختيارية <code>[[...slug]]</code>. مجموعات المسارات <code>(marketing)</code> تنظّم المجلدات دون التأثير في الـURL. <strong>المسارات المتوازية</strong> (مجلدات <code>@slot</code>) تعرض شرائح متعددة في تخطيط واحد؛ <strong>المسارات المقترضة</strong> تعرض نافذة/طبقة فوقية بينما يشير الـURL إلى الصفحة الحقيقية. اعرف أنهما موجودتان كمفردات — ستقابلهما بالاسم قبل أن تقابلهما في الكود. السؤال العام عن <em>الغرض</em> من شجرة مجلدات (مجلدات الميزات، والمزامنة (colocation)، وتخطيطات المونوريبو) يعيش في <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code"><a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§Codebase architecture</a></a>.</p>
+
+<h2 id="sec-server-components-vs-client-components">مكونات الخادم مقابل مكونات العميل</h2>
+
+<p>هذه هي الفكرة الحاملة للوزن. الافتراضي في <code>app/</code>: <strong>مكوّن خادم</strong>. تختار المتصفح بالتوجيهة:</p>
+
+<pre><code><span class="comment-line">// app/counter.tsx — must run in the browser (hooks, events, window)</span>
+"use client";
+
+import { useState } from "react";
+
+export function Counter() {
+  const [n, setN] = useState(0);           <span class="comment-line">// box model applies here</span>
+  return &lt;button onClick={() =&gt; setN(n + 1)}&gt;{n}&lt;/button&gt;;
+}
+</code></pre>
+
+<pre><code><span class="comment-line">// app/posts/page.tsx — Server Component (default). No hooks. Can use secrets/fs/db.</span>
+import { Counter } from "../counter";
+import { db } from "@/lib/db";
+
+export default async function PostsPage() {
+  const posts = await db.post.findMany();  <span class="comment-line">// runs on the server</span>
+  return (
+    &lt;main&gt;
+      &lt;ul&gt;{posts.map(p =&gt; &lt;li key={p.id}&gt;{p.title}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;Counter /&gt;                          <span class="comment-line">// client island inside server page</span>
+    &lt;/main&gt;
+  );
+}
+</code></pre>
+
+<h3>قواعد تمنع الالتباس</h3>
+<ol>
+  <li>
+    <strong>لا يمكن لمكونات الخادم استخدام الخطافات أو واجهات المتصفح.</strong>
+    لا <code>useState</code> ولا <code>useEffect</code> ولا
+    <code>window</code>. تُصيَّر مرة واحدة لكل طلب (أو وقت البناء) —
+    لا توجد حلقة إعادة تصيير.
+  </li>
+  <li>
+    <strong>لا يمكن لمكونات العميل استيراد وحدات حصرية للخادم</strong>
+    (عملاء DB، أو بيئة خاصة بلا <code>NEXT_PUBLIC_</code>). تتدفق البيانات من الخادم إلى العميل كخصائص (قابلة للتسلسل).
+  </li>
+  <li>
+    <strong>اتجاه التركيب:</strong> يستطيع الخادم تصيير أطفال من العميل. ويستطيع العميل تصيير أطفال من الخادم فقط عبر أنماط مثل تمرير مكونات الخادم كـ<code>children</code> أو فتحات — لا باستيراد ملف خادم داخل ملف عميل.
+  </li>
+  <li>
+    <strong
+      >كل ما علّمك إياه مستند التحوّل النموذجي ما زال ينطبق على جانب العميل من الخط.</strong
+    >
+    RSC لا تستبدل الخطافات؛ إنها تصغّر أي جزء من الشجرة يحتاجها.
+  </li>
+  <li>
+    <strong>الحد الفاصل خاصية شجرة، لا خاصية ملف.</strong>
+    بمجرد أن يستورد مكوّن عميل وحدةً، تُجمَّع تلك الشجرة الفرعية في حزمة العميل — حتى الملفات التي لم تكتب <code>"use client"</code> أبدًا (النموذج الذهني <a href="#sec-mental-models-six-that-cover-90-of-next-reading">§١و</a>).
+  </li>
+</ol>
+
+<blockquote class="callout">
+  <p>
+    <strong>صيغة دان أبراموف</strong> (<a href="./react-2024-and-beyond.html#sec-react-server-components-split-rendering-across-two-processes">§٢</a> في React 2024 وما بعدها): العميل هو <code>UI = f(state)</code>؛ الخادم هو <code>UI = f(data)</code>؛ معًا <code>UI = f(data, state)</code>. عند قراءة ملف، اسأل أولًا: <em>في أي دالة أنا؟</em>
+  </p>
+</blockquote>
+
+<h2 id="sec-data-fetching-patterns">أنماط جلب البيانات</h2>
+
+<h3>مكونات خادم لازمنية + <code>fetch</code></h3>
+<p>
+  في App Router، <code>fetch</code> مدمج مع تخزين Next (تطور السلوك عبر الإصدارات — تحقق دائمًا من إصدار التطبيق الذي تقرأه). الشكل النمطي:
+</p>
+<pre><code>async function getUser(id) {
+  const res = await fetch(`https://api.example.com/users/${id}`, {
+    next: { revalidate: 60 },   <span class="comment-line">// ISR-style: revalidate every 60s</span>
+  });
+  if (!res.ok) throw new Error("Failed");
+  return res.json();
+}
+</code></pre>
+
+<h3>وصول مباشر إلى الواجهة الخلفية</h3>
+<p>
+  يمكن لمكونات الخادم استدعاء قواعد البيانات وأنظمة الملفات والخدمات الداخلية مباشرة — لا حاجة لكشف مسار REST عام لبيانات صفحتك. هذا سبب رئيسي لوجود RSC: مزامنة البيانات مع الواجهة دون شحن عميل الاستعلام إلى المتصفح.
+</p>
+
+<h3>إجراءات الخادم</h3>
+<p>
+  الدوال المعلَّمة بـ<code>"use server"</code> يمكن تمريرها إلى مكونات العميل كاستدعاءات رجوع (مثل <code>action</code> النموذج). تعمل على الخادم عند الاستدعاء. عاملها كـ<strong>نقاط نهاية عامة</strong> — تحقق من المدخلات، وطبّق المصادقة، ولا ترمّز الأسرار أبدًا (انظر <a href="./react-2024-and-beyond.html#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§٥</a> في React 2024 وما بعدها لموجة ثغرات RSC ديسمبر 2025 – يناير 2026).
+</p>
+
+<pre><code><span class="comment-line">// app/actions.ts</span>
+"use server";
+
+export async function updateTitle(formData) {
+  const title = formData.get("title");
+  <span class="comment-line">// validate + auth + db write</span>
+}
+</code></pre>
+
+<h3>معالجات المسارات (<code>route.ts</code>)</h3>
+<p>
+  <code>route.ts</code> مكافئ App Router لمسارات API. تدعم كل طرق HTTP، وتقرأ أجسام الطلبات، وتضبط الكوكيز، ويمكنها دفق الاستجابات. لجأ إليها حين تحتاج نقطة نهاية تستدعيها أطراف أخرى (متصفحات، وويب هوك، خدمات خارجية) — لا لبيانات صفحتك، التي تجلبها مكونات الخادم مباشرة (<a href="#sec-data-fetching-patterns">§٥.٢</a>).
+</p>
+
+<pre><code><span class="comment-line">// app/webhooks/stripe/route.ts — a Route Handler</span>
+export async function POST(request: Request) {
+  const payload = await request.json();
+  <span class="comment-line">// verify signature, do side effects</span>
+  return Response.json({ ok: true });
+}
+</code></pre>
+
+<h2 id="sec-caching-mental-model-including-cache-components">النموذج الذهني للتخزين المؤقت — بما فيه Cache Components</h2>
+
+<p>
+  قصة تخزين Next هي الجزء الذي يربك مطوري SPA المخضرمين أكثر من غيره. الطبقات التقريبية:
+</p>
+<ul>
+  <li>
+    <strong>تذكّر الطلب</strong> — استدعاءات <code>fetch</code> المكررة خلال تصيير خادم واحد يمكن دمجها.
+  </li>
+  <li>
+    <strong>تخزين البيانات</strong> — نتائج محفوظة عبر الطلبات (مع وسوم/أزمنة إعادة تحقق).
+  </li>
+  <li>
+    <strong>تخزين المسار الكامل</strong> — حمولة HTML/RSC ثابتة لمسار يمكن إنتاجه مسبقًا.
+  </li>
+  <li>
+    <strong>تخزين الموجّه (العميل)</strong> — تخزين جلسة عميل للشرائح المزارة لأجل تنقل سريع للخلف/للأمام.
+  </li>
+</ul>
+
+<h3>الواجهات الديناميكية — ما يقلب الشريحة من ثابتة إلى ديناميكية</h3>
+<p>
+  هذه هي <em>الإشارات الديناميكية</em> التي قال لك جدول النماذج الذهنية (<a href="#sec-mental-models-six-that-cover-90-of-next-reading">§١و</a>) أن تصطادها. استخدام أيٍّ منها يفرض التصيير الديناميكي لتلك الشريحة:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>الواجهة الديناميكية</th>
+      <th>الأثر</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>cookies()</code>، <code>headers()</code></td>
+      <td>قراءة بيانات خاصة بالطلب ← الشريحة تصبح ديناميكية</td>
+    </tr>
+    <tr>
+      <td><code>fetch</code> غير مخزَّن</td>
+      <td>لا يوجد إدخال تخزين يُعاد استخدامه ← بيانات تُجلب لكل طلب</td>
+    </tr>
+    <tr>
+      <td><code>searchParams</code></td>
+      <td>يعتمد على الـURL الوارد ← ديناميكي في الأوضاع الشائعة</td>
+    </tr>
+    <tr>
+      <td><code>export const dynamic = "force-dynamic"</code></td>
+      <td>خروج صريح عن التوليد الثابت</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p>
+    <strong>الثابت مقابل الديناميكي خاصية شجرة.</strong> استخدام بيانات خاصة بالطلب يفرض التصيير الديناميكي لتلك الشريحة. حين "تصل صفحة إلى الخادم دائمًا" في الإنتاج، ابحث عن تلك الإشارات الديناميكية قبل لوم المضيف. وعند تصحيح بيانات قديمة، السؤال ليس "هل Next معطل؟" بل "أيٌّ من الطبقات الأربع يخدمني؟"
+  </p>
+</blockquote>
+
+<h3>Cache Components — اتجاه Next الحديث</h3>
+<p>
+  <strong>Cache Components</strong> (اتجاه Next الحديث): اجعل التخزين المؤقت صريحًا وتركيبيًا — علّم أي أجزاء الشجرة قشرة ثابتة قابلة للتخزين مقابل فتحات ديناميكية، بدلًا من الرجاء أن تطابق الافتراضات العامة نيتك. مساحة الأسماء المستقرة عبر الإصدارات:
+</p>
+<ul>
+  <li>
+    <code><strong>use cache</strong></code> — علّم ناتج دالة أو مكوّن كقابل للتخزين؛ بديل الاعتماد على تخزين <code>fetch()</code> الضمني.
+  </li>
+  <li>
+    <code><strong>cacheLife</strong></code> — كم تعيش البيانات المخزنة (ملفات <code>seconds</code>، <code>minutes</code>، <code>hours</code>، <code>days</code>).
+  </li>
+  <li>
+    <code><strong>cacheTag</strong></code> — وسِم البيانات المخزنة لتتمكن من الإبطال بالوسم بعد تعديل — <code>revalidateTag("products")</code>.
+  </li>
+</ul>
+<p>
+  هذه تجعل التخزين المؤقت صريحًا وتركيبيًا وقابلًا للتصحيح. اقرأ وثائق إصدار Next الرئيسي في مشروعك للشكل الدقيق — تطورت الواجهة (مثل <code>revalidate</code>/<code>tags</code> على <code>fetch</code> مقابل الصيغ التوجيهية أعلاه)، والإصدار الذي تقرأه هو الفائز.
+</p>
+
+<p>أسئلة تصحيح عملية حين يكون المسار بطيئًا أو قديمًا:</p>
+<ol>
+  <li>هل هذه الشريحة ثابتة، أم ISR، أم ديناميكية؟</li>
+  <li>أي وسم / زمن يعيد تحقق البيانات؟</li>
+  <li>
+    هل أنظر إلى HTML من CDN، أم تصيير خادم، أم تخزين موجّه العميل؟
+  </li>
+</ol>
+
+<h2 id="sec-middleware-next-image-next-font-and-metadata">الوسيط (Middleware)، <code>next/image</code>، <code>next/font</code>، والبيانات التعريفية</h2>
+
+<h3>الوسيط (<code>middleware.ts</code>)</h3>
+<p>
+  يعمل قبل كل طلب على الحافة. يمكنه إعادة كتابة الـURLات، والتحويل، وضبط الترويسات، وفحص المصادقة، وتشكيل الطلب/الاستجابة. يعمل في <strong>وقت تشغيل الحافة (Edge Runtime)</strong> — لا واجهات Node.js، ولا نظام ملفات، ولا وصول لقاعدة بيانات. استخدمه لحُرّاس المصادقة، وكشف اللغة، وتشكيل الطلبات. لا تضع منطق أعمال في الوسيط — مكانه إجراءات الخادم أو معالجات المسارات.
+</p>
+
+<h3><code>next/image</code> — استبدل <code>&lt;img&gt;</code></h3>
+<p>
+  يعطي <code>next/image</code> تحميلًا كسولًا، وتحجيمًا متجاوبًا، وتحويل صيغ (WebP/AVIF)، وبدائل ضبابية خارج الصندوق. يحتاج <code>width</code>/<code>height</code> (أو <code>fill</code>) لحجز المساحة وتجنب انزياح التخطيط — صديق مؤشرات الويب الأساسية (Core Web Vitals). الصور البعيدة تتطلب إدراج المضيف في قائمة مسموحة في <code>next.config.ts</code>.
+</p>
+
+<h3><code>next/font</code></h3>
+<p>
+  يستضيف الخطوط ذاتيًا وقت البناء، مما يزيل طلبات <code>&lt;link&gt;</code> الخط الخارجية ويمنع FOIT/FOUT. يستبدل وسم Google Fonts الكلاسيكي <code>&lt;link&gt;</code> باستيراد وقت البناء.
+</p>
+
+<h3>البيانات التعريفية وSEO</h3>
+<p>
+  ينتج <code>generateMetadata</code> في مكونات الخادم <code>&lt;title&gt;</code> و<code>&lt;meta&gt;</code> وOpen Graph وJSON-LD. البيانات التعريفية الثابتة تُستخرج وقت البناء؛ والديناميكية تعمل لكل طلب. هكذا تبقى صفحات RSC صديقة لـSEO دون طبقة تصيير منفصلة لنظام إدارة محتوى بلا رأس (headless CMS).
+</p>
+
+<h2 id="sec-turbopack-and-the-build-toolchain">Turbopack وسلسلة أدوات البناء</h2>
+
+<p>
+  <strong>Turbopack</strong> هو مجمّع Next المبني على Rust (المسار الذي سبقه Webpack). HMR للتطوير وبناء الإنتاج يعتمدان عليه افتراضيًا بشكل متزايد في إصدارات Next الرئيسية الحالية. بالنسبة لك كقارئ لكود تطبيق:
+</p>
+<ul>
+  <li>
+    نادرًا ما تضبط Turbopack يوميًا؛ تلاحظه حين تكون البناءات سريعة أو حين يكون إضافة مخصصة لـWebpack فقط وتنكسر تحت Turbopack.
+  </li>
+  <li>
+    خط Next.js منتصف 2026 (مثل إعلانات عائلة 16.x) شدد على تنقل أسرع وتكامل تجريبي/متوسع مع مترجم React — طابق وثائقك المحلية مع إصدار Next المقفل في المستودع.
+  </li>
+  <li>
+    ثبّت إصدارات الإطار في الإنتاج؛ واقرأ ملاحظات الأمان والنسخ التجريبية قبل القفز بين الإصدارات الرئيسية (ثقافة إيقاع أمان شهري في بيئة Next بعد موجة ثغرات RSC — انظر <a href="./react-2024-and-beyond.html#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§٥</a> في React 2024 وما بعدها).
+  </li>
+</ul>
+
+<p>
+  ذو صلة: <strong>مترجم React</strong> (<a href="./react-2024-and-beyond.html#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§٣</a> في React 2024 وما بعدها) يمكنه العمل في خطوط Next بحيث تحتاج مكونات العميل إلى <code>useMemo</code>/<code>useCallback</code> مكتوبة يدويًا أقل. عامل ترقيات المترجم كترقيات React — إصدارات دقيقة، وتشغيل اختبارات كامل.
+</p>
+
+<h2 id="sec-navigation-streaming-and-ux-primitives">التنقل والدفق وبدائيات تجربة الاستخدام</h2>
+
+<ul>
+  <li>
+    <code>&lt;Link&gt;</code> — تنقل عميل مع تحميل مسبق للمسارات الثابتة.
+  </li>
+  <li>
+    <code>useRouter</code> / <code>usePathname</code> /
+    <code>useSearchParams</code> — واجهات تنقل خاصة بالعميل (<code
+      >"use client"</code
+    >).
+  </li>
+  <li>
+    <strong>الدفق</strong> — يمكن لمكونات الخادم دفق حمولة HTML/RSC؛ <code>loading.tsx</code> و<code>Suspense</code> يحددان ما يراه المستخدم بينما تتحلل شجرة فرعية بطيئة.
+  </li>
+  <li>
+    <strong>اتجاهات التنقل الفوري/التفاؤلي</strong> — تستثمر إصدارات Next الحديثة في جعل انتقالات المسارات تبدو سريعة كـSPA مع الاحتفاظ بفوائد تصيير الخادم. حين ترى "التنقل فوري لكن البيانات تظهر لاحقًا"، فذلك دفق + تخطيطات قشرة — ليس خطأً افتراضيًا.
+  </li>
+  <li>
+    <strong>التصيير المسبق الجزئي (PPR)</strong> — صيّر القشرة الثابتة مسبقًا وقت البناء، ودفق الفتحات الديناميكية فقط لكل طلب (<a href="./react-2024-and-beyond.html#sec-react-server-components-split-rendering-across-two-processes">§٤.٦</a> في React 2024 وما بعدها). نفس شكل "قشرة + Suspense" الذي تعرفه، لكن محسوب مسبقًا.
+  </li>
+</ul>
+
+<p>
+  قطع React 19.2 التي قد تقابلها داخل تطبيقات Next (<a href="./react-2024-and-beyond.html#sec-react-19-2-and-the-framework-routing-era">§٧</a> في React 2024 وما بعدها):
+  <code>useEffectEvent</code>، <code>&lt;Activity&gt;</code> — يجب أن يدعمهما إصدارا الإطار وReact معًا.
+</p>
+
+<h2 id="sec-auth-env-and-security-frontend-adjacent">المصادقة والبيئة والأمان (بجوار الواجهة الأمامية)</h2>
+
+<ul>
+  <li>
+    <code>process.env.NEXT_PUBLIC_*</code> — تُضمَّن في حزمة العميل. أي سر يجب أن يكون في بيئة خاصة بالخادم <em>بدون</em> تلك البادئة.
+  </li>
+  <li>
+    إجراءات الخادم ومعالجات المسارات = سطح هجوم. تحقق منها كواجهات API عامة. فحوصات المصادقة على الخادم، لا واجهة مخفية فقط.
+  </li>
+  <li>
+    بعد ثغرات بروتوكول RSC (ديسمبر 2025 – يناير 2026)، تثبّت فرق الإنتاج React/Next، وتشترك في تنبيهات الأمان، وتجدول التصحيحات. لا تخترع مُسلسِل RSC خاصًا بك.
+  </li>
+</ul>
+
+<h3>تفاصيل أمنية تستحق التسمية</h3>
+<table>
+  <thead>
+    <tr>
+      <th>الشاغل</th>
+      <th>ماذا تفعل</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CSRF لإجراءات الخادم</td>
+      <td>
+        مدمج (فحص الأصل Origin) لإجراءات الخادم؛ معالجات المسارات المخصصة تحتاج رموز CSRF يدوية إذا قبلت كوكيز من المتصفحات.
+      </td>
+    </tr>
+    <tr>
+      <td>تسرب كود الخادم إلى العميل</td>
+      <td>
+        ثبّت حزمة <code>server-only</code>؛ علّم الوحدات التي يجب ألا تعبر الحد أبدًا. يصبح استيرادها عميلًا خطأ بناء.
+      </td>
+    </tr>
+    <tr>
+      <td>سطح XSS</td>
+      <td>
+        ترويسات سياسة أمان المحتوى (Content-Security-Policy) (تُضبط في ترويسات <code>next.config.ts</code> أو الوسيط).
+      </td>
+    </tr>
+    <tr>
+      <td>الأسرار</td>
+      <td>لا ترمّز أبدًا؛ متغيرات بيئة / مدير أسرار فقط (<a href="#sec-data-fetching-patterns">§٥.٣</a>).</td>
+    </tr>
+  </tbody>
+</table>
+<h2 id="sec-ai-readiness-product-features-not-hype">الجاهزية للذكاء الاصطناعي — ميزات منتج، لا ضجيج</h2>
+
+<p>
+  Next مضيف شائع لواجهات منتجات الذكاء الاصطناعي لأن الدفق وحدود الخادم يناسبان تطبيقات النماذج اللغوية (LLM):
+</p>
+<ul>
+  <li>
+    <strong>استجابات متدفقة</strong> من معالجات المسارات أو إجراءات الخادم إلى مكونات العميل (رموز المحادثة).
+  </li>
+  <li>
+    <strong>مفاتيح حصرية للخادم</strong> لمزوّدي النماذج — لا <code>NEXT_PUBLIC_</code> أبدًا لأسرار API.
+  </li>
+  <li>
+    <strong>Vercel AI SDK</strong> (وأمثاله) بأنماطه: خطافات عميل بنمط <code>useChat</code> + مسار خادم يستدعي النموذج. الجانب React ما زال خطافات وإغلاقات؛ الجديد هو التدفقات اللازمنية.
+  </li>
+  <li>
+    <strong>RSC لنتائج الأدوات</strong> — صيّر واجهة بنيوية ينتجها النموذج على الخادم حين لا تحتاج تفاعلية عميل لتلك الشجرة الفرعية.
+  </li>
+</ul>
+
+<p>
+  إذا كنت تبني ميزات ذكاء اصطناعي في تطبيق، فضّل اختيار مزوّد مدروس وأبقِ الأسرار على الخادم. المهارة الأمامية تبقى: تصيير حالات التحميل/الخطأ/الجزئية دون إغلاقات قديمة.
+</p>
+
+<h2 id="sec-deployment-targets">أهداف النشر</h2>
+
+<p>
+  تنشر تطبيق Next، لا كومة من مكونات React. القطعة البنائية (<code>next build</code>) هي وحدة الحقيقة.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>الهدف</th>
+      <th>النموذج</th>
+      <th>الحساب الذهني</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Vercel</td>
+      <td>مُدار، بلا إعداد، نشر معاينة</td>
+      <td>
+        ارتباط بالمزوّد؛ أبسط مسار؛ أوقات تشغيل الحافة + Node مدمجة
+      </td>
+    </tr>
+    <tr>
+      <td>Docker / استضافة ذاتية</td>
+      <td><code>next build</code> ← صورة ← أي مضيف حاويات</td>
+      <td>تحكم كامل، تملك العمليات، لا آليات نشر معاينة</td>
+    </tr>
+    <tr>
+      <td>Amplify / Railway / Render</td>
+      <td>مُدار لكن متعدد الأطر</td>
+      <td>
+        تحسين أقل خصوصية بـNext من Vercel، لكن عمليات أقل من الاستضافة الذاتية
+      </td>
+    </tr>
+    <tr>
+      <td>حافة فقط</td>
+      <td>الوسيط + دوال الحافة، بلا SSR على Node</td>
+      <td>أسرع إقلاع بارد، سطح محدود بحدة</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-testing-in-next-js">الاختبار في Next.js</h2>
+
+<p>يجب أن يحترم الاختبار الانقسام بين الخادم والعميل:</p>
+<ul>
+  <li>
+    <strong>مكونات الخادم</strong> — اختبارات تكامل: استدعِ المكوّن مع البيانات، وأكد ناتج HTML. إعداد <code>next/jest</code> يعالج حد RSC/العميل.
+  </li>
+  <li>
+    <strong>مكونات العميل</strong> — مكتبة اختبار React كالمعتاد (نموذج صندوق إعادة العرض <a href="#sec-server-components-vs-client-components">§٤</a>).
+  </li>
+  <li>
+    <strong>إجراءات الخادم / معالجات المسارات</strong> — استدعِ الدوال مباشرة مع <code>formData</code>/طلبات وهمية؛ وأكد التحقق + المصادقة + الأثر الجانبي.
+  </li>
+  <li><strong>التدفق الكامل</strong> — Playwright / Cypress من طرف إلى طرف.</li>
+</ul>
+
+<h2 id="sec-worked-example-a-product-page-with-reviews-and-streaming">مثال عملي — صفحة منتج مع مراجعات ودفق</h2>
+
+<p>
+  كل ما سبق، مشروحًا عبر مسار واقعي واحد.
+  <em
+    >صفحة تفاصيل منتج مع مراجعات، وزر إضافة إلى السلة، ودفق.</em
+  >
+</p>
+
+<pre><code>app/products/[id]/
+  layout.tsx                     <span class="comment-line">// product chrome, shared across child routes</span>
+  page.tsx                       <span class="comment-line">// server component — fetch product, stream reviews</span>
+  loading.tsx                    <span class="comment-line">// shell while the server renders</span>
+  error.tsx                      <span class="comment-line">// boundary for the product subtree</span>
+</code></pre>
+<p>
+  <em>شجرة الملفات:</em> <code>layout.tsx</code> (الهيكل)،
+  <code>page.tsx</code> (بيانات خادم + <code>generateMetadata</code>)،
+  <code>loading.tsx</code> (بديل القشرة)،
+  <code>error.tsx</code> (الحد)، مكوّن خادم <code>Reviews.tsx</code> ملفوف في <code>&lt;Suspense&gt;</code>، وورقة عميل <code>AddToCart.tsx</code>.
+</p>
+
+<pre><code><span class="comment-line">// app/products/[id]/page.tsx</span>
+import { Suspense } from "react";
+import { Reviews } from "./Reviews";
+import { AddToCart } from "./AddToCart";
+
+export async function Page({ params }) {
+  const product = await getProduct(params.id);      <span class="comment-line">// cacheable, revalidate 60 (§6.2)</span>
+  return (
+    &lt;main&gt;
+      &lt;ProductData product={product} /&gt;
+      &lt;AddToCart productId={product.id} /&gt;          <span class="comment-line">// client leaf — the only island</span>
+      &lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;
+        &lt;Reviews productId={product.id} /&gt;          <span class="comment-line">// async server comp — streams in</span>
+      &lt;/Suspense&gt;
+    &lt;/main&gt;
+  );
+}
+
+export function generateMetadata({ params }) { ... }  <span class="comment-line">// SEO from product data</span>
+</code></pre>
+
+<p>
+  <strong>ترتيب القراءة:</strong> القشرة وبيانات المنتج تُشحن أولًا (<code>revalidate: 60</code>، ثابت)، والمراجعات تتدفق منفصلة (ديناميكية — لكل مستخدم)، وزر إضافة إلى السلة هو الجزيرة العميلة الوحيدة (خطافات)، و<code>generateMetadata</code> يشتق كتلة SEO. إخفاق تخزين أو ديناميكية مفروضة في أي مكان من السلسلة يغيّر ما يراه المستخدم — وهذا موضوع القسم التالي.
+</p>
+
+<h2 id="sec-failure-modes">أنماط الفشل</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>نمط الفشل</th>
+      <th>كيف يبدو</th>
+      <th>لماذا يحدث</th>
+      <th>الإصلاح</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>انتشار <code>"use client"</code></td>
+      <td>توجيهة واحدة في التخطيط الجذري؛ التطبيق كله يُرطَّب</td>
+      <td>أُضيفت لإصلاح خطأ خطافات، ثم تُركت</td>
+      <td>ادفع الحد إلى الورقة التي تحتاج الحالة (<a href="#sec-server-components-vs-client-components">§٤</a>).</td>
+    </tr>
+    <tr>
+      <td>جلب متسلسل (Waterfall)</td>
+      <td>الصفحة تستغرق ثوانٍ لأن الجلب يتسلسل</td>
+      <td><code>await</code> في الأب، ثم الطفل، ثم حفيده</td>
+      <td>
+        <code>Promise.all</code> في الأعلى؛ ودفق الأقسام المستقلة (<a href="#sec-navigation-streaming-and-ux-primitives">§٩</a>).
+      </td>
+    </tr>
+    <tr>
+      <td>تصيير ديناميكي عرضي</td>
+      <td>صفحة يفترض أن تكون ثابتة تضرب الخادم كل طلب</td>
+      <td>
+        <code>cookies()</code>/<code>headers()</code>/<code
+          >searchParams</code
+        >
+        في شريحة موجهة للثبات
+      </td>
+      <td>
+        ابحث عن الإشارة الديناميكية؛ <code>force-static</code> أو <code>use cache</code> عن قصد.
+      </td>
+    </tr>
+    <tr>
+      <td>إفراط في التخزين / بيانات قديمة</td>
+      <td>بيانات قديمة بعد تعديل</td>
+      <td>تخزين عدواني جدًا؛ لا إبطال عند الكتابة</td>
+      <td>
+        <code>revalidateTag</code> بعد التعديلات؛ <code>cacheLife</code> صريح.
+      </td>
+    </tr>
+    <tr>
+      <td>عدم تطابق الترطيب</td>
+      <td>"Text content does not match"</td>
+      <td>
+        العميل والخادم صيّرا ناتجًا مختلفًا
+        (<code>Date.now()</code>، <code>Math.random()</code>)
+      </td>
+      <td>
+        قيم خاصة بالمتصفح تُشغَّل وقت التنفيذ في <code>useEffect</code>؛
+        <code>suppressHydrationWarning</code> نادرًا.
+      </td>
+    </tr>
+    <tr>
+      <td>إجراء خادم غير مُتحقق</td>
+      <td>بيانات نموذج سيئة تصل إلى قاعدة البيانات</td>
+      <td>الثقة بـ<code>formData</code> عند نقطة النهاية</td>
+      <td>تحقق من المخطط (Zod) + مصادقة داخل كل إجراء (<a href="#sec-data-fetching-patterns">§٥.٣</a>).</td>
+    </tr>
+    <tr>
+      <td>كود خادم في حزمة العميل</td>
+      <td>استيراد <code>fs</code>/قاعدة بيانات يرمي خطأً عميلًا</td>
+      <td>مكوّن خادم سُحب أسفل حد العميل</td>
+      <td>
+        حارس <code>server-only</code>؛ أبقِ الخادم فوق الخط (<a href="#sec-mental-models-six-that-cover-90-of-next-reading">§١و</a>، <a href="#sec-auth-env-and-security-frontend-adjacent">§١٠</a>).
+      </td>
+    </tr>
+    <tr>
+      <td>التباس حالة التخطيط</td>
+      <td>
+        حالة في <code>layout.tsx</code> تُعاد — أو لا — عندما يُتوقع
+      </td>
+      <td>التخطيطات تبقى عبر التنقلات؛ الصفحات تُعاد تركيبها</td>
+      <td>
+        حالة خاصة بالتنقل إلى <code>page.tsx</code>؛ استخدم <code>template.tsx</code> لإعادة التركيب.
+      </td>
+    </tr>
+    <tr>
+      <td>الوسيط يفعل منطق الأعمال</td>
+      <td>كود الحافة يصبح طبقة تحكم غير قابلة للاختبار</td>
+      <td>عومل الوسيط كوحدة التحكم</td>
+      <td>
+        الوسيط = مصادقة، تحويلات، ترويسات؛ المنطق في الإجراءات/المعالجات (<a href="#sec-middleware-next-image-next-font-and-metadata">§٧</a>.١).
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-principles">المبادئ</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>المبدأ</th>
+      <th>المعنى</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>خادم افتراضيًا؛ عميل فقط عند الحاجة</td>
+      <td>
+        كل ملف في <code>app/</code> مكوّن خادم دون <code>"use client"</code>. هذا أقوى رأي في الإطار.
+      </td>
+    </tr>
+    <tr>
+      <td>البيانات تعيش حيث تُستخدم</td>
+      <td>
+        مكونات الخادم تجلب مباشرة؛ لا تبني نقطة نهاية REST لتغذية صفحتك (<a href="#sec-data-fetching-patterns">§٥.٢</a>).
+      </td>
+    </tr>
+    <tr>
+      <td>التخزين المؤقت صريح، لا سحر</td>
+      <td>
+        <code>revalidate</code>/<code>use cache</code>/<code>cacheTag</code>، لا رجاء. صحيح بالطبقات (<a href="#sec-caching-mental-model-including-cache-components">§٦</a>).
+      </td>
+    </tr>
+    <tr>
+      <td>الحد فاصل خط، لا تدرّج</td>
+      <td>
+        <code>"use client"</code> يرسم خطًا صلبًا يتحت ما دونه يُجمَّع عميلًا (<em><a href="#sec-mental-models-six-that-cover-90-of-next-reading">§١و</a></em> نموذج ذهني، "الشجرة تقرر").
+      </td>
+    </tr>
+    <tr>
+      <td>الدفق هو شكل التصيير الافتراضي</td>
+      <td>
+        القشرة أولًا، وحدود Suspense تحدد الكشف التدريجي (<a href="#sec-navigation-streaming-and-ux-primitives">§٩</a>).
+      </td>
+    </tr>
+    <tr>
+      <td>إجراءات الخادم نقاط نهاية عامة</td>
+      <td>
+        تحقق، وصادق، وقيّد المعدل، ودقّق — عاملها تمامًا كمسارات API (<a href="#sec-data-fetching-patterns">§٥.٣</a>، <a href="./react-2024-and-beyond.html#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§٥</a> في React 2024 وما بعدها).
+      </td>
+    </tr>
+    <tr>
+      <td>التطبيق هو وحدة النشر</td>
+      <td>تشحن تطبيق Next مبنيًا، لا مجموعة مكونات (<a href="#sec-deployment-targets">§١٢</a>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-ecosystem-a-tooling-catalog">النظام البيئي — كتالوج أدوات</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>الطبقة</th>
+      <th>الأدوات</th>
+      <th>لماذا تهم قراءة الكود</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>الاستضافة</td>
+      <td>Vercel، وDocker + أي سحابة، وRailway، وRender، وAmplify</td>
+      <td>هدف النشر يغيّر سلوك التخزين/الحافة (<a href="#sec-deployment-targets">§١٢</a>)</td>
+    </tr>
+    <tr>
+      <td>البيانات / ORM</td>
+      <td>Drizzle، Prisma، Supabase، Neon، Turso</td>
+      <td>"قاعدة البيانات" التي تنتظرها مكونات خادمك (<a href="#sec-data-fetching-patterns">§٥</a>.٢). Supabase PostgreSQL مستضاف — لغة الاستعلام وأنماط <code>ON CONFLICT</code>/RLS/LISTEN-NOTIFY في <a href="../sql-and-postgresql.html">SQL وPostgreSQL</a> تنطبق عليه مباشرة</td>
+    </tr>
+    <tr>
+      <td>المصادقة</td>
+      <td>Auth.js (NextAuth)، Clerk، Lucia، Supabase Auth</td>
+      <td>الجلسة تشكل قراءات <code>cookies()</code> (<a href="#sec-caching-mental-model-including-cache-components">§٦</a>.١)</td>
+    </tr>
+    <tr>
+      <td>مكتبات بيانات العميل</td>
+      <td>TanStack Query / SWR</td>
+      <td>
+        لبيانات العميل فقط؛ اعرف متى تكون زائدة مع RSC (<a href="./frontend-camps-survey.html#sec-camp-c-client-spas">§٣</a> من camps survey)
+      </td>
+    </tr>
+    <tr>
+      <td>التحقق</td>
+      <td>Zod، Valibot، ArkType</td>
+      <td>تحقق مخططي من مدخلات إجراءات الخادم (<a href="#sec-data-fetching-patterns">§٥.٣</a>، <a href="#sec-failure-modes">§١٥</a>)</td>
+    </tr>
+    <tr>
+      <td>حارس الحد</td>
+      <td>حزمة <code>server-only</code></td>
+      <td>
+        حارس وقت البناء ضد عبور كود الخادم للحد (<a href="#sec-auth-env-and-security-frontend-adjacent">§١٠.١</a>)
+      </td>
+    </tr>
+    <tr>
+      <td>التنسيق</td>
+      <td>Tailwind، CSS Modules، Panda</td>
+      <td>اهتمامات توافق RSC / استخراج وقت البناء</td>
+    </tr>
+    <tr>
+      <td>الاختبار</td>
+      <td>Vitest + RTL، Playwright، next/jest</td>
+      <td>انقسام اختبار الخادم مقابل العميل (<a href="#sec-testing-in-next-js">§١٣</a>)</td>
+    </tr>
+    <tr>
+      <td>المراقبة</td>
+      <td>Sentry، OpenTelemetry، Vercel Analytics</td>
+      <td>تتبع الإجراءات/المعالجات، وتتبع أخطاء RSC (<a href="#sec-failure-modes">§١٥</a>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-the-future-signals-to-watch">المستقبل — إشارات تستحق المراقبة</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>الإشارة</th>
+      <th>ماذا ستعني</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>عائلات Cache Components</td>
+      <td>
+        التخزين المؤقت صريح تمامًا؛ سؤال "ثابت؟ ديناميكي؟" يصبح موثقًا ذاتيًا
+      </td>
+    </tr>
+    <tr>
+      <td>تحسين العميل أولًا بالمترجم</td>
+      <td>
+        الحفظ اليدوي يواصل الخفوت في مكونات عميل Next (<a href="#sec-turbopack-and-the-build-toolchain">§٨</a>)
+      </td>
+    </tr>
+    <tr>
+      <td>PPR افتراضيًا</td>
+      <td>
+        كل صفحة قشرة ثابتة بفتحات ديناميكية؛ "الديناميكي" يصبح الحالة الخاصة
+      </td>
+    </tr>
+    <tr>
+      <td>ثقافة الإيقاع الأمني</td>
+      <td>
+        تنبيهات شهرية؛ التثبيت والتصحيح يصبحان روتينًا لا صدفة
+      </td>
+    </tr>
+    <tr>
+      <td>إنتاجية دفق الذكاء الاصطناعي</td>
+      <td>
+        واجهات محادثة/وكلاء مبنية على RSC + الوسيط، وتبقى على شكل خطافات (<a href="#sec-ai-readiness-product-features-not-hype">§١١</a>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-what-you-will-actually-read-at-work-the-checklist">ما ستقرؤه فعلًا في العمل — قائمة الفحص</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>السؤال</th>
+      <th>إن لم تستطع الإجابة…</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>هل هذا <code>pages/</code> أم <code>app/</code>؟</td>
+      <td>افحص المجلد؛ واجهات البيانات مختلفة (<a href="#sec-pages-router-vs-app-router">§٢</a>).</td>
+    </tr>
+    <tr>
+      <td>هل يبدأ الملف بـ<code>"use client"</code>؟</td>
+      <td>
+        إن لم يكن، افترض خادمًا؛ خطافات بلا التوجيهة = خطأ أو Pages Router قديم.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        من أين تأتي البيانات — <code>fetch</code>، قاعدة بيانات، خصائص، استعلام عميل؟
+      </td>
+      <td>افحص <a href="#sec-data-fetching-patterns">§٥</a>؛ المصدر يقرر طبقة التخزين (<a href="#sec-caching-mental-model-including-cache-components">§٦</a>).</td>
+    </tr>
+    <tr>
+      <td>هل يوجد إجراء خادم على هذا النموذج؟</td>
+      <td>عامله كنقطة نهاية عامة؛ تحقق + صادق (<a href="#sec-data-fetching-patterns">§٥.٣</a>).</td>
+    </tr>
+    <tr>
+      <td>
+        أي تخطيط يملك الهيكل، وهل تنجو الحالة من هذا التنقل؟
+      </td>
+      <td>التخطيطات تبقى؛ الصفحات تُعاد تركيبها (<a href="#sec-app-router-file-conventions-the-vocabulary">§٣</a>، <a href="#sec-failure-modes">§١٥</a>).</td>
+    </tr>
+    <tr>
+      <td>
+        هل الخطأ خطأ نموذج صندوق إعادة العرض React (عميل) أم خطأ تخزين-ديناميكية (Next)؟
+      </td>
+      <td>إن كانت "واجهة قديمة"، افحص طبقات التخزين الأربع أولًا (<a href="#sec-caching-mental-model-including-cache-components">§٦</a>).</td>
+    </tr>
+    <tr>
+      <td>أين حد العميل، وهل هو أدنى ما يمكن؟</td>
+      <td>عند الأوراق؟ <a href="#sec-server-components-vs-client-components">§٤</a>، <a href="#sec-principles">§١٦</a>.</td>
+    </tr>
+    <tr>
+      <td>هل الأسرار حصرية للخادم؟</td>
+      <td>
+        <code>NEXT_PUBLIC_*</code> تُشحن إلى المتصفح؛ وكل ما سواها يبقى على الخادم (<a href="#sec-data-fetching-patterns">§٥</a>، <a href="#sec-auth-env-and-security-frontend-adjacent">§١٠</a>).
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code><span class="comment-line">// Decision sketch when debugging "UI shows old data"</span>
+<span class="comment-line">// 1) Client state? → box model, deps, React Query keys</span>
+<span class="comment-line">// 2) Server Component props? → revalidate / cache tags / dynamic APIs</span>
+<span class="comment-line">// 3) Router cache? → refresh / hard navigation test</span>
+<span class="comment-line">// 4) CDN? → deployment / purge / ISR window</span>
+</code></pre>
+
+<h2 id="sec-how-this-ties-back-to-the-lessons">كيف يرتبط هذا بالدروس</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>فكرة JS / React</th>
+      <th>أين تظهر في Next</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>الوحدات (الدرس 11)</td>
+      <td>
+        وحدات حصرية للخادم مقابل وحدات مشتركة؛ الاستيراد العميل العرضي لقاعدة البيانات خطأ كلاسيكي
+      </td>
+    </tr>
+    <tr>
+      <td>الإغلاقات + الخطافات</td>
+      <td>مكونات العميل فقط — نفس خطافات React SPA</td>
+    </tr>
+    <tr>
+      <td><code>this</code> / الكلاسات</td>
+      <td>
+        مكونات قديمة داخل تطبيق Next؛ قابلة للقراءة عبر <a href="./class-to-hooks-paradigm-shift.html#sec-legacy-patterns-the-old-code-you-ll-read">§١٥</a> من وثيقة التحوّل النموذجي
+      </td>
+    </tr>
+    <tr>
+      <td>اللاتزامنية / الوعود</td>
+      <td>مكونات خادم لازمنية، ودفق، وإجراءات خادم</td>
+    </tr>
+    <tr>
+      <td>معالجة الأخطاء</td>
+      <td>
+        <code>error.tsx</code>، try/catch في دوال الخادم، <code>notFound()</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  لا تحتاج إلى "إنهاء Next" قبل شهادة HackerRank. تحتاج محو أمية Next حين يتحول المهمة بالكامل إلى قراءة كود العمل. الشهادة أولًا تبقى ترتيب المهمة.
+</p>
+
+<section class="win">
+  <h3>ما تغطيه هذه الوثيقة</h3>
+  <p>
+    Next.js هو React زائد توجيه، وانقسام خادم/عميل، وتخزين مؤقت، وأدوات. App Router يعتمد مكونات الخادم افتراضيًا؛ <code>"use client"</code> يعلّم الحد حيث ينطبق نموذجك الذهني للخطافات. التخزين المؤقت والواجهات الديناميكية يفسران كثيرًا من أسئلة "لماذا هذا ثابت/ديناميكي؟". Turbopack ومترجم React طبقتا سلسلة أدوات. الوسيط، والصور/الخطوط، والبيانات التعريفية، ومعالجات المسارات هي الملفات اليومية التي تقابلها في العمل. ميزات الذكاء الاصطناعي غالبًا دفق + أسرار خادم + واجهة React عادية. الأمان: إجراءات الخادم نقاط نهاية عامة. للمشهد الأوسع خارج Next انظر <a href="./frontend-camps-survey.html">camps survey</a>؛ لطبقة المنصة فوق هذا انظر <a href="./react-2024-and-beyond.html">React 2024 وما بعدها</a>؛ لمسارات المال التي تستخدم هذه المهارات انظر <a href="../frontend-income-markets.html">income markets</a>.
+  </p>
+</section>
+
+<section class="cite">
+  <strong>مصادر أولية ←</strong>
+  <a href="https://nextjs.org/docs"
+    >Vercel. <em>توثيق Next.js</em> (nextjs.org/docs).</a
+  >
+  ·
+  <a href="https://nextjs.org/blog/next-13"
+    >Vercel (2022). Next.js 13 — "App Router".</a
+  >
+  ·
+  <a href="https://nextjs.org/blog/next-14"
+    >Vercel (2023). Next.js 14 — إجراءات الخادم مستقرة.</a
+  >
+  ·
+  <a href="https://nextjs.org/blog/next-15"
+    >Vercel (2024). Next.js 15 — React 19، Turbopack، <code>next.config.ts</code>.</a
+  >
+  ·
+  <a href="https://overreacted.io/the-two-reacts/"
+    >أبراموف، د. (2024). "The Two Reacts".</a
+  >
+  ·
+  <a href="https://github.com/vercel/next.js"
+    >مستودع Next.js على GitHub وملاحظات الإصدارات.</a
+  >
+  ·
+  <a href="https://nextjs.org/docs/app/build-pipeline"
+    >Vercel. توثيق Turbopack.</a
+  >
+  ·
+  <a href="https://sdk.vercel.ai/docs">Vercel. توثيق AI SDK.</a>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>
+      "أرني الشلال في صفحة App Router حقيقية تجلب فيها ثلاثة مكونات بالتتابع — ثم أين كان سيصلحها الجلب المتوازي وSuspense."
+    </li>
+    <li>
+      "حين يجب أن تكون صفحة ثابتة لكنها تضرب الخادم كل طلب، مرّني بما تبحث عنه في الكود، وبالإصلاح."
+    </li>
+    <li>
+      "تتبّع إجراء خادم من طرف إلى طرف — التحقق، والمصادقة، وكتابة قاعدة البيانات، وإبطال التخزين، ومعالجة الأخطاء — وسمِّ كل مكان يمكن أن يخطئ فيه."
+    </li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · غوص عميق في Next.js</span>
+  <span>المهمة: قراءة JS/React في العمل</span>
+  <span>العودة إلى <a href="./react-2024-and-beyond.html">React 2024 وما بعدها</a> · مرجع: <a href="./glossary.html">المصطلحات</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>
