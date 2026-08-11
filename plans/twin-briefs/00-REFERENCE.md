@@ -1079,6 +1079,20 @@
 - sec-the-future-where-the-cms-internet-is-going
 - sec-summary-the-complete-mental-checklist
 
+## 2b. Twin status (v44) — cross-doc prefix rule
+`./doc.html` when the target HAS a twin, `../doc.html` when EN-only (30 twins as of v44):
+cs-and-software-engineering, glossary, react-2024-and-beyond, problem-solving, version-control-ci-cd-deployment,
+what-is-state-prequel, design-thinking, api-design, ui-ux-web-design, html-and-css, how-developers-think-frontend,
+system-design, software-development-process, class-to-hooks-paradigm-shift, angular-evolution,
+javascript-across-stacks, frontend-camps-survey, javascript-the-language, terminal-and-deployment-substrate,
+terminal-applications, algorithms-and-data-structures, dotnet-and-the-enterprise-lane, backend-engineering,
+data-modeling-and-databases, nextjs-deep-dive, observability-and-operations, security-and-threat-modeling,
+software-testing-and-debugging, payments-and-commerce, sql-and-postgresql.
+
+Still EN-only (11): beyond-the-browser, freelance-web-practice, frontend-income-markets, full-stack,
+hiring-process-and-interviews, income-stream-landscape, open-source, product-shapes, product-strategy,
+recurring-fear-of-replacement, wordpress-and-cms-internet.
+
 ## 3. Machinery (read-only, never re-implement)
 - ~/.agents/skills/translate-to-arabic/SKILL.md + conventions.md
 - ~/.agents/skills/reference-doc/SKILL.md

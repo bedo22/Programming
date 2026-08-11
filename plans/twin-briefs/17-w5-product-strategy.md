@@ -1,0 +1,46 @@
+# Twin brief — product-strategy (Wave 5)
+
+## Task (TRANSLATE mode — no AR twin exists)
+Produce the full Arabic twin + a per-doc hygiene map for `reference/product-strategy.html`.
+Deliverables (ONLY inside `/tmp/twin-product-strategy/`):
+- `en.html` — copy of the EN file (start: `cp reference/product-strategy.html /tmp/twin-product-strategy/en.html`)
+- `ar.html` — your full AR twin (house template)
+- `map.json` — `{"WANT":{...},"FOLDS":[[old,new],...]}` — WANT values are BARE ids, NO `#` prefix
+- `report.md` — change report: sections translated, table rows, pipeline counts, gate result, EVERY WANT/FOLD decision with a one-line justification, unresolved tokens listed as `pending`
+
+## Facts (from main-session survey)
+- visible h2s (NH): 24 | chars ≈ 35434
+- §-tokens outside pre/links: §1×1 §1c×1 §1f×1 §3×2 §3b×1 §3c×1 §4×2 §4b×3 §5×1 §5b×1 §6a×2 §9×2 §10×1 §13×1 (20 total)
+- 24 numbered h2s (0, 1, 1b–1f, 2, 3, 3b, 3c, 4, 4b, 5, 5b, 6, 7, 8, 9, 9a–9d, 10) — de-numbered by the pipeline. §13 DOES NOT EXIST in this doc — read the context; it is a legacy pointer (candidate: software-development-process or system-design legacy numbering). §6a also has no h2 — title-exact read. Others mostly self-refs to numbered sections (e.g. §3b → «Value capture — pricing and packaging»).
+
+## Mandatory reading (before writing any Arabic)
+1. `~/.agents/skills/translate-to-arabic/SKILL.md` — TRANSLATE mode + rules (one file at a time; house rules link to reference-doc skill)
+2. `~/.agents/skills/reference-doc/SKILL.md` — house template rules
+3. `plans/twin-briefs/00-REFERENCE.md` — dfn terminology gate + target anchor index
+4. Exemplar for structure/voice/ratio: `reference/ar/react-2024-and-beyond.html`
+
+## Steps
+1. Read the EN file completely (structure, then every line).
+2. Terminology gate: every concept covered by a dfn in 00-REFERENCE.md uses EXACTLY that Arabic form; a needed term absent from the dfn list → STOP, list it in report.md, NEVER invent.
+3. Write the whole AR twin in one pass: `lang="ar" dir="rtl"`, asset paths `../../assets/…`, lang-switch header line `../product-strategy.html (English)`, h2 titles translated, **h2 ids = EN's ids verbatim** (mirror), tables row-for-row, `<pre>` blocks verbatim, `&amp;` escaping. Too big for one write → parts in /tmp, concatenate, size-check each part. Full translation (ratio band 0.75–0.97): do NOT abbreviate.
+4. Hygiene on YOUR copies only:
+   `python3 ~/.agents/skills/translate-to-arabic/scripts/twin-pipeline.py /tmp/twin-product-strategy/en.html /tmp/twin-product-strategy/ar.html 24 --map /tmp/twin-product-strategy/map.json --strict-folds`
+   Fold rules: §-token → `<a href="…">§N</a>`; bare `§N` → WANT (target id, verified by READING the target section — title-exact match wins over the legacy number); dotted `§4.1`-style → FOLD to parent h2 anchor; cross-doc: `./doc.html#id` when the target has a twin, `../doc.html#id` when EN-only; fold olds VERBATIM, sorted by length DESC; every WANT id must exist in 00-REFERENCE.md.
+5. Gate: `python3 ~/.agents/skills/translate-to-arabic/scripts/verify-twins.py /tmp/twin-product-strategy/en.html /tmp/twin-product-strategy/ar.html product-strategy` → target ALL GATES PASSED; an out-of-band ratio is a recorded-exception flag → note density reasoning in report.md.
+6. report.md last, then STOP (no further work, no cleanup of /tmp/twin-product-strategy/).
+
+## Non-negotiable rules
+- NEVER touch git (no add/commit/tag/branch/checkout) — the main session owns the repo.
+- NEVER modify `reference/`, `reference/ar/`, `maps/`, `PROGRESS.md`, `AGENTS.md` — read-only except your cp source.
+- No heading numerals, ever. No `§` left outside links after step 4.
+- h2 ids identical EN↔AR; phantom `<h2>` inside `<pre>` stay untouched.
+- Mojibake safety: verify with `python3 -c "open('/tmp/twin-product-strategy/ar.html',encoding='utf-8').read()"` — never judge Arabic by terminal echo.
+
+## Resilience (provider hiccups — v34+)
+- Write each AR part to /tmp as soon as it is complete — NEVER hold the whole doc in one generation.
+- On `403 server_error` / `Stream ended without finish_reason`: pause ~60s, retry ONCE. If it recurs 3+ times: save every completed part, write a `STATUS:` line at the top of report.md (where you stopped, what remains), and STOP. The orchestrator resumes you; do not keep hammering.
+- Losing one stream costs one part — keep parts small (2–3 h2s) on docs > 20 h2.
+
+## Fold pre-check + ratio policy (v40+)
+- BEFORE the first pipeline run: verify every fold old-string — `python3 -c "import json;m=json.load(open('map.json'));en=open('en.html').read();ar=open('ar.html').read();print([o for o,_ in m['FOLDS'] if o not in en and o not in ar] or 'all folds match')"`. Fix any phantom old BEFORE running twin-pipeline; a strict-folds failure mid-run costs most when it cascades into re-translation.
+- A ratio FLAG with a recorded exception is a VALID terminal state — NEVER pad/rewrite to hit the band. Density reasoning = run `python3 ~/.agents/skills/translate-to-arabic/scripts/density-audit.py en.html ar.html`, paste the per-section table into report.md, eyeball ONLY flagged outliers, then stop.
