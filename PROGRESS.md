@@ -56,6 +56,9 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 ### EN-only — 🔴 no twin (12)
 beyond-the-browser, freelance-web-practice, frontend-income-markets, full-stack, hiring-process-and-interviews, income-stream-landscape, open-source, product-shapes, product-strategy, recurring-fear-of-replacement, sql-and-postgresql, wordpress-and-cms-internet.
 
+> **Coverage policy FLIPPED (v44):** the old Tier-C line (career/income docs stay EN-only) is void — shelf owner is an Egyptian local-market profile (Arabic interviews, local companies, Arabic client market). ALL docs get twins.
+> W4 (local-market cluster): frontend-income-markets, hiring-process-and-interviews, wordpress-and-cms-internet, freelance-web-practice — briefs 13–16. W5: product-strategy, product-shapes, recurring-fear-of-replacement, open-source. W6: beyond-the-browser, full-stack, income-stream-landscape.
+
 ## Tiers & gates
 
 - **T0 · anchors + bootstrap** — ✅ done (v10): ids on all EN h2s + AR parity twins; AGENTS.md + this ledger; anchor-ref conversion deferred to each doc's own pass.
