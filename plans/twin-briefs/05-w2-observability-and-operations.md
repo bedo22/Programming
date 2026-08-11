@@ -39,3 +39,7 @@ Deliverables (ONLY inside `/tmp/twin-observability-and-operations/`):
 - Write each AR part to /tmp as soon as it is complete — NEVER hold the whole doc in one generation.
 - On `403 server_error` / `Stream ended without finish_reason`: pause ~60s, retry ONCE. If it recurs 3+ times: save every completed part, write a `STATUS:` line at the top of report.md (where you stopped, what remains), and STOP. The orchestrator resumes you; do not keep hammering.
 - Losing one stream costs one part — keep parts small (2–3 h2s) on docs > 20 h2.
+
+## Fold pre-check + ratio policy (v40+)
+- BEFORE the first pipeline run: verify every fold old-string — `python3 -c "import json;m=json.load(open('map.json'));en=open('en.html').read();ar=open('ar.html').read();print([o for o,_ in m['FOLDS'] if o not in en and o not in ar] or 'all folds match')"`. Fix any phantom old BEFORE running twin-pipeline; a strict-folds failure mid-run costs most when it cascades into re-translation.
+- A ratio FLAG with a recorded exception is a VALID terminal state — NEVER pad/rewrite to hit the band. Report the density reasoning and stop.
