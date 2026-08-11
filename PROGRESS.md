@@ -60,7 +60,7 @@ Counts below are **visible h2s** (outside `<pre>`); raw counts lie. At v10 the r
 *(none — all 18 docs have matching twins; 18/18 twins green)*
 
 ### EN-only — 🔴 no twin (6)
-beyond-the-browser, full-stack, income-stream-landscape, open-source, product-shapes, product-strategy, recurring-fear-of-replacement.
+beyond-the-browser, full-stack, income-stream-landscape, open-source, product-shapes, recurring-fear-of-replacement.
 
 > **Coverage policy FLIPPED (v44):** the old Tier-C line (career/income docs stay EN-only) is void — shelf owner is an Egyptian local-market profile (Arabic interviews, local companies, Arabic client market). ALL docs get twins.
 > **Orchestration model v2 (v50):** watchdog+pager `plans/wave-watch.sh` (detached, 120s poll) — DETECTION (free) logs DONE/FAILED to /tmp/waves/LOG and WAKE-injects a message into the MAIN pi session (orca-ide terminal send, debounced 30 min/doc), so the orchestrator with full context does integration + judgment + respawns. The wave-integrate automation (v47) was REMOVED (its stateless agent couldn't judge; race risk on tags). Fallback if the main pane is ever closed: `orca-ide automations create --name wave-integrate --trigger '*/20 * * * *' --provider pi --repo name:Programming --precheck 'bash plans/wave-precheck.sh' --prompt <integration protocol, v50+ numbering>`.
