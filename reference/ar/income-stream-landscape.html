@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خريطة مسارات الدخل — مرجع</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+/*==== editable table cells ====*/
+.editable-table td[contenteditable] {
+  cursor: text;
+  min-width: 4em;
+  background: rgba(255,255,255,.55);
+}
+.editable-table td[contenteditable]:hover {
+  background: #fcf9f2;
+}
+.editable-table td[contenteditable]:focus {
+  outline: 1.5px solid var(--accent-soft);
+  background: #fffefb;
+}
+.editable-table td[contenteditable]::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  font-style: italic;
+  display: block;
+}
+.editable-table td[contenteditable]:empty::before {
+  content: attr(data-placeholder);
+}
+.editable-table td[contenteditable]:focus::before,
+.editable-table td[contenteditable]:not(:empty)::before {
+  content: none;
+}
+/*==== action bar ====*/
+.action-bar {
+  display: flex; gap: .6rem; flex-wrap: wrap;
+  margin: 1.2rem 0 1.8rem;
+}
+.action-bar button {
+  padding: .4rem .85rem; border: 1px solid var(--accent-soft);
+  background: var(--paper-warm); border-radius: 4px;
+  font-family: ui-sans-serif,system-ui,sans-serif; font-size: .85rem;
+  cursor: pointer; color: var(--ink);
+}
+.action-bar button:hover { background: #e9e0cc; }
+.action-bar button.danger { border-color: var(--bad); color: var(--bad); }
+.action-bar button.danger:hover { background: #fae6e6; }
+/*==== saved indicator ====*/
+.saved-tag {
+  font-family: ui-sans-serif,system-ui,sans-serif;
+  font-size: .72rem; color: var(--good);
+  margin-left: .6rem; opacity: 0; transition: opacity .3s;
+}
+.saved-tag.show { opacity: 1; }
+/*==== section salvage ====*/
+h2 .section-save-btn {
+  font-size: .72rem; font-weight: 400; margin-left: .5rem;
+  padding: .1rem .5rem; border: 1px solid var(--rule);
+  border-radius: 3px; background: var(--paper); cursor: pointer;
+  font-family: ui-sans-serif,system-ui,sans-serif;
+  color: var(--muted); vertical-align: middle;
+}
+h2 .section-save-btn:hover { background: var(--paper-warm); color: var(--ink); }
+/*==== export textarea ====*/
+.export-area {
+  width:100%; min-height:18rem; margin-top:.8rem;
+  font-family:ui-monospace,monospace; font-size:.78rem; line-height:1.4;
+  border:1px solid var(--rule); border-radius:4px; padding:.6rem .8rem;
+  background:var(--code-bg); color:var(--ink);
+  resize:vertical; white-space:pre; tab-size:2;
+}
+/*==== week-of line ====*/
+.week-of-line { display: flex; gap: .5rem; align-items: center; margin: .8rem 0; }
+.week-of-line input { border: 1px solid var(--rule); border-radius: 3px; padding: .25rem .5rem; background: #fffefb; font-family: ui-sans-serif,system-ui,sans-serif; flex: 0 0 10rem; }
+.week-of-line label { font-family: ui-sans-serif,system-ui,sans-serif; font-size: .88rem; color: var(--ink-soft); }
+
+/* tally inline edit */
+.tally-edit { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin: .6rem 0; }
+.tally-edit input { width: 3rem; border: 1px solid var(--rule); border-radius: 3px; padding: .2rem .4rem; background: #fffefb; text-align: center; font-family: ui-monospace,monospace; }
+
+/* map changes inline edit */
+.map-changes-edit { margin: .6rem 0; }
+.map-changes-edit div { margin: .25rem 0; font-family: ui-sans-serif,system-ui,sans-serif; font-size: .88rem; display: flex; gap: .5rem; align-items: center; }
+.map-changes-edit input { flex: 1; border: 1px solid var(--rule); border-radius: 3px; padding: .2rem .5rem; background: #fffefb; font-family: ui-sans-serif,system-ui,sans-serif; max-width: 20rem; }
+</style>
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · خريطة شخصية معبأة</p>
+  <h1>خريطة&nbsp;مسارات الدخل</h1>
+  <p class="meta">خريطة فرص من جهة الطلب · متعلم JavaScript/React بخلفية C++ · سياق مصر: العمل عن بُعد + محلي. كل الخلايا القابلة للتحرير تُحفظ تلقائيًا في <code>localStorage</code> — أغلِق الصفحة وعُد، وستبقى بياناتك.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../income-stream-landscape.html">English</a>
+  </p>
+</header>
+
+<div class="action-bar">
+  <button data-action="export">📋 تصدير إلى Markdown</button>
+  <button data-action="reset" class="danger">🗑 مسح كل بياناتي</button>
+  <span id="save-tag-global" class="saved-tag">✓ تم الحفظ</span>
+</div>
+
+<!-- ──── <a href="#s0">§٠</a> ورقة الغش (ثابتة) ──── -->
+<h2 id="s0">كيفية البحث في هذا</h2>
+
+<blockquote class="callout">
+<p><strong>لا تبحث فقط</strong> عن <code>income stream landscape</code> أو <code>demand-side opportunity mapping</code> — فهذه <em>تسمياتنا</em>، وليست الطريقة التي تعنون بها المصادر الجيدة صفحاتها. مسار واحد + جغرافيا/مهارة + مقياس. فضّل المصادر الأولية على القوائم الترويجية للمؤثرين.</p>
+</blockquote>
+
+<table>
+  <thead><tr><th>المسار</th><th>استعلامات بحث أفضل</th><th>فضّل أنواع المصادر هذه</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A · الوظائف (مصر)</strong></td><td><code>frontend developer salary Egypt</code>, <code>React developer Wuzzuf</code></td><td>Wuzzuf وLinkedIn وصفحات التوظيف في الشركات وحكايات عروض الأقران</td></tr>
+    <tr><td><strong>B · الوظائف عن بُعد</strong></td><td><code>React TypeScript salary remote</code>, <code>levels.fyi frontend</code></td><td>YC Work at a Startup (نطاقات منشورة عبر <code>/jobs/role/front-end-engineer</code>) وRemoteOK (<code>/remote-react-jobs</code> + RSS) وHN «Who's Hiring» الشهرية وبحث LinkedIn المحفوظ وlevels.fyi (زيارة من المتصفح)</td></tr>
+    <tr><td><strong>C · العمل الحر</strong></td><td><code>Upwork React hourly rates</code></td><td>إعلانات وظائف حية ووثائق الرسوم</td></tr>
+    <tr><td><strong>D · الشبكات الحصرية</strong></td><td><code>Toptal screening process</code></td><td>صفحات المنصة الرسمية، لا أساطير Reddit</td></tr>
+    <tr><td><strong>E · التعليق التوضيحي بالذكاء الاصطناعي</strong></td><td><code>DataAnnotation rates</code>, <code>Outlier AI expert pay</code></td><td>صفحات التقديم وشروط الخدمة وساعاتك المدفوعة</td></tr>
+    <tr><td><strong>F · التعليم</strong></td><td><code>teach programming Arabic</code></td><td>أسعار الإرشاد على المنصات واهتمامك الوارد</td></tr>
+    <tr><td><strong>G · C++/WASM</strong></td><td><code>WebAssembly job React</code></td><td>وصف وظائف متخصصة ومتعاقدون متخصصون</td></tr>
+    <tr><td><strong>ماكرو · مصر</strong></td><td><code>ITIDA digital freelancers</code>, <code>CBE USD EGP</code></td><td>إصدارات ITIDA/MCIT ومراجع CBE</td></tr>
+    <tr><td><strong>ماكرو · الطلب</strong></td><td><code>Stack Overflow developer survey</code>, <code>HackerRank developer skills report</code></td><td>صفحات الاستطلاعات الرسمية</td></tr>
+  </tbody>
+</table>
+
+<p><strong>وصفة أسبوعية (~45 دقيقة، بلا ماسح):</strong> YC Work at a Startup أدوار الواجهة الأمامية + عن بُعد (نطاقات منشورة) · ملخص بحث LinkedIn المحفوظ · موجز RemoteOK لـ React مع فلتر دولة · HN «Who's Hiring» الشهرية (فلتر <code>remote react</code>) · تحقق متقاطع من levels.fyi. لا تبنِ ماسحًا — بيانات منصة واحدة تغفل مسارات ATS والحكومة والتعليق التوضيحي بالذكاء الاصطناعي والتعليم كليًا، وتنكسر مع تحديثات مكافحة البوتات.</p>
+
+<p>وثيقة مصاحبة: <a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a> (تعريفات المسارات ومحاذيرها).</p>
+
+<!-- ──── <a href="#s1">§١</a> التموضع (ثابت) ──── -->
+<h2 id="s1">التموضع</h2>
+
+<table>
+  <thead><tr><th>الحقل</th><th>المعبأ</th></tr></thead>
+  <tbody>
+    <tr><td><strong>الآن</strong></td><td>مطوّر C++ يبني أساسات JS متينة؛ ليس بعد مرشحًا لإنتاج React.</td></tr>
+    <tr><td><strong>+شهادة (~2–6 أسبوع)</strong></td><td>حاصل على شهادة JS؛ أساس قوي؛ يتعلم قراءة مكونات React حقيقية.</td></tr>
+    <tr><td><strong>+إثبات (~3–9 أشهر)</strong></td><td>مطوّر واجهة أمامية/React يقدر على شحن واجهات المستخدم وتصحيح الخطافات والإغلاقات؛ ميزة C++ لأجل WASM.</td></tr>
+    <tr><td><strong>اللغات</strong></td><td>الإنجليزية التقنية (عمل/دراسة)؛ العربية (ميزة في التعليم والسوق المحلي).</td></tr>
+    <tr><td><strong>المزايا غير العادلة</strong></td><td>تفكير الأنظمة من C++؛ ثنائي اللغة؛ مناخ التصدير الرقمي الذي تروّجه الحكومة المصرية؛ مسار دراسة JS عميق.</td></tr>
+  </tbody>
+</table>
+<!-- ──── <a href="#s2">§٢</a> عينة الطلب الحي (قابلة للتحرير) ──── -->
+<h2 id="s2">عينة الطلب الحي <button class="section-save-btn" data-save="s2">حفظ التغييرات</button></h2>
+
+<p><em>تصوّر مبدئي من طلب الواجهة الأمامية النموذجي في 2026. بعد أسبوع عينات واحد، استبدل الخلايا أدناه.</em></p>
+
+<table class="editable-table" id="table-s2">
+  <thead><tr><th>المهارة / الإشارة</th><th>عن بُعد%</th><th>محلي مصر%</th><th>عمل حر%</th><th>فجوتك</th></tr></thead>
+  <tbody>
+    <tr><td>أساسيات JavaScript</td><td contenteditable data-placeholder="مرتفع جداً">مرتفع جداً</td><td contenteditable data-placeholder="مرتفع جداً">مرتفع جداً</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="فجوة">منخفض — مسار الدراسة الرئيسي</td></tr>
+    <tr><td>خطافات React</td><td contenteditable data-placeholder="مرتفع جداً">مرتفع جداً</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="فجوة">متوسط — النظرية اكتملت والقليل مُشحَن</td></tr>
+    <tr><td>TypeScript</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="متوسط–مرتفع">متوسط–مرتفع</td><td contenteditable data-placeholder="متوسط">متوسط</td><td contenteditable data-placeholder="فجوة">مرتفع — مؤجل حتى بعد الشهادة</td></tr>
+    <tr><td>Next.js / App Router</td><td contenteditable data-placeholder="متوسط–مرتفع">متوسط–مرتفع</td><td contenteditable data-placeholder="متوسط">متوسط</td><td contenteditable data-placeholder="متوسط">متوسط</td><td contenteditable data-placeholder="فجوة">مرتفع — على مستوى الاستطلاع فقط</td></tr>
+    <tr><td>CSS / واجهة متجاوبة</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="مرتفع جداً">مرتفع جداً</td><td contenteditable data-placeholder="فجوة">غير معروف — غير مُدرَّب في مسار الشهادة</td></tr>
+    <tr><td>سير عمل Git + PR</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="متوسط">متوسط</td><td contenteditable data-placeholder="فجوة">مفترض أساسي؛ تحقّق</td></tr>
+    <tr><td>الإنجليزية المكتوبة</td><td contenteditable data-placeholder="حاسم">حاسم</td><td contenteditable data-placeholder="متوسط">متوسط</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="فجوة">مفترض قابل للعمل؛ تحقّق في المقترحات</td></tr>
+    <tr><td>محفظة / إثبات GitHub</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="متوسط">متوسط</td><td contenteditable data-placeholder="مرتفع">مرتفع</td><td contenteditable data-placeholder="فجوة">مرتفع — مفقود</td></tr>
+    <tr><td>شهادة HackerRank</td><td contenteditable data-placeholder="منخفض–متوسط">منخفض–متوسط</td><td contenteditable data-placeholder="منخفض–متوسط">منخفض–متوسط</td><td contenteditable data-placeholder="منخفض">منخفض</td><td contenteditable data-placeholder="فجوة">قيد التنفيذ — عائد مرتفع <em>لمرحلتك</em></td></tr>
+  </tbody>
+</table>
+
+<p><strong>خلاصة الطلب:</strong> السوق يدفع مقابل <strong>JS + React + إثبات</strong>. رجّح المسارات التي تقبل قويًّا في JS / متعلمًا في React، وليس فقط Next + TS مُشحَنة.</p>
+
+<!-- ──── <a href="#s3">§٣</a> المسارات بممرات المراحل (ثابت) ──── -->
+<h2 id="s3">المسارات بممرات المراحل <button class="section-save-btn" data-save="s3">حفظ الملاحظات</button></h2>
+
+<p>مفتاح: <strong>قوي / ممكن / ضعيف / مغلق</strong></p>
+
+<h3>المسار A — التوظيف المحلي (مصر)</h3>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>ممكن</td><td>قوي</td><td>قوي</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>مقابلة JS + أساسيات React/CSS</td><td>+ إشارة الشهادة/المحفظة</td><td>قصص إنتاج</td></tr>
+    <tr><td><strong>الوقت حتى أول دخل</strong></td><td>4–12 أسبوعًا <em>تقديري</em></td><td>3–8 أسابيع <em>تقديري</em></td><td>مستمر</td></tr>
+    <tr><td><strong>السقف</strong></td><td>نطاقات EGP المحلية</td><td>محلي أعلى / MNC محلي</td><td>مسار القيادة بطيء</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3a" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار A">أفضل ممر مستقر بينما العمل عن بُعد العالمي صعب. يتوافق مع المهمة.</span></p>
+
+<h3>المسار B — التوظيف عن بُعد (عالمي)</h3>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>ضعيف / مغلق</td><td>ممكن</td><td>ممكن ← قوي</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>«سنتان+ من React»، TS، المنطقة الزمنية</td><td>المحفظة + الشهادة تساعدان</td><td>قصص أثر</td></tr>
+    <tr><td><strong>الوقت حتى أول دخل</strong></td><td>طويل <em>تقديري</em></td><td>ما زال طويلًا <em>تقديري</em></td><td>1–4 أشهر <em>تقديري</em></td></tr>
+    <tr><td><strong>السقف</strong></td><td>USD مرتفع</td><td>مرتفع</td><td>الأعلى</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3b" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار B">أبقِه وجهة، لا المطاردة الأساسية لهذا الربع.</span></p>
+
+<h3>المسار C — العمل الحر المفتوح (من فئة Upwork)</h3>
+<p>هذه الوثيقة ترسم جانب الدخل من العمل الحر — المنصات والأسعار والبوابات. أما جانب <em>التسليم</em> — تحديد النطاق، وحساب التسعير، والعقود، والتسليم النهائي للعميل، والعقد الدائم الذي يحوّل الأعمال لمرة واحدة إلى نشاط تجاري — فيعيش في <a href="./freelance-web-practice.html">ممارسة العمل الحر على الويب</a>، واختيار المنصة لمعظم أعمال العملاء في <a href="./wordpress-and-cms-internet.html">WordPress وإنترنت أنظمة إدارة المحتوى</a>. النصفان معًا هما مهارة العمل الحر: هذه الصفحة تجد المال، وتلك الوثيقة تسلّم العمل.</p>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>ضعيف–ممكن</td><td>ممكن</td><td>قوي</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>لا تقييمات؛ حجم المقترحات</td><td>إثبات اجتماعي؛ صياغة متخصصة</td><td>سمعة + تخصص C++</td></tr>
+    <tr><td><strong>الوقت حتى أول دخل</strong></td><td>2–8 أسابيع إذا كنت هجوميًا</td><td>أسرع مع التقييمات</td><td>ثابت</td></tr>
+    <tr><td><strong>السقف</strong></td><td>صافي منخفض مبكرًا</td><td>متوسط</td><td>مرتفع إذا تخصصت</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3c" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار C">مسار جانبي قابل للحياة؛ احمِ وقتك من أعمال السباق نحو القاع.</span></p>
+
+<h3>المسار D — الشبكات الحصرية (من فئة Toptal)</h3>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>مغلق</td><td>مغلق / ضعيف</td><td>ممكن</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>فحص متعدد المراحل</td><td>نفسه</td><td>+ برمجة حية + إنجليزية</td></tr>
+    <tr><td><strong>السقف</strong></td><td>أجر ساعي مرتفع جدًا</td><td>—</td><td>مرتفع</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3d" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار D">لا تبنِ النصف الثاني من 2026 حول هذا. أعد الزيارة بعد الإثبات.</span></p>
+
+<h3>المسار E — التعليق التوضيحي بالذكاء الاصطناعي / تقييم الخبراء</h3>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>ممكن</td><td>أقوى</td><td>قوي</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>اختبارات التقديم؛ تباين الحجم</td><td>درجات معايير أعلى</td><td>تخصص في المجال</td></tr>
+    <tr><td><strong>الوقت حتى أول دخل</strong></td><td>1–4 أسابيع <em>تقديري</em></td><td>مستمر</td><td>مستمر</td></tr>
+    <tr><td><strong>السقف</strong></td><td>~$25–30+/ساعة عام؛ أعلى في التخصص</td><td>أعلى في مهام الكود</td><td>دخل جانبي جيد</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3e" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار E">أفضل ممر جانبي بالدولار على المدى القريب — يكافئ بالضبط ما تدرسه. خطر الوفرة/المجاعة.</span></p>
+
+<h3>المسار F — التعليم / المحتوى (عربي + إنجليزي)</h3>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>ممكن</td><td>أقوى</td><td>قوي</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>جمهور / ثقة</td><td>إثبات + جودة الدروس</td><td>توزيع</td></tr>
+    <tr><td><strong>الوقت حتى أول دخل</strong></td><td>أسابيع–أشهر</td><td>متوسط</td><td>يتضاعف</td></tr>
+    <tr><td><strong>السقف</strong></td><td>منخفض مبكرًا</td><td>متوسط</td><td>مرتفع إذا نجح التوزيع</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3f" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار F">لديك بالفعل مواد تعليمية (EN + AR). رأس مال مهني + نقود اختيارية.</span></p>
+
+<h3>المسار G — تخصص C++ × الويب (WASM، أدوات، أداء)</h3>
+<table>
+  <thead><tr><th></th><th>الآن</th><th>بعد الشهادة + المحفظة</th><th>بعد إثبات 6–12 شهرًا</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ملاءمة الممر</strong></td><td>ضعيف</td><td>ممكن</td><td>قوي</td></tr>
+    <tr><td><strong>البوابة</strong></td><td>المتصفح + أدوات البناء</td><td>عرض WASM واحد</td><td>مشاكل عملاء</td></tr>
+    <tr><td><strong>السقف</strong></td><td>مرتفع لكل مشروع</td><td>مرتفع</td><td>مرتفع</td></tr>
+  </tbody>
+</table>
+<p><span contenteditable id="note-s3g" style="font-style:italic;color:var(--ink-soft)" data-placeholder="ملاحظاتك على المسار G">ميزة غير عادلة بعيدة المدى. أوقفها خلف الشهادة.</span></p>
+<!-- ──── <a href="#s4">§٤</a> بطاقة نتائج الاقتصاديات (ثابتة) ──── -->
+<h2 id="s4">بطاقة نتائج الاقتصاديات</h2>
+
+<p>مقياس من 1 إلى 5. <strong>ترتيب القيمة المتوقعة (EV)</strong> = الأولوية <em>لأيامك التسعين القادمة</em>.</p>
+
+<table>
+  <thead><tr><th>المسار</th><th>إمكانية الوصول</th><th>سقف الأجر</th><th>ضريبة الوقت</th><th>قيمة التعلم</th><th>الجانب السلبي</th><th>قيمة 90 يومًا</th></tr></thead>
+  <tbody>
+    <tr><td>A محلي</td><td>3</td><td>3</td><td>4</td><td>5</td><td>USD أقل</td><td><strong>2</strong></td></tr>
+    <tr><td>B عن بُعد</td><td>1</td><td>5</td><td>5</td><td>4</td><td>إرهاق الرفض</td><td><strong>5</strong> (وعي)</td></tr>
+    <tr><td>C عمل حر</td><td>2</td><td>3</td><td>5</td><td>3</td><td>تسعير منخفض</td><td><strong>3</strong></td></tr>
+    <tr><td>D حصري</td><td>1</td><td>5</td><td>4</td><td>2</td><td>تكلفة الفرصة</td><td><strong>7</strong> (تجاهل)</td></tr>
+    <tr><td>E تعليق توضيحي</td><td>3</td><td>3</td><td>2–3</td><td>4</td><td>الحجم يجف</td><td><strong>1</strong></td></tr>
+    <tr><td>F تعليم</td><td>2</td><td>2</td><td>4</td><td>5</td><td>نقود بطيئة</td><td><strong>4</strong></td></tr>
+    <tr><td>G C++/WASM</td><td>1</td><td>4</td><td>3</td><td>3</td><td>يصرف عن الشهادة</td><td><strong>6</strong></td></tr>
+  </tbody>
+</table>
+
+<h3>الاستراتيجية الأساسية لـ 90 يومًا</h3>
+<table>
+  <thead><tr><th>الأولوية</th><th>المسار</th><th>ميزانية الوقت</th><th>مقياس النجاح</th></tr></thead>
+  <tbody>
+    <tr><td><strong>P0</strong></td><td>المهمة: الشهادة + L12</td><td>50–60% من وقت التعلم المكثف</td><td>الشهادة محجوزة/مجتازة</td></tr>
+    <tr><td><strong>P1</strong></td><td>E — التعليق التوضيحي بالذكاء الاصطناعي</td><td>10–20%</td><td>قبول + أول ساعات مدفوعة</td></tr>
+    <tr><td><strong>P2</strong></td><td>A — جاهزية الوظيفة المحلية</td><td>15–25%</td><td>واجهة React واحدة + 5 تطبيقات بعد الشهادة</td></tr>
+    <tr><td><strong>P3</strong></td><td>C — العمل الحر</td><td>0–10%</td><td>5 مقترحات/أسبوع كحد أقصى في التخصص</td></tr>
+    <tr><td><strong>ركن</strong></td><td>B, D, G</td><td>قائمة مراقبة</td><td>أعد الزيارة بعد ممر الإثبات</td></tr>
+  </tbody>
+</table>
+
+<!-- ──── <a href="#s5">§٥</a> المهارة ← فجوة المسار (قابلة للتحرير) ──── -->
+<h2 id="s5">المهارة ← فجوة المسار <button class="section-save-btn" data-save="s5">حفظ التغييرات</button></h2>
+
+<table class="editable-table" id="table-s5">
+  <thead><tr><th>المهارة</th><th>مطلوبة بواسطة</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+  <tbody>
+    <tr><td>الإغلاقات / النطاق / <code>this</code> / الوحدات</td><td contenteditable data-placeholder="مطلوبة بواسطة">الشهادة، التعليق التوضيحي، كل الوظائف</td><td contenteditable data-placeholder="الحالة">مسار دراسة قوي</td><td contenteditable data-placeholder="الإجراء">استكمال L12 ← الشهادة</td></tr>
+    <tr><td>طلاقة المصفوفات/الكائنات/السلاسل</td><td contenteditable data-placeholder="مطلوبة بواسطة">الشهادة، التعليق التوضيحي</td><td contenteditable data-placeholder="الحالة">مغطاة في الدروس</td><td contenteditable data-placeholder="الإجراء">تمارين موقوتة</td></tr>
+    <tr><td>معرفة قراءة خطافات React</td><td contenteditable data-placeholder="مطلوبة بواسطة">محلي/عن بُعد/عمل حر</td><td contenteditable data-placeholder="الحالة">بناء على مستوى القراءة</td><td contenteditable data-placeholder="الإجراء">اقرأ مكوّنًا حقيقيًا واحدًا/أسبوع بعد الشهادة</td></tr>
+    <tr><td>واجهة واحدة مُشحَنة</td><td contenteditable data-placeholder="مطلوبة بواسطة">عمل حر، وظائف</td><td contenteditable data-placeholder="الحالة">مفقود</td><td contenteditable data-placeholder="الإجراء">ابنِ تطبيقًا صغيرًا واحدًا (لا عشرين درسًا تعليميًا)</td></tr>
+    <tr><td>TypeScript</td><td contenteditable data-placeholder="مطلوبة بواسطة">عن بُعد، كثير من الوظائف المحلية المتوسطة</td><td contenteditable data-placeholder="الحالة">مؤجل</td><td contenteditable data-placeholder="الإجراء">بعد الشهادة</td></tr>
+    <tr><td>معرفة قراءة Next.js</td><td contenteditable data-placeholder="مطلوبة بواسطة">كثير من وظائف المنتجات</td><td contenteditable data-placeholder="الحالة">مرجع فقط</td><td contenteditable data-placeholder="الإجراء">تصفح الغوص العميق عند قراءة كود العمل</td></tr>
+    <tr><td>CSS/التخطيط</td><td contenteditable data-placeholder="مطلوبة بواسطة">كل أعمال الواجهة تقريبًا</td><td contenteditable data-placeholder="الحالة">غير معروف</td><td contenteditable data-placeholder="الإجراء">دقّق بإعادة بناء صفحة هبوط واحدة</td></tr>
+    <tr><td>إنجليزية المقترحات/المقابلات</td><td contenteditable data-placeholder="مطلوبة بواسطة">عن بُعد، عمل حر</td><td contenteditable data-placeholder="الحالة">غير معروف</td><td contenteditable data-placeholder="الإجراء">اكتب 3 قوالب؛ نفّذ مقابلتين تجريبيتين</td></tr>
+    <tr><td>وجود المحفظة</td><td contenteditable data-placeholder="مطلوبة بواسطة">عن بُعد، عمل حر</td><td contenteditable data-placeholder="الحالة">ضعيف</td><td contenteditable data-placeholder="الإجراء">GitHub: تحضير الشهادة + تطبيق React واحد</td></tr>
+  </tbody>
+</table>
+
+<!-- ──── <a href="#s6">§٦</a> سجل التحويلات (قابل للتحرير) ──── -->
+<h2 id="s6">سجل التحويلات <button class="section-save-btn" data-save="s6">حفظ التغييرات</button></h2>
+
+<h3>الطلبات / المقترحات</h3>
+<table class="editable-table" id="table-s6a">
+  <thead><tr><th>التاريخ</th><th>المسار</th><th>الهدف</th><th>النتيجة</th><th>الدرس المستفاد</th></tr></thead>
+  <tbody>
+    <tr><td contenteditable data-placeholder="2026-07-28">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="شركة / عمل">—</td><td contenteditable data-placeholder="مرفوض/مقبول/قيد الانتظار">—</td><td contenteditable data-placeholder="ما تعلمته">—</td></tr>
+    <tr><td contenteditable data-placeholder="2026-08-04">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="شركة / عمل">—</td><td contenteditable data-placeholder="مرفوض/مقبول/قيد الانتظار">—</td><td contenteditable data-placeholder="ما تعلمته">—</td></tr>
+    <tr><td contenteditable data-placeholder="2026-08-11">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="شركة / عمل">—</td><td contenteditable data-placeholder="مرفوض/مقبول/قيد الانتظار">—</td><td contenteditable data-placeholder="ما تعلمته">—</td></tr>
+  </tbody>
+</table>
+
+<h3>المعدلات المقيسة</h3>
+<table class="editable-table" id="table-s6b">
+  <thead><tr><th>المسار</th><th>المحاولات</th><th>الفوز</th><th>معدل الفوز</th><th>ساعات مدفوعة</th><th>USD الإجمالي</th><th>الرسوم/الضرائب/الصرف</th><th>صافي $/ساعة</th></tr></thead>
+  <tbody>
+    <tr><td>التعليق التوضيحي</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td></tr>
+    <tr><td>عمل حر</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td></tr>
+    <tr><td>وظائف</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="0">0</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td><td contenteditable data-placeholder="—">—</td></tr>
+  </tbody>
+</table>
+<!-- ──── <a href="#s7">§٧</a> عينة الطلب الأسبوعية (قابلة للتحرير) ──── -->
+<h2 id="s7">عينة الطلب الأسبوعية <button class="section-save-btn" data-save="s7">حفظ التغييرات</button></h2>
+
+<div class="week-of-line">
+  <label for="week-of">أسبوع:</label>
+  <input type="text" id="week-of" placeholder="2026-08-04" data-local="week-of-input">
+</div>
+
+<p>المصادر: <span contenteditable id="sources-note" data-placeholder="10 محلي · 10 عن بُعد · 5 عمل حر">10 محلي · 10 عن بُعد · 5 عمل حر</span></p>
+
+<table class="editable-table" id="table-s7">
+  <thead><tr><th>#</th><th>الدور / العمل</th><th>المسار</th><th>المتطلبات الأساسية</th><th>أجر مذكور؟</th><th>التقديم خلال 90 يومًا؟</th></tr></thead>
+  <tbody>
+    <tr><td contenteditable data-placeholder="1">1</td><td contenteditable data-placeholder="عنوان الدور">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React، TS...">—</td><td contenteditable data-placeholder="نعم/لا/غير معروف">—</td><td contenteditable data-placeholder="نعم/لا/ربما">—</td></tr>
+    <tr><td contenteditable data-placeholder="2">2</td><td contenteditable data-placeholder="عنوان الدور">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React، TS...">—</td><td contenteditable data-placeholder="نعم/لا/غير معروف">—</td><td contenteditable data-placeholder="نعم/لا/ربما">—</td></tr>
+    <tr><td contenteditable data-placeholder="3">3</td><td contenteditable data-placeholder="عنوان الدور">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React، TS...">—</td><td contenteditable data-placeholder="نعم/لا/غير معروف">—</td><td contenteditable data-placeholder="نعم/لا/ربما">—</td></tr>
+    <tr><td contenteditable data-placeholder="4">4</td><td contenteditable data-placeholder="عنوان الدور">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React، TS...">—</td><td contenteditable data-placeholder="نعم/لا/غير معروف">—</td><td contenteditable data-placeholder="نعم/لا/ربما">—</td></tr>
+    <tr><td contenteditable data-placeholder="5">5</td><td contenteditable data-placeholder="عنوان الدور">—</td><td contenteditable data-placeholder="A/B/C/E">—</td><td contenteditable data-placeholder="React، TS...">—</td><td contenteditable data-placeholder="نعم/لا/غير معروف">—</td><td contenteditable data-placeholder="نعم/لا/ربما">—</td></tr>
+  </tbody>
+</table>
+
+<h4>تكرار المهارات هذا الأسبوع (عدّ)</h4>
+<div class="tally-edit">
+  <label>JS <input type="text" id="tally-js" data-local="tally-js" size="2" placeholder="0"></label>
+  <label>React <input type="text" id="tally-react" data-local="tally-react" size="2" placeholder="0"></label>
+  <label>TS <input type="text" id="tally-ts" data-local="tally-ts" size="2" placeholder="0"></label>
+  <label>Next <input type="text" id="tally-next" data-local="tally-next" size="2" placeholder="0"></label>
+  <label>CSS <input type="text" id="tally-css" data-local="tally-css" size="2" placeholder="0"></label>
+  <label>أخرى <input type="text" id="tally-other" data-local="tally-other" size="2" placeholder="0"></label>
+</div>
+
+<h4>تغييرات الخريطة هذا الأسبوع</h4>
+<div class="map-changes-edit">
+  <div><label>ترقية مسار:</label> <input type="text" id="map-promote" data-local="map-promote" placeholder="—"></div>
+  <div><label>خفض مسار:</label> <input type="text" id="map-demote" data-local="map-demote" placeholder="—"></div>
+  <div><label>بوابة جديدة مكتشفة:</label> <input type="text" id="map-gate" data-local="map-gate" placeholder="—"></div>
+</div>
+
+<!-- ──── <a href="#s8">§٨</a> الحكم (ثابت) ──── -->
+<h2 id="s8">الحكم في صفحة واحدة</h2>
+
+<blockquote class="callout">
+  <p><strong>أنت تبيع (الآن):</strong> كفاءة أساسيات JavaScript قيد التقدم ← إشارة الشهادة التالية.</p>
+  <p><strong>أفضل طلب مدفوع على المدى القريب:</strong> تقييم/تعليق توضيحي لكود الذكاء الاصطناعي <em>إذا</em> وُجد الحجم + سمح العقد؛ وإلا إصلاحات عمل حر صغيرة.</p>
+  <p><strong>أفضل طلب مهني على المدى القريب:</strong> أدوار الواجهة الأمامية المبتدئة محليًا بعد الشهادة + مشروع React واحد.</p>
+  <p><strong>أفضل صعود بعيد المدى:</strong> توظيف منتج React عن بُعد (ربما Next)؛ تخصص C++/WASM اختياري.</p>
+  <p><strong>لا تطارد هذا الربع:</strong> شبكات فئة Toptal، وتقديم عشوائي واسع لوظائف كبار عن بُعد.</p>
+  <p><strong>قفل المهمة:</strong> لا تدع تحسين الدخل يؤخر الشهادة — عمود «بعد الشهادة» في الخريطة هو حيث تقفز معظم الممرات من ضعيف إلى ممكن/قوي.</p>
+</blockquote>
+
+<!-- ──── وثائق ذات صلة ──── -->
+<h2 id="sec-related-docs">وثائق ذات صلة</h2>
+<ul>
+  <li><a href="./frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a> — تعريفات المسارات والمصادر الكلية</li>
+  <li><a href="./frontend-camps-survey.html">مسح معسكرات الواجهة الأمامية</a> — ما الذي يطلبه الطلب من المكدسات</li>
+  <li><a href="./nextjs-deep-dive.html">غوص عميق في Next.js</a> — معرفة وظائف المنتجات في مرحلة لاحقة</li>
+  <li><a href="./class-to-hooks-paradigm-shift.html">التحول النموذجي من الكلاسات إلى الدوال</a> — نموذج قراءة React للعمل</li>
+  <li><a href="../product-strategy.html">Product Strategy</a> — نموذج العمل خلف المسار، والتسعير واقتصاديات الوحدة</li>
+  <li><a href="../product-shapes.html">Product Shapes</a> — النمط المتكرر للعمل الذي ينتجه كل مسار</li>
+</ul>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · خريطة مسارات الدخل</span>
+  <span>الخلايا القابلة للتحرير تُحفظ تلقائيًا في localStorage</span>
+  <span>مرجع: <a href="./glossary.html">المصطلحات</a></span>
+</footer>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  // ──── أدوات مساعدة localStorage ────
+  var STORAGE_PREFIX = 'income_landscape_';
+
+  function saveToStorage(key, value) {
+    try { localStorage.setItem(STORAGE_PREFIX + key, String(value)); } catch(e) {}
+  }
+
+  function loadFromStorage(key, fallback) {
+    try {
+      var v = localStorage.getItem(STORAGE_PREFIX + key);
+      return v !== null ? v : fallback;
+    } catch(e) { return fallback; }
+  }
+
+  // ──── حفظ الخلايا تلقائيًا ────
+  function setupEditableAutosave(tableId) {
+    var table = document.getElementById(tableId);
+    if (!table) return;
+    var cells = table.querySelectorAll('td[contenteditable]');
+    cells.forEach(function(td) {
+      var rowIdx = td.closest('tr').rowIndex;
+      var colIdx = td.cellIndex;
+      var storageKey = tableId + '_' + rowIdx + '_' + colIdx;
+
+      // استعادة
+      var saved = loadFromStorage(storageKey, null);
+      if (saved !== null) {
+        td.textContent = saved;
+      }
+
+      // حفظ عند مغادرة الخلية
+      td.addEventListener('blur', function() {
+        saveToStorage(storageKey, td.textContent.trim());
+      });
+    });
+  }
+
+  // ──── حفظ المحتوى المضمّن القابل للتحرير ────
+  function setupInlineAutosave(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var saved = loadFromStorage(id, null);
+    if (saved !== null) el.textContent = saved;
+    el.addEventListener('blur', function() {
+      saveToStorage(id, el.textContent.trim());
+    });
+  }
+
+  // ──── حفظ حقول الإدخال ────
+  function setupInputAutosave(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var saved = loadFromStorage(id, null);
+    if (saved !== null) el.value = saved;
+    el.addEventListener('blur', function() {
+      saveToStorage(id, el.value.trim());
+    });
+    // استمع أيضًا للإدخالات الأخرى
+    el.addEventListener('input', function() {
+      saveToStorage(id, el.value.trim());
+    });
+  }
+
+  // إعداد كل input[data-local] للحفظ التلقائي
+  document.querySelectorAll('input[data-local]').forEach(function(el) {
+    var key = el.getAttribute('data-local');
+    var saved = loadFromStorage(key, null);
+    if (saved !== null) el.value = saved;
+    el.addEventListener('blur', function() {
+      saveToStorage(key, el.value.trim());
+    });
+    el.addEventListener('input', function() {
+      saveToStorage(key, el.value.trim());
+    });
+  });
+
+  // ──── مؤشر الحفظ ────
+  var globalTag = document.getElementById('save-tag-global');
+  function flashSaved() {
+    globalTag.classList.add('show');
+    clearTimeout(globalTag._timer);
+    globalTag._timer = setTimeout(function() {
+      globalTag.classList.remove('show');
+    }, 1500);
+  }
+
+  // ──── أزرار حفظ الأقسام ────
+  document.querySelectorAll('[data-save]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var sectionId = btn.getAttribute('data-save');
+      // الجداول الرئيسية تُحفظ تلقائيًا عند مغادرة الخلية.
+      // لكن الزر يضمن حفظًا يدويًا لحقول «الملاحظات» المضمّنة أيضًا.
+      // فقط يومض المؤشر.
+      flashSaved();
+    });
+  });
+
+  // ──── إعداد الجداول ────
+  ['table-s2', 'table-s5', 'table-s6a', 'table-s6b', 'table-s7'].forEach(setupEditableAutosave);
+
+  // ──── إعداد الملاحظات المضمّنة ────
+  ['note-s3a','note-s3b','note-s3c','note-s3d','note-s3e','note-s3f','note-s3g','sources-note'].forEach(setupInlineAutosave);
+
+  // ──── مسح كل البيانات ────
+  document.querySelector('[data-action="reset"]').addEventListener('click', function() {
+    if (!confirm('مسح كل البيانات المحفوظة من هذه الصفحة؟ لا يمكن التراجع عن هذا.')) return;
+    var keysToRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key.indexOf(STORAGE_PREFIX) === 0) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
+    location.reload();
+  });
+
+  // ──── تصدير إلى Markdown ────
+  document.querySelector('[data-action="export"]').addEventListener('click', function() {
+    function cellText(td) {
+      return (td.textContent || '').trim();
+    }
+
+    var md = '# خريطة مسارات الدخل (معبأة)\n\n';
+    md += 'مصدَّر تلقائيًا من [income-stream-landscape.html](./income-stream-landscape.html) — النسخة التفاعلية.\n\n';
+
+    // <a href="#s2">§٢</a>
+    md += '## 2. عينة الطلب الحي\n\n';
+    md += '| المهارة / الإشارة | عن بُعد% | محلي مصر% | عمل حر% | فجوتك |\n';
+    md += '|---|---|---|---|---|\n';
+    var t2 = document.getElementById('table-s2');
+    if (t2) {
+      t2.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 5) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // <a href="#s5">§٥</a>
+    md += '## 5. المهارة ← فجوة المسار\n\n';
+    md += '| المهارة | مطلوبة بواسطة | الحالة | الإجراء |\n';
+    md += '|---|---|---|---|\n';
+    var t5 = document.getElementById('table-s5');
+    if (t5) {
+      t5.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 4) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // <a href="#s6">§٦أ</a>
+    md += '## 6. سجل التحويلات\n\n### الطلبات / المقترحات\n\n';
+    md += '| التاريخ | المسار | الهدف | النتيجة | الدرس المستفاد |\n';
+    md += '|---|---|---|---|---|\n';
+    var t6a = document.getElementById('table-s6a');
+    if (t6a) {
+      t6a.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 5) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // <a href="#s6">§٦ب</a>
+    md += '### المعدلات المقيسة\n\n';
+    md += '| المسار | المحاولات | الفوز | معدل الفوز | ساعات مدفوعة | USD الإجمالي | الرسوم/الضرائب/الصرف | صافي $/ساعة |\n';
+    md += '|---|---|---|---|---|---|---|---|\n';
+    var t6b = document.getElementById('table-s6b');
+    if (t6b) {
+      t6b.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 8) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' | ' + cellText(tds[5]) + ' | ' + cellText(tds[6]) + ' | ' + cellText(tds[7]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // <a href="#s7">§٧</a>
+    md += '## 7. عينة الطلب الأسبوعية\n\n';
+    var weekOf = (document.getElementById('week-of') || {}).value || '________';
+    md += '**أسبوع:** ' + weekOf + '\n\n';
+    var sources = (document.getElementById('sources-note') || {}).textContent || '10 محلي · 10 عن بُعد · 5 عمل حر';
+    md += '**المصادر:** ' + sources.trim() + '\n\n';
+    md += '| # | الدور / العمل | المسار | المتطلبات الأساسية | أجر مذكور؟ | التقديم خلال 90 يومًا؟ |\n';
+    md += '|---|---|---|---|---|---|\n';
+    var t7 = document.getElementById('table-s7');
+    if (t7) {
+      t7.querySelectorAll('tbody tr').forEach(function(tr) {
+        var tds = tr.querySelectorAll('td');
+        if (tds.length >= 6) {
+          md += '| ' + cellText(tds[0]) + ' | ' + cellText(tds[1]) + ' | ' + cellText(tds[2]) + ' | ' + cellText(tds[3]) + ' | ' + cellText(tds[4]) + ' | ' + cellText(tds[5]) + ' |\n';
+        }
+      });
+    }
+    md += '\n';
+
+    // العدّ
+    md += '**تكرار المهارات هذا الأسبوع:**  ';
+    md += 'JS: ' + ((document.getElementById('tally-js') || {}).value || '__') + ' · ';
+    md += 'React: ' + ((document.getElementById('tally-react') || {}).value || '__') + ' · ';
+    md += 'TS: ' + ((document.getElementById('tally-ts') || {}).value || '__') + ' · ';
+    md += 'Next: ' + ((document.getElementById('tally-next') || {}).value || '__') + ' · ';
+    md += 'CSS: ' + ((document.getElementById('tally-css') || {}).value || '__') + ' · ';
+    md += 'أخرى: ' + ((document.getElementById('tally-other') || {}).value || '__') + '\n\n';
+
+    md += '**تغييرات الخريطة هذا الأسبوع:**  \n';
+    md += '- ترقية: ' + ((document.getElementById('map-promote') || {}).value || '__') + '\n';
+    md += '- خفض: ' + ((document.getElementById('map-demote') || {}).value || '__') + '\n';
+    md += '- بوابة جديدة: ' + ((document.getElementById('map-gate') || {}).value || '__') + '\n\n';
+
+    // ملاحظات المسارات
+    md += '**ملاحظات المسارات (من <a href="#s3">§٣</a>):**  \n';
+    ['A','B','C','D','E','F','G'].forEach(function(s) {
+      var el = document.getElementById('note-s3' + s.toLowerCase());
+      if (el && el.textContent.trim()) {
+        md += '- المسار ' + s + ': ' + el.textContent.trim() + '\n';
+      }
+    });
+    md += '\n';
+
+    // العرض في منطقة نصية
+    var existing = document.querySelector('.export-area');
+    if (existing) existing.remove();
+
+    var ta = document.createElement('textarea');
+    ta.className = 'export-area';
+    ta.value = md;
+    ta.readOnly = true;
+    var btn = document.querySelector('[data-action="export"]');
+    btn.parentNode.insertBefore(ta, btn.nextSibling);
+    ta.focus();
+    ta.select();
+    // نسخ إلى الحافظة
+    try {
+      document.execCommand('copy');
+      flashSaved();
+    } catch(e) {}
+
+    // زر الإغلاق
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = 'إغلاق التصدير';
+    closeBtn.style.cssText = 'padding:.3rem .7rem;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;margin-top:.4rem;';
+    closeBtn.addEventListener('click', function() {
+      ta.remove(); this.remove();
+    });
+    ta.parentNode.insertBefore(closeBtn, ta.nextSibling);
+  });
+
+})();
+</script>
+</body>
+</html>
