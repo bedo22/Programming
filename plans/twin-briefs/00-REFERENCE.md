@@ -1079,19 +1079,23 @@
 - sec-the-future-where-the-cms-internet-is-going
 - sec-summary-the-complete-mental-checklist
 
-## 2b. Twin status (v44) — cross-doc prefix rule
-`./doc.html` when the target HAS a twin, `../doc.html` when EN-only (30 twins as of v44):
-cs-and-software-engineering, glossary, react-2024-and-beyond, problem-solving, version-control-ci-cd-deployment,
-what-is-state-prequel, design-thinking, api-design, ui-ux-web-design, html-and-css, how-developers-think-frontend,
-system-design, software-development-process, class-to-hooks-paradigm-shift, angular-evolution,
-javascript-across-stacks, frontend-camps-survey, javascript-the-language, terminal-and-deployment-substrate,
-terminal-applications, algorithms-and-data-structures, dotnet-and-the-enterprise-lane, backend-engineering,
-data-modeling-and-databases, nextjs-deep-dive, observability-and-operations, security-and-threat-modeling,
-software-testing-and-debugging, payments-and-commerce, sql-and-postgresql.
+## 2b. Twin status (v56) — cross-doc prefix rule
+`./doc.html` for EVERY sibling target: **all 41 docs have Arabic twins** (completed v56, 2026-08-12). The
+EN-only class no longer exists; the `../` prefix survives only for the repo-root hub (`../index.html`) and
+the EN self language-switch (`../glossary.html (English)`).
 
-Still EN-only (11): beyond-the-browser, freelance-web-practice, frontend-income-markets, full-stack,
-hiring-process-and-interviews, income-stream-landscape, open-source, product-shapes, product-strategy,
-recurring-fear-of-replacement, wordpress-and-cms-internet.
+All 41: cs-and-software-engineering, glossary, react-2024-and-beyond, problem-solving,
+version-control-ci-cd-deployment, what-is-state-prequel, design-thinking, api-design, ui-ux-web-design,
+html-and-css, how-developers-think-frontend, system-design, software-development-process,
+class-to-hooks-paradigm-shift, angular-evolution, javascript-across-stacks, frontend-camps-survey,
+javascript-the-language, terminal-and-deployment-substrate, terminal-applications,
+algorithms-and-data-structures, dotnet-and-the-enterprise-lane, backend-engineering,
+data-modeling-and-databases, nextjs-deep-dive, observability-and-operations, security-and-threat-modeling,
+software-testing-and-debugging, payments-and-commerce, sql-and-postgresql, product-strategy, product-shapes,
+recurring-fear-of-replacement, open-source, income-stream-landscape, beyond-the-browser, full-stack,
+wordpress-and-cms-internet, freelance-web-practice, frontend-income-markets, hiring-process-and-interviews.
+
+EN-only: none.
 
 ## 3. Machinery (read-only, never re-implement)
 - ~/.agents/skills/translate-to-arabic/SKILL.md + conventions.md
