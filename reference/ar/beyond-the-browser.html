@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ما بعد المتصفح — React Native وElectron وجسر المنصات</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · ما بعد المتصفح — شحن برمجيات قابلة للتثبيت من خلفية JS/React</p>
+  <h1>ما بعد المتصفح — React Native وElectron وجسر المنصات</h1>
+  <p class="meta">لأجل: المطوّر الذي يعرف React على الويب ويريد أن يعرف ماذا يحدث حين يغادر الكود المتصفح — القرار، والجسور، وقيود المنصات التي لا وجود لها على الويب.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../beyond-the-browser.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يقع هذا.</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> يستعرض كل مضيف يعمل فيه JS — الخادم، الحافة، المدمج، الهاتف — ويملك جداول المشهد الأصلي في قسم الهاتف. هذه الوثيقة هي نصف واجهة-التثبيت من تلك القصة، تُروى من مقعد مطوّر React: مصفوفة القرار، وعمارة React Native، وجسر الحاسوب المكتبي، ومعرفة المنصات التي تحتاجها للشحن. لا تُعلّمك Kotlin أو Swift — فهذا مسار مهني مختلف، وهو مُخطَّط له أصلًا في <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§٤ من وثيقة JS Across Stacks</a>.</p>
+<pre>
+┌───────────────────────────────────────────────────────────────────┐
+│   THE BROWSER (where you are)   ← HTML &amp; CSS, JS Language, React   │
+│   URLs · no install · instant deploy · same-origin sandbox         │
+└───────────────────────────────────────────────────────────────────┘
+                              │  "how far from the browser?"
+                              ▼
+┌───────────────────────────────────────────────────────────────────┐
+│   THIS DOC — the installable hosts, from a React dev's seat        │
+│   PWA → Capacitor → React Native → Electron/Tauri → Smart TV →     │
+│   Gaming (mini-games) — each is a BRIDGE between JS and a native   │
+│   platform, and each changes rendering, distribution, and security │
+└───────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌───────────────────────────────────────────────────────────────────┐
+│   JAVASCRIPT ACROSS STACKS   ← owns server (§3), embedded (§5),    │
+│   edge (§7), and the native landscape tables (§4) — link, don't    │
+│   duplicate.                                                       │
+└───────────────────────────────────────────────────────────────────┘
+   Web = the sandbox you know. Beyond the browser = the same language
+   with a different bridge, different distribution, different rules.
+</pre>
+  <p><strong>الجيران على الرف:</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> (خريطة المضيفين — المنبع لهذه الوثيقة) · <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (يجلس React Native بجانب معسكر الميتا-أطر) · <a href="./react-2024-and-beyond.html">React 2024 &amp; Beyond</a> (المؤسسة تملك الآن RN/Expo) · <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> (الإيقاع — النموذج الذي ينتقل) · <a href="./system-design.html">System Design</a> (الدفع، المزامنة دون اتصال، الروابط العميقة كاهتمامات تصميمية) · <a href="./glossary.html">Glossary</a></p>
+</blockquote>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ التعريف (مفردات الجسر إلى المنصات — إنه يعيد تأطير كل قسم)، ثم خريطة ما خارج المتصفح لترى المشهد كاملًا وما تملكه هذه الوثيقة وما لا تملكه، ثم مصفوفة القرار. بعد ذلك اقرأ أقسام المنصات التي تهمك فعلًا — يحصل React Native وElectron على أعمق معالجة؛ أما التلفاز الذكي والألعاب فقسمان كاملان لكنهما مكثّفان. روابط متقاطعة:</p>
+<ul>
+  <li>استطلاع المضيفين (نظرة عامة على الخادم/الحافة/المدمج/الهاتف): <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a>.</li>
+  <li>أين يقف React Native بين أطر الويب: <a href="./frontend-camps-survey.html">Frontend Camps Survey</a>.</li>
+  <li>النموذج الذهني القابل للنقل (النموذج ← العرض ← التدفق): <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a>.</li>
+  <li>الدفع، المزامنة دون اتصال، الروابط العميقة كعمارة: <a href="./system-design.html">System Design</a>.</li>
+  <li>مرجع: <a href="./glossary.html">Glossary</a>.</li>
+</ul>
+
+<p><strong>إذا سألت يومًا «هل يجب أن يكون هذا تطبيقًا؟» أو تساءلت كيف يعمل React Native وElectron فعلًا تحت الغطاء — فهذه هي الخريطة.</strong> طيف واحد، وأربعة جسور، والقيود التي تتشاركها كل منصة قابلة للتثبيت.</p>
+
+<h2 id="sec-definition-the-platform-bridge-problem">التعريف — مشكلة الجسر إلى المنصات</h2>
+
+<p>المتصفح صندوق رمل (sandbox) بثلاثة نماذج محددة: <strong>نموذج تصيير</strong> (DOM + CSS)، و<strong>نموذج أمان</strong> (نفس الأصل، معزول)، و<strong>نموذج توزيع</strong> (روابط URL، بلا تثبيت). كل منصة خارج المتصفح تغيّر واحدًا على الأقل من هذه — والأداة التي تحمل JavaScript عبر الحد الفاصل هي <strong>الجسر</strong>. عالم ما-خارج-المتصفح كله طيفٌ يتراوح حسب بُعدك عن المتصفح، وما تضحّي به:</p>
+
+<table>
+  <thead><tr><th>البعد</th><th>الويب</th><th>React Native</th><th>Electron</th><th>الأصلي</th></tr></thead>
+  <tbody>
+    <tr><td><strong>التصيير</strong></td><td>DOM + CSS</td><td>مكونات واجهة أصلية</td><td>DOM + CSS (Chromium)</td><td>مجموعة أدوات واجهة المنصة</td></tr>
+    <tr><td><strong>التوزيع</strong></td><td>URL، بلا تثبيت</td><td>App Store / Play Store</td><td>مثبّت / تحديث تلقائي</td><td>App Store / Play Store</td></tr>
+    <tr><td><strong>الأمان</strong></td><td>نفس الأصل، معزول</td><td>أذونات نظام التشغيل</td><td>وصول Node.js + Chromium</td><td>أذونات نظام التشغيل</td></tr>
+    <tr><td><strong>نموذج التحديث</strong></td><td>فوري (نشر)</td><td>مراجعة متجر التطبيقات (أيام)</td><td>فوري (تحديث تلقائي)</td><td>مراجعة متجر التطبيقات</td></tr>
+    <tr><td><strong>دون اتصال</strong></td><td>محدود (عامل الخدمة)</td><td>كامل (تخزين أصلي)</td><td>كامل (نظام الملفات المحلي)</td><td>كامل</td></tr>
+    <tr><td><strong>الوصول للعتاد</strong></td><td>محدود (واجهات الويب)</td><td>كامل (وحدات أصلية)</td><td>كامل (Node.js)</td><td>كامل</td></tr>
+  </tbody>
+</table>
+
+<p><strong>المفردات الجوهرية:</strong> <strong>الجسر</strong> هو الآلية التي تتيح لـ JS التحدث مع منصة أصلية. يوصّل React Native الـ JS بمكونات واجهة أصلية؛ ويوصّل Electron الـ JS بـ Chromium إضافة إلى Node؛ ويوصّل Capacitor تطبيق ويب بقشرة أصلية. حيثما كان الجسر ثقيلًا (تسلسل، لاتزامن، تقلّب إصدارات)، تتضرر الأداء والصحة — ولهذا فإن تاريخ كل نظام بيئي هو إلى حد كبير تاريخ جعل جسره أرق.</p>
+
+<h2 id="sec-the-outside-the-browser-map-what-javascript-runs-on">خريطة ما خارج المتصفح — أين يعمل JavaScript</h2>
+
+<p>يعمل JavaScript في أماكن أكثر بكثير من الهواتف والحواسيب المكتبية. قبل بناء أي شيء، اعرف الخريطة كاملة — واعلم أن معظمها <em>مغطى أصلًا في مواضع أخرى على هذا الرف</em>، لذلك تملك هذه الوثيقة مضيفات واجهة-التثبيت فقط:</p>
+
+<table>
+  <thead><tr><th>المضيف</th><th>تقنيات واقعية</th><th>أين يعيش</th><th>هذه الوثيقة</th></tr></thead>
+  <tbody>
+    <tr><td><strong>الخادم / الواجهة الخلفية</strong></td><td>Node.js, Deno, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-backend-perspective">§٣</a>/<a href="./javascript-across-stacks.html#sec-the-node-runtime-how-js-actually-behaves-on-a-server">§٣ب</a> · <a href="./backend-engineering.html">Backend Engineering</a></td><td>—</td></tr>
+    <tr><td><strong>الحافة / بلا خادم / السحابة</strong></td><td>Cloudflare Workers, Vercel Edge, Deno Deploy, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-other-perspective-edge-serverless-build-tools">§٧</a></td><td>—</td></tr>
+    <tr><td><strong>المدمج / إنترنت الأشياء</strong></td><td>Espruino, low.js, Johnny-Five, Moddable</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-embedded-iot-perspective">§٥</a> (جدول سقف الذاكرة)</td><td>—</td></tr>
+    <tr><td><strong>طبقة تطبيقات الذكاء الاصطناعي</strong></td><td>Transformers.js, TensorFlow.js, Vercel AI SDK</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-ai-data-science-perspective">§٦</a></td><td>—</td></tr>
+    <tr><td><strong>أدوات سطر الأوامر / أدوات المطوّر</strong></td><td>Claude Code, git, npm — أي شيء يملك <code>bin</code></td><td><a href="./terminal-applications.html">Terminal Applications</a> (الوثيقة كلها)</td><td>—</td></tr>
+    <tr><td><strong>الهاتف</strong></td><td>React Native (Expo, bare), Capacitor, NativeScript</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§٤</a> (نظرة عامة)</td><td><strong>غوص عميق (<a href="#sec-react-native-the-mobile-bridge">§٤</a> هنا)</strong></td></tr>
+    <tr><td><strong>الحاسوب المكتبي</strong></td><td>Electron, Tauri, Neutralino, Wails</td><td>لا شيء</td><td><strong>غوص عميق (<a href="#sec-electron-tauri-the-desktop-bridge">§٦</a> هنا)</strong></td></tr>
+    <tr><td><strong>التلفاز الذكي</strong></td><td>Samsung Tizen, LG webOS</td><td>لا شيء</td><td><strong>قسم كامل (<a href="#sec-smart-tv-tizen-webos-the-hidden-300m-screens">§٨</a> هنا)</strong></td></tr>
+    <tr><td><strong>الألعاب</strong></td><td>Cocos Creator, LayaAir, Egret, WeChat/TikTok mini-games</td><td>لا شيء</td><td><strong>قسم كامل (<a href="#sec-gaming-the-js-lane-outside-the-browser">§٩</a> هنا)</strong></td></tr>
+  </tbody>
+</table>
+
+<p><strong>حدود عدم التكرار:</strong> جداول المشهد الأصلي (Kotlin/Compose وSwift/SwiftUI وFlutter) تعيش أصلًا في JavaScript Across Stacks <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§٤</a> — تحيل هذه الوثيقة إليه بدلًا من إعادة تدريسها. والمضيفات الخادم والحافة والمدمج والذكاء الاصطناعي يملكها بالكامل استطلاع المضيفات — تلخّصها هذه الوثيقة فقط في الخريطة أعلاه. ومضيف أدوات سطر الأوامر وثيقة كاملة أصلًا.</p>
+
+<h2 id="sec-the-decision-matrix-when-to-use-what">مصفوفة القرار — متى تستخدم ماذا</h2>
+
+<p>كل قرار منصة يختزل إلى سؤال واحد: <strong>«هل يحتاج المستخدم إلى تثبيت هذا، وهل يحتاج قدراتٍ أصلية؟»</strong></p>
+
+<table>
+  <thead><tr><th>حالتك</th><th>الخيار الأفضل</th><th>لماذا</th></tr></thead>
+  <tbody>
+    <tr><td>موقع محتوى، تسويق، مدونة، وثائق</td><td><strong>الويب (Next.js/Astro)</strong></td><td>SEO، تحديثات فورية، بلا احتكاك تثبيت</td></tr>
+    <tr><td>أداة داخلية، لوحة تحكم، لوحة إدارة</td><td><strong>الويب (React SPA)</strong></td><td>لا توزيع مطلوب، تكرار سريع</td></tr>
+    <tr><td>تطبيق 90% منه محتوى ويب + 10% ميزات أصلية</td><td><strong>PWA أو Capacitor</strong></td><td>كود ويب + قشرة أصلية للأقلية</td></tr>
+    <tr><td>تطبيق مستهلك يحتاج إحساسًا أصليًا (كاميرا، GPS، دفع، دون اتصال)</td><td><strong>React Native</strong></td><td>واجهة أصلية + سرعة مطوّري JS</td></tr>
+    <tr><td>تطبيق حاسوب مكتبي (VS Code, Slack, Discord, Figma)</td><td><strong>Electron</strong> (أو Tauri)</td><td>واجهة ويب + وصول لنظام الملفات/النظام</td></tr>
+    <tr><td>تطبيق غرفة معيشة / شاشة بعيدة، بث، تجربة صندوق استقبال</td><td><strong>Tizen / webOS</strong></td><td>الطريق الوحيد إلى ~300M تلفاز؛ وهو تطبيق ويب على أي حال</td></tr>
+    <tr><td>لعبة عابرة تستهدف أكبر متجر تطبيقات في الصين</td><td><strong>Mini-game (Cocos/Laya) أو محرك ويب</strong></td><td>صندوق رمل JS بلا DOM، لعب فوري، توزيع اجتماعي</td></tr>
+    <tr><td>أداء حرج، تجربة خاصة بالمنصة، فريق كبير</td><td><strong>الأصلي (Kotlin/Swift)</strong></td><td>أقصى أداء، أمانة للمنصة</td></tr>
+    <tr><td>لعبة، AR/VR، GPU ثقيل</td><td><strong>الأصلي أو Unity/Unreal</strong></td><td>لا يمكن لـ React Native/Electron منافسته</td></tr>
+    <tr><td>نموذج أولي / MVP للتحقق من فكرة</td><td><strong>الويب أو Expo (React Native)</strong></td><td>أسرع طريق إلى المستخدمين</td></tr>
+  </tbody>
+</table>
+
+<p>النسخة القصيرة الرباعية: <strong>بلا تثبيت وبلا أصلي → الويب. تثبيت + أصلي + فريق JS → React Native. تثبيت + حاسوب مكتبي + فريق JS → Electron/Tauri. تثبيت + أقصى أمانة + فريق أصلي → Kotlin/Swift.</strong> وكل ما عدا ذلك متغير من الأرضية الوسطى لأحد هذه.</p>
+
+<h2 id="sec-react-native-the-mobile-bridge">React Native — الجسر إلى الهواتف</h2>
+
+<h3>كيف يصبح كود React تطبيقًا أصليًا</h3>
+
+<p>يحافظ React Native على نموذجك الذهني في React — المكونات، الخصائص، الحالة، الخطافات — لكنه يستبدل ما تصيّر <em>داخله</em>. React على الويب تصيّر عناصر DOM؛ وReact Native تصيّر عروض iOS/Android أصلية. الآلية الرابطة بين الاثنين كانت قصة أداء الإطار:</p>
+
+<pre>OLD ARCHITECTURE (pre-2022) — the bridge was the bottleneck:
+  JavaScript thread → JSON bridge (async, batched) → Native thread
+  (React)            (serialized messages)            (UIKit/Android views)
+      Every JS↔native call serialized to JSON and batched → frame drops
+      during animations. This was the famous "bridge problem."
+
+NEW ARCHITECTURE (2022+, default since 0.76):
+  JavaScript thread → JSI (JavaScript Interface) → Native thread
+  (React)             (direct C++ references,      (Fabric renderer,
+                       synchronous, no JSON)         TurboModules)
+      JS holds direct references to C++ objects. No serialization.
+      Synchronous calls. The architectural cousin of React's own move
+      from reconciliation to Fiber — remove the serialization layer.
+</pre>
+
+<p>التفاصيل التي ستسمع أسماءها: <strong>JSI</strong> (واجهة المرجع المباشر التي تستبدل الجسر)، و<strong>Fabric</strong> (المصيّر الجديد الذي يلتزم واجهة المستخدم على الخيط الأصلي)، و<strong>TurboModules</strong> (وحدات أصلية تُحمَّل كسولًا). لقراءة الكود والتصحيح، اعرف الأسماء؛ أما العمارة المهمة فهي «متزامن، بلا JSON، مراجع مباشرة».</p>
+
+<h3>ما الذي ينتقل من معرفتك بـ React — وما الذي لا ينتقل</h3>
+
+<table>
+  <thead><tr><th>React على الويب</th><th>React Native</th></tr></thead>
+  <tbody>
+    <tr><td>تصيّر إلى DOM (<code>&lt;div&gt;</code>, <code>&lt;span&gt;</code>)</td><td>تصيّر إلى مكونات أصلية (<code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, <code>&lt;Image&gt;</code>)</td></tr>
+    <tr><td>CSS للتنسيق</td><td>StyleSheet (مبني على flexbox، بلا محددات، بلا تتالي)</td></tr>
+    <tr><td>المتصفح يدير التنقل</td><td>أنت تديره (React Navigation, Expo Router)</td></tr>
+    <tr><td>المتصفح يدير التمرير</td><td><code>&lt;ScrollView&gt;</code>, <code>&lt;FlatList&gt;</code>, <code>&lt;SectionList&gt;</code></td></tr>
+    <tr><td><code>onClick</code>, <code>onChange</code></td><td><code>onPress</code>, <code>onLongPress</code>, معالجات الإيماءات</td></tr>
+    <tr><td>عامل الخدمة للعمل دون اتصال</td><td>AsyncStorage, SQLite, نظام الملفات الأصلي</td></tr>
+    <tr><td>توجيه URL</td><td>تنقل Stack/Tab/Drawer (بلا URLs افتراضيًا)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>ما ينتقل كاملًا:</strong> المكونات، الخصائص، الحالة، الخطافات (<code>useState</code>, <code>useEffect</code>, <code>useRef</code>)، السياق، المخفِّضات، التركيب، نموذج إعادة التصيير، الإغلاقات البالية، مصفوفات التبعيات. <a href="./how-developers-think-frontend.html">إيقاع النموذج ← العرض ← التدفق</a> مطابق — المنصة حوله هي التي تغيّرت. <strong>ما يختفي:</strong> واجهات DOM (<code>document</code>, <code>window</code>)، CSS، تخزين المتصفح، وافتراض أن «المتصفح يصيّر HTML الخاص بي». نظام التشغيل يصيّر العروض الأصلية الآن.</p>
+
+<h3>Expo مقابل سير العمل العاري (bare)</h3>
+
+<table>
+  <thead><tr><th></th><th>Expo (مُدار)</th><th>سير العمل العاري</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ما هو</strong></td><td>خدمة بناء مُدارة + عميل تطوير</td><td>تملك المشروع الأصلي (Xcode/Android Studio)</td></tr>
+    <tr><td><strong>الوصول للكود الأصلي</strong></td><td>عبر وحدات Expo / prebuild</td><td>وصول مباشر للكود الأصلي</td></tr>
+    <tr><td><strong>البناء</strong></td><td>Expo Application Services (سحابة)</td><td>محلي (Xcode, Gradle)</td></tr>
+    <tr><td><strong>تحديثات OTA</strong></td><td>Expo Updates (تحديثات JS فورية)</td><td>حل يدوي أو مخصص</td></tr>
+    <tr><td><strong>متى تستخدمه</strong></td><td>90% من التطبيقات. ابدأ من هنا.</td><td>عندما تحتاج وحدات أصلية مخصصة غير متوفرة كوحدات Expo</td></tr>
+  </tbody>
+</table>
+
+<p><strong>القاعدة الكسولة:</strong> ابدأ بـ Expo. لا تنتقل إلى bare إلا حين لا يستطيع Expo فعل ما تحتاج. معظم التطبيقات لا تحتاج الانتقال أبدًا.</p>
+
+<h3>التنقل — أكبر تحول ذهني من الويب إلى الهاتف</h3>
+
+<pre>Web:    /home → /product/123 → /checkout        (URLs are state)
+Mobile: HomeStack → ProductScreen(id: 123) → CheckoutScreen
+        (the navigation STACK is state; there are no URLs by default)
+</pre>
+
+<ul>
+  <li><strong>تنقل المكدس</strong> — دفع/سحب الشاشات (مكدس بطاقات).</li>
+  <li><strong>تنقل التبويبات</strong> — تبويبات سفلية، لكل منها مكدسها الخاص.</li>
+  <li><strong>تنقل الدرج</strong> — قائمة جانبية.</li>
+  <li><strong>الربط العميق</strong> — ربط URLs بالشاشات، لإشعارات الدفع والروابط الخارجية.</li>
+</ul>
+
+<p>المكتبات: React Navigation (معيار المجتمع) وExpo Router (مبني على الملفات، شبيه Next.js عن قصد — <code>app/(tabs)/index.tsx</code> ↔ <code>app/page.tsx</code>). هذا أكبر تكلفة إعادة تعلّم لمطوّر React على الويب، فاحسب لها ميزانية.</p>
+
+<h3>كود خاص بالمنصة</h3>
+
+<pre>import { Platform } from "react-native";
+
+const shadow = Platform.select({
+  ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 2 } },
+  android: { elevation: 4 },
+});
+
+// button.ios.js      ← loaded on iOS only
+// button.android.js  ← loaded on Android only
+// button.js          ← fallback for everything else
+</pre>
+
+<h3>الوحدات الأصلية — عندما لا يكفي JS</h3>
+
+<p>عندما تحتاج وصولًا للعتاد (كاميرا، Bluetooth، قياسات حيوية، NFC) أو واجهات خاصة بالمنصة: <strong>وحدات Expo</strong> تغطي ~90% من الحالات وتصونها فريق Expo؛ <strong>وحدات المجتمع</strong> (<code>react-native-camera</code>, <code>react-native-maps</code>) تغطي أكثر؛ <strong>الوحدات الأصلية المخصصة</strong> هي المكان الذي تكتب فيه Kotlin/Swift وتعرضه لـ JS عبر JSI — المكان الوحيد الذي تحتاج فيه معرفة أصلية حقيقية. كل ما عدا ذلك يبقى في TypeScript.</p>
+
+<h2 id="sec-android-ios-platform-literacy-the-minimum-to-ship-and-debug">معرفة منصتي Android وiOS — الحد الأدنى للشحن والتصحيح</h2>
+
+<p>لا تصبح مطوّر Android. تتعلم ما تفرضه Android وiOS على التطبيق، لأن تلك القيود تشكّل كل قرار في React Native:</p>
+
+<table>
+  <thead><tr><th>المفهوم</th><th>ماذا يعني لتطبيق React Native الخاص بك</th></tr></thead>
+  <tbody>
+    <tr><td><strong>APK / AAB</strong></td><td>APK = تثبيت مباشر؛ AAB = صيغة Play Store. Expo يبنيها لك.</td></tr>
+    <tr><td><strong>الأذونات</strong></td><td>الكاميرا، الموقع، التخزين، الإشعارات — يمنحها المستخدم وقت التشغيل. تُصرَّح في <code>AndroidManifest.xml</code> وتُطلب عبر واجهات React Native.</td></tr>
+    <tr><td><strong>مراجعة Play Store</strong></td><td>عادة 1–7 أيام. بخلاف نشر الويب، لا يمكنك الدفع فورًا — خطط للإصدارات.</td></tr>
+    <tr><td><strong>توقيع التطبيق</strong></td><td>توقّع بمخزن مفاتيح (keystore). فقدان المخزن = فقدان القدرة على التحديث. احتفظ بنسخة احتياطية.</td></tr>
+    <tr><td><strong>Intents</strong></td><td>تواصل Android بين التطبيقات: الروابط العميقة، المشاركة، فتح الملفات. واجهة <code>Linking</code> في React Native تدير معظمها.</td></tr>
+    <tr><td><strong>دورة حياة النشاط</strong></td><td>يمكن لـ Android قتل تطبيقك في الخلفية. لا تفترض أن JS يعمل. استخدم مهام الخلفية / الدفع.</td></tr>
+    <tr><td><strong>زر الرجوع</strong></td><td>Android يملك زر رجوع نظاميًا. يجب أن يتعامل تنقلك معه. iOS لا يملك واحدًا.</td></tr>
+    <tr><td><strong>التجزؤ</strong></td><td>آلاف أحجام الأجهزة وإصدارات Android والمصنعين. اختبر على أجهزة حقيقية لا محاكيات فقط.</td></tr>
+  </tbody>
+</table>
+
+<p><strong>iOS باختصار:</strong> حزمة IPA، مراجعة App Store أشد صرامة (1–3 أيام، رفضات سياسات؛ يمنحك TestFlight قناة بيتا مغلقة قبل تلك المراجعة)، نظام توقيع Apple (ملفات التزويد والشهادات — يديرها Expo)، تنفيذ خلفية أشد تقييدًا (الدفع هو وسيلة الوصول الأساسية)، إيماءة السحب-للرجوع بدلًا من زر الرجوع، وإرشادات واجهة Apple (أشرطة تبويب أسفل، أشرطة تنقل أعلى). يجب أن تعرف أيضًا سلسلة البناء التي يجرّدها Expo: JS/TS ← مجمّع Metro ← مشروع أصلي ← Gradle (Android) أو Xcode (iOS) ← متجر ← مراجعة ← تثبيت. EAS Build (بناء Expo السحابي) وFastlane يؤتمتان نصف Gradle/Xcode ← متجر من تلك السلسلة — قصة CI/CD الكاملة من اختصاص <a href="./version-control-ci-cd-deployment.html">Version Control &amp; CI/CD</a>.</p>
+
+<p><strong>إمكانية الوصول أصلية، ليست اختيارية.</strong> دلالات إمكانية الوصول على الويب تنتقل، لكن الخطافات تختلف: يعرض React Native <code>accessibilityLabel</code> و<code>accessibilityRole</code> و<code>accessibilityState</code> على المكونات، يقرؤها VoiceOver (iOS) وTalkBack (Android) — المعادلات الأصلية لتسميات وأدوار aria. اختبر على جهاز حقيقي مع قارئ شاشة، بنفس الطريقة التي تفحص بها الويب بـ NVDA. <a href="./ui-ux-web-design.html">UI/UX &amp; Web Design</a> تملك الانضباط من ناحية التصميم؛ أما على التلفاز فشكل إمكانية الوصول هو تركيز مدفوع بجهاز التحكم، وهو ما يغطيه قسم التلفاز الذكي.</p>
+
+<p><strong>الإبلاغ عن الأعطال هو مجموعة اختباراتك الأخرى.</strong> الأخطاء على الهاتف تأتي بنوعين: استثناءات JS وأعطال أصلية. يلتقط Sentry أو Crashlytics الاثنين — ارفع <strong>خرائط المصادر</strong> الخاصة بـ Metro لتظهر أخطاء JS كمكدسات استدعاءات قابلة للقراءة، ودع الأداة تعيد بناء تقرير الانهيار الأصلي (iOS/Android) إلى مكدس دالة-وسطر. اربطها قبل الإطلاق؛ إنها الفرق بين «أبلغ المستخدمون عن خطأ» ومكدس استدعاءات في بريدك.</p>
+
+<h2 id="sec-electron-tauri-the-desktop-bridge">Electron وTauri — جسر الحاسوب المكتبي</h2>
+
+<h3>العمارة: عمليتان وأنبوب بينهما</h3>
+
+<p>Electron هو المضيف المكتبي لسبب واحد بالضبط: يتيح لك شحن تطبيق ويب كتطبيق حاسوب مكتبي أصلي، معيدًا استخدام كل معرفتك بـ React/CSS/المتصفح. يفعل ذلك بتشغيل Chromium (تصيير) وNode.js (وصول للنظام) في تطبيق واحد، مقسومًا على عمليتين:</p>
+
+<pre>┌─────────────────────────────────────────────────────────────┐
+│                      Electron App                            │
+│                                                              │
+│  ┌──────────────────┐        IPC          ┌────────────────┐ │
+│  │   MAIN PROCESS   │  (ipcMain/ipcRenderer) │ RENDERER      │ │
+│  │     (Node.js)    │ ◄──────────────────► │   (Chromium)   │ │
+│  │                  │                      │                │ │
+│  │ • filesystem     │                      │ • your React   │ │
+│  │ • OS APIs        │                      │   app (DOM+CSS)│ │
+│  │ • menus / tray   │                      │ • sandboxed by  │ │
+│  │ • notifications  │                      │   default (12+) │ │
+│  └──────────────────┘                      └────────────────┘ │
+│   "owns the OS"         bridge = IPC calls    "owns the UI"    │
+└─────────────────────────────────────────────────────────────┘
+</pre>
+
+<p><strong>ما ينتقل من React الويب: كل شيء.</strong> يعمل تطبيق React الخاص بك داخل Chromium — DOM وCSS وواجهات المتصفح كلها حاضرة. إنه حرفيًا تبويب متصفح مع وصول نظامي إضافي فوقه. <strong>ما يختلف:</strong> وصول كامل لنظام الملفات (عبر العملية الرئيسية)، توزيع بالمثبّت (<code>.exe</code>/<code>.dmg</code>/<code>.AppImage</code>)، تحديث تلقائي عبر electron-updater، علبة النظام + اختصارات عامة + إشعارات أصلية، ونموذج أمان يجب فيه إبقاء <code>nodeIntegration</code> <em>مغلقًا</em> في العارض وتمرير الوصول للنظام عبر IPC.</p>
+
+<h3>مشكلة Electron: حجم الحزمة</h3>
+
+<p>يشحن Electron Chromium (~150MB) + Node.js (~30MB) مع كل تطبيق. لهذا يُثبَّت VS Code بحجم ~100MB وSlack بـ ~200MB. البدائل موجودة بسبب هذا:</p>
+
+<table>
+  <thead><tr><th>الأداة</th><th>النهج</th><th>حجم الحزمة</th><th>المفاضلة</th></tr></thead>
+  <tbody>
+    <tr><td>Electron</td><td>Chromium + Node.js</td><td>~150MB+</td><td>توافق كامل، نظام بيئي ضخم (VS Code, Slack, Discord, Figma)</td></tr>
+    <tr><td>Tauri</td><td>WebView النظام + خلفية Rust</td><td>~3–10MB</td><td>أصغر بكثير، لكن WebView يختلف حسب نظام التشغيل</td></tr>
+    <tr><td>Wails</td><td>WebView النظام + خلفية Go</td><td>~5–10MB</td><td>خلفية Go، أصغر من Electron</td></tr>
+    <tr><td>Neutralino</td><td>WebView النظام + خلفية خفيفة</td><td>~2–5MB</td><td>أصغر حتى، أقل نضجًا</td></tr>
+    <tr><td>PWA</td><td>مبني على المتصفح، قابل للتثبيت</td><td>0 (يعيد استخدام متصفح موجود)</td><td>وصول نظامي محدود</td></tr>
+  </tbody>
+</table>
+
+<p><strong>القرار:</strong> Electron عندما تحتاج أقصى توافق ونظام بيئي؛ وTauri عندما يهمّ حجم الحزمة وتتحمل تباينات WebView. كلاهما يمنح تطبيق React نظام ملفات وعلبة نظام.</p>
+
+<h2 id="sec-pwa-and-capacitor-the-middle-ground">PWA وCapacitor — الأرضية الوسطى</h2>
+
+<p><strong>PWA (تطبيق الويب التقدمي)</strong> — تطبيق الويب الخاص بك يُجعل قابلًا للتثبيت، بلا متجر تطبيقات. عامل الخدمة (دون اتصال + دفع)، بيان تطبيق الويب (طلب التثبيت، الأيقونة، شاشة البداية)، وواجهات ويب للكاميرا/GPS (محدودة مقابل الأصلي). <strong>متى يربح:</strong> تطبيقات المحتوى، التجارة الإلكترونية، الأدوات الداخلية — أي مكان تريد «قابلًا للتثبيت» دون مراجعة متجر. <strong>متى يخسر:</strong> تكامل أصلي ثقيل، معالجة خلفية، اكتشاف عبر المتاجر.</p>
+
+<p><strong>Capacitor (فريق Ionic)</strong> — تطبيق الويب الخاص بك ملفوف في قشرة أصلية. يعرض WebView تطبيق React؛ توفّر الإضافات الأصلية الكاميرا والدفع والقياسات الحيوية ونظام الملفات؛ قاعدة كود واحدة ← iOS + Android + Web. <strong>متى يربح:</strong> لديك أصلًا تطبيق ويب وتحتاج نسخة هاتف مع بعض الميزات الأصلية (90% ويب، 10% أصلي). <strong>متى يخسر:</strong> تحتاج واجهة بإحساس أصلي — تصيير WebView لا يطابق نعومة الحركة/الإيماءات الأصلية.</p>
+
+<p>العلاقة: <strong>يمنحك PWA «قابلًا للتثبيت» بقشرة صفرية؛ ويمنحك Capacitor القشرة الأصلية؛ ويمنحك React Native الواجهة الأصلية.</strong> اختر أنحف جسر يحقق مصفوفة القرار.</p>
+
+<h2 id="sec-smart-tv-tizen-webos-the-hidden-300m-screens">التلفاز الذكي — Tizen وwebOS، شاشات ~300 مليون المخفية</h2>
+
+<p>أكبر سوق خارج المتصفح لا يفكر فيه معظم المطوّرين أبدًا: كل تلفاز Samsung منذ 2015 يعمل بـ Tizen، وكل تلفاز LG يعمل بـ webOS — معًا نحو 300M شاشة غرفة معيشة — <strong>وكلاهما منصتا تطبيقات ويب</strong>. تطبيقك هو HTML وCSS وJavaScript يعمل داخل محرك مشتق من Chromium يشحنه التلفاز. فريق يستطيع بناء واجهة ويب يستطيع بناء قشرة تطبيق تلفاز.</p>
+
+<p>لكن التلفاز جهاز مقيد مبني لغرض محدد، والقيود هي ما يجعله منصته الخاصة:</p>
+
+<table>
+  <thead><tr><th>الواقع</th><th>ماذا يعني</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Chromium ثابت لكل سنة طراز</strong></td><td>محرك الويب يُثبَّت وقت التصنيع ولا يُرقّى أبدًا. تلفاز 2022 ≈ Chromium 94؛ 2025 ≈ 120؛ 2026 ≈ 126. واجهة ويب شُحنت في Chrome 110 تفشل بصمت على تلفاز 2022. اكشف الميزات، ولا تتفقد الإصدارات أبدًا.</td></tr>
+    <tr><td><strong>واجهات وسائط أصلية</strong></td><td>يتحكم AVPlay في Tizen بخط أنابيب وسائط العتاد (DRM، الترجمة، مسارات الصوت، 4K) أبعد من عنصر <code>&lt;video&gt;</code> العادي. يمدد webOS مسار وسائط HTML5.</td></tr>
+    <tr><td><strong>DRM عبر EME</strong></td><td>PlayReady + Widevine عبر Encrypted Media Extensions — أبدًا Apple FairPlay (لا أجهزة Apple هنا). عميل DRM مخبوز في برنامج كل تلفاز؛ لا يمكنك ترقيته في الميدان.</td></tr>
+    <tr><td><strong>حقيقة الصيغ</strong></td><td>يدعم webOS HLS أصلًا؛ DASH غير مدعوم رسميًا. عبّئ مرة واحدة إلى CMAF واخدم الاثنين.</td></tr>
+    <tr><td><strong>اعتماد لكل متجر</strong></td><td>يصدّق Samsung TV Seller Office ومتجر LG كلٌّ على حدة، لكل مجموعة طراز — إطلاق &lt; 5s، تنقل زر الرجوع يعمل، لا شاشات فارغة. خطط لعدة جولات إصلاح.</td></tr>
+    <tr><td><strong>تجربة شاشة بعيدة</strong></td><td>تنقل تركيز مدفوع بجهاز التحكم، لا مؤشر. يدفع webOS حتى بـ Enact — إطار مبني على React مضبوط لغرفة المعيشة.</td></tr>
+  </tbody>
+</table>
+
+<p>بالنسبة لمطوّر React: مهاراتك تنتقل مباشرة (إنه تطبيق ويب في قشرة Chromium). المعرفة الجديدة هي خط أنابيب الوسائط (AVPlay/EME)، وترخيص DRM، وضريبة تجزؤ الأجهزة عبر سنوات الطراز. هذا مسار مهني حقيقي لتطبيقات البث — ومعظم المطوّرين لم يسمعوا به أصلًا.</p>
+
+<h2 id="sec-gaming-the-js-lane-outside-the-browser">الألعاب — مسار JavaScript خارج المتصفح</h2>
+
+<p>نعم، هرب JavaScript إلى الألعاب — لكن شكله يفاجئ معظم المطوّرين. مسار أجهزة الكونسول الكبير (Unity C#, Unreal C++) ليس JS. مسار JS الحقيقي له جزآن:</p>
+
+<p><strong>1. صندوق رمل الألعاب المصغرة.</strong> يستضيف WeChat وTikTok ألعابًا ليست <em>صفحات ويب</em>: بيئة JavaScript بلا DOM مع سياق canvas + WebGL (WebGPU بشكل متزايد)، إضافة إلى واجهات المضيف للتخزين والصوت والشبكات والطبقة الاجتماعية/الدفع. لا <code>window</code> ولا <code>document</code>. حزمتك الأولى محدودة بسقف ~4MB (تُنزَّل الأصول منفصلة). تترجم المحركات إلى هذا الهدف: Cocos Creator وLayaAir وEgret (TypeScript/JS)، مع كون Cocos الافتراضي لأن محركها مثبت مسبقًا في عميل WeChat ولا يُحتسب ضد الـ 4MB. تصل ألعاب Unity إليه فقط عبر تحويل WebGL→mini-game (أو محرك Tuanjie من Unity China، الذي يعامله كهدف أصلي).</p>
+
+<p><strong>2. محركات المتصفح التي تبقى في المتصفح — لكن المهارات تنتقل.</strong> تعمل Phaser وPixiJS وThree.js وBabylon.js في تبويب متصفح (WebGL/canvas) وهي تقنيًا ما تزال <em>داخل</em> المتصفح. تهمّ هنا لأن لعبة Three.js قريبة هيكليًا من اللعبة المصغرة — الفجوة هي طبقة المحوّل وميزانية الـ 4MB، لا التصيير.</p>
+
+<table>
+  <thead><tr><th>المسار</th><th>اللغة</th><th>يعمل في</th><th>متى تختاره</th></tr></thead>
+  <tbody>
+    <tr><td>لعبة مصغرة (Cocos/Laya/Egret)</td><td>TypeScript/JS</td><td>صندوق رمل WeChat/TikTok، وأيضًا الهاتف الأصلي</td><td>ألعاب عابرة لأكبر واجهات المتاجر، فريق JS</td></tr>
+    <tr><td>محرك ويب (Phaser/Pixi/Three)</td><td>JS</td><td>تبويب متصفح</td><td>ألعاب لعب فوري من URL؛ المهارات تنتقل إلى الألعاب المصغرة</td></tr>
+    <tr><td>Unity / Unreal</td><td>C# / C++</td><td>كل شيء، عبر التصدير/WASM</td><td>ثقيلة الأداء، ثلاثية الأبعاد، عبر المنصات — ليست مسار JS</td></tr>
+  </tbody>
+</table>
+
+<p><strong>عندما يلمس مطوّر React هذا:</strong> انضباطك في المكونات/الحالة/الحلقة ينتقل إلى واجهة اللعبة وإلى حلقة اللعبة (تحديث ← تصيير)، لكن اللعبة عمارة مختلفة عن تطبيق ويب — حلقة تصيير مستمرة بدلًا من تصيير لكل تغيّر حالة. ابدأ بمحرك متصفح؛ إنه أقل حركة مُهدَرة، ونقل اللعبة المصغرة تمرين محوّل + تمرين ميزانية.</p>
+
+<h2 id="sec-constraints-that-apply-to-every-installable-platform">قيود تنطبق على كل منصة قابلة للتثبيت</h2>
+
+<p>كل ما سبق — الهاتف، الحاسوب المكتبي، التلفاز، الألعاب — يصطدم بالجدران نفسها التي ببساطة لا وجود لها على الويب. صمّم في مواجهة هذا الجدول:</p>
+
+<table>
+  <thead><tr><th>القيد</th><th>الويب</th><th>الهاتف (RN)</th><th>الحاسوب المكتبي (Electron)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>التوزيع</strong></td><td>فوري (نشر)</td><td>مراجعة متجر التطبيقات (أيام)</td><td>مثبّت / تحديث تلقائي</td></tr>
+    <tr><td><strong>نموذج التحديث</strong></td><td>فوري</td><td>متجر التطبيقات (أو OTA لتغييرات JS فقط)</td><td>فوري (تحديث تلقائي)</td></tr>
+    <tr><td><strong>دون اتصال</strong></td><td>محدود</td><td>كامل</td><td>كامل</td></tr>
+    <tr><td><strong>إشعارات الدفع</strong></td><td>محدودة (دفع ويب)</td><td>دفع أصلي (APNs/FCM)</td><td>إشعارات نظام التشغيل</td></tr>
+    <tr><td><strong>الربط العميق</strong></td><td>URLs</td><td><code>myapp://screen</code> + روابط عامة</td><td>بروتوكول <code>myapp://</code></td></tr>
+    <tr><td><strong>الأذونات</strong></td><td>مطالبات المتصفح</td><td>مطالبات أذونات نظام التشغيل (وقت التشغيل)</td><td>مطالبات أذونات نظام التشغيل</td></tr>
+    <tr><td><strong>التنفيذ في الخلفية</strong></td><td>عامل الخدمة (محدود)</td><td>مقيّد بنظام التشغيل</td><td>كامل (Node.js)</td></tr>
+    <tr><td><strong>سياسات المتاجر</strong></td><td>لا شيء</td><td>Apple/Google (المحتوى، المدفوعات، الخصوصية)</td><td>لا شيء (عادة)</td></tr>
+    <tr><td><strong>الدفع</strong></td><td>أي مزود</td><td>Apple/Google IAP للسلع الرقمية (رسوم 30%)</td><td>أي مزود</td></tr>
+  </tbody>
+</table>
+
+<p>هذه أيضًا اهتمامات تصميم نظم — الدفع والمزامنة دون اتصال والربط العميق عمارة لا تجميل، و<a href="./system-design.html">System Design</a> هو المكان الذي تحصل فيه على معاملتها الكاملة.</p>
+
+<h2 id="sec-the-native-landscape-link-don-t-duplicate">المشهد الأصلي — اربط، لا تكرر</h2>
+
+<p>تحتاج أن <em>تفهم</em> المنصات الأصلية التي تستهدفها جسورك، لكنك لا تحتاج أن تتعلم البناء فيها. يحمل JavaScript Across Stacks <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§٤</a> أصلًا جداول المقارنة المتعمقة لكل مسار أصلي — Kotlin/Jetpack Compose (يترجم React Native إلى عروض Android أصلية؛ تكتب Kotlin فقط للوحدات الأصلية المخصصة)، وSwift/SwiftUI (المكافئ في iOS)، وDart/Flutter (بديل Google عبر المنصات بمصيّره الخاص — تختاره لاتساق مثالي عبر المنصات، لا لإحساس أصلي). إذا ظهر قرار أصلي، اقرأ ذلك القسم؛ إنه المرجع، وهذه الوثيقة تتعمد ألا تكرره.</p>
+
+<h2 id="sec-worked-example-a-habit-tracker-every-way">مثال تطبيقي — متتبع عادات، بكل الطرق</h2>
+
+<pre>The same product, four installable approaches — and one to reject:
+
+1 · Web (PWA):  Next.js + Service Worker + manifest
+   Distribution: URL, installable            Choose for: internal
+   tool, quick validation, no native features needed.
+
+2 · React Native (Expo): Expo + Expo Router + expo-sqlite
+   Distribution: App Store + Play Store      Choose for: consumer
+   app, push, offline, native feel.
+
+3 · Capacitor:   existing React SPA + Capacitor shell
+   Distribution: App Store + Play Store      Choose for: already have
+   a web app, need mobile wrapper + push.
+
+4 · Electron:    React + Electron
+   Distribution: desktop installer           Choose for: desktop
+   tracker with system tray + notifications.
+
+5 · Native (Kotlin/Swift): full native rewrite
+   Rejected here — RN/Expo covers it; native adds cost without a
+   real limitation forcing it.
+
+Expo Router version:
+  habit-tracker/
+  ├── app/                    # file-based navigation (Next.js-style)
+  │   ├── _layout.tsx         # root layout (tab navigation)
+  │   ├── (tabs)/index.tsx    # home: today's habits
+  │   ├── (tabs)/history.tsx  # past completions
+  │   ├── (tabs)/settings.tsx
+  │   └── habit/[id].tsx      # detail screen
+  ├── components/             # HabitCard, StreakBadge, CheckButton
+  ├── store/habits.ts         # state (Zustand)
+  └── db/schema.ts            # expo-sqlite schema
+
+Web concept             →  React Native equivalent
+app/page.tsx            →  app/(tabs)/index.tsx
+&lt;div className="card"&gt; →  &lt;View style={styles.card}&gt;
+onClick                 →  onPress
+localStorage            →  expo-sqlite / AsyncStorage
+CSS display:flex        →  flexDirection:"row" (flexbox is default)
+Browser notification    →  expo-notifications (native push)
+history.pushState       →  router.push("/habit/123")
+</pre>
+
+<h2 id="sec-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
+
+<table>
+  <thead><tr><th>نمط الفشل</th><th>كيف يبدو</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td>معاملة RN كالويب</td><td>استخدام <code>&lt;div&gt;</code> ومحددات CSS و<code>document.querySelector</code></td><td>تعلّم مفردات المكونات الأصلية: <code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, <code>&lt;FlatList&gt;</code></td></tr>
+    <tr><td>تجاهل اختلافات المنصات</td><td>نفس واجهة المستخدم على iOS/Android، متجاهلًا الأعراف</td><td><code>Platform.select</code>؛ اتبع HIG (iOS) وMaterial (Android)</td></tr>
+    <tr><td>عدم معالجة زر الرجوع</td><td>Android يخرج من التطبيق، فيضيع التنقل</td><td>اضبط سلوك الرجوع في React Navigation</td></tr>
+    <tr><td>افتراض أن JS يعمل دائمًا</td><td>مهام الخلفية تفشل، المؤقتات لا تعمل</td><td>مهام خلفية أصلية، إشعارات دفع</td></tr>
+    <tr><td>اختبار بالمحاكي فقط</td><td>يعمل على المحاكي، ينكسر على الجهاز الحقيقي</td><td>اختبر على أجهزة iOS وAndroid فيزيائية</td></tr>
+    <tr><td>تجاهل أوقات المراجعة</td><td>يخطط «نشر فوري» فيكتشف مراجعة 3 أيام</td><td>خطط لدورات الإصدار؛ OTA لتغييرات JS فقط</td></tr>
+    <tr><td>سوء إعداد أمان Electron</td><td><code>nodeIntegration: true</code> في العارض</td><td>أبقِ العارض معزولًا؛ الوصول للنظام عبر IPC</td></tr>
+    <tr><td>الأصلي عندما يكفي RN</td><td>6 أشهر من Kotlin/Swift لتطبيق يبنيه RN في 6 أسابيع</td><td>ابدأ بـ RN/Expo؛ اذهب أصليًا فقط عند قيد حقيقي</td></tr>
+    <tr><td>الويب عندما يُحتاج الأصلي</td><td>PWA يقاتل حدود المتصفح من أجل كاميرا + دفع + دون اتصال</td><td>استخدم React Native أو Capacitor</td></tr>
+    <tr><td>التلفاز: تفقّد إصدار Chromium</td><td>يفشل بصمت على سنوات الطراز الأقدم</td><td>اكشف الميزات؛ اختبر على أقدم سنة طراز مدعومة</td></tr>
+    <tr><td>الألعاب: افتراض DOM متصفح</td><td>اللعبة المصغرة تنهار — لا <code>window</code>/<code>document</code></td><td>استخدم محوّل اللعبة المصغرة الرسمي للمحرك؛ احترم سقف الـ 4MB للحزمة الأولى</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-principles">المبادئ</h2>
+
+<table>
+  <thead><tr><th>المبدأ</th><th>لماذا</th></tr></thead>
+  <tbody>
+    <tr><td>ابدأ بالويب ما لم يكن لديك سبب أصلي</td><td>صفر احتكاك تثبيت، تحديثات فورية، SEO</td></tr>
+    <tr><td>ابدأ بـ Expo ما لم يكن لديك سبب لسير العمل العاري</td><td>يدير Expo 90% من الاهتمامات الأصلية؛ انتقل فقط عند الحاجة</td></tr>
+    <tr><td>المتصفح ليس نظام التشغيل</td><td>الأذونات، حدود الخلفية، متاجر التطبيقات — صمّم لها</td></tr>
+    <tr><td>التنقل ليس توجيهًا</td><td>الهاتف يستخدم مكدسات/تبويبات/أدراجًا؛ الويب يستخدم URLs. لا تُجبِر أحدهما على الآخر</td></tr>
+    <tr><td>أعراف المنصة مهمة</td><td>سحب-للرجوع في iOS، زر رجوع في Android، علبة نظام في الحاسوب المكتبي — المستخدمون يتوقعونها</td></tr>
+    <tr><td>حجم الحزمة ميزة</td><td>~150MB لـ Electron تكلفة حقيقية؛ فكّر في Tauri</td></tr>
+    <tr><td>النموذج الذهني لـ JS ينتقل</td><td>React والخطافات والحالة والمؤثرات — كلها متطابقة. المنصة حولها هي التي تتغير</td></tr>
+    <tr><td>لكل جسر تاريخ من الترقّق</td><td>جسر RN→JSI، وعزل Electron — اقرأ العمارة وتوقع التقلّب</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الخلاصة — قائمة الفحص الذهنية الكاملة</h2>
+
+<p>اطبع هذا. إنه الوثيقة كلها في عشرة أسطر:</p>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>المتصفح صندوق رمل (تصيير، أمان، توزيع). كل مضيف خارجي جسر عبر واحد من هذه.</td></tr>
+    <tr><td>2</td><td>اسأل: هل يحتاج المستخدم إلى تثبيت هذا، وهل يحتاج قدرات أصلية؟ لا/لا ← الويب.</td></tr>
+    <tr><td>3</td><td>تثبيت + أصلي + فريق JS ← React Native (Expo أولًا). تثبيت + حاسوب مكتبي + فريق JS ← Electron/Tauri.</td></tr>
+    <tr><td>4</td><td>React تنتقل كاملة (المكونات، الخطافات، الإيقاع). DOM وCSS وURLs هي ما يتغير.</td></tr>
+    <tr><td>5</td><td>عمارة RN هي قصة ترقّق الجسر: جسر JSON ← JSI/Fabric/TurboModules.</td></tr>
+    <tr><td>6</td><td>التنقل ليس توجيهًا: مكدسات/تبويبات/أدراج + ربط عميق تحل محل URLs.</td></tr>
+    <tr><td>7</td><td>التلفاز (Tizen/webOS) منصة تطبيقات ويب على ~300M شاشة — Chromium ثابت، AVPlay/EME، اعتماد لكل متجر.</td></tr>
+    <tr><td>8</td><td>مسار الألعاب في JS هو صندوق رمل اللعبة المصغرة بلا DOM + محركات المتصفح؛ مسار الكونسول الكبير ليس JS.</td></tr>
+    <tr><td>9</td><td>متاجر التطبيقات، الأذونات، دون اتصال، الدفع، الروابط العميقة، ورسوم IAP 30% تنطبق على كل منصة قابلة للتثبيت.</td></tr>
+    <tr><td>10</td><td>المشهد الأصلي يعيش في JavaScript Across Stacks <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§٤</a> — اربط إليه، لا تكرر.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2 id="sec-primary-sources">المصادر الأولية</h2>
+  <ol>
+    <li>وثائق React Native — <a href="https://reactnative.dev/architecture/landing-page">New Architecture</a> — JSI وFabric وTurboModules كبديل للجسر، وهي العمارة التي يقوم عليها <a href="#sec-react-native-the-mobile-bridge">§٤</a> في هذه الوثيقة.</li>
+    <li>وثائق Electron — <a href="https://www.electronjs.org/docs/latest/tutorial/process-model">Process Model</a> — تقسيم الرئيسي/العارض/IPC وقواعد الأمان (العزل، <code>nodeIntegration</code>).</li>
+    <li>Samsung Developer — <a href="https://developer.samsung.com/smarttv/develop/getting-started/creating-tv-applications.html">Creating TV Applications (Tizen)</a> — تطبيقات التلفاز كتطبيقات ويب، Chromium الثابت لكل سنة طراز، الاعتماد.</li>
+    <li>webOS TV Developer — <a href="https://webostv.developer.lge.com/">webOS TV development</a> — نموذج تطبيق الويب، إطار Enact (React)، دعم HLS، Luna Service API.</li>
+    <li>وثائق مطوّري ألعاب WeChat المصغرة — <a href="https://developers.weixin.qq.com/minigame/dev/guide/game-engine/engine-overview.html">engine adaptation overview</a> — صندوق رمل اللعبة المصغرة بلا DOM، قاعدة حزمة 4MB، محوّلات Cocos/Laya/Egret.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2 id="sec-ask-your-teacher">اسأل معلمك</h2>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«اشرح لي العمارة الجديدة لـ React Native من قاعدة كود حقيقية — أين بالضبط يلمس JSI كائن C++، وماذا ينكسر إذا تجاهلته؟»</li>
+    <li>«لديّ تطبيق Next.js. أرني الخطوات الفعلية للفّه في Capacitor لنظامي iOS/Android، وأي الأجزاء ستحتاج أن تصبح وحدات أصلية.»</li>
+    <li>«خذ مثال متتبع العادات وادفعه إلى Tizen — ماذا يتغير لتجربة الشاشة البعيدة المدفوعة بجهاز التحكم، وماذا يفحص الاعتماد فعلًا؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · ما بعد المتصفح — React Native وElectron وجسر المنصات</span>
+  <span>المنبع: <a href="./javascript-across-stacks.html">JS Across Stacks</a> · الإطار: <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> · وقت التشغيل: <a href="./react-2024-and-beyond.html">React 2024 &amp; Beyond</a> · النموذج: <a href="./how-developers-think-frontend.html">How Frontend Developers Think</a> · التصميم: <a href="./system-design.html">System Design</a> · المصطلحات: <a href="./glossary.html">مصطلحات مشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>

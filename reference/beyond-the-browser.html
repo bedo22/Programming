@@ -14,10 +14,13 @@
   <p class="kicker">Reference · Beyond the Browser — shipping installable software from a JS/React background</p>
   <h1>Beyond the Browser — React Native, Electron, and the Platform Bridge</h1>
   <p class="meta">For: the developer who knows web React and wants to know what happens when code leaves the browser — the decision, the bridges, and the platform constraints that don't exist on the web.</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>Language:</strong> English · <a href="./ar/beyond-the-browser.html">العربية</a>
+  </p>
 </header>
 
 <blockquote class="callout">
-  <p><strong>Where this fits.</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> surveys every host JS runs in — server, edge, embedded, mobile — and owns the mobile section's native-landscape tables. This doc is the installable-UI half of that story, told from a React developer's seat: the decision matrix, React Native's architecture, the desktop bridge, and the platform literacy you need to ship. It does NOT teach you Kotlin or Swift — that is a different career, and it is already mapped in the stacks doc's §4.</p>
+  <p><strong>Where this fits.</strong> <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> surveys every host JS runs in — server, edge, embedded, mobile — and owns the mobile section's native-landscape tables. This doc is the installable-UI half of that story, told from a React developer's seat: the decision matrix, React Native's architecture, the desktop bridge, and the platform literacy you need to ship. It does NOT teach you Kotlin or Swift — that is a different career, and it is already mapped in the stacks doc's <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§4</a>.</p>
 <pre>
 ┌───────────────────────────────────────────────────────────────────┐
 │   THE BROWSER (where you are)   ← HTML &amp; CSS, JS Language, React   │
@@ -82,19 +85,19 @@
 <table>
   <thead><tr><th>Host</th><th>Real-world tech</th><th>Where it lives</th><th>This doc</th></tr></thead>
   <tbody>
-    <tr><td><strong>Server / backend</strong></td><td>Node.js, Deno, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §3/§3b · <a href="./backend-engineering.html">Backend Engineering</a></td><td>—</td></tr>
-    <tr><td><strong>Edge / serverless / cloud</strong></td><td>Cloudflare Workers, Vercel Edge, Deno Deploy, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §7</td><td>—</td></tr>
-    <tr><td><strong>Embedded / IoT</strong></td><td>Espruino, low.js, Johnny-Five, Moddable</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §5 (RAM-floor table)</td><td>—</td></tr>
-    <tr><td><strong>AI application layer</strong></td><td>Transformers.js, TensorFlow.js, Vercel AI SDK</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §6</td><td>—</td></tr>
+    <tr><td><strong>Server / backend</strong></td><td>Node.js, Deno, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-backend-perspective">§3</a>/<a href="./javascript-across-stacks.html#sec-the-node-runtime-how-js-actually-behaves-on-a-server">§3b</a> · <a href="./backend-engineering.html">Backend Engineering</a></td><td>—</td></tr>
+    <tr><td><strong>Edge / serverless / cloud</strong></td><td>Cloudflare Workers, Vercel Edge, Deno Deploy, Bun</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-other-perspective-edge-serverless-build-tools">§7</a></td><td>—</td></tr>
+    <tr><td><strong>Embedded / IoT</strong></td><td>Espruino, low.js, Johnny-Five, Moddable</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-embedded-iot-perspective">§5</a> (RAM-floor table)</td><td>—</td></tr>
+    <tr><td><strong>AI application layer</strong></td><td>Transformers.js, TensorFlow.js, Vercel AI SDK</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-ai-data-science-perspective">§6</a></td><td>—</td></tr>
     <tr><td><strong>CLI / dev tools</strong></td><td>Claude Code, git, npm — anything with a <code>bin</code></td><td><a href="./terminal-applications.html">Terminal Applications</a> (the whole doc)</td><td>—</td></tr>
-    <tr><td><strong>Mobile</strong></td><td>React Native (Expo, bare), Capacitor, NativeScript</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> §4 (overview)</td><td><strong>Deep dive (§4 here)</strong></td></tr>
-    <tr><td><strong>Desktop</strong></td><td>Electron, Tauri, Neutralino, Wails</td><td>nothing</td><td><strong>Deep dive (§6 here)</strong></td></tr>
-    <tr><td><strong>Smart TV</strong></td><td>Samsung Tizen, LG webOS</td><td>nothing</td><td><strong>Full section (§8 here)</strong></td></tr>
-    <tr><td><strong>Gaming</strong></td><td>Cocos Creator, LayaAir, Egret, WeChat/TikTok mini-games</td><td>nothing</td><td><strong>Full section (§9 here)</strong></td></tr>
+    <tr><td><strong>Mobile</strong></td><td>React Native (Expo, bare), Capacitor, NativeScript</td><td><a href="./javascript-across-stacks.html">JS Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§4</a> (overview)</td><td><strong>Deep dive (<a href="#sec-react-native-the-mobile-bridge">§4</a> here)</strong></td></tr>
+    <tr><td><strong>Desktop</strong></td><td>Electron, Tauri, Neutralino, Wails</td><td>nothing</td><td><strong>Deep dive (<a href="#sec-electron-tauri-the-desktop-bridge">§6</a> here)</strong></td></tr>
+    <tr><td><strong>Smart TV</strong></td><td>Samsung Tizen, LG webOS</td><td>nothing</td><td><strong>Full section (<a href="#sec-smart-tv-tizen-webos-the-hidden-300m-screens">§8</a> here)</strong></td></tr>
+    <tr><td><strong>Gaming</strong></td><td>Cocos Creator, LayaAir, Egret, WeChat/TikTok mini-games</td><td>nothing</td><td><strong>Full section (<a href="#sec-gaming-the-js-lane-outside-the-browser">§9</a> here)</strong></td></tr>
   </tbody>
 </table>
 
-<p><strong>Duplication boundaries:</strong> the native-landscape tables (Kotlin/Compose, Swift/SwiftUI, Flutter) already live in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §4 — this doc links there instead of re-teaching them. The server, edge, embedded, and AI hosts are fully owned by the stacks doc — this doc only summarizes them in the map above. The CLIs host is a whole doc already.</p>
+<p><strong>Duplication boundaries:</strong> the native-landscape tables (Kotlin/Compose, Swift/SwiftUI, Flutter) already live in <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§4</a> — this doc links there instead of re-teaching them. The server, edge, embedded, and AI hosts are fully owned by the stacks doc — this doc only summarizes them in the map above. The CLIs host is a whole doc already.</p>
 
 <h2 id="sec-the-decision-matrix-when-to-use-what">The decision matrix — when to use what</h2>
 
@@ -342,7 +345,7 @@ const shadow = Platform.select({
 
 <h2 id="sec-the-native-landscape-link-don-t-duplicate">The native landscape — link, don't duplicate</h2>
 
-<p>You need to <em>understand</em> the native platforms your bridges target, but you don't need to learn to build in them. <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> §4 already carries the deep comparison tables for each native lane — Kotlin/Jetpack Compose (React Native compiles to native Android views; you write Kotlin only for custom native modules), Swift/SwiftUI (the iOS equivalent), and Dart/Flutter (Google's cross-platform alternative with its own renderer — you choose it for pixel-perfect cross-platform consistency, not native feel). If a native decision comes up, read that section; it is the authority, and this doc deliberately does not repeat it.</p>
+<p>You need to <em>understand</em> the native platforms your bridges target, but you don't need to learn to build in them. <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§4</a> already carries the deep comparison tables for each native lane — Kotlin/Jetpack Compose (React Native compiles to native Android views; you write Kotlin only for custom native modules), Swift/SwiftUI (the iOS equivalent), and Dart/Flutter (Google's cross-platform alternative with its own renderer — you choose it for pixel-perfect cross-platform consistency, not native feel). If a native decision comes up, read that section; it is the authority, and this doc deliberately does not repeat it.</p>
 
 <h2 id="sec-worked-example-a-habit-tracker-every-way">Worked example — a habit tracker, every way</h2>
 
@@ -441,14 +444,14 @@ history.pushState       →  router.push("/habit/123")
     <tr><td>7</td><td>TV (Tizen/webOS) is a web-app platform on ~300M screens — fixed Chromium, AVPlay/EME, per-store certification.</td></tr>
     <tr><td>8</td><td>Gaming's JS lane is the DOM-less mini-game sandbox + browser engines; the big console lane is not JS.</td></tr>
     <tr><td>9</td><td>App stores, permissions, offline, push, deep links, and 30% IAP fees apply to every installable platform.</td></tr>
-    <tr><td>10</td><td>The native landscape lives in JavaScript Across Stacks §4 — link there, don't duplicate.</td></tr>
+    <tr><td>10</td><td>The native landscape lives in JavaScript Across Stacks <a href="./javascript-across-stacks.html#sec-the-mobile-perspective">§4</a> — link there, don't duplicate.</td></tr>
   </tbody>
 </table>
 
 <section class="cite">
   <h2 id="sec-primary-sources">Primary sources</h2>
   <ol>
-    <li>React Native documentation — <a href="https://reactnative.dev/architecture/landing-page">New Architecture</a> — JSI, Fabric, and TurboModules as the bridge replacement, the architecture this doc's §4 rests on.</li>
+    <li>React Native documentation — <a href="https://reactnative.dev/architecture/landing-page">New Architecture</a> — JSI, Fabric, and TurboModules as the bridge replacement, the architecture this doc's <a href="#sec-react-native-the-mobile-bridge">§4</a> rests on.</li>
     <li>Electron documentation — <a href="https://www.electronjs.org/docs/latest/tutorial/process-model">Process Model</a> — the main/renderer/IPC split and the security rules (sandbox, <code>nodeIntegration</code>).</li>
     <li>Samsung Developer — <a href="https://developer.samsung.com/smarttv/develop/getting-started/creating-tv-applications.html">Creating TV Applications (Tizen)</a> — TV apps as web apps, fixed per-model-year Chromium, certification.</li>
     <li>webOS TV Developer — <a href="https://webostv.developer.lge.com/">webOS TV development</a> — web-app model, Enact (React) framework, HLS support, Luna Service API.</li>

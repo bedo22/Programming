@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التفكير الشامل (Full-Stack Thinking) — القرارات عند الفاصل</title>
+  <link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+
+<main>
+
+<header class="lesson-head">
+  <p class="kicker">مرجع · التفكير الشامل (Full-Stack Thinking) — أين يعيش المنطق والحالة والبيانات عبر الحدود</p>
+  <h1>التفكير الشامل (Full-Stack Thinking) والفاصل</h1>
+  <p class="meta">لمن: المطوّر الذي يبني كلا الجانبين ويصطدم باستمرار بأسئلة لا تجيب عنها وثائق الواجهة الأمامية ولا وثائق الواجهة الخلفية — أين يعيش هذا المنطق، وأين تعيش هذه الحالة، وكيف أتتبّع خطأً عبر الحدود؟</p>
+  <p class="meta" style="margin-bottom: 0">
+    <strong>اللغة:</strong> العربية · <a href="../full-stack.html">English</a>
+  </p>
+</header>
+
+<blockquote class="callout">
+  <p><strong>أين يقع هذا.</strong> كل وثيقة أخرى في الرفّ تجيب عن سؤال من جانب واحد: <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> تسأل «كيف يعالج الخادم الطلب؟»، و<a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> تسأل «كيف أبني هذا المكوّن؟». هذه الوثيقة هي <em>الفاصل</em> — المسافة بين الجانبين حيث لا تنتمي القرارات إلى أيٍّ منهما وحده. ليست «معرفة React وNode معًا». بل معرفة أين تقع الحدود، وما الذي يجري على كل جانب، وكيف تُحرَّك.</p>
+<pre>
+┌─────────────────────────────────────────────┐
+│   FRONTEND DOCS                              │
+│   HTML &amp; CSS · JS · React/Next.js ·         │
+│   How Developers Think · UI/UX               │
+│   "How do I build this component?"           │
+└─────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│   THE SEAM (THIS DOC)                        │
+│   "Where does this logic live?"              │
+│   "Where does this state live?"              │
+│   "How do I trace a bug across the boundary?"│
+│   "How do I test the full flow?"             │
+└─────────────────────────────────────────────┘
+                    ▲
+                    │
+┌─────────────────────────────────────────────┐
+│   BACKEND DOCS                               │
+│   Backend Engineering · SQL · Data Modeling  │
+│   "How does the server handle the request?"  │
+└─────────────────────────────────────────────┘
+   Full-stack is not the sum of both sides. It
+   is the decisions that only exist BETWEEN them.
+</pre>
+  <p><strong>الجيران في الرفّ:</strong> <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> (حلقة الخادم) · <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> (حلقة الواجهة الأمامية، بما فيها تصنيف الحالات) · <a href="./api-design.html">تصميم واجهات البرمجة (API)</a> (العقد) · <a href="./system-design.html">التصميم المعماري</a> (المعمارية وقواعد ملكية البيانات) · <a href="./nextjs-deep-dive.html">غوص عميق في Next.js</a> (مكوّنات الخادم مقابل مكوّنات العميل) · <a href="./software-testing-and-debugging.html">الاختبار والتصحيح</a> (مستويات الاختبار) · <a href="./security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> (فاصل المصادقة) · <a href="./glossary.html">المصطلحات</a></p>
+</blockquote>
+
+<h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
+
+<p>ترتيب القراءة: اقرأ التعريف (ما هو التفكير الشامل وما ليس هو — مفردات الحدود مهمة)، ثم رحلة الطلب الكاملة — الإطار الوحيد الذي بُنيَت عليه هذه الوثيقة — ثم أداتَي القرار الأساسيتين: «أين ينتمي هذا؟» و«الأشكال الثلاثة للبيانات». المثال العملي يربط كل شيء معًا. روابط متقاطعة:</p>
+<ul>
+  <li>الجانب الخادمي من الرحلة: <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> <a href="./backend-engineering.html#sec-the-request-lifecycle-the-timeline-inside-the-brackets">§١ب</a> — دورة حياة الطلب.</li>
+  <li>الجانب العميلي من الرحلة: <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> — حلقة الخيوط الثلاثة، و<a href="./how-developers-think-frontend.html#sec-frontend-state-decisions-the-taxonomy">§٥أ</a> لتصنيف الحالات.</li>
+  <li>العقد بين الجانبين: <a href="./api-design.html">تصميم واجهات البرمجة (API)</a>.</li>
+  <li>المعمارية فوق الاثنين معًا: <a href="./system-design.html">التصميم المعماري</a>، خاصة <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§٧</a> (ملكية البيانات).</li>
+  <li>مرجع: <a href="./glossary.html">المصطلحات</a>.</li>
+</ul>
+
+<p><strong>إذا سبق أن سلّمت ميزة من البداية إلى النهاية واصطدمت بالسؤال «انتظر — أين يُفترض أن يعيش هذا؟» — فهذه هي الخريطة.</strong> رحلة واحدة، جدولا قرارات، وانضباط تتبّع عبر الحدود.</p>
+
+<h2 id="sec-definition-what-full-stack-thinking-is-and-what-it-is-not">التعريف — ما هو التفكير الشامل (Full-Stack Thinking) وما ليس هو</h2>
+
+<p><strong>التفكير الشامل هو انضباط اتخاذ القرارات عند الفاصل بين الواجهة الأمامية والواجهة الخلفية.</strong> ليس «معرفة الجانبين معًا» — فهاتان مهارتان، لا مهارة واحدة. بل معرفة أين تقع الحدود، وما الذي ينتمي إلى كل جانب، وكيف تُحرَّك الحدود عندما تتطلّب الميزة ذلك.</p>
+
+<table>
+  <thead><tr><th>ليس هو</th><th>لماذا</th></tr></thead>
+  <tbody>
+    <tr><td>«معرفة React وNode معًا»</td><td>مهارتان تصادف أن تمتلكهما، وليس طريقة تفكير</td></tr>
+    <tr><td>التصميم المعماري (System Design)</td><td>هذا يقرّر <em>المعمارية</em>؛ والتفكير الشامل يقرّر أين يعيش المنطق <em>داخلها</em></td></tr>
+    <tr><td>تصميم واجهات البرمجة (API)</td><td>هذا يحدّد <em>العقد</em>؛ والتفكير الشامل يقرّر ما يجري على كل جانب منه</td></tr>
+    <tr><td>درس تعليمي لإطار عمل</td><td>هذه طبقة التفكير، لا طبقة التنفيذ</td></tr>
+  </tbody>
+</table>
+
+<p>الأسئلة التي تجيب عنها هذه الوثيقة هي التي لا يجيب عنها أي جانب وحده: <strong>«هل يجب جلب هذه البيانات على الخادم أم على العميل؟» «هل يجب أن يحدث هذا التحقق على جانب العميل، أم الخادم، أم كليهما؟» «هل يجب أن تعيش هذه الحالة في قاعدة البيانات، أم كاش الـ API، أم المكوّن؟» «كيف أتتبّع خطأً من الواجهة إلى قاعدة البيانات؟» «كيف أختبر التدفق الكامل؟»</strong> كل واحد من تلك الأسئلة هو سؤال فاصل.</p>
+<h2 id="sec-history-the-boundary-keeps-moving">التاريخ — الحدود تتحرك باستمرار</h2>
+
+<p><strong>تحرّكت حدود التفكير الشامل ثلاث مرات، وكل حركة أعادت تعريف معنى «full-stack»:</strong></p>
+
+<ul>
+  <li><strong>التقارب (1995–2005، LAMP).</strong> كان PHP يصرّف HTML <em>و</em> يتحدث إلى MySQL — لغة واحدة، عملية واحدة، والحدود بالكاد كانت موجودة. «مطوّر full-stack» كان يعني «يعرف PHP».</li>
+  <li><strong>الانفصال (2005–2015، AJAX → SPA).</strong> أصبح المتصفح منصة تطبيقات. انقسمت الواجهة الأمامية عن الخلفية، وأصبح الـ API هو الحدود، وتراجع الدور مع تخصّص الفرق — فقد «full-stack» معناه، ثم فقد ممارسيه.</li>
+  <li><strong>إعادة التقارب (2015–، React + Node → Next.js/RSC).</strong> جافاسكربت على الجانبين، ثم مكوّنات الخادم تطمس الخط مجددًا. الحدود الآن <em>قرار لكل ميزة</em> — هذه البيانات تُصرَّف على الخادم، ومعالج النقر هذا يعمل على العميل، والخط يتحرك ميزةً ميزة.</li>
+</ul>
+
+<p><strong>الدرس لهذه الوثيقة:</strong> الفاصل ليس جدارًا ثابتًا. لقد انجرف نحو المتصفح، ثم ابتعد عنه، ويُرسم الآن ميزةً ميزة. التفكير الشامل هو مهارة رسمه بشكل صحيح للميزة التي أمامك. (تطوّر حلقة الواجهة الأمامية نفسها مُغطّى في <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> <a href="./how-developers-think-frontend.html#sec-evolution-constraint-inversions-across-the-same-idea">§١ج</a>؛ والخط الخاص بـ Next.js في <a href="./nextjs-deep-dive.html">غوص عميق في Next.js</a> <a href="./nextjs-deep-dive.html#sec-history-the-10-year-line">§١ب</a>.)</p>
+
+<h2 id="sec-the-full-request-journey-the-frame-everything-hangs-on">رحلة الطلب الكاملة — الإطار الذي يُعلَّق عليه كل شيء</h2>
+
+<p>أهم نموذج ذهني في التفكير الشامل: <strong>تتبّع رحلة الطلب الكاملة.</strong> كل ميزة هي رحلة ذهاب وإياب، والأخطاء يمكن أن تعيش في أي نقطة فيها:</p>
+<pre>User clicks button
+  → Browser: event handler fires
+    → Component: state update, optimistic UI
+      → Network: HTTP request sent
+        → Server: route matched, middleware runs
+          → Handler: business logic executes
+            → Database: query runs, transaction commits
+          → Handler: response shaped
+        → Network: response returned
+      → Component: state update with server response
+    → Browser: re-render, paint
+  → User sees result
+</pre>
+<p>لا وثائق الواجهة الأمامية ولا وثائق الواجهة الخلفية تتتبّع الأمر كله. <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> تتوقف عند «المعالج يعيد استجابة»؛ ووثائق الواجهة الأمامية تتوقف عند «المكوّن يطلق استدعاء fetch». انضباط full-stack هو <strong>تتبّع رحلة الذهاب والإياب كاملة ومعرفة أي طبقة تشتبه بها أولًا من عَرَضٍ معيّن</strong>:</p>
+
+<table>
+  <thead><tr><th>العَرَض</th><th>أين قد يعيش الخطأ</th><th>كيف تتتبّعه</th></tr></thead>
+  <tbody>
+    <tr><td>يرى المستخدم بيانات قديمة</td><td>كاش العميل غير مُبطَل</td><td>افحص استراتيجية إبطال الكاش</td></tr>
+    <tr><td>يرى المستخدم بيانات خاطئة</td><td>الـ API يعيد شكلًا خاطئًا، أو استعلام قاعدة البيانات خاطئ</td><td>افحص استجابة الـ API، ثم استعلام قاعدة البيانات</td></tr>
+    <tr><td>النقر على الزر لا يفعل شيئًا</td><td>معالج أحداث العميل معطوب</td><td>وحدة تحكم المتصفح، تبويب الشبكة</td></tr>
+    <tr><td>بطء تحميل الصفحة</td><td>استعلام الخادم بطيء أو تصيير العميل بطيء</td><td>سجلات الخادم وأداء العميل معًا</td></tr>
+    <tr><td>خطأ 500</td><td>معالج الخادم انهار</td><td>سجلات الخادم، تتبّع المكدس</td></tr>
+    <tr><td>خطأ 401</td><td>الرمز منتهي أو غير صالح</td><td>انتهاء صلاحية الرمز، تدفق التجديد</td></tr>
+    <tr><td>حُفظت البيانات لكن الواجهة لم تتحدّث</td><td>التحديث المتفائل غير مُسوّى</td><td>منطق مزامنة حالة العميل</td></tr>
+  </tbody>
+</table>
+
+<p>المهارة التي يجب بناؤها: <strong>العَرَض يشير إلى طبقة؛ والتتبّع يؤكدها.</strong> هذه ليست مهارة واجهة أمامية ولا مهارة واجهة خلفية — إنها مهارة العيش عند الفاصل.</p>
+
+<h2 id="sec-where-does-this-belong-the-central-question">أين ينتمي هذا؟ — السؤال المركزي</h2>
+
+<p>كل قطعة منطق، وكل قطعة حالة، وكل قاعدة تحقق تحتاج إلى بيت. مطوّرو full-stack يجيبون عن هذا أكثر من أي سؤال آخر:</p>
+
+<table>
+  <thead><tr><th>الشيء</th><th>العميل؟</th><th>الخادم؟</th><th>قاعدة البيانات؟</th></tr></thead>
+  <tbody>
+    <tr><td>تحقق النموذج (البنية)</td><td>✅ تغذية راجعة فورية</td><td>✅ أمن</td><td>—</td></tr>
+    <tr><td>تحقق النموذج (قواعد العمل)</td><td>اختياري (تجربة المستخدم)</td><td>✅ مطلوب</td><td>✅ قيود</td></tr>
+    <tr><td>التفويض</td><td>—</td><td>✅ مطلوب</td><td>—</td></tr>
+    <tr><td>تحويل البيانات</td><td>اختياري (كاش)</td><td>✅ المرجع</td><td>—</td></tr>
+    <tr><td>الفرز / الترشيح</td><td>مجموعات بيانات صغيرة</td><td>مجموعات بيانات كبيرة</td><td>فهارس</td></tr>
+    <tr><td>الإجماليات المحسوبة</td><td>كاش عرض</td><td>✅ المرجع</td><td>—</td></tr>
+    <tr><td>حالة الواجهة (مرور المؤشر، التركيز، النافذة)</td><td>✅ فقط</td><td>—</td><td>—</td></tr>
+    <tr><td>حالة المجال (السلة، المستخدم)</td><td>كاش</td><td>✅ المرجع</td><td>✅ مصدر الحقيقة</td></tr>
+    <tr><td>الإعدادات (Configuration)</td><td>بيئة وقت التشغيل</td><td>✅ المرجع</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<p><strong>القاعدة:</strong> الخادم هو مصدر الحقيقة لحالة المجال؛ والعميل هو مصدر الحقيقة لحالة الواجهة؛ وقاعدة البيانات هي مصدر الحقيقة للبيانات الدائمة؛ وكل شيء آخر هو كاش. النصف الخادمي من سؤال الملكية هذا — من يكتب ماذا، في نظام من الخدمات — موجود في <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§٧</a> (ملكية البيانات، الكاتب الوحيد). هذه الوثيقة هي النسخة الخاصة بكل ميزة من السؤال نفسه.</p>
+
+<h2 id="sec-state-across-the-boundary-who-owns-what-and-how-the-copies-sync">الحالة عبر الحدود — من يملك ماذا، وكيف تتزامن النسخ</h2>
+
+<p>تصنيف حالات الجانب العميلي (حالة الواجهة، بيانات الخادم، الكاش، حالة النموذج، حالة الرابط، الحالة المشتقة) مُغطّى بالكامل في <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> <a href="./how-developers-think-frontend.html#sec-frontend-state-decisions-the-taxonomy">§٥أ</a> — بما في ذلك القاعدة التي تقول إن بيانات الخادم تنتمي إلى طبقة استعلام/كاش، لا إلى <code>useState</code> عادي. هذه الوثيقة تضيف الجزء الذي تتوقف عنده تلك الوثيقة: <strong>ما الذي يحدث عند الحدود عندما يكون لقطعة بيانات بيتان.</strong></p>
+
+<table>
+  <thead><tr><th>نوع الحالة</th><th>أين تعيش</th><th>من يملكها</th><th>آلية المزامنة</th></tr></thead>
+  <tbody>
+    <tr><td>حالة الواجهة (مرور المؤشر، التركيز، النافذة)</td><td>المكوّن</td><td>العميل فقط</td><td>لا حاجة</td></tr>
+    <tr><td>حالة النموذج (إدخال مسودّة)</td><td>المكوّن</td><td>العميل فقط</td><td>إرسال إلى الخادم</td></tr>
+    <tr><td>بيانات الخادم (الملف الشخصي، الطلبات)</td><td>قاعدة البيانات</td><td>الخادم</td><td>جلب/كاش على العميل</td></tr>
+    <tr><td>الكاش (استجابات الـ API)</td><td>ذاكرة العميل</td><td>العميل</td><td>استراتيجية الإبطال</td></tr>
+    <tr><td>الجلسة / المصادقة</td><td>الرمز/ملف تعريف الارتباط</td><td>الخادم يصدر، العميل يخزّن</td><td>تجديد الرمز</td></tr>
+    <tr><td>التحديثات اللحظية</td><td>دفع من الخادم</td><td>الخادم</td><td>WebSocket / SSE / استطلاع</td></tr>
+    <tr><td>التحديثات المتفائلة</td><td>العميل</td><td>العميل</td><td>التسوية مع استجابة الخادم</td></tr>
+  </tbody>
+</table>
+
+<p><strong>وظيفة full-stack لكل قطعة بيانات:</strong> أين مصدر الحقيقة، وكيف تبقى النسخ الأخرى متزامنة؟ ثلاث آليات مزامنة تهيمن، والاختيار بينها هو قرار الفاصل بحد ذاته:</p>
+
+<ul>
+  <li><strong>متفائل</strong> — العميل يفترض النجاح، يحدّث فورًا، ويسوّي عندما يستجيب الخادم (أو يتراجع عند الخطأ). الأفضل عندما نادرًا ما يرفض الخادم وعندما يكون زمن الاستجابة مهمًا.</li>
+  <li><strong>إعادة الجلب</strong> — العميل ينتظر إجابة الخادم ثم يعيد التصيير. الأبسط، صحيح دائمًا، والأبطأ في إظهار التغذية الراجعة.</li>
+  <li><strong>الإبطال</strong> — بعد عملية كتابة، علّم النسخة المخزنة مؤقتًا بأنها قديمة ليعيد الجلبُ التالي قراءتها. الطريق الأوسط: واجهة سريعة، بيانات صحيحة، مزيد من الآليات (مفاتيح الكاش، وسوم).</li>
+</ul>
+<h2 id="sec-the-three-shapes-of-data-same-thing-three-forms">الأشكال الثلاثة للبيانات — الشيء نفسه في ثلاثة أشكال</h2>
+
+<p>البيانات نفسها لها ثلاثة أشكال مختلفة وهي تعبر المكدس، والتحويلات بينها هي حيث تعيش أخطاء full-stack:</p>
+
+<table>
+  <thead><tr><th>الطبقة</th><th>الشكل</th><th>مثال</th></tr></thead>
+  <tbody>
+    <tr><td>قاعدة البيانات</td><td>صفوف مطبّعة مع مفاتيح أجنبية</td><td><code>orders</code>, <code>order_items</code>, <code>products</code></td></tr>
+    <tr><td>الـ API</td><td>JSON غير مطبّع مع كائنات متداخلة</td><td><code>{ order: { id, items: [{ product: { name } }] } }</code></td></tr>
+    <tr><td>المكوّن</td><td>حالة مسطّحة محسّنة للتصيير</td><td><code>{ orderItems: [{ productName, quantity, total }] }</code></td></tr>
+  </tbody>
+</table>
+
+<p>كل طبقة تشكّل البيانات لمهمتها الخاصة: قاعدة البيانات تطبّع من أجل <em>السلامة</em> (حقيقة واحدة، صف واحد، بلا تكرار)؛ والـ API يزيل التطبيع من أجل <em>الراحة</em> (طلب واحد يعيد الرسم البياني كاملًا)؛ والمكوّن يسطّح من أجل <em>التصيير</em> (ما يحتاجه القالب، محسوبًا مسبقًا).</p>
+
+<p><strong>من يملك كل تحويل:</strong> تشكيل قاعدة البيانات ← الـ API هو وظيفة الخادم (المعالج يبني شكل الاستجابة — انظر <a href="./api-design.html">تصميم واجهات البرمجة (API)</a>)؛ وتشكيل الـ API ← المكوّن هو حيث تطبّع طبقة استعلام (React Query/SWR) أو محدد (selector) JSON المتداخل إلى حالة مسطّحة؛ وتشكيل المكوّن ← قاعدة البيانات يحدث عند الكتابة، عندما يسطّح نموذج إلى حمولة (payload). تقرير خطأ يقول «البيانات تبدو خاطئة في الواجهة لكن قاعدة البيانات سليمة» هو دائمًا تقريبًا أحد هذه التحويلات يفعل الشيء الخاطئ — ولهذا يبدأ تتبّع الرحلة (<a href="#sec-the-full-request-journey-the-frame-everything-hangs-on">§٢</a>) من العَرَض ويمشي عبر الأشكال.</p>
+
+<h2 id="sec-tracing-and-testing-across-the-boundary">التتبّع والاختبار عبر الحدود</h2>
+
+<p>مستويات الاختبار التي تعبر الفاصل — التكامل، والعقد، والنهاية إلى النهاية — مُغطّاة بالكامل بالفعل في <a href="./software-testing-and-debugging.html">الاختبار والتصحيح</a> <a href="./software-testing-and-debugging.html#sec-testing-levels-from-one-unit-to-the-whole-system">§٢</a>، بما في ذلك قاعدة استخدام أدنى مستوى ينتج أدلة جديرة بالثقة. الجزء الخاص بـ full-stack هو معرفة الاختبارات التي <em>تملكها أنت</em>، لأن لا فريق الواجهة الأمامية ولا فريق الواجهة الخلفية يملكها وحده:</p>
+
+<table>
+  <thead><tr><th>نوع الاختبار</th><th>ما يغطيه</th><th>من يملكه</th></tr></thead>
+  <tbody>
+    <tr><td>اختبارات الوحدة (واجهة أمامية)</td><td>منطق المكوّنات، الأدوات المساعدة</td><td>الواجهة الأمامية</td></tr>
+    <tr><td>اختبارات الوحدة (واجهة خلفية)</td><td>منطق العمل، أدوات التحقق</td><td>الواجهة الخلفية</td></tr>
+    <tr><td>اختبارات التكامل</td><td>نقطة نهاية الـ API ← قاعدة البيانات</td><td>الواجهة الخلفية</td></tr>
+    <tr><td><strong>اختبارات العقد</strong></td><td>عقد الـ API يطابق توقعات العميل</td><td><strong>Full-stack</strong></td></tr>
+    <tr><td><strong>اختبارات E2E</strong></td><td>التدفق الكامل: نقر ← API ← قاعدة بيانات ← استجابة ← واجهة</td><td><strong>Full-stack</strong></td></tr>
+    <tr><td><strong>اختبارات الأداء</strong></td><td>زمن استجابة الرحلة الكاملة</td><td><strong>Full-stack</strong></td></tr>
+  </tbody>
+</table>
+
+<p><strong>مطوّر full-stack يملك الاختبارات التي تعبر الحدود.</strong> اختبارات العقد (اتفاقية المزوّد/المستهلك — انظر <a href="./api-design.html">تصميم واجهات البرمجة (API)</a> و<a href="./software-testing-and-debugging.html">الاختبار والتصحيح</a>) تلتقط فشل «تطوّرت الواجهة الأمامية والخلفية بشكل مستقل»؛ واختبارات E2E تلتقط انكسار الرحلة؛ واختبارات الأداء تلتقط تحسينًا في جانب واحد جعل الجانب الآخر أسوأ.</p>
+
+<h2 id="sec-the-security-seam-the-client-is-untrusted">فاصل الأمن — العميل غير موثوق</h2>
+
+<p>المعالجة الكاملة للأمن موجودة في <a href="./security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> (قسم إدارة الهوية والوصول (IAM) للرموز والجلسات وملفات تعريف الارتباط) وفي <a href="./nextjs-deep-dive.html">غوص عميق في Next.js</a> <a href="./nextjs-deep-dive.html#sec-auth-env-and-security-frontend-adjacent">§١٠</a> للأجزاء المجاورة للواجهة الأمامية. القاعدة الشاملة (full-stack) التي تربطها معًا قصيرة: <strong>العميل غير موثوق؛ والخادم هو نقطة التنفيذ.</strong></p>
+
+<table>
+  <thead><tr><th>الاهتمام</th><th>جانب العميل</th><th>جانب الخادم</th></tr></thead>
+  <tbody>
+    <tr><td>المصادقة</td><td>خزّن الرمز بأمان</td><td>تحقق منه، وأصدر الجلسة</td></tr>
+    <tr><td>التفويض</td><td>أخفِ واجهة لا يستطيع المستخدم الوصول إليها</td><td>نفّذ الوصول على كل طلب</td></tr>
+    <tr><td>تحقق المدخلات</td><td>تغذية راجعة فورية لخبرة المستخدم</td><td>فحص أمني مطلوب</td></tr>
+    <tr><td>الأسرار</td><td>أبدًا في حزمة العميل</td><td>متغيرات البيئة، على جانب الخادم</td></tr>
+  </tbody>
+</table>
+
+<p>العميل يخفي من أجل خبرة المستخدم؛ والخادم ينفّذ من أجل الأمن. كلاهما مطلوب؛ ولا يكفي أيٌّ منهما وحده — أي شخص يستطيع استدعاء الـ API مباشرة، لذا فإن إخفاء واجهة العميل هو زينة، وتحقق الخادم هو البوابة الفعلية.</p>
+
+<h2 id="sec-worked-example-tracing-one-feature-across-the-seam">مثال عملي — تتبّع ميزة واحدة عبر الفاصل</h2>
+<pre>Feature: "Add to cart." One journey, five seam decisions.
+
+1 · Where does the data live?
+      cart contents = domain state → database (source of truth),
+      server-owned. Client keeps a cache for instant display.
+
+2 · Where does the validation live?
+      "is this product in stock?" = business rule → server +
+      database constraint (stock &gt; 0). Client only validates
+      the obvious (quantity ≥ 1) for instant feedback.
+
+3 · How does the UI update?
+      Optimistic: the client adds the item instantly, then
+      reconciles. If the server rejects (out of stock), roll
+      back and show the error. → the optimistic/invalidate
+      sync decision from §4.
+
+4 · How do I test it?
+      Contract test: the /cart POST response matches what the
+      client expects. E2E test: click → network → server →
+      database → response → badge updates.
+
+5 · Where does a bug at each layer show up?
+      "Badge didn't update"      → optimistic sync (§4)
+      "Item reappears on refresh" → server didn't persist (§1)
+      "Shows in stock, isn't"    → server validated stock on a
+                                   stale read (the database
+                                   constraint is the real gate)
+
+Tracing rule: the symptom names the layer, the journey walks
+it back. Same as the table in §2 — this feature is that table
+made concrete.
+</pre>
+<h2 id="sec-most-common-failure-modes-the-seam-anti-patterns">أنماط الفشل الأكثر شيوعًا — الأنماط المضادة للفاصل</h2>
+
+<table>
+  <thead><tr><th>نمط الفشل</th><th>شكله</th><th>الإصلاح</th></tr></thead>
+  <tbody>
+    <tr><td>تسريب التجريد</td><td>أسماء أعمدة قاعدة البيانات تظهر في المكوّن</td><td>الـ API يشكّل البيانات؛ والواجهة لا ترى المخطط أبدًا</td></tr>
+    <tr><td>العميل كمصدر حقيقة</td><td>حالة العميل هي البيانات المرجعية</td><td>الخادم هو المرجع؛ والعميل يحمل كاشًا يمكن تحديثه</td></tr>
+    <tr><td>الخادم كمخزن لحالة الواجهة</td><td>الخادم يخزّن «هل النافذة مفتوحة»</td><td>حالة الواجهة تعيش في المكوّن؛ والخادم يخزّن حالة المجال</td></tr>
+    <tr><td>التحقق على العميل فقط</td><td>الخادم يثق بمدخلات العميل</td><td>أي شخص يستطيع استدعاء الـ API مباشرة — يجب على الخادم التحقق</td></tr>
+    <tr><td>التحقق على الخادم فقط</td><td>لا تغذية راجعة فورية للمستخدم</td><td>العميل يتحقق من أجل السرعة، والخادم من أجل الأمان — كلاهما</td></tr>
+    <tr><td>لا عقد بين الجانبين</td><td>الواجهة الأمامية والخلفية تتطوّران بشكل مستقل</td><td>اختبارات العقد في CI على مستودعي المنتِج والمستهلك معًا</td></tr>
+    <tr><td>نقطة نهاية شاملة (God endpoint)</td><td>نقطة نهاية واحدة تعيد كل شيء</td><td>نقاط نهاية ضيقة مع كاش، وترقيم صفحات، وتحكم بالوصول</td></tr>
+    <tr><td>تحديث متفائل لا يُسوّى أبدًا</td><td>الواجهة تظهر نجاحًا رفضه الخادم</td><td>سوِّ مع استجابة الخادم؛ وتراجع عند الخطأ</td></tr>
+    <tr><td>عدم تطابق الإصدار</td><td>الواجهة الأمامية تستدعي v2، والواجهة الخلفية ما زالت تقدّم v1 — حقول خاطئة بصمت</td><td>أصدر (Version) الـ API واختبر العقد مقابل النسخة الحية (<a href="./api-design.html">تصميم واجهات البرمجة (API)</a> <a href="./api-design.html#sec-schema-evolution-the-compatibility-matrix">§٨ز</a>)</td></tr>
+    <tr><td>عدم تطابق صيغة السلك</td><td>الـ API يرسل <code>snake_case</code>، والمكوّن يقرأ <code>camelCase</code> — حقول تختفي وقت التشغيل</td><td>وحّد عقد السلك؛ وولّد أنواعًا مشتركة من المخطط (<a href="./api-design.html">تصميم واجهات البرمجة (API)</a> <a href="./api-design.html#sec-schema-evolution-the-compatibility-matrix">§٨</a>)</td></tr>
+    <tr><td>إعادة استخدام مفتاح التساوي الذاتي</td><td>إعادة المحاولة تستخدم مفتاحًا واحدًا لنية مختلفة؛ فيزيل الخادم تكرار العملية الخاطئة</td><td>مفتاح تساوي ذاتي واحد لكل نية عملية، جديد عند كل إعادة محاولة (<a href="./api-design.html">تصميم واجهات البرمجة (API)</a>، دلالات العمليات)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-principles">المبادئ</h2>
+
+<table>
+  <thead><tr><th>المبدأ</th><th>لماذا</th></tr></thead>
+  <tbody>
+    <tr><td>الخادم هو مصدر الحقيقة لحالة المجال</td><td>العميل يستطيع التحديث؛ والخادم لا يمكن أن يخطئ مرتين</td></tr>
+    <tr><td>العميل هو مصدر الحقيقة لحالة الواجهة</td><td>رحلة ذهاب وإياب لسؤال «هل النافذة مفتوحة» هي إهدار خالص</td></tr>
+    <tr><td>قاعدة البيانات هي مصدر الحقيقة للثبات</td><td>القيود تتفوق على كود التطبيق كخط الدفاع الأخير</td></tr>
+    <tr><td>كل شيء آخر هو كاش</td><td>الكاش هو نسخة العميل من حقيقة الخادم — يحتاج استراتيجية إبطال</td></tr>
+    <tr><td>تحقق في كل طبقة</td><td>العميل من أجل السرعة، والخادم من أجل الأمان، وقاعدة البيانات من أجل السلامة</td></tr>
+    <tr><td>تتبّع الرحلة الكاملة، لا جانبًا واحدًا</td><td>العَرَض يسمّي الطبقة؛ والتتبّع الكامل وحده يؤكدها</td></tr>
+    <tr><td>املك الاختبارات التي تعبر الحدود</td><td>اختبارات العقد وE2E والأداء ليست ملك أحد غيرك</td></tr>
+    <tr><td>العميل غير موثوق</td><td>نفّذ على الخادم؛ والعميل يوفّر خبرة المستخدم فقط</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الملخص — قائمة الفحص الذهنية الكاملة</h2>
+
+<p>اطبع هذه. إنها الوثيقة كلها في عشرة أسطر:</p>
+
+<table>
+  <thead><tr><th>#</th><th>السطر</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>التفكير الشامل هو قرارات عند الفاصل — لا «معرفة React وNode معًا».</td></tr>
+    <tr><td>2</td><td>تتبّع رحلة الطلب الكاملة: نقر ← مكوّن ← شبكة ← خادم ← قاعدة بيانات ← عودة.</td></tr>
+    <tr><td>3</td><td>الأخطاء يمكن أن تعيش في أي نقطة من الرحلة — العَرَض يسمّي الطبقة، والتتبّع يؤكدها.</td></tr>
+    <tr><td>4</td><td>أين ينتمي هذا؟ الخادم = حالة المجال، العميل = حالة الواجهة، قاعدة البيانات = الثبات، الباقي = كاش.</td></tr>
+    <tr><td>5</td><td>كل نسخة بيانات عبر الحدود تحتاج آلية مزامنة: متفائل، أو إعادة جلب، أو إبطال.</td></tr>
+    <tr><td>6</td><td>للبيانات ثلاثة أشكال — صفوف مطبّعة، JSON غير مطبّع، حالة مكوّن مسطّحة — والتحويلات هي حيث تعيش الأخطاء.</td></tr>
+    <tr><td>7</td><td>املك اختبارات عبور الحدود: العقد، وE2E، والأداء.</td></tr>
+    <tr><td>8</td><td>العميل غير موثوق؛ والخادم هو نقطة التنفيذ. تحقق في كل طبقة.</td></tr>
+    <tr><td>9</td><td>العميل يخفي من أجل خبرة المستخدم؛ والخادم ينفّذ من أجل الأمن. كلاهما، لا واحد.</td></tr>
+    <tr><td>10</td><td>عند الشك، تتبّع ميزة واحدة من البداية إلى النهاية — الرحلة تجيب عن أسئلة الملكية.</td></tr>
+  </tbody>
+</table>
+
+<section class="cite">
+  <h2 id="sec-primary-sources">المصادر الأولية</h2>
+  <ol>
+    <li>Fowler, Martin — <a href="https://martinfowler.com/bliki/TwoHardThings.html">TwoHardThings</a> — إبطال الكاش سُمّي المشكلة الصعبة في full-stack التي وُجدت آليات المزامنة في هذه الوثيقة (<a href="#sec-state-across-the-boundary-who-owns-what-and-how-the-copies-sync">§٤</a>) لحلّها.</li>
+    <li>توثيق React Query — <a href="https://tanstack.com/query/latest">TanStack Query</a> — أنماط المتفائل/الإبطال/إعادة الجلب كممارسة مطبّقة.</li>
+    <li>مراجع DDD في <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">§٧</a> — قواعد ملكية البيانات والسياق المحدود التي يعتمد عليها <a href="#sec-where-does-this-belong-the-central-question">§٣</a> في هذه الوثيقة.</li>
+    <li>OWASP — <a href="https://owasp.org/www-community/controls/Input_Validation_Cheat_Sheet">Input Validation Cheat Sheet</a> — «تحقق على الخادم، دائمًا» كقاعدة التنفيذ خلف <a href="#sec-the-security-seam-the-client-is-untrusted">§٧</a>.</li>
+  </ol>
+</section>
+
+<section class="teacher">
+  <h2 id="sec-ask-your-teacher">اسأل معلمك</h2>
+  <p>ثلاث متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«خذ مثال "أضف إلى السلة" العملي وأرني الميزة نفسها حيث تختلف إجابة "أين يعيش هذا؟" — متى تنتقل السلة إلى العميل فقط أو قاعدة البيانات فقط؟»</li>
+    <li>«امشِ معي في خطأ full-stack حقيقي: يرى المستخدم بيانات قديمة في الواجهة، وقاعدة البيانات صحيحة. أرِني الطبقات التي أفحصها بالترتيب، وشكل الإصلاح في كل طبقة.»</li>
+    <li>«قارن المتفائل وإعادة الجلب والإبطال لنفس الواجهة — ما تكلفة كلٍّ في الكود والصحة وإدراك المستخدم؟»</li>
+  </ul>
+</section>
+
+<footer class="lesson-foot">
+  <span><a href="../../index.html">← العودة إلى الفهرس</a></span>
+  <span>مرجع · التفكير الشامل (Full-Stack Thinking) — القرارات عند الفاصل</span>
+  <span>الواجهة الأمامية: <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> · العقد: <a href="./api-design.html">تصميم واجهات البرمجة (API)</a> · الواجهة الخلفية: <a href="./backend-engineering.html">هندسة الواجهة الخلفية</a> · المعمارية: <a href="./system-design.html">التصميم المعماري</a> · الاختبارات: <a href="./software-testing-and-debugging.html">الاختبار والتصحيح</a> · الأمن: <a href="./security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> · المصطلحات: <a href="./glossary.html">مصطلحات مشتركة</a></span>
+</footer>
+
+</main>
+<script src="../../assets/lesson.js"></script>
+</body>
+</html>
