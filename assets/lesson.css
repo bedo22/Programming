@@ -135,6 +135,14 @@ footer.lesson-foot{
 
 @media print{
   body{background:#fff; padding:1.5rem}
-  .quiz, .predict{break-inside:avoid}
+  .quiz, .predict, .dd-figure{break-inside:avoid}
   a{color:var(--ink); text-decoration:none}
 }
+
+/* Editorial diagrams (diagram-design skill) */
+.dd-figure{margin:1.6rem 0; padding:.65rem; background:var(--paper-warm,#fff);
+  border:1px solid var(--rule,rgba(45,49,66,.12)); border-radius:8px}
+.dd-figure .dd-svg{display:block; width:100%; height:auto}
+.dd-figure figcaption{margin-top:.5rem; font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.85rem; color:var(--ink, #8a8f98); line-height:1.5}
+.dd-figure figcaption strong{color:var(--ink, #2d3142)}
