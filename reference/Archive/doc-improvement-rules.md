@@ -50,8 +50,14 @@ before touching it. Record:
 6. **What theory underpins the method?** (the causal chain: why does
    this approach work? What cognitive science, historical evidence, or
    domain logic supports it?)
+7. **What mental model does this doc give the reader?** (the internal
+   representation they'll carry away — not the rules, but the framework
+   for deriving rules. "Trade-offs are everywhere" is a mental model.
+   "Use DRY" is a rule.)
+8. **What boundary conditions does each technique have?** (when does it
+   work, when does it fail, what assumptions does it make?)
 
-If you can't answer these six, you don't understand the doc well enough
+If you can't answer these eight, you don't understand the doc well enough
 to improve it.
 
 ## Phase 2 — Analyse the narrative
@@ -158,24 +164,38 @@ Pay special attention to "why" questions:
 - "Why does this fail?" → needs a causal answer
 - "Why should I care?" → needs a motivational answer (the stakes)
 
-### Missing theory
+### Missing theory — two kinds
 
-Every method should have a supporting "why." Check:
+Every method should have a supporting "why." But "why" comes in two
+forms, and both are needed:
 
+**Causal mechanism** — *why does this technique work?*
+- "Use a hash map for counting" is a rule.
+- "Use a hash map because O(1) lookup eliminates the nested scan" is
+  knowledge. The mechanism is the "why."
+- Check: does the method explain *what would go wrong without it?*
+  If you can remove the technique and nothing breaks, the "why" is weak.
+
+**Conceptual framework** — *what kind of problem is this for?*
+- "Use DRY" is a rule.
+- "DRY applies to knowledge duplication, not code duplication — two
+  functions that look identical but serve different business rules
+  should stay separate" is a framework. It tells you the *boundary*
+  of the rule.
+- Check: does the reader know *when this technique applies and when
+  it doesn't?* If the answer is "always" or "never," the framework
+  is missing.
+
+Also check:
 - **Does the method cite its evidence?** "Studies show X" without a
   citation is a claim, not knowledge. Link to the source.
-- **Does the method explain its mechanism?** "Use a hash map for counting"
-  is a rule. "Use a hash map because O(1) lookup eliminates the nested
-  scan" is knowledge. The mechanism is the "why."
-- **Does the method connect to a larger framework?** "Write Input/Operation/
-  Output" is a technique. "Write Input/Operation/Output because it
-  offloads working memory to an external representation (Miller 1956)"
-  is a technique grounded in theory. The connection makes it memorable.
+- **Does the method connect to a larger framework?** "Write Input/
+  Operation/Output" is a technique. "Write I/O/O because it offloads
+  working memory to an external representation (Miller 1956)" is a
+  technique grounded in theory. The connection makes it memorable.
 - **Is the theory explained at the right level?** Not every doc needs a
   full cognitive science lecture. But every doc should have at least a
-  one-sentence "why" for each major technique. The reader should finish
-  knowing *why* the method works, even if they don't know the full
-  theoretical apparatus.
+  one-sentence "why" for each major technique.
 
 ### Missing sections
 
@@ -192,6 +212,40 @@ Check against the house template's spine order:
 
 If a doc is missing a standard section, ask whether it should have one.
 Not every doc needs every section — but the absence should be deliberate.
+
+### Missing boundary conditions
+
+Every technique has conditions where it works and conditions where it
+fails. Check:
+
+- **Does each technique have a "when NOT to use" clause?** "Use DRY"
+  is incomplete without "but not for two functions that look identical
+  but represent different business rules." "Use greedy" is incomplete
+  without "but prove the exchange argument first."
+- **Does each technique state its assumptions?** "Use binary search"
+  assumes sorted input. "Use BFS for shortest path" assumes unweighted
+  edges. If the assumption isn't stated, the reader will misapply it.
+- **Does each technique have a failure mode?** Not just "what goes wrong
+  in general" but "what goes wrong when you apply this technique in the
+  wrong context?"
+
+### Missing transfer conditions
+
+The ultimate test: can the reader apply this to a situation the doc
+doesn't cover?
+
+- **Does the doc teach the pattern, or just the example?** "Count word
+  frequencies using a hash map" teaches an example. "Count occurrences
+  of any token using a map from token to count" teaches a pattern. The
+  pattern transfers; the example doesn't.
+- **Does the doc give the reader a way to recognize *new* instances?**
+  "This is a hash-map problem because the operation is counting" is
+  recognition. "Use a hash map" is a rule. Recognition transfers;
+  rules don't.
+- **Does the worked example show *why* the method produced the result,
+  not just *that* it did?** The reader should be able to trace the
+  causal chain: "it worked because O(1) lookup eliminated the nested
+  scan." If they can only say "it worked," the mental model failed.
 
 ### Missing depth
 
@@ -247,6 +301,23 @@ When moving content, leave a pointer in the original:
   toolkit it reaches for.
 </p>
 ```
+
+### Landscape awareness
+
+Beyond ownership, check whether the reader understands the *conceptual
+landscape*:
+
+- **Does the doc place its techniques in a family?** "Hash-map counting
+  is a special case of the frequency pattern" is landscape awareness.
+  "Use a hash map" is an isolated rule. The family helps the reader
+  recognize related techniques.
+- **Does the doc show *why* one technique was chosen over another?**
+  "We used DP because the sub-problems overlap" is landscape awareness.
+  "Use DP" is a rule. The choice reasoning helps the reader make their
+  own choices.
+- **Does the doc distinguish *similar but different* techniques?**
+  "D&C is for independent sub-problems; DP is for overlapping ones" is
+  a conceptual boundary. Without it, the reader confuses the two.
 
 ### Boundary clarity
 
@@ -332,6 +403,12 @@ After all changes:
 10. Every cross-reference points to the owning doc
 11. **Every major technique has a "why"** — the reader finishes knowing
     why the method works, not just what the method is
+12. **Every major technique has boundary conditions** — the reader knows
+    when to use it AND when NOT to use it
+13. **The doc builds a mental model, not just a rule set** — the reader
+    can derive rules from the framework, not just follow them
+14. **Transfer test: could the reader apply this to an uncovered case?**
+    If the reader can only solve the examples shown, the doc failed
 
 ## What NOT to do
 
