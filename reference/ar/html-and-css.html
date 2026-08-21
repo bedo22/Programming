@@ -13,8 +13,9 @@
   <p class="kicker">مرجع · هندسة المنصة — الطبقة بين المتصفح والمكون</p>
   <h1>HTML و CSS — طبقة المنصة بين المتصفح والمكون</h1>
   <p class="meta">العقد الذي ينفذه المتصفح: بنية المستند، التدرج، التخطيط، السمات، وشجرة إمكانية الوصول. وثائق شقيقة: <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> (انضباط العرض الذي يعيش داخل هذه الركيزة)، <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> (حلقة التنفيذ التي تستهلك هذه العناصر الأولية)، <a href="./javascript-the-language.html">JavaScript: اللغة</a> (اللغة التي تتلاعب بهذه الركيزة)، <a href="./system-design.html">التصميم المعماري</a> (الطبقة المعمارية التي تعمل استراتيجية عرضها على هذه المنصة)، <a href="./frontend-camps-survey.html">مسح معسكرات الواجهات الأمامية</a> (خيارات الأطر تستخلص هذه الطبقة بشكل مختلف).</p>
+        <p class="meta"><strong>لمن هذه الوثيقة:</strong> المطوّرون الذين يكتبون أول مكوّناتهم الإنتاجية بـ HTML/CSS — وكل من أرسل يومًا انزياح تخطيط، أو حرب تحديدية، أو <code><div onclick></code> غير قابل للوصول. تفترض معرفة أساسية بالويب ولا تتطلب معرفة بإطار عمل.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../html-and-css.html">English</a>
+          <strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../html-and-css.html">English</a>
         </p>
       </header>
 
@@ -27,7 +28,7 @@
 
 <p>ترتيب القراءة: مستقل. روابط تقاطعية:</p>
 <ul>
-  <li>أعلى إلى <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> — UI/UX يقرر ما <em>يجب أن يكون</em> الشيء المعروض؛ HTML و CSS هي الركيزة التي يعرض <em>عليها</em>. مصفوفة رؤية الحالة (<a href="./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns">§9 في UI/UX</a>) تُرسم مباشرة إلى حالات HTML (<code>aria-busy</code>، <code>aria-invalid</code>) وحالات CSS (<code>:hover</code>، <code>:focus-visible</code>، <code>[data-loading]</code>).</li>
+  <li>أعلى إلى <a href="./ui-ux-web-design.html">تصميم UI/UX والويب</a> — UI/UX يقرر ما <em>يجب أن يكون</em> الشيء المعروض؛ HTML و CSS هي الركيزة التي يعرض <em>عليها</em>. مصفوفة رؤية الحالة (<a href="./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns">مثال UI/UX التطبيقي</a>) تُرسم مباشرة إلى حالات HTML (<code>aria-busy</code>، <code>aria-invalid</code>) وحالات CSS (<code>:hover</code>، <code>:focus-visible</code>، <code>[data-loading]</code>).</li>
   <li>أسفل إلى <a href="./how-developers-think-frontend.html">كيف يفكر المطورون عند بناء ميزة واجهة أمامية</a> — حلقة المطور تبني المكونات باستخدام عناصر HTML وقواعد CSS كعناصر أولية. قرارات الحلقة "الشكل" (API المكون، شكل الحالة) مقيدة بما تجعل المنصة قابلاً للتعبير.</li>
   <li>تقاطعي مع <a href="./javascript-the-language.html">JavaScript: اللغة</a> — JS تتلاعب بـ DOM (شجرة HTML في الذاكرة) و CSSOM (ورقة أنماط CSS في الذاكرة). هذا المستند يشرح ما <em>هاتان الشجرتان</em> وكيف يحل التدرج قبل أن تلمسها JS.</li>
   <li>تقاطعي مع <a href="./system-design.html">التصميم المعماري</a> — استراتيجية العرض (SSR، RSC، Islands، SPA) هي قرار حول <em>من يصدر HTML الأولي ومتى يصل CSS</em>. عقد المنصة (تحليل HTML، حظر CSS، تحميل الخطوط) هو الحقيقة الأساسية التي تفاوض كل استراتيجية معها.</li>
@@ -632,7 +633,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 <h2 id="sec-core-web-vitals-platform-knobs">مؤشرات الويب الأساسية ↔ مفاتيح المنصة</h2>
 
-<p>الأداء ميزة منصة تقوم بتهيئتها (<a href="#sec-principles-the-shared-constants">المبادئ</a>). كل مؤشر ويب أساسي يطابق ضوابط HTML/CSS محددة؛ المفاتيح هنا، وسير عمل القياس واستراتيجية العرض يعيش في <a href="./system-design.html">التصميم المعماري</a>.</p>
+<p>الأداء ميزة منصة تقوم بتهيئتها (<a href="#sec-principles-the-shared-constants">المبادئ</a>). كل مؤشر ويب أساسي يطابق ضوابط HTML/CSS محددة؛ المفاتيح هنا، وسير عمل القياس واستراتيجية العرض يعيش في <a href="./system-design.html">التصميم المعماري</a>. تعتبر حدود Google المنشورة "جيدًا": LCP ≤ 2.5&nbsp;ثانية، وINP ≤ 200&nbsp;مللي ثانية، وCLS ≤ 0.1 عند المئين الخامس والسبعين — اضبط كل مفتاح مقابل تلك الأرقام، لا ضد الانطباعات.</p>
 
 <table>
   <thead><tr><th>المؤشر</th><th>صلته بـ HTML/CSS</th></tr></thead>
@@ -1163,6 +1164,27 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     </tr>
   </tbody>
 </table>
+
+---
+
+<details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>BFC (سياق التنسيق الكتلي)</strong> — لماذا تنهار الهوامش وتفيض العناصر العائمة. ابحث "BFC margin collapse".</li>
+  <li><strong>AOM / شجرة إمكانية الوصول</strong> — ما يتنقل فيه قارئات الشاشة فعليًا. ابحث "accessibility tree vs DOM".</li>
+  <li><strong>طبقات التدرج (<code>@layer</code>)</strong> — ترتيب أصل صريح؛ تنهي حروب التحديدية. ابحث "CSS cascade layers".</li>
+  <li><strong>الخصائص المنطقية (<code>*-inline-start/end</code>)</strong> — تباعد جاهز لـ RTL دون تجاوزات. ابحث "CSS logical properties".</li>
+  <li><strong>استعلام الحاوية (<code>@container</code>)</strong> — نقاط توقف يملكها المكوّن. ابحث "container queries vs media queries".</li>
+  <li><strong>التحجيم الجوهري (<code>min-content</code>/<code>max-content</code>/<code>fit-content</code>)</strong> — تخطيط من المحتوى إلى الخارج. ابحث "intrinsic web design".</li>
+  <li><strong>CLS / LCP / INP</strong> — مؤشرات الويب الأساسية الثلاثة. ابحث كلًا منها مع "thresholds".</li>
+  <li><strong>FOIT / FOUT</strong> — نص خفي/وامض أثناء تحميل الخط. ابحث "font-display swap optional".</li>
+  <li><strong>Forced colors</strong> — عقد وضع التباين العالي في ويندوز. ابحث "forced-colors CSS".</li>
+  <li><strong>Baseline</strong> — حالة الدعم عبر المتصفحات. ابحث "web platform Baseline status".</li>
+  <li><strong>OKLCH</strong> — فضاء لون موحد إدراكيًا. ابحث "OKLCH color CSS".</li>
+  <li><strong>رموز DTCG</strong> — صيغة W3C لرموز التصميم التي تُترجم إلى خصائص مخصصة. ابحث "W3C design tokens format".</li>
+</ul>
+</details>
 
 ---
 
