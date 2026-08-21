@@ -418,7 +418,12 @@ Customer → card data → PSP → ① AUTHORIZATION request → card network �
 <tr><td><strong>لا معالجة 3DS / SCA</strong></td><td>عملاء الاتحاد الأوروبي لا يكملون الدفع (تفويض SCA)؛ مسؤولية الاحتيال تبقى لك</td><td>عالِج <code>requires_action</code>؛ إتمام الدفع المستضاف يمنحك إياه</td></tr>
 <tr><td><strong>لا مقاييس دفع</strong></td><td>لا تميّز خطأَ الدفع عن مشكلة الرفض</td><td>تتبّع معدل التفويض ومعدل الرفض ومعدل الاسترداد العكسي — الأرقام الأربعة للوحة</td></tr>
 </tbody>
-</table><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي — كتالوج الأدوات بمقاييس القرار</h2>
+</table>
+
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي — كتالوج الأدوات بمقاييس القرار</h2>
+
+<details>
+<summary>توسيع كتالوج النظام البيئي</summary>
 
 <table>
 <thead><tr><th>الفئة</th><th>الأدوات</th><th>مقياس القرار</th></tr></thead>
@@ -435,6 +440,8 @@ Customer → card data → PSP → ① AUTHORIZATION request → card network �
 </table>
 
 <p><strong>التاجر المسجل (MoR) — Paddle, Lemon Squeezy, FastSpring, Polar</strong> يقفون مستوىً فوق الـ PSP: هم <em>البائع القانوني</em> لمنتجك. يملكون حساب ضريبة المبيعات/VAT وتحويلها، والاسترداد، والاسترداد العكسي، ونطاق PCI — سطح الامتثال كله — مقابل رسمٍ أكبر (عادةً 5%+ مقابل ~2.9% معالجة). المقايضة: يظهر اسم الـ MoR في كشف حساب العميل المصرفي، وتخصيص إتمام الدفع محدود، والرسم يتراكم على الحجم. يستحق حين تبيع عالميًا وكان فرق الرسم أرخص من موظف ضرائب/امتثال؛ ولا يستحق حين يكون الحجم عاليًا أو كان إتمام الدفع سطحًا للعلامة التجارية. ملاحظة: استحوذت Stripe على Lemon Squeezy (2024)، ويستمر مستقلةً؛ وPolar خيار المصدر المفتوح المستقل.</p>
+
+</details>
 
 <h2 id="sec-the-future-where-money-movement-is-going">المستقبل — إلى أين تتجه حركة المال</h2>
 
