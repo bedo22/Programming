@@ -4,6 +4,12 @@ How to improve any shelf doc. Derived from the problem-solving.html
 refactoring and informed by the shelf-review skill's criteria model,
 guards, and pattern library.
 
+## The non-negotiable rule
+
+**No content or explanation deletion.** Only true duplication may be removed.
+If a doc feels too long, the fix is better navigation, not less content.
+If content teaches the wrong thing in the wrong doc, move it — don't delete it.
+
 ## The organizing principle
 
 Every shelf doc teaches three things, and they are equally important:
@@ -230,6 +236,18 @@ For every claim, table, or framework in the doc:
 The rule: **one doc owns each piece of knowledge.** The other docs
 reference it. Never have two docs teaching the same thing independently.
 
+When moving content, leave a pointer in the original:
+
+```html
+<p>
+  This doc stops at <em>choosing</em> the technique. The companion —
+  <a href="./target-doc.html#sec-anchor">Target Doc — Section Name</a>
+  — is where the technique becomes a working template with code and edge
+  cases. One shelf doc per question: this is the thinking, that is the
+  toolkit it reaches for.
+</p>
+```
+
 ### Boundary clarity
 
 After checking duplication, verify:
@@ -286,8 +304,17 @@ For each change:
 - Make the change
 - Verify h2 parity (EN = AR)
 - Verify all anchors resolve
-- Sync the AR twin
+- Sync the AR twin (see below)
 - Run verify-twins.py
+
+**AR twin sync checklist:**
+- Added TOC → add Arabic TOC with translated section names
+- Added lookup bar → add Arabic lookup bar
+- Added details toggles → add same toggles to AR
+- Added new section → translate section and insert at matching spine slot
+- Merged sections → merge in AR too
+- Moved content → replace with Arabic pointer in AR
+- Fixed bare §-refs in AR → link to anchors
 
 ## Phase 7 — Verify and report
 
@@ -305,6 +332,17 @@ After all changes:
 10. Every cross-reference points to the owning doc
 11. **Every major technique has a "why"** — the reader finishes knowing
     why the method works, not just what the method is
+
+## What NOT to do
+
+- **Don't compress explanations for brevity.** If an explanation helps
+  clarity, it stays. The "why" is never optional.
+- **Don't remove history/theory sections** even if they "slow the narrative."
+  Move them later in the doc or interleave with the method, but don't cut.
+- **Don't create new docs** for questions already answered (even partially)
+  in an existing doc. Expand the existing doc instead.
+- **Don't skip the AR twin.** Every structural change to EN must be mirrored.
+  The verify script catches structural drift, not content drift.
 
 ## Failure modes to avoid
 
