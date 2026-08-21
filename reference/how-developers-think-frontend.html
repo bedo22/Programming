@@ -151,7 +151,7 @@
 <p>The three-thread loop wasn't derived from cognitive science — it was derived from practice, from decades of developers noticing what works. But cognitive science explains <em>why</em> it works, providing the theoretical foundation.</p>
 
 <h3>Working memory limitations — why you can't hold all three threads at once</h3>
-<p>Working memory is severely limited (Miller 1956: ~7±2 items; Cowan 2001: ~4). You cannot simultaneously hold the data shape (Model), the component tree (View), <em>and</em> the event flow (Flow) in working memory while also writing code. The loop is the workaround: you focus on one thread at a time, holding the others lightly, and cycle through them. Each pass is shallow enough to fit in working memory. This is the same principle as Pólya's "offload to external representation" (see <a href="./problem-solving.html">Problem-Solving</a>) — the rounds let you externalize one thread while holding another.</p>
+<p>Working memory is severely limited (Miller 1956: ~7±2 items; Cowan 2001: ~4). You cannot simultaneously hold the data shape (Model), the component tree (View), <em>and</em> the event flow (Flow) in working memory while also writing code. The loop is the workaround: you focus on one thread at a time, holding the others lightly, and cycle through them. Each pass is shallow enough to fit in working memory. This is the same principle as Pólya's "offload to external representation" (see <a href="./problem-solving.html">Problem-Solving</a>) — the rounds let you externalize one thread while holding another. And the unit of memory is the chunk, not the item — "the largest meaningful unit the person recognizes" — so chunk size grows with knowledge (hdt-Δ3). This is the mechanism behind senior fluency: veterans hold bigger chunks, so the same three threads fit more easily and the loop feels like one fluid motion.</p>
 
 <h3>Cognitive load theory — why shallow-then-deep beats all-at-once</h3>
 <p>Sweller's cognitive load theory (1980s) identifies three types of mental effort: intrinsic (the problem's difficulty), extraneous (how info is presented), and germane (effort to build schemas). Building a feature all-at-once maximizes extraneous load — you're juggling data, layout, <em>and</em> logic simultaneously. The rounds reduce extraneous load: in Round 1 (Skeleton) you only deal with the simplest possible data + one element + one event. As you deepen, you add one thread at a time, keeping total load within working memory capacity. <strong>The rounds are a cognitive load management strategy.</strong></p>
@@ -263,6 +263,8 @@
   <li><strong>What accessibility requirements matter?</strong> — keyboard, contrast, semantics.</li>
   <li><strong>What does "done" mean for this feature?</strong> — the frontend Definition of Done (<a href="#sec-frontend-state-decisions-the-taxonomy">frontend state taxonomy</a>).</li>
 </ul>
+
+<p><strong>Rank the checklist by risk</strong> (likelihood × impact × invisibility) before starting: Boehm's spiral was explicitly risk-driven, and the habit transfers — the deepest round should target the biggest risk, not the first item (see <a href="./system-design.html">System Design</a>'s capacity/failure-domain thinking).</p>
 
 <p>If you can answer these in Round 0, the rounds below become execution rather than discovery — and you've caught the "loading vs empty" trap before it costs days (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">sketching the data shape</a>).</p>
 
@@ -681,6 +683,8 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 <p>A <strong>rhythm</strong> is a pattern you internalize so you can improvise around it. Like playing jazz: there's a chord progression, but what you actually play depends on what just happened. Senior devs play the codebase. Juniors play the sheet music. The loop is the chord progression.</p>
 
+<p>The Agile Manifesto makes the same argument at org scale — "individuals and interactions over processes and tools", "responding to change over following a plan": judgment-first was worth writing down precisely because process-first keeps winning by default.</p>
+
 <p>This is why it resists being turned into a checklist that you follow robotically: a checklist assumes you know <em>what to do next</em> — the loop assumes you know <em>what's missing</em>, which is an aesthetic judgment, not a mechanical one.</p>
 
 ---
@@ -696,7 +700,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
   <tbody>
     <tr>
       <td><strong>Boehm's Spiral</strong> (1986)</td>
-      <td>First formal "loop" model — each cycle runs Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper. The named ancestor of "skeleton → deepen → polish." IID (Larman &amp; Basili, 2003) later traced this back further, to the 1950s (NASA's Project Mercury) — older than Waterfall.</td>
+      <td>First formal "loop" model — each cycle runs Plan → Risk Analysis → Engineering → Evaluation, each cycle deeper. The named ancestor of "skeleton → deepen → polish." IID (Larman &amp; Basili, 2003) later traced this back further, to the 1950s (NASA's Project Mercury) — older than Waterfall; the lineage runs on: Mercury veterans formed the IBM division that built the space shuttle's onboard software, another early IID landmark.</td>
     </tr>
     <tr>
       <td><strong>Modern frontend</strong> (React, Vue, Svelte, 2015–now)</td>
@@ -705,7 +709,7 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
   </tbody>
 </table>
 
-<p>So: Boehm <em>named</em> it, XP <em>operationalized</em> it in code, Agile <em>institutionalized</em> it at sprint scale — and React <em>made it work at the component scale</em>. What this doc describes is the bottom of that stack: the same pattern, at the scale of an afternoon's work.</p>
+<p>So: Boehm <em>named</em> it, XP <em>operationalized</em> it in code (Beck, distilled from the Chrysler C3 payroll project, 1996), Agile <em>institutionalized</em> it at sprint scale — and React <em>made it work at the component scale</em>. What this doc describes is the bottom of that stack: the same pattern, at the scale of an afternoon's work.</p>
 
 ---
 

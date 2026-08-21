@@ -29,3 +29,5 @@ Claims *added* by passes 1–9, tiered per the new provenance rule:
 | Local unit suite <~10s; PR gate <~10min | v76 | labeled convention ("common budgets") |
 | Search-vocabulary entries + teacher questions + leverage framings | all | framing/no quantitative claims |
 No volatile facts (versions/benchmarks/dates) were introduced from memory; all such content pre-dated the campaign or was mirrored between twins.
+
+| how-developers-think-frontend Track A+B (PLAN v4) | skill v1.4 | 2026-08-21 | digest gate PASS (8 sources, 25/25 matrix); Track B authored from deltas Δ1–Δ5 both twins; gates green ratio 1.14 recorded exception | R15=pre R16=pre(v72) R17=pre R18=pre R19=pre R20=pre | dispositions: R14 SKIP (five-camps table carries it); new claims tiered: shuttle-IID lineage T1(fetched wiki), chunk-mechanism T1(Miller via fetched page), XP-C3-1996 T1(XP wiki), manifesto quote T1(verbatim), risk-driven spiral T1(SEI/wiki) |
