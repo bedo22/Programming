@@ -551,7 +551,30 @@ const posts = await getPosts();
       <li><a href="../nextjs-deep-dive.html">غوص عميق في Next.js</a> — الميتا-إطار العمل الذي ستقابله غالباً في وظيفة React.</li>
       <li><a href="../frontend-income-markets.html">أسواق دخل الواجهة الأمامية</a> — جانب الطلب: وظائف، فريلانس، شرح AI، سياق مصر عن بعد.</</ul>
 
-    <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2><h2 id="sec-principles-the-invariants-across-every-camp">المبادئ — الثوابت عبر كل معسكر</h2>
+    <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+
+<details>
+<summary>توسيع كتالوج النظام البيئي</summary>
+
+
+<table>
+  <thead><tr><th>الفئة</th><th>الأدوات / المنصات</th><th>المحرّك ← الهدف</th><th>معايير القرار</th></tr></thead>
+  <tbody>
+    <tr><td><strong>تحديد المعسكر واكتشاط الإطار</strong></td><td>Wappalyzer، BuiltWith، Framework Detector، @astrojs/compiler</td><td>مستودع غير معروف ← معسكر + إصدار + إعدادات</td><td>دقة الاكتشاف؛ معدل الإيجابيات الكاذبة؛ الوقت للتعريف</td></tr>
+    <tr><td><strong>أدوات الهجرة (معسكر لمعسكر)</strong></td><td>Astro Islands migration، Next.js Codemods، React ← Svelte/Vue/Solid codemods</td><td>المعسكر المصدر ← المعسكر الهدف بكود أصلي عامل</td><td>درجة الأصالية؛ معدل نجاح الاختبارات؛ نسبة الإصلاح اليدوي</td></tr>
+    <tr><td><strong>تحليل الحزمة وفرض الميزانية</strong></td><td>webpack-bundle-analyzer، Vite Bundle Analyzer، bundlesize، ci-size</td><td>حزمة غير معروفة ← مقياس، ميزانية، بوابة</td><td>gebnis pass/fail؛ اتجاه حجم الحزمة؛ عدد القطع</td></tr>
+    <tr><td><strong>أدوات الجزيرة/الترطيب الجزئي</strong></td><td>Astro (client:*)، Qwik (resumable)، Fresh، Marko، Elder.js</td><td>ترطيب كامل ← ترطيب انتقائي بالجزي</td><td>نسبة بايتات التفاعلية؛ وقت الترطيب؛ تعقيد الإعداد</td></tr>
+    <tr><td><strong>هجرة TypeScript وسلامة الأنواع</strong></td><td>ts-migrate، TS Morph، Zod، Valibot، ArkType</td><td>JS/TS فضفاض ← TS صارم أصلي للمعسكر</td><td>نسبة any؛ تغطية الأنواع؛ سرعة الهجرة</td></tr>
+    <tr><td><strong>مقارنة نموذج التفاعلية</strong></td><td>React DevTools، Svelte DevTools، Vue DevTools، Solid DevTools</td><td>نموذج ذهني خاطئ ← فهم تفاعلية مناسب للمعسكر</td><td>عدد إعادة العرض؛ دقة المشتقات؛ زمن التصحيح</td></tr>
+    <tr><td><strong>ترجمة المعسكر بالذكاء الاصطناعي</strong></td><td>GitHub Copilot، Cursor، Sourcegraph Cody، Windsurf</td><td>«ترجم هذا المكوّن لمعسكر X» ← كود أصلي عامل</td><td>درجة الأصالية؛ معدل نجاح الاختبارات؛ نسبة الإصلاح اليدوي</td></tr>
+  </tbody>
+</table>
+
+<p><strong>طريقة الاختيار:</strong> ابدأ بتحديد المعسكر واكتشاط الإطار («一组最小 viability أداة مسح»). أضف أدوات الهجرة عند قرار انتقال المعسكر. أضف تحليل الحزمة عند وجود ميزانية أداء. أضف أدوات الجزر عند استهداف HTML-first. أضف الترجمة بالذكاء الاصطناعي عند معرفة المعسكر المصدر. الأداة تخدم الهجرة — لا العكس.</p>
+
+</details>
+
+<h2 id="sec-principles-the-invariants-across-every-camp">المبادئ — الثوابت عبر كل معسكر</h2>
 
 <ol>
   <li><strong>المعسكرات مراكز ثقل.</strong> التطبيقات الحقيقية هجينة؛ حدد الأساسي ثم الثانوي.</li>
