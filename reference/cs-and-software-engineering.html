@@ -18,6 +18,35 @@
 </p>
 </header>
 
+<nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+  <details open>
+    <summary style="cursor: pointer; font-weight: bold;">Jump to section</summary>
+    <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0;">
+      <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+      <li><a href="#sec-definition-what-cs-is-what-se-is-and-how-they-differ">Definition</a></li>
+      <li><a href="#sec-history-from-lovelace-to-the-ai-era-1843present">History</a></li>
+      <li><a href="#sec-evolution-constraint-inversions-across-the-discipline">Evolution</a></li>
+      <li><a href="#sec-intersection-with-neighbors-the-umbrella">Intersection</a></li>
+      <li><a href="#sec-underlying-theory-complexity-computability-and-information">Theory</a></li>
+      <li><a href="#sec-mental-models-the-engineering-mindset">Mental models</a></li>
+      <li><a href="#sec-what-is-computer-science-the-science-of-computation">What is CS?</a></li>
+      <li><a href="#sec-what-is-software-engineering-the-engineering-of-software">What is SE?</a></li>
+      <li><a href="#sec-the-parameters-quality-attributes-what-you-measure">Quality attributes</a></li>
+      <li><a href="#sec-the-measures-big-o-notation-and-complexity-classes">Big O notation</a></li>
+      <li><a href="#sec-the-trade-offs-when-parameters-conflict">Trade-offs</a></li>
+      <li><a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">Judgment</a></li>
+      <li><a href="#sec-engineering-principles-dry-solid-kiss-yagni">Engineering principles</a></li>
+      <li><a href="#sec-what-makes-code-better">What makes code better</a></li>
+      <li><a href="#sec-technical-debt-when-speed-now-costs-later">Technical debt</a></li>
+      <li><a href="#sec-worked-example-evaluating-a-brute-force-solution">Worked example</a></li>
+      <li><a href="#sec-the-most-common-failure-modes">Failure modes</a></li>
+      <li><a href="#sec-ecosystem-books-tools-and-communities">Ecosystem</a></li>
+      <li><a href="#sec-the-future-the-evaluation-premium">The future</a></li>
+      <li><a href="#sec-summary-the-complete-evaluation-checklist">Summary</a></li>
+    </ul>
+  </details>
+</nav>
+
 <blockquote class="callout">
   <p><strong>Where this fits.</strong> This doc is the <em>umbrella</em> — the discipline that grounds every technical reference on this shelf; adjacent references (UI/UX, Design Thinking) intersect it by shaping requirements and human constraints:</p>
   <ul>
@@ -1158,6 +1187,133 @@ All three are Pareto-optimal — none dominates the others on <em>all</em> param
   <li><strong>Least surprise</strong>: a function should do what its name suggests, nothing more. <code>getUser()</code> should not also delete the user as a side effect.</li>
   <li><strong>Low coupling, high cohesion</strong> (Stevens, Myers &amp; Constantine, 1974): modules should be internally coherent (high cohesion) and minimally dependent on each other (low coupling). Boundaries, layering, and dependency direction are the architecture of this principle — it is why separation of concerns works. At scale this is System Design’s territory (<a href="./system-design.html">System Design</a>).</li>
 </ul>
+
+<h2 id="sec-what-makes-code-better">What makes code better — from principles to practice</h2>
+
+<p>The principles in <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a> are the named rules. This section shows what they look like in actual code — the concrete moves that turn "follow SOLID" into "this function is better than it was."</p>
+
+<h3>Naming — the single most underrated skill</h3>
+<p>A name is a compressed explanation. A good name eliminates the need for a comment; a bad name requires a comment to explain the name. The quality attribute this serves is <strong>readability</strong> (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>) — can another developer understand the approach without asking you?</p>
+<table>
+  <thead><tr><th>Principle</th><th>Bad</th><th>Good</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Name reveals intent</strong></td><td><code>const d = new Date()</code></td><td><code>const createdAt = new Date()</code></td><td>The reader knows <em>what</em> the date represents without reading the surrounding code.</td></tr>
+    <tr><td><strong>Avoid mental mapping</strong></td><td><code>const x = users.filter(u => u.active)</code></td><td><code>const activeUsers = users.filter(u => u.active)</code></td><td><code>x</code> forces the reader to remember what it means. <code>activeUsers</code> doesn't.</td></tr>
+    <tr><td><strong>Function names are verbs</strong></td><td><code>function userData() { ... }</code></td><td><code>function fetchUserData() { ... }</code></td><td>A function <em>does</em> something — the name should say what.</td></tr>
+    <tr><td><strong>Boolean names are predicates</strong></td><td><code>const check = user.admin === true</code></td><td><code>const isAdmin = user.admin</code></td><td>Boolean names should read as yes/no questions. <code>isAdmin</code> is a question; <code>check</code> is not.</td></tr>
+    <tr><td><strong>Avoid abbreviations</strong></td><td><code>function calcBtnClk() { ... }</code></td><td><code>function handleCalculateButtonClick() { ... }</code></td><td>Abbreviations save you 2 seconds of typing and cost every reader 5 seconds of decoding.</td></tr>
+    <tr><td><strong>Same word, same meaning</strong></td><td>One function called <code>get</code>, another called <code>fetch</code>, another called <code>retrieve</code></td><td>All data-access functions use <code>fetch</code></td><td>Consistent vocabulary builds the reader's mental model. If <code>get</code> means something different from <code>fetch</code>, say why.</td></tr>
+  </tbody>
+</table>
+
+<h3>Function design — the building blocks</h3>
+<p>Functions are the unit of readability. If a function is clear, the code around it can be understood. If a function is murky, no amount of commenting saves it.</p>
+<table>
+  <thead><tr><th>Rule</th><th>What it means</th><th>The test</th></tr></thead>
+  <tbody>
+    <tr><td><strong>One job</strong> (SRP from <a href="#sec-engineering-principles-dry-solid-kiss-yagni">SOLID §8</a>)</td><td>A function does one thing. It does it well. It does it only.</td><td>Can you describe the function with a single sentence without using "and"? If not, split it.</td></tr>
+    <tr><td><strong>Small</strong></td><td>Most functions should be 5–20 lines. If a function is 100 lines, it has at least two jobs.</td><td>Does the function fit on one screen without scrolling? If not, it's too long.</td></tr>
+    <tr><td><strong>Few parameters</strong></td><td>0–2 parameters is ideal. 3+ parameters suggest the function is doing too much, or the parameters should be grouped into an object.</td><td>Can you remember the parameters without looking at the signature? If not, there are too many.</td></tr>
+    <tr><td><strong>No side effects</strong></td><td>A function should not modify anything outside its scope. Input in, output out. Side effects make functions unpredictable and hard to test.</td><td>Can you call the function twice with the same input and get the same output? If not, there's a hidden side effect.</td></tr>
+    <tr><td><strong>Early return</strong></td><td>Handle edge cases at the top and return. Avoid deep nesting. The happy path should be at the top level.</td><td>Is the main logic at the same indentation level as the function declaration? Or is it buried inside 3 levels of if/else?</td></tr>
+  </tbody>
+</table>
+
+<h3>Code smells — the symptoms of deeper problems</h3>
+<p>A <strong>code smell</strong> is a surface indicator that something deeper is wrong. Not a bug — the code works — but a signal that the code will be hard to change, test, or understand as it grows. Named by Martin Fowler's <em>Refactoring</em> catalog (1999).</p>
+<table>
+  <thead><tr><th>Smell</th><th>What you see</th><th>The deeper problem</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Duplicate code</strong></td><td>The same logic in two places</td><td>DRY violation (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§8</a>). A change to one copy will eventually diverge from the other.</td><td>Extract into a shared function. But only if the two copies represent the <em>same knowledge</em> — two functions that look identical but serve different business rules should stay separate.</td></tr>
+    <tr><td><strong>Long function</strong></td><td>A function that's 50+ lines</td><td>Multiple jobs (SRP violation). Hard to name, hard to test, hard to reuse.</td><td>Extract sub-functions. Name each one. The parent function becomes a readable sequence of named steps.</td></tr>
+    <tr><td><strong>Long parameter list</strong></td><td>A function with 4+ parameters</td><td>The function is doing too much, or the parameters form a logical group.</td><td>Group related parameters into an object. Or split the function.</td></tr>
+    <tr><td><strong>Feature envy</strong></td><td>A function uses another object's data more than its own</td><td>The function belongs on the other object.</td><td>Move the function to the object it's envious of.</td></tr>
+    <tr><td><strong>Shotgun surgery</strong></td><td>A single change requires edits in many different functions</td><td>Responsibility is scattered. Related code is not together.</td><td>Consolidate the scattered logic into one place.</td></tr>
+    <tr><td><strong>Data clumps</strong></td><td>The same 3 parameters appear together in multiple functions</td><td>These data items belong together in a struct/object.</td><td>Extract a class or object that groups them.</td></tr>
+    <tr><td><strong>Primitive obsession</strong></td><td>Using strings/numbers for everything instead of small types</td><td>Loss of type safety and expressiveness. <code>"admin"</code> is just a string; <code>Role.ADMIN</code> is a concept.</td><td>Introduce value objects or enums for domain concepts.</td></tr>
+  </tbody>
+</table>
+
+<h3>Refactoring — improving code without changing behavior</h3>
+<p><strong>Refactoring</strong> is the disciplined practice of improving code's internal structure without changing its external behavior. Named by Martin Fowler (1999); the catalog includes dozens of specific techniques. The key principle: <strong>refactor in small, behavior-preserving steps, with tests passing at each step.</strong></p>
+<table>
+  <thead><tr><th>Technique</th><th>When to use it</th><th>What changes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Extract function</strong></td><td>A block of code does one identifiable thing</td><td>Pull it into a named function. The original code now reads as a sequence of named steps.</td></tr>
+    <tr><td><strong>Rename</strong></td><td>A name doesn't reveal intent (<a href="#sec-what-makes-code-better">naming rules above</a>)</td><td>Change the name. Use IDE support to rename everywhere safely.</td></tr>
+    <tr><td><strong>Inline function</strong></td><td>A function's body is as clear as its name</td><td>Replace the call with the body. Removes an unnecessary layer of indirection.</td></tr>
+    <tr><td><strong>Extract variable</strong></td><td>An expression is repeated or unclear</td><td>Pull the expression into a named variable. The name explains the intent.</td></tr>
+    <tr><td><strong>Replace magic numbers with named constants</strong></td><td>A literal number appears without explanation</td><td><code>if (status === 3)</code> → <code>if (status === STATUS_APPROVED)</code></td></tr>
+    <tr><td><strong>Decompose conditional</strong></td><td>An if/else is complex</td><td>Extract the condition into a named function: <code>if (isEligibleForDiscount(order))</code></td></tr>
+    <tr><td><strong>Replace nested conditionals with guard clauses</strong></td><td>Deep nesting (3+ levels)</td><td>Handle edge cases first and return early. The happy path stays at the top level.</td></tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p><strong>The refactoring rule:</strong> never refactor and add features at the same time. Refactor first (all tests pass), then add the feature on the clean foundation. Mixing the two makes it impossible to tell which change broke the test.</p>
+</blockquote>
+
+<h3>The "before and after" — a worked refactoring</h3>
+<p>Here's a real function that was "working" but had multiple smells. Trace the improvement:</p>
+<pre style="background:#f4f4f4; padding:1rem; overflow-x:auto; font-size:.85rem;">
+// BEFORE: long function, duplicate code, magic numbers, deep nesting
+function process(data, type) {
+  let result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (type === 'active') {
+      if (data[i].status === 3) {
+        if (data[i].age > 18) {
+          result.push(data[i]);
+        }
+      }
+    } else if (type === 'all') {
+      if (data[i].status === 3) {
+        result.push(data[i]);
+      }
+    } else if (type === 'minors') {
+      if (data[i].status === 3) {
+        if (data[i].age <= 18) {
+          result.push(data[i]);
+        }
+      }
+    }
+  }
+  return result;
+}
+</pre>
+<p><strong>Smells identified:</strong> long function, duplicate <code>status === 3</code> check, magic number <code>3</code>, deep nesting, unclear name (<code>process</code>).</p>
+<pre style="background:#f4f4f4; padding:1rem; overflow-x:auto; font-size:.85rem;">
+// AFTER: extracted functions, named constants, guard clauses, clear names
+const STATUS_APPROVED = 3;
+
+function isApproved(user) {
+  return user.status === STATUS_APPROVED;
+}
+
+function filterUsers(users, predicate) {
+  return users.filter(predicate);
+}
+
+function getActiveAdults(users) {
+  return filterUsers(users, u => isApproved(u) && u.age > 18);
+}
+
+function getApprovedUsers(users) {
+  return filterUsers(users, u => isApproved(u));
+}
+
+function getApprovedMinors(users) {
+  return filterUsers(users, u => isApproved(u) && u.age <= 18);
+}
+
+function filterByType(users, type) {
+  if (type === 'active') return getActiveAdults(users);
+  if (type === 'all') return getApprovedUsers(users);
+  if (type === 'minors') return getApprovedMinors(users);
+  return [];
+}
+</pre>
+<p><strong>What improved:</strong> each function has one job and a clear name. The <code>status === 3</code> check exists in one place. Nesting is gone. A new developer can read <code>getActiveAdults</code> and understand it without reading the implementation. This is maintainability (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§4</a>) in action.</p>
 
 <h2 id="sec-principles-the-shared-constants">Principles — the shared constants</h2>
 
