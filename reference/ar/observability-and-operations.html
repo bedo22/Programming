@@ -23,6 +23,30 @@
   <p>المراقبة والتشغيل انضباطُ <em>معرفةِ</em> ما إذا كان النظام الحيّ سليمًا، و<em>إيجادِ</em> الخلل حين لا يكون كذلك، و<em>إعادتهِ</em> إلى الصحة دون أن يضيع ما علّمك إياه الفشل. يملك الأحكام التي لا يستطيع أي إشارة واحدة إصدارها: أيّ القياسات تستحق هدفًا، وأيّ الأهداف تستحق تنبيهًا، وأيّ التنبيهات تستحق إيقاظ إنسان، وأيّ الإيقاظات تستحق تقريرًا بعديًا. إنها الطبقة بين «شُحن الكود» و«المستخدم بخير» — وهي الانضباط الوحيد في هذا الرف الذي لا يظهر غيابه إلا حين ينكسر شيء.</p>
 </section>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>انتقل إلى</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</a></li>
+      <li><a href="#sec-definition-what-observability-operations-is-and-what-it-is-not">التعريف</a></li>
+      <li><a href="#sec-history-from-paging-to-telemetry-to-learning-machines">التاريخ</a></li>
+      <li><a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">النظرية</a></li>
+      <li><a href="#sec-mental-models-how-operators-actually-reason">النماذج العقلية</a></li>
+      <li><a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a></li>
+      <li><a href="#sec-alert-design-turning-targets-into-contracts-with-humans">تصميم التنبيهات</a></li>
+      <li><a href="#sec-incident-response-from-detection-to-recovery">الاستجابة للحوادث</a></li>
+      <li><a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعيدة</a></li>
+      <li><a href="#sec-runbooks-making-the-known-response-boring">دفاتر التشغيل</a></li>
+      <li><a href="#sec-principles-the-shared-constants">المبادئ</a></li>
+      <li><a href="#sec-on-call-design-the-rotation-is-a-product-not-a-duty">تصميم النوبات</a></li>
+      <li><a href="#sec-chaos-engineering-practicing-failure-on-purpose">هندسة الفوضى</a></li>
+      <li><a href="#sec-worked-example-the-checkout-incident">مثال عملي</a></li>
+      <li><a href="#sec-common-failure-modes">أنماط الفشل</a></li>
+      <li><a href="#sec-summary-the-operational-checklist">قائمة التحقق</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
 
 <p>ترتيب القراءة: مستقلة، بعد التصميم المعماري وهندسة الواجهات الخلفية. روابط متقاطعة:</p>
@@ -893,7 +917,9 @@
       <td>عمليةٌ بلا حقوقِ قرار؛ أُعطي البيجرُ لشخصٍ لن يدعه النظامُ يتصرف</td>
     </tr>
   </tbody>
-</table><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي — فهرس أدوات بمقاييس قرار</h2>
+</table>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display: inline;">النظام البيئي — فهرس أدوات بمقاييس قرار</h2></summary>
 
 <table>
   <thead><tr><th>الفئة</th><th>الأدوات</th><th>المحفّز ← الهدف</th><th>مقياس القرار</th></tr></thead>
@@ -948,6 +974,7 @@
     </tr>
   </tbody>
 </table>
+</details>
 
 <h2 id="sec-the-future-where-the-operational-layer-is-heading">المستقبل — إلى أين تتجه الطبقة التشغيلية</h2>
 

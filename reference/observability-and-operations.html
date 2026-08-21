@@ -23,6 +23,32 @@
   <p>Observability &amp; operations is the discipline of <em>knowing</em> whether the live system is healthy, <em>finding</em> the fault when it isn't, and <em>returning</em> it to health without losing what the failure taught you. It owns the judgments that no single signal can make: which measurements deserve a target, which targets deserve an alert, which alerts deserve a page, and which pages deserve a postmortem. It is the layer between "the code shipped" and "the user is fine" — and it is the only discipline on this shelf whose absence is invisible until something breaks.</p>
 </section>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>Jump to</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+      <li><a href="#sec-definition-what-observability-operations-is-and-what-it-is-not">Definition</a></li>
+      <li><a href="#sec-history-from-paging-to-telemetry-to-learning-machines">History</a></li>
+      <li><a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">Theory</a></li>
+      <li><a href="#sec-mental-models-how-operators-actually-reason">Mental models</a></li>
+      <li><a href="#sec-slo-design-choosing-what-to-promise">SLO design</a></li>
+      <li><a href="#sec-alert-design-turning-targets-into-contracts-with-humans">Alert design</a></li>
+      <li><a href="#sec-incident-response-from-detection-to-recovery">Incident response</a></li>
+      <li><a href="#sec-postmortems-learning-making-failure-an-investment">Postmortems</a></li>
+      <li><a href="#sec-runbooks-making-the-known-response-boring">Runbooks</a></li>
+      <li><a href="#sec-principles-the-shared-constants">Principles</a></li>
+      <li><a href="#sec-on-call-design-the-rotation-is-a-product-not-a-duty">On-call design</a></li>
+      <li><a href="#sec-capacity-planning-load-testing-knowing-the-ceiling">Capacity planning</a></li>
+      <li><a href="#sec-chaos-engineering-practicing-failure-on-purpose">Chaos engineering</a></li>
+      <li><a href="#sec-operational-gates-shift-left-and-the-launch-gate">Operational gates</a></li>
+      <li><a href="#sec-worked-example-the-checkout-incident">Worked example</a></li>
+      <li><a href="#sec-common-failure-modes">Failure modes</a></li>
+      <li><a href="#sec-summary-the-operational-checklist">Checklist</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, after System Design and Backend Engineering. Cross-links:</p>
@@ -903,7 +929,8 @@
   </tbody>
 </table>
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display: inline;">Ecosystem — tooling catalog with decision metrics</h2></summary>
 
 <table>
   <thead><tr><th>Category</th><th>Tools</th><th>Trigger → Target</th><th>Decision metric</th></tr></thead>
@@ -958,6 +985,7 @@
     </tr>
   </tbody>
 </table>
+</details>
 
 <h2 id="sec-the-future-where-the-operational-layer-is-heading">The future — where the operational layer is heading</h2>
 
