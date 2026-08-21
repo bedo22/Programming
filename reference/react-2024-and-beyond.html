@@ -13,14 +13,15 @@
   <p class="kicker">Reference · React ecosystem — post-hooks developments</p>
   <h1>React 2024 and beyond — compiler, RSC, foundation</h1>
   <p class="meta">What changed in React after hooks settled: React 19's platform shift, the React Compiler v1.0, React Server Components splitting rendering across computers, the React Foundation under the Linux Foundation, the RSC security lesson (Dec 2025), why React didn't adopt signals, Preact as the structural branch, and the framework/routing era. The class-to-hooks story is complete; this doc is what happened next.</p>
+        <p class="meta"><strong>Who this is for:</strong> developers past the hooks model who now meet React 19+, the Compiler, RSC, and framework-era decisions in real codebases — and need the boundary, security, and upgrade rules.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>Language:</strong> English · <a href="./ar/react-2024-and-beyond.html">العربية</a>
+          <strong>Last reviewed:</strong> 2026-08-21 · <strong>Language:</strong> English · <a href="./ar/react-2024-and-beyond.html">العربية</a>
         </p>
       </header>
 
 <section class="recap">
   <h3 style="margin-top:0">How this relates to the main paradigm-shift doc</h3>
-  <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm-shift reference</a> ends at the compiler era (§AN§PGEgaHJlZj0iLi9jbGFzcy10by1ob29rcy1wYXJhZGlnbS1zaGlmdC5odG1sI3NlYy1lcmEtNC10aGUtcmVhY3QtY29tcGlsZXItYW5kLWJleW9uZCI+PGEgaHJlZj0iI3NlYy1yZWFjdC0xOS10aGUtcGxhdGZvcm0tc2hpZnQiPsKnMTwvYT4=§NA<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a></a>) and sends you here for the 2024+ details. Everything in this doc builds on the hooks mental model from that reference — client components still capture values per render, <code>useState</code> still works exactly as described there. The big news: React 19 made the platform features real, the compiler is stable, RSC splits the process, and React is now foundation-governed.</p>
+  <p>The <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks paradigm-shift reference</a> ends at the compiler era (<a href="./class-to-hooks-paradigm-shift.html#sec-era-4-the-react-compiler-and-beyond">Era 4: the compiler</a>, <a href="#sec-actions-and-forms-progressive-enhancement-returns">Actions and forms</a>) and sends you here for the 2024+ details. Everything in this doc builds on the hooks mental model from that reference — client components still capture values per render, <code>useState</code> still works exactly as described there. The big news: React 19 made the platform features real, the compiler is stable, RSC splits the process, and React is now foundation-governed.</p>
 </section>
 
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
@@ -38,12 +39,12 @@
 <table>
   <thead><tr><th>Feature</th><th>What it changes for reading code</th></tr></thead>
   <tbody>
-    <tr><td><code>Actions</code> (form/transition actions)</td><td>Async state transitions and form submission are first-class React behavior (<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a>)</td></tr>
+    <tr><td><code>Actions</code> (form/transition actions)</td><td>Async state transitions and form submission are first-class React behavior (<a href="#sec-actions-and-forms-progressive-enhancement-returns">Actions and forms</a>)</td></tr>
     <tr><td><code>useActionState</code></td><td>State for an async action: pending, error, result</td></tr>
     <tr><td><code>useFormStatus</code></td><td>Pending status for form submission, read from a child</td></tr>
     <tr><td><code>useOptimistic</code></td><td>Optimistic UI with automatic rollback on failure</td></tr>
     <tr><td><code>use()</code></td><td>Read a promise or context in render, under Suspense</td></tr>
-    <tr><td>Server Actions</td><td>Server-side mutations wired to forms and transitions (<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a>, <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+    <tr><td>Server Actions</td><td>Server-side mutations wired to forms and transitions (<a href="#sec-actions-and-forms-progressive-enhancement-returns">Actions and forms</a>, <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
     <tr><td><code>ref</code> as a prop</td><td><code>forwardRef</code> largely unnecessary</td></tr>
     <tr><td>Document metadata</td><td>Native <code>&lt;title&gt;</code>/<code>&lt;meta&gt;</code>/<code>&lt;link&gt;</code> hoisting, no external head manager</td></tr>
     <tr><td>Stylesheet precedence + async scripts</td><td>Ordering of stylesheets and scripts becomes declarative</td></tr>
@@ -52,7 +53,7 @@
 </table>
 
 <blockquote class="callout">
-  <p><strong>Reading 19-era code:</strong> when you see <code>useActionState</code> + a <code>&lt;form action={asyncFn}&gt;</code> + <code>useOptimistic</code>, the shape is "mutate, show predicted, reconcile." This replaces the old "submit + setLoading + setError" hand-rolled dance. The patterns from class-to-hooks <a href="./class-to-hooks-paradigm-shift.html#sec-oop-the-paradigm-classes-came-from"><a href="#sec-react-19-the-platform-shift">§1</a></a> still apply — this is a new <em>arrangement</em> of the same state rules, not a new state model.</p>
+  <p><strong>Reading 19-era code:</strong> when you see <code>useActionState</code> + a <code>&lt;form action={asyncFn}&gt;</code> + <code>useOptimistic</code>, the shape is "mutate, show predicted, reconcile." This replaces the old "submit + setLoading + setError" hand-rolled dance. The patterns from class-to-hooks <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a> still apply — this is a new <em>arrangement</em> of the same state rules, not a new state model.</p>
 </blockquote>
 
 <h2 id="sec-actions-and-forms-progressive-enhancement-returns">Actions and forms — progressive enhancement returns</h2>
@@ -80,7 +81,7 @@
 </ul>
 
 <blockquote class="callout">
-  <p><strong>Server Actions are endpoints.</strong> Being "server-side" does not make a function safe. Server Actions are public HTTP endpoints: validate every argument, authorize the caller, rate-limit sensitive operations, and treat return values as untrusted. Form data is user input — never assume the types at the boundary (<a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>).</p>
+  <p><strong>Server Actions are endpoints.</strong> Being "server-side" does not make a function safe. Server Actions are public HTTP endpoints: validate every argument, authorize the caller, rate-limit sensitive operations, and treat return values as untrusted. Form data is user input — never assume the types at the boundary (<a href="#sec-react-server-components-split-rendering-across-two-processes">the RSC split</a>).</p>
 </blockquote>
 
 <h2 id="sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">The React Compiler is stable (Oct 2025) and ship-by-default (2026)</h2>
@@ -113,7 +114,7 @@
 
 <h3>1 The RSC boundary rules</h3>
 
-<p>These are the rules that <em>define</em> the boundary. Everything in this doc about the compiler (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>) still applies to client components; these apply to server vs client:</p>
+<p>These are the rules that <em>define</em> the boundary. Everything in this doc about the compiler (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>) still applies to client components; these apply to server vs client:</p>
 
 <table>
   <thead><tr><th>Rule</th><th>Meaning</th></tr></thead>
@@ -125,7 +126,7 @@
     <tr><td>Client components can receive server-rendered <code>children</code></td><td>The composition escape hatch: the server wraps the client part</td></tr>
     <tr><td>Client components cannot pass functions into server components</td><td>Props into server components must be serializable (server can't execute client data)</td></tr>
     <tr><td>Context is client-only</td><td>Providers/consumers live in the client tree; server components can't read client context</td></tr>
-    <tr><td>Server code must not ship secrets</td><td>Server files don't go to the client — but data leaked <em>through</em> server output still matters (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+    <tr><td>Server code must not ship secrets</td><td>Server files don't go to the client — but data leaked <em>through</em> server output still matters (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
   </tbody>
 </table>
 
@@ -169,7 +170,7 @@
     <tr><td>URL state</td><td>Router / search params</td></tr>
     <tr><td>Local UI state</td><td>Client <code>useState</code> / <code>useReducer</code></td></tr>
     <tr><td>Shared interactive state</td><td>Context, Zustand, Redux Toolkit, Jotai</td></tr>
-    <tr><td>Mutation state (pending/optimistic/error)</td><td>Actions + <code>useActionState</code> + <code>useOptimistic</code> (<a href="#sec-actions-and-forms-progressive-enhancement-returns">§2</a>)</td></tr>
+    <tr><td>Mutation state (pending/optimistic/error)</td><td>Actions + <code>useActionState</code> + <code>useOptimistic</code> (<a href="#sec-actions-and-forms-progressive-enhancement-returns">Actions and forms</a>)</td></tr>
   </tbody>
 </table>
 
@@ -179,7 +180,7 @@
 
 <h3>5 Error handling and error boundaries</h3>
 
-<p>Error boundaries are client-only — they cannot be server components. A server component at the root of a failing subtree has no <code>error.tsx</code>-equivalent for the whole tree, and nested error boundaries wrap <em>client</em> trees. The practical shape in the framework era: a route-level error file (Next.js <code>error.tsx</code>, React Router error elements) is the server-aware catch-all; component-level boundaries belong on interactive client leaves. Errors must be serialized only as strings across the boundary — never share live objects or functions (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.1</a>).</p>
+<p>Error boundaries are client-only — they cannot be server components. A server component at the root of a failing subtree has no <code>error.tsx</code>-equivalent for the whole tree, and nested error boundaries wrap <em>client</em> trees. The practical shape in the framework era: a route-level error file (Next.js <code>error.tsx</code>, React Router error elements) is the server-aware catch-all; component-level boundaries belong on interactive client leaves. Errors must be serialized only as strings across the boundary — never share live objects or functions (<a href="#sec-react-server-components-split-rendering-across-two-processes">RSC boundary rules</a>).</p>
 
 <h3>6 Streaming and partial prerendering</h3>
 
@@ -208,7 +209,7 @@
 
 <h2 id="sec-react-19-2-and-the-framework-routing-era">React 19.2 and the framework/routing era</h2>
 
-<p><a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (Oct 1, 2025) shipped three features that change daily code: <code>&lt;Activity /&gt;</code> (preserves a hidden subtree's state — the "navigated away and lost my form" problem solved at the framework level), <code>useEffectEvent</code> (the documented fix for the "deps array lies because I want latest props in the handler" pattern from the paradigm-shift doc's §AN§PGEgaHJlZj0iLi9jbGFzcy10by1ob29rcy1wYXJhZGlnbS1zaGlmdC5odG1sI3NlYy13aHktbm90LWp1c3QtdXNlLWZ1bmN0aW9uYWwtcHJvZ3JhbW1pbmctd2l0aG91dC1ob29rcyI+PGEgaHJlZj0iI3NlYy1yZWFjdC0xOS10aGUtcGxhdGZvcm0tc2hpZnQiPsKnMTwvYT4=§NA<a href="#sec-react-19-the-platform-shift">§1</a></a>), and React Performance Tracks (DevTools overlays for what re-rendered and why).</p>
+<p><a href="https://react.dev/blog/2025/10/01/react-19-2">React 19.2</a> (Oct 1, 2025) shipped three features that change daily code: <code>&lt;Activity /&gt;</code> (preserves a hidden subtree's state — the "navigated away and lost my form" problem solved at the framework level), <code>useEffectEvent</code> (the documented fix for the "deps array lies because I want latest props in the handler" pattern from the paradigm-shift doc's <a href="./class-to-hooks-paradigm-shift.html#sec-the-stale-closure-problem-and-why-it-isn-t-one">stale closures</a>), and React Performance Tracks (DevTools overlays for what re-rendered and why).</p>
 
 <p>In parallel, React's official recommendation for new apps shifted: <a href="https://react.dev/blog/2025/02/14/sunsetting-create-react-app">Sunsetting Create React App</a> (Feb 14, 2025) made it explicit — <strong>new React apps should use a framework</strong>. CRA deprecation ended "just a Vite React app" as the default starting point. The pattern: React is moving <em>up-stack</em>. The component model is settled; the next layer is the framework — routing, data fetching, code splitting, server rendering, caching.</p>
 
@@ -258,7 +259,7 @@
   <li><strong>Embedded / constrained environments.</strong> Web views in native apps, kiosks, low-end Android, edge SPAs where every kilobyte shows up in core-web-vitals.</li>
 </ul>
 
-<p>Preact also adopted signals early (Sep 2022, <a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals</a>) as an official add-on — proof-by-existence that React's "no" is a governance/design decision (<a href="#sec-the-signals-question-and-why-react-didn-t-adopt-them">§8</a>), not a technical impossibility.</p>
+<p>Preact also adopted signals early (Sep 2022, <a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals</a>) as an official add-on — proof-by-existence that React's "no" is a governance/design decision (<a href="#sec-the-signals-question-and-why-react-didn-t-adopt-them">the signals question</a>), not a technical impossibility.</p>
 
 <h3>3 Reading Preact at work</h3>
 
@@ -278,8 +279,8 @@
     <tr><td>CRA → Vite SPA</td><td>Modern build without framework</td><td>Replace CRA build only; keep client-rendered</td><td>Miss SSR/RSC benefits</td></tr>
     <tr><td>React 18 → 19</td><td>Actions, compiler compat, modern APIs</td><td>Codemods, test forms/effects, update libs</td><td>Edge-case breaking changes</td></tr>
     <tr><td>Manual memoization → compiler</td><td>Perf maintenance burden</td><td>Exact-pin, enable lint, test hotspots</td><td>False safety if Rules of React violated</td></tr>
-    <tr><td>Client-only app → RSC</td><td>Too much client fetching/bundle</td><td>Move data display to server, keep leaves client</td><td>Boundary design mistakes (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.1</a>)</td></tr>
-    <tr><td>Server data in global client store → server data</td><td>Duplication, staleness, bundle weight</td><td>Move to server components/framework cache/query layer</td><td>State ownership confusion (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
+    <tr><td>Client-only app → RSC</td><td>Too much client fetching/bundle</td><td>Move data display to server, keep leaves client</td><td>Boundary design mistakes (<a href="#sec-react-server-components-split-rendering-across-two-processes">RSC boundary rules</a>)</td></tr>
+    <tr><td>Server data in global client store → server data</td><td>Duplication, staleness, bundle weight</td><td>Move to server components/framework cache/query layer</td><td>State ownership confusion (<a href="#sec-react-server-components-split-rendering-across-two-processes">state after RSC</a>)</td></tr>
   </tbody>
 </table>
 
@@ -288,18 +289,18 @@
 <table>
   <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix</th></tr></thead>
   <tbody>
-    <tr><td>Treating Server Actions as internal-only</td><td>No validation/authz; abuse, corruption</td><td>Treat every Server Function as a public endpoint (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
-    <tr><td>Client boundary too high</td><td>Whole page client-side; bundle bloat, lost server data</td><td>Push client boundaries to leaves (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.2</a>)</td></tr>
+    <tr><td>Treating Server Actions as internal-only</td><td>No validation/authz; abuse, corruption</td><td>Treat every Server Function as a public endpoint (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
+    <tr><td>Client boundary too high</td><td>Whole page client-side; bundle bloat, lost server data</td><td>Push client boundaries to leaves (<a href="#sec-react-server-components-split-rendering-across-two-processes">client boundary placement</a>)</td></tr>
     <tr><td>Server boundary too high</td><td>Interactive components on the server, hooks fail</td><td>Move interactive components to client</td></tr>
     <tr><td>Passing non-serializable props across the boundary</td><td>Runtime errors / silent behavior changes</td><td>Pass serializable props; use <code>children</code> composition</td></tr>
     <tr><td>Using context in server components</td><td>Not supported</td><td>Move context into the client tree</td></tr>
-    <tr><td>Overtrusting the compiler</td><td>Developers ignore Rules of React</td><td>Keep lint rules; test behavior (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
+    <tr><td>Overtrusting the compiler</td><td>Developers ignore Rules of React</td><td>Keep lint rules; test behavior (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>)</td></tr>
     <tr><td>Disabling lint rules to make compiler pass</td><td>Latent bugs hide</td><td>Fix the rule violation, not the lint rule</td></tr>
-    <tr><td>Storing server data in global client state</td><td>Duplication, stale data, bundle weight</td><td>Server components / framework cache / query layer (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
+    <tr><td>Storing server data in global client state</td><td>Duplication, stale data, bundle weight</td><td>Server components / framework cache / query layer (<a href="#sec-react-server-components-split-rendering-across-two-processes">state after RSC</a>)</td></tr>
     <tr><td>Confusing RSC with SSR</td><td>Wrong mental model; hydration confusion</td><td>Split-process model: server components serialize UI, not just HTML</td></tr>
-    <tr><td>Ignoring security patches</td><td>CVE exposure</td><td>Pin, monitor, apply React/framework security releases (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
-    <tr><td>Upgrading the compiler casually</td><td>Memoization changes expose latent bugs</td><td>Exact pin, changelog review, full test pass (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
-    <tr><td>Using signals mentally inside React</td><td>Expecting fine-grained DOM updates that models don't give</td><td>Understand React's render + compiler memoization model (<a href="#sec-the-signals-question-and-why-react-didn-t-adopt-them">§8</a>)</td></tr>
+    <tr><td>Ignoring security patches</td><td>CVE exposure</td><td>Pin, monitor, apply React/framework security releases (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
+    <tr><td>Upgrading the compiler casually</td><td>Memoization changes expose latent bugs</td><td>Exact pin, changelog review, full test pass (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>)</td></tr>
+    <tr><td>Using signals mentally inside React</td><td>Expecting fine-grained DOM updates that models don't give</td><td>Understand React's render + compiler memoization model (<a href="#sec-the-signals-question-and-why-react-didn-t-adopt-them">the signals question</a>)</td></tr>
   </tbody>
 </table>
 
@@ -308,14 +309,14 @@
 <table>
   <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
   <tbody>
-    <tr><td>Client and server are different processes</td><td>RSC is a boundary decision, not a styling or SSR trick (<a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>)</td></tr>
-    <tr><td>The compiler automates memoization, not correctness</td><td>The Rules of React still matter (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
-    <tr><td>Server Functions are endpoints</td><td>Validate, authorize, rate-limit, audit (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
-    <tr><td>Frameworks are now the default React surface</td><td>Routing, data, caching, rendering live in the framework (<a href="#sec-react-19-2-and-the-framework-routing-era">§7</a>)</td></tr>
-    <tr><td>React is becoming platform-governed</td><td>Stability and ecosystem coordination over single-company urgency (<a href="#sec-the-react-foundation-feb-2026-meta-is-no-longer-the-sole-owner">§6</a>)</td></tr>
-    <tr><td>Server data stays server-owned when possible</td><td>Don't move read-only server data into client state (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
-    <tr><td>Interactivity belongs at the edge</td><td>Client components as small and leaf-like as practical (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.2</a>)</td></tr>
-    <tr><td>Upgrade carefully</td><td>Compiler and framework security changes require disciplined upgrades (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>, <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+    <tr><td>Client and server are different processes</td><td>RSC is a boundary decision, not a styling or SSR trick (<a href="#sec-react-server-components-split-rendering-across-two-processes">the RSC split</a>)</td></tr>
+    <tr><td>The compiler automates memoization, not correctness</td><td>The Rules of React still matter (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>)</td></tr>
+    <tr><td>Server Functions are endpoints</td><td>Validate, authorize, rate-limit, audit (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
+    <tr><td>Frameworks are now the default React surface</td><td>Routing, data, caching, rendering live in the framework (<a href="#sec-react-19-2-and-the-framework-routing-era">the framework era</a>)</td></tr>
+    <tr><td>React is becoming platform-governed</td><td>Stability and ecosystem coordination over single-company urgency (<a href="#sec-the-react-foundation-feb-2026-meta-is-no-longer-the-sole-owner">the Foundation</a>)</td></tr>
+    <tr><td>Server data stays server-owned when possible</td><td>Don't move read-only server data into client state (<a href="#sec-react-server-components-split-rendering-across-two-processes">state after RSC</a>)</td></tr>
+    <tr><td>Interactivity belongs at the edge</td><td>Client components as small and leaf-like as practical (<a href="#sec-react-server-components-split-rendering-across-two-processes">client boundary placement</a>)</td></tr>
+    <tr><td>Upgrade carefully</td><td>Compiler and framework security changes require disciplined upgrades (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>, <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
   </tbody>
 </table>
 
@@ -327,14 +328,14 @@
 <table>
   <thead><tr><th>Layer</th><th>Tools</th><th>Purpose</th></tr></thead>
   <tbody>
-    <tr><td>Frameworks</td><td>Next.js, React Router, Expo, Astro, Vite</td><td>Rendering/routing/deployment surface (<a href="#sec-react-19-2-and-the-framework-routing-era">§7</a>)</td></tr>
-    <tr><td>Compiler toolchain</td><td><code>babel-plugin-react-compiler</code>, <code>eslint-plugin-react-hooks</code></td><td>Memoization + Rules-of-React enforcement (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
+    <tr><td>Frameworks</td><td>Next.js, React Router, Expo, Astro, Vite</td><td>Rendering/routing/deployment surface (<a href="#sec-react-19-2-and-the-framework-routing-era">the framework era</a>)</td></tr>
+    <tr><td>Compiler toolchain</td><td><code>babel-plugin-react-compiler</code>, <code>eslint-plugin-react-hooks</code></td><td>Memoization + Rules-of-React enforcement (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>)</td></tr>
     <tr><td>DevTools</td><td>React DevTools Performance Tracks, React Scan</td><td>Render inspection and profiling</td></tr>
-    <tr><td>Server/client data</td><td>TanStack Query, SWR, Apollo, RTK Query</td><td>Cache — sync server data with UI (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.3</a>)</td></tr>
-    <tr><td>Client state</td><td>Zustand, Redux Toolkit, Jotai, Context</td><td>Interactive UI state (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.4</a>)</td></tr>
+    <tr><td>Server/client data</td><td>TanStack Query, SWR, Apollo, RTK Query</td><td>Cache — sync server data with UI (<a href="#sec-react-server-components-split-rendering-across-two-processes">the caching model</a>)</td></tr>
+    <tr><td>Client state</td><td>Zustand, Redux Toolkit, Jotai, Context</td><td>Interactive UI state (<a href="#sec-react-server-components-split-rendering-across-two-processes">state after RSC</a>)</td></tr>
     <tr><td>Testing</td><td>Vitest/Jest, Testing Library, Playwright</td><td>Component / integration / E2E evidence</td></tr>
-    <tr><td>Boundary validation</td><td>Zod / TypeBox / Valibot + TypeScript</td><td>Validate Server Function args (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
-    <tr><td>Supply chain</td><td>deps audit, lockfile, CVE monitor</td><td>Security hygiene (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+    <tr><td>Boundary validation</td><td>Zod / TypeBox / Valibot + TypeScript</td><td>Validate Server Function args (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
+    <tr><td>Supply chain</td><td>deps audit, lockfile, CVE monitor</td><td>Security hygiene (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
   </tbody>
 </table>
 
@@ -359,22 +360,48 @@
 <table>
   <thead><tr><th>Question</th><th>Check</th></tr></thead>
   <tbody>
-    <tr><td>Is this component client or server — explicitly?</td><td>Boundary is explicit (<a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>)</td></tr>
+    <tr><td>Is this component client or server — explicitly?</td><td>Boundary is explicit (<a href="#sec-react-server-components-split-rendering-across-two-processes">the RSC split</a>)</td></tr>
     <tr><td>Does it need hooks/effects/browser APIs?</td><td>If yes, it's client</td></tr>
     <tr><td>Is the data server-owned and read-only?</td><td>Prefer server component</td></tr>
-    <tr><td>Are Server Functions validated and authorized?</td><td>Yes — treat as endpoints (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
-    <tr><td>Are props across the RSC boundary serializable?</td><td>Yes (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.1</a>)</td></tr>
-    <tr><td>Is the compiler exact-pinned and tested on upgrade?</td><td>Yes (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
-    <tr><td>Are lint rules enforcing the Rules of React?</td><td>Yes (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">§3</a>)</td></tr>
-    <tr><td>Is the framework choice deliberate?</td><td>Next/Router/Expo/Vite/Astro (<a href="#sec-react-19-2-and-the-framework-routing-era">§7</a>)</td></tr>
-    <tr><td>Is the caching behavior understood?</td><td>Request/router/data/HTTP (<a href="#sec-react-server-components-split-rendering-across-two-processes"><a href="#sec-react-server-components-split-rendering-across-two-processes">§4</a>.3</a>)</td></tr>
-    <tr><td>Is the security/upgrade cadence defined?</td><td>Yes (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">§5</a>)</td></tr>
+    <tr><td>Are Server Functions validated and authorized?</td><td>Yes — treat as endpoints (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
+    <tr><td>Are props across the RSC boundary serializable?</td><td>Yes (<a href="#sec-react-server-components-split-rendering-across-two-processes">RSC boundary rules</a>)</td></tr>
+    <tr><td>Is the compiler exact-pinned and tested on upgrade?</td><td>Yes (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>)</td></tr>
+    <tr><td>Are lint rules enforcing the Rules of React?</td><td>Yes (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>)</td></tr>
+    <tr><td>Is the framework choice deliberate?</td><td>Next/Router/Expo/Vite/Astro (<a href="#sec-react-19-2-and-the-framework-routing-era">the framework era</a>)</td></tr>
+    <tr><td>Is the caching behavior understood?</td><td>Request/router/data/HTTP (<a href="#sec-react-server-components-split-rendering-across-two-processes">the caching model</a>)</td></tr>
+    <tr><td>Is the security/upgrade cadence defined?</td><td>Yes (<a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
   </tbody>
 </table>
 
 <section class="win">
   <h3>What this doc covers</h3>
   <p>What changed in React after hooks: React 19's platform features, Actions/forms, the compiler, RSC (boundary, caching, state), the trust boundary, foundation governance, the framework era, signals, Preact, and the practical machinery (migration, failure modes, principles, ecosystem, future, checklist). Not the class→hooks mental model (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks</a>), not the full frontend-camp landscape (<a href="./frontend-camps-survey.html">camps</a>), not Next.js internals (<a href="./nextjs-deep-dive.html">nextjs</a>), not system architecture or TypeScript (<a href="./system-design.html">system-design</a>, <a href="./javascript-across-stacks.html">across-stacks</a>).</p>
+</section>
+
+<details>
+<summary><h3 style="display:inline">Search vocabulary — what things are called</h3></summary>
+<p>You cannot search for a problem you cannot name. The terms of art this doc uses, each one a working search key:</p>
+<ul>
+  <li><strong>RSC (React Server Components)</strong> — components that run on the server and serialize UI. Search "React Server Components boundary".</li>
+  <li><strong>Server Function / Server Action</strong> — a <code>"use server"</code> endpoint wired to forms. Search "React server actions security".</li>
+  <li><strong>Suspense boundary</strong> — what shows while a suspended branch waits. Search "React Suspense streaming SSR".</li>
+  <li><strong>Partial prerendering (PPR)</strong> — static shell at build, dynamic parts streamed. Search "React partial prerendering".</li>
+  <li><strong>Hydration</strong> — attaching client code to server HTML. Search "React hydration mismatch".</li>
+  <li><strong>Signals</strong> — fine-grained reactive cells (the other frameworks' model). Search "signals vs React re-render model".</li>
+  <li><strong>Trust boundary</strong> — where untrusted input crosses into privileged code. Search "RSC wire protocol CVE".</li>
+  <li><strong>Serializability</strong> — the constraint on props crossing the client/server split. Search "RSC serializable props".</li>
+  <li><strong>Request memoization / router cache / data cache</strong> — the RSC caching layers. Search "Next.js caching layers request memoization".</li>
+</ul>
+</details>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Show me one of our Server Functions and walk me through its validation and authorization — what would an attacker POST directly at the endpoint?"</li>
+    <li>"Where did we draw our client/server boundaries, and which component would you move across the boundary first if bundle size became a problem?"</li>
+    <li>"What did adopting the compiler change about how we review PRs — and which Rules-of-React violation did the lint rules catch that we'd have shipped otherwise?"</li>
+  </ul>
 </section>
 
 <footer class="lesson-foot">

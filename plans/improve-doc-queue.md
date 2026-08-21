@@ -9,7 +9,7 @@ AR twin through the pipeline/splice and runs the battery before its checkpoint.
 
 - [x] 1. **javascript-the-language** ✅ v62 — 299w/sec, 43 numerals, no teacher device. Foundation-tier language doc.
 - [x] 2. **class-to-hooks-paradigm-shift** ✅ v63 (h3 divergence → SYNC queue) — worst overall: 316w/sec, 59 numerals, 35 sections uncollapsed.
-- [ ] 3. **react-2024-and-beyond** — 261w/sec, 46 numerals (PROGRESS.md hygiene-debt list).
+- [x] 3. **react-2024-and-beyond** ✅ v68 (incl. nested-anchor + base64 corruption repair) — 261w/sec, 46 numerals (PROGRESS.md hygiene-debt list).
 - [ ] 4. **javascript-across-stacks** — 353w/sec but 30 numerals + open catalogs.
 - [ ] 5. **what-is-state-prequel** — React-path on-ramp; audit first (was recently reworked).
 - [ ] 6. **ui-ux-web-design** — sibling of html-and-css; AR h2s still numbered per PROGRESS.md.
