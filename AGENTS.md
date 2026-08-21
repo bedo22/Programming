@@ -5,8 +5,9 @@ Static HTML teaching shelf. English docs in `reference/<topic>.html`, Arabic RTL
 
 ## Governing skills
 
-- `reference-doc` — builds new EN doc + AR twin from scratch (house template, spine order, verification).
-- `translate-to-arabic` — syncs stale twins / translates EN-only docs (modes auto-detected). Read it before touching any doc.
+- `reference-doc` — builds new EN doc + AR twin from scratch. SKILL.md is a workflow router; `references/template.md` has the HTML skeleton, `references/core-rules.md` has twin links, anchors, verification.
+- `translate-to-arabic` — syncs stale twins / translates EN-only docs (modes auto-detected). SKILL.md is a workflow router; `references/` has sync-protocol, translate-protocol, arabic-rules, hygiene-mechanics. The hygiene scripts are locked — never re-implement.
+- `shelf-review` — audits the shelf (per-doc, deep analysis, mechanical verification, change review). SKILL.md routes to mode-specific reference files.
 - `scrape` — fetch real pages when research needs live sources.
 
 ## Arabic hygiene tooling (v18+) — locked, not re-derived
