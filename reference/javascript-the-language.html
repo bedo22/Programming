@@ -13,8 +13,9 @@
   <p class="kicker">REFERENCE · THE LANGUAGE, NOT THE FRAMEWORKS</p>
   <h1>JavaScript: The Language — History, Design, and the Runtime Model</h1>
   <p class="meta">How JS became JS: the 1995 Netscape/Sun deal, the Brendan Eich 10-day sprint, Mocha → LiveScript → JavaScript → ECMAScript, the prototype model, the event loop, single-threaded concurrency, and why a scripting language for form validation became the only language that runs natively in every browser. A foundation doc for the rest of the reference shelf. Sibling to <a href="./html-and-css.html">HTML & CSS</a> (the platform substrate JS manipulates).</p>
+        <p class="meta"><strong>Who this is for:</strong> developers who can write JS but can't always predict it — anyone surprised by an event-loop ordering, a lost <code>this</code>, or a mutation that leaked. Pairs with the lesson series for mechanics.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>Language:</strong> English · <a href="./ar/javascript-the-language.html">العربية</a>
+          <strong>Last reviewed:</strong> 2026-08-21 · <strong>Language:</strong> English · <a href="./ar/javascript-the-language.html">العربية</a>
         </p>
       </header>
 
@@ -26,6 +27,21 @@
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone. One sitting. This doc is <em>not</em> a JS tutorial — the <a href="../lessons/0001-the-accidental-lingua-franca.html">lesson series</a> already are (from lesson 0001, the accidental lingua franca, to lesson 0022, the real world). This doc is not a React doc — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> already is. This doc <em>is</em> the missing piece: the language's history, design rationale, runtime model, and core semantics map — written so you can read any JS codebase without asking "why did they do it this way?" at the language level. Cross-cutting to <a href="./html-and-css.html">HTML & CSS</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them. Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
+
+<h2 id="sec-the-leverage-map-where-the-work-concentrates">The leverage map — where the work actually concentrates</h2>
+
+<p>The semantics map below has eleven dimensions, but daily JS work does not spread evenly across them. Rough practitioner tiers, derived from what the failure-modes table punishes most often and what code-reading actually demands:</p>
+
+<table>
+  <thead><tr><th>Tier</th><th>Semantics</th><th>Covers</th></tr></thead>
+  <tbody>
+    <tr><td><strong>T1 — master first</strong></td><td>Closures + <code>let</code>/<code>const</code> scope; <code>===</code> with explicit conversions; async ordering (sync → microtasks → macrotasks); call-site <code>this</code> and arrow functions; reference-vs-value copying; ESM imports</td><td>The large majority of everyday reading and writing: callbacks, state updates, module wiring — and most of the failure-modes table.</td></tr>
+    <tr><td><strong>T2 — learn when the situation demands</strong></td><td>Generators and iteration protocols; <code>WeakMap</code>/<code>WeakSet</code> retention habits; custom error classes; strict-mode nuances; <code>Object.is</code> edge cases; structured clone</td><td>Streams, caches, per-object metadata, library-grade error hierarchies.</td></tr>
+    <tr><td><strong>T3 — rare specialist knowledge</strong></td><td><code>Proxy</code>/<code>Reflect</code>; <code>WeakRef</code>/<code>FinalizationRegistry</code>; symbols beyond the iterator protocol; <code>eval</code>/<code>with</code> (mostly to avoid)</td><td>Framework internals, observability tooling, metaprogramming libraries. Reaching for T3 while T1 is shaky is the classic beginner inversion.</td></tr>
+  </tbody>
+</table>
+
+<p>An honesty note: the tier boundaries are practitioner judgment, not measurement — but testable the same way as any leverage claim: audit your last ten confusing JS bugs; most will live in T1 semantics working exactly as specified.</p>
 
 <h2 id="sec-the-10-days-in-may-1995">The 10 days in May 1995</h2>
 
@@ -119,7 +135,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   </tbody>
 </table>
 
-<p>The Node.js bet (2009): the <em>same loop</em> works server-side. No threads per request — one loop, many concurrent I/O operations. This is why Node handles 10k connections on one thread while a threaded server needs 10k threads. The trade-off: CPU-bound work blocks the loop. The solution: worker threads (2018) or offload to another process.</p>
+<p>The Node.js bet (2009): the <em>same loop</em> works server-side. No threads per request — one loop, many concurrent I/O operations. This is why Node handles 10k connections on one thread while a threaded server needs 10k threads. The trade-off: CPU-bound work blocks the loop. The solution: worker threads (2018) or offload to another process. Calibration: the HTML spec clamps nested <code>setTimeout</code> delays to ~4&nbsp;ms after five levels of nesting — "0&nbsp;ms" never means now.</p>
 
 ---
 
@@ -201,7 +217,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 <p>Three facts that shape every program:</p>
 
 <ul>
-  <li><strong>Functions are objects</strong> — they can be assigned, passed, and given properties (see <a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">§4</a>). <strong>Arrays are objects</strong> — with a special <code>length</code> that tracks the highest index, not a count of elements.</li>
+  <li><strong>Functions are objects</strong> — they can be assigned, passed, and given properties (see <a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">first-class functions</a>). <strong>Arrays are objects</strong> — with a special <code>length</code> that tracks the highest index, not a count of elements.</li>
   <li><strong><code>typeof null === "object"</code></strong> is a historical bug (<code>null</code>'s type tag was stored as the object tag for lack of a better one). Preserved forever — the web cannot break.</li>
   <li><strong>Wrappers exist but should stay invisible.</strong> <code>new String("x")</code>, <code>new Number(1)</code>, <code>new Boolean(true)</code> create object wrappers that mostly behave like primitives but compare by reference — <code>new Number(1) === 1</code> is <code>false</code>. Never construct them explicitly; let primitives auto-wrap when you call methods (<code>"abc".toUpperCase()</code>).</li>
 </ul>
@@ -292,7 +308,7 @@ for (let i = 0; i < 3; i++) {
 <table>
   <thead><tr><th>Concept</th><th>Meaning</th></tr></thead>
   <tbody>
-    <tr><td><code>Object.create(proto)</code></td><td>Object that delegates to <code>proto</code> — the raw primitive (<a href="#sec-the-design-prototype-model-not-classes">§3</a>)</td></tr>
+    <tr><td><code>Object.create(proto)</code></td><td>Object that delegates to <code>proto</code> — the raw primitive (<a href="#sec-the-design-prototype-model-not-classes">prototype model</a>)</td></tr>
     <tr><td>Constructor + <code>new</code></td><td>Calling <code>new F()</code> creates an object whose prototype is <code>F.prototype</code></td></tr>
     <tr><td><code>.prototype</code> / <code>__proto__</code></td><td><code>F.prototype</code> is the delegate of instances; <code>__proto__</code> reads the actual link (modern: <code>Object.getPrototypeOf</code>)</td></tr>
     <tr><td><code>instanceof</code></td><td>Checks the <em>chain</em>, not a classical type</td></tr>
@@ -422,14 +438,14 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 <ul>
   <li>Disables silent errors (assignment to read-only props throws).</li>
   <li>Prevents accidental globals (undeclared <code>x = 1</code> now throws).</li>
-  <li>Makes plain-function <code>this</code> <code>undefined</code> instead of the global object (see <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b</a>.4) — catching more call-site bugs.</li>
+  <li>Makes plain-function <code>this</code> <code>undefined</code> instead of the global object (see <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">core semantics map</a>.4) — catching more call-site bugs.</li>
   <li>Kills a few legacy syntax traps; banning <code>with</code>, octals with <code>0</code> prefix.</li>
 </ul>
 
 <p>In modern code you almost never write <code>"use strict"</code> yourself: <strong>modules and classes are strict by default</strong>. Modules always; classes always. Fine-grained that fixed behaviors arrive even for code that never opted in.</p>
 
 <blockquote class="callout">
-  <p><strong>What ECMAScript does <em>not</em> define:</strong> DOM, CSSOM, <code>fetch</code>, timers, <code>console</code>, the file system, network sockets, environment variables, browser storage, Web Workers, service workers. All of these are host facilities (<a href="#sec-the-host-environment-not-the-language">§6</a>). When code "doesn't run" in a new environment, the first question is which host API it assumed.</p>
+  <p><strong>What ECMAScript does <em>not</em> define:</strong> DOM, CSSOM, <code>fetch</code>, timers, <code>console</code>, the file system, network sockets, environment variables, browser storage, Web Workers, service workers. All of these are host facilities (<a href="#sec-the-host-environment-not-the-language">host environment</a>). When code "doesn't run" in a new environment, the first question is which host API it assumed.</p>
 </blockquote>
 
 <h2 id="sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">Standardization: ECMAScript, TC39, the ES6/2015 tipping point</h2>
@@ -449,18 +465,18 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
   </tbody>
 </table>
 
-<p>The same pattern as <a href="#sec-why-a-new-language-not-a-java-applet-or-c-extension">§2</a>, applied to the standard itself — <strong>the dominant constraint of an era shaped the next language</strong>:</p>
+<p>The same pattern as <a href="#sec-why-a-new-language-not-a-java-applet-or-c-extension">why a new language</a>, applied to the standard itself — <strong>the dominant constraint of an era shaped the next language</strong>:</p>
 
 <table>
   <thead><tr><th>Dominant constraint</th><th>Language response</th></tr></thead>
   <tbody>
-    <tr><td>Browser needed safe glue</td><td>Dynamic, interpreted, GC'd scripting language (<a href="#sec-why-a-new-language-not-a-java-applet-or-c-extension">§2</a>)</td></tr>
-    <tr><td>Java syntax required politically</td><td>C/Java-shaped syntax over Scheme-like semantics (<a href="#sec-the-10-days-in-may-1995">§1</a>)</td></tr>
+    <tr><td>Browser needed safe glue</td><td>Dynamic, interpreted, GC'd scripting language (<a href="#sec-why-a-new-language-not-a-java-applet-or-c-extension">why a new language</a>)</td></tr>
+    <tr><td>Java syntax required politically</td><td>C/Java-shaped syntax over Scheme-like semantics (<a href="#sec-the-10-days-in-may-1995">the 10 days in May 1995</a>)</td></tr>
     <tr><td>Early tooling was weak</td><td>Forgiving syntax and runtime; survival over rigor</td></tr>
     <tr><td>ES3 stagnation → platform divergence</td><td>ES5 (2009) rescued the already-shipped practical features</td></tr>
     <tr><td>App complexity exploded</td><td>ES2015: modules, classes, promises, block scope, <code>Map</code>/<code>Set</code></td></tr>
     <tr><td>Large teams needed maintainability</td><td>Strict mode, then TypeScript around JS (2012+)</td></tr>
-    <tr><td>Multiple runtimes emerged (Node, Deno, Bun, workers)</td><td>Host separation got more deliberate (<a href="#sec-the-host-environment-not-the-language">§6</a>); web-standard primitives got first-class</td></tr>
+    <tr><td>Multiple runtimes emerged (Node, Deno, Bun, workers)</td><td>Host separation got more deliberate (<a href="#sec-the-host-environment-not-the-language">host environment</a>); web-standard primitives got first-class</td></tr>
     <tr><td>Annual cadence</td><td>Features arrive in small, additive, browser-verified steps</td></tr>
     <tr><td>AI-assisted coding</td><td>Semantic clarity and runtime mental models matter more; tooling terrain shifts</td></tr>
   </tbody>
@@ -587,15 +603,15 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 <table>
   <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
   <tbody>
-    <tr><td>Small core, extensible host</td><td>The language defines semantics; the host defines the environment (<a href="#sec-the-host-environment-not-the-language">§6</a>)</td></tr>
-    <tr><td>First-class functions</td><td>Functions are values — assignable, passable, returnable (<a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">§4</a>)</td></tr>
-    <tr><td>Lexical scope and closures</td><td>Scope is static and capturable; <code>this</code> is not (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.3</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.4</a>)</td></tr>
-    <tr><td>Prototype delegation</td><td>Objects inherit from objects; <code>class</code> is sugar (<a href="#sec-the-design-prototype-model-not-classes">§3</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.5</a>)</td></tr>
-    <tr><td>Single-threaded event loop</td><td>Concurrency through events, not shared-memory threads (<a href="#sec-the-design-single-threaded-event-loop">§5</a>)</td></tr>
-    <tr><td>Dynamic typing with coercion</td><td>Flexible, but requires discipline (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.1</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.2</a>)</td></tr>
-    <tr><td>Backward compatibility</td><td>The web cannot break; features are additive (<a href="#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">§7</a>)</td></tr>
+    <tr><td>Small core, extensible host</td><td>The language defines semantics; the host defines the environment (<a href="#sec-the-host-environment-not-the-language">host environment</a>)</td></tr>
+    <tr><td>First-class functions</td><td>Functions are values — assignable, passable, returnable (<a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">first-class functions</a>)</td></tr>
+    <tr><td>Lexical scope and closures</td><td>Scope is static and capturable; <code>this</code> is not (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">scope and closures</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">“this” binding</a>)</td></tr>
+    <tr><td>Prototype delegation</td><td>Objects inherit from objects; <code>class</code> is sugar (<a href="#sec-the-design-prototype-model-not-classes">prototype model</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">prototypes in depth</a>)</td></tr>
+    <tr><td>Single-threaded event loop</td><td>Concurrency through events, not shared-memory threads (<a href="#sec-the-design-single-threaded-event-loop">single-threaded event loop</a>)</td></tr>
+    <tr><td>Dynamic typing with coercion</td><td>Flexible, but requires discipline (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">Types: primitives vs objects</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">equality and coercion</a>)</td></tr>
+    <tr><td>Backward compatibility</td><td>The web cannot break; features are additive (<a href="#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">standardization</a>)</td></tr>
     <tr><td>Minimal syntax, maximal semantics</td><td>Small surface; behavior is nuanced — <code>this</code>, coercion, prototypes</td></tr>
-    <tr><td>Specification over implementation</td><td>Engines implement ECMAScript; they do not define it (<a href="#sec-the-engines-v8-spidermonkey-javascriptcore">§8</a>)</td></tr>
+    <tr><td>Specification over implementation</td><td>Engines implement ECMAScript; they do not define it (<a href="#sec-the-engines-v8-spidermonkey-javascriptcore">the engines</a>)</td></tr>
   </tbody>
 </table>
 
@@ -615,7 +631,7 @@ Promise.resolve()
 console.log(4);
 <span class="output">// 1, 4, 3, 2</span></code></pre>
 
-<p><strong>Why.</strong> <code>1</code> and <code>4</code> are synchronous — they run to completion first. <code>3</code> is a microtask: it drains after the current task, before the next macrotask. <code>2</code> is a macrotask from the timer — it runs last, after the microtask queue is empty. The answer is <code>1, 4, 3, 2</code>. This is the ordering rule from <a href="#sec-mental-models-how-developers-actually-reason-about-the-event-loop">§5b</a> in one trace: sync → microtasks → macrotasks → render.</p>
+<p><strong>Why.</strong> <code>1</code> and <code>4</code> are synchronous — they run to completion first. <code>3</code> is a microtask: it drains after the current task, before the next macrotask. <code>2</code> is a macrotask from the timer — it runs last, after the microtask queue is empty. The answer is <code>1, 4, 3, 2</code>. This is the ordering rule from <a href="#sec-mental-models-how-developers-actually-reason-about-the-event-loop">mental models of the loop</a> in one trace: sync → microtasks → macrotasks → render.</p>
 
 <h3>Prototype delegation is a runtime walk</h3>
 
@@ -632,7 +648,7 @@ dog.speak(); <span class="output">// bark — own property shadows the chain</sp
 delete dog.speak;
 dog.speak(); <span class="output">// generic sound — the chain is walked again</span></code></pre>
 
-<p><strong>Why.</strong> Setting <code>dog.speak</code> created an <em>own</em> property that shadowed the delegated one; <code>delete</code> removed it and the chain walk resumed. Nothing was copied between objects at any point — lookup is delegation (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.5</a>). This is also why <code>class</code> methods that you expect to "exist on the instance" actually live on the prototype.</p>
+<p><strong>Why.</strong> Setting <code>dog.speak</code> created an <em>own</em> property that shadowed the delegated one; <code>delete</code> removed it and the chain walk resumed. Nothing was copied between objects at any point — lookup is delegation (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">prototypes in depth</a>). This is also why <code>class</code> methods that you expect to "exist on the instance" actually live on the prototype.</p>
 
 <h2 id="sec-failure-modes-where-the-model-breaks-in-practice">Failure modes — where the model breaks in practice</h2>
 
@@ -642,15 +658,15 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
   <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix / mental model</th></tr></thead>
   <tbody>
     <tr><td>Blocking the event loop</td><td>CPU-heavy work freezes all concurrency</td><td>Offload to worker/process; keep tasks small</td></tr>
-    <tr><td>Losing <code>this</code></td><td>Extracted method loses its object context</td><td>Arrow function or <code>bind</code>; call site decides <code>this</code> (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.4</a>)</td></tr>
-    <tr><td><code>var</code> loop closure bug</td><td>All callbacks see the last value</td><td><code>let</code> per-iteration binding (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.3</a>)</td></tr>
-    <tr><td>Mutation of shared objects</td><td>Reference sharing spreads changes silently</td><td>Understand value vs reference; copy before mutate (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.6</a>)</td></tr>
-    <tr><td>Prototype pollution</td><td>Untrusted keys modify <code>Object.prototype</code></td><td>Strict key allowlists, <code>Map</code>, parse-only merge (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.5</a>)</td></tr>
-    <tr><td>Unhandled promise rejection</td><td>Async failure is ignored, silently</td><td>Handle at boundary; global rejection handler as safety net (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.9</a>)</td></tr>
-    <tr><td>Coercion surprises</td><td><code>==</code>, <code>+</code>, truthiness produce odd results</td><td>Prefer <code>===</code>; make conversions explicit (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.2</a>)</td></tr>
+    <tr><td>Losing <code>this</code></td><td>Extracted method loses its object context</td><td>Arrow function or <code>bind</code>; call site decides <code>this</code> (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">“this” binding</a>)</td></tr>
+    <tr><td><code>var</code> loop closure bug</td><td>All callbacks see the last value</td><td><code>let</code> per-iteration binding (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">scope and closures</a>)</td></tr>
+    <tr><td>Mutation of shared objects</td><td>Reference sharing spreads changes silently</td><td>Understand value vs reference; copy before mutate (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">reference vs value</a>)</td></tr>
+    <tr><td>Prototype pollution</td><td>Untrusted keys modify <code>Object.prototype</code></td><td>Strict key allowlists, <code>Map</code>, parse-only merge (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">prototypes in depth</a>)</td></tr>
+    <tr><td>Unhandled promise rejection</td><td>Async failure is ignored, silently</td><td>Handle at boundary; global rejection handler as safety net (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">error handling</a>)</td></tr>
+    <tr><td>Coercion surprises</td><td><code>==</code>, <code>+</code>, truthiness produce odd results</td><td>Prefer <code>===</code>; make conversions explicit (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">equality and coercion</a>)</td></tr>
     <tr><td>Treating JS as statically typed</td><td>Shape changes cause runtime failures</td><td>TypeScript/JSDoc for large codebases; validate at trust boundaries</td></tr>
-    <tr><td>Assuming host APIs are language</td><td>Code breaks when the host changes</td><td>Identify the host first (<a href="#sec-the-host-environment-not-the-language">§6</a>)</td></tr>
-    <tr><td>Misusing <code>class</code> like Java/C#</td><td>Expecting classical OOP semantics</td><td>Remember the prototype chain underneath (<a href="#sec-the-design-prototype-model-not-classes">§3</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.5</a>)</td></tr>
+    <tr><td>Assuming host APIs are language</td><td>Code breaks when the host changes</td><td>Identify the host first (<a href="#sec-the-host-environment-not-the-language">host environment</a>)</td></tr>
+    <tr><td>Misusing <code>class</code> like Java/C#</td><td>Expecting classical OOP semantics</td><td>Remember the prototype chain underneath (<a href="#sec-the-design-prototype-model-not-classes">prototype model</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">prototypes in depth</a>)</td></tr>
     <tr><td>Global state</td><td>Modules/functions depend on shared mutable globals</td><td>Narrow scope; pass dependencies explicitly</td></tr>
   </tbody>
 </table>
@@ -667,11 +683,28 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
     <tr><td>Pattern matching</td><td>Structural <code>switch</code> over shapes</td><td>More expressive control flow, if it clears TC39</td></tr>
     <tr><td>Records and tuples</td><td>Immutable data structures at language level</td><td>Deep immutability without a library</td></tr>
     <tr><td>Decorators</td><td>Metadata/reflection for classes</td><td>Framework and dependency-injection patterns</td></tr>
-    <tr><td>WASM Component Model / GC</td><td>Non-JS modules interoperate more directly</td><td>JS stays the glue, but the glue's reach narrows (<a href="#sec-the-wasm-junction">§9</a>)</td></tr>
+    <tr><td>WASM Component Model / GC</td><td>Non-JS modules interoperate more directly</td><td>JS stays the glue, but the glue's reach narrows (<a href="#sec-the-wasm-junction">the WASM junction</a>)</td></tr>
     <tr><td>Signals-style reactivity</td><td>Framework patterns influencing language/library thinking</td><td>The 2026 concurrency-and-state discussion, not a spec item</td></tr>
     <tr><td>AI-assisted coding</td><td>More generated JS in production</td><td>Semantic clarity and runtime mental models become the differentiator</td></tr>
   </tbody>
 </table>
+
+<details>
+<summary><h3 style="display:inline">Search vocabulary — what things are called</h3></summary>
+<p>You cannot search for a problem you cannot name. The terms of art this doc uses, each one a working search key:</p>
+<ul>
+  <li><strong>TDZ (Temporal Dead Zone)</strong> — why <code>let</code>/<code>const</code> throw before their declaration line. Search "TDZ JavaScript".</li>
+  <li><strong>Run-to-completion / event loop</strong> — why sync code finishes before any callback. Search "JavaScript event loop run to completion".</li>
+  <li><strong>Microtask vs macrotask</strong> — promise-vs-timer ordering. Search "microtasks macrotasks ordering".</li>
+  <li><strong>JIT &amp; hidden classes</strong> — why V8 is fast and micro-benchmarks lie. Search "V8 hidden classes JIT".</li>
+  <li><strong>IIFE</strong> — the pre-module scoping idiom you'll meet in old code. Search "immediately invoked function expression".</li>
+  <li><strong>Tree-shaking</strong> — dead-export elimination enabled by ESM's static structure. Search "tree shaking ES modules".</li>
+  <li><strong>Dual-package hazard</strong> — two copies of one module via CJS+ESM interop. Search "dual package hazard".</li>
+  <li><strong>Prototype pollution</strong> — untrusted keys reaching <code>Object.prototype</code>. Search "prototype pollution CVE".</li>
+  <li><strong>Coercion / truthiness</strong> — the specified rules behind <code>[] == false</code>. Search "JavaScript abstract equality".</li>
+  <li><strong>GC roots &amp; retention</strong> — what keeps objects alive; the real leak mechanism. Search "JavaScript memory retention heap snapshot".</li>
+</ul>
+</details>
 
 <h2 id="sec-summary-checklist">Summary checklist</h2>
 
@@ -680,19 +713,34 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
 <table>
   <thead><tr><th>Question</th><th>Answer if you know it</th></tr></thead>
   <tbody>
-    <tr><td>Which host does this run in?</td><td>Browser / Node / Deno / Bun / Worker — the globals it can use (<a href="#sec-the-host-environment-not-the-language">§6</a>)</td></tr>
-    <tr><td>Which scope is this?</td><td>Function vs block; hoisting and TDZ apply (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.3</a>)</td></tr>
-    <tr><td>How is <code>this</code> bound here?</td><td>Call site, unless it is an arrow function (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.4</a>)</td></tr>
-    <tr><td>Is this object shared by reference?</td><td>Yes for objects/arrays; mutation leaks (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.6</a>)</td></tr>
-    <tr><td>Is this async scheduled correctly?</td><td>Microtask vs macrotask; sync runs to completion first (<a href="#sec-the-design-single-threaded-event-loop">§5</a>, <a href="#sec-worked-examples-semantics-and-runtime-in-one-trace">§13a</a>)</td></tr>
-    <tr><td>Is the event loop blocked here?</td><td>Long synchronous work freezes everything (<a href="#sec-the-design-single-threaded-event-loop">§5</a>)</td></tr>
-    <tr><td>ESM or CommonJS?</td><td>Static/parse-time vs dynamic/runtime; interop is deliberate (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.7</a>)</td></tr>
-    <tr><td>Are prototypes being modified safely?</td><td>No prototype pollution from untrusted keys (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.5</a>)</td></tr>
-    <tr><td>Are errors handled, sync and async?</td><td><code>throw</code>/<code>try</code> sync; <code>.catch</code>/rejection handlers async (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b.9</a>)</td></tr>
-    <tr><td>Language feature or host API?</td><td>ECMAScript semantics vs environment-provided API (<a href="#sec-the-host-environment-not-the-language">§6</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§6b</a>)</td></tr>
+    <tr><td>Which host does this run in?</td><td>Browser / Node / Deno / Bun / Worker — the globals it can use (<a href="#sec-the-host-environment-not-the-language">host environment</a>)</td></tr>
+    <tr><td>Which scope is this?</td><td>Function vs block; hoisting and TDZ apply (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">scope and closures</a>)</td></tr>
+    <tr><td>How is <code>this</code> bound here?</td><td>Call site, unless it is an arrow function (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">“this” binding</a>)</td></tr>
+    <tr><td>Is this object shared by reference?</td><td>Yes for objects/arrays; mutation leaks (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">reference vs value</a>)</td></tr>
+    <tr><td>Is this async scheduled correctly?</td><td>Microtask vs macrotask; sync runs to completion first (<a href="#sec-the-design-single-threaded-event-loop">single-threaded event loop</a>, <a href="#sec-worked-examples-semantics-and-runtime-in-one-trace">ordering worked example</a>)</td></tr>
+    <tr><td>Is the event loop blocked here?</td><td>Long synchronous work freezes everything (<a href="#sec-the-design-single-threaded-event-loop">single-threaded event loop</a>)</td></tr>
+    <tr><td>ESM or CommonJS?</td><td>Static/parse-time vs dynamic/runtime; interop is deliberate (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">modules</a>)</td></tr>
+    <tr><td>Are prototypes being modified safely?</td><td>No prototype pollution from untrusted keys (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">prototypes in depth</a>)</td></tr>
+    <tr><td>Are errors handled, sync and async?</td><td><code>throw</code>/<code>try</code> sync; <code>.catch</code>/rejection handlers async (<a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">error handling</a>)</td></tr>
+    <tr><td>Language feature or host API?</td><td>ECMAScript semantics vs environment-provided API (<a href="#sec-the-host-environment-not-the-language">host environment</a>, <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">core semantics map</a>)</td></tr>
   </tbody>
 </table>
 
+
+<section class="win">
+  <h3>What this doc covers</h3>
+  <p>The language: its history, design bets, runtime model, standardization. Not frameworks (<a href="./class-to-hooks-paradigm-shift.html">paradigm-shift</a>, <a href="./angular-evolution.html">angular-evolution</a>). Not JS syntax mechanics (<a href="../lessons/0001-the-accidental-lingua-franca.html">the lesson series</a>). Not the JS-vs-TypeScript/Java/.NET split — that lives in the <a href="./javascript-across-stacks.html">across-stacks sibling</a>.</p>
+</section>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Show me a production bug where someone assumed <code>setTimeout(fn, 0)</code> meant 'run now'. What state did the callback finally observe?"</li>
+    <li>"When you inherit a codebase mixing CommonJS and ESM, how do you choose what to migrate first — and what does the dual-package hazard look like in the lockfile?"</li>
+    <li>"Which design bet from this doc do you expect to matter least in ten years — and what constraint inversion would have to happen to prove you right?"</li>
+  </ul>
+</section>
 
 <footer class="lesson-foot">
   <span><a href="../index.html">← Back to the index</a></span>

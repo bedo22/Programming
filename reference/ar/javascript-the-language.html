@@ -13,8 +13,9 @@
   <p class="kicker">مرجع · اللغة، لا الأطر</p>
   <h1>جافاسكريبت: اللغة — التاريخ، التصميم، ونموذج التشغيل</h1>
   <p class="meta">كيف أصبحت JS هي JS: صفقة نتسكيب/صن 1995، سباق برندان إيك في 10 أيام، موكا → لايف سكريبت → جافاسكريبت → إيكماسكربت، نموذج البروتوتايب، حلقة الأحداث، التزامن أحادي المسار، ولماذا أصبحت لغة برمجية نصية لتحقق النماذج هي اللغة الوحيدة التي تعمل أصلياً في كل متصفح. وثيقة تأسيسية لباقي رف المراجع.</p>
+        <p class="meta"><strong>لمن هذه الوثيقة:</strong> مطوّرون يستطيعون كتابة JS لكن لا يستطيعون دائمًا التنبؤ بها — أي مَن فوجئ بترتيب حلقة أحداث، أو <code>this</code> ضائع، أو تسريب تعديل. تُقرأ مع سلسلة الدروس لتفاصيل الآليات.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../javascript-the-language.html">English</a>
+          <strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../javascript-the-language.html">English</a>
         </p>
       </header>
 
@@ -26,6 +27,21 @@
 <h2 id="sec-how-to-use-this-doc">كيف تستخدم هذه الوثيقة</h2>
 
 <p>ترتيب القراءة: مستقلة. جلسة واحدة. هذه الوثيقة <em>ليست</em> درس JS — <a href="../../lessons/0001-the-accidental-lingua-franca.html">سلسلة الدروس</a> بالفعل هي (من الدرس ٠٠٠١ — اللغة العرضية — إلى الدرس ٠٠٢٢ — العالم الحقيقي). هذه الوثيقة <em>ليست</em> وثيقة رياكت — <a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a> بالفعل هي. هذه الوثيقة <em>هي</em> القطعة المفقودة: تاريخ اللغة، منطق التصميم، ونموذج التشغيل، مكتوبة لتستطيع قراءة أي قاعدة كود JS دون أن تسأل "لماذا فعلوها هكذا؟" على مستوى اللغة. المرجع: <a href="./glossary.html">المصطلحات</a> — مفردات مشتركة عبر جميع وثائق المراجع.</p>
+
+<h2 id="sec-the-leverage-map-where-the-work-concentrates">خريطة الرافعة — أين يتركّز العمل فعليًا</h2>
+
+<p>لخريطة الدلالات أدناه أحد عشر بُعدًا، لكن عمل JS اليومي لا يتوزع بالتساوي عليها. تدرّجات عملية تقريبية، مستمدة مما يعاقب عليه جدول أنماط الفشل أكثر شيوعًا وما تتطلبه قراءة الشيفرة فعليًا:</p>
+
+<table>
+  <thead><tr><th>التدرّج</th><th>الدلالات</th><th>ما تغطيه</th></tr></thead>
+  <tbody>
+    <tr><td><strong>T1 — أتقِنها أولًا</strong></td><td>الإغلاقات ونطاق <code>let</code>/<code>const</code>؛ <code>===</code> مع تحويلات صريحة؛ ترتيب اللازامن (المتزامن → المهام الدقيقة → المهام الكبيرة)؛ ربط <code>this</code> بموقع الاستدعاء والدوال السهمية؛ النسخ بالمرجع مقابل القيمة؛ استيراد ESM</td><td>الغالبية العظمى من القراءة والكتابة اليومية: الاستدعاءات الراجعة، تحديثات الحالة، توصيل الوحدات — ومعظم جدول أنماط الفشل.</td></tr>
+    <tr><td><strong>T2 — تعلّمها عندما يطلبها الموقف</strong></td><td>المولّدات وبروتوكولات التكرار؛ عادات الاحتفاظ بـ <code>WeakMap</code>/<code>WeakSet</code>؛ أصناف الأخطاء المخصصة؛ تفاصيل الوضع الصارم؛ حالات <code>Object.is</code> الحدّية؛ النسخ البنيوي</td><td>التدفقات، الذواكر المؤقتة، البيانات الوصفية لكل كائن، تسلسلات أخطاء بمستوى المكتبات.</td></tr>
+    <tr><td><strong>T3 — معرفة متخصصة نادرة</strong></td><td><code>Proxy</code>/<code>Reflect</code>؛ <code>WeakRef</code>/<code>FinalizationRegistry</code>؛ الرموز غير التكرارية؛ <code>eval</code>/<code>with</code> (للتجنب غالبًا)</td><td>مؤلفو الأطر، أدوات المراقبة، مكتبات الميتابراغمة. اللجوء إلى T3 وT1 موضع اهتزاز هو انقلاب المبتدئ الكلاسيكي.</td></tr>
+  </tbody>
+</table>
+
+<p>ملاحظة صدقٍ: حدود التدرّجات اجتهاد عملي وليست قياسًا — لكنها قابلة للاختبار كأي ادعاء رافعة: راجع آخر عشرة أخطاء JS محيّرة؛ سيكون معظمها في دلالات T1 وهي تعمل تمامًا كما حُدّدت.</p>
 
 <h2 id="sec-the-10-days-in-may-1995">العشرة أيام في مايو ١٩٩٥</h2>
 
@@ -119,7 +135,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
   </tbody>
 </table>
 
-<p>رهان Node.js (٢٠٠٩): <em>نفس الحلقة</em> تعمل جانب الخادم. لا خيوط لكل طلب — حلقة واحدة، عمليات I/O متزامنة كثيرة. لهذا Node تتعامل مع ١٠ آلاف اتصال على خيط واحد بينما خادم خيوط يحتاج ١٠ آلاف خيط. المقايضة: العمل المكثف CPU يسد الحلقة. الحل: خيوط عاملة (٢٠١٨) أو نقل لعملية أخرى.</p>
+<p>رهان Node.js (٢٠٠٩): <em>نفس الحلقة</em> تعمل جانب الخادم. لا خيوط لكل طلب — حلقة واحدة، عمليات I/O متزامنة كثيرة. لهذا Node تتعامل مع ١٠ آلاف اتصال على خيط واحد بينما خادم خيوط يحتاج ١٠ آلاف خيط. المقايضة: العمل المكثف CPU يسد الحلقة. الحل: خيوط عاملة (٢٠١٨) أو نقل لعملية أخرى. معايرة: تقيّد مواصفة HTML تأخير <code>setTimeout</code> المتداخل إلى ~4&nbsp;مللي ثانية بعد خمسة مستويات من التداخل — "0&nbsp;ms" لا تعني أبدًا الآن.</p>
 
 <h2 id="sec-mental-models-how-developers-actually-reason-about-the-event-loop">النماذج الذهنية — كيف يفكر المطورون فعلاً حول حلقة الأحداث</h2>
 
@@ -195,7 +211,7 @@ dog.speak(); <span class="output">// Dog makes a sound</span>
 <p>ثلاث حقائق تشكل كل برنامج:</p>
 
 <ul>
-  <li><strong>الدوال كائنات</strong> — يمكن إسنادها وتمريرها وإعطاؤها خصائص (انظر <a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">§٤</a>). <strong>المصفوفات كائنات</strong> — بخصائص <code>length</code> خاصة تتبع أعلى فهرس، لا عدد عناصر.</li>
+  <li><strong>الدوال كائنات</strong> — يمكن إسنادها وتمريرها وإعطاؤها خصائص (انظر <a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">الدوال من الدرجة الأولى</a>). <strong>المصفوفات كائنات</strong> — بخصائص <code>length</code> خاصة تتبع أعلى فهرس، لا عدد عناصر.</li>
   <li><strong><code>typeof null === "object"</code></strong> خلل تاريخي (وسم نوع <code>null</code> خُزِن كوسم الكائن لعدم وجود أفضل). محفوظ للأبد — الويب لا يمكن أن ينكسر.</li>
   <li><strong>الغلافات موجودة لكن يجب أن تبقى غير مرئية.</strong> <code>new String("x")</code> و<code>new Number(1)</code> و<code>new Boolean(true)</code> تنشئ أغلفة كائن تتصرف غالباً كبدائيات لكنها تُقارن بالمرجع — <code>new Number(1) === 1</code> هي <code>false</code>. لا تُنشئها صراحةً أبداً؛ دع البدائيات تلتف تلقائياً عند استدعاء الدوال (<code>"abc".toUpperCase()</code>).</li>
 </ul>
@@ -286,7 +302,7 @@ for (let i = 0; i < 3; i++) {
 <table>
   <thead><tr><th>المفهوم</th><th>المعنى</th></tr></thead>
   <tbody>
-    <tr><td><code>Object.create(proto)</code></td><td>كائن يفوض إلى <code>proto</code> — البدائية الخام (<a href="#sec-the-design-prototype-model-not-classes">§٣</a>)</td></tr>
+    <tr><td><code>Object.create(proto)</code></td><td>كائن يفوض إلى <code>proto</code> — البدائية الخام (<a href="#sec-the-design-prototype-model-not-classes">نموذج البروتوتايب</a>)</td></tr>
     <tr><td>منشئ + <code>new</code></td><td>استدعاء <code>new F()</code> ينشئ كائناً بروتوتايبه <code>F.prototype</code></td></tr>
     <tr><td><code>.prototype</code> / <code>__proto__</code></td><td><code>F.prototype</code> مفوَّض النسخ؛ <code>__proto__</code> يقرأ الرابط الفعلي (حديثاً: <code>Object.getPrototypeOf</code>)</td></tr>
     <tr><td><code>instanceof</code></td><td>يفحص <em>السلسلة</em> لا نوعاً كلاسيكياً</td></tr>
@@ -416,14 +432,14 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 <ul>
   <li>يعطّل الأخطاء الصامتة (الإسناد لخصائص للقراءة فقط يرمي).</li>
   <li>يمنع العاميات العرضية (<code>x = 1</code> غير المصرَّح يرمي الآن).</li>
-  <li>يجعل <code>this</code> في الدوال العادية <code>undefined</code> بدل الكائن العام (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>) — يلتقط مزيداً من أخطاء مواضع الاستدعاء.</li>
+  <li>يجعل <code>this</code> في الدوال العادية <code>undefined</code> بدل الكائن العام (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>) — يلتقط مزيداً من أخطاء مواضع الاستدعاء.</li>
   <li>يقتل فخاخ صياغة قديمة قليلة؛ حظر <code>with</code> والثماني بادئة <code>0</code>.</li>
 </ul>
 
 <p>في الكود الحديث لا تكتب <code>"use strict"</code> بنفسك أبداً تقريباً: <strong>الوحدات والكلاسات صارمة افتراضياً</strong>. الوحدات دائماً؛ الكلاسات دائماً. هذا ضبط دقيق يجعل السلوكيات المصلحة تصل حتى للكود الذي لم يشترك أبداً.</p>
 
 <blockquote class="callout">
-  <p><strong>ما لا تعرّفه ECMAScript:</strong> DOM، CSSOM، <code>fetch</code>، المؤقتات، <code>console</code>، نظام الملفات، مقابس الشبكة، متغيرات البيئة، تخزين المتصفح، عمال الويب، عمال الخدمة. كلها مرافق مضيف (<a href="#sec-the-host-environment-not-the-language">§٦</a>). حين «لا يعمل» الكود في بيئة جديدة، أول سؤال هو أي واجهة مضيف افترضها.</p>
+  <p><strong>ما لا تعرّفه ECMAScript:</strong> DOM، CSSOM، <code>fetch</code>، المؤقتات، <code>console</code>، نظام الملفات، مقابس الشبكة، متغيرات البيئة، تخزين المتصفح، عمال الويب، عمال الخدمة. كلها مرافق مضيف (<a href="#sec-the-host-environment-not-the-language">بيئة المضيف</a>). حين «لا يعمل» الكود في بيئة جديدة، أول سؤال هو أي واجهة مضيف افترضها.</p>
 </blockquote><h2 id="sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">التقييس: إيكماسكربت، TC39، نقطة التحول ES6/2015</h2>
 
 <p>١٩٩٦: نتسكيب تسلم JS لـ Ecma International → <strong>إيكماسكربت</strong> (اسم المواصفة؛ "جافاسكريبت" علامة تجارية).</p>
@@ -506,15 +522,15 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 <table>
   <thead><tr><th>المبدأ</th><th>المعنى</th></tr></thead>
   <tbody>
-    <tr><td>نواة صغيرة، مضيف قابل للتوسيع</td><td>اللغة تعرّف الدلالات؛ المضيف يعرّف البيئة (<a href="#sec-the-host-environment-not-the-language">§٦</a>)</td></tr>
-    <tr><td>دوال من الدرجة الأولى</td><td>الدوال قيم — قابلة للإسناد والتمرير والإرجاع (<a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">§٤</a>)</td></tr>
-    <tr><td>نطاق معجمي وإغلاقات</td><td>النطاق ثابت وقابل للالتقاط؛ <code>this</code> ليس كذلك (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>تفويض البروتوتايب</td><td>الكائنات ترث من كائنات؛ <code>class</code> سكر (<a href="#sec-the-design-prototype-model-not-classes">§٣</a>، انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>حلقة أحداث أحادية المسار</td><td>تزامن عبر الأحداث، لا خيوط ذاكرة مشتركة (<a href="#sec-the-design-single-threaded-event-loop">§٥</a>)</td></tr>
-    <tr><td>أنواع ديناميكية مع إكراه</td><td>مرنة، لكن تتطلب انضباطاً (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>توافق رجعي</td><td>الويب لا يمكن أن ينكسر؛ الميزات إضافية (<a href="#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">§٧</a>)</td></tr>
+    <tr><td>نواة صغيرة، مضيف قابل للتوسيع</td><td>اللغة تعرّف الدلالات؛ المضيف يعرّف البيئة (<a href="#sec-the-host-environment-not-the-language">بيئة المضيف</a>)</td></tr>
+    <tr><td>دوال من الدرجة الأولى</td><td>الدوال قيم — قابلة للإسناد والتمرير والإرجاع (<a href="#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart">الدوال من الدرجة الأولى</a>)</td></tr>
+    <tr><td>نطاق معجمي وإغلاقات</td><td>النطاق ثابت وقابل للالتقاط؛ <code>this</code> ليس كذلك (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>تفويض البروتوتايب</td><td>الكائنات ترث من كائنات؛ <code>class</code> سكر (<a href="#sec-the-design-prototype-model-not-classes">نموذج البروتوتايب</a>، انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>حلقة أحداث أحادية المسار</td><td>تزامن عبر الأحداث، لا خيوط ذاكرة مشتركة (<a href="#sec-the-design-single-threaded-event-loop">حلقة الأحداث</a>)</td></tr>
+    <tr><td>أنواع ديناميكية مع إكراه</td><td>مرنة، لكن تتطلب انضباطاً (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>توافق رجعي</td><td>الويب لا يمكن أن ينكسر؛ الميزات إضافية (<a href="#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point">التقييس</a>)</td></tr>
     <tr><td>صياغة ضئيلة، دلالات قصوى</td><td>سطح صغير؛ السلوك دقيق — <code>this</code>، الإكراه، البروتوتايبات</td></tr>
-    <tr><td>المواصفة فوق التنفيذ</td><td>المحركات تنفذ ECMAScript؛ لا تعرّفها (<a href="#sec-the-engines-v8-spidermonkey-javascriptcore">§٨</a>)</td></tr>
+    <tr><td>المواصفة فوق التنفيذ</td><td>المحركات تنفذ ECMAScript؛ لا تعرّفها (<a href="#sec-the-engines-v8-spidermonkey-javascriptcore">المحركات</a>)</td></tr>
   </tbody>
 </table>
 <h2 id="sec-worked-examples-semantics-and-runtime-in-one-trace">أمثلة محلولة — الدلالات وزمن التشغيل في مسار واحد</h2>
@@ -533,7 +549,7 @@ Promise.resolve()
 console.log(4);
 <span class="output">// 1, 4, 3, 2</span></code></pre>
 
-<p><strong>لماذا.</strong> <code>1</code> و<code>4</code> متزامنان — يعملان حتى الاكتمال أولاً. <code>3</code> مهمة دقيقة: تُفرَّغ بعد المهمة الحالية، قبل المهمة الكبرى التالية. <code>2</code> مهمة كبرى من المؤقت — تعمل أخيراً، بعد فراغ طابور المهام الدقيقة. الجواب <code>1, 4, 3, 2</code>. هذه قاعدة الترتيب من <a href="#sec-mental-models-how-developers-actually-reason-about-the-event-loop">§٥ب</a> في مسار واحد: متزامن ← مهام دقيقة ← مهام كبرى ← عرض.</p>
+<p><strong>لماذا.</strong> <code>1</code> و<code>4</code> متزامنان — يعملان حتى الاكتمال أولاً. <code>3</code> مهمة دقيقة: تُفرَّغ بعد المهمة الحالية، قبل المهمة الكبرى التالية. <code>2</code> مهمة كبرى من المؤقت — تعمل أخيراً، بعد فراغ طابور المهام الدقيقة. الجواب <code>1, 4, 3, 2</code>. هذه قاعدة الترتيب من <a href="#sec-mental-models-how-developers-actually-reason-about-the-event-loop">النماذج الذهنية للحلقة</a> في مسار واحد: متزامن ← مهام دقيقة ← مهام كبرى ← عرض.</p>
 
 <h3>تفويض البروتوتايب مسير زمن تشغيل</h3>
 
@@ -550,7 +566,7 @@ dog.speak(); <span class="output">// bark — own property shadows the chain</sp
 delete dog.speak;
 dog.speak(); <span class="output">// generic sound — the chain is walked again</span></code></pre>
 
-<p><strong>لماذا.</strong> إسناد <code>dog.speak</code> أنشأ خاصية <em>ذاتية</em> حجبت المُفوَّضة؛ <code>delete</code> أزالها واستؤنف مسير السلسلة. لم يُنسخ شيء بين الكائنات في أي نقطة — البحث تفويض (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>). هذا أيضاً سبب أن دوال <code>class</code> التي تتوقع أنها «توجد على النسخة» تعيش فعلياً على البروتوتايب.</p>
+<p><strong>لماذا.</strong> إسناد <code>dog.speak</code> أنشأ خاصية <em>ذاتية</em> حجبت المُفوَّضة؛ <code>delete</code> أزالها واستؤنف مسير السلسلة. لم يُنسخ شيء بين الكائنات في أي نقطة — البحث تفويض (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>). هذا أيضاً سبب أن دوال <code>class</code> التي تتوقع أنها «توجد على النسخة» تعيش فعلياً على البروتوتايب.</p>
 <h2 id="sec-failure-modes-where-the-model-breaks-in-practice">أنماط الفشل — أين ينكسر النموذج عملياً</h2>
 
 <p>معظم أخطاء إنتاج JS ليست أخطاء صياغة؛ إنها النموذج يعمل بالضبط كما هو محدد مقابل افتراض خاطئ. الجدول يقرن كل نمط فشل بالنموذج الذهني الذي يمنعه.</p>
@@ -559,15 +575,15 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
   <thead><tr><th>نمط الفشل</th><th>ماذا يحدث</th><th>الإصلاح / النموذج الذهني</th></tr></thead>
   <tbody>
     <tr><td>سد حلقة الأحداث</td><td>العمل الثقيل CPU يجمد كل التزامن</td><td>انقل إلى عامل/عملية؛ أبقِ المهام صغيرة</td></tr>
-    <tr><td>فقدان <code>this</code></td><td>الدالة المستخرجة تفقد سياق كائنها</td><td>دالة سهم أو <code>bind</code>؛ موضع الاستدعاء يقرر <code>this</code> (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>خلل إغلاق حلقة <code>var</code></td><td>كل المعاودات ترى القيمة الأخيرة</td><td>ربط <code>let</code> لكل تكرار (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>تحوير الكائنات المشتركة</td><td>مشاركة المرجع تنشر التغييرات بصمت</td><td>افهم القيمة مقابل المرجع؛ انسخ قبل التحوير (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>تلوث البروتوتايب</td><td>المفاتيح غير الموثوقة تحور <code>Object.prototype</code></td><td>قوائم مفاتيح صارمة، <code>Map</code>، دمج يقرأ فقط (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>رفض وعد غير معالَج</td><td>الفشل غير المتزامن يُتجاهل بصمت</td><td>عالِج عند الحد؛ معالج رفض عمومي كشبكة أمان (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
-    <tr><td>مفاجآت الإكراه</td><td><code>==</code> و<code>+</code> والصدق تنتج نتائج غريبة</td><td>فضّل <code>===</code>؛ اجعل التحويلات صريحة (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
+    <tr><td>فقدان <code>this</code></td><td>الدالة المستخرجة تفقد سياق كائنها</td><td>دالة سهم أو <code>bind</code>؛ موضع الاستدعاء يقرر <code>this</code> (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>خلل إغلاق حلقة <code>var</code></td><td>كل المعاودات ترى القيمة الأخيرة</td><td>ربط <code>let</code> لكل تكرار (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>تحوير الكائنات المشتركة</td><td>مشاركة المرجع تنشر التغييرات بصمت</td><td>افهم القيمة مقابل المرجع؛ انسخ قبل التحوير (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>تلوث البروتوتايب</td><td>المفاتيح غير الموثوقة تحور <code>Object.prototype</code></td><td>قوائم مفاتيح صارمة، <code>Map</code>، دمج يقرأ فقط (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>رفض وعد غير معالَج</td><td>الفشل غير المتزامن يُتجاهل بصمت</td><td>عالِج عند الحد؛ معالج رفض عمومي كشبكة أمان (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
+    <tr><td>مفاجآت الإكراه</td><td><code>==</code> و<code>+</code> والصدق تنتج نتائج غريبة</td><td>فضّل <code>===</code>؛ اجعل التحويلات صريحة (انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
     <tr><td>معاملة JS كأنها معنونة سكونياً</td><td>تغيرات الشكل تسبب فشل زمن تشغيل</td><td>TypeScript/JSDoc لقواعد الكود الكبيرة؛ تحقق عند حدود الثقة</td></tr>
-    <tr><td>افتراض أن واجهات المضيف لغة</td><td>الكود ينكسر حين يتغير المضيف</td><td>حدد المضيف أولاً (<a href="#sec-the-host-environment-not-the-language">§٦</a>)</td></tr>
-    <tr><td>إساءة استخدام <code>class</code> مثل Java/C#</td><td>توقع دلالات OOP كلاسيكية</td><td>تذكر سلسلة البروتوتايب تحتها (<a href="#sec-the-design-prototype-model-not-classes">§٣</a>، انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">§٦ب</a>)</td></tr>
+    <tr><td>افتراض أن واجهات المضيف لغة</td><td>الكود ينكسر حين يتغير المضيف</td><td>حدد المضيف أولاً (<a href="#sec-the-host-environment-not-the-language">بيئة المضيف</a>)</td></tr>
+    <tr><td>إساءة استخدام <code>class</code> مثل Java/C#</td><td>توقع دلالات OOP كلاسيكية</td><td>تذكر سلسلة البروتوتايب تحتها (<a href="#sec-the-design-prototype-model-not-classes">نموذج البروتوتايب</a>، انظر <a href="#sec-the-core-semantics-map-what-ecmascript-itself-defines">خريطة الدلالات الأساسية</a>)</td></tr>
     <tr><td>حالة عمومية</td><td>وحدات/دوال تعتمد على عاميات مشتركة قابلة للتغيير</td><td>ضيّق النطاق؛ مرر التبعيات صراحةً</td></tr>
   </tbody>
 </table>
@@ -583,11 +599,28 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
     <tr><td>مطابقة الأنماط</td><td><code>switch</code> بنيوي فوق الأشكال</td><td>تدفق تحكم أبلغ تعبيراً، إن اجتاز TC39</td></tr>
     <tr><td>السجلات والصفوف</td><td>بنى بيانات غير قابلة للتغيير على مستوى اللغة</td><td>عمق عدم قابلية التغيير دون مكتبة</td></tr>
     <tr><td>المزينات</td><td>بيانات وصفية/انعكاس للكلاسات</td><td>أنماط الأطر وحقن الاعتماديات</td></tr>
-    <tr><td>نموذج مكونات WASM / GC</td><td>وحدات غير JS تتعاون بشكل مباشر أكثر</td><td>JS تبقى الصمغ، لكن مدى الصمغ يضيق (<a href="#sec-the-wasm-junction">§٩</a>)</td></tr>
+    <tr><td>نموذج مكونات WASM / GC</td><td>وحدات غير JS تتعاون بشكل مباشر أكثر</td><td>JS تبقى الصمغ، لكن مدى الصمغ يضيق (<a href="#sec-the-wasm-junction">تقاطع WASM</a>)</td></tr>
     <tr><td>تفاعلية بنمط الإشارات</td><td>أنماط الأطر تؤثر في تفكير اللغة/المكتبات</td><td>نقاش 2026 للتزامن والحالة، لا بند مواصفة</td></tr>
     <tr><td>برمجة بمساعدة الذكاء الاصطناعي</td><td>JS مولَّد أكثر في الإنتاج</td><td>الوضوح الدلالي ونماذج زمن التشغيل الذهنية يصبحان المميِّز</td></tr>
   </tbody>
 </table>
+<details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>TDZ (المنطقة الميتة الزمنية)</strong> — لماذا ترمي <code>let</code>/<code>const</code> قبل سطر التصريح. ابحث "TDZ JavaScript".</li>
+  <li><strong>التنفيذ حتى الإتمام / حلقة الأحداث</strong> — لماذا تنتهي الشيفرة المتزامنة قبل أي استدعاء راجع. ابحث "JavaScript event loop run to completion".</li>
+  <li><strong>مهام دقيقة مقابل مهام كبيرة</strong> — ترتيب الوعد مقابل المؤقّت. ابحث "microtasks macrotasks ordering".</li>
+  <li><strong>JIT والأصناف الخفية</strong> — لماذا V8 سريعة ولماذا تكذب القياسات الدقيقة. ابحث "V8 hidden classes JIT".</li>
+  <li><strong>IIFE</strong> — أسلوب التحجيم قبل الوحدات في الشيفرة القديمة. ابحث "immediately invoked function expression".</li>
+  <li><strong>Tree-shaking</strong> — إزالة التصديرات الميتة التي يتيحها هيكل ESM الساكن. ابحث "tree shaking ES modules".</li>
+  <li><strong>خطر الحزمة المزدوجة</strong> — نسختان من وحدة واحدة عبر interop بين CJS وESM. ابحث "dual package hazard".</li>
+  <li><strong>تلويث البروتوتايب</strong> — مفاتيح غير موثوقة تصل إلى <code>Object.prototype</code>. ابحث "prototype pollution CVE".</li>
+  <li><strong>التحويل والحقيقة الزائفة</strong> — القواعد المحددة وراء <code>[] == false</code>. ابحث "JavaScript abstract equality".</li>
+  <li><strong>جذور GC والاحتفاظ</strong> — ما يُبقي الكائنات حية؛ آلية التسريب الحقيقية. ابحث "JavaScript memory retention heap snapshot".</li>
+</ul>
+</details>
+
 <h2 id="sec-summary-checklist">قائمة الملخص</h2>
 
 <p>الأسئلة التي تحدد فهمك لهذا المستند — المرجع عند فحص أي فهم للغة:</p>
@@ -682,6 +715,16 @@ dog.speak(); <span class="output">// generic sound — the chain is walked again
 <section class="win">
   <h3>ما تغطيه هذه الوثيقة</h3>
   <p>اللغة: التاريخ، رهانات التصميم، نموذج التشغيل، التقييس. لا أطر (<a href="./class-to-hooks-paradigm-shift.html">paradigm-shift</a>، <a href="./angular-evolution.html">angular-evolution</a>). لا آليات بنية جملة JS (<a href="../../lessons/0001-the-accidental-lingua-franca.html">سلسلة الدروس</a>). لا الانقسام بين JS و TypeScript/Java/.NET/Spring Boot — ذلك في <a href="./javascript-across-stacks.html">الوثيقة الشقيقة عبر المنصات</a>.</p>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاثة متابعات لتعميق هذا:</p>
+  <ul>
+    <li>"اعرض عليّ خطأ إنتاج افترض فيه أحدهم أن <code>setTimeout(fn, 0)</code> تعني 'نفّذ الآن'. ما الحالة التي لاحظها الاستدعاء في النهاية؟"</li>
+    <li>"عندما ترث قاعدة شيفرة تخلط CommonJS وESM، كيف تختار ما تُهاجر إليه أولًا — وكيف يبدو خطر الحزمة المزدوجة في ملف القفل؟"</li>
+    <li>"أي رهان تصميمي من هذه الوثيقة تتوقع أن يكون الأقل أهمية بعد عشر سنوات — وأي انقلاب في القيود يجب أن يحدث ليُثبت صحة توقعك؟"</li>
+  </ul>
 </section>
 
 <footer class="lesson-foot">
