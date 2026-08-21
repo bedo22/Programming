@@ -125,7 +125,7 @@
       <td><strong>٢٠٠٠</strong></td>
       <td>أطروحة Roy Fielding — REST</td>
       <td>Roy Fielding (UC Irvine)</td>
-      <td>ست قيود: عميل-خادم، عديم الحالة، قابل للتخزين المؤقت، واجهة موحدة، نظام طبقي، كود عند الطلب. موارد + أفعال HTTP + وسائط فائقة (HATEOAS).</td>
+      <td>ست قيود: عميل-خادم، عديم الحالة، قابل للتخزين المؤقت، واجهة موحدة، نظام طبقي، كود عند الطلب (اختياري — الوحيد الذي عدّه فيلدنغ اختياريًا). انعدام الحالة يشتري الوضوح والموثوقية وقابلية التوسع مقابل بيانات متكررة في كل طلب (api-design-Δ1، api-design-Δ2). موارد + أفعال HTTP + وسائط فائقة (HATEOAS).</td>
     </tr>
     <tr>
       <td><strong>٢٠٠٢</strong></td>
@@ -149,7 +149,7 @@
       <td><strong>٢٠١٥</strong></td>
       <td>GraphQL مفتوح المصدر (Facebook)</td>
       <td>Lee Byron، Dan Schafer، Nick Schrock</td>
-      <td>استعلامات يحددها العميل، نقطة نهاية واحدة، تفحص المخطط. يحل الإفراط/نقص الجلب للجوّال.</td>
+      <td>بُنيت داخليًا في فيسبوك منذ 2012 وطُرحت للعموم 2015. استعلامات يحددها العميل، نقطة نهاية واحدة، تفحص المخطط. يحل الإفراط/نقص الجلب للجوّال.</td>
     </tr>
     <tr>
       <td><strong>٢٠١٦–٢٠٢٠</strong></td>
@@ -322,12 +322,12 @@
     <tr>
       <td><strong>نظرية CAP و PACELC</strong></td>
       <td>Eric Brewer (٢٠٠٠)، Gilbert & Lynch (٢٠٠٢)، Daniel Abadi (٢٠١٠)</td>
-      <td>كل عملية API تنطوي على خيار اتساق. العقد يجب أن يعلنه (قوي، نهائي، اقرأ كتاباتك، سببي).</td>
+      <td>كل عملية API تنطوي على خيار اتساق. العقد يجب أن يعلنه (قوي، نهائي، اقرأ كتاباتك، سببي) — جعل Dynamo ذلك ملموسًا بحصص N/R/W القابلة للضبط (api-design-Δ10).</td>
     </tr>
     <tr>
       <td><strong>قيد HATEOAS / الوسائط الفائقة</strong></td>
       <td>Roy Fielding، ٢٠٠٠</td>
-      <td>العملاء يتنقلون عبر الروابط، لا عبر معرفة خارج النطاق. العقد تشمل القابلية للاكتشاف. نادراً ما تُنفذ بالكامل؛ <em>الفكرة</em> تشكل التصفح والإصدار.</td>
+      <td>العملاء يتنقلون عبر الروابط، لا عبر معرفة خارج النطاق. العقد تشمل القابلية للاكتشاف. نادراً ما تُنفذ بالكامل؛ <em>الفكرة</em> تشكل التصفح والإصدار. لواجهة فيلدنغ الموحدة أربعة أوجه تستحق فحص أي تصميم: تعريف الموارد، التلاعب عبر التمثيلات، الرسائل ذاتية الوصف، الوسائط الفائقة (api-design-Δ3).</td>
     </tr>
     <tr>
       <td><strong>قانون بوستل (مبدأ المتانة)</strong></td>
@@ -472,6 +472,8 @@
   </tbody>
 </table>
 
+<p>ملاحظة عابرة للأساليب: المواعيد النهائية والإلغاء مواطنان من الدرجة الأولى في العقد، لا شأن لاحق للعميل — gRPC يرقّيهما إلى وسيطات RPC صريحة، وREST يقاربهما بمهلات موثقة لكل نقطة نهاية.</p>
+
 <p>كل السبع تشترك في نفس DNA: <em>حدد الحد → اجعله قابلاً للتحقق آليًا → طوره دون كسر المستهلكين</em>. الاختلافات هي النقل، التسلسل، نموذج الاقتران، ومن يملك شكل الاستعلام.</p>
 
 ---
@@ -483,7 +485,7 @@
 <ol>
   <li><strong>العقد أولاً.</strong> العقد (OpenAPI، proto، GraphQL SDL) هو مصدر الحقيقة. الكود يتولد منه؛ الاختبارات تتحقق ضده؛ الوثائق تُعرض منه.</li>
   <li><strong>التساوي الذاتي افتراضيًا على التغييرات.</strong> كل POST/PATCH/PUT يغيّر حالة يقبل encabezado <code>Idempotency-Key</code>. إعادة المحاولات آمنة؛ العملاء لا يخمنون.</li>
-  <li><strong>الخطأ كـ API، لا كحادث.</strong> كل خطأ يعيد غلافًا مهيكليًا (RFC 9457 Problem Details أو مكافئ): <code>type</code>، <code>title</code>، <code>status</code>، <code>detail</code>، <code>instance</code>، <code>retry_after</code>. العملاء يبدلون (switch) على <code>type</code>، لا مطابقة نصوص.</li>
+  <li><strong>الخطأ كـ API، لا كحادث.</strong> كل خطأ يعيد غلافًا مهيكليًا (RFC 9457 Problem Details أو مكافئ): <code>type</code>، <code>title</code>، <code>status</code>، <code>detail</code>، <code>instance</code>، <code>retry_after</code>. العملاء يبدلون (switch) على <code>type</code>، لا مطابقة نصوص. تفاصيل المشاكل بصيغة JSON تُقدَّم كـ <code>application/problem+json</code> (api-design-Δ6).</li>
   <li><strong>الإصدار ككلفة كسر متعمدة.</strong> التغييرات الكاسرة تحصل على إصدار جديد (رابط أو هيدر) مع تاريخ غروب. التغييرات غير الكاسرة (إضافة حقل اختياري، إضافة قيمة تعداد) تشحن في نفس الإصدار. تكلفة رفع الإصدار صريحة.</li>
   <li><strong>سطح ضيق، قدرة عميقة.</strong> تفضل موارد/عمليات صغيرة كثر على "نقطة نهاية إله" واحدة. تجزئة الواجهة تنطبق: العملاء يعتمدون فقط على ما يستخدمون.</li>
   <li><strong>أوضاع فشل متوقعة.</strong> حدود المعدل تعيد <code>429</code> مع <code>Retry-After</code>. فترات المهلة موثقة. الفشلات الجزئية (APIs الدفعية) تعيد حالة لكل بند، لا 500 واحدًا.</li>
@@ -1064,7 +1066,7 @@ type Shipment {
 <ul>
   <li><strong>Kin Lane (API Evangelist)</strong> — "APIs كمنتجات": معظم المنظمات تعامل APIs كقطع أثرية تقنية، لا كمنتجات مع مدراء منتج، مقاييس، ودورة حياة. العقد هو المنتج؛ كل شيء آخر تغليف.</li>
   <li><strong>API Handyman (Arnaud Lauret)</strong> — "تصميم واجهات برمجة تطبيقات الويب": REST غالبًا ما تحمّل كحمولة عبادة؛ الوسائط الفائقة مهجورة؛ الإصدار غير متناسق؛ تنسيقات الأخطاء مخترعة لكل نقطة نهاية.</li>
-  <li><strong>استطلاعات Stoplight / SmartBear</strong> — "حالة API ٢٠٢٣": ٦٠٪ من المنظمات ليس لديها إرشادات تصميم API؛ ٤٠٪ تكتشف تغييرات كاسرة في الإنتاج؛ التحقق من المخطط في CI نادر.</li>
+  <li><strong>استطلاعات Stoplight / SmartBear</strong> — "حالة API ٢٠٢٣": ٦٠٪ من المنظمات ليس لديها إرشادات تصميم API؛ ٤٠٪ تكتشف تغييرات كاسرة في الإنتاج؛ التحقق من المخطط في CI نادر.<sup class="unverified" title="غير موثّق — لم يُعثر على مصدر أولي بعد">†</sup></li>
   <li><strong>Phil Sturgeon (APIs You Won't Hate)</strong> — "تصميم أولاً مقابل كود أولاً": الكود أولاً (التوضيحات annotations) ينتج عقودًا تعكس حوادث التنفيذ؛ التصميم أولاً (OpenAPI/proto) ينتج عقودًا تخدم المستهلكين.</li>
 </ul>
 
@@ -1204,7 +1206,8 @@ type Shipment {
 ---
 
 <section class="cite">
-  <strong>مصادر أولية →</strong>
+<strong>ملخص المصادر:</strong> <a href="../../digests/api-design.md">هضم عملي لهذه المصادر (مصفوفة التغطية وفروقات الاستخراج)</a> ·
+    <strong>مصادر أولية →</strong>
   <a href="https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">Fielding, R. (2000). <em>Architectural Styles and the Design of Network-based Software Architectures</em> (PhD dissertation).</a> ·
   <a href="https://www.rfc-editor.org/rfc/rfc791">Postel, J. (1981). RFC 791 — Internet Protocol (Robustness Principle).</a> ·
   <a href="https://www.rfc-editor.org/rfc/rfc9457">Nottingham, M. & Wilde, E. (2023). RFC 9457 — Problem Details for HTTP APIs.</a> ·
@@ -1214,7 +1217,7 @@ type Shipment {
   <a href="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson, L. (2008). <em>Richardson Maturity Model</em>.</a> ·
   <a href="https://www.cs.umd.edu/~pugh/csci741/yourdon.pdf">Yourdon & Constantine (1979). <em>Structured Design</em> (coupling/cohesion).</a> ·
   <a href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf">Lamport, L. (1978). "Time, Clocks, and the Ordering of Events in a Distributed System."</a> ·
-  <a href="https://www.allthingsdistributed.com/2012/01/cap-twelve-years-later.html">Brewer, E. (2012). "CAP Twelve Years Later: How the 'Rules' Have Changed."</a> ·
+  <a href="https://www.comp.nus.edu.sg/~gilbert/pubs/BrewersConjecture-SigAct.pdf">Gilbert, S. &amp; Lynch, N. (2002). "Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services."</a> <span class="unverified" title="الرابط السابق (Brewer 2012) ميت — البديل تم التحقق من جلبانه 2026-08-21">(بديل لرابط Brewer 2012 الميت)</span> ·
   <a href="https://apievangelist.com/">Lane, K. (ongoing). <em>API Evangelist — APIs as Products</em>.</a> ·
   <a href="https://apihandyman.io/">Lauret, A. (ongoing). <em>API Handyman — The Design of Web APIs</em>.</a>
 </section>

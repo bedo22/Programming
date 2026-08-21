@@ -126,7 +126,7 @@
       <td><strong>2000</strong></td>
       <td>Roy Fielding's dissertation — REST</td>
       <td>Roy Fielding (UC Irvine)</td>
-      <td>Six constraints: client-server, stateless, cacheable, uniform interface, layered system, code-on-demand. Resources + HTTP verbs + hypermedia (HATEOAS).</td>
+      <td>Six constraints: client-server, stateless, cacheable, uniform interface, layered system, code-on-demand (optional — the only one Fielding marks optional). Statelessness buys visibility, reliability, and scalability at the cost of repeated per-request data (api-design-Δ1, api-design-Δ2). Resources + HTTP verbs + hypermedia (HATEOAS).</td>
     </tr>
     <tr>
       <td><strong>2002</strong></td>
@@ -150,7 +150,7 @@
       <td><strong>2015</strong></td>
       <td>GraphQL open-sourced (Facebook)</td>
       <td>Lee Byron, Dan Schafer, Nick Schrock</td>
-      <td>Client-specified queries, single endpoint, schema introspection. Solves over/under-fetching for mobile.</td>
+      <td>Built internally at Facebook from 2012, open-sourced 2015. Client-specified queries, single endpoint, schema introspection. Solves over/under-fetching for mobile.</td>
     </tr>
     <tr>
       <td><strong>2016–2020</strong></td>
@@ -328,12 +328,12 @@
     <tr>
       <td><strong>CAP Theorem & PACELC</strong></td>
       <td>Eric Brewer (2000), Gilbert & Lynch (2002), Daniel Abadi (2010)</td>
-      <td>Every API operation implies a consistency choice. The contract must declare it (strong, eventual, read-your-writes, causal).</td>
+      <td>Every API operation implies a consistency choice. The contract must declare it (strong, eventual, read-your-writes, causal) — Dynamo made the dial concrete with tunable N/R/W quorums (api-design-Δ10).</td>
     </tr>
     <tr>
       <td><strong>HATEOAS / Hypermedia Constraint</strong></td>
       <td>Roy Fielding, 2000</td>
-      <td>Clients navigate via links, not out-of-band knowledge. The contract includes discoverability. Rarely fully implemented; the <em>idea</em> shapes pagination and versioning.</td>
+      <td>Clients navigate via links, not out-of-band knowledge. The contract includes discoverability. Rarely fully implemented; the <em>idea</em> shapes pagination and versioning. Fielding's uniform interface has four facets worth checking a design against: resource identification, manipulation through representations, self-descriptive messages, hypermedia (api-design-Δ3).</td>
     </tr>
     <tr>
       <td><strong>Postel's Law (Robustness Principle)</strong></td>
@@ -478,6 +478,8 @@
   </tbody>
 </table>
 
+<p>One cross-style note: deadlines and cancellation are contract citizens, not client afterthoughts — gRPC promotes them to first-class RPC arguments, and REST approximates them with timeouts documented per endpoint.</p>
+
 <p>All seven share the same DNA: <em>define the boundary → make it machine-verifiable → evolve it without breaking consumers</em>. The differences are transport, serialization, coupling model, and who owns the query shape.</p>
 
 ---
@@ -489,7 +491,7 @@
 <ol>
   <li><strong>Contract-first.</strong> The contract (OpenAPI, proto, GraphQL SDL) is the source of truth. Code generates from it; tests verify against it; docs render from it.</li>
   <li><strong>Idempotency by default on mutations.</strong> Every POST/PATCH/PUT that mutates state accepts an <code>Idempotency-Key</code> header. Retries are safe; clients don't guess.</li>
-  <li><strong>Error as API, not accident.</strong> Every error returns a structured envelope (RFC 9457 Problem Details or equivalent): <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, <code>instance</code>, <code>retry_after</code>. Clients switch on <code>type</code>, not string matching.</li>
+  <li><strong>Error as API, not accident.</strong> Every error returns a structured envelope (RFC 9457 Problem Details or equivalent): <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, <code>instance</code>, <code>retry_after</code>. Clients switch on <code>type</code>, not string matching. JSON problem details are served as <code>application/problem+json</code> (api-design-Δ6).</li>
   <li><strong>Versioning as deliberate breaking-cost.</strong> Breaking changes get a new version (URL or header) with a sunset date. Non-breaking changes (add optional field, add enum value) ship in the same version. The cost of a version bump is explicit.</li>
   <li><strong>Narrow surface, deep capability.</strong> Prefer many small resources/operations over one "god endpoint." Interface Segregation applies: clients depend only on what they use.</li>
   <li><strong>Predictable failure modes.</strong> Rate limits return <code>429</code> with <code>Retry-After</code>. Timeouts are documented. Partial failures (batch APIs) return per-item status, not a single 500.</li>
@@ -1084,7 +1086,7 @@ type Shipment {
 <ul>
   <li><strong>Kin Lane (API Evangelist)</strong> — "APIs as Products": most orgs treat APIs as technical artifacts, not products with PMs, metrics, and lifecycle. The contract is the product; everything else is packaging.</li>
   <li><strong>API Handyman (Arnaud Lauret)</strong> — "The Design of Web APIs": REST is often cargo-culted; hypermedia is abandoned; versioning is inconsistent; error formats are invented per endpoint.</li>
-  <li><strong>Stoplight / SmartBear surveys</strong> — "State of API 2023": 60% of orgs have no API design guidelines; 40% discover breaking changes in production; schema validation in CI is rare.</li>
+  <li><strong>Stoplight / SmartBear surveys</strong> — "State of API 2023": 60% of orgs have no API design guidelines; 40% discover breaking changes in production; schema validation in CI is rare.<sup class="unverified" title="Unverified — no primary source located yet">†</sup></li>
   <li><strong>Phil Sturgeon (APIs You Won't Hate)</strong> — "Design First vs Code First": code-first (annotations) produces contracts that mirror implementation accidents; design-first (OpenAPI/proto) produces contracts that serve consumers.</li>
 </ul>
 
@@ -1226,6 +1228,8 @@ type Shipment {
 ---
 
 <section class="cite">
+  <strong>Unverified marker:</strong> <span class="unverified">†</span> = claim awaiting a located primary source — see the source digest ·
+  <strong>Source digest:</strong> <a href="../digests/api-design.md">working digestion of these sources (coverage matrix + extraction deltas)</a> ·
   <strong>Primary sources →</strong>
   <a href="https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">Fielding, R. (2000). <em>Architectural Styles and the Design of Network-based Software Architectures</em> (PhD dissertation).</a> ·
   <a href="https://www.rfc-editor.org/rfc/rfc791">Postel, J. (1981). RFC 791 — Internet Protocol (Robustness Principle).</a> ·
@@ -1236,7 +1240,7 @@ type Shipment {
   <a href="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson, L. (2008). <em>Richardson Maturity Model</em>.</a> ·
   <a href="https://www.cs.umd.edu/~pugh/csci741/yourdon.pdf">Yourdon & Constantine (1979). <em>Structured Design</em> (coupling/cohesion).</a> ·
   <a href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf">Lamport, L. (1978). "Time, Clocks, and the Ordering of Events in a Distributed System."</a> ·
-  <a href="https://www.allthingsdistributed.com/2012/01/cap-twelve-years-later.html">Brewer, E. (2012). "CAP Twelve Years Later: How the 'Rules' Have Changed."</a> ·
+  <a href="https://www.comp.nus.edu.sg/~gilbert/pubs/BrewersConjecture-SigAct.pdf">Gilbert, S. &amp; Lynch, N. (2002). "Brewer's Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services."</a> <span class="unverified" title="Prior cite (Brewer 2012) is dead — replacement verified fetchable 2026-08-21">(replaces dead Brewer 2012 link)</span> ·
   <a href="https://apievangelist.com/">Lane, K. (ongoing). <em>API Evangelist — APIs as Products</em>.</a> ·
   <a href="https://apihandyman.io/">Lauret, A. (ongoing). <em>API Handyman — The Design of Web APIs</em>.</a>
 </section>

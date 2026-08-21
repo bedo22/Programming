@@ -146,3 +146,7 @@ footer.lesson-foot{
 .dd-figure figcaption{margin-top:.5rem; font-family:ui-sans-serif,system-ui,sans-serif;
   font-size:.85rem; color:var(--ink, #8a8f98); line-height:1.5}
 .dd-figure figcaption strong{color:var(--ink, #2d3142)}
+
+/* Unverified-claim marker (improve-doc sources.md v1.4) */
+.unverified { color: #b45309; cursor: help; font-weight: bold; }
+[dir="rtl"] .unverified { font-family: inherit; }
