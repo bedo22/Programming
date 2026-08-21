@@ -13,8 +13,9 @@
   <p class="kicker">Reference · JavaScript fundamentals — the ideas under the code</p>
   <h1>What Is "State"? — A Prequel to Programming in React</h1>
   <p class="meta">Programming primitives, the four theories of computation, how data becomes values becomes variables becomes state, the state-transition model, and why "state" is the same word across Turing machines and React hooks. Read this before the main paradigm-shift doc if terms like "variable ≠ state" or "lifetime" aren't second nature.</p>
+        <p class="meta"><strong>Who this is for:</strong> anyone coming to the React track without a computer-science background — anyone for whom "variable ≠ state" or "lifetime" isn't yet second nature. Read before the class-to-hooks paradigm-shift doc.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>Language:</strong> English · <a href="./ar/what-is-state-prequel.html">العربية</a>
+          <strong>Last reviewed:</strong> 2026-08-21 · <strong>Language:</strong> English · <a href="./ar/what-is-state-prequel.html">العربية</a>
         </p>
       </header>
 
@@ -592,6 +593,16 @@ setCount(items.length);                  <span class="comment-line">// must be k
 <p>State is a thing that <em>persists</em> and that <em>the next event depends on</em>. The history of UI programming is the history of <em>where that state lives</em>: in a global variable, in a closure, in a class instance field, in a framework store, in a hook slot, in a server database. Each migration was a different answer to one question: <em>where does the state live, and who is responsible for keeping it alive across events?</em> React itself moved state roughly every 3-5 years — class instance (2013) → hook slot (2018) → client/server split (2022) → compiler-memoized hooks (2024) — and the <a href="./class-to-hooks-paradigm-shift.html">main paradigm-shift doc</a> is the inside of that story.</p>
 
 <p>Continue reading at the main doc: <a href="./class-to-hooks-paradigm-shift.html">Class-to-Function Paradigm Shift in React</a>, which starts with "OOP — the paradigm classes came from" and assumes you have internalized the foundation in this prequel: what <em>state</em> is (Turing), what <em>functions</em> are (Church), what <em>variables</em> are (von Neumann), what <em>types</em> are (Shannon), and the chain they form: data → value → variable → state.</p>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Take a real component from our app: identify its state, its derived values, and its configuration — where does each live and why?"</li>
+    <li>"Show me a production bug that happened because something with the wrong lifetime was treated as state (or the reverse)."</li>
+    <li>"Which of the four theories explains a behavior you noticed in DevTools this week?"</li>
+  </ul>
+</section>
 
 <footer class="lesson-foot">
   <span><a href="../index.html">← Back to the index</a></span>
