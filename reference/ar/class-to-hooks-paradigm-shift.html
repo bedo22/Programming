@@ -13,8 +13,9 @@
   <p class="kicker">مرجع · جافاسكريبت، نحو قراءة رياكت في العمل</p>
   <h1>التحول النموذجي من الكلاسات إلى الدوال في رياكت</h1>
   <p class="meta">مرجع شامل. لماذا انتقلت رياكت من الكلاسات إلى الخطافات (hooks)، ماذا تغير، ماذا بقي، ولماذا لم تكن البرمجة الوظيفية وحدها كافية.</p>
+        <p class="meta"><strong>لمن هذه الوثيقة:</strong> مطوّرون تعلّموا رياكت الكلاسات (أو سيرثونها قريبًا) ويحتاجون أن يقرؤوا ويتعرّفوا على أعمار مكونات رياكت الأربعة ويهاجروا بينها في العمل.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../class-to-hooks-paradigm-shift.html">English</a>
+          <strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../class-to-hooks-paradigm-shift.html">English</a>
         </p>
       </header>
 
@@ -22,6 +23,21 @@
   <h3>لماذا هذا المستند</h3>
   <p>الدرس 5 قدّم <code>this</code> و <code>bind</code> لأنك ستواجههما في كود رياكت قديم في العمل. لكنك سألت السؤال الصحيح: <em>لماذا ابتعدت رياكت عن الكلاسات أصلًا؟ ألم يكن الأسلوب الوظيفي كافيًا؟</em> هذا المستند يجيب على كليهما — لأن الإجابة غير بديهية: رياكت كان لديها مكونات دالية قبل الخطافات، ولم تكن كافية. الخطافات كانت القطعة المفقودة التي جعلت الدوال قابلة للاستخدام للمكونات الحقيقية. القصة لها أربعة عصور.</p>
 </section>
+
+<h2 id="sec-the-leverage-map-where-the-work-concentrates">خريطة الرافعة — أين يتركّز العمل فعليًا</h2>
+
+<p>الأقسام التالية ثلاثة وثلاثون، لكن عمل رياكت اليومي يتركّز بشدة في قليل منها. تدرّجات عملية تقريبية، مستمدة مما يعاقب عليه جدول أنماط الفشل أكثر شيوعًا وما تتطلبه قواعد الشيفرة الحقيقية عند قراءتها:</p>
+
+<table>
+  <thead><tr><th>التدرّج</th><th>الدلالات</th><th>ما تغطيه</th></tr></thead>
+  <tbody>
+    <tr><td><strong>T1 — أتقِنها أولًا</strong></td><td><code>useState</code>/<code>useEffect</code> وقواعد الخطافات؛ التأثيرات مقابل معالجات الأحداث؛ المساواة بالمرجع في مصفوفات الاعتماديات؛ المفاتيح وهوية القوائم؛ نماذج التخزين الثلاثة (حالة/مرجع/متغير محلي)</td><td>الغالبية العظمى من عمل المكوّنات اليومي — وتقريبًا كل صف من جدول الأخطاء الكلاسيكية.</td></tr>
+    <tr><td><strong>T2 — تعلّمها عندما يطلبها الموقف</strong></td><td>الخطافات المخصصة لإعادة استخدام المنطق؛ <code>useReducer</code>؛ السياق وكلفته في إعادة التصيير؛ <code>useMemo</code>/<code>useCallback</code>/React.memo؛ انضباط الحالة المشتقة؛ أشكال جلب البيانات</td><td>الحالة المشتركة، أعمال الأداء، النماذج، توصيل البيانات على مستوى التطبيق.</td></tr>
+    <tr><td><strong>T3 — معرفة متخصصة نادرة</strong></td><td>حدود Suspense و<code>use</code>؛ الانتقالات والقيم المؤجلة؛ أعمال الترطيب الداخلية؛ سلوك مترجم رياكت؛ انقسام العميل/الخادم في RSC</td><td>أعمال مجاورة للإطار، تطبيقات SSR، علم آثار التهجرة. اللجوء إلى T3 وT1 موضع اهتزاز هو انقلاب المبتدئ الكلاسيكي.</td></tr>
+  </tbody>
+</table>
+
+<p>ملاحظة صدقٍ: حدود التدرّجات اجتهاد عملي وليست قياسًا — قابلة للاختبار ضد تاريخك: آخر عشرة أخطاء رياكت محيّرة ستكون تقريبًا كلها في دلالات T1 وهي تعمل تمامًا كما حُدّدت.</p>
 
 <h2 id="sec-before-the-classes-a-word-on-foundations">قبل الكلاسات: كلمة عن الأساسيات</h2>
 
@@ -193,7 +209,7 @@
   </tbody>
 </table>
 
-<p>باقي <a href="./what-is-state-prequel.html">التمهيد (ما هي الحالة؟)</a> (المكونات الأساسية، الأنواع، الحالة، مدة الحياة) وباقي هذا المستند (OOP، الخطافات، المترجم، خادم-مكوّن) هي تفصيلات لهذه الأسس الأربعة. عندما تقرأ "حالة" في <a href="#sec-oop-the-paradigm-classes-came-from">§١</a>، استبدلها ذهنياً بـ "سجل حالات تورنغ." عندما تقرأ "دالة" في أقسام الخطافات، فكّر "دالة نقية بحساب اللامدا (تشيرش، 1936)." عندما تقرأ "متغير" في أي مكان، فكّر "عنوان ذاكرة فون نيومان باسم." عندما تقرأ "نوع"، فكّر "برهان شانون أن البتات لا تستطيع تفسير نفسها" — انظر <a href="./what-is-state-prequel.html#sec-types">الأنواع في التمهيد</a>.</p>
+<p>باقي <a href="./what-is-state-prequel.html">التمهيد (ما هي الحالة؟)</a> (المكونات الأساسية، الأنواع، الحالة، مدة الحياة) وباقي هذا المستند (OOP، الخطافات، المترجم، خادم-مكوّن) هي تفصيلات لهذه الأسس الأربعة. عندما تقرأ "حالة" في <a href="#sec-oop-the-paradigm-classes-came-from">البرمجة كائنية التوجه</a>، استبدلها ذهنياً بـ "سجل حالات تورنغ." عندما تقرأ "دالة" في أقسام الخطافات، فكّر "دالة نقية بحساب اللامدا (تشيرش، 1936)." عندما تقرأ "متغير" في أي مكان، فكّر "عنوان ذاكرة فون نيومان باسم." عندما تقرأ "نوع"، فكّر "برهان شانون أن البتات لا تستطيع تفسير نفسها" — انظر <a href="./what-is-state-prequel.html#sec-types">الأنواع في التمهيد</a>.</p>
 
 <h3>2 المكونان الأساسيان — البيانات والعمليات</h3>
 
@@ -449,7 +465,7 @@ $(function() {
 
 <p>هذا هو التغيير الأكثر خفاءً وأهمية في المسار بأكمله. توقفت الحالة عن أن تكون خاصية للمكون (حقل مثيل OOP) وأصبحت خاصية <em>لرياكت نفسها</em>، على أساس كل مثيل. دالة المكون الآن مجرد وصف لـ "أريد حالة في السلوتين 0 و1"؛ رياكت تخزّنها. هذا هو السبب في وجود <em>قواعد الخطافات</em> (لا يمكنك استدعاء <code>useState</code> بشكل شرطي — السلوت سيكون خارج الترتيب في المرة القادمة) — القسم 9 من هذا المستند.</p>
 
-<p>المقايضة التي قامت بها رياكت: دالة "ذات حالة" عبر ترتيب الاستدعاء أغرب من كلاس بحقول، لكن يمكنك الآن <em>استخراج منطق 상태ي إلى خطاف مخصص</em> — لأن المنطق مجرد استدعاءات دوال، وليس مثيلاً. هذا هو بالضبط حل مشكلة wrapper-hell من <a href="#sec-oop-the-paradigm-classes-came-from">§١</a> في طبقة التخزين.</p>
+<p>المقايضة التي قامت بها رياكت: دالة "ذات حالة" عبر ترتيب الاستدعاء أغرب من كلاس بحقول، لكن يمكنك الآن <em>استخراج منطق 상태ي إلى خطاف مخصص</em> — لأن المنطق مجرد استدعاءات دوال، وليس مثيلاً. هذا هو بالضبط حل مشكلة wrapper-hell من <a href="#sec-oop-the-paradigm-classes-came-from">البرمجة كائنية التوجه</a> في طبقة التخزين.</p>
 
 <h3>9 الإشارات (Signals) (2022+) — الحالة كعقدة رسم بياني، وليس سلوتاً</h3>
 
@@ -592,17 +608,17 @@ export default withAuth(withTheme(withRouter(MyComponent)));
 
 <h2 id="sec-the-version-markers-which-react-are-you-reading">مؤشرات النسخة — أي رياكت تقرأ؟</h2>
 
-<p>القسم ٣ روى العصور كخط زمني؛ هذه هي طبقة <em>النسخ</em> التي تطبقها عندما تفتح ملفاً غير مألوف. العصر يخبرك بالنموذج الذهني (<a href="#sec-era-1-class-components-the-original-model">§٤</a>–<a href="#sec-era-3-hooks-2018-making-functions-first-class">§٦</a>)؛ النسخة تخبرك بأي استدعاءات API تتوقعها. معظم السطح أدناه يظهر في <a href="#sec-era-3-hooks-2018-making-functions-first-class">§٦</a>–<a href="#sec-era-4-the-react-compiler-and-beyond">§١٢</a> وفي المستند المرافق <a href="./react-2024-and-beyond.html">رياكت 2024 وما بعدها</a>؛ هذه الخريطة هي الفهرس.</p>
+<p>القسم ٣ روى العصور كخط زمني؛ هذه هي طبقة <em>النسخ</em> التي تطبقها عندما تفتح ملفاً غير مألوف. العصر يخبرك بالنموذج الذهني (<a href="#sec-era-1-class-components-the-original-model">العصر الأول: مكونات الكلاس</a>–<a href="#sec-era-3-hooks-2018-making-functions-first-class">العصر الثالث: الخطافات</a>)؛ النسخة تخبرك بأي استدعاءات API تتوقعها. معظم السطح أدناه يظهر في <a href="#sec-era-3-hooks-2018-making-functions-first-class">العصر الثالث: الخطافات</a>–<a href="#sec-era-4-the-react-compiler-and-beyond">مترجم رياكت</a> وفي المستند المرافق <a href="./react-2024-and-beyond.html">رياكت 2024 وما بعدها</a>؛ هذه الخريطة هي الفهرس.</p>
 
 <table>
   <thead><tr><th>النسخة</th><th>وصلت</th><th>التغيير ذو المعنى</th><th>مُعرّفها في الملف</th></tr></thead>
   <tbody>
-    <tr><td><strong>16.8</strong></td><td>فبراير 2019</td><td>الخطافات تُطلق — الدوال تصير من الدرجة الأولى (<a href="#sec-era-3-hooks-2018-making-functions-first-class">§٦</a>)</td><td>أنماط <code>useState</code> / <code>useEffect</code></td></tr>
+    <tr><td><strong>16.8</strong></td><td>فبراير 2019</td><td>الخطافات تُطلق — الدوال تصير من الدرجة الأولى (<a href="#sec-era-3-hooks-2018-making-functions-first-class">العصر الثالث: الخطافات</a>)</td><td>أنماط <code>useState</code> / <code>useEffect</code></td></tr>
     <tr><td><strong>17</strong></td><td>أكتوبر 2020</td><td>داخلية في الغالب؛ واجهة الجذر الجديدة تتشكل</td><td>ما زال <code>ReactDOM.render</code> في معظم الملفات</td></tr>
     <tr><td><strong>18</strong></td><td>مارس 2022</td><td>التصيير المتزامن افتراضياً؛ التجميع التلقائي؛ <code>useTransition</code>، <code>useDeferredValue</code>، <code>useId</code>؛ الوضع الصارم يستدعي التأثيرات مرتين في التطوير</td><td><code>createRoot</code>؛ تأثيرات تتحقق من تنظيفها بنفسها</td></tr>
     <tr><td><strong>18.3</strong></td><td>2023</td><td>خطاف <code>use</code>؛ مترجم رياكت مفتوح المصدر</td><td><code>use(</code> داخل مكون</td></tr>
     <tr><td><strong>19</strong></td><td>ديسمبر 2024</td><td>المرجع كخاصية؛ بيانات الوثيقة؛ الإجراءات: <code>&lt;form action={fn}&gt;</code>، <code>useActionState</code>، <code>useOptimistic</code>، <code>useFormStatus</code>؛ RSC مستقر</td><td><code>&lt;form action=</code> أو <code>useActionState</code></td></tr>
-    <tr><td><strong>19.2</strong></td><td>أكتوبر 2025</td><td><code>useEffectEvent</code>، <code>&lt;Activity /&gt;</code>؛ إصلاحات مصفوفة التبعيات الموثقة</td><td><code>useEffectEvent</code> — مشكلة <a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">§٧</a> محلولة على مستوى الـ API</td></tr>
+    <tr><td><strong>19.2</strong></td><td>أكتوبر 2025</td><td><code>useEffectEvent</code>، <code>&lt;Activity /&gt;</code>؛ إصلاحات مصفوفة التبعيات الموثقة</td><td><code>useEffectEvent</code> — مشكلة <a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">الإغلاق العالق</a> محلولة على مستوى الـ API</td></tr>
   </tbody>
 </table>
 
@@ -872,7 +888,7 @@ function ChatHeader({ friend }) {
 
 <h2 id="sec-the-modern-hooks-catalog">كتالوج الخطافات الحديثة</h2>
 
-<p>كل ما يلي خطاف ستقرؤه في كود حقيقي. النموذج الذهني واحد دائماً: <strong>الخطاف دالة تسأل رياكت قدرةً</strong> — القدرة تعيش في عقدة الليف (fiber node) الخاصة بالمكون، والمكون مجرد وصف للقدرات التي يريدها، بترتيب الاستدعاء (<a href="#sec-the-rules-of-hooks-and-where-the-design-came-from">§٨</a>). كل الأسماء أدناه تنويعات على الفكرة الواحدة.</p>
+<p>كل ما يلي خطاف ستقرؤه في كود حقيقي. النموذج الذهني واحد دائماً: <strong>الخطاف دالة تسأل رياكت قدرةً</strong> — القدرة تعيش في عقدة الليف (fiber node) الخاصة بالمكون، والمكون مجرد وصف للقدرات التي يريدها، بترتيب الاستدعاء (<a href="#sec-the-rules-of-hooks-and-where-the-design-came-from">قواعد الخطافات</a>). كل الأسماء أدناه تنويعات على الفكرة الواحدة.</p>
 
 <table>
   <thead><tr><th>الخطاف</th><th>ماذا يطلب</th><th>إعادة تصيير عند التغيير؟</th><th>المكافئ في عصر الكلاس</th></tr></thead>
@@ -881,9 +897,9 @@ function ChatHeader({ friend }) {
     <tr><td><code>useReducer</code></td><td>حالة تُحدَّث بواسطة مخفّض <code>(state, action) → nextState</code></td><td>استدعاء الإرسال</td><td><code>setState</code> بكائن / مخفّضات بنمط Redux</td></tr>
     <tr><td><code>useContext</code></td><td>قيمة أقرب <code>Context.Provider</code></td><td>تغيّر هوية قيمة المزوّد</td><td><code>contextTypes</code> / <code>&lt;Consumer&gt;</code></td></tr>
     <tr><td><code>useRef</code></td><td>صندوق قابل للتغيير <em>لا</em> يطلق إعادة تصيير؛ الكائن نفسه في كل تصيير</td><td>لا</td><td>حقل مثيل (<code>this.timerID</code>)</td></tr>
-    <tr><td><code>useEffect</code></td><td>أثر جانبي بعد الطلاء، مربوطاً بمصفوفة تبعيات (<a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">§٧</a>)</td><td>لا (يُطلق بعد التصيير)</td><td>دوال دورة الحياة المعيّنة على التبعيات (<a href="#sec-the-lifecycle-to-hooks-translation-table">§١٤</a>)</td></tr>
+    <tr><td><code>useEffect</code></td><td>أثر جانبي بعد الطلاء، مربوطاً بمصفوفة تبعيات (<a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">الإغلاق العالق</a>)</td><td>لا (يُطلق بعد التصيير)</td><td>دوال دورة الحياة المعيّنة على التبعيات (<a href="#sec-the-lifecycle-to-hooks-translation-table">ترجمة دورة الحياة</a>)</td></tr>
     <tr><td><code>useLayoutEffect</code></td><td>تأثير يعمل <em>قبل</em> إعادة طلاء المتصفح (قِس ثم غيّر)</td><td>لا</td><td>دلالات <code>componentDidMount/Update</code></td></tr>
-    <tr><td><code>useMemo</code></td><td>قيمة مشتقة مخزنة، يعاد حسابها فقط عند تغير التبعيات (<a href="#sec-derived-state-compute-during-render-don-t-store">§١٠ب</a>)</td><td>لا — يتخطى إعادة الحساب، لا إعادة التصيير</td><td>قيمة مشتقة يدوية داخل <code>render()</code></td></tr>
+    <tr><td><code>useMemo</code></td><td>قيمة مشتقة مخزنة، يعاد حسابها فقط عند تغير التبعيات (<a href="#sec-derived-state-compute-during-render-don-t-store">الحالة المشتقة</a>)</td><td>لا — يتخطى إعادة الحساب، لا إعادة التصيير</td><td>قيمة مشتقة يدوية داخل <code>render()</code></td></tr>
     <tr><td><code>useCallback</code></td><td>هوية دالة مستقرة عبر التصييرات</td><td>لا</td><td>ألعاب هوية الدوال المربوطة</td></tr>
     <tr><td><code>useId</code></td><td>معرّف فريد مستقر ينجو SSR/الترطيب</td><td>لا</td><td>معرّفات مكتوبة يدوياً (عرضة للتصادم)</td></tr>
     <tr><td><code>useTransition</code></td><td>وسم تحديث كمنخفض الأولوية؛ واحصل على علم <code>isPending</code></td><td>نعم (علم الانتظار ينقلب)</td><td>—</td></tr>
@@ -1021,7 +1037,7 @@ class ProfilePage extends React.Component {
   </tbody>
 </table>
 
-<p>سؤال الاختصار لدالة مجهولة: <strong>«هل استدعاها حدث مستخدم، أم رياكت عند إنهاء تصيير؟»</strong> معالجات الأحداث تقرأ قيماً طازجة وقد تستدعي <code>setState</code> بحرية. التأثيرات تقرأ الإغلاق من التصيير الذي جدولها وتعمل مجدداً فقط عندما تقول مصفوفة التبعيات — فالقراءة "العالقة" هناك تبعية ناقصة (<a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">§٧</a>، <a href="#sec-the-classic-bugs-and-which-storage-model-fixes-each">§١٠</a>)، و<code>setState</code> غير المشروط هناك حلقة تغذية راجعة.</p><h2 id="sec-data-fetching-patterns-where-the-data-comes-from">أنماط جلب البيانات — من أين تأتي البيانات</h2>
+<p>سؤال الاختصار لدالة مجهولة: <strong>«هل استدعاها حدث مستخدم، أم رياكت عند إنهاء تصيير؟»</strong> معالجات الأحداث تقرأ قيماً طازجة وقد تستدعي <code>setState</code> بحرية. التأثيرات تقرأ الإغلاق من التصيير الذي جدولها وتعمل مجدداً فقط عندما تقول مصفوفة التبعيات — فالقراءة "العالقة" هناك تبعية ناقصة (<a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">الإغلاق العالق</a>، <a href="#sec-the-classic-bugs-and-which-storage-model-fixes-each">الأخطاء الكلاسيكية</a>)، و<code>setState</code> غير المشروط هناك حلقة تغذية راجعة.</p><h2 id="sec-data-fetching-patterns-where-the-data-comes-from">أنماط جلب البيانات — من أين تأتي البيانات</h2>
 
 <p>الجلب أشهر استخدام حقيقي لـ <code>useEffect</code> — والأكثر إحجاماً من فريق رياكت نفسه. عند قراءة الكود في العمل سترى خمسة أشكال؛ تعرّف على المقايضة قبل الحكم على النمط:</p>
 
@@ -1031,7 +1047,7 @@ class ProfilePage extends React.Component {
     <tr><td>تحميل بيانات الإطار/الموجّه</td><td>Next.js، React Router، Remix، Astro — مُحمِّلات تصريحية يملكها الإطار</td></tr>
     <tr><td>مكونات خادم رياكت</td><td>بيانات يملكها الخادم؛ لا حاجة لجلب من العميل إطلاقاً (المستند المرافق <a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>)</td></tr>
     <tr><td>مكتبة استعلام (TanStack Query، SWR، Apollo)</td><td>كاش عميل، إعادة محاولة، إعادة جلب خلفية</td></tr>
-    <tr><td><code>use</code> + التعليق (<a href="#sec-suspense-and-use-declarative-waiting-and-reading-resources-in-render">§٩د</a>)</td><td>تصيير قائم على الوعود حيثما كان مدعوماً</td></tr>
+    <tr><td><code>use</code> + التعليق (<a href="#sec-suspense-and-use-declarative-waiting-and-reading-resources-in-render">Suspense وuse</a>)</td><td>تصيير قائم على الوعود حيثما كان مدعوماً</td></tr>
     <tr><td><code>useEffect</code> + حالة يدوية</td><td>حالات عميل-فقط بسيطة — بحذر</td></tr>
   </tbody>
 </table>
@@ -1198,9 +1214,9 @@ useEffect(() =&gt; setFullName(first + ' ' + last), [first, last]);
 <span class="good">// Do — compute it during render; it's derived from state you already own</span>
 const fullName = first + ' ' + last;</code></pre>
 
-<p>القاعدة العامة: <strong>إذا أمكن حساب قيمة من حالة/خصائص تملكها أصلاً، فليست حالة منفصلة.</strong> تخزينها يخلق مصدر حقيقة ثانياً يجب أن تبقيه متزامناً — ومزامنة النسخ هي حيث تعيش الأخطاء الكلاسيكية (<a href="#sec-the-classic-bugs-and-which-storage-model-fixes-each">§١٠</a>). النسخة تتعفن، كود المزامنة ينمو، ولا شيء يصير مصدر الحقيقة الوحيد.</p>
+<p>القاعدة العامة: <strong>إذا أمكن حساب قيمة من حالة/خصائص تملكها أصلاً، فليست حالة منفصلة.</strong> تخزينها يخلق مصدر حقيقة ثانياً يجب أن تبقيه متزامناً — ومزامنة النسخ هي حيث تعيش الأخطاء الكلاسيكية (<a href="#sec-the-classic-bugs-and-which-storage-model-fixes-each">الأخطاء الكلاسيكية</a>). النسخة تتعفن، كود المزامنة ينمو، ولا شيء يصير مصدر الحقيقة الوحيد.</p>
 
-<p>القيم المشتقة يعاد حسابها كل تصيير. إذا غلا حسابٌ ما كلفةً، فثبّته <em>دون</em> إضافة حالة: ارفعه إلى ثابت وحدة، أو خزّنه بـ <code>useMemo</code>، أو دع مترجم رياكت يقرر (<a href="#sec-era-4-the-react-compiler-and-beyond">§١٢</a>). لا تلجأ إلى الحالة لتخزين حساب مؤقتاً.</p><h2 id="sec-context-the-mental-model-for-shared-state">السياق — النموذج الذهني للحالة المشتركة</h2>
+<p>القيم المشتقة يعاد حسابها كل تصيير. إذا غلا حسابٌ ما كلفةً، فثبّته <em>دون</em> إضافة حالة: ارفعه إلى ثابت وحدة، أو خزّنه بـ <code>useMemo</code>، أو دع مترجم رياكت يقرر (<a href="#sec-era-4-the-react-compiler-and-beyond">مترجم رياكت</a>). لا تلجأ إلى الحالة لتخزين حساب مؤقتاً.</p><h2 id="sec-context-the-mental-model-for-shared-state">السياق — النموذج الذهني للحالة المشتركة</h2>
 
 <p>الحالة المشتركة بين عدة مكونات تُمرَّر عادةً تنازلياً بالخصائص. عندما تطول مسافة التمرير — «حفر الخصائص» الكلاسيكي — تمنحك رياكت <strong>السياق</strong>: قيمة تُوفَّر قرب القمة ويُقرأ أي مكان تحتها، متجاوزاً كل طبقة خصائص وسيطة.</p>
 
@@ -1261,8 +1277,8 @@ const theme = useContext(ThemeCtx);</code></pre>
   <tbody>
     <tr><td>يستخدمها مكون واحد</td><td><code>useState</code> ذاك المكون</td></tr>
     <tr><td>أصل + طفل واحد</td><td>الأصل، مرررة كخصائص (أبسط حالات الرفع)</td></tr>
-    <tr><td>مكونات بعيدة كثيرة</td><td>سياق (<a href="#sec-context-the-mental-model-for-shared-state">§١٠ج</a>) أو مكتبة حالة</td></tr>
-    <tr><td>بيانات يملكها الخادم</td><td>مكون خادم، كاش إطار، أو مكتبة استعلام (<a href="#sec-data-fetching-patterns-where-the-data-comes-from">§٧ج</a>)</td></tr>
+    <tr><td>مكونات بعيدة كثيرة</td><td>سياق (<a href="#sec-context-the-mental-model-for-shared-state">السياق Context</a>) أو مكتبة حالة</td></tr>
+    <tr><td>بيانات يملكها الخادم</td><td>مكون خادم، كاش إطار، أو مكتبة استعلام (<a href="#sec-data-fetching-patterns-where-the-data-comes-from">أنماط جلب البيانات</a>)</td></tr>
     <tr><td>قابلة للمشاركة/للإشارة المرجعية</td><td>معاملات URL/البحث</td></tr>
     <tr><td>واجهة مؤقتة (تحويم، فتح/إغلاق)</td><td>حالة محلية أو مرجع</td></tr>
     <tr><td>تحولات منسقة معقدة</td><td><code>useReducer</code> — إجراءات مسماة بدل معيّنات متناثرة</td></tr>
@@ -1282,7 +1298,7 @@ const theme = useContext(ThemeCtx);</code></pre>
 <ul>
   <li><strong>وصول DOM</strong> — تركيز، تمرير، قياس: <code>const el = useRef(null); &lt;div ref={el} /&gt;</code>، واقرأ <code>el.current</code> في تأثير أو معالج.</li>
   <li><strong>دفاتر محاسبية مستقرة خارج التصيير</strong> — معرّفات المؤقتات، قيم سابقة.</li>
-  <li><strong>مخرج «القيمة الأحدث»</strong> — مرجع يُحدَّث كل تصيير، يقرؤه تأثير/فاصل زمني مستقر كان سيرى إغلاقاً عالقاً (<a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">§٧</a>).</li>
+  <li><strong>مخرج «القيمة الأحدث»</strong> — مرجع يُحدَّث كل تصيير، يقرؤه تأثير/فاصل زمني مستقر كان سيرى إغلاقاً عالقاً (<a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">الإغلاق العالق</a>).</li>
 </ul>
 
 <p>المراجع الاستدعائية (<code>ref={(n) =&gt; …}</code>) تلتصق مع تنظيف؛ وفي رياكت 19 تستطيع مكونات الدوال استقبال <code>ref</code> كخاصية مباشرة، مما يقلص <code>forwardRef</code>. خط الفصل: <strong>إذا كان تغيير القيمة يجب أن يعيد تصيير الواجهة، فهي حالة؛ وإذا كان وصولاً أمراً أو دفاتر غير معروضة، فهو مرجع.</strong></p>
@@ -1292,13 +1308,13 @@ const theme = useContext(ThemeCtx);</code></pre>
 <table>
   <thead><tr><th>الأداة</th><th>ماذا تخزّن</th><th>استخدمها عندما</th></tr></thead>
   <tbody>
-    <tr><td><code>useMemo</code></td><td>قيمة محسوبة</td><td>اشتقاق مكلف بتبعيات مستقرة (<a href="#sec-derived-state-compute-during-render-don-t-store">§١٠ب</a>)</td></tr>
+    <tr><td><code>useMemo</code></td><td>قيمة محسوبة</td><td>اشتقاق مكلف بتبعيات مستقرة (<a href="#sec-derived-state-compute-during-render-don-t-store">الحالة المشتقة</a>)</td></tr>
     <tr><td><code>useCallback</code></td><td>هوية دالة</td><td>تمرير استدعاءات يقارنها أطفال مخزّنون بالهوية</td></tr>
     <tr><td><code>React.memo</code></td><td>تصيير مكون</td><td>طفل يعيد التصيير كثيراً بخصائص نفسها</td></tr>
   </tbody>
 </table>
 
-<p>التخزين المؤقت ليس مجانياً — يضيف تتبع تبعيات وذاكرة وسطح أخطاء. مترجم رياكت (<a href="#sec-era-4-the-react-compiler-and-beyond">§١٢</a>) يؤتمته: في الكود الجديد قد لا ترى أياً منها يدوياً. لكن الكود القديم ما زال يحملها، والخطأ <em>غير الصحيح</em> منها ما زال يخفي أخطاء — وقراءتها تتطلب نفس تفكير الهوية كما <a href="#sec-reconciliation-keys-and-component-identity">§٩ج</a>.</p><h2 id="sec-why-not-just-use-functional-programming-without-hooks">لماذا لم تكن البرمجة الوظيفية وحدها كافية — القصة الكاملة</h2>
+<p>التخزين المؤقت ليس مجانياً — يضيف تتبع تبعيات وذاكرة وسطح أخطاء. مترجم رياكت (<a href="#sec-era-4-the-react-compiler-and-beyond">مترجم رياكت</a>) يؤتمته: في الكود الجديد قد لا ترى أياً منها يدوياً. لكن الكود القديم ما زال يحملها، والخطأ <em>غير الصحيح</em> منها ما زال يخفي أخطاء — وقراءتها تتطلب نفس تفكير الهوية كما <a href="#sec-reconciliation-keys-and-component-identity">المصالحة والمفاتيح</a>.</p><h2 id="sec-why-not-just-use-functional-programming-without-hooks">لماذا لم تكن البرمجة الوظيفية وحدها كافية — القصة الكاملة</h2>
 
 <p>الآن نصل إلى سؤالك الأصلي. الجواب المختصر: <strong>لأن الدوال الخالصة لا يمكنها إدارة الحالة أو التأثيرات الجانبية بطبيعتها</strong>. رياكت كانت بحاجة إلى طبقة وسيطة — الخطافات — لتعويض ما توفره الكلاسات تلقائيًا (كائن حي، دورة حياة، حالة مرتبطة بالمثيل).</p>
 
@@ -1359,11 +1375,11 @@ const theme = useContext(ThemeCtx);</code></pre>
 <table>
   <thead><tr><th>ما ستراه في الملف</th><th>تركيز القراءة</th></tr></thead>
   <tbody>
-    <tr><td><code>class Foo extends React.Component</code> أو <code>React.createClass</code></td><td>عصر المثيل: <code>this.state</code> / <code>this.props</code>، دوال دورة الحياة، <code>bind</code> (<a href="#sec-era-1-class-components-the-original-model">§٤</a>، <a href="#sec-the-lifecycle-to-hooks-translation-table">§١٤</a>)</td></tr>
-    <tr><td><code>function Foo(...)</code> وحيدة، بلا خطافات</td><td>دالة عارضة: خصائص تدخل، JSX يخرج، بلا حالة (مكون دالة من الدرجة الثانية، <a href="#sec-era-2-function-components-appear-but-they-re-second-class-2015">§٥</a>)</td></tr>
-    <tr><td><code>useState</code> / <code>useEffect</code> / <code>useMemo</code>…</td><td>عصر الخطافات: دالة تطلب من رياكت قدرات بترتيب الاستدعاء (<a href="#sec-era-3-hooks-2018-making-functions-first-class">§٦</a>، <a href="#sec-the-modern-hooks-catalog">§٦ب</a>)</td></tr>
-    <tr><td><code>createRoot</code>، <code>useTransition</code>، <code>startTransition</code></td><td>عصر 18+: التزامنية، التجميع التلقائي، البث (<a href="#sec-the-version-markers-which-react-are-you-reading">§٣ب</a>)</td></tr>
-    <tr><td><code>useActionState</code>، <code>&lt;form action=…&gt;</code>، <code>useOptimistic</code></td><td>عصر نماذج/إجراءات 19 (<a href="#sec-the-version-markers-which-react-are-you-reading">§٣ب</a>؛ المستند المرافق <a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>)</td></tr>
+    <tr><td><code>class Foo extends React.Component</code> أو <code>React.createClass</code></td><td>عصر المثيل: <code>this.state</code> / <code>this.props</code>، دوال دورة الحياة، <code>bind</code> (<a href="#sec-era-1-class-components-the-original-model">العصر الأول: مكونات الكلاس</a>، <a href="#sec-the-lifecycle-to-hooks-translation-table">ترجمة دورة الحياة</a>)</td></tr>
+    <tr><td><code>function Foo(...)</code> وحيدة، بلا خطافات</td><td>دالة عارضة: خصائص تدخل، JSX يخرج، بلا حالة (مكون دالة من الدرجة الثانية، <a href="#sec-era-2-function-components-appear-but-they-re-second-class-2015">العصر الثاني: مكونات الدوال</a>)</td></tr>
+    <tr><td><code>useState</code> / <code>useEffect</code> / <code>useMemo</code>…</td><td>عصر الخطافات: دالة تطلب من رياكت قدرات بترتيب الاستدعاء (<a href="#sec-era-3-hooks-2018-making-functions-first-class">العصر الثالث: الخطافات</a>، <a href="#sec-the-modern-hooks-catalog">كتالوج الخطافات</a>)</td></tr>
+    <tr><td><code>createRoot</code>، <code>useTransition</code>، <code>startTransition</code></td><td>عصر 18+: التزامنية، التجميع التلقائي، البث (<a href="#sec-the-version-markers-which-react-are-you-reading">مؤشرات النسخة</a>)</td></tr>
+    <tr><td><code>useActionState</code>، <code>&lt;form action=…&gt;</code>، <code>useOptimistic</code></td><td>عصر نماذج/إجراءات 19 (<a href="#sec-the-version-markers-which-react-are-you-reading">مؤشرات النسخة</a>؛ المستند المرافق <a href="./react-2024-and-beyond.html">react-2024-and-beyond</a>)</td></tr>
     <tr><td><code>use</code>، <code>&lt;Suspense&gt;</code> حول قراءة وعد</td><td>تصيير معتمد على البيانات (المستند المرافق)</td></tr>
   </tbody>
 </table>
@@ -1373,8 +1389,8 @@ const theme = useContext(ThemeCtx);</code></pre>
   <li><code>class Foo extends React.Component</code> ← <code>function Foo(props)</code>.</li>
   <li><code>this.state.xyz</code> ← <code>const [xyz, setXyz] = useState(initial)</code>؛ <code>this.setState({…})</code> ← استدعاءات <code>setXyz(prev =&gt; …)</code> بصيغة المُحدِّث.</li>
   <li><code>this.props.foo</code> ← <code>props.foo</code> (أو فكّها في قائمة المعاملات).</li>
-  <li>حقول المثيل (مؤقتات، معرّفات) ← <code>useRef</code> (<a href="#sec-the-storage-models-three-places-state-can-live-in-react">§٩</a>).</li>
-  <li>دورة الحياة ← تأثيرات عبر جدول <a href="#sec-the-lifecycle-to-hooks-translation-table">§١٤</a>: <code>componentDidMount</code> ← تأثير بـ <code>[]</code>؛ <code>componentDidUpdate</code> ← تأثير بمصفوفة تبعيات؛ تنظيف الإزالة ← التنظيف الذي يعيده التأثير.</li>
+  <li>حقول المثيل (مؤقتات، معرّفات) ← <code>useRef</code> (<a href="#sec-the-storage-models-three-places-state-can-live-in-react">نماذج التخزين</a>).</li>
+  <li>دورة الحياة ← تأثيرات عبر جدول <a href="#sec-the-lifecycle-to-hooks-translation-table">ترجمة دورة الحياة</a>: <code>componentDidMount</code> ← تأثير بـ <code>[]</code>؛ <code>componentDidUpdate</code> ← تأثير بمصفوفة تبعيات؛ تنظيف الإزالة ← التنظيف الذي يعيده التأثير.</li>
   <li>احذف النمطية: لا <code>constructor</code> ولا <code>super(props)</code> ولا <code>bind</code>؛ الدوال تصير إغلاقات في الجسد.</li>
   <li>الفحص الأخير: لا <code>this</code> متبقياً. الدالة القابلة للخطاف لا تحمل أياً منه.</li>
 </ol>
@@ -1394,13 +1410,13 @@ const theme = useContext(ThemeCtx);</code></pre>
     <tr><td><code>React.createClass</code></td><td>مصنع كلاسات ما قبل ES6 (عصر 2013)</td><td>مكون دالة، أو كلاس ES6</td></tr>
     <tr><td>دوال الربط التلقائي</td><td><code>createClass</code> كان يربط الدوال تلقائياً</td><td>ربط / حقول أسهم / إغلاقات الخطافات</td></tr>
     <tr><td>الخلائط (Mixins)</td><td>كائنات منطق مشتركة</td><td>خطافات مخصصة</td></tr>
-    <tr><td>مكونات الرتبة العليا (HOCs)</td><td>إعادة استخدام منطق ذي حالة بالغلاف</td><td>خطافات مخصصة (<a href="#sec-oop-the-paradigm-classes-came-from">§١</a>، جحيم الأغلفة)</td></tr>
+    <tr><td>مكونات الرتبة العليا (HOCs)</td><td>إعادة استخدام منطق ذي حالة بالغلاف</td><td>خطافات مخصصة (<a href="#sec-oop-the-paradigm-classes-came-from">البرمجة كائنية التوجه</a>، جحيم الأغلفة)</td></tr>
     <tr><td>خصائص التصيير (Render props)</td><td>تركيب طفل-كدالة</td><td>خطافات مخصصة، تركيب عادي</td></tr>
     <tr><td><code>PropTypes</code></td><td>فحص خصائص وقت التشغيل</td><td>TypeScript</td></tr>
     <tr><td><code>defaultProps</code></td><td>قيم خصائص افتراضية</td><td>معاملات افتراضية في توقيع الدالة</td></tr>
     <tr><td><code>PureComponent</code></td><td>مقارنة ضحلة للخصائص/الحالة</td><td><code>React.memo</code></td></tr>
-    <tr><td>السياق القديم (<code>childContextTypes</code>)</td><td>سياق الشجرة الفرعية القديم</td><td>سياق حديث / <code>useContext</code> (<a href="#sec-context-the-mental-model-for-shared-state">§١٠ج</a>)</td></tr>
-    <tr><td><code>componentWillMount</code> / <code>UNSAFE_*</code></td><td>مراحل دورة حياة مهجورة</td><td>تأثيرات، تصيير مشتق، خطافات (<a href="#sec-the-lifecycle-to-hooks-translation-table">§١٤</a>)</td></tr>
+    <tr><td>السياق القديم (<code>childContextTypes</code>)</td><td>سياق الشجرة الفرعية القديم</td><td>سياق حديث / <code>useContext</code> (<a href="#sec-context-the-mental-model-for-shared-state">السياق Context</a>)</td></tr>
+    <tr><td><code>componentWillMount</code> / <code>UNSAFE_*</code></td><td>مراحل دورة حياة مهجورة</td><td>تأثيرات، تصيير مشتق، خطافات (<a href="#sec-the-lifecycle-to-hooks-translation-table">ترجمة دورة الحياة</a>)</td></tr>
   </tbody>
 </table>
 
@@ -1411,18 +1427,18 @@ const theme = useContext(ThemeCtx);</code></pre>
 <table>
   <thead><tr><th>نمط الفشل</th><th>ماذا يحدث</th><th>الإصلاح</th></tr></thead>
   <tbody>
-    <tr><td>تأثير كمعالج حدث</td><td>المنطق يعمل عند التثبيت/التحديث بينما يجب أن يعمل عند فعل المستخدم</td><td>انقله إلى المعالج (<a href="#sec-effects-vs-event-handlers-two-places-that-do-something-opposite-rules">§٧ب</a>)</td></tr>
-    <tr><td>حالة مشتقة مخزنة كحالة</td><td>مصدرا حقيقة ينحرفان</td><td>احسب أثناء التصيير (<a href="#sec-derived-state-compute-during-render-don-t-store">§١٠ب</a>)</td></tr>
-    <tr><td>مزامنة الخصائص إلى الحالة (ضد-نمط)</td><td>المكون يتجاهل تغييرات الخصائص اللاحقة</td><td>استخدم الخصائص مباشرة، أو صفّر بـ <code>key</code> (<a href="#sec-reconciliation-keys-and-component-identity">§٩ج</a>)</td></tr>
-    <tr><td>تنظيف تأثير ناقص</td><td>اشتراكات/مؤقتات تتسرب؛ تحديثات بعد الإزالة</td><td>أعد التنظيف المطابق (<a href="#sec-era-3-hooks-2018-making-functions-first-class">§٦</a>، <a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">§٧</a>)</td></tr>
+    <tr><td>تأثير كمعالج حدث</td><td>المنطق يعمل عند التثبيت/التحديث بينما يجب أن يعمل عند فعل المستخدم</td><td>انقله إلى المعالج (<a href="#sec-effects-vs-event-handlers-two-places-that-do-something-opposite-rules">التأثيرات مقابل معالجات الأحداث</a>)</td></tr>
+    <tr><td>حالة مشتقة مخزنة كحالة</td><td>مصدرا حقيقة ينحرفان</td><td>احسب أثناء التصيير (<a href="#sec-derived-state-compute-during-render-don-t-store">الحالة المشتقة</a>)</td></tr>
+    <tr><td>مزامنة الخصائص إلى الحالة (ضد-نمط)</td><td>المكون يتجاهل تغييرات الخصائص اللاحقة</td><td>استخدم الخصائص مباشرة، أو صفّر بـ <code>key</code> (<a href="#sec-reconciliation-keys-and-component-identity">المصالحة والمفاتيح</a>)</td></tr>
+    <tr><td>تنظيف تأثير ناقص</td><td>اشتراكات/مؤقتات تتسرب؛ تحديثات بعد الإزالة</td><td>أعد التنظيف المطابق (<a href="#sec-era-3-hooks-2018-making-functions-first-class">العصر الثالث: الخطافات</a>، <a href="#sec-the-stale-closure-problem-and-why-it-isn-t-one">الإغلاق العالق</a>)</td></tr>
     <tr><td>مصفوفة تبعيات غير صادقة</td><td>إغلاقات عالقة أو حلقات لا نهائية</td><td>صحّح التبعيات، أو احذف التبعية بمُحدِّث</td></tr>
-    <tr><td>ضجيج هوية كائن/مصفوفة</td><td>التخزين المؤقت يفشل؛ التأثيرات تعيد العمل كل تصيير</td><td>ثبّت القيمة (ارفع/خزّن) (<a href="#sec-refs-in-depth-and-memoization-the-remaining-manual-doors">§١٠و</a>)</td></tr>
-    <tr><td>مفاتيح ناقصة / فهرس-كمفتاح في قوائم قابلة لإعادة الترتيب</td><td>الحالة تتبع العنصر الخاطئ</td><td>معرّفات مستقرة كـ <code>key</code> (<a href="#sec-reconciliation-keys-and-component-identity">§٩ج</a>)</td></tr>
-    <tr><td>قيمة سياق يعاد إنشاؤها كل تصيير</td><td>كل مستهلك يعيد التصيير دائماً</td><td>خزّن القيمة / قسّم المزوّدات (<a href="#sec-context-the-mental-model-for-shared-state">§١٠ج</a>)</td></tr>
-    <tr><td>تخزين مؤقت مبكر</td><td>تعقيد بلا ربح مقاس</td><td>قِس، أو دع المترجم يقرر (<a href="#sec-era-4-the-react-compiler-and-beyond">§١٢</a>)</td></tr>
-    <tr><td>خطاف مستدعى شرطياً</td><td>ترتيب الخطافات ينكسر؛ «Rendered fewer hooks»</td><td>انقل الخطافات إلى المستوى الأعلى (<a href="#sec-the-rules-of-hooks-and-where-the-design-came-from">§٨</a>)</td></tr>
-    <tr><td>قراءة واجهة متصفح أثناء التصيير</td><td>عدم تطابق SSR/الترطيب</td><td>انقلها إلى تأثير (<a href="#sec-hydration-server-html-meets-client-state">§١٣و</a>)</td></tr>
-    <tr><td>جلب بلا حارس سباق</td><td>الاستجابة القديمة تمحو الجديدة</td><td>علم تجاهل/AbortController (<a href="#sec-data-fetching-patterns-where-the-data-comes-from">§٧ج</a>)</td></tr>
+    <tr><td>ضجيج هوية كائن/مصفوفة</td><td>التخزين المؤقت يفشل؛ التأثيرات تعيد العمل كل تصيير</td><td>ثبّت القيمة (ارفع/خزّن) (<a href="#sec-refs-in-depth-and-memoization-the-remaining-manual-doors">المراجع والتخزين المؤقت</a>)</td></tr>
+    <tr><td>مفاتيح ناقصة / فهرس-كمفتاح في قوائم قابلة لإعادة الترتيب</td><td>الحالة تتبع العنصر الخاطئ</td><td>معرّفات مستقرة كـ <code>key</code> (<a href="#sec-reconciliation-keys-and-component-identity">المصالحة والمفاتيح</a>)</td></tr>
+    <tr><td>قيمة سياق يعاد إنشاؤها كل تصيير</td><td>كل مستهلك يعيد التصيير دائماً</td><td>خزّن القيمة / قسّم المزوّدات (<a href="#sec-context-the-mental-model-for-shared-state">السياق Context</a>)</td></tr>
+    <tr><td>تخزين مؤقت مبكر</td><td>تعقيد بلا ربح مقاس</td><td>قِس، أو دع المترجم يقرر (<a href="#sec-era-4-the-react-compiler-and-beyond">مترجم رياكت</a>)</td></tr>
+    <tr><td>خطاف مستدعى شرطياً</td><td>ترتيب الخطافات ينكسر؛ «Rendered fewer hooks»</td><td>انقل الخطافات إلى المستوى الأعلى (<a href="#sec-the-rules-of-hooks-and-where-the-design-came-from">قواعد الخطافات</a>)</td></tr>
+    <tr><td>قراءة واجهة متصفح أثناء التصيير</td><td>عدم تطابق SSR/الترطيب</td><td>انقلها إلى تأثير (<a href="#sec-hydration-server-html-meets-client-state">الترطيب</a>)</td></tr>
+    <tr><td>جلب بلا حارس سباق</td><td>الاستجابة القديمة تمحو الجديدة</td><td>علم تجاهل/AbortController (<a href="#sec-data-fetching-patterns-where-the-data-comes-from">أنماط جلب البيانات</a>)</td></tr>
     <tr><td>تحديث حالة أثناء التصيير</td><td>تصيير خاطئ أو حلقة</td><td>اشتقها، أو افعلها في حدث/تأثير</td></tr>
   </tbody>
 </table><h2 id="sec-principles-the-invariants-every-pattern-obeys">المبادئ — الثوابت التي يطيعها كل نمط</h2>
@@ -1430,16 +1446,16 @@ const theme = useContext(ThemeCtx);</code></pre>
 <table>
   <thead><tr><th>المبدأ</th><th>المعنى</th></tr></thead>
   <tbody>
-    <tr><td>الواجهة دالة من الحالة</td><td>التصييرات تصف العرض من الحالة الحالية (<a href="#sec-what-is-state-a-prequel-before-we-can-talk-about-react-s-choices">§٢</a>)</td></tr>
+    <tr><td>الواجهة دالة من الحالة</td><td>التصييرات تصف العرض من الحالة الحالية (<a href="#sec-what-is-state-a-prequel-before-we-can-talk-about-react-s-choices">ما هي “الحالة”</a>)</td></tr>
     <tr><td>كل تصيير لقطة</td><td>الخصائص والحالة ملتقطتان لكل تصيير؛ الإغلاقات فوقهما صحيحة</td></tr>
     <tr><td>الحالة مملوكة</td><td>لكل قطعة حالة مالك واحد من المكونات</td></tr>
     <tr><td>الخصائص تتدفق للأسفل، الأحداث للأعلى</td><td>تدفق بيانات باتجاه واحد</td></tr>
     <tr><td>التصيير يبقى نقياً</td><td>لا آثار جانبية، لا تحوير أثناء وصف الواجهة</td></tr>
-    <tr><td>التأثيرات تزامن؛ المعالجات تستجيب</td><td>مكانا «فعل شيء» لهما قواعد متعاكسة (<a href="#sec-effects-vs-event-handlers-two-places-that-do-something-opposite-rules">§٧ب</a>)</td></tr>
-    <tr><td>القيم المشتقة تُحسب، لا تُخزّن</td><td>لا تضاعف الحقيقة (<a href="#sec-derived-state-compute-during-render-don-t-store">§١٠ب</a>)</td></tr>
-    <tr><td>المفاتيح تعرّف الهوية</td><td>المفاتيح تحفظ الحالة أو تصفّرها (<a href="#sec-reconciliation-keys-and-component-identity">§٩ج</a>)</td></tr>
-    <tr><td>المراجع لتخزين خارج التصيير</td><td>لا مرجع أبداً لقيم تطلق الواجهة (<a href="#sec-refs-in-depth-and-memoization-the-remaining-manual-doors">§١٠و</a>)</td></tr>
-    <tr><td>المترجم يؤتمت التخزين المؤقت، لا الصحة</td><td>قواعد رياكت ما زالت مهمة (<a href="#sec-era-4-the-react-compiler-and-beyond">§١٢</a>)</td></tr>
+    <tr><td>التأثيرات تزامن؛ المعالجات تستجيب</td><td>مكانا «فعل شيء» لهما قواعد متعاكسة (<a href="#sec-effects-vs-event-handlers-two-places-that-do-something-opposite-rules">التأثيرات مقابل معالجات الأحداث</a>)</td></tr>
+    <tr><td>القيم المشتقة تُحسب، لا تُخزّن</td><td>لا تضاعف الحقيقة (<a href="#sec-derived-state-compute-during-render-don-t-store">الحالة المشتقة</a>)</td></tr>
+    <tr><td>المفاتيح تعرّف الهوية</td><td>المفاتيح تحفظ الحالة أو تصفّرها (<a href="#sec-reconciliation-keys-and-component-identity">المصالحة والمفاتيح</a>)</td></tr>
+    <tr><td>المراجع لتخزين خارج التصيير</td><td>لا مرجع أبداً لقيم تطلق الواجهة (<a href="#sec-refs-in-depth-and-memoization-the-remaining-manual-doors">المراجع والتخزين المؤقت</a>)</td></tr>
+    <tr><td>المترجم يؤتمت التخزين المؤقت، لا الصحة</td><td>قواعد رياكت ما زالت مهمة (<a href="#sec-era-4-the-react-compiler-and-beyond">مترجم رياكت</a>)</td></tr>
   </tbody>
 </table><h2 id="sec-hydration-server-html-meets-client-state">الترطيب — HTML الخادم يلتقي حالة العميل</h2>
 
@@ -1544,6 +1560,38 @@ useEffect(() =&gt; { setWidth(window.innerWidth); }, []);</code></pre>
   </table>
 
   <p>لاحظ نمطًا: كل عصر لا يلغي سابقه بالكامل — يبني عليه. أنت تتعلم سلسلة متصلة، وليس قفزات منفصلة.</p>
+</section>
+
+<details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>HOC (مكوّن من رتبة أعلى)</strong> — نمط إعادة الاستخدام في عصر الأغلفة وراء "جحيم الأغلفة". ابحث "React HOC vs custom hook".</li>
+  <li><strong>Render props</strong> — التركيب بابن-ك دالة، النمط الآخر قبل الخطافات.</li>
+  <li><strong>الإغلاق العالق</strong> — استدعاء راجع يقرأ قيم تصيير قديم. ابحث "React stale closure useEffect".</li>
+  <li><strong>قواعد الخطافات / ترتيب الاستدعاء</strong> — لماذا لا يمكن جعل الخطافات شرطية. ابحث "rules of hooks explanation".</li>
+  <li><strong>المصالحة والمفاتيح</strong> — كيف تطابق رياكت العناصر بين التصييرات. ابحث "React reconciliation keys index anti-pattern".</li>
+  <li><strong>متحكَّم مقابل غير متحكَّم</strong> — من يملك قيمة حقل النموذج. ابحث "controlled uncontrolled components React".</li>
+  <li><strong>Prop drilling</strong> — تمرير الخصائص عبر الوسطاء؛ ما يحله السياق. ابحث "prop drilling context".</li>
+  <li><strong>التجميع التلقائي</strong> — عدة setState تنهار إلى تصيير واحد (18+). ابحث "React automatic batching 18".</li>
+  <li><strong>عدم تطابق الترطيب</strong> — HTML الخادم يخالف أول تصيير عميل. ابحث "hydration mismatch React".</li>
+  <li><strong>Fiber</strong> — العقدة الداخلية لكل مكوّن تخزّن خانات الخطافات. ابحث "React fiber nodes hooks storage".</li>
+</ul>
+</details>
+
+<section class="win">
+  <h3>ما تغطيه هذه الوثيقة</h3>
+  <p>أصبحت تملك الآن القوس الكامل: لماذا وُجدت الكلاسات، ولماذا كانت مؤلمة (ثلاث مشكلات مسمّاة)، ولماذا لم تكفِ مكونات الدوال وحدها (كانت بلا حالة وبلا تأثيرات)، وما تضيفه الخطافات (حالة وتأثيرات من داخل دالة، وإعادة استخدام منطق عبر خطافات مخصصة)، ولماذا ليست الإغلاقات المشكلة (مصفوفات الاعتماديات هي موضع الأخطاء)، وكيف يُترجم نموذج دورة الحياة إلى نموذج المزامنة، وكيف يزيل مترجم رياكت الاحتكاك المتبقي، وأين تعيش الكلاسات في المشهد الحديث، وما تغيّر في 2025–2026 — استقرار المترجم، وانقسام العملية في RSC، ومؤسسة رياكت، درس أمن RSC، ولماذا لم تتبنَّ رياكت الـ signals، وPreact كفرع بنيوي، و<code>useEffectEvent</code> في رياكت 19.2 كإصلاح رسمي للأنماط التي وصفها قسم <a href="#sec-the-classic-bugs-and-which-storage-model-fixes-each">الأخطاء الكلاسيكية</a>. تستطيع الآن قراءة شيفرة رياكت القديمة في العمل، وتعرّف الأنماط، وعدم السقوط في فخ <code>this</code> حين لا وجود لـ <code>this</code>.</p>
+</section>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاثة متابعات لتعميق هذا:</p>
+  <ul>
+    <li>"اعرض عليّ مكوّن كلاسات حقيقيًا من قاعدة شيفرةنا وتجوّل معي في تهجرته إلى الخطافات — أي دورة حياة تُترجم بأقل نقاء، ولماذا؟"</li>
+    <li>"متى 'كدبت' مصفوفة اعتماديات في شيفرة كتبتها أو راجعتها — وأمسكتها قاعدة الفحص أم خطأ إنتاج؟"</li>
+    <li>"أي نمط قبل-الخطافات (HOCs، render props، mixins) تراه أكثر شيوعًا هنا، وما هي نسخته بخطاف مخصص؟"</li>
+  </ul>
 </section>
 
 <footer class="lesson-foot">
