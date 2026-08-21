@@ -45,6 +45,50 @@
         </p>
       </section>
 
+      <div style="background: #f8f6f1; border: 1px solid #e0dcd0; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <strong>مرجع سريع</strong> — الحركات الست، سطر واحد لكل:
+        <table style="margin: 0.5rem 0 0 0; font-size: 0.85rem; width: 100%; direction: rtl;">
+          <tbody>
+            <tr><td style="width: 30%;"><strong>المرحلة ١ (الفهم)</strong></td><td>المدخل / العملية / المخرج. تتبع مثالاً يدوياً. ا列出 القيود.</td></tr>
+            <tr><td><strong>المرحلة ٢ (التخطيط)</strong></td><td>خوارزمية مرقمة بلغة واضحة. اختر نموذجاً (<a href="./algorithms-and-data-structures.html#sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit">صندوق الأدوات</a>). اختر هيكل بيانات.</td></tr>
+            <tr><td><strong>المرحلة ٣ (التنفيذ)</strong></td><td>تحقق من كل خطوة أثناء كتابتها. لا ترتجل — إذا انحرف الكود عن الخطة، عُد إلى المرحلة ٢.</td></tr>
+            <tr><td><strong>المرحلة ٤ (انظر للخلف)</strong></td><td>الحالات الحدية. نهج أبسط؟ أرشفة النمط. التعميم.</td></tr>
+            <tr><td><strong>فوق-الإدراك</strong></td><td>كل بضع دقائق: "هل أحقق تقدماً؟ هل يجب أن أبدّل النهج؟"</td></tr>
+            <tr><td><strong>الممارسة</strong></td><td>حاول أولاً. أعد الحل من الذاكرة. اختلط أنواع المشكلات.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+        <details open>
+          <summary style="cursor: pointer; font-weight: bold;">انتقل إلى القسم</summary>
+          <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0; direction: rtl;">
+            <li><a href="#sec-how-to-use-this-doc">كيف تستخدم هذا المستند</a></li>
+            <li><a href="#sec-definition-what-problem-solving-is-and-what-it-is-not">تعريف</a></li>
+            <li><a href="#sec-the-universal-meta-rhythm-polya-s-four-phases"> مراحل بوليا الأربع</a></li>
+            <li><a href="#sec-the-lens-computational-thinking-s-four-pillars">التفكير الحسابي</a></li>
+            <li><a href="#sec-polya-s-heuristic-dictionary-the-moves">الاستدلالات</a></li>
+            <li><a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">فوق-الإدراك</a></li>
+            <li><a href="#sec-stepwise-refinement-top-down-decomposition-for-programming">التنقيح التدريجي</a></li>
+            <li><a href="#sec-algorithm-design-paradigms-the-technique-catalog">اختيار النموذج</a></li>
+            <li><a href="#sec-the-role-of-examples-concrete-before-abstract">الأمثلة</a></li>
+            <li><a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">التنقيح (Debugging)</a></li>
+            <li><a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">انظر للخلف (المرحلة ٤)</a></li>
+            <li><a href="#sec-mental-models-how-expert-problem-solvers-actually-reason">النماذج الذهنية</a></li>
+            <li><a href="#sec-worked-example-your-hackerrank-word-frequency-counter-traced-through-polya">أمثلة مطبقة</a></li>
+            <li><a href="#sec-fluency-vs-storage-strength-in-problem-solving">الطلاقة مقابل التخزين</a></li>
+            <li><a href="#sec-the-right-questions-a-catalog">فهرس الأسئلة</a></li>
+            <li><a href="#sec-principles-the-shared-constants">المبادئ</a></li>
+            <li><a href="#sec-history-from-mathematics-to-programming-1945present">التاريخ</a></li>
+            <li><a href="#sec-evolution-constraint-inversions-across-the-same-idea">التطور</a></li>
+            <li><a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي</a></li>
+            <li><a href="#sec-the-future-where-problem-solving-methodology-is-heading">المستقبل (الذكاء الاصطناعي)</a></li>
+            <li><a href="#sec-the-most-common-failure-modes">أنماط الفشل</a></li>
+            <li><a href="#sec-summary-the-complete-mental-checklist">الملخص والقائمة</a></li>
+          </ul>
+        </details>
+      </nav>
+
       <blockquote class="callout">
         <p><strong>الطبقات الثلاث المتداخلة للتفكير في البرمجيات</strong></p>
         <pre
@@ -1197,125 +1241,20 @@
         <strong>نموذج</strong> — نهج أساسي لتصميم الخوارزمية. لا توجد خوارزمية
         مثلى واحدة لكل المشكلات؛ توجد نماذج، كل واحدة تناسب فئة مختلفة من
         المشكلات. التعرف على النموذج الذي تطلبه مشكلة ما هو بحد ذاته مهارة تعرف
-        على أنماط تُبنى بالممارسة (<a
-          href="https://en.wikipedia.org/wiki/Competitive_programming"
-          >Wikipedia</a
-        >).
+        على أنماط تُبنى بالممارسة.
       </p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>النموذج</th>
-            <th>ما هو</th>
-            <th>متى تستخدمه</th>
-            <th>مشكلات مثال</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><dfn>القوة الغاشمة</dfn></td>
-            <td>جرّب كل الاحتمالات. بسيطة، غالباً بطيئة، لكن صحيحة.</td>
-            <td>
-              <strong>ابدأ دائماً هنا</strong> إذا كان المدخل صغيراً. احصل على
-              الصحيح أولاً، حسّن لاحقاً. الحل الأول غالباً قوة غاشمة؛ المهارة هي
-              معرفة متى تترقى.
-            </td>
-            <td>
-              إيجاد كل الأزواج التي مجموعها N (حلقة متداخلة)؛ تحقق من أولية رقم
-              (اختبر كل القواسم).
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>الجشع</dfn></td>
-            <td>
-              اتخذ الاختيار الأمثل محلياً في كل خطوة، أملاً في أمثلية عالمية.
-            </td>
-            <td>
-              عندما تملك المشكلة <em>بنية أقلية</em> و<em>خاصية اختيار جشع</em>
-              (الأمثل المحلي = الأمثل العالمي). ليست قابلة للتطبيق دائماً — أثبت
-              أنها تعمل قبل الوثوق بها.
-            </td>
-            <td>
-              أصغر عملة معدنية (أنظمة عملات معينة)؛ اختيار الأنشطة؛ ترميز
-              هوفمان.
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>فرّق وتغلّب</dfn></td>
-            <td>
-              قسّم المشكلة إلى مشكلات فرعية <strong>مستقلة</strong>، حل كل
-              واحدة، ادمج النتائج.
-            </td>
-            <td>
-              عندما تكون المشكلات الفرعية <strong>مستقلة</strong> (حل واحدة لا
-              يعتمد على أخرى). ثلاث خطوات: فرّق، تغلّب، ادمج (<a
-                href="https://www.geeksforgeeks.org/introduction-to-divide-and-conquer-algorithm-data-structure-and-algorithm-tutorials/"
-                >GeeksForGeeks</a
-              >).
-            </td>
-            <td>فرز الدمج، فرز التحديد، البحث الثنائي، FFT، برج هانوي.</td>
-          </tr>
-          <tr>
-            <td><dfn>البرمجة الديناميكية</dfn></td>
-            <td>
-              حل كل مشكلة فرعية مرة واحدة، خزّن النتيجة، وأعد استخدامها عند
-              تكرار نفس المشكلة الفرعية.
-            </td>
-            <td>
-              عندما <strong>تتداخل</strong> المشكلات الفرعية (تظهر نفس المشكلة
-              الفرعية مرات متعددة). التمييز الرئيسي عن فرّق-وتغلّب: متداخلة
-              مقابل مستقلة.
-            </td>
-            <td>
-              فيبوناتشي، حقيبة الظهر، مسافة التحرير، أطول تتابع مشترك، العملة
-              المعدنية (عام).
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>التراجع (الرجوع للخلف)</dfn></td>
-            <td>
-              جرّب كل الاحتمالات منهجياً، متخلياً عن مسار فورما ثبت أنه غير صالح
-              ("ارجع للخلف").
-            </td>
-            <td>
-              عندما تحتاج استكشاف كل الاحتمالات لكن يمكنك التقليم مبكراً. إشباع
-              القيود، البحث التوافيقي.
-            </td>
-            <td>الملكات N، حلال سودوكو، توليد كل التبديلات، حل المتاهات.</td>
-          </tr>
-          <tr>
-            <td><dfn>جدول التجزئة</dfn></td>
-            <td>
-              استخدم خريطة تجزئة (كائن/Map) للبحث O(١)، محوّلاً عمليات البحث ذات
-              الحلقات المتداخلة إلى تمريرات مفردة.
-            </td>
-            <td>
-              عندما تحتاج بحثاً سريعاً أو عدّاً أو إزالة تكرار. غالباً الترقي من
-              القوة الغاشمة الذي يحول O(n²) → O(n).
-            </td>
-            <td>
-              <strong>عدّ تواتر الكلمات (مشكلة HackerRank الخاصة بك)</strong>،
-              ثنائية من عنصرين، إيجاد التكرارات، أول حرف غير متكرر.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <blockquote class="callout">
-        <p>
-          <strong
-            >التمييز الحاسم — فرّق-وتغلّب مقابل البرمجة الديناميكية:</strong
-          >
-          فرّق-وتغلّب للمشكلات الفرعية <em>المستقلة</em> (فرز الدمج: كل نصف
-          يُفرز مستقلاً). البرمجة الديناميكية للمشكلات الفرعية
-          <em>المتداخلة</em> (فيبوناتشي: فيب(٥) يحتاج فيب(٤) و فيب(٣)، لكن
-          فيب(٤) يحتاج أيضاً فيب(٣) — لذا تخزّن فيب(٣) بدلاً من إعادة حسابه).
-          إذا لم تتداخل المشكلات الفرعية، استخدم فرّق-وتغلّب. إذا تداخلت، استخدم
-          البرمجة الديناميكية. هذا التمييز الواحد من أكثر ما يُختبر في المقابلات
-          والمسابقات.
-        </p>
-      </blockquote>
+      <p>
+        هذا المستند يتوقف عند <em>اختيار</em> التقنية. الرفيق —
+        <a href="./algorithms-and-data-structures.html#sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit"
+          >خوارزميات وهياكل البيانات — اختيار النموذج</a
+        >
+        — هو المكان الذي يصبح فيه كل نموذج قالباً عملياً مع الكود وحالات
+        الحدود والتمييز بين فرّق-وتغلّب والبرمجة الديناميكية. ذلك المستند يحتوي
+        أيضاً على دليل اختيار الهيكل (الحاجة → الهيكل → السبب) وجدول إشارات
+        التعرف الكامل (الإشارة → التقنية → السبب). مستند واحد لكل سؤال: هذا هو
+        التفكير، وذاك هو صندوق الأدوات الذي يصل إليه التفكير.
+      </p>
 
       <p>
         <strong
@@ -1482,7 +1421,8 @@
         المشكلات المستقبلية أسرع.
       </p>
 
-      <h3>فهرس الحالات الحدية — الفحص المنهجي</h3>
+      <details>
+        <summary><h3 style="display: inline;">فهرس الحالات الحدية — الفحص المنهجي</h3></summary>
       <p>
         بعد أن يعمل حلك على المثال، مر عبر قائمة المراجعة هذه من الحالات الحدية.
         هذه هي الحالات التي تفشل في الإنتاج وفي مجموعات الاختبار الخفية في
@@ -1550,6 +1490,7 @@
           </tr>
         </tbody>
       </table>
+      </details>
 
       <h3>هل يمكنك اشتقاق النتيجة بشكل مختلف؟</h3>
       <p>
@@ -2175,7 +2116,8 @@
         </tbody>
       </table>
 
-      <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي — فهرس الأدوات بمقاييس القرار</h2>
+      <details>
+        <summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display: inline;">النظام البيئي — فهرس الأدوات بمقاييس القرار</h2></summary>
 
       <p>
         حل المشكلات لا يكون أفضل من بيئة الممارسة التي تبني المهارة. إليك فهرس
@@ -2317,6 +2259,7 @@
           >
         </p>
       </blockquote>
+      </details>
 
       <h2 id="sec-the-future-where-problem-solving-methodology-is-heading">المستقبل — أين تتجه منهجية حل المشكلات</h2>
 
