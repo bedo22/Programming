@@ -18,8 +18,9 @@
           البيانات" فعلياً بأمثلة ملموسة. اقرأ هذا قبل أن تبدأ أي ميزة واجهة غير
           تافهة.
         </p>
-              <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../how-developers-think-frontend.html">English</a>
+              <p class="meta"><strong>لمن هذه الوثيقة:</strong> مطوّرون على وشك بناء أي ميزة واجهة غير بسيطة — وخاصة من وقف أمام ملف فارغ يتساءل «من أين أبدأ؟». اقرأها بعد html-and-css وjavascript-the-language.</p>
+        <p class="meta" style="margin-bottom: 0">
+          <strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../how-developers-think-frontend.html">English</a>
         </p>
       </header>
 
@@ -178,8 +179,8 @@
           >إذا حدّقت يوماً في ملف فارغ متسائلاً "من أين أبدأ أصلاً؟" — فهذه هي
           الخريطة.</strong
         >
-        اقرأ <a href="#sec-the-three-thread-mental-model-not-a-sequence-a-loop">§١</a> (الخيوط الثلاثة)، <a href="#sec-round-0-the-three-clarifying-questions-the-hardest-part">§٢</a>–<a href="#sec-round-3-edge-cases-and-polish-the-difference-between-works-and-ships">§٥</a> (الجولات)، <a href="#sec-frontend-state-decisions-the-taxonomy">§٥أ</a> (قرارات الحالة)، و<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>
-        (المثال المحلول) أولاً. ثم عدّ للنظرية (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">§١هـ</a>) وأنماط الفشل (<a href="#sec-the-most-common-failure-modes">§١٣ب</a>) بعد أن
+        اقرأ <a href="#sec-the-three-thread-mental-model-not-a-sequence-a-loop">نموذج الخيوط الثلاثة</a> (الخيوط الثلاثة)، <a href="#sec-round-0-the-three-clarifying-questions-the-hardest-part">الأسئلة التوضيحية الثلاثة</a>–<a href="#sec-round-3-edge-cases-and-polish-the-difference-between-works-and-ships">الجولة ٣: الحالات الحدية والصقل</a> (الجولات)، <a href="#sec-frontend-state-decisions-the-taxonomy">تصنيف قرارات الحالة</a> (قرارات الحالة)، و<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>
+        (المثال المحلول) أولاً. ثم عدّ للنظرية (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">علم النفس المعرفي</a>) وأنماط الفشل (<a href="#sec-the-most-common-failure-modes">أنماط الفشل</a>) بعد أن
         تجرّب الحلقة على ميزة حقيقية.
       </p>
       <h2 id="sec-definition-what-the-dev-loop-is-and-what-it-is-not">التعريف — ما هي حلقة التطوير <em>وما هي ليست</em></h2>
@@ -215,15 +216,15 @@
           مراحل على نطاق المشروع (المتطلبات ← التصميم ← التنفيذ ← الاختبار ←
           النشر؛ انظر
           <a href="../software-development-process.html"
-            >عملية تطوير البرمجيات §١</a
+            >عملية تطوير البرمجيات</a
           >). حلقة التطوير أصغر وأقدم — إنها إيقاع ميزة واحدة، وعمل بعد ظهيرة
-          واحدة. وكما يُظهر §٩، تسبق كل منهجية مسماة.
+          واحدة. وكما يُظهر <a href="#sec-what-is-this-process-called-entity-types-and-terminology">قسم المصطلحات</a>، تسبق كل منهجية مسماة.
         </li>
         <li>
           <strong>ليست خوارزمية ثابتة.</strong> لا يمكنك تدوين "الخطوة ١: افعل
           هذا، الخطوة ٢: افعل ذاك" لبناء ميزة — تتغير الخطوات كلما تعلمت. إنها
           <strong>إيقاع</strong>: تدور عبر الخيوط، تشعر بالاحتكاك، تعمّق حين
-          يئنّ. انظر §١٠ لمعرفة السبب.
+          يئنّ. انظر <a href="#sec-why-is-it-a-rhythm-not-a-structured-algorithm">قسم «لماذا إيقاع»</a> لمعرفة السبب.
         </li>
         <li>
           <strong>ليست لـ React فقط.</strong> حلقة الخيوط الثلاثة تسبق React —
@@ -235,7 +236,7 @@
       <h3>محددة المعالم مقابل الخبيثة — أين تعيش الحلقة</h3>
       <p>
         تعيش حلقة التطوير في أرض <strong>المشكلات الخبيثة</strong> بلا منازع
-        (انظر <a href="./problem-solving.html">حل المشكلات §١</a>): تتطور
+        (انظر <a href="./problem-solving.html">حل المشكلات</a>): تتطور
         المتطلبات، ومعايير النجاح ذاتية ("هل يبدو صحيحاً؟")، ولا توجد قاعدة توقف
         واضحة — فقط أفضل أو أسوأ. لهذا هي إيقاع، لا خوارزمية. تحدي HackerRank
         (محدد المعالم) يحصل على خوارزمية؛ ميزة واجهة (خبيثة) تحصل على إيقاع.
@@ -462,7 +463,7 @@
         الكود أيضاً. الحلقة هي التجاوز: تركز على خيط واحد في كل مرة، ممسكةً
         بالباقي بخفة، وتدور عبرها. كل تمريرة ضحلة بما يكفي لتلائم الذاكرة
         العاملة. هذا هو نفس مبدأ بوليا "نقل الذاكرة إلى تمثيل خارجي" (انظر
-        <a href="./problem-solving.html">حل المشكلات §١هـ</a>) — الجولات تتيح لك
+        <a href="./problem-solving.html">حل المشكلات</a>) — الجولات تتيح لك
         إخراج خيط واحد بينما تحمل آخر.
       </p>
 
@@ -496,12 +497,12 @@
       <p>
         إشارة الانتقال من جولة إلى التالية — "شعر الاحتكاك" — حكم فوق-إدراكي، لا
         قاعدة ميكانيكية. هذا هو فوق-إدراك شوينفيلد (انظر
-        <a href="./problem-solving.html">حل المشكلات §٥</a>) مطبّقاً على بناء
+        <a href="./problem-solving.html">حل المشكلات</a>) مطبّقاً على بناء
         الميزات: تراقب تقدمك وتقرر "هذه الجولة تئنّ، حان وقت التعميق". لا يمكنك
         تحويلها إلى قائمة مراجعة لأن قائمة المراجعة تفترض أنك تعرف
         <em>ماذا تفعل بعد ذلك</em> — الحلقة تفترض أنك تعرف <em>ما الناقص</em>،
         وهو حكم جمالي. استوعب كبار المطورين هذه الإشارة عبر مئات التكرارات؛
-        يبنيها المبتدئون عبر الممارسة المتعمدة (<a href="#sec-your-takeaway-the-deliberate-practice-loop">§٨</a>).
+        يبنيها المبتدئون عبر الممارسة المتعمدة (<a href="#sec-your-takeaway-the-deliberate-practice-loop">حلقة الممارسة المتعمدة</a>).
       </p>
 
       <h3>النموذج الحلزوني — السلف الرسمي</h3>
@@ -651,7 +652,7 @@
         </li>
         <li>
           <strong>ما حالات الواجهة الرئيسية؟</strong> — المسار السعيد، الفارغ،
-          التحميل، الخطأ (انظر §٥أ).
+          التحميل، الخطأ (انظر <a href="#sec-frontend-state-decisions-the-taxonomy">تصنيف قرارات الحالة</a>).
         </li>
         <li>
           <strong>ما البيانات القادمة من الخادم؟</strong> — وعبر أي عقد API؟
@@ -674,14 +675,14 @@
         </li>
         <li>
           <strong>ماذا تعني "منجز" بالنسبة لهذه الميزة؟</strong> — تعريف الإنجاز
-          في الواجهة الأمامية (§٥أ).
+          في الواجهة الأمامية (<a href="#sec-frontend-state-decisions-the-taxonomy">تصنيف قرارات الحالة</a>).
         </li>
       </ul>
 
       <p>
         إن استطعت الإجابة عن هذه في الجولة ٠، تصبح الجولات التالية تنفيذاً لا
         اكتشافاً — وقد التقطت فخ "التحميل مقابل الفارغ" قبل أن يكلّفك أياماً
-        (§١٣).
+        (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>).
       </p>
 
       <h2 id="sec-round-1-skeleton-pass-the-thinnest-end-to-end-slice">الجولة ١ — تمريرة الهيكل (أنحف شريحة من طرف إلى طرف)</h2>
@@ -867,7 +868,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
           <code>aria-*</code>
           بعد العناصر الأصلية، لا قبلها.
         </li>
-        <li><strong>تباين كافٍ</strong> — نص فوق خلفية يلبي تباين WCAG.</li>
+        <li><strong>تباين كافٍ</strong> — النص يلبي WCAG AA: ‏≥ 4.5:1 للنص العادي، ≥ 3:1 للنص الكبير (‎≥ 24px أو 19px غامق).</li>
         <li>
           <strong>حركة مخفَّضة</strong> — الحركات تحترم
           <code>prefers-reduced-motion</code>.
@@ -941,7 +942,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
           عمر المكوّن الذي أُطلق من أجله.
         </li>
         <li>
-          <strong>هل يضغط المستخدم مرتين؟</strong> — إرسالان، سجلّان مكرران.
+          <strong>هل يضغط المستخدم مرتين؟</strong> — إرسالان، سجلّان مكرران. حماية نموذجية: ارتداد تأخير ‎~300 ms لمدخلات البحث، وتعطيل فوري لزر الإرسال.
         </li>
         <li>
           <strong>هل تختلف استجابة الخادم عن التحديث المتفائل؟</strong> — افترضت
@@ -1001,7 +1002,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
       <h2 id="sec-frontend-state-decisions-the-taxonomy">قرارات الحالة في الواجهة الأمامية — النطاق الكامل</h2>
 
       <p>
-        تعامل §١–§٥ مع "الحالة" كفكرة واحدة، لكن خيط النموذج هو في الواقع
+        تعامل <a href="#sec-the-three-thread-mental-model-not-a-sequence-a-loop">الخيوط الثلاثة</a> مع "الحالة" كفكرة واحدة، لكن خيط النموذج هو في الواقع
         <strong>عدة أنواع مختلفة من الحالة</strong>، وخلطها هو مصدر معظم أخطاء
         الواجهة الأمامية. هذا هو النطاق الكامل الذي تتنقل فيه الجولات:
       </p>
@@ -1056,7 +1057,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
       <h3>حالات الواجهة غير المتزامنة — المصفوفة</h3>
 
       <p>
-        استخدم مثال صندوق البحث (§١٣) حقلاً
+        استخدم مثال صندوق البحث (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>) حقلاً
         <code>status: "idle" | "loading" | "done" | "error"</code>. تلك ليست
         حيلة لمرة واحدة — إنها المبدأ العام لأي ميزة غير متزامنة. قبل تنسيق
         المسار السعيد، اكتب كل حالة يمكن أن تكون عليها الميزة:
@@ -1117,7 +1118,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
       <p>
         <strong>"الحالات قبل البكسلات."</strong> اكتب هذه الحالات قبل تنسيق
         المسار السعيد — حالتا الخطأ والفارغ ميزتان أيضاً، وهما اللتان تُنتجان
-        واجهة تبدو معطوبة عند تخطيهما (§١٣ب، نمط فشل: حالات غير متزامنة مفقودة).
+        واجهة تبدو معطوبة عند تخطيهما (<a href="#sec-the-most-common-failure-modes">أنماط الفشل</a>، نمط فشل: حالات غير متزامنة مفقودة).
       </p>
 
       <h3>حالة الخادم مقابل حالة العميل</h3>
@@ -1144,13 +1145,13 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         </li>
         <li>
           <strong>حالة مشتقّة</strong> ← تُحسب عند العرض، لا تُخزَّن أبداً (انظر
-          §١٢ب).
+          <a href="#sec-principles-the-shared-constants">المبادئ</a>).
         </li>
       </ul>
 
       <p>
         هذا الانقسام أهم شيء مع React Query/SWR وRedux/Zustand وReact Server
-        Components وNext.js — كل واحدٍ منها يرسم الحدود في مكان مختلف (§١٣د).
+        Components وNext.js — كل واحدٍ منها يرسم الحدود في مكان مختلف (<a href="#sec-the-future-where-the-dev-loop-is-heading">مستقبل الحلقة</a>).
       </p>
 
       <h3>ملكية حالة المكوّن</h3>
@@ -1179,7 +1180,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
           </tr>
           <tr>
             <td>هل أي حالة عمومية؟</td>
-            <td>يتجنب مخازن العمومية المبكرة (§١٣ج).</td>
+            <td>يتجنب مخازن العمومية المبكرة (<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">كتالوج الأدوات</a>).</td>
           </tr>
           <tr>
             <td>هل أي حالة مبنية على العنوان؟</td>
@@ -1256,7 +1257,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         تكتمل الميزة عندما يتحقق كل هذا — نسخة مقياس الميزة من معايير الإنجاز في
         مستند العملية (انظر
         <a href="../software-development-process.html"
-          >عملية تطوير البرمجيات §١٠</a
+          >عملية تطوير البرمجيات</a
         >):
       </p>
 
@@ -1278,7 +1279,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
       <h2 id="sec-mental-models-how-developers-actually-reason-across-rounds">النماذج العقلية — كيف يستدل المطورون فعلياً عبر الجولات</h2>
 
       <p>
-        الحلقة في §١–§٥ هي تسلسل من <em>التمريرات</em>، لكن النموذج العقلي
+        الحلقة في <a href="#sec-the-three-thread-mental-model-not-a-sequence-a-loop">الخيوط الثلاثة</a> هي تسلسل من <em>التمريرات</em>، لكن النموذج العقلي
         للمطور أشبه بـ <strong>ثلاثي خيوط</strong>: خيط لـ "هل هذا
         <em>صحيح</em>؟" وخيط لـ "هل هذا <em>مكتمل</em>؟" وخيط لـ "هل هذا
         <em>رخيص</em>؟" توزّن التيارات المختلفة هذه الخيوط بطرق مختلفة.
@@ -1452,7 +1453,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         <strong>ليست SDLC</strong> و<strong>ليست منهجية مشروع</strong>. تلك تعيش
         على مقياس المشروع (انظر
         <a href="../software-development-process.html"
-          >عملية تطوير البرمجيات §١</a
+          >عملية تطوير البرمجيات</a
         >). هذه الحلقة أصغر وأقدم من أي منهجية مسماة. إليك كيف تندرج في أنواع
         الكيانات بمستوى أعلى:
       </p>
@@ -1475,7 +1476,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             <td>
               العملية على مقياس المشروع التي توفّر عنصر العمل. مغطاة بالكامل في
               <a href="../software-development-process.html"
-                >عملية تطوير البرمجيات §١</a
+                >عملية تطوير البرمجيات</a
               >
               — لا تُعاد هنا.
             </td>
@@ -1504,7 +1505,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         تحت طبقة SDLC/المنهجية. أقرب الأشياء المسماة
         <strong>"التطوير الحلزوني"</strong> (بوهم، ١٩٨٦) وإيقاع
         <strong>"برعم ← نمُ ← أقسِ"</strong> في أجايل/سكرم داخل السبرينت —
-        كلاهما هذه الحلقة نفسها بمقياس مختلف (انظر §١١). وداخل اكتشاف المنتج
+        كلاهما هذه الحلقة نفسها بمقياس مختلف (انظر <a href="#sec-history-of-this-loop-from-nasa-to-react">تاريخ الحلقة</a>). وداخل اكتشاف المنتج
         تُسمى <strong>"ابنِ-قس-تعلّم"</strong> (ريس،
         <em>الشركة الناشئة الرشيقة</em>) — الحلقة نفسها مع خطوة تغذية راجعة من
         السوق ملحقة.
@@ -1561,7 +1562,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         يمر الخيط عبر تاريخ البرمجيات كله، لكن الخط الزمني الكامل — الشلال ←
         الحلزوني ← IID ← XP ← أجايل ← Lean — يعود لمستند العملية (انظر
         <a href="../software-development-process.html"
-          >عملية تطوير البرمجيات §١ب</a
+          >عملية تطوير البرمجيات</a
         >). نحتفظ هنا فقط بالخطوتين اللتين تهمّان هذا المستند: السلف الذي سمّى
         الحلقة، والانزياح الحديث في الأطر الذي جعلها مرئية على نطاق الميزة.
       </p>
@@ -1763,18 +1764,18 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
           <tr>
             <td><strong>شعر الاحتكاك لتعرف متى تعمّق</strong></td>
             <td>
-              إشارة الانتقال من جولة إلى التالية فوق-إدراكية (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">§١هـ</a>). لا يمكنك
+              إشارة الانتقال من جولة إلى التالية فوق-إدراكية (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">علم النفس المعرفي</a>). لا يمكنك
               تحويلها لقائمة مراجعة — إنها حكم جمالي عن ما الناقص. استوعبها كبار
-              المطورين؛ يبنيها المبتدئون بالممارسة (<a href="#sec-your-takeaway-the-deliberate-practice-loop">§٨</a>). هذا فوق-إدراك شوينفيلد
+              المطورين؛ يبنيها المبتدئون بالممارسة (<a href="#sec-your-takeaway-the-deliberate-practice-loop">حلقة الممارسة المتعمدة</a>). هذا فوق-إدراك شوينفيلد
               مطبّقاً على بناء الميزات.
             </td>
           </tr>
           <tr>
             <td><strong>ارسَم شكل البيانات أولاً</strong></td>
             <td>
-              شكل البيانات يحدد شجرة المكونات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>). الخطأ فيه يكلف دقائق إذا
+              شكل البيانات يحدد شجرة المكونات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>). الخطأ فيه يكلف دقائق إذا
               انكشف مبكراً، وساعات إذا تأخر. هذا هو نفس مبدأ "البنية قبل الكود"
-              مثل التنقيح التدريجي (<a href="./problem-solving.html#sec-stepwise-refinement-top-down-decomposition-for">حل المشكلات §٦</a>) — الشكل هو العقد؛ الكود
+              مثل التنقيح التدريجي (<a href="./problem-solving.html#sec-stepwise-refinement-top-down-decomposition-for">حل المشكلات</a>) — الشكل هو العقد؛ الكود
               يملؤه.
             </td>
           </tr>
@@ -1799,7 +1800,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             <td><strong>البنية تتبع الحالة</strong></td>
             <td>
               شكل بياناتك يحدد شجرة مكوناتك. أصلح شكل البيانات وبنية الواجهة
-              تظهر غالباً بشكل طبيعي. لهذا يقول <a href="#sec-the-honest-truth-about-how-senior-devs-work">§٧</a> "كبار المطورين يؤجلون
+              تظهر غالباً بشكل طبيعي. لهذا يقول <a href="#sec-the-honest-truth-about-how-senior-devs-work">كيف يعمل الكبار فعلاً</a> "كبار المطورين يؤجلون
               القرارات" — يرسمون البيانات، يتركون البنية تظهر، ويعيدون البناء
               حين يثبت شكل البيانات خطأه.
             </td>
@@ -2063,7 +2064,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               يتطور.
             </td>
             <td>
-              ارسَم شكل البيانات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>) لكن ضع حداً زمنياً: ٥–١٠ دقائق، لا ساعة.
+              ارسَم شكل البيانات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>) لكن ضع حداً زمنياً: ٥–١٠ دقائق، لا ساعة.
               الرسم نقطة بداية، لا تصميم نهائي. الحلقة ستنقّحه.
             </td>
           </tr>
@@ -2076,7 +2077,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             <td>
               ارسَم دائماً أولاً — الأسماء، الحقول، نوع المجموعة، العمليات. حتى
               دقيقتان من الرسم تلتقط فخ "تحميل مقابل فارغ" قبل أن يكلف أياماً
-              (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>).
+              (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>).
             </td>
           </tr>
           <tr>
@@ -2090,7 +2091,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               القيم المشتقة تُحسب في وقت العرض، لا تُخزن أبداً.
               <code>const visible = items.filter(i =&gt; i.active)</code> — لا
               <code>const [visible, setVisible] = useState(...)</code>. انظر
-              قائمة <a href="#sec-summary-the-complete-mental-checklist">§١٤</a>.
+              قائمة <a href="#sec-summary-the-complete-mental-checklist">قائمة التحقق</a>.
             </td>
           </tr>
           <tr>
@@ -2113,9 +2114,9 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               Overflow. يعمل، لكنك لا تفهم لماذا. عندما يتحطم، لا تستطيع تصحيحه.
             </td>
             <td>
-              النسخ أولاً والفهم لاحقاً مقبول لكبار المطورين (<a href="#sec-the-honest-truth-about-how-senior-devs-work">§٧</a>) الذين استوعبوا
+              النسخ أولاً والفهم لاحقاً مقبول لكبار المطورين (<a href="#sec-the-honest-truth-about-how-senior-devs-work">كيف يعمل الكبار فعلاً</a>) الذين استوعبوا
               الأنماط. لكن إذا كنت تتعلم: ابنِ الهيكل بنفسك، ثم قارن بالنسخة
-              المنسوخة. الجهد يبني المخطط (<a href="./problem-solving.html#sec-mental-models-how-expert-problem-solvers-actually-reason">حل المشكلات §١و</a>).
+              المنسوخة. الجهد يبني المخطط (<a href="./problem-solving.html#sec-mental-models-how-expert-problem-solvers-actually-reason">حل المشكلات</a>).
             </td>
           </tr>
           <tr>
@@ -2126,9 +2127,9 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               تأجيله حتى تشعر بألم عدمه.
             </td>
             <td>
-              افعل أبسط شيء أولاً (<a href="#sec-the-honest-truth-about-how-senior-devs-work">§٧</a>). مصفوفة، useState، دالة عادية. وصل أدوات
+              افعل أبسط شيء أولاً (<a href="#sec-the-honest-truth-about-how-senior-devs-work">كيف يعمل الكبار فعلاً</a>). مصفوفة، useState، دالة عادية. وصل أدوات
               التحسين فقط عندما <em>تشعر بالاحتكاك</em> — عرض بطيء، منطق مكرر،
-              ثقب الخصائص. مفوّض React (<a href="#sec-the-future-where-the-dev-loop-is-heading">§١٣د</a>) يقوم بأتمتة هذا بوتيرة متزايدة.
+              ثقب الخصائص. مفوّض React (<a href="#sec-the-future-where-the-dev-loop-is-heading">مستقبل الحلقة</a>) يقوم بأتمتة هذا بوتيرة متزايدة.
             </td>
           </tr>
           <tr>
@@ -2138,8 +2139,8 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               يئنّ فعلاً. تعمّق في الشيء الخطأ، أو تتخطى التعميق حيث يهم.
             </td>
             <td>
-              إشارة "شعر الاحتكاك" فوق-إدراكية (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">§١هـ</a>). ابنِها بالممارسة المتعمدة
-              (<a href="#sec-your-takeaway-the-deliberate-practice-loop">§٨</a>): ابنِ ٥٠ ميزة، لاحظاً كل مرة ما جعلك تريد التعميق. مع الوقت،
+              إشارة "شعر الاحتكاك" فوق-إدراكية (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">علم النفس المعرفي</a>). ابنِها بالممارسة المتعمدة
+              (<a href="#sec-your-takeaway-the-deliberate-practice-loop">حلقة الممارسة المتعمدة</a>): ابنِ ٥٠ ميزة، لاحظاً كل مرة ما جعلك تريد التعميق. مع الوقت،
               تصبح الإشارة تلقائية.
             </td>
           </tr>
@@ -2150,7 +2151,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               تعمل على جهازك وتبدو معطوبة في الإنتاج.
             </td>
             <td>
-              اكتب حالات الخامل/التحميل/النجاح/الفارغ/الخطأ أولاً (<a href="#sec-frontend-state-decisions-the-taxonomy">§٥أ</a>، "الحالات
+              اكتب حالات الخامل/التحميل/النجاح/الفارغ/الخطأ أولاً (<a href="#sec-frontend-state-decisions-the-taxonomy">تصنيف قرارات الحالة</a>، "الحالات
               قبل البكسلات") وانسّقها جنباً إلى جنب مع المسار السعيد.
             </td>
           </tr>
@@ -2162,7 +2163,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               عالج بيانات الخادم بخصائص استعلام/تخزين مؤقت (React Query/SWR) أو
-              مكوّنات الخادم؛ أبقِ حالة الواجهة منفصلة (<a href="#sec-frontend-state-decisions-the-taxonomy">§٥أ</a>).
+              مكوّنات الخادم؛ أبقِ حالة الواجهة منفصلة (<a href="#sec-frontend-state-decisions-the-taxonomy">تصنيف قرارات الحالة</a>).
             </td>
           </tr>
           <tr>
@@ -2172,7 +2173,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               المشاركة حقيقياً. الآن كل تغيير حالة يتطلب تحديث مخزن.
             </td>
             <td>
-              أبقِ الحالة محلية حتى يظهر ألم تمرير الخصائص فعلياً (<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">§١٣ج</a>). المخزن
+              أبقِ الحالة محلية حتى يظهر ألم تمرير الخصائص فعلياً (<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">كتالوج الأدوات</a>). المخزن
               قرار تؤجله، لا افتراضي.
             </td>
           </tr>
@@ -2184,7 +2185,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               أعد النظر في ملكية الحالة أو استخدم التركيب (منفذ/أطفال) لتجاوز
-              الطبقات — أو، عندما تكون المشاركة حقيقية، مخزناً (<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">§١٣ج</a>).
+              الطبقات — أو، عندما تكون المشاركة حقيقية، مخزناً (<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">كتالوج الأدوات</a>).
             </td>
           </tr>
           <tr>
@@ -2195,7 +2196,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               افحص نقاط التوقف المستهدفة في الجولة ٢، لا بعد الشحن (قائمة
-              استجابة <a href="#sec-round-2-deepening-pass-make-it-real">§٤</a>).
+              استجابة <a href="#sec-round-2-deepening-pass-make-it-real">الجولة ٢: اجعلها حقيقية</a>).
             </td>
           </tr>
           <tr>
@@ -2206,7 +2207,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               استخدم HTML دلالياً ونفّذ قائمة فحص إمكانية الوصول في الجولة ٢، مع
-              التنسيق (<a href="#sec-round-2-deepening-pass-make-it-real">§٤</a>).
+              التنسيق (<a href="#sec-round-2-deepening-pass-make-it-real">الجولة ٢: اجعلها حقيقية</a>).
             </td>
           </tr>
           <tr>
@@ -2217,7 +2218,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               نسّق الحالات، لا الشاشات فقط — كل حالة غير متزامنة تستحق واجهة
-              (<a href="#sec-frontend-state-decisions-the-taxonomy">§٥أ</a>).
+              (<a href="#sec-frontend-state-decisions-the-taxonomy">تصنيف قرارات الحالة</a>).
             </td>
           </tr>
           <tr>
@@ -2227,7 +2228,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               حالاتك — ويصبح كود التحميل/الخطأ فوضى من الحلول المؤقتة.
             </td>
             <td>
-              تنسّق مع عقد API (<a href="#sec-round-0-the-three-clarifying-questions-the-hardest-part">§٠</a>) وعالج الأخطاء صراحةً؛ إذا كان العقد سيئاً،
+              تنسّق مع عقد API (<a href="#sec-round-0-the-three-clarifying-questions-the-hardest-part">الأسئلة التوضيحية الثلاثة</a>) وعالج الأخطاء صراحةً؛ إذا كان العقد سيئاً،
               أخرجه للسطح لا أن تداري فوقه.
             </td>
           </tr>
@@ -2239,7 +2240,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               اقيَس أولاً (المقيِّس)، ثم مِمو النقطة الساخنة الفعلية (قائمة أداء
-              <a href="#sec-round-3-edge-cases-and-polish-the-difference-between-works-and-ships">§٥</a>).
+              <a href="#sec-round-3-edge-cases-and-polish-the-difference-between-works-and-ships">الجولة ٣: الحالات الحدية والصقل</a>).
             </td>
           </tr>
           <tr>
@@ -2250,7 +2251,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             </td>
             <td>
               تحقّق من هيكل الذكاء الاصطناعي مقابل رسم شكل البيانات الخاص بك
-              (<a href="#sec-the-future-where-the-dev-loop-is-heading">§١٣د</a>). الرسم هو العقد؛ مخرج الذكاء الاصطناعي غير موثوق حتى
+              (<a href="#sec-the-future-where-the-dev-loop-is-heading">مستقبل الحلقة</a>). الرسم هو العقد؛ مخرج الذكاء الاصطناعي غير موثوق حتى
               يطابقه.
             </td>
           </tr>
@@ -2277,9 +2278,9 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
           <tr>
             <td rowspan="2"><strong>رسم شكل البيانات</strong></td>
             <td><strong>ورقة وقلم</strong></td>
-            <td>الجولة ٠ (أسئلة الوضوح)، رسم شكل البيانات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>).</td>
+            <td>الجولة ٠ (أسئلة الوضوح)، رسم شكل البيانات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>).</td>
             <td>
-              الأداة الأهم على الإطلاق. تنقل الذاكرة العاملة (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">§١هـ</a>). لا إعداد،
+              الأداة الأهم على الإطلاق. تنقل الذاكرة العاملة (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">علم النفس المعرفي</a>). لا إعداد،
               لا تشتيت، لا ذكاء اصطناعي يفكر نيابةً عنك. ابدأ هنا دائماً.
             </td>
           </tr>
@@ -2318,7 +2319,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               التكرار على نطاق الميزة ممكناً.
             </td>
             <td>
-              الافتراضي. تغذية المللي ثواني هي سبب عمل الجولات أصلاً (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">§١هـ</a>). إذا
+              الافتراضي. تغذية المللي ثواني هي سبب عمل الجولات أصلاً (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">علم النفس المعرفي</a>). إذا
               استغرق خادم تطويرك أكثر من ثانية للتحميل، أصلح ذلك أولاً — التغذية
               البطيئة تقتل الحلقة.
             </td>
@@ -2348,7 +2349,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             <td>
               صل إليها فقط عندما يصبح ثقب الخصائص مؤلماً (إشارة "شعر الاحتكاك").
               Zustand الأخف؛ Redux الأثقل (والأكثر تبنياً بزيادة). قد يقلل مفوّض
-              React (<a href="#sec-the-future-where-the-dev-loop-is-heading">§١٣د</a>) الحاجة لبعضها.
+              React (<a href="#sec-the-future-where-the-dev-loop-is-heading">مستقبل الحلقة</a>) الحاجة لبعضها.
             </td>
           </tr>
           <tr>
@@ -2365,7 +2366,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
             <td>فحص DOM، الشبكة، وحدة التحكم.</td>
             <td>
               لخيط التدفق — رؤية ما الأحداث التي تُطلق، وما يرجعه API، وكيف يبدو
-              DOM. انظر <a href="./html-and-css.html">HTML &amp; CSS §٥ب</a> للنموذج العقلي المنصّاتي.
+              DOM. انظر <a href="./html-and-css.html">HTML &amp; CSS</a> للنموذج العقلي المنصّاتي.
             </td>
           </tr>
           <tr>
@@ -2377,8 +2378,8 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
               ١ للأنماط الشائعة (قائمة مهام، نموذج، جدول)، لكن جولتَي التعميق
               والصقل تحتاجان حكماً بشرياً — إشارة "شعر الاحتكاك" إشارتك أنت، لا
               إشارة الذكاء الاصطناعي. لا تسمح أبداً للذكاء الاصطناعي بتوليد رسم
-              شكل البيانات — ذلك القرار الذي يلتقط الفخاخ (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>). انظر
-              <a href="./problem-solving.html">حل المشكلات §١٣ج</a> لنفس
+              شكل البيانات — ذلك القرار الذي يلتقط الفخاخ (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>). انظر
+              <a href="./problem-solving.html">حل المشكلات</a> لنفس
               التحذير.
             </td>
           </tr>
@@ -2388,7 +2389,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
       <blockquote class="callout">
         <p>
           <strong>الأداة الأهم على الإطلاق: ورقة وقلم.</strong> رسم شكل البيانات
-          (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">§١٣</a>) هو أهم قرار صاعد، ويجب أن يحدث على الورق قبل أي كود. لا أداة
+          (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>) هو أهم قرار صاعد، ويجب أن يحدث على الورق قبل أي كود. لا أداة
           تعوّض عن فعل كتابة "ما الأسماء؟ ما الحقول؟ ما نوع المجموعة؟" باليد.
           أضيق حلقة تغذية راجعة هي بين قلمك ودماغك.
         </p>
@@ -2415,7 +2416,7 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         <a href="./react-2024-and-beyond.html">React ٢٠٢٤+</a> و<a
           href="../nextjs-deep-dive.html"
           >التعمق في Next.js</a
-        >. الدلالة للحلقة: رسم شكل البيانات (§١٣) يحتاج الآن حساب ما جانبي
+        >. الدلالة للحلقة: رسم شكل البيانات (<a href="#sec-sketching-the-data-shape-what-it-actually-means-with-a-full-worked-example">رسم شكل البيانات</a>) يحتاج الآن حساب ما جانبي
         الخادم والعميل — بُعد جديد في الجولة ٠.
       </p>
 
@@ -2426,8 +2427,8 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         الجولة ١؛ يغير ما يفعله الإنسان فيها: <em>مراجعة</em> هيكل الذكاء
         الاصطناعي مقابل رسم شكل البيانات، بدلاً من كتابته من الصفر. جولتا
         التعميق والصقل ما زالتا تحتاجان حكماً بشرياً — إشارة "شعر الاحتكاك"
-        (§١هـ) عملُ الإنسان، لا عملُ الذكاء الاصطناعي. لكن فخ الطلاقة (انظر
-        <a href="./problem-solving.html">حل المشكلات §١١</a>) يشتد: يجعل الذكاء
+        (<a href="#sec-underlying-theory-why-the-loop-works-the-cognitive-science">علم النفس المعرفي</a>) عملُ الإنسان، لا عملُ الذكاء الاصطناعي. لكن فخ الطلاقة (انظر
+        <a href="./problem-solving.html">حل المشكلات</a>) يشتد: يجعل الذكاء
         الاصطناعي من السهل الشعور بأنك تفهم الميزة دون بناء المخطط الذي يتيح لك
         <em>الارتجال</em> عند تحطمها.
       </p>
@@ -2444,7 +2445,23 @@ Cart = Map&lt;productId, quantity&gt;   ← أو مجرد مصفوفة، قرّ�
         تولّد الميزات — المهارة الوحيدة التي تتراكم عبر مسيرتك كلها.
       </p>
 
-      <h2 id="sec-summary-the-complete-mental-checklist">الملخص — قائمة المراجعة العقلية الكاملة</h2>
+      <details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>Prop drilling (تمرير الخصائص)</strong> — شقّ الخصائص عبر مكوّنات وسيطة لا تستخدمها. ابحث "react prop drilling avoid".</li>
+  <li><strong>Lifting state up (رفع الحالة)</strong> — نقل الحالة إلى أقرب سلف مشترك للمكوّنات التي تحتاجها. ابحث "react lifting state up".</li>
+  <li><strong>مكوّن متحكَّم به مقابل غير متحكَّم</strong> — هل تعيش حالة النموذج في state أم في DOM؟ ابحث "react controlled uncontrolled input".</li>
+  <li><strong>الحالة المشتقة</strong> — قيم تُحسب من حالات أخرى وقت التصيير، ولا تُخزَّن أبداً. ابحث "react derived state dont store".</li>
+  <li><strong>التحديث المتفائل</strong> — الواجهة تفترض النجاح قبل تأكيد الخادم؛ وتحتاج مسار تراجع. ابحث "optimistic UI update rollback".</li>
+  <li><strong>شاشة الهيكل (Skeleton screen)</strong> — عنصر نائب بشكل المحتوى أثناء التحميل. ابحث "skeleton screen loading UX".</li>
+  <li><strong>أرقّ شريحة من طرف إلى طرف</strong> — أصغر مسار عامل يمر بالخيوط الثلاثة. ابحث "walking skeleton thin vertical slice".</li>
+  <li><strong>Spike / صندوق زمني</strong> — كود يُبنى ليُرمى للإجابة عن سؤال، ضمن ميزانية وقت ثابتة. ابحث "agile spike timebox".</li>
+  <li><strong>YAGNI</strong> — «لن تحتاجها»: لا تبني لمتطلبات لم تظهر بعد. ابحث "YAGNI principle".</li>
+</ul>
+</details>
+
+<h2 id="sec-summary-the-complete-mental-checklist">الملخص — قائمة المراجعة العقلية الكاملة</h2>
 
       <p>
         في المرة القادمة حين تجلس لبناء ميزة، شغّل هذه القائمة. إذا استطعت
