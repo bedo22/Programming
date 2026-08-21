@@ -18,3 +18,14 @@ A row lacking an id introduced after its date is **due for re-check**.
 | how-developers-think-frontend (+AR twin) | improve-doc v1.2 | 2026-08-21 | ALL GATES PASSED, ratio 1.15 recorded exception; zero numerals both twins (54 EN + full AR incl. prettier-split `</a` closers and bare-textual refs); heredoc-corruption lesson recorded in skill conventions | R9=pre R11 R12 R16 R19(WCAG AA 4.5:1/3:1 contrast + ~300ms debounce added) | R14=N/A(five-camps weighting table serves leverage function — second map would duplicate) R15/R17/R18=pre |
 | ui-ux-web-design REDO (+AR twin) | improve-doc v1.2 | 2026-08-21 | ALL GATES PASSED, ratio 0.82; full read executed per user correction | R9=pre R11=v71 R12=v71 R14=N/A(mental-models table carries the function) R15/R17/R18=pre(benchmark density) R19=pre(response budgets, contrast ratios, target sizes, pluralization counts) R16=v71 | VERDICT: v71 template output happened to match diagnosis; zero further additions pass the insight tests — adding more would be padding |
 | software-testing-and-debugging (+AR twin) | improve-doc v1.2 | 2026-08-21 | ALL GATES PASSED, ratio 0.89; repaired 16 double-nested <a><a> anchors per twin (pre-existing corruption); 36 § refs de-numbered both twins incl. cross-doc Problem-Solving §9; map emptied | R9=pre R11 R12 R15=pre R16 R17=pre R18=pre(TDD when/when-not + doubles tables) R19(SLO 99.9%→~43min/mo error budget; <10s local suite / <10min PR gate budgets) R14=N/A(metrics-with-warning-signs table carries diagnostic function) |
+
+### New-claims audit (retroactive, skill v1.3)
+Claims *added* by passes 1–9, tiered per the new provenance rule:
+| Claim | Pass | Tier |
+|---|---|---|
+| WCAG AA contrast ≥4.5:1 / ≥3:1 large text | v72 | spec-grade (WCAG 2.x SC 1.4.3) |
+| Debounce ~300ms search inputs; immediate disabled-state submits | v72 | labeled convention ("typical guard") |
+| SLO 99.9% → ~43 min downtime/month error budget | v76 | workable arithmetic (0.1% × 30d) |
+| Local unit suite <~10s; PR gate <~10min | v76 | labeled convention ("common budgets") |
+| Search-vocabulary entries + teacher questions + leverage framings | all | framing/no quantitative claims |
+No volatile facts (versions/benchmarks/dates) were introduced from memory; all such content pre-dated the campaign or was mirrored between twins.

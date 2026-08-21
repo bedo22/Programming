@@ -13,8 +13,9 @@
   <p class="kicker">مرجع · هندسة البرمجيات — الطبقة بين المنتج والكود</p>
   <h1>التصميم المعماري — كيف تتعامل المعمارية بما لا يستطيع الكود وحدَه</h1>
   <p class="meta">انضباط تقرير <em>كيف يتلاءم الحل على النطاق الواسع</em> — من الخدمات وتدفقات البيانات إلى حدود المكونات وعقود واجهات البرمجة. وثائق شقيقة: <a href="./design-thinking.html">التفكير التصميمي</a> (طبقة المنتج السابقة)، <a href="./how-developers-think-frontend.html">كيف يفكر المطورون</a> (حلقة التنفيذ التالية)، <a href="./api-design.html">تصميم API</a> (طبقة العقد التي تجعل الحدود قابلة للاستدعاء)، <a href="./ui-ux-web-design.html">تصميم واجهات المستخدم وتجربة المستخدم والويب</a> (طبقة العرض التي تجعل الحالة مقروءة)، <a href="./html-and-css.html">HTML و CSS</a> (ركيزة المنصة التي تعمل عليها استراتيجية العرض)، <a href="./javascript-across-stacks.html">JavaScript عبر المكدسات</a> (عواقب مستوى اللغة).</p>
+        <p class="meta"><strong>لمن هذه الوثيقة:</strong> مهندسون قراراتهم يجب أن تعيش أطول من ميزة واحدة — من يختار حدود الخدمات، أو ملكية البيانات، أو نماذج الاتساق، أو استراتيجية التوسع. قرارات هنا مكلفة التراجع؛ اقرأها قبل أن تبدأ حلقة المكوّنات.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../system-design.html">English</a>
+          <strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../system-design.html">English</a>
         </p>
       </header>
 
@@ -317,7 +318,7 @@
   </tbody>
 </table>
 
-<p><strong>نمط مضاد:</strong> القطع الكبير (Big-bang cutover). كل صف في الجدول أعلاه يستخدم الخنق (strangler fig)، تشغيل متوازي، أو استخراج تدريجي. جدول المعماريات في <a href="#sec-evolution-paradigms-through-one-lens">§٣</a> يوضح <em>مراكز الجاذبية</em> — وليس حالات متعارضة.</p>
+<p><strong>نمط مضاد:</strong> القطع الكبير (Big-bang cutover). كل صف في الجدول أعلاه يستخدم الخنق (strangler fig)، تشغيل متوازي، أو استخراج تدريجي. جدول المعماريات في <a href="#sec-evolution-paradigms-through-one-lens">النماذج بعدسة واحدة</a> يوضح <em>مراكز الجاذبية</em> — وليس حالات متعارضة.</p>
 
 ---
 
@@ -536,7 +537,7 @@
 
 <h2 id="sec-capacity-planning-how-to-estimate-load-storage-and-latency">تخطيط السعة — كيفية تقدير الحمل والتخزين وزمن الاستجابة</h2>
 
-<p>تخطيط السعة ليس تنبؤاً مثالياً. إنه اختيار معمارية تنجو من عدم اليقين — الانضباط الذي يحوّل أرقام حسابات الظهر في <a href="#sec-worked-example-design-a-url-shortener">§٩</a> إلى عملية قابلة للتكرار.</p>
+<p>تخطيط السعة ليس تنبؤاً مثالياً. إنه اختيار معمارية تنجو من عدم اليقين — الانضباط الذي يحوّل أرقام حسابات الظهر في <a href="#sec-worked-example-design-a-url-shortener">مثال مختصر الروابط</a> إلى عملية قابلة للتكرار.</p>
 
 <h3>عملية تخطيط السعة</h3>
 
@@ -580,7 +581,7 @@
 
 <p><strong>القاعدة:</strong> إذا لم يتسع نموذج السعة لصفحة واحدة، فالمعمارية أعقد من أن تُفهم تحت الحمل. النموذج أداة دعم قرار، لا جدولاً بيانات لذاته.</p><h2 id="sec-data-architecture-storage-partitioning-replication-and-evolution">معمارية البيانات — التخزين والتقسيم والتكرار والتطور</h2>
 
-<p>ملكية البيانات (<a href="#sec-component-layer-micro-where-system-design-meets-code">§٧</a>) تقول <em>من</em> يكتب؛ معمارية البيانات تقول <em>كيف تُخزَّن وتُقسَّم وتُكرَّر وتتطور</em>. اختر التخزين بنمط الوصول، لا بالشهرة.</p>
+<p>ملكية البيانات (<a href="#sec-component-layer-micro-where-system-design-meets-code">طبقة المكوّنات</a>) تقول <em>من</em> يكتب؛ معمارية البيانات تقول <em>كيف تُخزَّن وتُقسَّم وتُكرَّر وتتطور</em>. اختر التخزين بنمط الوصول، لا بالشهرة.</p>
 
 <h3>مصفوفة قرار التخزين</h3>
 
@@ -633,11 +634,11 @@
   <li><strong>كتابة مزدوجة</strong> للترحيلات — اكتب للتمثيلين القديم والجديد حتى نقطة التحويل.</li>
   <li><strong>تعبئة الخلف</strong> تعمل كوظائف خلفية ذات نقاط تحقق؛ تفشل في المنتصف ويجب أن تستأنف.</li>
   <li><strong>الترحيلات المباشرة</strong> (pgroll, gh-ost) تتفوق على ترحيلات التوقف لأي نظام دائم التشغيل.</li>
-  <li>عرّف <strong>الاحتفاظ</strong> مسبقاً — نمو التخزين قرار سعة وتكلفة (<a href="#sec-capacity-planning-how-to-estimate-load-storage-and-latency">§٦ب</a>، صف التكلفة).</li>
+  <li>عرّف <strong>الاحتفاظ</strong> مسبقاً — نمو التخزين قرار سعة وتكلفة (<a href="#sec-capacity-planning-how-to-estimate-load-storage-and-latency">تخطيط السعة</a>، صف التكلفة).</li>
   <li>عامل <strong>تغييرات البيانات غير القابلة للعكس</strong> (حذف، إعادة كتابة) كأبواب باتجاه واحد تتطلب ADR.</li>
 </ul><h2 id="sec-caching-architecture-where-to-cache-what-to-cache-and-how-to-invalidate">معمارية التخزين المؤقت — أين تخزّن، ماذا تخزّن، وكيف تُبطل</h2>
 
-<p>التخزين المؤقت رافعة توسع في <a href="#sec-architectural-layer-macro-patterns-with-consequences">§٦</a>؛ هنا يصير انضباط تصميم. كل كاش نسخة من البيانات مع <strong>عقد تقادم</strong> — السؤال دائماً: «ما مقدار التقادم المقبول؟»</p>
+<p>التخزين المؤقت رافعة توسع في <a href="#sec-architectural-layer-macro-patterns-with-consequences">طبقة الأنماط الكبرى</a>؛ هنا يصير انضباط تصميم. كل كاش نسخة من البيانات مع <strong>عقد تقادم</strong> — السؤال دائماً: «ما مقدار التقادم المقبول؟»</p>
 
 <h3>مستويات الكاش</h3>
 
@@ -675,10 +676,10 @@
   <li><strong>قيم ضخمة</strong> — ميغابايتات في مفتاح واحد تدهور كل قراءة. الحل: قلّص أو خزّن البيانات الوصفية فقط.</li>
   <li><strong>TTL غير محدودة</strong> — الذاكرة تنمو للأبد. الحل: TTL، سياسة إخلاء (LRU/LFU)، حدود حجم.</li>
   <li><strong>إبطال غير متسق</strong> — الكاش لا يُبطل عند الكتابة → تُخدم بيانات قديمة. الحل: مفاتيح بإصدارات أو كتابة عابرة.</li>
-  <li><strong>تخزين بيانات غير مصرّح بها أو مخصصة</strong> — الأخطر: تسريب بيانات عبر المستأجرين/المستخدمين. لا تخزّن أبداً في طبقة تتجاوز التفويض (<a href="./how-developers-think-frontend.html">انظر حلقة المطور §13c</a> للتحذير نفسه).</li>
+  <li><strong>تخزين بيانات غير مصرّح بها أو مخصصة</strong> — الأخطر: تسريب بيانات عبر المستأجرين/المستخدمين. لا تخزّن أبداً في طبقة تتجاوز التفويض (<a href="./how-developers-think-frontend.html">انظر حلقة المطور</a> للتحذير نفسه).</li>
 </ul><h2 id="sec-event-and-queue-reliability-the-operational-layer-under-async">موثوقية الأحداث والطوابير — الطبقة التشغيلية تحت اللا-تزامن</h2>
 
-<p>مثال <a href="#sec-worked-example-design-an-event-driven-order-system">§١٠</a> المبني على الأحداث هو المسار السعيد. الأنظمة الحدثية تكسب تعقيدها في هذه التفاصيل — بدونها، التسليم اللا-متزامن خسارة بيانات صامتة.</p>
+<p>مثال <a href="#sec-worked-example-design-an-event-driven-order-system">مثال نظام الطلبات</a> المبني على الأحداث هو المسار السعيد. الأنظمة الحدثية تكسب تعقيدها في هذه التفاصيل — بدونها، التسليم اللا-متزامن خسارة بيانات صامتة.</p>
 
 <table>
   <thead><tr><th>الاهتمام</th><th>النمط</th></tr></thead>
@@ -698,7 +699,7 @@
 </table>
 
 <blockquote class="callout">
-  <p><strong>نقش صندوق الإخراج.</strong> عندما تكتب خدمة إلى قاعدتها <em>ويجب</em> أن تصدر حدثاً، افعل الاثنين ذرياً: اكتب صف الحدث في <strong>جدول صندوق الإخراج</strong> في نفس المعاملة مع كتابة الأعمال. ثم ينشر مرحّل (relay) صفوف الصندوق إلى الوسيط. يمنع هذا الفشل الكلاسيكي — «حُدّثت قاعدة البيانات، لم يُرسل الحدث أبداً» — السيناريو ذاته الذي يكسر اتساق المخزون/الطلبات في <a href="#sec-worked-example-design-an-event-driven-order-system">§١٠</a> بصمت.</p>
+  <p><strong>نقش صندوق الإخراج.</strong> عندما تكتب خدمة إلى قاعدتها <em>ويجب</em> أن تصدر حدثاً، افعل الاثنين ذرياً: اكتب صف الحدث في <strong>جدول صندوق الإخراج</strong> في نفس المعاملة مع كتابة الأعمال. ثم ينشر مرحّل (relay) صفوف الصندوق إلى الوسيط. يمنع هذا الفشل الكلاسيكي — «حُدّثت قاعدة البيانات، لم يُرسل الحدث أبداً» — السيناريو ذاته الذي يكسر اتساق المخزون/الطلبات في <a href="#sec-worked-example-design-an-event-driven-order-system">مثال نظام الطلبات</a> بصمت.</p>
 </blockquote>
 
 <p><strong>القاعدة:</strong> النظام الحدثي جاهز للإنتاج فقط عندما يمكن محاسبة كل رسالة — مستهلكة، أو ميتة-الرسائل، أو قابلة لإعادة التشغيل. إذا كان حدث يمكن أن يختفي بصمت، فالمعمارية غير مكتملة.</p><h2 id="sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية والتعافي من الكوارث — SLO والتنكس والتعافي</h2>
@@ -716,7 +717,7 @@
     <tr><td>ميزانية الأخطاء</td><td>عدم الموثوقية المسموح — عند إنفاقها، يتقدم عمل الموثوقية على الميزات</td></tr>
     <tr><td>RPO</td><td>هدف نقطة الاسترداد — أقصى فقدان بيانات مقبول</td></tr>
     <tr><td>RTO</td><td>هدف زمن الاسترداد — أقصى توقف مقبول</td></tr>
-    <tr><td>نطاق الانفجار</td><td>ما يفشل عند فشل جزء واحد (<a href="#sec-mental-models-how-architects-actually-reason">§٥ب</a> مجالات الفشل)</td></tr>
+    <tr><td>نطاق الانفجار</td><td>ما يفشل عند فشل جزء واحد (<a href="#sec-mental-models-how-architects-actually-reason">كيف يفكر المعماريون</a> مجالات الفشل)</td></tr>
     <tr><td>التنكس الرشيق</td><td>ما يستمر في العمل أثناء الفشل الجزئي</td></tr>
   </tbody>
 </table>
@@ -755,7 +756,7 @@
 
 <h3>الاستجابة للحوادث — دفاتر التشغيل، المناوبة، والتقرير البعدي</h3>
 
-<p>الاكتشاف مُصمَّم (<a href="#sec-observability-designing-systems-that-can-be-understood-in-production">§٦g</a>)؛ الاستجابة <em>عملية</em>، ويجب أن توجد قبل أول تنبيه. الحلقة:</p>
+<p>الاكتشاف مُصمَّم (<a href="#sec-observability-designing-systems-that-can-be-understood-in-production">المراقبة</a>)؛ الاستجابة <em>عملية</em>، ويجب أن توجد قبل أول تنبيه. الحلقة:</p>
 
 <table>
   <thead><tr><th>المرحلة</th><th>ماذا يحدث</th><th>الانضباط</th></tr></thead>
@@ -777,7 +778,7 @@
   <li><strong>ميزانيات إعادة المحاولة</strong> — سقف لإجمالي المحاولات؛ المحاولات بلا حدود تصير حملاً متتالياً.</li>
   <li><strong>تأجيل أسي مع تشتيت</strong> — يمنع عواصف إعادة المحاولة من نوع القطيع الهادر.</li>
   <li><strong>قواطع الدائرة</strong> — افشل بسرعة تجاه الاعتماد المكسور بدل التراكم عليه.</li>
-  <li><strong>حواجز</strong> — اعزل تجمعات الخيوط/الاتصالات لكل اعتماد (<a href="#sec-architectural-layer-macro-patterns-with-consequences">§٦</a> أنماط الفشل).</li>
+  <li><strong>حواجز</strong> — اعزل تجمعات الخيوط/الاتصالات لكل اعتماد (<a href="#sec-architectural-layer-macro-patterns-with-consequences">طبقة الأنماط الكبرى</a> أنماط الفشل).</li>
   <li><strong>إسقاط الحمل</strong> — أسقط العمل منخفض القيمة (تحليلات، قراءات غير حرجة) قبل أن يسقط المسارات الحرجة.</li>
   <li><strong>تحديد المعدل</strong> — سقوف لكل عميل ولكل خدمة.</li>
   <li><strong>ضغط خلفي للطابور</strong> — عندما يتجاوز المنتجون المستهلكين، دع الطابور يشير بالخلف بدل التخزين المؤقت للأبد.</li>
@@ -801,13 +802,13 @@
 <h3>المتطلبات المعمارية</h3>
 
 <ul>
-  <li><strong>معرّفات الارتباط</strong> تُنشر عبر كل طلب وحدث — معرّف واحد يربط السجلات والآثار والمقاييس برحلة واحدة (<a href="#sec-worked-example-design-an-event-driven-order-system">§١٠</a> يفعل هذا للطلبات).</li>
+  <li><strong>معرّفات الارتباط</strong> تُنشر عبر كل طلب وحدث — معرّف واحد يربط السجلات والآثار والمقاييس برحلة واحدة (<a href="#sec-worked-example-design-an-event-driven-order-system">مثال نظام الطلبات</a> يفعل هذا للطلبات).</li>
   <li><strong>سجلات منظمة</strong> (JSON)، لا نص حر — قابلة للبحث والتصفية والتحليل آلياً.</li>
   <li><strong>نشر الآثار</strong> (OpenTelemetry) عبر كل حد خدمة — أثر يتوقف عند خدمة واحدة هو فشل تحديد موضعي.</li>
   <li><strong>صحة الاعتمادات</strong> — كل خدمة تبلغ عن حالة الخدمات التي تستدعيها (خريطة مجالات الفشل، مصنوعة مرئية).</li>
   <li><strong>تأخر الطابور، نسبة ضرب الكاش، التشبع</strong> — المقاييس التي تتنبأ بالمشاكل قبل أن يشعر بها المستخدمون.</li>
   <li><strong>مقاييس الأعمال</strong> — عمليات الدفع، التسجيلات، المدفوعات. الصحة التقنية وحدها لا تثبت أن المنتج يعمل.</li>
-  <li><strong>تنبيهات مربوطة بأثر المستخدم</strong> — التنبيهات المزعجة تُتجاهل؛ تنبيه حرق SLO (<a href="#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§٦و</a>) يربط الإنذارات بميزانية الأخطاء.</li>
+  <li><strong>تنبيهات مربوطة بأثر المستخدم</strong> — التنبيهات المزعجة تُتجاهل؛ تنبيه حرق SLO (<a href="#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>) يربط الإنذارات بميزانية الأخطاء.</li>
   <li><strong>لوحات قيادة لكل خدمة ولكل رحلة حرجة</strong> — الخدمة الخضراء قد تحمل رحلة مكسورة.</li>
 </ul>
 
@@ -866,7 +867,7 @@
 
 <p>القاعدة: <strong>تحقق عند كل حد</strong>. تكلفة فحص تحقق لا تُذكر؛ تكلفة انتشار حالة فاسدة ليست كذلك.
 
-<p>الطريقة لكل ميزة لإيجاد تلك الحدود — رسم مخطط تدفق البيانات وتشغيل STRIDE على كل عبور — في <a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> (نمذجة التهديدات ومثال محلول). هذا القسم هو <em>أين</em> المعمارية؛ تلك الوثيقة هي <em>كيف تُعدّ</em>.</p></p>
+<p>الطريقة لكل ميزة لإيجاد تلك الحدود — رسم مخطط تدفق البيانات وتشغيل STRIDE على كل عبور — في <a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> (نمذجة التهديدات ومثال محلول). هذا القسم هو <em>أين</em> المعمارية؛ تلك الوثيقة هي <em>كيف تُعدّ</em>.</p>
 
 <h3>معمارية قاعدة الكود — الشكل المادي للحدود</h3>
 
@@ -1000,9 +1001,83 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
     <tr><td>حجم PostgreSQL</td><td>100M صف × 500B = 50 GB</td><td>أساسي واحد + نسخة مكررة متزامنة</td></tr>
     <tr><td>إنتاجية Kafka</td><td>115k حدث/ثانية × 500B = 57 MB/ثانية</td><td>عنقود 3 وسطاء، 100 GB SSD لكل واحد. اضرب بمعامل التكرار وacks للحمل الحقيقي للقرص/الشبكة.</td></tr>
   </tbody>
-</table><h2 id="sec-worked-example-design-an-event-driven-order-system">مثال محلول — تصميم نظام طلبات قائم على الأحداث</h2>
+</table><h3>مخطط التسلسل (نصي)</h3>
+
+<pre><code>User → API Gateway → Shorten Service → PostgreSQL (INSERT)
+                              ↓
+                         Redis (SET short_code → long_url)
+                              ↓
+                         Return { short_code }
+
+User → API Gateway → Resolve Service → Redis (GET short_code)
+                              ↓ (miss)
+                         PostgreSQL (SELECT long_url)
+                              ↓
+                         Redis (SET short_code → long_url)
+                              ↓
+                         302 Redirect
+
+Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
+</code></pre>
+
+<h3>تقدير السعة (حساب ظهر الظرف)</h3>
+
+<table>
+  <thead><tr><th>المقياس</th><th>القيمة</th><th>الحساب</th></tr></thead>
+  <tbody>
+    <tr><td>كتابة/يوم</td><td>100 مليون</td><td>~1,150/s وسطياً، ~5,000/s ذروةً</td></tr>
+    <tr><td>قراءة/يوم</td><td>10 مليارات</td><td>~115k/s وسطياً، ~500k/s ذروةً</td></tr>
+    <tr><td>ذاكرة Redis (الساخن 20%)</td><td>~20 مليون مفتاح × 200B = 4 GB</td><td>يتسع في r6g.xlarge واحد. حساب ظهر ظرف فقط — الاستخدام الفعلي يحتاج وسم المفاتيح وحجم التسلسل والتجزئة والتكرار.</td></tr>
+    <tr><td>حجم PostgreSQL</td><td>100 مليون صف × 500B = 50 GB</td><td>أساسي واحد + نسخة مزامنة واحدة</td></tr>
+    <tr><td>إنتاجية Kafka</td><td>115k حدث/s × 500B = 57 MB/s</td><td>عنقود 3 وسطاء، 100 GB SSD لكل واحد. اضرب في معامل النسخ وacks للحمل الحقيقي للقرص/الشبكة.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-worked-example-design-an-event-driven-order-system">مثال محلول — تصميم نظام طلبات قائم على الأحداث</h2>
 
 <p><strong>المجال:</strong> وضع طلب، دفع، مخزون، شحن — كلاسيكيات التجارة الإلكترونية.</p>
+
+<h3>المتطلبات</h3>
+
+<ul>
+  <li>وضع طلب ← حجز مخزون ← خصم دفع ← تأكيد شحن</li>
+  <li>كل خطوة يملكها فريق مختلف (الطلبات، المخزون، الدفع، الشحن)</li>
+  <li>أي خطوة قد تفشل؛ يجب دعم التعويض (إلغاء الحجز، استرداد الدفع)</li>
+  <li>الاتساق النهائي مقبول؛ مسار تدقيق مطلوب</li>
+  <li>10 آلاف طلب/دقيقة عند الذروة</li>
+</ul>
+
+<h3>المعمارية</h3>
+
+<pre><code>┌─────────────┐     OrderPlaced      ┌──────────────┐
+│   Order     │ ──────────────────►  │  Inventory   │
+│  Service    │                      │  Service     │
+└─────────────┘                      └──────┬───────┘
+       │                                     │
+       │ InventoryReserved / InventoryFailed │
+       ▼                                     ▼
+┌─────────────┐     PaymentCharged    ┌──────────────┐
+│  Payment    │ ◄──────────────────►  │  Shipping    │
+│  Service    │                       │  Service     │
+└─────────────┘                       └──────────────┘
+       │                                     │
+       ▼                                     ▼
+   OrderConfirmed / OrderFailed (compensating events flow back)
+</code></pre>
+
+<h3>قرارات التصميم الرئيسية</h3>
+
+<table>
+  <thead><tr><th>القرار</th><th>الاختيار</th><th>المبرر</th></tr></thead>
+  <tbody>
+    <tr><td>التواصل</td><td>أحداث غير متزامنة (Kafka)، لا RPC متزامن</td><td>الفرق تنشر باستقلالية؛ RPC المتزامن يقيد التوافر</td></tr>
+    <tr><td>نمط الساغا</td><td>تصميم رقصي (أحداث) لا تنسيقي (منسق مركزي)</td><td>لا نقطة فشل وحيدة؛ كل خدمة تملك تعويضها</td></tr>
+    <tr><td>التعديل (Idempotency)</td><td>كل حدث يحمل <code>event_id</code>؛ المستهلكون يزيلون التكرار</td><td>ضمان Kafka هو «مرة على الأقل»؛ التعديل = أثر «مرة واحدة بالضبط»</td></tr>
+    <tr><td>معالجة الاضطراب</td><td>إصدار الحدث + <code>causation_id</code>؛ المستهلكون يخزنون أو يرفضون القديم</td><td>انقسامات الشبكة تعيد الترتيب؛ على المستهلكين المعالجة</td></tr>
+    <tr><td>التعويض</td><td>أحداث <code>InventoryReleased</code> و<code>PaymentRefunded</code> تتدفق عائدة</td><td>الساغا تتراجع بأفعال أمامية؛ لا معاملة موزعة</td></tr>
+    <tr><td>المراقبة</td><td>معرّف ارتباط (order_id) ينتقل عبر كل الأحداث</td><td>التتبع الموزع = تصفية بـ correlation_id في مجمع السجلات</td></tr>
+  </tbody>
+</table>
 
 <h3>اختيارات الطبقة المعمارية</h3>
 
@@ -1044,10 +1119,10 @@ OrderCompleted(order_id)                   ← الحالة النهائية
 <h3>أنماط الفشل التي يتعامل معها هذا التصميم</h3>
 
 <ul>
-  <td>خدمة المخزون معطلة → خدمة الطلب تُصدر <code>OrderPlaced</code>؛ المخزون يعالج عند استعادته. لا حجب.</li>
-  <td>الدفع يفشل → يُصدر <code>PaymentFailed</code>؛ الطلب يُصدر <code>InventoryReleased</code>؛ المخزون يعوض.</li>
-  <td>انقسام شبكة بين الدفع والشحن → كلاهما يواصل معالجة الأحداث المحلية؛ مهمة تسوية تعمل كل ساعة.</li>
-  <td><code>PaymentCharged</code> مكرر → المستهلك يرى نفس <code>event_id</code>، يتجاهل الثاني. تأثير مرة واحدة بدقة.</li>
+  <li>خدمة المخزون معطلة → خدمة الطلب تُصدر <code>OrderPlaced</code>؛ المخزون يعالج عند استعادته. لا حجب.</li>
+  <li>الدفع يفشل → يُصدر <code>PaymentFailed</code>؛ الطلب يُصدر <code>InventoryReleased</code>؛ المخزون يعوض.</li>
+  <li>انقسام شبكة بين الدفع والشحن → كلاهما يواصل معالجة الأحداث المحلية؛ مهمة تسوية تعمل كل ساعة.</li>
+  <li><code>PaymentCharged</code> مكرر → المستهلك يرى نفس <code>event_id</code>، يتجاهل الثاني. تأثير مرة واحدة بدقة.</li>
 </ul>
 
 ---
@@ -1263,6 +1338,23 @@ OrderCompleted(order_id)                   ← الحالة النهائية
 </table>
 
 ---
+
+<details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>السياق المحدود (Bounded context)</strong> — الحد الدلالي الذي يسري فيه نموذج المجال. ابحث "DDD bounded context strategic design".</li>
+  <li><strong>نمط الساغا (Saga)</strong> — معاملة موزعة عبر أفعال تعويضية. ابحث "saga pattern choreography vs orchestration".</li>
+  <li><strong>مفتاح التعديل (Idempotency key)</strong> — مفتاح يولده العميل يجعل إعادة المحاولة آمنة. ابحث "idempotency key API design stripe".</li>
+  <li><strong>قاطع الدائرة / الحاجز (Bulkhead)</strong> — فشل سريع وعزل للاعتماديات العطلة. ابحث "circuit breaker pattern resilience4j".</li>
+  <li><strong>نمط التين الخنق (Strangler fig)</strong> — ترحيل تدريجي خلف واجهة توجيه. ابحث "strangler fig pattern migration".</li>
+  <li><strong>Event sourcing / CQRS</strong> — سجل الأحداث مصدر الحقيقة؛ نماذج قراءة/كتابة منفصلة. ابحث "event sourcing CQRS explained".</li>
+  <li><strong>نمط الصندوق الخارجي (Outbox)</strong> — كتابة قاعدة بيانات وإصدار حدث ذرياً. ابحث "transactional outbox pattern microservices".</li>
+  <li><strong>طابور الرسائل الميتة (DLQ)</strong> — حيث تذهب الرسائل السامة بدلاً من أن تتلاشى. ابحث "dead letter queue best practices".</li>
+  <li><strong>ميزانية الأخطاء</strong> — بدل عدم الموثوقية القابل للإنفاق تحت SLO. ابحث "error budget google SRE".</li>
+  <li><strong>الضغط العكسي / إلقاء الحمل</strong> — النجاة من منتجين أسرع من المستهلكين. ابحث "backpressure load shedding queue".</li>
+</ul>
+</details>
 
 <h2 id="sec-summary-the-architectural-checklist">ملخص — قائمة تحقق معمارية</h2>
 
