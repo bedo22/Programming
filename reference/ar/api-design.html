@@ -23,6 +23,32 @@
   <p>معظم الدروس تعلم "كيف تستدعي API" أو "كيف تكتب ملف OpenAPI". تصميم API يبدأ بـ "ما العقد الذي يسمح للجانبين بالتحرك دون كسر بعضهما". إنه انضباط مستقل بتاريخه وطرقه وأوضاع فشله — ليس "REST مقابل GraphQL" كعقيدة، ليس "كتابة Swagger" كعمل روتيني، ليس "توليد SDK" كحل سحري. يلتقط هذا المستند إياه كاهتمام هندسي من الدرجة الأولى: طبقة الواجهة التي تغذي التصميم المعماري وحلقة المطور. إذا شحنت تغييرًا كاسرة أسقطت تطبيقًا جوّالًا في الإنتاج، فهذه هي الطبقة التي فاتتك.</p>
 </section>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>انتقل إلى</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">كيف تستخدم هذا المستند</a></li>
+      <li><a href="#sec-definition-what-api-design-is-and-what-it-is-not">التعريف</a></li>
+      <li><a href="#sec-history-from-rpc-to-graphql-to-events">التاريخ</a></li>
+      <li><a href="#sec-underlying-theory-what-makes-a-contract-designed-not-accidental">النظرية</a></li>
+      <li><a href="#sec-mental-models-how-api-designers-actually-reason">النماذج العقلية</a></li>
+      <li><a href="#sec-methodologies-styles-the-named-approaches">المنهجيات</a></li>
+      <li><a href="#sec-principles-the-shared-constants">المبادئ</a></li>
+      <li><a href="#sec-conventions-identifiers-the-rules-that-keep-contracts-predictable">الاتفاقيات</a></li>
+      <li><a href="#sec-collections-pagination-filtering-sorting-and-search">المجموعات</a></li>
+      <li><a href="#sec-validation-errors-transactional-safety">التحقق والأمان</a></li>
+      <li><a href="#sec-long-running-operations-202-job-resources-and-webhooks">العمليات طويلة الأمد</a></li>
+      <li><a href="#sec-realtime-and-streaming-contracts">الوقت الحقيقي</a></li>
+      <li><a href="#sec-schema-evolution-the-compatibility-matrix">تطور المخطط</a></li>
+      <li><a href="#sec-security-browser-contracts">الأمان</a></li>
+      <li><a href="#sec-ai-safe-tool-contracts">عقود آمنة للذكاء الاصطناعي</a></li>
+      <li><a href="#sec-worked-example-design-a-public-shipment-tracking-api">مثال عملي</a></li>
+      <li><a href="#sec-the-most-common-failure-modes">أنماط الفشل</a></li>
+      <li><a href="#sec-summary-the-contract-checklist">قائمة التحقق</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">كيف تستخدم هذا المستند</h2>
 
 <p>ترتيب القراءة: مستقل. روابط تقاطعية:</p>
@@ -1046,7 +1072,8 @@ type Shipment {
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display: inline;">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2></summary>
 
 <p>تصميم API جيد فقط بقدر الأدوات التي تجعل العقود مرئية، قابلة للاختبار، وقابلة للتطور. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
 
@@ -1111,6 +1138,7 @@ type Shipment {
 </table>
 
 <p><strong>طريقة اختيار:</strong> ابدأ بتعريف العقد + التدقيق + توليد العميل ("مجموعة أدوات API الدنيا القابلة للحياة"). أضف اختبار العقد عند عدد المستهلكين >3. أضف سجل المخطط عند عدد الفرق >5 أو تعدد لغات. أضف بوابة عندما تتجاوز احتياجات إدارة الحركة قدرات المكتبة. أضف Full-Stack آمن بالأنواع عندما تكون TypeScript هي اللغة الأساسية. الأداة تخدم العقد — لا العكس.</p>
+</details>
 
 ---
 

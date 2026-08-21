@@ -23,6 +23,32 @@
   <p>Most tutorials teach "how to call an API" or "how to write an OpenAPI file." API Design starts at "what contract lets both sides move without breaking each other." It is a distinct discipline with its own history, methods, and failure modes — not "REST vs GraphQL" as a religion, not "Swagger authoring" as a chore, not "SDK generation" as a silver bullet. This doc captures it as a first-class engineering concern: the interface layer that feeds system design and the developer loop. If you've ever shipped a breaking change that took down a mobile app in production, this is the layer you missed.</p>
 </section>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>Jump to</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+      <li><a href="#sec-definition-what-api-design-is-and-what-it-is-not">Definition</a></li>
+      <li><a href="#sec-history-from-rpc-to-graphql-to-events">History</a></li>
+      <li><a href="#sec-underlying-theory-what-makes-a-contract-designed-not-accidental">Theory</a></li>
+      <li><a href="#sec-mental-models-how-api-designers-actually-reason">Mental models</a></li>
+      <li><a href="#sec-methodologies-styles-the-named-approaches">Methodologies</a></li>
+      <li><a href="#sec-principles-the-shared-constants">Principles</a></li>
+      <li><a href="#sec-conventions-identifiers-the-rules-that-keep-contracts-predictable">Conventions</a></li>
+      <li><a href="#sec-collections-pagination-filtering-sorting-and-search">Collections</a></li>
+      <li><a href="#sec-validation-errors-transactional-safety">Validation & concurrency</a></li>
+      <li><a href="#sec-long-running-operations-202-job-resources-and-webhooks">Long-running ops</a></li>
+      <li><a href="#sec-realtime-and-streaming-contracts">Realtime & streaming</a></li>
+      <li><a href="#sec-schema-evolution-the-compatibility-matrix">Schema evolution</a></li>
+      <li><a href="#sec-security-browser-contracts">Security</a></li>
+      <li><a href="#sec-ai-safe-tool-contracts">AI-safe contracts</a></li>
+      <li><a href="#sec-worked-example-design-a-public-shipment-tracking-api">Worked example</a></li>
+      <li><a href="#sec-the-most-common-failure-modes">Failure modes</a></li>
+      <li><a href="#sec-summary-the-contract-checklist">Checklist</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone. Cross-links:</p>
@@ -1066,7 +1092,8 @@ type Shipment {
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display: inline;">Ecosystem — tooling catalog with decision metrics</h2></summary>
 
 <p>API design is only as good as the tooling that makes contracts visible, testable, and evolvable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
 
@@ -1131,6 +1158,7 @@ type Shipment {
 </table>
 
 <p><strong>Selection heuristic:</strong> Start with Contract Definition + Linting + Client Generation (the "minimum viable API toolkit"). Add Contract Testing when consumer count >3. Add Schema Registry when team count >5 or polyglot. Add Gateway when traffic management needs exceed library capabilities. Add Type-Safe Full-Stack when TypeScript is the primary language. The tool serves the contract — not the reverse.</p>
+</details>
 
 ---
 
