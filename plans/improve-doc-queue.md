@@ -33,9 +33,14 @@ return to stage-only until told otherwise.
 1. Seed from doc `.cite` (none → obvious primaries). Fetch ALL live; mirrors allowed;
    failures recorded. Dead cited link → replace with fetch-verified accessible primary
    (keep old attribution), mark replacement note.
-2. Digest `reference/digests/<stem>.md`: tiers (primary/supporting), triage fields,
-   **Δ deltas mandatory on primaries**, coverage matrix over every visible h2,
-   Gaps with ≥3 hunts before any `†`.
+2. Unified Digestion Architecture (skill sources.md UDA v1) — three artifacts:
+   a. `reference/sources/<short-key>.md` source-key distillation (house `_TEMPLATE.md`:
+      Identity w/ verified DOI+dates, claims-from-docs, key findings w/ quotes,
+      Does-NOT-support caveats, related-digests graph, verification history);
+      primaries get teaching-grade prose. Grep-first reuse.
+   b. Thin doc shell `reference/digests/<stem>.md`: fetch ledger, coverage matrix
+      over every visible h2, Gaps (≥3 hunts before `†`), Δ ids → source keys.
+   c. Ecosystem: SOURCE-ACCESS.md + digest-coverage.py gate.
 3. Gate: `digest-coverage.py <doc> <digest>` exit 0.
 4. Wire digest link into cite section, EN (`../digests/<stem>.md`) + AR
    (`../../digests/<stem>.md`, translated label).
