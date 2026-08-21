@@ -40,7 +40,8 @@ return to stage-only until told otherwise.
       primaries get teaching-grade prose. Grep-first reuse.
    b. Thin doc shell `reference/digests/<stem>.md`: fetch ledger, coverage matrix
       over every visible h2, Gaps (≥3 hunts before `†`), Δ ids → source keys.
-   c. Ecosystem: SOURCE-ACCESS.md + digest-coverage.py gate.
+   c. Ecosystem: SOURCE-ACCESS.md + digest-coverage.py gate + maintenance duties
+      (claims-list updates on consumption; migration debt tracked in skill sources.md).
 3. Gate: `digest-coverage.py <doc> <digest>` exit 0.
 4. Wire digest link into cite section, EN (`../digests/<stem>.md`) + AR
    (`../../digests/<stem>.md`, translated label).
