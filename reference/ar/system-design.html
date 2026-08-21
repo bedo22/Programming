@@ -18,6 +18,38 @@
         </p>
       </header>
 
+<nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+  <details open>
+    <summary style="cursor: pointer; font-weight: bold;">انتقل إلى القسم</summary>
+    <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0; direction: rtl;">
+      <li><a href="#sec-how-to-use-this-doc">كيف تستخدم هذا المستند</a></li>
+      <li><a href="#sec-definition-what-system-design-is-and-what-it-is-not">التعريف</a></li>
+      <li><a href="#sec-history-from-flowcharts-to-distributed-systems">التاريخ</a></li>
+      <li><a href="#sec-evolution-paradigms-through-one-lens">التطور</a></li>
+      <li><a href="#sec-migration-paths-between-architectures">مسارات الهجرة</a></li>
+      <li><a href="#sec-intersection-with-neighbors">التقاطع</a></li>
+      <li><a href="#sec-underlying-theory-what-makes-a-system-designed-not-assembled">النظرية</a></li>
+      <li><a href="#sec-mental-models-how-architects-actually-reason">النماذج العقلية</a></li>
+      <li><a href="#sec-architectural-layer-macro-patterns-with-consequences">الأنماط المعمارية</a></li>
+      <li><a href="#sec-capacity-planning-how-to-estimate-load-storage-and-latency">تخطيط السعة</a></li>
+      <li><a href="#sec-data-architecture-storage-partitioning-replication-and-evolution">هندسة البيانات</a></li>
+      <li><a href="#sec-caching-architecture-where-to-cache-what-to-cache-and-how-to-invalidate">التخزين المؤقت</a></li>
+      <li><a href="#sec-event-and-queue-reliability-the-operational-layer-under-async">الأحداث والطوابير</a></li>
+      <li><a href="#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية</a></li>
+      <li><a href="#sec-observability-designing-systems-that-can-be-understood-in-production">المراقبة</a></li>
+      <li><a href="#sec-component-layer-micro-where-system-design-meets-code">طبقة المكونات</a></li>
+      <li><a href="#sec-why-it-is-a-method-not-an-algorithm">منهج لا خوارزمية</a></li>
+      <li><a href="#sec-worked-example-design-a-url-shortener">مثال: مختصر الروابط</a></li>
+      <li><a href="#sec-worked-example-design-an-event-driven-order-system">مثال: نظام الطلبات</a></li>
+      <li><a href="#sec-methodologies-heuristics">المنهجيات</a></li>
+      <li><a href="#sec-common-failure-modes">أنماط الفشل</a></li>
+      <li><a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي</a></li>
+      <li><a href="#sec-the-future-where-system-design-is-going">المستقبل</a></li>
+      <li><a href="#sec-summary-the-architectural-checklist">الملخص</a></li>
+    </ul>
+  </details>
+</nav>
+
 <section class="recap">
   <h3 style="margin-top:0">لماذا هذا المستند منفصل</h3>
   <p>"البرمجة الحقيقية في التصميم المعماري." هذا المستند يلتقط ما يعنيه ذلك. التصميم المعماري ليس اكتشاف منتج التفكير التصميمي، ولا حلقة مكونات المطور. إنه <strong>الطبقة المعمارية</strong> التي تترجم مشكلة معتمدة إلى حل منظم — معرّفة الخدمات، ملكية البيانات، حدود الاتساق، أنماط الفشل، والدرزات حيث تلتقي المكونات. تعمل على مستويين في وقت واحد: <em>معماري</em> (كلي: الخدمات، الأحداث، التوسع) و<em>مكوني</em> (دقيق: سياقات محددة، عقود واجهات برمجة، حدود الثقة). كلاهما تصميم معماري؛ لا يكتمل أحدهما دون الآخر.</p>

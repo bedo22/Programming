@@ -18,6 +18,38 @@
         </p>
       </header>
 
+<nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+  <details open>
+    <summary style="cursor: pointer; font-weight: bold;">Jump to section</summary>
+    <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0;">
+      <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+      <li><a href="#sec-definition-what-system-design-is-and-what-it-is-not">Definition</a></li>
+      <li><a href="#sec-history-from-flowcharts-to-distributed-systems">History</a></li>
+      <li><a href="#sec-evolution-paradigms-through-one-lens">Evolution</a></li>
+      <li><a href="#sec-migration-paths-between-architectures">Migration paths</a></li>
+      <li><a href="#sec-intersection-with-neighbors">Intersection</a></li>
+      <li><a href="#sec-underlying-theory-what-makes-a-system-designed-not-assembled">Theory</a></li>
+      <li><a href="#sec-mental-models-how-architects-actually-reason">Mental models</a></li>
+      <li><a href="#sec-architectural-layer-macro-patterns-with-consequences">Architectural patterns</a></li>
+      <li><a href="#sec-capacity-planning-how-to-estimate-load-storage-and-latency">Capacity planning</a></li>
+      <li><a href="#sec-data-architecture-storage-partitioning-replication-and-evolution">Data architecture</a></li>
+      <li><a href="#sec-caching-architecture-where-to-cache-what-to-cache-and-how-to-invalidate">Caching</a></li>
+      <li><a href="#sec-event-and-queue-reliability-the-operational-layer-under-async">Events & queues</a></li>
+      <li><a href="#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">Reliability</a></li>
+      <li><a href="#sec-observability-designing-systems-that-can-be-understood-in-production">Observability</a></li>
+      <li><a href="#sec-component-layer-micro-where-system-design-meets-code">Component layer</a></li>
+      <li><a href="#sec-why-it-is-a-method-not-an-algorithm">Method, not algorithm</a></li>
+      <li><a href="#sec-worked-example-design-a-url-shortener">Worked example: URL shortener</a></li>
+      <li><a href="#sec-worked-example-design-an-event-driven-order-system">Worked example: order system</a></li>
+      <li><a href="#sec-methodologies-heuristics">Methodologies</a></li>
+      <li><a href="#sec-common-failure-modes">Failure modes</a></li>
+      <li><a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem</a></li>
+      <li><a href="#sec-the-future-where-system-design-is-going">The future</a></li>
+      <li><a href="#sec-summary-the-architectural-checklist">Summary</a></li>
+    </ul>
+  </details>
+</nav>
+
 <section class="recap">
   <h3 style="margin-top:0">Why this doc exists separately</h3>
   <p>"The real programming is in system design." This doc captures what that means. System Design is neither the product discovery of Design Thinking nor the component loop of the developer. It is the <strong>architectural layer</strong> that translates a validated problem into a structured solution — defining services, data ownership, consistency boundaries, failure modes, and the seams where components meet. It operates at two scales simultaneously: <em>architectural</em> (macro: services, events, scaling) and <em>component</em> (micro: bounded contexts, API contracts, trust boundaries). Both are system design; neither is complete without the other.</p>
