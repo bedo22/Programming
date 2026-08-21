@@ -30,7 +30,7 @@
   <li>Downstream to <a href="./system-design.html">System Design</a> — once you know <em>what</em> to build, system design answers <em>how it fits together at scale</em>.</li>
   <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — once architecture is set, the developer loop executes one component at a time.</li>
   <li>Downstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — once the problem is framed, UI/UX renders the empathy into habitable interfaces.</li>
-  <li>Upstream to <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — language choices are downstream of product constraints.</</li>
+  <li>Upstream to <a href="./javascript-across-stacks.html">JavaScript Across Stacks</a> — language choices are downstream of product constraints.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
 </ul>
 
@@ -160,6 +160,8 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
     </tr>
   </tbody>
 </table>
+
+<p><strong>Why this survived.</strong> The rhythm outlived every branded methodology because it solves a real problem: humans satisfice under ambiguity (Simon, 1957), and premature convergence is the default failure mode of groups under time pressure. Design Thinking's diverge-converge cycle is a structural countermeasure — it forces the team to explore before committing, which is unnatural enough to require a discipline. The critiques (Jen, Norman, Nussbaum) are valid against the institutional adoption — but the underlying insight (problem framing before solution) survived because the alternative (building the wrong thing perfectly) is worse.</p>
 
 ---
 
@@ -539,6 +541,8 @@ Layer 3: Developer Loop    → "How do I build this component well, right now?"
   </tbody>
 </table>
 
+<p><strong>Why these work.</strong> Each technique exploits a specific cognitive bias or constraint: Crazy 8s work because time pressure prevents the prefrontal cortex from filtering ideas — the first sketch is the obvious one, sketch 5 is the interesting one, and sketch 8 is the one you'd never reach without the constraint. HMW works because open-ended questions activate divergent thinking (Guilford, 1967) while closed questions activate convergent thinking. Analogous inspiration works because cross-domain analogies bypass functional fixedness — the tendency to see objects only in their usual role. Reverse brainstorming works because critiquing is cognitively easier than creating, and the reverse reveals the assumptions that forward thinking hides. Constraint-based ideation works because removing a constraint forces the brain to rebuild the solution from a different foundation, producing novel combinations.</p>
+
 <h3>Conceptual prototype taxonomy (testing without code)</h3>
 
 <table>
@@ -754,9 +758,10 @@ Reframed problem: How might we make the medication trigger visible at the right 
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display:inline">Ecosystem — tooling catalog with decision metrics</h2></summary>
 
-<p>Design Thinking is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</</p>
+<p>Design Thinking is only as good as the tooling that makes its artifacts visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
 <table>
   <thead><tr><th>Category</th><th>Tools / Platforms</th><th>Trigger → Target</th><th>Decision Metrics</th></tr></thead>
@@ -819,6 +824,8 @@ Reframed problem: How might we make the medication trigger visible at the right 
 </table>
 
 <p><strong>Selection heuristic:</strong> Start with Research Repository + Prototyping + Journey Mapping (the "minimum viable design toolkit"). Add Sprint Facilitation when running regular timeboxed discoveries. Add AI Augmentation when interview volume >10/week. Add Co-Design Platforms when affected communities are identifiable and accessible. Add Token Management when design system exists. The tool serves the rhythm — not the reverse.</p>
+
+</details>
 
 ---
 
