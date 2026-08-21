@@ -1,28 +1,55 @@
-# improve-doc pass queue — next 10 docs
+# Improve-doc campaign — PLAN v2 (2026-08-21)
 
-Ordered by measured deficiency (doc-profile signals: thin sections w/sec <320,
-missing audience/currency markers, positional-numeral debt, missing taught devices,
-uncollapsed catalogs) weighted by curriculum reach. One pass per doc = leverage map
-(R14) if flat, vocabulary (R16), calibration numbers (R19), markers (R11/R12),
-de-numbering debt, catalog collapse where reference-shaped. Every pass syncs the
-AR twin through the pipeline/splice and runs the battery before its checkpoint.
+Supersedes v1. v1's center of gravity was mechanical hygiene; v2's center of gravity is
+**valuable content addition under a credibility regime**. Mechanical work is now just
+Phase A of every pass. Governing mechanism: `plans/credibility.md`.
 
-- [x] 1. **javascript-the-language** ✅ v62 — 299w/sec, 43 numerals, no teacher device. Foundation-tier language doc.
-- [x] 2. **class-to-hooks-paradigm-shift** ✅ v63 (h3 divergence → SYNC queue) — worst overall: 316w/sec, 59 numerals, 35 sections uncollapsed.
-- [x] 3. **react-2024-and-beyond** ✅ v68 (incl. nested-anchor + base64 corruption repair) — 261w/sec, 46 numerals (PROGRESS.md hygiene-debt list).
-- [x] 4. **javascript-across-stacks** ✅ v69 — 353w/sec but 30 numerals + open catalogs.
-- [x] 5. **what-is-state-prequel** ✅ v70 — React-path on-ramp; audit first (was recently reworked).
-- [ ] 6. **ui-ux-web-design** ⚠️ v71 template-only (markers+vocab; doc never fully read) → REDO required — sibling of html-and-css; AR h2s still numbered per PROGRESS.md.
-- [x] 7. **how-developers-think-frontend** ✅ v72 — implementation loop; verify devices before assuming gaps.
-- [x] 6b. **ui-ux-web-design REDO** ✅ v75 — full read + diagnosis-driven additions per user correction (v71 was template treatment).
-- [x] 8. **software-testing-and-debugging** ✅ v76 — 240w/sec, 18 numerals.
-- [x] 9. **system-design** ✅ v77 — architecture anchor; likely needs leverage map more than devices.
-- [ ] 10. **api-design** — contracts tier; same treatment.
+## Pass template (every doc, all five phases)
 
-Not queued here but flagged by data: income-stream-landscape (156w/sec, worst thin
-score — career doc, lower reach than code docs), observability (87 numerals),
-angular-evolution, beyond-the-browser, full-stack, glossary, frontend-camps-survey.
-They join the next batch of 10.
+**Phase A — Mechanical sweep.** Profile (`doc-profile.py --classes`), de-number § refs
+via maps/<doc>.json WANT ids (both twins, incl. prettier-split closers and bare-textual
+refs), corruption scan (nested `<a><a>`, stray tags, `</a\n>` closers), empty map after.
 
-Status log:
-- v60/v61 — html-and-css ✅ (pilot; defects fed back into tooling)
+**Phase B — Deep diagnosis.** FULL read (no profiling shortcuts — v71 lesson). Classify
+Diátaxis type. Score against insight tests (veteran / cost-of-ignorance / action-change)
+and R1–R20 registry. Record reader-visible symptoms, not vibes. Honest N/A verdicts are
+allowed and must be justified in the ledger (v75 precedent).
+
+**Phase C — Value authoring.** Minimum TWO substantive additions unless diagnosis proves
+fewer suffice. Menu: leverage map (R14), failure diagnostics w/ mechanisms (R15),
+decision points + defaults (R18), calibration numbers (R19), war story + causal chain
+(R20), worked micro-example (R8/R13). Template blocks (markers/vocab/teacher) are
+hygiene, not additions — they don't count toward the two.
+
+**Phase D — Provenance.** Tier every added claim (T1/T2/T3 per plans/credibility.md).
+T1 → live-verify against primary source + cite. T2 → recompute. T3 → hedge in text.
+Ledger rows in rules-compliance.md new-claims audit. Volatile facts: doc-text or live
+scrape only.
+
+**Phase E — Twin sync + gates.** AR mirror (direct patches; splice for structural).
+verify-twins.py ALL GATES PASSED + parse integrity both twins. Compliance row (4-status
+R-notation + new-claims rows) → commit `Checkpoint vN:` + tag.
+
+## Queue
+
+| # | Doc | Why it's here | State |
+|---|-----|---------------|-------|
+| 1 | **api-design** | Carried from v1 (#10 untouched) | pending |
+| 2 | **react-2024-and-beyond depth-delta** | v68 ran pre-correction: full de-number + corruption repair done, but content diagnosis was template-era. Re-run Phases B–D only | pending |
+| 3 | **observability-and-operations** | 87 numerals (worst on shelf); neighbor of system-design | pending |
+| 4 | **income-stream-landscape** | Thinnest doc measured (156w/sec) | pending |
+| 5+ | Remaining shelf by thin-score | From batch profile table | queued |
+
+## Already complete (do NOT redo)
+
+- Passes 1–2 deep (v60–67) · react-2024 mechanical (v68) · across-stacks (v69)
+- prequel light-by-design (v70) · ui-ux REDO verified benchmark-grade (v75)
+- how-developers-think deep (v72) · testing-and-debugging deep (v76)
+- system-design deep + full twin reconciliation (v77)
+
+## Standing rules
+
+- Two-review rule for twin divergence: unique gems mirror INTO EN first, then prune/translate.
+- Recorded ratio/h3 exceptions = terminal states; never pad to gates.
+- Work-copy hygiene: never cp over a work copy mid-pass.
+- Never commit `Archive/What's missing.txt`.
