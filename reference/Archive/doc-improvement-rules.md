@@ -189,6 +189,22 @@ Not every doc needs every section — but the absence should be deliberate.
   in general" but "what goes wrong when you apply this technique in the
   wrong context?"
 
+### Missing depth (examples, evidence, explanations)
+
+Some sections are too shallow. Signs:
+- A claim without evidence ("studies show...") — needs a citation
+- A principle without example ("decompose before solving") — needs a
+  concrete demonstration of the principle in action
+- A technique without "why" ("use a hash map" — but why?) — already
+  caught by "Missing theory" above
+- A table row without explanation (just a label and a link) — the reader
+  doesn't know *why* this row matters or *when* to apply it
+
+For each shallow section, ask: what would make this both actionable AND
+understandable? Add the example AND the explanation of why the example
+works. The example proves the theory works in practice; the explanation
+of *why* it works is what makes it transferable.
+
 ### Missing transfer conditions
 
 The ultimate test: can the reader apply this to a situation the doc
@@ -327,6 +343,30 @@ After all changes:
 8. No content was deleted (only true duplication removed)
 9. Every section has a clear purpose in the narrative arc
 10. Every cross-reference points to the owning doc
+
+## What NOT to do
+
+- **Don't create new docs** for questions already answered (even partially)
+  in an existing doc. Expand the existing doc instead.
+- **Don't skip the AR twin.** Every structural change to EN must be mirrored.
+  The verify script catches structural drift, not content drift.
+
+## Failure modes to avoid
+
+These come from the shelf-review guards, the problem-solving experience,
+and the principle that theory and practice are equal:
+
+- **Audit against purpose, not taste.** "I would write it differently"
+  is not a finding. "The reader can't find X" is.
+- **Numbers must be worked.** A doc that cites a number without showing
+  the calculation fails the reader.
+- **The reader must be able to DO it.** If the doc's objective isn't
+  achievable from the doc alone, that's a finding. But "doing it" includes
+  understanding *why* — blind compliance is not the goal.
+- **Stale guidance is debt.** A dated claim without a date is worse
+  than no claim.
+- **The AR twin must fit Arabic readers.** Translation is not enough —
+  examples, norms, and cultural references must fit the audience.
 
 ## The meta-rule
 
