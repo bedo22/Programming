@@ -13,8 +13,9 @@
   <p class="kicker">مرجع · JS عبر المنصات</p>
   <h1>جافاسكريبت عبر المنصات: أين تعمل JS، ومن يحاربها</h1>
   <p class="meta">كيف تبدو JS من منظور الواجهة الأمامية، الخلفية، الجوّال، المدمج، والذكاء الاصطناعي — ما يستخدمه كل واحد من JS، ما لا يناسب JS، واللغات التي كتبت لملء تلك الفجوة (TypeScript، .NET/C#، Java/Spring Boot، Kotlin، Dart، Rust، Python). لكل منافس: جدول تموضع بفقرة واحدة عن النظرية التي تبرر إنشاء لغة جديدة بدلاً من تمديد لغة موجودة. وثيقة شقيقة لـ <a href="./javascript-the-language.html">javascript-the-language</a>.</p>
+        <p class="meta"><strong>لمن هذه الوثيقة:</strong> مطوّرون يختارون بين كوامن اللغات — أو يرثون نظاماً متعدد اللغات ويحتاجون منطق القيود وراء رهانات كل مسار.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../javascript-across-stacks.html">English</a>
+          <strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../javascript-across-stacks.html">English</a>
         </p>
       </header>
 
@@ -43,7 +44,7 @@
 
 <h2 id="sec-writing-typed-js-the-type-system-in-practice">كتابة JS معنونة — نظام الأنواع عملياً</h2>
 
-<p>جادل <a href="#sec-the-typescript-shift-the-js-competitor-that-survived">§٢</a> في <em>لماذا</em> يوجد TypeScript. هذا القسم في <em>كيف</em> يعمل كنظام قواعد: طبقة ثابتة تفحص الأنواع قبل أن يعمل المحرك أبداً، ثم تمحى إلى JS عادي. ثلاث أفكار هي الوظيفة كلها.</p>
+<p>جادل <a href="#sec-the-typescript-shift-the-js-competitor-that-survived">تحول TypeScript</a> في <em>لماذا</em> يوجد TypeScript. هذا القسم في <em>كيف</em> يعمل كنظام قواعد: طبقة ثابتة تفحص الأنواع قبل أن يعمل المحرك أبداً، ثم تمحى إلى JS عادي. ثلاث أفكار هي الوظيفة كلها.</p>
 
 <table>
   <thead><tr><th>الفكرة</th><th>ماذا تعني</th><th>المزلق الذي تمنعه</th></tr></thead>
@@ -109,7 +110,7 @@ function handle(r: Result): number {
   return r.error.length;                        // narrows to the err branch
 }</code></pre>
 
-<p><strong>ما ليس عليه هذا القسم:</strong> ليس درساً كاملاً في TS. إنه اللغة — لبناء المنطق حسب نموذج المشروع، تدرب على الترميز مع أي JS في هذه السلسلة. لأدوات البناء (tsc، tsconfig، JSX أم لا) انظر <a href="./javascript-the-language.html">javascript-the-language</a> <a href="#sec-failure-modes">§١١</a> الأدوات؛ قواعد نظام الأنواع أعلاه هي الجزء الذي يهم دائماً.</p>
+<p><strong>ما ليس عليه هذا القسم:</strong> ليس درساً كاملاً في TS. إنه اللغة — لبناء المنطق حسب نموذج المشروع، تدرب على الترميز مع أي JS في هذه السلسلة. لأدوات البناء (tsc، tsconfig، JSX أم لا) انظر <a href="./javascript-the-language.html">javascript-the-language</a> <a href="#sec-failure-modes">أنماط الفشل</a> الأدوات؛ قواعد نظام الأنواع أعلاه هي الجزء الذي يهم دائماً.</p>
 
 <h3>TypeScript في الإنتاج — القيمة والمزالق</h3>
 
@@ -120,7 +121,7 @@ function handle(r: Result): number {
 <table>
   <thead><tr><th>المزلقة</th><th>لماذا تعض</th><th>العادة التي تصلحها</th></tr></thead>
   <tbody>
-    <tr><td>افتراض أن الأنواع تتحقق من بيانات زمن التشغيل</td><td>الأنواع تمحى؛ حمولة API أو إدخال مستخدم يعبر الفحص النوعي دون تحقق</td><td>تحقق عند الحد (<a href="#sec-writing-typed-js-the-type-system-in-practice">§٢ب</a>) — مكتبات المخططات (zod، valibot، arktype) عند حافة الإدخال/الإخراج</td></tr>
+    <tr><td>افتراض أن الأنواع تتحقق من بيانات زمن التشغيل</td><td>الأنواع تمحى؛ حمولة API أو إدخال مستخدم يعبر الفحص النوعي دون تحقق</td><td>تحقق عند الحد (<a href="#sec-writing-typed-js-the-type-system-in-practice">JS معنونة عملياً</a>) — مكتبات المخططات (zod، valibot، arktype) عند حافة الإدخال/الإخراج</td></tr>
     <tr><td><code>any</code> كرد فعل تلقائي</td><td>يسكت المترجم لا الخلل؛ النوع يتوقف بصمت عن حراسة ذلك المسار</td><td>استخدم <code>unknown</code> ثم ضيّق؛ أبقِ <code>any</code> للجسور التوافقية المنظمة فقط</td></tr>
     <tr><td>إيقاف strict</td><td>كثير من القيمة تختفي مع عدم فرض <code>implicitAny</code></td><td>سلم <code>tsconfig</code> مع <code>strict: true</code> من اليوم الأول (الوضع الوحيد الذي تُنهى به المباريات)</td></tr>
     <tr><td>طقوس Enum</td><td>كائنات زمن تشغيل بكل الطقوس؛ غالباً الأداة الخطأ</td><td>فضّل اتحادات حرفية نصية + <code>as const</code> — قابلة للـ tree-shake ودقيقة</td></tr>
@@ -199,9 +200,24 @@ function handle(r: Result): number {
   </tbody>
 </table>
 
+<h3>٦ مسارات خلفية أخرى</h3>
+
+<p>PHP وRuby وElixir وKotlin وScala — كلها منافسة حقيقية في مسار أضيق من مسارات الويب الخلفية. قاعدة انقلاب القيود نفسها، برهان أكبر على محور محدد.
+
+<table>
+  <thead><tr><th>اللغة</th><th>الرهان الأساسي</th><th>تحسّن لصالح</th><th>متى تتفوق على Node</th></tr></thead>
+  <tbody>
+    <tr><td>PHP</td><td>تبسيط تسليم الويب</td><td>بساطة الاستضافة، منظومة CMS (ووردبريس)، نشر واحد للتشغيل</td><td>مواقع المحتوى، فرق WordPress/Laravel، استضافة مشتركة بـ 10$ شهرياً</td></tr>
+    <tr><td>Ruby</td><td>سعادة المطوّر</td><td>تكرار سريع للمنتج، اصطلاحات Rails فوق الإعدادات</td><td>منتجات CRUD مبكرة، سرعة النموذج الأولي إلى MVP</td></tr>
+    <tr><td>Elixir</td><td>تحمّل الأخطاء / الفوري</td><td>إشراف BEAM، الترقية الحية، التزامن الأفقي</td><td>الدردشة، الحضور، أساطيل IoT، جهوزية بمستوى الهاتف</td></tr>
+    <tr><td>Kotlin (خلفية)</td><td>JVM أفضل</td><td>أمان Null، coroutines، توافق Java</td><td>مؤسسات JVM تريد زمن تشغيل Java بصياغة أسلم وأكثر إيجازاً</td></tr>
+    <tr><td>Scala</td><td>JVM + FP</td><td>معالجة وظيفية آمنة النوع، تزامن Akka</td><td>خطوط أنابيب البيانات، الخلفيات المصدَرة للأحداث، فرق FP كثيفة</td></tr>
+  </tbody>
+</table>
+
 <h2 id="sec-the-node-runtime-how-js-actually-behaves-on-a-server">زمن تشغيل Node — كيف تتصرف JS فعلاً على خادم</h2>
 
-<p>وضّع <a href="#sec-the-backend-perspective">§٣</a> Node مقابل لغات الخلفية الأخرى؛ هذا القسم الفرعي عن <em>زمن التشغيل نفسه</em> — الآليات التي تجعل JS على الخادم تتصرف كما تتصرف. الأطر تأتي وتذهب، لكن هذه الآليات هي الثوابت.</p>
+<p>وضّع <a href="#sec-the-backend-perspective">منظور الخلفية</a> Node مقابل لغات الخلفية الأخرى؛ هذا القسم الفرعي عن <em>زمن التشغيل نفسه</em> — الآليات التي تجعل JS على الخادم تتصرف كما تتصرف. الأطر تأتي وتذهب، لكن هذه الآليات هي الثوابت.</p>
 
 <h3>حلقة أحداث الخادم — المراحل وقاعدة المهام الدقيقة</h3>
 <p>المتصفح وNode يتشاركان عائلة حلقة الأحداث نفسها، لكن الخادم بلا إطار عرض يفرض على الحلقة التنازل بين المعالجات — الحلقة المسدودة تسد <em>كل</em> طلب. الحلقة تعمل بمراحل بترتيب ثابت: <strong>المؤقتات</strong> (setTimeout/setInterval) ← <strong>المعلّقة</strong> (معالجات الإدخال/الإخراج المؤجلة) ← <strong>الاستقصاء</strong> (انتظر الإدخال/الإخراج، شغّل معظم المعالجات) ← <strong>الفحص</strong> (setImmediate) ← <strong>الإغلاق</strong> (المقابض المغلقة). بين كل مرحلة — وبعد كل معالج — <em>طابور المهام الدقيقة</em> يُفرَّغ أولاً: <code>queueMicrotask</code> وكل استمرارية <code>Promise.then</code>.</p>
@@ -401,7 +417,7 @@ src.pipe(res);
 
 <h2 id="sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">النمط: متى تهزم لغة جديدة تمديد لغة قديمة؟</h2><h2 id="sec-choosing-a-stack">اختيار كومة</h2>
 
-<p>النمط (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">§٨</a>) يفسر الفائزين بعد وقوع الأمر؛ هذه نسخة التطلع — كيف تختار كومة اليوم. نفس القاعدة، مطبقة أولاً: حدد <em>القيد المسيطر</em>، ثم اللغة التي يطابق رهان تصميمها. «أي لغة أفضل؟» سؤال خاطئ. «أي قيد يهيمن، ومن راهن عليه؟» هو السؤال الذي يجيب.</p>
+<p>النمط (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">نمط انقلاب القيود</a>) يفسر الفائزين بعد وقوع الأمر؛ هذه نسخة التطلع — كيف تختار كومة اليوم. نفس القاعدة، مطبقة أولاً: حدد <em>القيد المسيطر</em>، ثم اللغة التي يطابق رهان تصميمها. «أي لغة أفضل؟» سؤال خاطئ. «أي قيد يهيمن، ومن راهن عليه؟» هو السؤال الذي يجيب.</p>
 
 <table>
   <thead><tr><th>القيد</th><th>السؤال الذي تسأله</th><th>ماذا تفحص</th></tr></thead>
@@ -427,7 +443,7 @@ src.pipe(res);
 <table>
   <thead><tr><th>من ← إلى</th><th>المُطلِق</th><th>الاستراتيجية</th><th>الخطر الرئيسي</th></tr></thead>
   <tbody>
-    <tr><td>JS ← TS</td><td>يكبر الفريق عن ~5 مطورين؛ ألم إعادة البناء؛ أخطاء شكل زمن التشغيل</td><td>تدريجي (<a href="#sec-writing-typed-js-the-type-system-in-practice">§٢ب</a>): allowJs ← @ts-check ← .d.ts ← strict</td><td>إرهاق الأنواع؛ ثقة زائفة إن لم تُتحقق الحدود</td></tr>
+    <tr><td>JS ← TS</td><td>يكبر الفريق عن ~5 مطورين؛ ألم إعادة البناء؛ أخطاء شكل زمن التشغيل</td><td>تدريجي (<a href="#sec-writing-typed-js-the-type-system-in-practice">JS معنونة عملياً</a>): allowJs ← @ts-check ← .d.ts ← strict</td><td>إرهاق الأنواع؛ ثقة زائفة إن لم تُتحقق الحدود</td></tr>
     <tr><td>Node ← Go</td><td>خدمة شبكة عالية الإنتاجية؛ نموذج تزامن بسيط يكفي</td><td>أبقِ Node عند BFF/الحافة؛ استخرج الخدمة الساخنة</td><td>عدم إلمام الفريق؛ انقسام التشغيل بين زمني تشغيل</td></tr>
     <tr><td>Node ← Rust</td><td>مسار ساخن مرتبط بالـ CPU؛ أمان الذاكرة؛ حاجة WASM</td><td>استخرج وحدة واحدة كمكتبة أو خدمة جانبية</td><td>منحنى تعلم الملكية/الاستعارة</td></tr>
     <tr><td>Node ← Java/C#</td><td>امتثال مؤسسي، نواة معاملاتية، أنظمة طويلة العمر</td><td>شجرة خانقة للمجال الأساسي؛ أبقِ JS عند الأطراف</td><td>الطقوس، إيقاع تكرار أبطأ</td></tr>
@@ -446,16 +462,16 @@ src.pipe(res);
   <thead><tr><th>نمط الفشل</th><th>ماذا يحدث</th><th>الإصلاح</th></tr></thead>
   <tbody>
     <tr><td>اختيار لغة مدفوع بالسيرة الذاتية</td><td>يختار الفريق Rust/Go/Kotlin للمكانة لا للقيود</td><td>ابدأ من القيد المسيطر لا من اللغة</td></tr>
-    <tr><td>افتراض أن أنواع TS أمان زمن تشغيل</td><td>حمولات API غير صالحة تعبر الفحص النوعي؛ انهيار في زمن التشغيل</td><td>تحقق عند حدود زمن التشغيل (<a href="#sec-writing-typed-js-the-type-system-in-practice">§٢ب</a>)</td></tr>
+    <tr><td>افتراض أن أنواع TS أمان زمن تشغيل</td><td>حمولات API غير صالحة تعبر الفحص النوعي؛ انهيار في زمن التشغيل</td><td>تحقق عند حدود زمن التشغيل (<a href="#sec-writing-typed-js-the-type-system-in-practice">JS معنونة عملياً</a>)</td></tr>
     <tr><td>معاملة JS كـ«لغة واحدة» في كل مكان</td><td>واجهات برمجة المتصفح مفترضة في Node؛ وحدات Node مفترضة في المتصفح</td><td>حدد المضيف أولاً؛ واجهات المنصة تختلف لكل كومة</td></tr>
     <tr><td>Node لعمل مرتبط بالـ CPU دون عمال</td><td>حلقة الأحداث تسد؛ كل طلب يتوقف</td><td>خيوط عامل، وحدات أصلية، أو لغة أخرى (Go/Rust)</td></tr>
     <tr><td>React Native حين يهم الإخلاص الأصلي</td><td>الإيماءات واصطلاحات المنصة تبدو خاطئة؛ خصائص منصة فقيرة</td><td>انقل الأسطح الحرجة إلى الأصلي؛ أبقِ JS للباقي</td></tr>
     <tr><td>JS تدفع ما بعد ميزانيات ذاكرة الجهاز</td><td>زمن التشغيل لا يتسع؛ البطارية تستنزف؛ توقفات GC</td><td>C/C++/Rust/MicroPython على الأجهزة المقيدة</td></tr>
     <tr><td>Python لإنتاجية عالية دون فهم GIL</td><td>مفاجآت كمون/إنتاجية</td><td>Go/Rust/Java/C#، أو اكتب المسار الساخن في وحدة أصلية</td></tr>
     <tr><td>لغة تُترجم إلى JS في المتصفح</td><td>احتكاك النظام البيئي/الأدوات، بلا ميزة زمن تشغيل</td><td>فضّل تمديد TS، أو شراكة WASM على الاستبدال</td></tr>
-    <tr><td>الاختراع حين ينجح التمديد</td><td>منحدر هجرة، خسارة النظام البيئي</td><td>مدّد حين يكون القيد دون تغيير (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">§٨</a>)</td></tr>
+    <tr><td>الاختراع حين ينجح التمديد</td><td>منحدر هجرة، خسارة النظام البيئي</td><td>مدّد حين يكون القيد دون تغيير (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">نمط انقلاب القيود</a>)</td></tr>
     <tr><td>التمديد حين تكون الحاجة اختراعاً</td><td>ترقيع زمن تشغيل لم يعد رهانه يلائم</td><td>انقلب القيد — يجب أن تتغير الأداة</td></tr>
-    <tr><td>تجاهل كلفة التوافق</td><td>نظام متعدد اللغات ملصوق بحدود هشة</td><td>فضّل اللغات ذات FFI/عقود قوية (صف <a href="#sec-choosing-a-stack">§٩</a> للتوافق)</td></tr>
+    <tr><td>تجاهل كلفة التوافق</td><td>نظام متعدد اللغات ملصوق بحدود هشة</td><td>فضّل اللغات ذات FFI/عقود قوية (صف <a href="#sec-choosing-a-stack">اختيار الكومة</a> للتوافق)</td></tr>
   </tbody>
 </table><h2 id="sec-principles">المبادئ</h2>
 
@@ -469,15 +485,15 @@ src.pipe(res);
     <tr><td>اخترع حين ينقلب القيد</td><td>Go/Rust/Swift — رهان التصميم القديم لم يعد يلائم</td></tr>
     <tr><td>النظام البيئي يهزم الصيغة</td><td>المكتبات والأدوات تقرر التبني (NumPy·PyTorch لبايثون)</td></tr>
     <tr><td>التوافق يهزم النقاء</td><td>اللغات التي تتكامل تنتشر أسرع من «الأفضل»</td></tr>
-    <tr><td>زمن التشغيل أهم من الصيغة</td><td>نفس الصيغة تعني أشياء مختلفة لكل مضيف (<a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">§٥ب</a>)</td></tr>
+    <tr><td>زمن التشغيل أهم من الصيغة</td><td>نفس الصيغة تعني أشياء مختلفة لكل مضيف (<a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">النماذج الذهنية عبر الأكوام</a>)</td></tr>
     <tr><td>الأنواع لا تحل محل التحقق في زمن التشغيل</td><td>الفحوص الثابتة تتوقف عند الحد؛ تحقق من البيانات الخارجية</td></tr>
     <tr><td>مهارة الفريق قيد حقيقي</td><td>أفضل لغة نظرية لا يمكنك توظيفها هي الاختيار الخاطئ</td></tr>
-    <tr><td>كلفة الهجرة جزء من التصميم</td><td>الاختيار يشمل كلفة الانتقال لاحقاً (<a href="#sec-migration-paths">§١٠</a>)</td></tr>
+    <tr><td>كلفة الهجرة جزء من التصميم</td><td>الاختيار يشمل كلفة الانتقال لاحقاً (<a href="#sec-migration-paths">مسارات الهجرة</a>)</td></tr>
   </tbody>
 </table>
 <h2 id="sec-a-worked-example-a-realtime-collaborative-editor">مثال محلول — محرر تعاوني فوري</h2>
 
-<p>منتج، ومجموعة قيود، وقرارات اللغة التي تفرضها كل واحدة. هذه نماذج <a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">§٥ب</a> الذهنية وقائمة <a href="#sec-choosing-a-stack">§٩</a> المطبقة على شيء واحد محدد.</p>
+<p>منتج، ومجموعة قيود، وقرارات اللغة التي تفرضها كل واحدة. هذه نماذج <a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">النماذج الذهنية عبر الأكوام</a> الذهنية وقائمة <a href="#sec-choosing-a-stack">اختيار الكومة</a> المطبقة على شيء واحد محدد.</p>
 
 <p><strong>المنتج:</strong> تحرير مستندات متعدد المستخدمين — مؤشرات حية، حضور، تعديلات دون اتصال، مزامنة فورية، استمرار خادم.</p>
 
@@ -487,25 +503,25 @@ src.pipe(res);
     <tr><td>واجهة محرر المتصفح</td><td>المضيف = متصفح، JS/WASM وحدهما يعملان</td><td>TS</td><td>مضيف إلزامي؛ TS يمدد JS دون تغيير زمن تشغيل</td></tr>
     <tr><td>منطق التعاون (دمج CRDT)</td><td>الصحة تحت التزامن؛ نفس الخوارزمية يجب أن تعمل في المتصفح والخادم واختبارات التكامل</td><td>وحدة TS مشتركة، اختيارياً نواة ساخنة تُجمَّع إلى WASM</td><td>كود مشترك يُبقي مصدر حقيقة واحداً؛ WASM للمسارات الثقيلة حسابياً</td></tr>
     <tr><td>خادم فوري (اتصالات، حضور، نشر)</td><td>مرتبط بالإدخال/الإخراج، اتصالات حية كثيرة، كمون p99</td><td>Node (وحدة كومة JS) أو Elixir (إشراف BEAM، حضور)</td><td>كلاهما يراهن على الإدخال/الإخراج الفوري؛ Node يُبقي الفريق بلغة واحدة، Elixir يفوز بتحمل الأعطال على مقياس الأسطول</td></tr>
-    <tr><td>الاستمرار / المصادقة / الفوترة</td><td>أمان المعاملات، الصحة، الامتثال المؤسسي</td><td>نواة Java/C#؛ BFF Node صغير أمامها</td><td>ثقيل المعاملات، طويل العمر — الممر المؤسسي (<a href="#sec-the-backend-perspective">§٣</a>)</td></tr>
+    <tr><td>الاستمرار / المصادقة / الفوترة</td><td>أمان المعاملات، الصحة، الامتثال المؤسسي</td><td>نواة Java/C#؛ BFF Node صغير أمامها</td><td>ثقيل المعاملات، طويل العمر — الممر المؤسسي (<a href="#sec-the-backend-perspective">منظور الخلفية</a>)</td></tr>
     <tr><td>عميل دون اتصال على الجوّال</td><td>إخلاص المنصة مقابل مشاركة الكود</td><td>React Native للمنطق المشترك؛ طبقات أصلية حيث تتطلب الإيماءات</td><td>RN افتراضياً؛ أسطح أصلية حين يتدهور إخلاص المنصة</td></tr>
   </tbody>
 </table>
 
-<p><strong>ما يظهره المثال:</strong> لا توجد «أفضل لغة» واحدة — كل شريحة تجيب قيداً مسيطراً مختلفاً. المنتج نفسه يمتد على خمسة ممرات، وقاعدة هذا المستند تختار لغة لكل واحدة باستقلال. اللحامات (كود CRDT المشترك، عقد BFF↔النواة المعنون، الحضور على المقبس) هي حيث تُدفع كلفة التوافق (<a href="#sec-choosing-a-stack">§٩</a>، <a href="#sec-failure-modes">§١١</a>).</p>
+<p><strong>ما يظهره المثال:</strong> لا توجد «أفضل لغة» واحدة — كل شريحة تجيب قيداً مسيطراً مختلفاً. المنتج نفسه يمتد على خمسة ممرات، وقاعدة هذا المستند تختار لغة لكل واحدة باستقلال. اللحامات (كود CRDT المشترك، عقد BFF↔النواة المعنون، الحضور على المقبس) هي حيث تُدفع كلفة التوافق (<a href="#sec-choosing-a-stack">اختيار الكومة</a>، <a href="#sec-failure-modes">أنماط الفشل</a>).</p>
 <h2 id="sec-the-future-signals-worth-watching">المستقبل — إشارات تستحق المراقبة</h2>
 
 <table>
   <thead><tr><th>الإشارة</th><th>ماذا ستعني</th><th>أي قسم تلمس</th></tr></thead>
   <tbody>
-    <tr><td>نموذج مكونات WASM</td><td>وحدات غير JS أكثر داخل أنظمة JS البيئية، دون استبدال</td><td>تأطير <a href="#sec-the-other-perspective-edge-serverless-build-tools">§٧</a> الشريك</td></tr>
-    <tr><td>توحيد زمن الحافة (WinterCG)</td><td>الحافة تتقارب على واجهة JS واحدة — JS تبقى صمغ الحافة</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">§٧</a> افتراضي بالمضيف</td></tr>
-    <tr><td>اقتراح ترميز الأنواع في JS</td><td>أنواع خفيفة في زمن التشغيل نفسه — اقتصاد «الترجمة بعيداً» في TS يتحول</td><td>أطروحة تمديد <a href="#sec-the-typescript-shift-the-js-competitor-that-survived">§٢</a></td></tr>
-    <tr><td>خيوط حرة / مترجمات أسرع في Python</td><td>جدار GIL/الأداء في بايثون يتآكل — انقلاب Mojo يزدحم</td><td>طبقة نموذج <a href="#sec-the-ai-data-science-perspective">§٦</a></td></tr>
-    <tr><td>Kotlin Multiplatform</td><td>Kotlin ينافس عبر الجوّال والخلفية، لا أندرويد فقط</td><td>ممر <a href="#sec-the-mobile-perspective">§٤</a> الجوّال</td></tr>
-    <tr><td>Swift على الخادم</td><td>ينمي مجالات خلفية مجاورة لآبل</td><td>ممرات <a href="#sec-the-backend-perspective">§٣</a> الخلفية</td></tr>
-    <tr><td>Rust في أدوات الواجهة الأمامية</td><td>أدوات نظام JS البيئي أكثر تُعاد كتابتها بـ Rust (swc، rolldown)</td><td>انقلاب أدوات <a href="#sec-the-other-perspective-edge-serverless-build-tools">§٧</a></td></tr>
-    <tr><td>AI المتصفح / WebGPU</td><td>استدلال أكثر داخل مضيف JS — ادعاء ممر التوصيل في JS يقوى</td><td>توصيل <a href="#sec-the-ai-data-science-perspective">§٦</a> الذكاء الاصطناعي</td></tr>
+    <tr><td>نموذج مكونات WASM</td><td>وحدات غير JS أكثر داخل أنظمة JS البيئية، دون استبدال</td><td>تأطير <a href="#sec-the-other-perspective-edge-serverless-build-tools">Edge وServerless وأدوات البناء</a> الشريك</td></tr>
+    <tr><td>توحيد زمن الحافة (WinterCG)</td><td>الحافة تتقارب على واجهة JS واحدة — JS تبقى صمغ الحافة</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">Edge وServerless وأدوات البناء</a> افتراضي بالمضيف</td></tr>
+    <tr><td>اقتراح ترميز الأنواع في JS</td><td>أنواع خفيفة في زمن التشغيل نفسه — اقتصاد «الترجمة بعيداً» في TS يتحول</td><td>أطروحة تمديد <a href="#sec-the-typescript-shift-the-js-competitor-that-survived">تحول TypeScript</a></td></tr>
+    <tr><td>خيوط حرة / مترجمات أسرع في Python</td><td>جدار GIL/الأداء في بايثون يتآكل — انقلاب Mojo يزدحم</td><td>طبقة نموذج <a href="#sec-the-ai-data-science-perspective">منظور الذكاء الاصطناعي</a></td></tr>
+    <tr><td>Kotlin Multiplatform</td><td>Kotlin ينافس عبر الجوّال والخلفية، لا أندرويد فقط</td><td>ممر <a href="#sec-the-mobile-perspective">منظور الجوّال</a> الجوّال</td></tr>
+    <tr><td>Swift على الخادم</td><td>ينمي مجالات خلفية مجاورة لآبل</td><td>ممرات <a href="#sec-the-backend-perspective">منظور الخلفية</a> الخلفية</td></tr>
+    <tr><td>Rust في أدوات الواجهة الأمامية</td><td>أدوات نظام JS البيئي أكثر تُعاد كتابتها بـ Rust (swc، rolldown)</td><td>انقلاب أدوات <a href="#sec-the-other-perspective-edge-serverless-build-tools">Edge وServerless وأدوات البناء</a></td></tr>
+    <tr><td>AI المتصفح / WebGPU</td><td>استدلال أكثر داخل مضيف JS — ادعاء ممر التوصيل في JS يقوى</td><td>توصيل <a href="#sec-the-ai-data-science-perspective">منظور الذكاء الاصطناعي</a> الذكاء الاصطناعي</td></tr>
   </tbody>
 </table>
 <h2 id="sec-summary-checklist">قائمة الملخص</h2>
@@ -552,6 +568,33 @@ src.pipe(res);
 <section class="win">
   <h3>ما تغطيه هذه الوثيقة</h3>
   <p>أين تعمل JS، ما يستخدمه كل مضيف منها، واللغات المبنية لمحاربتها في كل مسار. لا اللغة نفسها (<a href="./javascript-the-language.html">javascript-the-language</a>). لا مشهد أطر الواجهة الأمامية (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>). لا دواخل رياكت (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a>).</p>
+</section>
+
+<details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>التنضيج التدريجي / التنضيد البنيوي</strong> — خاصيتا التصميم الأساسيتان لـ TS. ابحث "TypeScript structural typing".</li>
+  <li><strong>محو الأنواع</strong> — لماذا تختفي الأنواع عند التشغيل. ابحث "TypeScript type erasure runtime".</li>
+  <li><strong>الضغط العكسي (Backpressure)</strong> — التدفقات توقف مصدرها حين يكون المصرّف بطيئاً. ابحث "Node stream backpressure".</li>
+  <li><strong>BFF (خلفية من أجل الواجهة)</strong> — طبقة JS أمام نواة الخلفية. ابحث "backend for frontend pattern".</li>
+  <li><strong>شجرة الخنق (Strangler fig)</strong> — هجرة تدريجية حول نواة قديمة. ابحث "strangler fig migration".</li>
+  <li><strong>GIL</strong> — قفل بايثون العام؛ جدار الأداء في مسار الذكاء الاصطناعي. ابحث "Python GIL explained".</li>
+  <li><strong>FFI</strong> — واجهة الدوال الأجنبية؛ كيف تستدعي اللغات بعضها أصلياً. ابحث "FFI napi-rs".</li>
+  <li><strong>إشراف BEAM</strong> — نموذج تحمّل الأخطاء في Erlang/Elixir. ابحث "BEAM let it crash supervision".</li>
+  <li><strong>WinterCG</strong> — جهد توحيد واجهات أوقات التشغيل الطرفية. ابحث "WinterCG runtime keys".</li>
+  <li><strong>CRDT</strong> — نوع البيانات المنسوخ بلا تعارض وراء التحرير التعاوني. ابحث "CRDT vs OT collaborative editing".</li>
+</ul>
+</details>
+
+<section class="teacher">
+  <h3>اسأل معلمك</h3>
+  <p>ثلاثة متابعات لتعميق هذا:</p>
+  <ul>
+    <li>«اختر نظاماً عملت عليه: أي شريحة كانت لغتها خاطئة لقيدها، وكم كلّف ذلك سنوياً؟»</li>
+    <li>«حين يقول فريقنا 'ينبغي إعادة كتابة هذا بـ Go/Rust'، أي قيد انقلب فعلاً — وهل إجابة الفريق تبدأ من القيد أم من السيرة الذاتية؟»</li>
+    <li>«أين يدفع معماريّنا اليوم ضريبة interop، وأي درز ستحذفه لو استطعت؟»</li>
+  </ul>
 </section>
 
 <footer class="lesson-foot">

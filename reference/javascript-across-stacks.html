@@ -13,8 +13,9 @@
   <p class="kicker">REFERENCE · JS ACROSS STACKS</p>
   <h1>JavaScript Across Stacks — Where JS Runs, and Who Fights It</h1>
   <p class="meta">How JS looks from the frontend, backend, mobile, embedded, and AI perspectives — what each one uses of JS, what about JS doesn't fit, and the languages written to fill that gap (TypeScript, .NET/C#, Java/Spring Boot, Kotlin, Dart, Rust, Python). For each competitor: one positioning table on what justifies creating a new language instead of extending an existing one. Companion to <a href="./javascript-the-language.html">javascript-the-language</a>.</p>
+        <p class="meta"><strong>Who this is for:</strong> developers choosing between language stacks — or inheriting a polyglot system and needing the constraint logic behind each lane's language bets.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>Language:</strong> English · <a href="./ar/javascript-across-stacks.html">العربية</a>
+          <strong>Last reviewed:</strong> 2026-08-21 · <strong>Language:</strong> English · <a href="./ar/javascript-across-stacks.html">العربية</a>
         </p>
       </header>
 
@@ -66,7 +67,7 @@
 
 <h2 id="sec-writing-typed-js-the-type-system-in-practice">Writing typed JS — the type system in practice</h2>
 
-<p><a href="#sec-the-typescript-shift-the-js-competitor-that-survived">§2</a> argued <em>why</em> TS exists. This is <em>how</em> it works as a system of rules: a static overlay that type-checks before the engine ever runs, then erases to plain JS. Three ideas are the whole job.</p>
+<p><a href="#sec-the-typescript-shift-the-js-competitor-that-survived">the TypeScript shift</a> argued <em>why</em> TS exists. This is <em>how</em> it works as a system of rules: a static overlay that type-checks before the engine ever runs, then erases to plain JS. Three ideas are the whole job.</p>
 
 <table>
   <thead><tr><th>Idea</th><th>What it means</th><th>The trap it pre-empts</th></tr></thead>
@@ -132,7 +133,7 @@ function handle(r: Result): number {
   return r.error.length;                        // narrows to the err branch
 }</code></pre>
 
-<p><strong>What this section is not:</strong> a full TS tutorial. It's the language — to build logic per project-model, practice typing alongside any JS in this series. For the toolchain (tsc, tsconfig, JSX vs not) see <a href="./javascript-the-language.html">javascript-the-language</a> <a href="#sec-failure-modes">§11</a> tooling; the type-system rules above are the part that ever matters.</p>
+<p><strong>What this section is not:</strong> a full TS tutorial. It's the language — to build logic per project-model, practice typing alongside any JS in this series. For the toolchain (tsc, tsconfig, JSX vs not) see <a href="./javascript-the-language.html">javascript-the-language</a> <a href="#sec-failure-modes">failure modes</a> tooling; the type-system rules above are the part that ever matters.</p>
 
 <h3>3 TypeScript in production — value and traps</h3>
 
@@ -143,7 +144,7 @@ function handle(r: Result): number {
 <table>
   <thead><tr><th>Trap</th><th>Why it bites</th><th>The habit that fixes it</th></tr></thead>
   <tbody>
-    <tr><td>Assuming types validate runtime data</td><td>Types erase; an API payload or user input passes a type-check unverified</td><td>Validate at the boundary (<a href="#sec-writing-typed-js-the-type-system-in-practice">§2b.2</a>) — schema libs (zod, valibot, arktype) at the I/O edge</td></tr>
+    <tr><td>Assuming types validate runtime data</td><td>Types erase; an API payload or user input passes a type-check unverified</td><td>Validate at the boundary (<a href="#sec-writing-typed-js-the-type-system-in-practice">the runtime boundary</a>) — schema libs (zod, valibot, arktype) at the I/O edge</td></tr>
     <tr><td><code>any</code> as a reflex</td><td>Quiets the compiler, not the bug; the type silently stops guarding that path</td><td>Use <code>unknown</code>, then narrow; keep <code>any</code> for structured interop shims only</td></tr>
     <tr><td>Strict off</td><td>Much of the value disappears with <code>implicitAny</code> un-enforced</td><td>Ship <code>tsconfig</code> with <code>strict: true</code> from day one (the only mode to end games in)</td></tr>
     <tr><td>Enum ceremony</td><td>Runtime objects with all the ceremony; often the wrong tool</td><td>Prefer union string literals + <code>as const</code> — tree-shakeable, exact</td></tr>
@@ -248,7 +249,7 @@ function handle(r: Result): number {
 
 <h2 id="sec-the-node-runtime-how-js-actually-behaves-on-a-server">The Node runtime — how JS actually behaves on a server</h2>
 
-<p><a href="#sec-the-backend-perspective">§3</a> positioned Node against other backend languages; this subsection is about the <em>runtime itself</em> — the mechanisms that make server-side JS behave the way it does. Frameworks come and go, but these mechanics are the constants.</p>
+<p><a href="#sec-the-backend-perspective">the backend perspective</a> positioned Node against other backend languages; this subsection is about the <em>runtime itself</em> — the mechanisms that make server-side JS behave the way it does. Frameworks come and go, but these mechanics are the constants.</p>
 
 <h3>1 The server event loop — phases, and the microtask rule</h3>
 <p>The browser and Node share the same event loop family, but the server has no render frame forcing the loop to yield between callbacks — a blocked loop blocks <em>every</em> request. The loop runs in phases in fixed order: <strong>timers</strong> (setTimeout/setInterval) → <strong>pending</strong> (deferred I/O callbacks) → <strong>poll</strong> (wait for I/O, run most callbacks) → <strong>check</strong> (setImmediate) → <strong>close</strong> (closed handles). Between every phase — and after every callback — the <em>microtask queue</em> drains first: <code>queueMicrotask</code>, and every <code>Promise.then</code> continuation.</p>
@@ -481,7 +482,7 @@ src.pipe(res);
 
 <h2 id="sec-choosing-a-stack">Choosing a Stack</h2>
 
-<p>The pattern (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">§8</a>) explains winners after the fact; this is the forward version — how to pick a stack today. Same rule, applied first: identify the <em>dominant constraint</em>, then the language whose design bet matches it. "Which language is best?" is the wrong question. "Which constraint dominates, and who bet on it?" is the one that answers.</p>
+<p>The pattern (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">the constraint-inversion pattern</a>) explains winners after the fact; this is the forward version — how to pick a stack today. Same rule, applied first: identify the <em>dominant constraint</em>, then the language whose design bet matches it. "Which language is best?" is the wrong question. "Which constraint dominates, and who bet on it?" is the one that answers.</p>
 
 <table>
   <thead><tr><th>Constraint</th><th>Question to ask</th><th>What to check</th></tr></thead>
@@ -509,7 +510,7 @@ src.pipe(res);
 <table>
   <thead><tr><th>From → To</th><th>Trigger</th><th>Strategy</th><th>Main risk</th></tr></thead>
   <tbody>
-    <tr><td>JS → TS</td><td>Team grows past ~5 devs; refactor pain; runtime shape bugs</td><td>Gradual (<a href="#sec-writing-typed-js-the-type-system-in-practice">§2b.3</a>): allowJs → @ts-check → .d.ts → strict</td><td>Type fatigue; false confidence if boundaries unvalidated</td></tr>
+    <tr><td>JS → TS</td><td>Team grows past ~5 devs; refactor pain; runtime shape bugs</td><td>Gradual (<a href="#sec-writing-typed-js-the-type-system-in-practice">production traps</a>): allowJs → @ts-check → .d.ts → strict</td><td>Type fatigue; false confidence if boundaries unvalidated</td></tr>
     <tr><td>Node → Go</td><td>High-throughput network service; simple concurrency model suffices</td><td>Keep Node at the BFF/edge; extract the hot service</td><td>Team unfamiliarity; ops split between two runtimes</td></tr>
     <tr><td>Node → Rust</td><td>CPU-bound hot path; memory safety; WASM need</td><td>Extract one module as a library or sidecar service</td><td>Ownership/borrowing learning curve</td></tr>
     <tr><td>Node → Java/C#</td><td>Enterprise compliance, transactional core, long-lived systems</td><td>Strangler-fig the core domain; keep JS at the edges</td><td>Ceremony, slower iteration cadence</td></tr>
@@ -530,16 +531,16 @@ src.pipe(res);
   <thead><tr><th>Failure mode</th><th>What happens</th><th>Fix</th></tr></thead>
   <tbody>
     <tr><td>Resume-driven language choice</td><td>Team picks Rust/Go/Kotlin for prestige, not constraints</td><td>Start from the dominant constraint, not the language</td></tr>
-    <tr><td>Assuming TS types are runtime safety</td><td>Invalid API payloads pass type-check; crash at runtime</td><td>Validate at runtime boundaries (<a href="#sec-writing-typed-js-the-type-system-in-practice">§2b.3</a>)</td></tr>
+    <tr><td>Assuming TS types are runtime safety</td><td>Invalid API payloads pass type-check; crash at runtime</td><td>Validate at runtime boundaries (<a href="#sec-writing-typed-js-the-type-system-in-practice">production traps</a>)</td></tr>
     <tr><td>Treating JS as "one language" everywhere</td><td>Browser APIs assumed on Node; Node modules assumed in browser</td><td>Identify the host first; platform APIs differ per stack</td></tr>
     <tr><td>Node for CPU-bound work without workers</td><td>Event loop blocks; every request stalls</td><td>Worker threads, native modules, or another language (Go/Rust)</td></tr>
     <tr><td>React Native when native fidelity matters</td><td>Gestures/platform conventions feel wrong; poor platform features</td><td>Move critical surfaces native; keep JS for the rest</td></tr>
     <tr><td>JS pushed past-device RAM budgets</td><td>Runtime can't fit; battery drains; GC pauses</td><td>C/C++/Rust/MicroPython on constrained devices</td></tr>
     <tr><td>Python for high-throughput without understanding GIL</td><td>Latency/throughput surprises</td><td>Go/Rust/Java/C#, or write Python's hot path in a native module</td></tr>
     <tr><td>Compile-to-JS language in browser</td><td>Ecosystem/tooling friction, no runtime advantage</td><td>Prefer TS extension, or WASM partnership over replacement</td></tr>
-    <tr><td>Invent when extension works</td><td>Migration cliff, ecosystem loss</td><td>Extend when the constraint is unchanged (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">§8</a>)</td></tr>
+    <tr><td>Invent when extension works</td><td>Migration cliff, ecosystem loss</td><td>Extend when the constraint is unchanged (<a href="#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">the constraint-inversion pattern</a>)</td></tr>
     <tr><td>Extend when invention is needed</td><td>Patching a runtime whose bet no longer fits</td><td>The constraint inverted — the tool must change</td></tr>
-    <tr><td>Ignoring interop cost</td><td>Polyglot system glued with fragile boundaries</td><td>Prefer languages with strong FFI/contracts (<a href="#sec-choosing-a-stack">§9</a> interop row)</td></tr>
+    <tr><td>Ignoring interop cost</td><td>Polyglot system glued with fragile boundaries</td><td>Prefer languages with strong FFI/contracts (<a href="#sec-choosing-a-stack">choosing a stack</a> interop row)</td></tr>
   </tbody>
 </table>
 
@@ -555,16 +556,16 @@ src.pipe(res);
     <tr><td>Invent when the constraint inverts</td><td>Go/Rust/Swift — the old design bet no longer fits</td></tr>
     <tr><td>Ecosystem beats syntax</td><td>Libraries and tooling decide adoption (Python's NumPy·PyTorch)</td></tr>
     <tr><td>Interop beats purity</td><td>Languages that integrate spread faster than "better" ones</td></tr>
-    <tr><td>Runtime matters more than syntax</td><td>Same syntax means next to different things per host (<a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">§5b</a>)</td></tr>
+    <tr><td>Runtime matters more than syntax</td><td>Same syntax means next to different things per host (<a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">cross-stack mental models</a>)</td></tr>
     <tr><td>Types do not replace runtime validation</td><td>Static checks stop at the boundary; validate external data</td></tr>
     <tr><td>Team skill is a real constraint</td><td>The best theoretical language you can't staff is the wrong choice</td></tr>
-    <tr><td>Migration cost is part of the design</td><td>Choice includes the cost of moving later (<a href="#sec-migration-paths">§10</a>)</td></tr>
+    <tr><td>Migration cost is part of the design</td><td>Choice includes the cost of moving later (<a href="#sec-migration-paths">migration paths</a>)</td></tr>
   </tbody>
 </table>
 
 <h2 id="sec-a-worked-example-a-realtime-collaborative-editor">A Worked Example — a Realtime Collaborative Editor</h2>
 
-<p>A product, a set of constraints, and the language decisions each one forces. This is <a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">§5b</a>'s mental models and <a href="#sec-choosing-a-stack">§9</a>'s checklist applied to one concrete thing.</p>
+<p>A product, a set of constraints, and the language decisions each one forces. This is <a href="#sec-mental-models-how-cross-stack-reasoning-actually-works">cross-stack mental models</a>'s mental models and <a href="#sec-choosing-a-stack">choosing a stack</a>'s checklist applied to one concrete thing.</p>
 
 <p><strong>The product:</strong> multi-user document editing — live cursors, presence, offline edits, instant sync, server persistence.</p>
 
@@ -574,26 +575,26 @@ src.pipe(res);
     <tr><td>Browser editor UI</td><td>Host = browser, only JS/WASM runs</td><td>TS</td><td>Mandatory host; TS extends JS without a runtime change</td></tr>
     <tr><td>Collaboration logic (CRDT merge)</td><td>Correctness under concurrency; same algorithm must run in browser, server, and integration tests</td><td>TS shared module, optionally hot core compiled to WASM</td><td>Shared code keeps one source of truth; WASM for compute-heavy paths</td></tr>
     <tr><td>Realtime server (connections, presence, fan-out)</td><td>I/O-bound, many live connections, p99 latency</td><td>Node (JS-stack unity) or Elixir (BEAM supervision, presence)</td><td>Both bet on realtime I/O; Node keeps the team monoglot, Elixir wins fault-tolerance at fleet scale</td></tr>
-    <tr><td>Persistence / auth / billing</td><td>Transaction safety, correctness, enterprise compliance</td><td>Java/C# core; small Node BFF in front</td><td>Transaction-heavy, long-lived — the enterprise lane (<a href="#sec-the-backend-perspective">§3.1–3.2</a>)</td></tr>
+    <tr><td>Persistence / auth / billing</td><td>Transaction safety, correctness, enterprise compliance</td><td>Java/C# core; small Node BFF in front</td><td>Transaction-heavy, long-lived — the enterprise lane (<a href="#sec-the-backend-perspective">the Java/C# lanes</a>)</td></tr>
     <tr><td>Offline client on mobile</td><td>Platform fidelity vs code-sharing</td><td>React Native for shared logic; native layers where gestures demand</td><td>RN by default; native surfaces when platform fidelity degrades</td></tr>
   </tbody>
 </table>
 
-<p><strong>What the example shows:</strong> no single "best language" — each slice answers a different dominant constraint. The same product spans five lanes, and this doc's rule picks a language for each independently. The seams (shared CRDT code, the typed BFF↔core contract, presence on the socket) are where interop cost is paid (<a href="#sec-choosing-a-stack">§9</a>, <a href="#sec-failure-modes">§11</a>).</p>
+<p><strong>What the example shows:</strong> no single "best language" — each slice answers a different dominant constraint. The same product spans five lanes, and this doc's rule picks a language for each independently. The seams (shared CRDT code, the typed BFF↔core contract, presence on the socket) are where interop cost is paid (<a href="#sec-choosing-a-stack">choosing a stack</a>, <a href="#sec-failure-modes">failure modes</a>).</p>
 
 <h2 id="sec-the-future-signals-worth-watching">The Future — Signals Worth Watching</h2>
 
 <table>
   <thead><tr><th>Signal</th><th>What it would mean</th><th>Which section it touches</th></tr></thead>
   <tbody>
-    <tr><td>WASM component model</td><td>More non-JS modules inside JS ecosystems, without replacement</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">§7</a> partner framing</td></tr>
-    <tr><td>Edge runtime standardization (WinterCG)</td><td>The edge converges on one JS API — JS stays the edge glue</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">§7</a> default-by-host</td></tr>
-    <tr><td>Type annotations proposal in JS</td><td>Lightweight typing in the runtime itself — TS's "compile away" economics shift</td><td><a href="#sec-the-typescript-shift-the-js-competitor-that-survived">§2</a> extension thesis</td></tr>
-    <tr><td>Python free-threading / faster interpreters</td><td>Python's GIL/perf wall erodes — Mojo's inversion gets crowded</td><td><a href="#sec-the-ai-data-science-perspective">§6</a> model layer</td></tr>
-    <tr><td>Kotlin Multiplatform</td><td>Kotlin competes across mobile + backend, not just Android</td><td><a href="#sec-the-mobile-perspective">§4</a> mobile lane</td></tr>
-    <tr><td>Swift on server</td><td>Grows Apple-adjacent backend niches</td><td><a href="#sec-the-backend-perspective">§3</a> backend lanes</td></tr>
-    <tr><td>Rust in frontend tooling</td><td>More JS-ecosystem tools rewritten in Rust (swc, rolldown)</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">§7</a> tools inversion</td></tr>
-    <tr><td>Browser AI / WebGPU</td><td>More inference inside the JS host — JS's delivery-lane claim strengthens</td><td><a href="#sec-the-ai-data-science-perspective">§6</a> AI delivery</td></tr>
+    <tr><td>WASM component model</td><td>More non-JS modules inside JS ecosystems, without replacement</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">edge, serverless, and build tools</a> partner framing</td></tr>
+    <tr><td>Edge runtime standardization (WinterCG)</td><td>The edge converges on one JS API — JS stays the edge glue</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">edge, serverless, and build tools</a> default-by-host</td></tr>
+    <tr><td>Type annotations proposal in JS</td><td>Lightweight typing in the runtime itself — TS's "compile away" economics shift</td><td><a href="#sec-the-typescript-shift-the-js-competitor-that-survived">the TypeScript shift</a> extension thesis</td></tr>
+    <tr><td>Python free-threading / faster interpreters</td><td>Python's GIL/perf wall erodes — Mojo's inversion gets crowded</td><td><a href="#sec-the-ai-data-science-perspective">the AI/data-science perspective</a> model layer</td></tr>
+    <tr><td>Kotlin Multiplatform</td><td>Kotlin competes across mobile + backend, not just Android</td><td><a href="#sec-the-mobile-perspective">the mobile perspective</a> mobile lane</td></tr>
+    <tr><td>Swift on server</td><td>Grows Apple-adjacent backend niches</td><td><a href="#sec-the-backend-perspective">the backend perspective</a> backend lanes</td></tr>
+    <tr><td>Rust in frontend tooling</td><td>More JS-ecosystem tools rewritten in Rust (swc, rolldown)</td><td><a href="#sec-the-other-perspective-edge-serverless-build-tools">edge, serverless, and build tools</a> tools inversion</td></tr>
+    <tr><td>Browser AI / WebGPU</td><td>More inference inside the JS host — JS's delivery-lane claim strengthens</td><td><a href="#sec-the-ai-data-science-perspective">the AI/data-science perspective</a> AI delivery</td></tr>
   </tbody>
 </table>
 
@@ -609,13 +610,40 @@ src.pipe(res);
     <tr><td>Does the workload expose a JS weakness?</td><td>CPU-bound, memory safety, realtime, embedded RAM</td></tr>
     <tr><td>Is the ecosystem mature enough?</td><td>Libraries, observability, deployment, hiring pool</td></tr>
     <tr><td>What is the migration path if the choice is wrong?</td><td>Strangler fig, FFI, BFF split, WASM module, native module</td></tr>
-    <tr><td>Are runtime boundaries validated?</td><td>Types do not validate external data (<a href="#sec-writing-typed-js-the-type-system-in-practice">§2b</a>, <a href="#sec-migration-paths">§10</a>)</td></tr>
+    <tr><td>Are runtime boundaries validated?</td><td>Types do not validate external data (<a href="#sec-writing-typed-js-the-type-system-in-practice">typed JS in practice</a>, <a href="#sec-migration-paths">migration paths</a>)</td></tr>
   </tbody>
 </table>
 
 <section class="win">
   <h3>What this doc covers</h3>
-  <p>Where JS runs, what each host uses of it, and the languages built to fight it in each lane — plus how to choose a stack (<a href="#sec-choosing-a-stack">§9</a>), migrate (<a href="#sec-migration-paths">§10</a>), avoid the common failure modes (<a href="#sec-failure-modes">§11</a>), and reason through a real product (<a href="#sec-a-worked-example-a-realtime-collaborative-editor">§13</a>). Not the JS language itself (<a href="./javascript-the-language.html">javascript-the-language</a>), not the frontend framework landscape (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>), not React internals (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a>), not service or API architecture (<a href="./system-design.html">system-design</a>, <a href="./api-design.html">api-design</a>).</p>
+  <p>Where JS runs, what each host uses of it, and the languages built to fight it in each lane — plus how to choose a stack (<a href="#sec-choosing-a-stack">choosing a stack</a>), migrate (<a href="#sec-migration-paths">migration paths</a>), avoid the common failure modes (<a href="#sec-failure-modes">failure modes</a>), and reason through a real product (<a href="#sec-a-worked-example-a-realtime-collaborative-editor">the worked example</a>). Not the JS language itself (<a href="./javascript-the-language.html">javascript-the-language</a>), not the frontend framework landscape (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>), not React internals (<a href="./class-to-hooks-paradigm-shift.html">class-to-hooks-paradigm-shift</a>), not service or API architecture (<a href="./system-design.html">system-design</a>, <a href="./api-design.html">api-design</a>).</p>
+</section>
+
+<details>
+<summary><h3 style="display:inline">Search vocabulary — what things are called</h3></summary>
+<p>You cannot search for a problem you cannot name. The terms of art this doc uses, each one a working search key:</p>
+<ul>
+  <li><strong>Gradual typing / structural typing</strong> — TS's two core design properties. Search "TypeScript structural typing".</li>
+  <li><strong>Type erasure</strong> — why types vanish at runtime. Search "TypeScript type erasure runtime".</li>
+  <li><strong>Backpressure</strong> — streams pausing their source when the sink is slow. Search "Node stream backpressure".</li>
+  <li><strong>BFF (backend-for-frontend)</strong> — the JS layer in front of a core backend. Search "backend for frontend pattern".</li>
+  <li><strong>Strangler fig</strong> — incremental migration around a legacy core. Search "strangler fig migration".</li>
+  <li><strong>GIL</strong> — Python's global interpreter lock; the AI-lane perf wall. Search "Python GIL explained".</li>
+  <li><strong>FFI</strong> — foreign-function interface; how languages call each other natively. Search "FFI napi-rs".</li>
+  <li><strong>BEAM supervision</strong> — Erlang/Elixir's fault-tolerance model. Search "BEAM let it crash supervision".</li>
+  <li><strong>WinterCG</strong> — the edge-runtime API standardization effort. Search "WinterCG runtime keys".</li>
+  <li><strong>CRDT</strong> — conflict-free replicated data type behind collaborative editing. Search "CRDT vs OT collaborative editing".</li>
+</ul>
+</details>
+
+<section class="teacher">
+  <h3>Ask your teacher</h3>
+  <p>Three follow-ups to deepen this:</p>
+  <ul>
+    <li>"Pick a system you've worked on: which slice had the wrong language for its constraint, and what did it cost per year?"</li>
+    <li>"When our team says 'we should rewrite this in Go/Rust', which constraint has actually inverted — and is the team's answer constraint-first or resume-first?"</li>
+    <li>"Where does our architecture pay interop tax today, and which seam would you delete if you could?"</li>
+  </ul>
 </section>
 
 <footer class="lesson-foot">

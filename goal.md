@@ -64,4 +64,5 @@ Finish this plan Plan: improve-doc campaign — 10 docs (passes 1–10)
 ## Progress log
 (append one line per step)
 - 2026-08-21: v68 — pass 3/10 react-2024-and-beyond ✅: de-numbered 61 refs, repaired 12 nested-anchor folds + 2 base64-corrupted folds (both twins), markers/vocabulary/teacher added; gates all green, ratio 0.85.
+- 2026-08-21: v69 — pass 4/10 javascript-across-stacks ✅: 54 refs de-numbered both twins, markers/vocabulary/teacher added; h3-parity gate caught missing AR 'other backend lanes' section → translated + inserted (22/22); gates green ratio 0.77.
 - 2026-08-21: v60–v67 — passes 1–2 complete (javascript-the-language, class-to-hooks incl. uniqueness audit/prune/full AR reconciliation); skill hardened mid-campaign (h3-parity gate, parse-integrity gate, bilingual markers, ledger notation).
