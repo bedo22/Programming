@@ -190,7 +190,7 @@
       <tr>
       <td><dfn>معمارية قاعدة الكود (Codebase Architecture)</dfn></td>
       <td>الشكل المادي للحدود: شجرة المجلدات. مجلدات الميزات مقابل المجلدات الطبقية، الموضع المشترك (colocation)، ولماذا src/. إذا لم يستطع الكود رؤية الحدود فحدودك غير موجودة — ويجب أن تقابل وحدات التسليم مجلدات الميزات (شرائح عمودية).</td>
-      <td>التصميم المعماري <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">Component layer (micro) — where system design meets code</a>؛ ممارسة العمل الحر (EN) §النطاق</td>
+      <td>التصميم المعماري <a href="./system-design.html#sec-component-layer-micro-where-system-design-meets-code">Component layer (micro) — where system design meets code</a>؛ ممارسة العمل الحر (EN) <a href="../freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost">The scoping call — where projects are won or lost</a></td>
     </tr>
   </tbody>
 </table>
@@ -866,17 +866,17 @@
     <tr>
       <td><dfn>سجل المخاطر (Risk Register)</dfn></td>
       <td>الجدول الحي للتهديدات × الأصول × الاحتمال × الأثر × المعالجة × المالك — الآلة التي تجعل "الأمن إدارة مخاطر" انضباطاً تشغيلياً لا شعاراً. الصفوف تتغير: أعد التقييم عند تغيير النظام أو تهديدات جديدة أو حوادث.</td>
-      <td>الأمن ونمذجة التهديدات (EN) §إدارة المخاطر</td>
+      <td>الأمن ونمذجة التهديدات (EN) <a href="../security-and-threat-modeling.html#sec-risk-management-the-decision-framework">Risk management — the decision framework</a></td>
     </tr>
     <tr>
       <td><dfn>الامتثال (Compliance)</dfn></td>
       <td>ما يحدث حين تصبح متطلبات الأمن قابلة للتدقيق — قانون أو عقد أو قواعد صناعية (SOC 2، ISO 27001، PCI DSS، HIPAA، GDPR، NIST CSF، FedRAMP). الامتثال ليس أماناً: هو الأرضية التي يطلبها المنظم؛ الأمان حماية الأصول فوق الأرضية.</td>
-      <td>الأمن ونمذجة التهديدات (EN) §الامتثال؛ المدفوعات والتجارة (EN) <a href="../payments-and-commerce.html#sec-pci-dss-and-compliance-the-rules-you-inherited">PCI DSS and compliance — the rules you inherited</a></td>
+      <td>الأمن ونمذجة التهديدات (EN) <a href="../security-and-threat-modeling.html#sec-compliance-when-security-becomes-auditable">Compliance — when security becomes auditable</a>؛ المدفوعات والتجارة (EN) <a href="../payments-and-commerce.html#sec-pci-dss-and-compliance-the-rules-you-inherited">PCI DSS and compliance — the rules you inherited</a></td>
     </tr>
     <tr>
       <td><dfn>SAST / DAST / SCA</dfn></td>
       <td>أصناف الماسحات الثلاثة: فحص أمان التطبيقات الثابت (أنماط الكود في CI)، فحص أمان التطبيقات الديناميكي (ثغرات وقت التشغيل ضد بيئة الاختبار)، تحليل تركيب البرمجيات (CVEs معروفة في التبعيات). معاً يتحققون من تخفيفات نموذج التهديدات — يجدون أصناف الأخطاء، لا منطق العمل.</td>
-      <td>الأمن ونمذجة التهديدات (EN) §الخطوة 6، §النظام البيئي</td>
+      <td>الأمن ونمذجة التهديدات (EN) §الخطوة 6، <a href="../security-and-threat-modeling.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a></td>
     </tr>
   </tbody>
 </table>
@@ -929,7 +929,7 @@
     <tr>
       <td><dfn>الاستجابة للحوادث (Incident Response)</dfn></td>
       <td>المراقبة والتشغيل</td>
-      <td>المراقبة والتشغيل (EN) <a href="./observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment">Postmortems &amp;amp; learning — making failure an investment</a>، <a href="./observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a>؛ SDP (EN) <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>؛ الأمن ونمذجة التهديدات (EN) §إدارة المخاطر</td>
+      <td>المراقبة والتشغيل (EN) <a href="./observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment">Postmortems &amp;amp; learning — making failure an investment</a>، <a href="./observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a>؛ SDP (EN) <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>؛ الأمن ونمذجة التهديدات (EN) <a href="../security-and-threat-modeling.html#sec-risk-management-the-decision-framework">Risk management — the decision framework</a></td>
     </tr>
     <tr>
       <td><dfn>التقرير البعدي (Postmortem)</dfn></td>
@@ -939,7 +939,7 @@
     <tr>
       <td><dfn>دليل التشغيل (Runbook)</dfn></td>
       <td>المراقبة والتشغيل</td>
-      <td>المراقبة والتشغيل (EN) <a href="./observability-and-operations.html#sec-principles-the-shared-constants">Principles — the shared constants</a>، <a href="./observability-and-operations.html#sec-common-failure-modes">Common failure modes</a>؛ SDP (EN) <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>؛ الأمن ونمذجة التهديدات (EN) §نمذجة التهديدات</td>
+      <td>المراقبة والتشغيل (EN) <a href="./observability-and-operations.html#sec-principles-the-shared-constants">Principles — the shared constants</a>، <a href="./observability-and-operations.html#sec-common-failure-modes">Common failure modes</a>؛ SDP (EN) <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>؛ الأمن ونمذجة التهديدات (EN) <a href="../security-and-threat-modeling.html#sec-underlying-theory-threat-modeling">Underlying theory — threat modeling</a></td>
     </tr>
     <tr>
       <td><dfn>المناوبة (On-Call)</dfn></td>
@@ -967,22 +967,22 @@
     <tr>
       <td><dfn>نوع المنشور (Post Type / CPT)</dfn></td>
       <td>نوع محتوى في ووردبريس — منشورات، صفحات، أو أنواع مخصصة (خدمات، حجوزات، منتجات). مخطط نموذج المحتوى: CPTs + تصنيفات + حقول وصفية، مسجلة في الكود.</td>
-      <td>ووردبريس وإنترنت CMS (EN) §كيف يعمل ووردبريس</td>
+      <td>ووردبريس وإنترنت CMS (EN) <a href="../wordpress-and-cms-internet.html#sec-how-wordpress-works-the-mechanics">How WordPress works — the mechanics</a></td>
     </tr>
     <tr>
       <td><dfn>القالب مقابل الإضافة (Theme vs. Plugin)</dfn></td>
       <td>القالب يملك العرض (القوالب، الأنماط)؛ الإضافة تملك السلوك والميزات. "كل إضافة تبعية" — دققها وثبّتها وحدّثها بجدول زمني.</td>
-      <td>ووردبريس وإنترنت CMS (EN) §كيف يعمل ووردبريس</td>
+      <td>ووردبريس وإنترنت CMS (EN) <a href="../wordpress-and-cms-internet.html#sec-how-wordpress-works-the-mechanics">How WordPress works — the mechanics</a></td>
     </tr>
     <tr>
       <td><dfn>CMS بلا رأس (Headless CMS)</dfn></td>
       <td>نموذج محتوى CMS مكشوف كـAPI (WP-REST، WPGraphQL) مع واجهة أمامية منفصلة (Next.js). يفوز فقط حين يوجد فريق واجهات واحتياجات متعددة الأسطح — وإلا فووردبريس الكلاسيكي هو الجواب الكسول الصحيح.</td>
-      <td>ووردبريس وإنترنت CMS (EN) §الووردبريس الحديث</td>
+      <td>ووردبريس وإنترنت CMS (EN) <a href="../wordpress-and-cms-internet.html#sec-modern-wordpress-gutenberg-rest-and-headless">Modern WordPress — Gutenberg, REST, and headless</a></td>
     </tr>
     <tr>
       <td><dfn>جوتنبرج / الكتل (Gutenberg / Blocks)</dfn></td>
       <td>المحرر القائم على الكتل (٢٠١٨) — المحتوى ككتل قابلة للتركيب، ما يجعل المحتوى بيانات منظمة وسطح التحرير سلعة.</td>
-      <td>ووردبريس وإنترنت CMS (EN) §الووردبريس الحديث</td>
+      <td>ووردبريس وإنترنت CMS (EN) <a href="../wordpress-and-cms-internet.html#sec-modern-wordpress-gutenberg-rest-and-headless">Modern WordPress — Gutenberg, REST, and headless</a></td>
     </tr>
   </tbody>
 </table>
@@ -995,7 +995,7 @@
     <tr>
       <td><dfn>التفويض / الالتقاط / التسوية (Authorization / Capture / Settlement)</dfn></td>
       <td>أرجل الدفع بالبطاقة الثلاثة: التفويض = تجميد على البطاقة، الالتقاط = طلب المال، التسوية = وصوله لحسابك بعد أيام. كل دفعة وعد حتى التسوية.</td>
-      <td>المدفوعات والتجارة (EN) §التعريف، §كيف تعمل الدفعات</td>
+      <td>المدفوعات والتجارة (EN) §التعريف، <a href="../payments-and-commerce.html#sec-how-payments-work-the-mechanics">How payments work — the mechanics</a></td>
     </tr>
     <tr>
       <td><dfn>PSP — مزود خدمة الدفع</dfn></td>
@@ -1005,17 +1005,17 @@
     <tr>
       <td><dfn>مفتاح التساوي الذاتي (Idempotency Key)</dfn></td>
       <td>نسخة المال: مفتاح لكل عملية منطقية على الرسوم — نفس المفتاح = نفس الرسوم، للأبد. الحارس ضد الرسوم المزدوجة عند إعادة المحاولة.</td>
-      <td>المدفوعات والتجارة (EN) §أنماط التكامل؛ هندسة الواجهات الخلفية (EN) <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">Transactions and concurrency — &quot;the row changed since I read it&quot;</a></td>
+      <td>المدفوعات والتجارة (EN) <a href="../payments-and-commerce.html#sec-integration-patterns-where-the-code-meets-the-money">Integration patterns — where the code meets the money</a>؛ هندسة الواجهات الخلفية (EN) <a href="./backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">Transactions and concurrency — &quot;the row changed since I read it&quot;</a></td>
     </tr>
     <tr>
       <td><dfn>الويب هوك كمصدر حقيقة (Webhook as Source of Truth)</dfn></td>
       <td>نتائج الدفع (مدفوع، فشل، نزاع) تصل كويب هوكس من المزود؛ استجابة API المتزامنة تفاؤل فقط. تحقق من التوقيعات، أزل التكرار بمعرّف الحدث، وسجّل التحولات.</td>
-      <td>المدفوعات والتجارة (EN) §أنماط التكامل</td>
+      <td>المدفوعات والتجارة (EN) <a href="../payments-and-commerce.html#sec-integration-patterns-where-the-code-meets-the-money">Integration patterns — where the code meets the money</a></td>
     </tr>
     <tr>
       <td><dfn>الاسترداد العكسي (Chargeback / Dispute)</dfn></td>
       <td>بنك العميل يسحب المال زائداً رسوماً بينما تُراجع الأدلة. الطريقة الافتراضية لعودة المال في أنظمة البطاقات — صمّم للانعكاس.</td>
-      <td>المدفوعات والتجارة (EN) §الاستردادات والنزاعات، §الاحتيال</td>
+      <td>المدفوعات والتجارة (EN) <a href="../payments-and-commerce.html#sec-refunds-chargebacks-and-disputes-the-money-that-comes-back">Refunds, chargebacks, and disputes — the money that comes back</a>، <a href="../payments-and-commerce.html#sec-fraud-the-tax-on-trust">Fraud — the tax on trust</a></td>
     </tr>
     <tr>
       <td><dfn>PCI DSS</dfn></td>
@@ -1025,12 +1025,12 @@
     <tr>
       <td><dfn>3D Secure (3DS)</dfn></td>
       <td>يوثّق العميل هويته مع بنكه المصدر أثناء الإتمام (تحدٍ أو صامت). تحول المسؤولية هو النقطة: مع 3DS البنك يملك استردادات الاحتيال، دونه التاجر. PSD2/SCA تلزمها في الاتحاد الأوروبي.</td>
-      <td>المدفوعات والتجارة (EN) §الاحتيال، §أنماط التكامل</td>
+      <td>المدفوعات والتجارة (EN) <a href="../payments-and-commerce.html#sec-fraud-the-tax-on-trust">Fraud — the tax on trust</a>، §أنماط التكامل</td>
     </tr>
     <tr>
       <td><dfn>التاجر المسجل (Merchant of Record)</dfn></td>
       <td>بادل، ليمون سكويزي، فاست سبرينغ — البائع القانوني للمنتج: يملك حساب الضرائب/تحويلها، الاستردادات، الاستردادات العكسية، PCI. رسوم أعلى (٥٪+ مقابل ~٢٫٩٪) مقابل سطح الامتثال كاملاً.</td>
-      <td>المدفوعات والتجارة (EN) §النظام البيئي</td>
+      <td>المدفوعات والتجارة (EN) <a href="../security-and-threat-modeling.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a></td>
     </tr>
   </tbody>
 </table>
@@ -1043,17 +1043,17 @@
     <tr>
       <td><dfn>ترجمة النتيجة (The Outcome Translation)</dfn></td>
       <td>العميل يشتري نتيجة عمل ("المرضى يجدونني"، "أستطيع تحرير موقعي") لا كوداً. كل محادثة وعرض ومرحلة تعيد ترجمة الميزات إلى عالمه.</td>
-      <td>ممارسة العمل الحر (EN) §التعريف، §النطاق</td>
+      <td>ممارسة العمل الحر (EN) §التعريف، <a href="../freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost">The scoping call — where projects are won or lost</a></td>
     </tr>
     <tr>
       <td><dfn>انجراف النطاق / سياسة التغيير (Scope Creep / Change Policy)</dfn></td>
       <td>ميزات تُضاف بعد العقد. القاعدة ليست "لا تغييرات" — بل "للتغييرات أثمان": نطاق مكتوب، استثناءات صريحة، وسياسة تغيير في العرض.</td>
-      <td>ممارسة العمل الحر (EN) §التسعير، §العقد، §أنماط الفشل</td>
+      <td>ممارسة العمل الحر (EN) §التسعير، <a href="../freelance-web-practice.html#sec-the-contract-the-relationship-s-memory">The contract — the relationship&#x27;s memory</a>، <a href="../freelance-web-practice.html#sec-most-common-failure-modes">Most common failure modes</a></td>
     </tr>
     <tr>
       <td><dfn>الدفعة المقدمة والمراحل (Deposit & Milestones)</dfn></td>
       <td>٣٠–٥٠٪ مقدماً قبل العمل + دفعات مراحل مرتبطة بتسليمات مرئية (تصميم ← بيئة تجريبية ← إطلاق). تحدد الشروط قبل العمل؛ تصفي العملاء غير الجادين؛ تمول المشروع.</td>
-      <td>ممارسة العمل الحر (EN) §التسعير، §تلقي الدفع</td>
+      <td>ممارسة العمل الحر (EN) §التسعير، <a href="../payments-and-commerce.html#sec-how-payments-work-the-mechanics">How payments work — the mechanics</a></td>
     </tr>
     <tr>
       <td><dfn>العقد الدائم (The Retainer)</dfn></td>
@@ -1068,7 +1068,7 @@
     <tr>
       <td><dfn>رسوم الإنهاء (Kill Fee)</dfn></td>
       <td>شرط الإنهاء، الممارَس باحتراف: إشعار مكتوب، دفع العمل المنجز حتى التاريخ، تسليم المخرجات. احتفظ بالدفعة المقدمة مقابل العمل المنجز وامشِ — طرد عميل سيئ مبكراً أرخص من الإنجاز معه.</td>
-      <td>ممارسة العمل الحر (EN) §النطاق (أعلام حمراء)، §العقد</td>
+      <td>ممارسة العمل الحر (EN) §النطاق (أعلام حمراء)، <a href="../freelance-web-practice.html#sec-the-contract-the-relationship-s-memory">The contract — the relationship&#x27;s memory</a></td>
     </tr>
     <tr>
       <td><dfn>موجز المشروع (Project Brief)</dfn></td>
@@ -1091,17 +1091,17 @@
     <tr>
       <td><dfn>المقابلة السلوكية (Behavioral Interview)</dfn></td>
       <td>الجولة التي تسعرك كخطر توظيف (هل تكسر النظام، تنهار تحت الضغط، أو ترحل مبكراً؟) لا كاختبار محتوى تقني. أسئلة مثل "أين ترى نفسك خلال خمس سنوات" و"ما أكبر نقطة ضعف لديك" فحوصات مخاطر بقناعين — أجب عن المخاطرة بمثال STAR.</td>
-      <td>التوظيف والمقابلات (EN) §مقابلة الموارد البشرية والسلوكية؛ أسواق دخل الواجهات (EN) §تحذيرات</td>
+      <td>التوظيف والمقابلات (EN) <a href="../hiring-process-and-interviews.html#sec-the-hr-behavioral-interview-the-messy-questions">The HR &amp;amp; behavioral interview — the &quot;messy&quot; questions</a>؛ أسواق دخل الواجهات (EN) <a href="../observability-and-operations.html#sec-alert-design-turning-targets-into-contracts-with-humans">Alert design — turning targets into contracts with humans</a></td>
     </tr>
     <tr>
       <td><dfn>STAR</dfn></td>
       <td>شكل الإجابة لأسئلة السلوك: الموقف، المهمة، الفعل، النتيجة — قصة ~٣٠ ثانية بنتيجة ملموسة. إجابة بلا مثال ادعاء؛ إجابة STAR دليل.</td>
-      <td>التوظيف والمقابلات (EN) §مقابلة الموارد البشرية والسلوكية؛ جدول الترجمة السلوكية</td>
+      <td>التوظيف والمقابلات (EN) <a href="../hiring-process-and-interviews.html#sec-the-hr-behavioral-interview-the-messy-questions">The HR &amp;amp; behavioral interview — the &quot;messy&quot; questions</a>؛ جدول الترجمة السلوكية</td>
     </tr>
     <tr>
       <td><dfn>الواجب المنزلي / السبورة (Take-home / Whiteboard)</dfn></td>
       <td>صيغتا الفحص التقني. الواجب المنزلي تمرين برمجي بزمن محدود يُحكم عليه بـ"هل يعمل، هل نظيف، هل أستطيع مراجعته"؛ السبورة (بما فيها الترميز الحي بالفيديو) تُحكم بالتفكير بصوت مسموع والتخطيط قبل البرمجة والصحة قبل التحسين. كلاهما عينة من الانضباط، لا الانضباط نفسه.</td>
-      <td>التوظيف والمقابلات (EN) §مكالمة الفحص والفحص التقني، §جولة التصميم المعماري؛ حل المشكلات §مراحل بوليا الأربع؛ التصميم المعماري (EN) §The interview samples the discipline</td>
+      <td>التوظيف والمقابلات (EN) <a href="../hiring-process-and-interviews.html#sec-the-screening-call-the-technical-screen">The screening call &amp;amp; the technical screen</a>، <a href="../hiring-process-and-interviews.html#sec-the-system-design-round">The system design round</a>؛ حل المشكلات §مراحل بوليا الأربع؛ التصميم المعماري (EN) §The interview samples the discipline</td>
     </tr>
   </tbody>
 </table>
@@ -1137,22 +1137,22 @@
     <tr>
       <td><dfn>JOIN</dfn></td>
       <td>قاعدة الاقتران التي تعيد دمج الجداول العلائقية: INNER يبقي المطابقات فقط، LEFT يبقي كل صفوف اليسار مع NULL للمطابقة الناقصة. إصلاح N+1، وسبب حاجة المفاتيح الأجنبية للفهارس.</td>
-      <td>SQL وPostgreSQL (EN) §الـJOINs؛ هندسة الواجهات الخلفية (EN) <a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</a>e (N+1)؛ نمذجة البيانات وقواعد البيانات (EN) §الفهرسة</td>
+      <td>SQL وPostgreSQL (EN) <a href="../sql-and-postgresql.html#sec-joins-the-core-skill">JOINs — the core skill</a>؛ هندسة الواجهات الخلفية (EN) <a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</a>e (N+1)؛ نمذجة البيانات وقواعد البيانات (EN) <a href="../data-modeling-and-databases.html#sec-indexing-strategies-the-read-path">Indexing strategies — the read path</a></td>
     </tr>
     <tr>
       <td><dfn>CTE — تعبير الجدول المشترك</dfn></td>
       <td>نتيجة وسيطة مسماة عبر WITH — تُقرأ من الأعلى للأسفل كخط أنابيب؛ WITH RECURSIVE يمشي الأشجار والتدرجات.</td>
-      <td>SQL وPostgreSQL (EN) §الاستعلامات الفرعية وCTEs</td>
+      <td>SQL وPostgreSQL (EN) <a href="../sql-and-postgresql.html#sec-subqueries-and-ctes-composing-queries">Subqueries and CTEs — composing queries</a></td>
     </tr>
     <tr>
       <td><dfn>الدالة النافذة (Window Function)</dfn></td>
       <td>قيمة بأسلوب التجميع تُحسب دون طي الصفوف (ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)). أعلى-N لكل مجموعة، مجاميع جارية، فروق LAG/LEAD.</td>
-      <td>SQL وPostgreSQL (EN) §الدوال النافذة</td>
+      <td>SQL وPostgreSQL (EN) <a href="../sql-and-postgresql.html#sec-window-functions-ranking-and-running-totals">Window functions — ranking and running totals</a></td>
     </tr>
     <tr>
       <td><dfn>UPSERT</dfn></td>
       <td>إدراج ينجو من التكرار: ON CONFLICT في بوستغرس، ON DUPLICATE KEY في ماي سكل. الجانب القاعدي لمفاتيح التساوي الذاتي في API.</td>
-      <td>SQL وPostgreSQL (EN) §كتابة البيانات؛ تصميم API §التساوي الذاتي</td>
+      <td>SQL وPostgreSQL (EN) <a href="../sql-and-postgresql.html#sec-writing-data-insert-update-delete-upsert">Writing data — INSERT, UPDATE, DELETE, UPSERT</a>؛ تصميم API <a href="../payments-and-commerce.html#sec-pci-dss-and-compliance-the-rules-you-inherited">PCI DSS and compliance — the rules you inherited</a></td>
     </tr>
   </tbody>
 </table>
@@ -1165,7 +1165,7 @@
     <tr>
       <td><dfn>ASP.NET Core</dfn></td>
       <td>إطار مايكروسوفت للويب: سلسلة وسائط ← وحدة تحكم ← خدمة ← EF Core ← SQL Server. حلقة طلب هندسة الواجهات الخلفية بزي مختلف — اقرأ، لا تتعلم من جديد.</td>
-      <td>.NET والممر المؤسسي (EN) §حلقة الطلب بنسخة C#؛ هندسة الواجهات الخلفية (EN) <a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</a></td>
+      <td>.NET والممر المؤسسي (EN) <a href="../dotnet-and-the-enterprise-lane.html#sec-the-request-loop-c-edition">The request loop, C# edition</a>؛ هندسة الواجهات الخلفية (EN) <a href="./backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</a></td>
     </tr>
     <tr>
       <td><dfn>EF Core</dfn></td>
@@ -1175,7 +1175,7 @@
     <tr>
       <td><dfn>T-SQL</dfn></td>
       <td>لهجة SQL لسيرفر SQL: TOP مقابل LIMIT، GETDATE()، IDENTITY، MERGE بدل UPSERT. الـ٩٠٪ المشتركة من اللغة متطابقة.</td>
-      <td>.NET والممر المؤسسي (EN) <a href="../dotnet-and-the-enterprise-lane.html#sec-sql-server-the-t-sql-dialect">SQL Server — the T-SQL dialect</a>؛ SQL وPostgreSQL (EN) §اللغة الأساسية</td>
+      <td>.NET والممر المؤسسي (EN) <a href="../dotnet-and-the-enterprise-lane.html#sec-sql-server-the-t-sql-dialect">SQL Server — the T-SQL dialect</a>؛ SQL وPostgreSQL (EN) <a href="../dotnet-and-the-enterprise-lane.html#sec-sql-server-the-t-sql-dialect">SQL Server — the T-SQL dialect</a></td>
     </tr>
   </tbody>
 </table>
