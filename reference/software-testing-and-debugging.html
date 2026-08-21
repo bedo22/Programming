@@ -29,6 +29,31 @@
   <p>Testing produces evidence; CI/CD consumes it. A pipeline without meaningful tests automates the wrong question.</p>
 </blockquote>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>Jump to</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+      <li><a href="#sec-definition-what-testing-is-and-what-it-is-not">Definition</a></li>
+      <li><a href="#sec-history-from-debugging-to-continuous-and-ai-era-testing">History</a></li>
+      <li><a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">Underlying theory</a></li>
+      <li><a href="#sec-mental-models-how-senior-engineers-think-about-tests">Mental models</a></li>
+      <li><a href="#sec-testing-levels-from-one-unit-to-the-whole-system">Testing levels</a></li>
+      <li><a href="#sec-testing-techniques-how-to-choose-inputs-that-matter">Testing techniques</a></li>
+      <li><a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">Test doubles</a></li>
+      <li><a href="#sec-test-driven-development-tests-as-design-pressure">TDD</a></li>
+      <li><a href="#sec-test-strategy-what-to-automate-and-what-not-to">Test strategy</a></li>
+      <li><a href="#sec-non-functional-testing-proving-the-qualities-that-users-feel">Non-functional testing</a></li>
+      <li><a href="#sec-production-verification-testing-does-not-stop-at-deployment">Production verification</a></li>
+      <li><a href="#sec-debugging-the-evidence-when-a-test-fails">Debugging</a></li>
+      <li><a href="#sec-ai-era-testing-generated-code-and-nondeterministic-systems">AI-era testing</a></li>
+      <li><a href="#sec-worked-example-a-feature-tested-from-unit-to-production">Worked example</a></li>
+      <li><a href="#sec-the-most-common-failure-modes">Failure modes</a></li>
+      <li><a href="#sec-the-complete-mental-checklist">Checklist</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful alongside <a href="./software-development-process.html">The Process</a> and <a href="./version-control-ci-cd-deployment.html">CI/CD &amp; Deployment</a>. Cross-links:</p>
@@ -191,6 +216,37 @@
 
 <p>The strongest suites mix techniques. Example tests are readable; property tests hunt beyond imagination; exploratory tests expose assumptions that nobody wrote down.</p>
 
+<h3>Why these techniques work — the theory behind the inputs</h3>
+<p>
+  <strong>Boundary value analysis</strong> works because bugs cluster at edges.
+  The cause is cognitive: developers think in ranges ("0 to 100") but
+  implement in transitions ("less than 0", "exactly 0", "exactly 100",
+  "greater than 100"). Off-by-one errors, empty collections, zero
+  divisions, and maximum-length strings are all boundary failures. Testing
+  the edges catches the class of bug that middle-of-range testing misses.
+</p>
+<p>
+  <strong>Equivalence partitioning</strong> works because most input spaces
+  have regions where behavior should be identical. If inputs 1–99 should all
+  produce the same result, testing one from that group is as informative as
+  testing all of them. The technique lets you cover a large input space
+  with a small number of tests by sampling each region once.
+</p>
+<p>
+  <strong>Property-based testing</strong> works because invariants are more
+  powerful than examples. An example says "input 5 produces output 10." An
+  invariant says "for all inputs, output equals input plus one." The
+  property covers every input, including the ones the developer never
+  imagined. Generators search for counterexamples that hand-picked inputs
+  would miss.
+</p>
+<p>
+  <strong>Mutation testing</strong> works because it tests the tests. If a
+  mutant (a small code change) survives without being detected, the suite
+  has a gap: it executes the code but does not assert the right behavior.
+  Coverage measures what runs; mutation measures what is verified.
+</p>
+
 <h2 id="sec-test-doubles-mocks-stubs-fakes-and-spies">Test doubles — mocks, stubs, fakes, and spies</h2>
 
 <p>A <strong>test double</strong> replaces a collaborator so the test can control behavior, speed, and failure modes. The names are not interchangeable:</p>
@@ -207,6 +263,17 @@
 
 <p><strong>The design rule:</strong> double the collaborator at a boundary you own, not deep inside someone else's implementation. Mocking every dependency makes tests fast but evasive; using real collaborators everywhere makes tests slow and brittle. The senior move is to test domain logic directly and isolate infrastructure at narrow seams.</p>
 
+<details>
+  <summary><strong>When mocks hurt more than they help</strong></summary>
+  <ul>
+    <li><strong>When the mock encodes the implementation.</strong> If the mock's setup mirrors the code under test ("call A, then B, then C"), the test passes as long as the code does exactly that — even if the behavior is wrong. The test verifies the choreography, not the outcome.</li>
+    <li><strong>When the real collaborator is fast and deterministic.</strong> If the dependency is a pure function or an in-memory data structure, using a real collaborator gives more trustworthy evidence at negligible cost.</li>
+    <li><strong>When the boundary is unstable.</strong> If the collaborator's interface changes frequently, every mock must be updated — and the mock's expectations may silently drift from reality.</li>
+    <li><strong>When the test needs to verify state, not interactions.</strong> If the question is "what did the system produce?" rather than "what calls were made?" — assert on the output, not on the mock.</li>
+  </ul>
+  <p><strong>The rule:</strong> mock at architectural boundaries (network, filesystem, database, external APIs), not at internal function boundaries. If you can replace the mock with the real thing and the test is still fast and deterministic, prefer the real thing.</p>
+</details>
+
 <h2 id="sec-test-driven-development-tests-as-design-pressure">Test-Driven Development — tests as design pressure</h2>
 
 <p>TDD is not "write all tests first." It is a small loop:</p>
@@ -217,7 +284,25 @@
   <li><strong>Refactor</strong> — improve the design while keeping the tests green.</li>
 </ol>
 
-<p>The benefit is not moral purity; it is feedback. TDD forces the developer to state the behavior before writing the implementation, keep changes small, and notice when the design resists being tested. It works best for logic with clear oracles: rules, transformations, calculations, state transitions. It works less naturally for exploratory UI, integration-heavy code, or behavior whose oracle is still unknown.</p>
+<p>The benefit is not moral purity; it is feedback. TDD forces the developer to state the behavior before writing the implementation, keep changes small, and notice when the design resists being tested.</p>
+
+<details>
+  <summary><strong>When TDD earns its keep — and when it doesn't</strong></summary>
+  <p><strong>TDD works best when:</strong></p>
+  <ul>
+    <li>The oracle is clear — you know what the correct output is before writing the code (rules, transformations, calculations, state transitions).</li>
+    <li>The logic is complex enough that writing the test first forces you to think about the design before implementation.</li>
+    <li>The code will live long enough that the regression safety pays for the upfront investment.</li>
+  </ul>
+  <p><strong>TDD works less naturally when:</strong></p>
+  <ul>
+    <li>The oracle is unknown — you don't know what the correct behavior is yet (exploratory UI, experimental features, research code). Write a thin slice first to learn, then TDD the stable parts.</li>
+    <li>The code is integration-heavy — wiring services, configuring infrastructure, setting up pipelines. The value is in the integration, not in isolated units. Use integration tests or contract tests instead.</li>
+    <li>The behavior is visual or subjective — does this look right? Does this feel right? These questions need human judgment, not automated assertions.</li>
+    <li>The code is throwaway — a prototype, a spike, a one-off script. The cost of writing tests first exceeds the cost of throwaway.</li>
+  </ul>
+  <p><strong>The rule:</strong> TDD is a tool for gaining feedback during design, not a moral requirement. Use it when the feedback loop pays for itself; skip it when it doesn't. The goal is working, testable code — not test-first purity.</p>
+</details>
 
 <h2 id="sec-test-strategy-what-to-automate-and-what-not-to">Test strategy — what to automate, and what not to</h2>
 
