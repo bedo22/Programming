@@ -30,6 +30,31 @@
   <p>The Rhythm is how you build a feature; this doc is how the feature gets prioritized, sprinted, shipped, and maintained. They're at different scales, and both are needed.</p>
 </blockquote>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>Jump to</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+      <li><a href="#sec-definition-what-the-sdlc-is-what-a-methodology-is-what-agile-is">Definition</a></li>
+      <li><a href="#sec-history-from-waterfall-to-agile-to-ai-agents-1970present">History</a></li>
+      <li><a href="#sec-underlying-theory-empirical-process-control-and-lean">Underlying theory</a></li>
+      <li><a href="#sec-mental-models-adaptive-vs-predictive-empirical-vs-defined">Mental models</a></li>
+      <li><a href="#sec-the-sdlc-the-six-phases">The SDLC phases</a></li>
+      <li><a href="#sec-the-agile-manifesto-4-values-12-principles-2001">Agile Manifesto</a></li>
+      <li><a href="#sec-scrum-the-most-widely-adopted-agile-framework">Scrum</a></li>
+      <li><a href="#sec-kanban-flow-not-timeboxes">Kanban</a></li>
+      <li><a href="#sec-xp-lean-devops-the-rest-of-the-landscape">XP, Lean, DevOps</a></li>
+      <li><a href="#sec-the-macro-micro-connection-how-this-doc-relates-to-the-rhythm">Macro/micro connection</a></li>
+      <li><a href="#sec-worked-example-a-scrum-sprint-end-to-end">Worked example: Scrum sprint</a></li>
+      <li><a href="#sec-worked-example-a-kanban-support-flow-end-to-end">Worked example: Kanban flow</a></li>
+      <li><a href="#sec-how-to-choose-a-process-the-practical-question">How to choose</a></li>
+      <li><a href="#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">AI frontier</a></li>
+      <li><a href="#sec-the-most-common-failure-modes">Failure modes</a></li>
+      <li><a href="#sec-summary-the-process-checklist">Summary checklist</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
 <p>Reading order: standalone, but most useful <em>after</em> you understand the feature-scale rhythm (<a href="./how-developers-think-frontend.html">The Rhythm</a>) — that gives you the micro-process; this doc gives you the macro-process it sits within. Cross-links:</p>
@@ -442,7 +467,7 @@
     <tr><td><em>Extreme Programming Explained</em> — Kent Beck</td><td>The XP origin. "Make it work, make it right, make it fast." The engineering practices.</td></tr>
     <tr><td><em>The Phoenix Project</em> / <em>The DevOps Handbook</em></td><td>DevOps in narrative form (Phoenix Project is a novel) and reference form (Handbook). How CI/CD transforms delivery.</td></tr>
     <tr><td><em>Accelerate</em> — Forsgren, Humble, Kim</td><td>The evidence behind the DORA metrics (<a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a>): what actually correlates with delivery performance.</td></tr>
-    <tr><td><em>Continuous Delivery</em> — Humble &amp; Farley</td><td>Foundational CI/CD thinking; the mechanics behind the release-strategy ideas in <a href="#sec-release-strategies-and-environments">§9i</a>.</td></tr>
+    <tr><td><em>Continuous Delivery</em> — Humble &amp; Farley</td><td>Foundational CI/CD thinking; the mechanics behind the release-strategy ideas in <a href="#sec-release-testing-branching-the-delivery-mechanics">the delivery mechanics</a>.</td></tr>
     <tr><td><em>Team Topologies</em> — Skelton &amp; Pais</td><td>Team design and organizational flow; the deep-dive behind <a href="#sec-team-topology-and-organizational-constraints-conway-s-law">§9m</a>.</td></tr>
     <tr><td><em>Kanban</em> — David Anderson · <em>User Story Mapping</em> — Jeff Patton</td><td>The core Kanban reference, and the discovery/requirements practice from <a href="#sec-the-agile-manifesto-4-values-12-principles-2001">§3</a>.</td></tr>
     <tr><td rowspan="3"><strong>Metrics &amp; frameworks</strong></td><td>DORA metrics</td><td>The standard delivery-performance metrics (deployment frequency, lead time for changes, change failure rate, MTTR) from <a href="#sec-process-metrics-how-to-know-the-process-is-working">§9f</a>.</td></tr>
@@ -579,50 +604,17 @@
 
 <p><strong>The full treatment</strong> of this layer — choosing targets, designing alerts, running incidents, postmortem craft, runbooks — lives in <a href="./observability-and-operations.html">Observability &amp; Operations</a>.</p>
 
-<h2 id="sec-release-strategies-and-environments">Release strategies and environments</h2>
+<h2 id="sec-release-testing-branching-the-delivery-mechanics">Release strategies, testing, and branching — the delivery mechanics</h2>
 
-<p>Deployment is not just "ship it." Teams move work through environments and choose how much risk each release carries:</p>
-
-<table>
-  <thead><tr><th>Strategy</th><th>What it is</th><th>Risk profile</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Environment ladder</strong></td><td>Dev → staging → production; each environment approximates the next one closer.</td><td>Catches issues early, but environments can drift from production.</td></tr>
-    <tr><td><strong>Feature flags</strong></td><td>Ship the code but turn it on/off at runtime — decouple deploy from release.</td><td>Low risk per change; needs flag hygiene (remove flags when the feature ships).</td></tr>
-    <tr><td><strong>Canary releases</strong></td><td>Route a small % of traffic to the new version, watch metrics, then widen.</td><td>Contained blast radius; requires good observability and fast decisions.</td></tr>
-    <tr><td><strong>Blue-green</strong></td><td>Run two environments; swap traffic to the new one, keep the old for instant rollback.</td><td>Very fast rollback; doubles infrastructure cost.</td></tr>
-    <tr><td><strong>Automated rollback</strong></td><td>If health checks fail after deploy, automatically revert.</td><td>Fast recovery; needs reliable health checks or you roll back good changes.</td></tr>
-  </tbody>
-</table>
-
-<p><strong>The safer the release mechanism, the more frequently the team can ship.</strong> This is the DevOps insight at the release level: deployment risk is managed by mechanics (canaries, flags, rollback), not by releasing less often.</p>
-
-<h2 id="sec-testing-strategy-the-test-pyramid">Testing strategy — the test pyramid</h2>
-
-<p>Testing is not a single phase; it's a strategy with different speeds and scopes:</p>
-
-<table>
-  <thead><tr><th>Layer</th><th>What it covers</th><th>Speed / cost</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Unit tests</strong></td><td>Single functions and modules in isolation.</td><td>Fast, cheap — the base of the pyramid, the most tests.</td></tr>
-    <tr><td><strong>Integration tests</strong></td><td>Boundaries between modules: databases, APIs, services.</td><td>Slower, catches wiring bugs unit tests can't.</td></tr>
-    <tr><td><strong>End-to-end tests</strong></td><td>Critical user journeys through the whole stack.</td><td>Slow, brittle — a few, for the paths that matter most.</td></tr>
-    <tr><td><strong>Exploratory / UAT</strong></td><td>Humans probing the real product for behavior automated tests miss.</td><td>Unpredictable, invaluable.</td></tr>
-  </tbody>
-</table>
-
-<p><strong>Watch the flaky test.</strong> A test that fails intermittently gets ignored, and an ignored test is worse than no test — it trains the team to skip the suite. A healthy strategy balances speed, coverage, and realism, and <em>pays down</em> flaky and out-of-date tests rather than accumulating them.</p>
-
-<h2 id="sec-branching-and-integration-strategy">Branching and integration strategy</h2>
-
-<p>Process and version control are connected. The branching model either supports the delivery cadence or fights it:</p>
+<p>This doc owns the <em>process</em> — how the team organizes work. The <em>mechanics</em> of delivery — release strategies (blue-green, canary, feature flags), the test pyramid, and branching models — are owned by <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a>. This section explains <em>why</em> they matter to the process, and points there for the how:</p>
 
 <ul>
-  <li><strong>Trunk-based development</strong> — everyone commits to the main line (with short-lived feature branches), integrates multiple times a day. Best fit for CI/CD and frequent release.</li>
-  <li><strong>Git Flow</strong> — a develop branch plus release branches and long-lived feature branches. More ceremony; suits versioned releases with long support windows.</li>
-  <li><strong>Short-lived feature branches</strong> — isolate work for hours to days, merge back fast. Merge conflicts shrink as branch lifetime shrinks.</li>
+  <li><strong>Release strategies</strong> (feature flags, canary, blue-green) determine how often the team can safely ship. The safer the mechanism, the more frequently the team can deploy — which tightens the feedback loop that Agile depends on. The full treatment: <a href="./version-control-ci-cd-deployment.html#sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies</a>.</li>
+  <li><strong>Testing strategy</strong> (unit → integration → E2E) determines how much confidence the Definition of Done can claim. A team that only writes unit tests has a narrow safety net; a team with a balanced pyramid can ship frequently without fear. The full treatment: <a href="./version-control-ci-cd-deployment.html#sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">CI pipeline</a> and <a href="./software-testing-and-debugging.html">Software Testing & Debugging</a>.</li>
+  <li><strong>Branching strategy</strong> (trunk-based, GitHub Flow, GitFlow) determines how the team integrates code. Long-lived branches create mini-waterfalls between developers; short-lived branches enable the frequent integration that CI requires. The full treatment: <a href="./version-control-ci-cd-deployment.html#sec-branching-strategies-how-teams-share-the-dag">Branching strategies</a>.</li>
 </ul>
 
-<p><strong>The rule:</strong> long-lived branches increase merge risk and delay feedback. Choose a branching strategy that supports the team's delivery cadence — don't let the branch model become an unintended waterfall between code and integration.</p>
+<p><strong>The process connection:</strong> Scrum defines the cadence (sprints), but these mechanics define whether the cadence is real or aspirational. A team that does 2-week sprints but deploys once a quarter has the ceremony without the delivery. The mechanics are what make Agile's "working software frequently" promise honest.</p>
 
 <h2 id="sec-estimation-and-planning-forecasts-not-promises">Estimation and planning — forecasts, not promises</h2>
 
