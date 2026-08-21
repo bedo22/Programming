@@ -244,6 +244,15 @@ For every claim, table, or framework:
 
 **One doc owns each piece of knowledge.** The other docs reference it.
 
+**Before replacing content with a pointer, verify the target doc has the
+same EXPLANATIONS, not just the same CONCEPTS.** A concept appearing in
+another doc (e.g. "feature flags exist") is not the same as the
+doc's explanation (e.g. "feature flags decouple deploy from release,
+but they don't undo data writes"). If the target doc lacks the
+explanations, MERGE them into the target doc FIRST, then replace with
+a pointer. Never replace detailed content with a pointer to a doc that
+only mentions the concept in passing.
+
 When moving content, leave a pointer:
 
 ```html
@@ -369,6 +378,14 @@ and the principle that theory and practice are equal:
   examples, norms, and cultural references must fit the audience.
 
 ## The meta-rule
+
+**Don't be lazy.** If you previously added only navigation to a doc and
+said "the doc is already good," go back and redo the analysis with the
+full rules file. A TOC fixes navigation, not content gaps. Every doc
+must be analysed for: missing theory, missing boundary conditions,
+duplication, misplaced content, mental models, transfer conditions.
+Do one doc at a time so you don't overload your context. If you don't
+have enough knowledge to fill a gap, search for it.
 
 Improvement is not the same as making the doc shorter. A doc that is
 long because the topic is deep is a good doc. A doc that is long
