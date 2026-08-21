@@ -90,6 +90,16 @@ return to stage-only until told otherwise.
 - Glossary: Track A only (it derives from other docs); do LAST.
 - index.html: excluded entirely.
 
+## WAVE 1.5 — KEY HARVEST (inserted before Wave 2)
+
+The four pre-UDA shells ground their extractions in /tmp snapshots that will not
+survive indefinitely. Before Wave 2, convert that knowledge into permanent source
+keys (`reference/sources/`), re-fetching only where a snapshot is lost. Raw material:
+the shells' triage entries + the snapshots themselves. Target ~20 keys across the
+four docs; each key follows _TEMPLATE.md (distillation-grade for primaries).
+Shells are NOT redone — they already comply; only their Δ pointers gain key targets.
+Order: api-design keys → hdt keys → std keys → system-design keys.
+
 ## DOC ORDER (interleave A+B per doc before next)
 
 Wave 1 — alumni: mechanical layer pre-clean, but FULL A+B like everyone else.
