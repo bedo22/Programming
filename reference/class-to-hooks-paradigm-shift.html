@@ -247,6 +247,8 @@ function Counter() {
   <p><strong>The one-sentence history.</strong> State started as a separate object (MVC model), got pushed into the document (web), leaked into closures (jQuery), got pulled back into framework models (Backbone/Angular), got pushed into the component (React classes), got pulled halfway out into stores (Flux/Redux), got stored in React itself by call order (hooks), and most recently got split between browser-state and server-data (RSC). Every one of these moves solved a specific bug and introduced a new one. Reading React today means understanding which of these eras the file you are looking at belongs to.</p>
 </blockquote>
 
+<p><strong>Why this pattern persists.</strong> State migrates because the dominant constraint keeps shifting: in 1979 the constraint was "two views of the same data" (MVC solved it); in 2005 it was "state scattered in the DOM" (Backbone/Angular solved it); in 2013 it was "state in a global scope is hard to reason about" (React classes solved it); in 2015 it was "component-local state can't be shared" (Flux/Redux solved it); in 2018 it was "logic reuse requires wrapper hell" (hooks solved it); in 2024 it was "server and client have different state lifecycles" (RSC solved it). Each solution creates the next constraint. The pattern repeats because UI state is fundamentally a tension between locality (state close to where it's used) and shareability (state accessible where it's needed) — and every framework finds a different point on that spectrum.</p>
+
 <h2 id="sec-the-four-eras-a-timeline">The four eras — a timeline</h2>
 
 <table>
