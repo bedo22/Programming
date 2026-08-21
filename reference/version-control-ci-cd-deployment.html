@@ -636,6 +636,19 @@
         <em>live</em> by branch protection that won't merge a busted main.
       </p>
 
+      <blockquote class="callout">
+        <p>
+          <strong>The branch lifetime rule:</strong> long-lived branches
+          increase merge risk and delay feedback. A branch that lives for
+          weeks accumulates conflicts and diverges from main — the longer it
+          lives, the more dangerous the merge. Choose a branching strategy
+          that supports the team's delivery cadence: if you deploy daily,
+          branches should live hours; if you deploy weekly, branches can live
+          days. Don't let the branch model become an unintended waterfall
+          between code and integration.
+        </p>
+      </blockquote>
+
       <h2 id="sec-the-collaboration-loop-push-pull-merge-and-the-pull-request">The collaboration loop — push/pull, merge, and the pull request
       </h2>
 
@@ -951,6 +964,51 @@
         </li>
       </ul>
 
+      <h3>The test pyramid — what the pipeline should run</h3>
+      <p>
+        Not all tests are equal. The pipeline should run them in order of
+        speed and cost, cheapest first:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>What it covers</th>
+            <th>Speed / cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Unit tests</strong></td>
+            <td>Single functions and modules in isolation.</td>
+            <td>Fast, cheap — the base of the pyramid, the most tests.</td>
+          </tr>
+          <tr>
+            <td><strong>Integration tests</strong></td>
+            <td>Boundaries between modules: databases, APIs, services.</td>
+            <td>Slower, catches wiring bugs unit tests can't.</td>
+          </tr>
+          <tr>
+            <td><strong>End-to-end tests</strong></td>
+            <td>Critical user journeys through the whole stack.</td>
+            <td>Slow, brittle — a few, for the paths that matter most.</td>
+          </tr>
+          <tr>
+            <td><strong>Exploratory / UAT</strong></td>
+            <td>Humans probing the real product for behavior automated tests miss.</td>
+            <td>Unpredictable, invaluable.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Watch the flaky test.</strong> A test that fails intermittently
+        gets ignored, and an ignored test is worse than no test — it trains
+        the team to skip the suite. Quarantine flaky tests and fix them;
+        don't rerun blindly. A healthy strategy balances speed, coverage,
+        and realism, and <em>pays down</em> flaky and out-of-date tests
+        rather than accumulating them.
+      </p>
+
       <h3>Pipeline security and supply-chain integrity</h3>
       <p>
         A modern pipeline verifies more than application behavior. The build
@@ -1077,6 +1135,20 @@
         >):
       </p>
 
+      <h3>The environment ladder</h3>
+      <p>
+        Before choosing a strategy, understand the environment shape:
+        <strong>Development → Staging → Production</strong>. Each environment
+        approximates the next one closer. Staging should mirror production
+        as closely as possible; the closer the match, the more trustworthy
+        staging evidence is. The risk: environments can <em>drift</em> from
+        production (different data, different config, different scale),
+        making staging evidence unreliable. The fix: environment promotion
+        uses the <strong>same artifact</strong> across all environments, with
+        only configuration differing.
+      </p>
+
+      <h3>The classic deployment strategies</h3>
       <table>
         <thead>
           <tr>
@@ -1131,6 +1203,17 @@
               Separating "deploy" from "release" — reduce exposure by flag. A
               flag does not undo data writes, schema changes, external side
               effects, or incompatible code paths.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Automated rollback</strong></td>
+            <td>
+              If health checks fail after deploy, automatically revert to the
+              previous version.
+            </td>
+            <td>
+              Fast recovery without human intervention; needs reliable health
+              checks or you risk rolling back good changes.
             </td>
           </tr>
         </tbody>
