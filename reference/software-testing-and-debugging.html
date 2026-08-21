@@ -177,7 +177,7 @@
 <ul>
   <li><strong>Tests are executable questions.</strong> A good test asks one precise question: "given this state, should this happen?" If a test needs a paragraph to explain, it is probably asking too many questions.</li>
   <li><strong>Coverage is not confidence.</strong> Code coverage tells you what was executed, not what was verified. 90% line coverage can miss the one branch that corrupts money, data, or access control.</li>
-  <li><strong>The test pyramid is a heuristic, not a law.</strong> Fast, isolated tests should usually dominate; broad tests should usually be fewer. But the right shape depends on architecture, risk, tooling, and team discipline.</li>
+  <li><strong>The test pyramid is a heuristic, not a law.</strong> Fast, isolated tests should usually dominate; broad tests should usually be fewer. But the right shape depends on architecture, risk, tooling, and team discipline. (Origin: Mike Cohn, <em>Succeeding with Agile</em>, 2009 — Fowler and Vocke popularized the current form — std-Δ1.)</li>
   <li><strong>A flaky suite is a broken communication channel.</strong> If the team stops trusting red, red becomes decorative. Flakiness is not an annoyance; it is a quality defect in the evidence system.</li>
   <li><strong>Tests are design pressure.</strong> If a unit is painful to test, the pain often reveals hidden coupling, unclear boundaries, or too many responsibilities. TDD uses that pressure deliberately.</li>
 </ul>
@@ -198,7 +198,7 @@
   </tbody>
 </table>
 
-<p><strong>The practical rule:</strong> use the lowest level that can produce trustworthy evidence for the question being asked. Do not use an end-to-end test to prove a pure calculation, and do not use a mocked unit test to prove a deployment is healthy.</p>
+<p><strong>The practical rule:</strong> use the lowest level that can produce trustworthy evidence for the question being asked. Do not use an end-to-end test to prove a pure calculation, and do not use a mocked unit test to prove a deployment is healthy. Expect definitional fuzziness: ask three people what "unit" means and you get four answers — pick the meaning that makes the level's evidence trustworthy and state it in your strategy (std-Δ2).</p>
 
 <h2 id="sec-testing-techniques-how-to-choose-inputs-that-matter">Testing techniques — how to choose inputs that matter</h2>
 
@@ -388,7 +388,7 @@ Test strategy
   <li><strong>Health checks</strong> report readiness and liveness to the platform.</li>
   <li><strong>Logs, metrics, and traces</strong> expose behavior that pre-production tests could not reproduce.</li>
   <li><strong>Alerts</strong> turn anomalies into actionable signals.</li>
-  <li><strong>SLOs and error budgets</strong> define how much failure is acceptable before reliability work outranks feature work. Example: a 99.9% availability SLO leaves an error budget of ~43 minutes of downtime per month (0.1% of 30 days) — spend it on deploys, or lose it to incidents.</li>
+  <li><strong>SLOs and error budgets</strong> define how much failure is acceptable before reliability work outranks feature work. Example: a 99.9% availability SLO leaves an error budget of ~43 minutes of downtime per month (0.1% of 30 days) — spend it on deploys, or lose it to incidents. Google SRE defines the error budget as "an SLO for meeting other SLOs", tracked daily/weekly; availability targets are spoken in "nines" (std-Δ3).</li>
   <li><strong>Canaries</strong> expose a small slice of traffic first, so real-world evidence arrives before full release.</li>
 </ul>
 
