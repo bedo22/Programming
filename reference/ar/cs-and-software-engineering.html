@@ -26,6 +26,36 @@
         </p>
       </header>
 
+      <nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+        <details open>
+          <summary style="cursor: pointer; font-weight: bold;">انتقل إلى القسم</summary>
+          <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0; direction: rtl;">
+            <li><a href="#sec-how-to-use-this-doc">كيف تستخدم هذا المستند</a></li>
+            <li><a href="#sec-definition-what-cs-is-what-se-is-and-how-they-differ">التعريف</a></li>
+            <li><a href="#sec-history-from-lovelace-to-the-ai-era-1843present">التاريخ</a></li>
+            <li><a href="#sec-evolution-constraint-inversions-across-the-discipline">التطور</a></li>
+            <li><a href="#sec-intersection-with-neighbors-the-umbrella">التقاطع</a></li>
+            <li><a href="#sec-underlying-theory-complexity-computability-and-information">النظرية</a></li>
+            <li><a href="#sec-mental-models-the-engineering-mindset">النماذج العقلية</a></li>
+            <li><a href="#sec-what-is-computer-science-the-science-of-computation">ما هي CS؟</a></li>
+            <li><a href="#sec-what-is-software-engineering-the-engineering-of-software">ما هي SE؟</a></li>
+            <li><a href="#sec-the-parameters-quality-attributes-what-you-measure">سمات الجودة</a></li>
+            <li><a href="#sec-the-measures-big-o-notation-and-complexity-classes">O الكبير</a></li>
+            <li><a href="#sec-the-trade-offs-when-parameters-conflict">المفاضلات</a></li>
+            <li><a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">الحكم</a></li>
+            <li><a href="#sec-engineering-principles-dry-solid-kiss-yagni">المبادئ الهندسية</a></li>
+            <li><a href="#sec-what-makes-code-better">ما يجعل الكود أفضل</a></li>
+            <li><a href="#sec-principles-the-shared-constants">المبادئ</a></li>
+            <li><a href="#sec-technical-debt-when-speed-now-costs-later">الديون التقنية</a></li>
+            <li><a href="#sec-worked-example-evaluating-a-brute-force-solution">مثال مطبق</a></li>
+            <li><a href="#sec-the-most-common-failure-modes">أنماط الفشل</a></li>
+            <li><a href="#sec-ecosystem-books-tools-and-communities">النظام البيئي</a></li>
+            <li><a href="#sec-the-future-the-evaluation-premium">المستقبل</a></li>
+            <li><a href="#sec-summary-the-complete-evaluation-checklist">الملخص</a></li>
+          </ul>
+        </details>
+      </nav>
+
       <blockquote class="callout">
         <p>
           <strong>أين يندرج هذا.</strong> هذا المستند هو <em>المظلة</em> —
@@ -224,8 +254,8 @@
           اللذان ينتجان المعرفة والمهارات التي يستهلكها SDLC.
         </li>
         <li>
-          <strong>ليس للأكاديميين فقط.</strong> المبادئ الهندسية (§٨) ومهارة
-          التقييم (§٤–§٧) عملية — تستخدمها في كل مرة تختار فيها بين حل بال
+          <strong>ليس للأكاديميين فقط.</strong> المبادئ الهندسية (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>) ومهارة
+          التقييم (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>–<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>) عملية — تستخدمها في كل مرة تختار فيها بين حل بال
           القوة الغاشمة وآخر محسن، في كل مرة تقرر "هل هذا مقروء بما يكفي؟"، في
           كل مرة تجري مفاضلة.
         </li>
@@ -1613,7 +1643,7 @@
       </p>
 
       <p>
-        <strong>لكن — وهذا حكم الهندسة (§٧):</strong> لـ n < ١٠٠، O(n²) جيد.
+        <strong>لكن — وهذا حكم الهندسة (<a href="#sec-the-judgment-which-parameters-matter-when-and-when-to-stop">§٧</a>):</strong> لـ n < ١٠٠، O(n²) جيد.
         ١٠،٠٠٠ عملية فورية. جواب CS "استخدم الخوارزمية المثلى." جواب SE "استخدم
         أبسط خوارزمية تناسب حد الوقت لحجم المدخلات المتوقع." معرفة الفرق هي
         مهارة الحكم.
@@ -1924,6 +1954,70 @@
         </li>
       </ul>
 
+      <h2 id="sec-what-makes-code-better">ما يجعل الكود أفضل — من المبادئ إلى الممارسة</h2>
+
+      <p>المبادئ في <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a> هي القواعد المسماة. هذا القسم يُظهر كيف تبدو في الكود الفعلي — الحركات الملموسة التي تحوّل "اتبع SOLID" إلى "هذه الدالة أفضل مما كانت".</p>
+
+      <h3>التسمية — المهارة الأقل تقييماً</h3>
+      <p>الاسم هو شرح مضغوط. الاسم الجيد يلغي الحاجة للتعليق؛ الاسم السيء يتطلب تعليقاً لشرحه. صفة الجودة التي تخدمها هي <strong>المقروئية</strong> (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>) — هل يستطيع مطور آخر فهم النهج دون سؤالك؟</p>
+      <table>
+        <thead><tr><th>المبدأ</th><th>سيء</th><th>جيد</th><th>لماذا</th></tr></thead>
+        <tbody>
+          <tr><td><strong>الاسم يكشف القصد</strong></td><td><code>const d = new Date()</code></td><td><code>const createdAt = new Date()</code></td><td>القارئ يعرف <em>ماذا</em> يمثل التاريخ دون قراءة الكود المحيط.</td></tr>
+          <tr><td><strong>تجنب التعيين الذهني</strong></td><td><code>const x = users.filter(u => u.active)</code></td><td><code>const activeUsers = users.filter(u => u.active)</code></td><td><code>x</code> يُلزم القارئ بتذكر معناه. <code>activeUsers</code> لا.</td></tr>
+          <tr><td><strong>أسماء الدوال أفعال</strong></td><td><code>function userData() { ... }</code></td><td><code>function fetchUserData() { ... }</code></td><td>الدالة <em>تفعل</em> شيئاً — الاسم يجب أن يقول ماذا.</td></tr>
+          <tr><td><strong>أسماء Boolean أسئلة</strong></td><td><code>const check = user.admin === true</code></td><td><code>const isAdmin = user.admin</code></td><td>أسماء Boolean يجب أن تُقرأ كأسئلة نعم/لا. <code>isAdmin</code> سؤال؛ <code>check</code> ليس كذلك.</td></tr>
+          <tr><td><strong>تجنب الاختصارات</strong></td><td><code>function calcBtnClk() { ... }</code></td><td><code>function handleCalculateButtonClick() { ... }</code></td><td>الاختصارات توفر ثانيتين من الكتابة وتُكلف كل قارئ ٥ ثوانٍ من فك الشفرة.</td></tr>
+          <tr><td><strong>نفس الكلمة، نفس المعنى</strong></td><td>دالة تسمى <code>get</code> وأخرى <code>fetch</code> وأخرى <code>retrieve</code></td><td>جميع دوال الوصول للبيانات تستخدم <code>fetch</code></td><td>المفردات المتسقة تبني النموذج الذهني للقارئ.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>تصميم الدوال — اللبنات الأساسية</h3>
+      <p>الدوال هي وحدة المقروئية. إذا كانت الدالة واضحة، فإن الكود حولها يمكن فهمه. إذا كانت الدالة غامضة، فلا تعليق ينقذها.</p>
+      <table>
+        <thead><tr><th>القاعدة</th><th>ما تعنيه</th><th>الاختبار</th></tr></thead>
+        <tbody>
+          <tr><td><strong>وظيفة واحدة</strong> (SRP من <a href="#sec-engineering-principles-dry-solid-kiss-yagni">SOLID §٨</a>)</td><td>الدالة تفعل شيئاً واحداً. تفعله جيداً. لا تفعل غيره.</td><td>هل يمكنك وصف الدالة بجملة واحدة دون استخدام "و"؟ إذا لا، قسّمها.</td></tr>
+          <tr><td><strong>صغيرة</strong></td><td>معظم الدوال ٥–٢٠ سطراً. إذا كانت الدالة ١٠٠ سطر، فهي تفعل وظيفتين على الأقل.</td><td>هل الدالة تناسب شاشة واحدة دون التمرير؟ إذا لا، فهي طويلة جداً.</td></tr>
+          <tr><td><strong>قليلة المعاملات</strong></td><td>٠–٢ معاملات مثالية. ٣+ تعني أن الدالة تفعل أكثر مما يجب.</td><td>هل يمكنك تذكر المعاملات دون النظر للتوقيع؟ إذا لا، فكثير جداً.</td></tr>
+          <tr><td><strong>بدون آثار جانبية</strong></td><td>الدالة لا يجب أن تُعدّل شيئاً خارج نطاقها. مدخلات، مخرجات فقط.</td><td>هل يمكنك استدعاء الدالة مرتين بنفس المدخل ونفس الناتج؟ إذا لا، هناك أثر جانبي مخفي.</td></tr>
+          <tr><td><strong>إرجاع مبكر</strong></td><td>تعامل مع الحالات الحدية في الأعلى وأعد. تجنب التداخل العميق.</td><td>هل المنطق الرئيسي بنفس مستوى المسافة البادئة seperti الإعلان؟ أم أنه مدفون داخل ٣ مستويات من if/else؟</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ريائح الكود — أعراض مشكلات أعمق</h3>
+      <p><strong>ريحة الكود</strong> هو مؤشر سطحي على خطأ أعمق. ليس خللاً — الكود يعمل — لكنه إشارة على أن الكود سيكون صعباً في التغيير أو الاختبار أو الفهم مع النمو. سمّاها كتالوج إعادة الهيكلة لمارتن فاولر (١٩٩٩).</p>
+      <table>
+        <thead><tr><th>الريحة</th><th>ما تراه</th><th>المشكلة الأعمق</th><th>الإصلاح</th></tr></thead>
+        <tbody>
+          <tr><td><strong>كود مكرر</strong></td><td>نفس المنطق في مكانين</td><td>انتهاك DRY (<a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a>). تغيير في نسخة سينحرف من الأخرى.</td><td>استخرج إلى دالة مشتركة. لكن فقط إذا كانت النسختان تمثلان <em>نفس المعرفة</em>.</td></tr>
+          <tr><td><strong>دالة طويلة</strong></td><td>دالة ٥٠+ سطراً</td><td>وظائف متعددة (انتهاك SRP). صعبة التسمية والاختبار.</td><td>استخرج دوال فرعية. اسم كل واحدة.ARENT الدالة الأم تصبح سلسلة من الخطوات المسماة.</td></tr>
+          <tr><td><strong>قائمة معاملات طويلة</strong></td><td>دالة بـ ٤+ معاملات</td><td>الدالة تفعل أكثر مما يجب.</td><td>اجمع المعاملاتrelated في كائن. أو قسّم الدالة.</td></tr>
+          <tr><td><strong>غيرة الميزة</strong></td><td>دالة تستخدم بيانات كائن آخر أكثر من بياناتها</td><td>الدالة تنتمي للكائن الآخر.</td><td>انقل الدالة للكائن الذي تغب عليه.</td></tr>
+          <tr><td><strong>جراحة البطندق</strong></td><td>تغيير واحد يتطلب تعديلات في أماكن متعددة</td><td>المسؤولية مبعثرة.</td><td>consolidate المنطق المبعثر في مكان واحد.</td></tr>
+          <tr><td><strong>تجمع البيانات</strong></td><td>نفس ٣ معاملات تظهر معاً في دوال متعددة</td><td>هذه البيانات تنتمي معاً في كائن.</td><td>استخرج كائناً يجمعها.</td></tr>
+          <tr><td><strong>هوس بدائية</strong></td><td>استخدام نصوص/أرقام لكل شيء بدلاً من أنواع صغيرة</td><td>فقدان سلامة النوع والتعبيرية.</td><td>أدخل كائنات قيمة أو تعدادات للمفاهيم المجالية.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>إعادة الهيكلة — تحسين الكود دون تغيير السلوك</h3>
+      <p><strong>إعادة الهيكلة</strong> هي ممارسة منضبطة لتحسين البنية الداخلية للكود دون تغيير سلوكه الخارجي. القاعدة الرئيسية: <strong>أعد الهيكلة بخطوات صغيرة محافظة للسلوك، مع اختبارات تمر في كل خطوة.</strong></p>
+      <table>
+        <thead><tr><th>التقنية</th><th>متى تستخدمها</th><th>ما يتغير</th></tr></thead>
+        <tbody>
+          <tr><td><strong>استخراج دالة</strong></td><td>كتلة من الكود تفعل شيئاً محدداً</td><td>اسحبها إلى دالة مسمّاة. الكود الأصلي يصبح قراءة كسلسلة من الخطوات.</td></tr>
+          <tr><td><strong>إعادة تسمية</strong></td><td>الاسم لا يكشف القصد</td><td>غيّر الاسم. استخدم دعم IDE لإعادة التسمية بأمان.</td></tr>
+          <tr><td><strong>ادمج الدالة</strong></td><td>جسم الدالة واضح كما اسمها</td><td>استبدل الاستدعاء بالجسم. يزيل طبقة تجريد غير ضرورية.</td></tr>
+          <tr><td><strong>استخراج متغير</strong></td><td>تعبير متكرر أو غير واضح</td><td>اسحب التعبير إلى متغير مسمّى. الاسم يشرح القصد.</td></tr>
+          <tr><td><strong>استبدل الأرقام السحرية بثوابت</strong></td><td>رقم حرفية يظهر بدون شرح</td><td><code>if (status === 3)</code> → <code>if (status === STATUS_APPROVED)</code></td></tr>
+          <tr><td><strong>فك الشرطيات المتداخلة بجمل حرس</strong></td><td>تداخل عميق (٣+ مستويات)</td><td>تعامل مع الحالات الحدية أولاً وأعد. المسار السعيد يبقى في المستوى الأعلى.</td></tr>
+        </tbody>
+      </table>
+
+      <blockquote class="callout">
+        <p><strong>قاعدة إعادة الهيكلة:</strong> لا تُعيد الهيكلة وتُضيف ميزات في نفس الوقت. أعد الهيكلة أولاً (كل الاختبارات تمر)، ثم أضف الميزة على الأساس النظيف. الخلط بينهما يجعل من المستحيل تحديد أي تغيير أخلّ بالاختبار.</p>
+      </blockquote>
+
       <h2 id="sec-principles-the-shared-constants">المبادئ — الثوابت المشتركة</h2>
 
       <p>
@@ -1964,7 +2058,7 @@
             <td>
               الدماغ البشري يستوعب ~٤ عناصر في الذاكرة العاملة. التجريد (واجهات،
               دوال، وحدات) يخفي التفاصيل لتستطيع التفكير بالصورة الكبرى. كل مبدأ
-              في §٨ استراتيجية تجريد.
+              في <a href="#sec-engineering-principles-dry-solid-kiss-yagni">§٨</a> استراتيجية تجريد.
             </td>
           </tr>
           <tr>
