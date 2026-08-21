@@ -46,6 +46,20 @@
 
 ---
 
+<h2 id="sec-the-leverage-map-where-the-work-concentrates">خريطة الرافعة — أين يتركّز العمل فعليًا</h2>
+
+<p>الأقسام التالية كثيرة، لكن العمل اليومي على المنصة لا يتوزع بالتساوي عليها. معظم عمل المكوّنات يتركّز في حفنة من الأساسيات؛ والباقي يتعلّمه المرء عندما يطلبه موقف محدد. تدرّجات عملية تقريبية، مستمدة مما يعاقب عليه فهرس أنماط الفشل أكثر شيوعًا، وما تؤتمته أدوات المنظومة أولًا، والميزات التي بلغت Baseline:</p>
+
+<table>
+  <thead><tr><th>التدرّج</th><th>الأساسيات</th><th>ما تغطيه</th></tr></thead>
+  <tbody>
+    <tr><td><strong>T1 — أتقِنها أولًا</strong></td><td>العناصر الدلالية و<a href="#sec-html-platform-primitives-the-kitchen-it-ships-with">جدول اختيار العناصر</a>؛ أساسيات Flexbox/Grid مع <code>gap</code>؛ الخصائص المخصصة كرموز تصميم؛ <code>:focus-visible</code>؛ <code>prefers-reduced-motion</code>؛ الخصائص المنطقية (<code>*-inline-*</code>)</td><td>الغالبية العظمى من عمل المكوّنات اليومي: التخطيط، السمات، تنسيق الحالة، إمكانية الوصول بلوحة المفاتيح، جاهزية الاتجاه RTL.</td></tr>
+    <tr><td><strong>T2 — تعلّمها عندما يطلبها الموقف</strong></td><td>استعلامات الحاوية؛ طبقات التدرج (<code>@layer</code>)؛ الخطوط السائلة بـ <code>clamp()</code>؛ <code>srcset</code>/<code>picture</code>؛ حالات التحقق الأصلية؛ <code>details</code>/<code>dialog</code>/واجهة Popover</td><td>التصميم المتجاوب على مستوى المكوّن، CSS طرف ثالث بلا تصادمات، الصفحات الغنية بالوسائط، النماذج فوق الافتراضي، الطبقات بدون JS.</td></tr>
+    <tr><td><strong>T3 — معرفة متخصصة نادرة</strong></td><td>Houdini paint/Typed OM؛ <code>@scope</code>؛ View Transitions؛ Anchor Positioning؛ CSS Toggles؛ masonry</td><td>مؤلفو أدوات التصميم، مشرفو أنظمة التصميم، أعمال التفاعل المتقدمة. اللجوء إلى T3 وT1 موضع اهتزاز هو انقلاب المبتدئ الكلاسيكي.</td></tr>
+  </tbody>
+</table>
+
+<p>ملاحظة صدقٍ: حدود التدرّجات اجتهاد عملي وليست قياسًا — لكن ادعاء الترتيب قابل للاختبار ضد أعمالك نفسها: عُدّ آخر عشرة أخطاء CSS أصلحتها؛ سيُعَدّ معظمها إلى أساسيات T1 مُساءة الاستخدام، لا إلى ميزات T3 الغائبة.</p>
 <h2 id="sec-definition-what-html-css-is-and-what-it-is-not">تعريف — ما <em>هو</em> HTML و CSS وما <em>ليس</em> به</h2>
 
 <h3>ما هو</h3>
@@ -995,7 +1009,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     </tr>
     <tr>
       <td><strong>CSS-in-JS وقت تشغيل في الإنتاج</strong></td>
-      <td><code>styled-components</code> يحقن <code><style></code> كل عرض؛ 50ms إعادة حساب أنماط عند تفاعل</td>
+      <td><code>styled-components</code> يحقن <code>&lt;style&gt;</code> كل عرض؛ 50ms إعادة حساب أنماط عند تفاعل</td>
       <td>صفر وقت تشغيل غير معتمد. حل: Linaria، Panda CSS، StyleX، vanilla-extract — تجميع لـ .css ساكنة عند البناء.</td>
     </tr>
     <tr>

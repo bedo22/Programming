@@ -13,8 +13,9 @@
   <p class="kicker">Reference · Platform engineering — the layer between the browser and the component</p>
   <h1>HTML & CSS — The Platform Layer Between the Browser and the Component</h1>
   <p class="meta">The contract the browser implements: document structure, cascade, layout, theming, and the accessibility tree. Sibling docs: <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> (the rendering discipline that lives inside this substrate), <a href="./how-developers-think-frontend.html">How Developers Think</a> (the implementation loop that consumes these primitives), <a href="./javascript-the-language.html">JavaScript: The Language</a> (the language that manipulates this substrate), <a href="./system-design.html">System Design</a> (the architectural layer whose rendering strategy runs on this platform), <a href="./frontend-camps-survey.html">Frontend Camps Survey</a> (framework choices abstract this layer differently).</p>
+        <p class="meta"><strong>Who this is for:</strong> developers writing their first production HTML/CSS — and anyone who has shipped a layout shift, a specificity war, or an inaccessible <code><div onclick></code>. Assumes basic web familiarity; no framework knowledge required.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>Language:</strong> English · <a href="./ar/html-and-css.html">العربية</a>
+          <strong>Last reviewed:</strong> 2026-08-21 · <strong>Language:</strong> English · <a href="./ar/html-and-css.html">العربية</a>
         </p>
       </header>
 
@@ -27,7 +28,7 @@
 
 <p>Reading order: standalone. Cross-links:</p>
 <ul>
-  <li>Upstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — UI/UX decides what the rendered thing <em>should be</em>; HTML & CSS is the substrate it renders <em>on</em>. The state visibility matrix (<a href="./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns">§9 in UI/UX</a>) maps directly to HTML states (<code>aria-busy</code>, <code>aria-invalid</code>) and CSS states (<code>:hover</code>, <code>:focus-visible</code>, <code>[data-loading]</code>).</li>
+  <li>Upstream to <a href="./ui-ux-web-design.html">UI/UX & Web Design</a> — UI/UX decides what the rendered thing <em>should be</em>; HTML & CSS is the substrate it renders <em>on</em>. The state visibility matrix (<a href="./ui-ux-web-design.html#sec-worked-example-a-checkout-flow-that-doesn-t-punish-returns">the UI/UX worked example</a>) maps directly to HTML states (<code>aria-busy</code>, <code>aria-invalid</code>) and CSS states (<code>:hover</code>, <code>:focus-visible</code>, <code>[data-loading]</code>).</li>
   <li>Downstream to <a href="./how-developers-think-frontend.html">How Developers Think When Building a Frontend Feature</a> — the developer loop builds components using HTML elements and CSS rules as primitives. The loop's "shape" decisions (component API, state shape) are constrained by what the platform makes expressible.</li>
   <li>Cross-cutting to <a href="./javascript-the-language.html">JavaScript: The Language</a> — JS manipulates the DOM (HTML's in-memory tree) and the CSSOM (CSS's in-memory stylesheet). This doc explains what those trees <em>are</em> and how the cascade resolves before JS touches them.</li>
   <li>Cross-cutting to <a href="./system-design.html">System Design</a> — rendering strategy (SSR, RSC, Islands, SPA) is a decision about <em>who emits the initial HTML and when CSS arrives</em>. The platform contract (HTML parsing, CSS blocking, font loading) is the ground truth every strategy negotiates with.</li>
@@ -43,6 +44,21 @@
   </ul>
   <p>CSS operates on a third structure: the <strong>Render Tree</strong> (DOM + computed styles → boxes). The cascade, layout, paint, and composite all happen here. Three trees, one source: the HTML you write.</p>
 </blockquote>
+
+<h2 id="sec-the-leverage-map-where-the-work-concentrates">The leverage map — where the work actually concentrates</h2>
+
+<p>The sections that follow are many, but daily platform work does not spread evenly across them. Most component work concentrates in a handful of primitives; the rest is learned when a specific situation demands it. Rough practitioner tiers, derived from what the failure-modes catalog punishes most often, what ecosystem tooling automates first, and which features have reached Baseline:</p>
+
+<table>
+  <thead><tr><th>Tier</th><th>Primitives</th><th>Covers</th></tr></thead>
+  <tbody>
+    <tr><td><strong>T1 — master first</strong></td><td>Semantic elements and the <a href="#sec-html-platform-primitives-the-kitchen-it-ships-with">element-choice table</a>; Flexbox/Grid basics with <code>gap</code>; Custom Properties as tokens; <code>:focus-visible</code>; <code>prefers-reduced-motion</code>; logical properties (<code>*-inline-*</code>)</td><td>The large majority of everyday component work: layout, theming, state styling, keyboard accessibility, RTL readiness.</td></tr>
+    <tr><td><strong>T2 — learn when the situation demands</strong></td><td>Container queries; cascade layers (<code>@layer</code>); fluid type with <code>clamp()</code>; <code>srcset</code>/<code>picture</code>; native validation states; <code>details</code>/<code>dialog</code>/Popover API</td><td>Component-responsive design, collision-free third-party CSS, media-heavy pages, forms beyond defaults, overlays without JS.</td></tr>
+    <tr><td><strong>T3 — rare specialist knowledge</strong></td><td>Houdini paint/Typed OM; <code>@scope</code>; View Transitions; Anchor Positioning; CSS Toggles; masonry</td><td>Design-tool authors, design-system maintainers, cutting-edge interaction work. Reaching for T3 while T1 is shaky is the classic beginner inversion.</td></tr>
+  </tbody>
+</table>
+
+<p>An honesty note: the tier boundaries are practitioner judgment, not measurement — but the ordering claim is testable against your own backlog. Count the last ten CSS bugs you fixed: most will trace to T1 primitives misused, not T3 features missing.</p>
 
 ---
 <h2 id="sec-definition-what-html-css-is-and-what-it-is-not">Definition — what HTML & CSS <em>is</em> and what it is <em>not</em></h2>
@@ -350,11 +366,11 @@
 ---
 <h2 id="sec-practical-surface-the-controls-the-platform-hands-you">Practical surface — the controls the platform hands you</h2>
 
-<p>The theory in <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
+<p>The theory in <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">Underlying theory</a> is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
 
 <h2 id="sec-html-platform-primitives-the-kitchen-it-ships-with">HTML platform primitives — the kitchen it ships with</h2>
 
-<p>Semantic HTML is the accessibility API (<a href="#sec-definition-what-html-css-is-and-what-it-is-not">§1.3</a>). This is the working map of what the platform gives you before any CSS or JS.</p>
+<p>Semantic HTML is the accessibility API (<a href="#sec-definition-what-html-css-is-and-what-it-is-not">Definition</a>). This is the working map of what the platform gives you before any CSS or JS.</p>
 
 <table>
   <thead><tr><th>Category</th><th>Elements / APIs</th><th>Why it matters</th></tr></thead>
@@ -364,8 +380,8 @@
     <tr><td><strong>Text semantics</strong></td><td><code>p</code>, <code>h1</code>–<code>h6</code>, <code>strong</code>, <code>em</code>, <code>mark</code>, <code>time</code>, <code>code</code>, <code>abbr</code>, <code>blockquote</code></td><td>Meaning + styling hooks + reading structure without guesswork.</td></tr>
     <tr><td><strong>Lists</strong></td><td><code>ul</code>, <code>ol</code>, <code>dl</code>, <code>li</code>, <code>dt</code>, <code>dd</code></td><td>Grouping semantics, counted lists, term/definition pairs — not "bullets."</td></tr>
     <tr><td><strong>Tables</strong></td><td><code>table</code>, <code>thead</code>, <code>tbody</code>, <code>caption</code>, <code>th</code>, <code>td</code>, <code>scope</code></td><td>Tabular data with header association; part of the <code>table</code> AOM contract.</td></tr>
-    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (<a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs">§6e</a>).</td></tr>
-    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (<a href="#sec-media-and-responsive-images">§6f</a>).</td></tr>
+    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (<a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs">Forms and validation</a>).</td></tr>
+    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (<a href="#sec-media-and-responsive-images">Media</a>).</td></tr>
     <tr><td><strong>Disclosure & dialog</strong></td><td><code>details</code>, <code>summary</code>, <code>dialog</code>, Popover API</td><td>Native expand/collapse and overlays before any JS — keyboard and focus included.</td></tr>
     <tr><td><strong>Scripting boundary</strong></td><td><code>script</code>, <code>noscript</code>, <code>template</code></td><td>Behavior injection, progressive-enhancement escape hatch, inert markup fragments.</td></tr>
   </tbody>
@@ -570,7 +586,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </table>
 
 <ul>
-  <li>Use semantic tokens, not raw hex (see <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
+  <li>Use semantic tokens, not raw hex (see <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">Underlying theory</a>, "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
   <li>Meet WCAG AA contrast; don't communicate by color alone.</li>
   <li>Test dark mode with images, shadows, brand colors; test forced-colors mode.</li>
   <li>Adjust with OKLCH/OKLAB for perceptual uniformity; provide fallbacks for wide-gamut output.</li>
@@ -599,7 +615,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 <h2 id="sec-core-web-vitals-platform-knobs">Core Web Vitals ↔ platform knobs</h2>
 
-<p>Performance is a platform feature you configure (<a href="#sec-principles-the-shared-constants">§8</a>). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>.</p>
+<p>Performance is a platform feature you configure (<a href="#sec-principles-the-shared-constants">Principles</a>). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>. Google's published thresholds mark "good" as LCP ≤ 2.5&nbsp;s, INP ≤ 200&nbsp;ms, and CLS ≤ 0.1 at the 75th percentile — calibrate every knob-turn against those numbers, not against vibes.</p>
 
 <table>
   <thead><tr><th>Metric</th><th>HTML/CSS relevance</th></tr></thead>
@@ -971,7 +987,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     </tr>
     <tr>
       <td><strong>CSS-in-JS runtime in production</strong></td>
-      <td><code>styled-components</code> injecting <code><style></code> on every render; 50ms style recalc on interaction</td>
+      <td><code>styled-components</code> injecting <code>&lt;style&gt;</code> on every render; 50ms style recalc on interaction</td>
       <td>Zero-runtime not adopted. Fix: Linaria, Panda CSS, StyleX, vanilla-extract — compile to static .css at build.</td>
     </tr>
     <tr>
@@ -982,12 +998,12 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>Magic numbers drift</strong></td>
       <td>Hardcoded <code>px</code>/<code>hex</code> everywhere; a "small spacing" change means an audit</td>
-      <td>No token layer. Fix: hoist to custom properties (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> "Tokens over magic numbers").</td>
+      <td>No token layer. Fix: hoist to custom properties (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs">Underlying theory</a>, "Tokens over magic numbers").</td>
     </tr>
     <tr>
       <td><strong>Utility soup</strong></td>
       <td>Markup becomes <code>&lt;div class="pt-4 flex gap-2 text-sm text-muted item-center"&gt;</code>; semantics gone</td>
-      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (<a href="#sec-methodologies-named-frameworks">§7</a> Methodologies).</td>
+      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (<a href="#sec-methodologies-named-frameworks">Methodologies</a>).</td>
     </tr>
     <tr>
       <td><strong>Sticky misuse: doesn't stick</strong></td>
@@ -1002,7 +1018,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>CSS-only overreach</strong></td>
       <td>Tabs, accordions, form validation logic forced into <code>:nth-child</code> and selectors</td>
-      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> "State lives in attributes").</td>
+      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs">"State lives in attributes"</a>).</td>
     </tr>
     <tr>
       <td><strong>Unused / undelivered CSS</strong></td>
@@ -1012,12 +1028,12 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>Dark mode inverted media hack</strong></td>
       <td><code>filter: invert() hue-rotate(...)</code> breaks images, brand colors, shadows</td>
-      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (<a href="#sec-color-systems-and-theming">§6h</a>).</td>
+      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (<a href="#sec-color-systems-and-theming">Color systems</a>).</td>
     </tr>
     <tr>
       <td><strong>Animation overuse</strong></td>
       <td>Entry animations everywhere; vestibular discomfort; heavy main-thread load</td>
-      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (<a href="#sec-motion-and-transitions">§6i</a>).</td>
+      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (<a href="#sec-motion-and-transitions">Motion</a>).</td>
     </tr>
     <tr>
       <td><strong>Token bureaucracy</strong></td>
@@ -1168,6 +1184,26 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     </tr>
   </tbody>
 </table>
+
+---
+<details>
+<summary><h3 style="display:inline">Search vocabulary — what things are called</h3></summary>
+<p>You cannot search for a problem you cannot name. The terms of art this doc uses, each one a working search key:</p>
+<ul>
+  <li><strong>BFC (block formatting context)</strong> — why margins collapse and floats overflow. Search "BFC margin collapse".</li>
+  <li><strong>AOM / accessibility tree</strong> — what screen readers actually traverse. Search "accessibility tree vs DOM".</li>
+  <li><strong>Cascade layers (<code>@layer</code>)</strong> — explicit origin ordering; ends specificity wars. Search "CSS cascade layers tutorial".</li>
+  <li><strong>Logical properties (<code>*-inline-start/end</code>)</strong> — RTL-ready spacing without overrides. Search "CSS logical properties".</li>
+  <li><strong>Container query (<code>@container</code>)</strong> — component-owned breakpoints. Search "container queries vs media queries".</li>
+  <li><strong>Intrinsic sizing (<code>min-content</code>/<code>max-content</code>/<code>fit-content</code>)</strong> — layout from content outward. Search "intrinsic web design".</li>
+  <li><strong>CLS / LCP / INP</strong> — the three Core Web Vitals. Search each plus "thresholds".</li>
+  <li><strong>FOIT / FOUT</strong> — invisible/flashing text during font load. Search "font-display swap optional".</li>
+  <li><strong>Forced colors</strong> — Windows High Contrast mode contract. Search "forced-colors CSS".</li>
+  <li><strong>Baseline</strong> — cross-browser support status. Search "web platform Baseline status".</li>
+  <li><strong>OKLCH</strong> — perceptually uniform color space. Search "OKLCH color CSS".</li>
+  <li><strong>DTCG tokens</strong> — the W3C design-tokens format that compiles to custom properties. Search "W3C design tokens format".</li>
+</ul>
+</details>
 
 ---
 <h2 id="sec-summary-the-platform-checklist">Summary — the platform checklist</h2>
