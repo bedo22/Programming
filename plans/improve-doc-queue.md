@@ -10,10 +10,11 @@ AR twin through the pipeline/splice and runs the battery before its checkpoint.
 - [x] 1. **javascript-the-language** ✅ v62 — 299w/sec, 43 numerals, no teacher device. Foundation-tier language doc.
 - [x] 2. **class-to-hooks-paradigm-shift** ✅ v63 (h3 divergence → SYNC queue) — worst overall: 316w/sec, 59 numerals, 35 sections uncollapsed.
 - [x] 3. **react-2024-and-beyond** ✅ v68 (incl. nested-anchor + base64 corruption repair) — 261w/sec, 46 numerals (PROGRESS.md hygiene-debt list).
-- [ ] 4. **javascript-across-stacks** — 353w/sec but 30 numerals + open catalogs.
-- [ ] 5. **what-is-state-prequel** — React-path on-ramp; audit first (was recently reworked).
-- [ ] 6. **ui-ux-web-design** — sibling of html-and-css; AR h2s still numbered per PROGRESS.md.
-- [ ] 7. **how-developers-think-frontend** — implementation loop; verify devices before assuming gaps.
+- [x] 4. **javascript-across-stacks** ✅ v69 — 353w/sec but 30 numerals + open catalogs.
+- [x] 5. **what-is-state-prequel** ✅ v70 — React-path on-ramp; audit first (was recently reworked).
+- [ ] 6. **ui-ux-web-design** ⚠️ v71 template-only (markers+vocab; doc never fully read) → REDO required — sibling of html-and-css; AR h2s still numbered per PROGRESS.md.
+- [x] 7. **how-developers-think-frontend** ✅ v72 — implementation loop; verify devices before assuming gaps.
+- [ ] 6b. **ui-ux-web-design REDO** — full read + diagnosis-driven additions per user correction (v71 was template treatment).
 - [ ] 8. **software-testing-and-debugging** — 240w/sec, 18 numerals.
 - [ ] 9. **system-design** — architecture anchor; likely needs leverage map more than devices.
 - [ ] 10. **api-design** — contracts tier; same treatment.
