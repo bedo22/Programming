@@ -90,6 +90,8 @@
 </tbody>
 </table>
 
+<p><strong>Why these structures exist.</strong> Every data structure in this doc was invented to solve a specific computational constraint: arrays give O(1) index access but O(n) search; hash maps give O(1) search but lose ordering; heaps give O(log n) min/max but not search; tries give O(prefix-length) lookup but waste memory on short keys; graphs model relationships that trees cannot (cycles, many-to-many). The "right" structure is the one whose strengths match your operation and whose weaknesses don't matter for your problem. That's the whole discipline — not memorizing structures, but matching constraints to trade-offs.</p>
+
 <h2 id="sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit">Paradigm selection — the thinking that reaches for the toolkit</h2>
 
 <p>
