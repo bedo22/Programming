@@ -30,6 +30,28 @@
   <p>الإيقاع ينتج التزامات؛ العملية تنظمهم؛ هذا المستند ينشرهم. كل منهم يجيب "كيف" مختلفًا.</p>
 </blockquote>
 
+<nav class="doc-toc">
+  <details open>
+    <summary>انتقل إلى</summary>
+    <ul>
+      <li><a href="#sec-how-to-use-this-doc">كيف تستخدم هذا المستند</a></li>
+      <li><a href="#sec-mental-models-how-senior-engineers-actually-reason-about-delivery">النماذج العقلية</a></li>
+      <li><a href="#sec-definition-what-version-control-is-and-what-it-is-not">التعريف</a></li>
+      <li><a href="#sec-the-internals-objects-dag-and-branches">Git من الداخل (DAG)</a></li>
+      <li><a href="#sec-branching-strategies-how-teams-share-the-dag">استراتيجيات التفرع</a></li>
+      <li><a href="#sec-the-collaboration-loop-push-pull-merge-and-the-pull-request">حلقة التعاون / طلب السحب</a></li>
+      <li><a href="#sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">التكامل المستمر</a></li>
+      <li><a href="#sec-continuous-delivery-continuous-deployment-get-the-distinction-right">التسليم vs النشر</a></li>
+      <li><a href="#sec-deployment-strategies-the-ship-it-safely-toolbox">استراتيجيات النشر</a></li>
+      <li><a href="#sec-semver-and-releases-naming-the-snapshots-you-ship">SemVer والإصدارات</a></li>
+      <li><a href="#sec-a-concrete-walkthrough-one-push-taken-through-every-stage">جولة عملية</a></li>
+      <li><a href="#sec-worked-example-the-hackerrank-repo-shipped">مثال HackerRank</a></li>
+      <li><a href="#sec-the-most-common-failure-modes">أنماط الفشل</a></li>
+      <li><a href="#sec-the-complete-mental-checklist">قائمة التحقق</a></li>
+    </ul>
+  </details>
+</nav>
+
 <h2 id="sec-how-to-use-this-doc">كيف تستخدم هذا المستند</h2>
 
 <p>ترتيب القراءة: مستقل، لكن الأكثر فائدة <em>بعد</em> إيقاع مقياس الميزة (<a href="./how-developers-think-frontend.html">الإيقاع</a>) وبجانب مستند العملية (<a href="../software-development-process.html">عملية تطوير البرمجيات</a>). الروابط المتقاطعة:</p>
@@ -143,6 +165,52 @@
 </ul>
 
 <p><strong>كيف تختار:</strong> هل يمكنك نشر <code>main</code> للإنتاج في أي لحظة؟ إذن GitHub Flow/الخط الرئيسي. هل تنشر إصدارات مُوسمة لعملاء يدفعون بنظام صارم؟ إذن فرع إصدار يضيف بنية. عند الشك، ابدأ بالتطوير على الخط الرئيسي — الطقوس تظهر عندما يحتاجها إصدار فعلي (<a href="#sec-the-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</a> فشل "الإفراط في الهندسة").</p>
+
+<details>
+  <summary><strong>جدول القرار: أي استراتيجية تفرع تناسب فريقك؟</strong></summary>
+  <table>
+    <thead>
+      <tr>
+        <th>الإشارة</th>
+        <th>الاستراتيجية الموصى بها</th>
+        <th>لماذا</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>نشر إلى الإنتاج في أي لحظة (SaaS، تطبيق ويب)</td>
+        <td>الخط الرئيسي / GitHub Flow</td>
+        <td>الخط الرئيسي جاهز للإطلاق دائمًا؛ CI هي البوابة الوحيدة.</td>
+      </tr>
+      <tr>
+        <td>إصدارات مجدولة للعملاء المدفوعين (منتج مُصدَّر)</td>
+        <td>فروع إصدار (GitFlow خفيف)</td>
+        <td>قطارات الإصدار تحتاج نافذة تثبيت و artefacts مُرقّمة.</td>
+      </tr>
+      <tr>
+        <td>دعم عدة إصدارات طويلة العيش في نفس الوقت</td>
+        <td>GitFlow</td>
+        <td>فروع إصلاح سريع لكل سطر إصدار؛ الطقوس تستحقها.</td>
+      </tr>
+      <tr>
+        <td>مشروع شخصين، بدون عملية إصدار</td>
+        <td>الخط الرئيسي (minimal)</td>
+        <td>أي نموذج تفرع فيه تكلفة ضائعة؛ التزام فقط إلى الخط الرئيسي.</td>
+      </tr>
+      <tr>
+        <td>تطبيق محمول مع دورات مراجعة المتجر</td>
+        <td>فروع إصدار + أعلام الميزات</td>
+        <td>موافقة المتجر تضيف أسابيع؛ تحتاج فرعًا مستقرًا لانتقاء الإصلاحات.</td>
+      </tr>
+      <tr>
+        <td>مكتبة مع عقد توافق semver</td>
+        <td>الخط الرئيسي + فروع إصدار</td>
+        <td>الخط الرئيسي يتتبع الأ major التالي؛ فروع الإصدار تحافظ على الـ minor/patch الحالي.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>السؤال الجوهري: <em>هل يمكن للخط الرئيسي الذهاب إلى الإنتاج الآن؟</em> إذا نعم، الخط الرئيسي. إذا لا، تحتاج فرعًا يمكنه ذلك.</p>
+</details>
 
 <h3>طلب السحب كوحدة تغيير (مع CI + مراجعة)</h3>
 <p>سير عمل GitHub يعامل <strong>طلب السحب</strong> كوحدة قابلة للمراجعة، مُبوّبة: فرع → التزام شريحة → دفع → فتح طلب سحب → CI يفحص → الزملاء يراجعون → دمج (أو عند بوابة خضراء). طلب السحب هو حيث "تحقق قبل أن تدمج" من مستند العملية يعيش جسديًا — الانضباط المفروض للالتزام بصغر، قابلية المراجعة، والمُبوّب <em>حيًا</em> بحماية الفرع التي لن تدمج خطًا رئيسيًا معطلًا.</p>

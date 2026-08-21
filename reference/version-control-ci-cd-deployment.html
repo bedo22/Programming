@@ -71,6 +71,28 @@
         </p>
       </blockquote>
 
+      <nav class="doc-toc">
+        <details open>
+          <summary>Jump to</summary>
+          <ul>
+            <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+            <li><a href="#sec-mental-models-how-senior-engineers-actually-reason-about-delivery">Mental models</a></li>
+            <li><a href="#sec-version-control-what-it-is-and-why-it-exists">Version control — what it is</a></li>
+            <li><a href="#sec-the-internals-objects-dag-and-branches">Git internals (DAG)</a></li>
+            <li><a href="#sec-branching-strategies-how-teams-share-the-dag">Branching strategies</a></li>
+            <li><a href="#sec-the-collaboration-loop-push-pull-merge-and-the-pull-request">Collaboration loop / PR</a></li>
+            <li><a href="#sec-continuous-integration-what-a-pipeline-actually-runs-and-why-it-s-a-gate">Continuous Integration</a></li>
+            <li><a href="#sec-continuous-delivery-continuous-deployment-get-the-distinction-right">CD vs CD</a></li>
+            <li><a href="#sec-deployment-strategies-the-ship-it-safely-toolbox">Deployment strategies</a></li>
+            <li><a href="#sec-semver-and-releases-naming-the-snapshots-you-ship">SemVer &amp; releases</a></li>
+            <li><a href="#sec-a-concrete-walkthrough-one-push-taken-through-every-stage">Worked walkthrough</a></li>
+            <li><a href="#sec-worked-example-the-hackerrank-repo-shipped">HackerRank worked example</a></li>
+            <li><a href="#sec-the-most-common-failure-modes">Failure modes</a></li>
+            <li><a href="#sec-the-complete-mental-checklist">Mental checklist</a></li>
+          </ul>
+        </details>
+      </nav>
+
       <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
       <p>
@@ -537,6 +559,72 @@
         branch adds structure. When in doubt, start trunk-based — the ceremony
         emerges when a release actually needs it (<a href="#sec-the-most-common-failure-modes">The most common failure modes</a> "over-engineering").
       </p>
+
+      <details>
+        <summary><strong>Decision table: which branching strategy fits your team?</strong></summary>
+        <table>
+          <thead>
+            <tr>
+              <th>Signal</n              </th>
+              <th>Recommended strategy
+              </th>
+              <th>Why
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Deploy to prod at any moment (SaaS, web app)
+              </td>
+              <td>Trunk-based / GitHub Flow
+              </td>
+              <td>Main is always releasable; CI is the only gate.
+              </td>
+            </tr>
+            <tr>
+              <td>Scheduled releases to paying customers (versioned product)
+              </td>
+              <td>Release branches (light GitFlow)
+              </td>
+              <td>Release trains need a stabilization window and tagged artifacts.
+              </td>
+            </tr>
+            <tr>
+              <td>Multiple long-lived versions supported simultaneously
+              </td>
+              <td>GitFlow
+              </td>
+              <td>Hotfix branches per release line; ceremony earns its keep.
+              </td>
+            </tr>
+            <tr>
+              <td>2-person project, no release process
+              </td>
+              <td>Trunk-based (minimal)
+              </td>
+              <td>Overhead of any branch model is wasted; just commit to main.
+              </td>
+            </tr>
+            <tr>
+              <td>Mobile app with store review cycles
+              </td>
+              <td>Release branches + feature flags
+              </td>
+              <td>Store approval adds weeks; you need a stable branch to cherry-pick fixes.
+              </td>
+            </tr>
+            <tr>
+              <td>Library with semver compatibility contract
+              </td>
+              <td>Trunk-based + release branches
+              </td>
+              <td>Main tracks next major; release branches maintain current minor/patch.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>The key question: <em>can main go to production right now?</em> If yes, trunk-based. If no, you need a branch that can.</p>
+      </details>
 
       <h3>The pull request as the unit of change (with CI + review)</h3>
       <p>
