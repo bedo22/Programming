@@ -142,6 +142,8 @@
   </tbody>
 </table>
 
+<p><strong>لماذا نجحت.</strong> منصة الويب نجحت في كل محاولة استبدالها (Flash، Silverlight، Java Applets، التطبيقات الأصلية) لأن عقدها فريد في مرونته: مستند إعلاني يظهر في كل مكان، يتدهور ب graceful، ويمكن فحصه افتراضياً. كل milestone حل ألم حقيقي: CSS 1 فصل البنية عن العرض (نهاية عصر font)، Flexbox قتل clearfix، Grid قتل الـ holy grail float، استعلامات الحاوية قلت عملarounds استعلام viewport، وطبقات التسلسل الهرمي قلت حرب !important تصاعد. المنصة تمتص الأنماط التي كانت polyfill أو خاصة بالإطارات — التداخل، التحديد النطاق، تموضع المرساة — لأن نمط انعكاس القيد يتكرر: حين يتحرك القيد المهيمن، تبتلع ميزة المنصة الجديدة ذلك القيد.</p>
+
 ---
 
 <h2 id="sec-evolution-constraint-inversions-across-the-platform">تطور — انعكاسات القيود عبر المنصة</h2>
@@ -1021,7 +1023,8 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display:inline">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2></summary>
 
 <p>المنصة جيدة فقط بقدر الأدوات التي تجعل أولياتها مرئية، قابلة للاختبار، وقابلة للمشاركة. يسرد هذا القسم فئات الأدوات الأساسية، مع معايير قرار لكل منها.</p>
 
@@ -1092,6 +1095,8 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </table>
 
 <p><strong>طريقة اختيار:</strong> ابدأ بالتأليف (Stylelint + CSS Modules) + خط إنتاج الرموز (Style Dictionary) + التراجع البصري (Chromatic/Playwright). أضف CSS-in-JS إذا كان تحديد الموقع المشترك للمكون مهمًا. أضف إطار الأدوات إذا كان الالتزام بنظام التصميم هو الأولوية. أضف تدقيق إمكانية الوصول إذا كان القطاع منظماً أو عام. أضف ملف الأداء إذا كانت Core Web Vitals هي مؤشرات الأداء الرئيسية. المنصة توفر الأوليات؛ الأدوات تجعلها قابلة للحوكمة.</p>
+
+</details>
 
 ---
 

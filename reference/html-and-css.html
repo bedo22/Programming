@@ -140,6 +140,8 @@
   </tbody>
 </table>
 
+<p><strong>Why this survived.</strong> The web platform survived every attempt to replace it (Flash, Silverlight, Java Applets, native apps) because its contract is uniquely resilient: a declarative document that renders everywhere, degrades gracefully, and is inspectable by default. Each milestone solved a real pain: CSS 1 separated structure from presentation (ending the <font> tag era), Flexbox killed the clearfix hack, Grid killed the float-based holy grail, Container Queries killed viewport-query workarounds, and Cascade Layers killed the !important escalation war. The platform absorbs patterns that were previously polyfilled or framework-specific — nesting, scoping, anchor positioning — because the constraint inversion pattern repeats: when the dominant constraint shifts, a new platform feature absorbs it.</p>
+
 ---
 <h2 id="sec-evolution-constraint-inversions-across-the-platform">Evolution — constraint inversions across the platform</h2>
 
@@ -348,11 +350,11 @@
 ---
 <h2 id="sec-practical-surface-the-controls-the-platform-hands-you">Practical surface — the controls the platform hands you</h2>
 
-<p>The theory in <a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
+<p>The theory in <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> is the substrate; this section is the concrete control surface you reach for every day. It maps the most common practical needs to the platform primitive that answers them, so you choose the built-in before you invent a workaround. Anything a sibling doc owns more deeply is linked rather than re-litigated here.</p>
 
 <h2 id="sec-html-platform-primitives-the-kitchen-it-ships-with">HTML platform primitives — the kitchen it ships with</h2>
 
-<p>Semantic HTML is the accessibility API (<a href="#sec-definition-what-html-css-is-and-what-it-is-not"><a href="#sec-definition-what-html-css-is-and-what-it-is-not">§1.3</a></a>). This is the working map of what the platform gives you before any CSS or JS.</p>
+<p>Semantic HTML is the accessibility API (<a href="#sec-definition-what-html-css-is-and-what-it-is-not">§1.3</a>). This is the working map of what the platform gives you before any CSS or JS.</p>
 
 <table>
   <thead><tr><th>Category</th><th>Elements / APIs</th><th>Why it matters</th></tr></thead>
@@ -362,8 +364,8 @@
     <tr><td><strong>Text semantics</strong></td><td><code>p</code>, <code>h1</code>–<code>h6</code>, <code>strong</code>, <code>em</code>, <code>mark</code>, <code>time</code>, <code>code</code>, <code>abbr</code>, <code>blockquote</code></td><td>Meaning + styling hooks + reading structure without guesswork.</td></tr>
     <tr><td><strong>Lists</strong></td><td><code>ul</code>, <code>ol</code>, <code>dl</code>, <code>li</code>, <code>dt</code>, <code>dd</code></td><td>Grouping semantics, counted lists, term/definition pairs — not "bullets."</td></tr>
     <tr><td><strong>Tables</strong></td><td><code>table</code>, <code>thead</code>, <code>tbody</code>, <code>caption</code>, <code>th</code>, <code>td</code>, <code>scope</code></td><td>Tabular data with header association; part of the <code>table</code> AOM contract.</td></tr>
-    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (<a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs"><a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs">§6e</a></a>).</td></tr>
-    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (<a href="#sec-media-and-responsive-images"><a href="#sec-media-and-responsive-images">§6f</a></a>).</td></tr>
+    <tr><td><strong>Forms</strong></td><td><code>form</code>, <code>label</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>button</code>, <code>fieldset</code>, <code>legend</code>, <code>output</code></td><td>Native interaction, validation, focus, keyboard, submission (<a href="#sec-forms-and-validation-platform-behavior-not-styled-inputs">§6e</a>).</td></tr>
+    <tr><td><strong>Media</strong></td><td><code>img</code>, <code>picture</code>, <code>video</code>, <code>audio</code>, <code>figure</code>, <code>figcaption</code>, <code>track</code></td><td>Responsive and accessible media, captions, art direction (<a href="#sec-media-and-responsive-images">§6f</a>).</td></tr>
     <tr><td><strong>Disclosure & dialog</strong></td><td><code>details</code>, <code>summary</code>, <code>dialog</code>, Popover API</td><td>Native expand/collapse and overlays before any JS — keyboard and focus included.</td></tr>
     <tr><td><strong>Scripting boundary</strong></td><td><code>script</code>, <code>noscript</code>, <code>template</code></td><td>Behavior injection, progressive-enhancement escape hatch, inert markup fragments.</td></tr>
   </tbody>
@@ -568,7 +570,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </table>
 
 <ul>
-  <li>Use semantic tokens, not raw hex (see <a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
+  <li>Use semantic tokens, not raw hex (see <a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> "Tokens over magic numbers"; design tokens originate in <a href="./ui-ux-web-design.html">UI/UX</a> and run on custom properties here).</li>
   <li>Meet WCAG AA contrast; don't communicate by color alone.</li>
   <li>Test dark mode with images, shadows, brand colors; test forced-colors mode.</li>
   <li>Adjust with OKLCH/OKLAB for perceptual uniformity; provide fallbacks for wide-gamut output.</li>
@@ -597,7 +599,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 <h2 id="sec-core-web-vitals-platform-knobs">Core Web Vitals ↔ platform knobs</h2>
 
-<p>Performance is a platform feature you configure (<a href="#sec-principles-the-shared-constants"><a href="#sec-principles-the-shared-constants">§8</a></a>). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>.</p>
+<p>Performance is a platform feature you configure (<a href="#sec-principles-the-shared-constants">§8</a>). Each Core Web Vital maps to specific HTML/CSS controls; the knobs are here, the measurement and rendering-strategy workflow lives in <a href="./system-design.html">System Design</a>.</p>
 
 <table>
   <thead><tr><th>Metric</th><th>HTML/CSS relevance</th></tr></thead>
@@ -980,12 +982,12 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>Magic numbers drift</strong></td>
       <td>Hardcoded <code>px</code>/<code>hex</code> everywhere; a "small spacing" change means an audit</td>
-      <td>No token layer. Fix: hoist to custom properties (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> "Tokens over magic numbers").</td>
+      <td>No token layer. Fix: hoist to custom properties (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> "Tokens over magic numbers").</td>
     </tr>
     <tr>
       <td><strong>Utility soup</strong></td>
       <td>Markup becomes <code>&lt;div class="pt-4 flex gap-2 text-sm text-muted item-center"&gt;</code>; semantics gone</td>
-      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (<a href="#sec-methodologies-named-frameworks"><a href="#sec-methodologies-named-frameworks">§7</a></a> Methodologies).</td>
+      <td>Utility-only style with no component boundary. Fix: componentize repeated patterns; keep only one token source (<a href="#sec-methodologies-named-frameworks">§7</a> Methodologies).</td>
     </tr>
     <tr>
       <td><strong>Sticky misuse: doesn't stick</strong></td>
@@ -1000,7 +1002,7 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>CSS-only overreach</strong></td>
       <td>Tabs, accordions, form validation logic forced into <code>:nth-child</code> and selectors</td>
-      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs"><a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a></a> "State lives in attributes").</td>
+      <td>Complex state machines don't belong in stylesheets. Fix: keep behavior in JS + HTML state attributes; CSS selects states (<a href="#sec-underlying-theory-the-algorithms-the-platform-runs">§5</a> "State lives in attributes").</td>
     </tr>
     <tr>
       <td><strong>Unused / undelivered CSS</strong></td>
@@ -1010,12 +1012,12 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
     <tr>
       <td><strong>Dark mode inverted media hack</strong></td>
       <td><code>filter: invert() hue-rotate(...)</code> breaks images, brand colors, shadows</td>
-      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (<a href="#sec-color-systems-and-theming"><a href="#sec-color-systems-and-theming">§6h</a></a>).</td>
+      <td>Filter is a blunt instrument. Fix: design tokens + OKLCH + <code>color-scheme</code> (<a href="#sec-color-systems-and-theming">§6h</a>).</td>
     </tr>
     <tr>
       <td><strong>Animation overuse</strong></td>
       <td>Entry animations everywhere; vestibular discomfort; heavy main-thread load</td>
-      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (<a href="#sec-motion-and-transitions"><a href="#sec-motion-and-transitions">§6i</a></a>).</td>
+      <td>Motion treated as decoration. Fix: motion tokens + <code>prefers-reduced-motion</code> (<a href="#sec-motion-and-transitions">§6i</a>).</td>
     </tr>
     <tr>
       <td><strong>Token bureaucracy</strong></td>
@@ -1040,7 +1042,8 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display:inline">Ecosystem — tooling catalog with decision metrics</h2></summary>
 
 <p>The platform is only as good as the tooling that makes its primitives visible, testable, and shareable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -1111,6 +1114,8 @@ padding-inline: clamp(1rem, 4vw, 2rem);</code></pre>
 </table>
 
 <p><strong>Selection heuristic:</strong> Start with Authoring (Stylelint + CSS Modules) + Token Pipeline (Style Dictionary) + Visual Regression (Chromatic/Playwright). Add CSS-in-JS if component co-location matters. Add Utility framework if design system adherence is the priority. Add A11y linting if regulated or public sector. Add Performance profiling if Core Web Vitals are KPIs. The platform provides the primitives; the tooling makes them governable.</p>
+
+</details>
 
 ---
 
