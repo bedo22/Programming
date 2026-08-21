@@ -474,7 +474,32 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2><h2 id="sec-principles-the-design-bets-that-survive-every-change">المبادئ — رهانات التصميم التي تنجو كل تغيير</h2>
+<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">النظام الإيكولوجي — كتالوج الأدوات مع معايير القرار</h2>
+
+<details>
+<summary>توسيع كتالوج النظام البيئي</summary>
+
+<table>
+  <thead><tr><th>الفئة</th><th>الأدوات / المنصات</th><th>المحرّك ← الهدف</th><th>معايير القرار</th></tr></thead>
+  <tbody>
+    <tr><td><strong>الفحص والتنسيق</strong></td><td>ESLint، Biome، Prettier، dprint، Oxlint</td><td>نمط غير متسق / أخطاء خفية ← مُ enforce، إصلاح تلقائي، بوابة CI</td><td>تغطية القواعد؛ معدل الإيجابيات الكاذبة؛ زمن الإصلاح</td></tr>
+    <tr><td><strong>فحص الأنواع</strong></td><td>TypeScript (tsc)، JSDoc + TS Check</td><td>أنواع ديناميكية ← عقود ثابتة، التقاط الانحدارات عند البناء</td><td>تغطية الأنواع؛ نسبة any؛ كثافة الأخطاء</td></tr>
+    <tr><td><strong>الاختبار</strong></td><td>Vitest، Jest، Playwright، Cypress</td><td>سلوك غير مُختبر ← سلوك مُتحقق ومُ.nano</td><td>التغطية؛ معدل التقاط الأخطاء؛ وقت التنفيذ</td></tr>
+    <tr><td><strong>التجميع والترجمة</strong></td><td>Vite، Rspack، Turbopack، esbuild، swc</td><td>مصدر ← حزم مُحسّنة ومُ nano</td><td>وقت البناء؛ حجم الحزمة؛ استراتيجية التقسيم</td></tr>
+    <tr><td><strong>البيئة التنفيذية</strong></td><td>Node.js، Deno، Bun، Cloudflare Workers</td><td>كود ← منفذ في البيئة المستهدفة</td><td>زمن بدء التنفيذ؛ حجم الذاكرة؛ توافق الواجهات</td></tr>
+    <tr><td><strong>التحليل الثابت والأمان</strong></td><td>SonarQube، CodeQL، Semgrep، Snyk</td><td>ثغرات غير معروفة ← مُsurface، مُرتب، مُصحّح</td><td>معدل اكتشاف الثغرات؛ معدل الإيجابيات الكاذبة</td></tr>
+    <tr><td><strong>قياس الأداء</strong></td><td>Chrome DevTools، Node --inspect، Speedscope</td><td>كود بطيء ← عنق زجاجة مُحدد ← مسار حار مُحسّن</td><td>الزمن للعنق الزجاجة؛ وضوح رسم اللهب</td></tr>
+    <tr><td><strong>الهجرة والكود_modes</strong></td><td>jscodeshift، TS Morph، Babel plugins</td><td>أنماط قديمة ← ما يعادلها الحديث على نطاق واسع</td><td>دقة التحويل؛ نسبة الإصلاح اليدوي</td></tr>
+    <tr><td><strong>التوثيق</strong></td><td>TypeDoc، JSDoc، VitePress</td><td>كود مصدري ← وثائق حية وقابلة للبحث</td><td>التغطية؛ الانحراف (كود vs وثائق)</td></tr>
+    <tr><td><strong>التطوير بالذكاء الاصطناعي</strong></td><td>GitHub Copilot، Cursor، Windsurf</td><td>نية ← كود / اختبار / إعادة هيكلة / شرح</td><td>معدل القبول؛ معدل التقاط الهلوسة</td></tr>
+  </tbody>
+</table>
+
+<p><strong>طريقة الاختيار:</strong> ابدأ بالفحص + فحص الأنواع + الاختبار («一组最小 أدوات JS viability»). أضف التجميع عندما يتجاوز وقت البناء 30 ثانية. أضف التحليل الثابت عندما يتجاوز عدد التبعيات 100. الأداة تخدم اللغة — لا العكس.</p>
+
+</details>
+
+<h2 id="sec-principles-the-design-bets-that-survive-every-change">المبادئ — رهانات التصميم التي تنجو كل تغيير</h2>
 
 <p>كل ما فوق، مضغوطاً إلى القواعد التي يمكنك حملها وإعادة اشتقاق التفاصيل منها:</p>
 

@@ -503,6 +503,9 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 
 <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
 
+<details>
+<summary>Expand ecosystem catalog</summary>
+
 <p>The language is only as useful as the tooling that makes its semantics visible, testable, and migratable. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
 <table>
@@ -572,6 +575,8 @@ console.log(a.x); <span class="output">// 2 — a saw the change too</span></cod
 </table>
 
 <p><strong>Selection heuristic:</strong> Start with Linting + Type Checking + Testing (the "minimum viable JS toolkit"). Add Bundling when build time >30s or bundle size matters. Add Static Analysis when dependency count >100. Add Profiling when p99 latency > budget. Add Migration tooling when pattern count >5 across codebase. The tool serves the language — not the reverse.</p>
+
+</details>
 
 ---
 
