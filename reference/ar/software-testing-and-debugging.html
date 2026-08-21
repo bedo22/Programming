@@ -14,7 +14,8 @@
   <h1>الاختبار والتصحيح</h1>
   <p class="meta">ما هو الاختبار (أسلوب منضبط لإنتاج دليل حول سلوك البرمجيات) وما هو التصحيح (البحث المنضبط عن عطل عندما يقول الدليل إن السلوك خاطئ). يغطي كيف يختلف الاختبار عن التصحيح، والتحقق والمصادقة وضمان الجودة، والتاريخ من التصحيح إلى الاختبار المستمر وفي عصر الذكاء الاصطناعي، والمستويات والتقنيات التي تبني ثقةً مفيدة، والبدائل الاختبارية وTDD، وكيفية اختيار استراتيجية اختبار دون عبادة الهرم، والاختبار غير الوظيفي، والتحقق من الإنتاج، وصندوق أدوات التصحيح. اقرأه لفهم ما الدليل الذي يحتاجه كودك قبل أن يثق به خط التسليم — وماذا تفعل عندما يفشل ذلك الدليل.</p>
         <p class="meta" style="margin-bottom: 0">
-          <strong>اللغة:</strong> العربية · <a href="../software-testing-and-debugging.html">English</a>
+          <p class="meta"><strong>لمن هذه الوثيقة:</strong> مطوّرون يكتبون كوداً يجب أن يُوثَق به — من يقرّر ماذا يختبر وكيف، أو ماذا يعني بناء أحمر. اقرأها إلى جانب وثيقة CI/CD.</p>
+        <p class="meta" style="margin-bottom: 0"><strong>آخر مراجعة:</strong> 2026-08-21 · <strong>اللغة:</strong> العربية · <a href="../software-testing-and-debugging.html">English</a></p>
         </p>
       </header>
 
@@ -66,7 +67,7 @@
   <li>الجودة: <a href="./cs-and-software-engineering.html">علوم الحاسوب وهندسة البرمجيات</a> — سمات الجودة والمفاضلات التي يقيّمها الاختبار.</li>
   <li>مرجع: <a href="./glossary.html">المعجم</a> — المصطلحات المشتركة.</li>
 </ul>
-<p><strong>إذا تساءلت يومًا لماذا لا تكفي اختبارات الوحدة، أو متى يضرّ الـ mock أكثر مما ينفع، أو ما الذي يشتريه لك TDD فعلًا، أو كيف يعرف الفريق أن النشر سليم بعد الإصدار، فهذا المستند يجيب.</strong> اقرأ <a href="#sec-definition-what-testing-is-and-what-it-is-not">§١</a>–<a href="#sec-testing-techniques-how-to-choose-inputs-that-matter">§٣</a> أولًا، ثم <a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">§٤</a>–<a href="#sec-testing-metrics-how-to-know-whether-the-evidence-is-useful">§٨</a> لصندوق الأدوات العملي، و<a href="#sec-production-verification-testing-does-not-stop-at-deployment">§٩</a> للتحقق من الإنتاج و<a href="#sec-debugging-the-evidence-when-a-test-fails">§١٠</a> للتصحيح (الدليل عند فشل اختبار)، ثم <a href="#sec-ai-era-testing-generated-code-and-nondeterministic-systems">§١١</a>–<a href="#sec-the-complete-mental-checklist">§١٥</a> لحدود الذكاء الاصطناعي، والمثال الكامل، وخريطة الأدوات، وأنماط الفشل، وقائمة المراجعة.</p><h2 id="sec-definition-what-testing-is-and-what-it-is-not">التعريف — ما هو الاختبار، وما هو <em>ليس</em></h2>
+<p><strong>إذا تساءلت يومًا لماذا لا تكفي اختبارات الوحدة، أو متى يضرّ الـ mock أكثر مما ينفع، أو ما الذي يشتريه لك TDD فعلًا، أو كيف يعرف الفريق أن النشر سليم بعد الإصدار، فهذا المستند يجيب.</strong> اقرأ <a href="#sec-definition-what-testing-is-and-what-it-is-not">تعريف الاختبار</a>–<a href="#sec-testing-techniques-how-to-choose-inputs-that-matter">تقنيات الاختيار</a> أولًا، ثم <a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">مضاعفات الاختبار</a>–<a href="#sec-testing-metrics-how-to-know-whether-the-evidence-is-useful">مقاييس الاختبار</a> لصندوق الأدوات العملي، و<a href="#sec-production-verification-testing-does-not-stop-at-deployment">التحقق في الإنتاج</a> للتحقق من الإنتاج و<a href="#sec-debugging-the-evidence-when-a-test-fails">أدلة التنقيح</a> للتصحيح (الدليل عند فشل اختبار)، ثم <a href="#sec-ai-era-testing-generated-code-and-nondeterministic-systems">اختبار عصر الذكاء الاصطناعي</a>–<a href="#sec-the-complete-mental-checklist">قائمة التحقق</a> لحدود الذكاء الاصطناعي، والمثال الكامل، وخريطة الأدوات، وأنماط الفشل، وقائمة المراجعة.</p><h2 id="sec-definition-what-testing-is-and-what-it-is-not">التعريف — ما هو الاختبار، وما هو <em>ليس</em></h2>
 
 <p><strong>الاختبار البرمجي</strong> هو تخصص إنتاج دليلٍ مفيد حول نظام برمجي عبر مراقبة سلوكه أو التحقق منه في ظروفٍ منتقاة. الاختبار ليس مجرد كود يعمل — بل ادعاءٌ حول السلوك المتوقع مقترنٌ بملاحظةٍ يمكنها تأكيده أو دحضه. يقع الاختبار داخل ممارسة <em>التحقق والمصادقة</em> (V&amp;V) الأوسع التي يؤطرها <a href="https://standards.ieee.org/standard/1012-2016.html">IEEE 1012</a>.</p>
 
@@ -294,7 +295,7 @@
 
 <ul>
   <li><strong>أتمت الفحوص عالية القيمة والقابلة للتكرار.</strong> قواعد العمل، والمسارات المعرضة للانحدارية، وعقود واجهات البرمجة، والحدود الحساسة أمنيًا.</li>
-  <li><strong>أبقِ التغذية الراجعة السريعة سريعة.</strong> المجموعة التي تعمل عند كل دفع يجب أن تجيب بسرعة؛ والمجموعات الأوسع يمكنها الركض لاحقًا أو وفق جدول.</li>
+  <li><strong>أبقِ التغذية الراجعة السريعة سريعة.</strong> المجموعة التي تعمل عند كل دفع يجب أن تجيب بسرعة؛ والمجموعات الأوسع يمكنها الركض لاحقًا أو وفق جدول. ميزانيات شائعة: مجموعة الوحدات محليًا في أقل من ~10 ثوانٍ، وبوابة PR في أقل من ~10 دقائق — بعدها يبدأ المطورون بتجميع الدفعات وتبقى حلقة التغذية الراجعة تتدهور.</li>
   <li><strong>لا تؤتمت ما هو أرخص استكشافًا.</strong> تجربة المستخدم المبكرة، والنماذج الأولية المتغيرة بسرعة، والفحوص النادرة لمرة واحدة — قد يكون استكشافها يدويًا أفضل قبل تجميدها في نصوص هشّة.</li>
   <li><strong>فضّل السلوك على التنفيذ.</strong> الاختبارات التي تعكس استدعاءات طرق خاصة تنكسر عند إعادة هيكلة الكود دون أن يتغير السلوك.</li>
   <li><strong>صمّم لقابلية قراءة الفشل.</strong> يجب أن يخبرك الاختبار الفاشل أي سلوك انكسر وأين ولماذا — لا مجرد أن السطر 437 أعاد false.</li>
@@ -323,7 +324,7 @@ Test strategy
   Ownership:                     (who maintains which suite)
 </pre>
 
-<p>اضبط القالب على نموذج المخاطر لديك (يجب أن تأتي صفوف «المخاطر» فيه مباشرة من تحليل المخاطر في <a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">§١هـ</a>) — ودع الصفوف <em>الأضعف</em> تخبرك بما تحسّنه تاليًا.</p><h2 id="sec-non-functional-testing-proving-the-qualities-that-users-feel">الاختبار غير الوظيفي — إثبات السمات التي يشعر بها المستخدمون</h2>
+<p>اضبط القالب على نموذج المخاطر لديك (يجب أن تأتي صفوف «المخاطر» فيه مباشرة من تحليل المخاطر في <a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">النظرية الكامنة</a>) — ودع الصفوف <em>الأضعف</em> تخبرك بما تحسّنه تاليًا.</p><h2 id="sec-non-functional-testing-proving-the-qualities-that-users-feel">الاختبار غير الوظيفي — إثبات السمات التي يشعر بها المستخدمون</h2>
 
 <table>
   <thead><tr><th>السمة</th><th>ماذا يسأل الاختبار</th><th>فحوص نموذجية</th></tr></thead>
@@ -365,7 +366,7 @@ Test strategy
   <li><strong>فحوص الصحة</strong> تبلغ المنصة بالجاهزية (readiness) والحيوية (liveness).</li>
   <li><strong>السجلات والمقاييس والتتبعات</strong> تكشف سلوكًا لم تستطع اختبارات ما قبل الإنتاج إعادة إنتاجه.</li>
   <li><strong>التنبيهات</strong> تحوّل الشذوذ إلى إشارات قابلة للتنفيذ.</li>
-  <li><strong>أهداف مستوى الخدمة (SLOs) وميزانية الأخطاء</strong> تعرّف مقدار الفشل المقبول قبل أن يتفوق عمل الموثوقية على عمل الميزات.</li>
+  <li><strong>أهداف مستوى الخدمة (SLOs) وميزانية الأخطاء</strong> تعرّف مقدار الفشل المقبول قبل أن يتفوق عمل الموثوقية على عمل الميزات. مثال: هدف توافر 99.9% يترك ميزانية أخطاء ~43 دقيقة توقف شهريًا (0.1% من 30 يومًا) — أنفِقها على النشر وإلا أهدرتها الحوادث.</li>
   <li><strong>الإصدارات التدريجية (canaries)</strong> تعرّض شريحة صغيرة من حركة المرور أولًا، فيصل الدليل الواقعي قبل الإصدار الكامل.</li>
 </ul>
 
@@ -375,7 +376,7 @@ Test strategy
 
 <ul>
   <li><strong>الاختبار</strong> يسأل «هل يظهر الدليل أن هذا يتصرف كما هو مقصود؟» إنه نظرة إلى الأمام — شغّل الفحوص، وأكّد السلوك، واجمع الدليل.</li>
-  <li><strong>التصحيح</strong> يبدأ حيث ينتهي الاختبار: يسأل «لماذا يقول الدليل إن السلوك خاطئ؟» ويعمل <em>بالعكس</em> من الدليل الفاشل إلى العطل — حلقة المراحل الأربع المعكوسة من <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">حل المشكلات §٩</a>. تملك هذه الوثيقة <em>الأدوات</em> على مقياس الفريق التي تجد العطل وتثبته؛ وتملك تلك الوثيقة <em>حلقة التفكير</em>.</li>
+  <li><strong>التصحيح</strong> يبدأ حيث ينتهي الاختبار: يسأل «لماذا يقول الدليل إن السلوك خاطئ؟» ويعمل <em>بالعكس</em> من الدليل الفاشل إلى العطل — حلقة المراحل الأربع المعكوسة من <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">حل المشكلات</a>. تملك هذه الوثيقة <em>الأدوات</em> على مقياس الفريق التي تجد العطل وتثبته؛ وتملك تلك الوثيقة <em>حلقة التفكير</em>.</li>
 </ul>
 
 <table>
@@ -401,12 +402,12 @@ Test strategy
     <tr><td><strong>نقاط الإيقاف / فحص الحالة</strong></td><td>أوقِف التنفيذ عند نقطة مشتبه بها وافحص الحالة الحية عندما يمكن فحص المخرجات مباشرة.</td></tr>
     <tr><td><strong>قارن المتوقع مقابل الفعلي</strong></td><td>وضّح عدم التطابق — دوّن ما يجب أن يحدث عند خطوة، ثم القيمة الفعلية؛ الفجوة تسمّي الافتراض الخاطئ.</td></tr>
     <tr><td><strong>البطة المطاطية</strong></td><td>اشرح الكود بصوت عالٍ لكشف الافتراضات الخفية — غالبًا يكون الافتراض نفسه هو العطل.</td></tr>
-    <tr><td><strong>اعزل الاعتمادية</strong></td><td>في فشل لاتزامني أو سباق أو ثقيل الحالة: اجعل الاختبار حتميًا (تحكم في الزمن والعشوائية والتزامن) أو استبدل العنصر المتعاون (<a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">§٤</a>؛ عزل <a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">§١هـ</a> وحتميته).</td></tr>
-    <tr><td><strong>مراقبة الإنتاج</strong></td><td>للفشل الذي لا يتكرر إلا تحت حركة مرور حقيقية: السجلات والمقاييس والتتبعات ولوحات الأخطاء (<a href="#sec-production-verification-testing-does-not-stop-at-deployment">§٩</a>) توفر دليلًا لا تستطيعه اختبارات ما قبل الإنتاج.</td></tr>
+    <tr><td><strong>اعزل الاعتمادية</strong></td><td>في فشل لاتزامني أو سباق أو ثقيل الحالة: اجعل الاختبار حتميًا (تحكم في الزمن والعشوائية والتزامن) أو استبدل العنصر المتعاون (<a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">مضاعفات الاختبار</a>؛ عزل <a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">النظرية الكامنة</a> وحتميته).</td></tr>
+    <tr><td><strong>مراقبة الإنتاج</strong></td><td>للفشل الذي لا يتكرر إلا تحت حركة مرور حقيقية: السجلات والمقاييس والتتبعات ولوحات الأخطاء (<a href="#sec-production-verification-testing-does-not-stop-at-deployment">التحقق في الإنتاج</a>) توفر دليلًا لا تستطيعه اختبارات ما قبل الإنتاج.</td></tr>
   </tbody>
 </table>
 
-<p><strong>تسليم عبر الوثائق.</strong> هذه هي الممارسة الهندسية للتصحيح — الأدوات والدليل. حلقة التفكير التي تحتها (راقب ← فرضية ← توقّع ← اختبر ← استنتج، والنمط المضاد «لا تخمّن، استكشف الفرضيات») هي <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">حل المشكلات §٩</a>؛ والطريقة التي يتيح بها سجل النسخ إجراء البحث (git bisect وblame وrevert) هي <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD</a>. ثلاث وثائق، حلقة واحدة: تملك هذه الوثيقة الأدوات، ويملك حل المشكلات التفكير، ويملك التحكم بالإصدارات الخط الزمني.</p><h2 id="sec-ai-era-testing-generated-code-and-nondeterministic-systems">اختبار عصر الذكاء الاصطناعي — الكود المولَّد والأنظمة غير الحتمية</h2>
+<p><strong>تسليم عبر الوثائق.</strong> هذه هي الممارسة الهندسية للتصحيح — الأدوات والدليل. حلقة التفكير التي تحتها (راقب ← فرضية ← توقّع ← اختبر ← استنتج، والنمط المضاد «لا تخمّن، استكشف الفرضيات») هي <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">حل المشكلات</a>؛ والطريقة التي يتيح بها سجل النسخ إجراء البحث (git bisect وblame وrevert) هي <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD</a>. ثلاث وثائق، حلقة واحدة: تملك هذه الوثيقة الأدوات، ويملك حل المشكلات التفكير، ويملك التحكم بالإصدارات الخط الزمني.</p><h2 id="sec-ai-era-testing-generated-code-and-nondeterministic-systems">اختبار عصر الذكاء الاصطناعي — الكود المولَّد والأنظمة غير الحتمية</h2>
 
 <p>يغيّر الذكاء الاصطناعي الاختبار في اتجاهين معًا:</p>
 
@@ -482,13 +483,13 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
     <tr><td><strong>إمكانية الوصول</strong></td><td>axe، Lighthouse</td><td>فحوص a11y آلية (اليَدوي ما زال مطلوبًا)</td></tr>
     <tr><td><strong>الأداء</strong></td><td>k6، JMeter، Lighthouse</td><td>أداء الحمل والعميل</td></tr>
     <tr><td><strong>الأمان</strong></td><td>OWASP ZAP، ماسحات الاعتماديات</td><td>اكتشاف الثغرات</td></tr>
-    <tr><td><strong>المحاكاة / ظاهَرية الخدمة</strong></td><td>MSW، WireMock</td><td>التحكم في الحدود الفاصلة (<a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">§٤</a>)</td></tr>
-    <tr><td><strong>بيانات الاختبار</strong></td><td>Factories، fixtures، Testcontainers</td><td>بيانات حتمية (<a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">§١هـ</a>)</td></tr>
-    <tr><td><strong>المراقبة</strong></td><td>Sentry، Datadog، Grafana، OpenTelemetry</td><td>دليل الإنتاج (<a href="#sec-production-verification-testing-does-not-stop-at-deployment">§٩</a>)</td></tr>
+    <tr><td><strong>المحاكاة / ظاهَرية الخدمة</strong></td><td>MSW، WireMock</td><td>التحكم في الحدود الفاصلة (<a href="#sec-test-doubles-mocks-stubs-fakes-and-spies">مضاعفات الاختبار</a>)</td></tr>
+    <tr><td><strong>بيانات الاختبار</strong></td><td>Factories، fixtures، Testcontainers</td><td>بيانات حتمية (<a href="#sec-underlying-theory-oracles-isolation-determinism-and-risk">النظرية الكامنة</a>)</td></tr>
+    <tr><td><strong>المراقبة</strong></td><td>Sentry، Datadog، Grafana، OpenTelemetry</td><td>دليل الإنتاج (<a href="#sec-production-verification-testing-does-not-stop-at-deployment">التحقق في الإنتاج</a>)</td></tr>
   </tbody>
 </table>
 
-<p>اختر أصغر مجموعة تغطي استراتيجيتك (<a href="#sec-test-strategy-what-to-automate-and-what-not-to">§٦</a>)، وغيّر الأدوات دون تغيير نموذج الدليل.</p><h2 id="sec-the-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
+<p>اختر أصغر مجموعة تغطي استراتيجيتك (<a href="#sec-test-strategy-what-to-automate-and-what-not-to">استراتيجية الاختبار</a>)، وغيّر الأدوات دون تغيير نموذج الدليل.</p><h2 id="sec-the-most-common-failure-modes">أنماط الفشل الأكثر شيوعًا</h2>
 
 <table>
   <thead><tr><th>الفشل</th><th>لماذا يحدث</th><th>الإصلاح</th></tr></thead>
@@ -501,7 +502,23 @@ Rollback/flag: disable coupon path if errors rise; investigate with traces
     <tr><td><strong>لا تحقق من الإنتاج</strong></td><td>يفترض الفريق أن CI الأخضر يثبت صحة البيئة الحية.</td><td>أضف فحوص الدخان والمراقبة والتنبيهات ومقاييس canary ومعايير إصدار/تراجع واضحة.</td></tr>
     <tr><td><strong>قبول اختبارات مولَّدة بالذكاء الاصطناعي بلا تمحيص</strong></td><td>تعيد الاختبارات المولَّدة صياغة الكود لا النية.</td><td>راجع الاختبارات كمواصفات؛ وأضف المراجع والحالات الحافة والحالات العدائية الناقصة.</td></tr>
   </tbody>
-</table><h2 id="sec-the-complete-mental-checklist">قائمة المراجعة العقلية الكاملة</h2>
+</table><details>
+<summary><h3 style="display:inline">مفردات البحث — ما اسم هذه الأشياء</h3></summary>
+<p>لا يمكنك البحث عن مشكلة لا تعرف اسمها. مصطلحات الفن التي تستخدمها هذه الوثيقة، وكل واحدة منها مفتاح بحث عامل:</p>
+<ul>
+  <li><strong>المرجع الحاكم (Test oracle)</strong> — مصدر الحقيقة لما ينبغي أن يحدث. ابحث "test oracle problem software testing".</li>
+  <li><strong>الاختبار المتقلب (Flaky test)</strong> — يجتاز ويفشل دون تغيير ذي صلة في الكود. ابحث "flaky tests causes fixes".</li>
+  <li><strong>مضاعفات الاختبار: mock/stub/fake/spy</strong> — عائلة استبدال المتعاونين. ابحث "test doubles mocks aren't stubs".</li>
+  <li><strong>أحمر-أخضر-أعد الهيكلة</strong> — حلقة TDD. ابحث "TDD red green refactor cycle".</li>
+  <li><strong>اختبار العقود</strong> — توافق المزوّد والمستهلك دون E2E كاملة. ابحث "pact contract testing consumer driven".</li>
+  <li><strong>نقطة الطفرة (Mutation score)</strong> — كم عطلاً حقنه تمسكه المجموعة. ابحث "mutation testing score stryker".</li>
+  <li><strong>اختبار الدخان</strong> — فحص «هل هي حية» الأدنى بعد البناء/النشر. ابحث "smoke testing vs sanity testing".</li>
+  <li><strong>النشر الكناري</strong> — الإصدار لشريحة مرور صغيرة أولًا. ابحث "canary deployment strategy".</li>
+  <li><strong>SLO / SLI / ميزانية الأخطاء</strong> — أهداف الموثوقية وبدل الفشل القابل للإنفاق. ابحث "SLO error budget google sre".</li>
+</ul>
+</details>
+
+<h2 id="sec-the-complete-mental-checklist">قائمة المراجعة العقلية الكاملة</h2>
 
 <p>إن حفظتَ صورة واحدة فقط، فاحفظ هذه: <strong>الاختبار سؤالٌ بمرجعٍ (oracle)؛ والمجموعة استراتيجية لإنتاج دليل بالسرعة والنطاق الصحيحين.</strong></p>
 

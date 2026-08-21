@@ -15,7 +15,7 @@ AR twin through the pipeline/splice and runs the battery before its checkpoint.
 - [ ] 6. **ui-ux-web-design** ⚠️ v71 template-only (markers+vocab; doc never fully read) → REDO required — sibling of html-and-css; AR h2s still numbered per PROGRESS.md.
 - [x] 7. **how-developers-think-frontend** ✅ v72 — implementation loop; verify devices before assuming gaps.
 - [x] 6b. **ui-ux-web-design REDO** ✅ v75 — full read + diagnosis-driven additions per user correction (v71 was template treatment).
-- [ ] 8. **software-testing-and-debugging** — 240w/sec, 18 numerals.
+- [x] 8. **software-testing-and-debugging** ✅ v76 — 240w/sec, 18 numerals.
 - [ ] 9. **system-design** — architecture anchor; likely needs leverage map more than devices.
 - [ ] 10. **api-design** — contracts tier; same treatment.
 
