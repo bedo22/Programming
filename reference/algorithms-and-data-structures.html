@@ -90,6 +90,169 @@
 </tbody>
 </table>
 
+<h2 id="sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit">Paradigm selection — the thinking that reaches for the toolkit</h2>
+
+<p>
+  Before diving into individual structures, you need to choose a <strong>paradigm</strong> — a fundamental approach to designing the algorithm. There is no single optimal algorithm for all problems; there are paradigms, each fitting a different class of problem. Recognizing which paradigm a problem calls for is itself a pattern-recognition skill built through practice.
+</p>
+
+<p>
+  <a href="./problem-solving.html">Problem-Solving</a> teaches <em>when</em> — Pólya's four phases, the metacognitive loop, the practice method. This section and the rest of this doc teach <em>what and how</em>: the paradigms, the structures, the templates. One shelf doc per question: that is the thinking; this is the toolkit the thinking reaches for.
+</p>
+
+<h3>The six paradigms</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Paradigm</th>
+      <th>What it is</th>
+      <th>When to use it</th>
+      <th>Example problems</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>Brute force</dfn></td>
+      <td>Try all possibilities. Simple, often slow, but correct.</td>
+      <td>
+        <strong>Always start here</strong> if the input is small. Get it correct
+        first, optimize later. The first solution is often brute force; the
+        skill is knowing when to upgrade.
+      </td>
+      <td>Find all pairs that sum to N (nested loop); check if a number is prime (test all divisors).</td>
+    </tr>
+    <tr>
+      <td><dfn>Greedy</dfn></td>
+      <td>Make the locally optimal choice at each step, hoping for a global optimum.</td>
+      <td>
+        When the problem has <em>optimal substructure</em> AND a <em>greedy
+        choice property</em> (local optimum = global optimum). Not always
+        applicable — prove it works before trusting it. See <a href="#sec-greedy-the-beautiful-lie">§Greedy</a>.
+      </td>
+      <td>Minimum coin change (certain coin systems); activity selection; Huffman coding.</td>
+    </tr>
+    <tr>
+      <td><dfn>Divide &amp; conquer</dfn></td>
+      <td>Divide the problem into <strong>independent</strong> sub-problems, solve each, merge results.</td>
+      <td>
+        When sub-problems are <strong>independent</strong> (solving one doesn't
+        depend on another). Three steps: Divide, Conquer, Merge. See <a href="#sec-recursion-the-self-referential-move">§Recursion</a> (D&C vs DP distinction).
+      </td>
+      <td>Merge sort, quick sort, binary search, FFT, Tower of Hanoi.</td>
+    </tr>
+    <tr>
+      <td><dfn>Dynamic programming</dfn></td>
+      <td>Solve each sub-problem once, store the result, reuse it when the same sub-problem recurs.</td>
+      <td>
+        When sub-problems <strong>overlap</strong> (the same sub-problem appears
+        multiple times). The key distinction from D&C: overlapping vs
+        independent sub-problems. See <a href="#sec-dynamic-programming-the-state-machine-of-optimization">§DP</a>.
+      </td>
+      <td>Fibonacci, knapsack, edit distance, longest common subsequence, coin change (general).</td>
+    </tr>
+    <tr>
+      <td><dfn>Backtracking</dfn></td>
+      <td>Systematically try all possibilities, abandoning a path as soon as it's shown to be invalid ("backtrack").</td>
+      <td>
+        When you need to explore all possibilities but can prune early.
+        Constraint satisfaction, combinatorial search.
+      </td>
+      <td>N-Queens, Sudoku solver, generating all permutations, maze solving.</td>
+    </tr>
+    <tr>
+      <td><dfn>Hash table</dfn></td>
+      <td>Use a hash map (object/Map) for O(1) lookup, turning nested-loop searches into single passes.</td>
+      <td>
+        When you need fast lookup, counting, or deduplication. Often the
+        upgrade from brute force that takes O(n²) → O(n). See <a href="#sec-arrays-strings-and-hashing-the-80">§Arrays</a>.
+      </td>
+      <td>Word frequency counting, two-sum, finding duplicates, first non-repeating character.</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote class="callout">
+  <p>
+    <strong>The critical distinction — D&amp;C vs DP:</strong> Divide &amp;
+    Conquer is for <em>independent</em> sub-problems (merge sort: each half is
+    sorted independently). Dynamic Programming is for <em>overlapping</em>
+    sub-problems (Fibonacci: fib(5) needs fib(4) and fib(3), but fib(4) also
+    needs fib(3) — so you store fib(3) rather than recomputing). If the
+    sub-problems don't overlap, use D&amp;C. If they do, use DP. This single
+    distinction is one of the most tested in interviews and competitions.
+  </p>
+</blockquote>
+
+<h3>Choosing the data structure</h3>
+<p>
+  Paradigms choose the <em>approach</em>; data structures choose the
+  <em>operations</em>. After picking a paradigm, ask what operations you need
+  (lookup, counting, ordering, min/max, adjacency) — that dictates the
+  structure:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Need</th>
+      <th>Natural data structure</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Fast lookup by key</td><td>Map / object</td><td>Average O(1) lookup</td></tr>
+    <tr><td>Count occurrences</td><td>Map</td><td>Keys store running counts</td></tr>
+    <tr><td>Remove duplicates</td><td>Set</td><td>Unique membership, O(1) add/check</td></tr>
+    <tr><td>Preserve order</td><td>Array</td><td>Ordered iteration, indexing</td></tr>
+    <tr><td>First-in-first-out</td><td>Queue</td><td>FIFO behavior (BFS)</td></tr>
+    <tr><td>Last-in-first-out</td><td>Stack</td><td>LIFO behavior (DFS, undo)</td></tr>
+    <tr><td>Min/max quickly</td><td>Heap / priority queue</td><td>Efficient min/max extraction (Top K, Dijkstra)</td></tr>
+    <tr><td>Relationships</td><td>Graph / adjacency list</td><td>Nodes and edges</td></tr>
+    <tr><td>Hierarchy</td><td>Tree</td><td>Parent/child structure</td></tr>
+    <tr><td>Fast prefix search</td><td>Trie</td><td>Prefix matching</td></tr>
+    <tr><td>Range queries</td><td>Sorted array / prefix sums</td><td>Efficient range operations</td></tr>
+  </tbody>
+</table>
+
+<h3>Paradigm recognition — reading the signal in the problem</h3>
+<p>
+  The most practical recognition skill is matching <em>phrases in the problem
+  statement</em> to a paradigm. These signals are heuristics, not proofs —
+  but they're right often enough to start:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Signal in problem statement</th>
+      <th>Likely paradigm</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>"Count occurrences" / "how many times"</td><td>Hash map</td></tr>
+    <tr><td>"Find duplicates"</td><td>Set / hash map</td></tr>
+    <tr><td>"Two elements that sum to X"</td><td>Hash map or two pointers</td></tr>
+    <tr><td>Input is sorted</td><td>Binary search / two pointers</td></tr>
+    <tr><td>"All combinations" / "all permutations"</td><td>Backtracking</td></tr>
+    <tr><td>"Shortest path" in unweighted graph</td><td>BFS</td></tr>
+    <tr><td>"Shortest path" with positive weights</td><td>Dijkstra</td></tr>
+    <tr><td>"Dependencies must be ordered"</td><td>Topological sort</td></tr>
+    <tr><td>"Maximum/minimum subarray"</td><td>Kadane / DP</td></tr>
+    <tr><td>"Overlapping intervals"</td><td>Sort + greedy</td></tr>
+    <tr><td>"Top K elements"</td><td>Heap</td></tr>
+    <tr><td>"Optimal solution with overlapping subproblems"</td><td>Dynamic programming</td></tr>
+    <tr><td>"Split into independent halves"</td><td>Divide &amp; conquer</td></tr>
+    <tr><td>Small n, "find any solution"</td><td>Brute force</td></tr>
+  </tbody>
+</table>
+<blockquote class="callout">
+  <p>
+    <strong>The recognition loop:</strong> these signals are not learned by
+    reading — they're learned by filing. Each problem you solve and file under
+    its signal adds one more row to your mental version of this table. After 50
+    filed problems, "count occurrences" fires the hash-map reflex before you
+    finish the sentence. See <a href="./problem-solving.html">Problem-Solving</a> Phase 4 (Look back) for the pattern-filing method.
+  </p>
+</blockquote>
+
 <h2 id="sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</h2>
 
 <p>Most interview problems — and most production code — are these three structures. Master this section and you can pass the majority of easy and many medium problems.</p>

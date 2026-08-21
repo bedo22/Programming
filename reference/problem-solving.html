@@ -50,8 +50,51 @@
           its computational thinking lens in 2006. This doc captures the full
           stack of that lineage, positioned between finding the problem (Design
           Thinking) and building the feature (The Rhythm).
-        </p>
-      </section>
+        </p>      </section>
+
+      <div style="background: #f8f6f1; border: 1px solid #e0dcd0; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <strong>Quick reference</strong> — the six moves, one line each:
+        <table style="margin: 0.5rem 0 0 0; font-size: 0.85rem; width: 100%;">
+          <tbody>
+            <tr><td style="width: 30%;"><strong>Phase 1 (Understand)</strong></td><td>Input / Operation / Output. Trace an example by hand. List constraints.</td></tr>
+            <tr><td><strong>Phase 2 (Plan)</strong></td><td>Numbered algorithm in plain language. Choose a paradigm (<a href="./algorithms-and-data-structures.html#sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit">toolkit</a>). Choose a data structure.</td></tr>
+            <tr><td><strong>Phase 3 (Execute)</strong></td><td>Check each step as you write it. Don't improvise — if code diverges from plan, go back to Phase 2.</td></tr>
+            <tr><td><strong>Phase 4 (Look back)</strong></td><td>Edge cases. Simpler approach? File the pattern. Generalize.</td></tr>
+            <tr><td><strong>Metacognition</strong></td><td>Every few minutes: "Am I progressing? Should I switch approach?"</td></tr>
+            <tr><td><strong>Practice</strong></td><td>Attempt first. Re-solve from memory. Interleave problem types.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+        <details open>
+          <summary style="cursor: pointer; font-weight: bold;">Jump to section</summary>
+          <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0;">
+            <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
+            <li><a href="#sec-definition-what-problem-solving-is-and-what-it-is-not">Definition</a></li>
+            <li><a href="#sec-the-universal-meta-rhythm-polya-s-four-phases">Pólya's four phases</a></li>
+            <li><a href="#sec-the-lens-computational-thinking-s-four-pillars">Computational thinking</a></li>
+            <li><a href="#sec-polya-s-heuristic-dictionary-the-moves">Heuristics</a></li>
+            <li><a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Metacognition</a></li>
+            <li><a href="#sec-stepwise-refinement-top-down-decomposition-for-programming">Stepwise refinement</a></li>
+            <li><a href="#sec-algorithm-design-paradigms-the-technique-catalog">Paradigm selection</a></li>
+            <li><a href="#sec-the-role-of-examples-concrete-before-abstract">Examples</a></li>
+            <li><a href="#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging</a></li>
+            <li><a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">Look back (Phase 4)</a></li>
+            <li><a href="#sec-mental-models-how-expert-problem-solvers-actually-reason">Mental models</a></li>
+            <li><a href="#sec-worked-example-your-hackerrank-word-frequency-counter-traced-through-polya">Worked examples</a></li>
+            <li><a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage</a></li>
+            <li><a href="#sec-the-right-questions-a-catalog">Questions catalog</a></li>
+            <li><a href="#sec-principles-the-shared-constants">Principles</a></li>
+            <li><a href="#sec-history-from-mathematics-to-programming-1945present">History</a></li>
+            <li><a href="#sec-evolution-constraint-inversions-across-the-same-idea">Evolution</a></li>
+            <li><a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem</a></li>
+            <li><a href="#sec-the-future-where-problem-solving-methodology-is-heading">The future (AI)</a></li>
+            <li><a href="#sec-the-most-common-failure-modes">Failure modes</a></li>
+            <li><a href="#sec-summary-the-complete-mental-checklist">Summary &amp; checklist</a></li>
+          </ul>
+        </details>
+      </nav>
 
       <blockquote class="callout">
         <p><strong>The three nested layers of thinking in software</strong></p>
@@ -908,7 +951,8 @@
         can't, go back and read it again.
       </p>
 
-      <h4>Constraints checklist — Phase 1 is incomplete without it</h4>
+      <details>
+        <summary><h4 style="display: inline;">Constraints checklist — Phase 1 is incomplete without it</h4></summary>
       <p>
         In algorithmic problem-solving, constraints often <em>choose the
         algorithm</em>: the maximum input size determines what complexity is
@@ -967,8 +1011,10 @@
           </tr>
         </tbody>
       </table>
+      </details>
 
-      <h4>Complexity budget — inferring acceptable complexity from input size</h4>
+      <details>
+        <summary><h4 style="display: inline;">Complexity budget — inferring acceptable complexity from input size</h4></summary>
       <p>
         A practical rule of thumb for picking the paradigm during Phase 2. The
         full Big O treatment lives in
@@ -1005,6 +1051,7 @@
           </tr>
         </tbody>
       </table>
+      </details>
 
       <h3>Phase 2 — Devise a plan</h3>
       <p>
@@ -1520,295 +1567,20 @@
         approach to designing the algorithm. There is no single optimal
         algorithm for all problems; there are paradigms, each fitting a
         different class of problem. Recognizing which paradigm a problem calls
-        for is itself a pattern-recognition skill built through practice (<a
-          href="https://en.wikipedia.org/wiki/Competitive_programming"
-          >Wikipedia</a
-        >).
+        for is itself a pattern-recognition skill built through practice.
       </p>
 
       <p>
         This doc stops at <em>choosing</em> the technique. The companion —
-        <a href="./algorithms-and-data-structures.html"
-          >Algorithms &amp; Data Structures</a
+        <a href="./algorithms-and-data-structures.html#sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit"
+          >Algorithms &amp; Data Structures — Paradigm selection</a
         >
-        — is where each structure and paradigm becomes a working template:
-        what a hash map is under the hood, how BFS actually runs, the binary
-        search template. One shelf doc per question: this is the thinking, that
-        is the toolkit it reaches for.
+        — is where each paradigm becomes a working template with code, edge
+        cases, and the D&amp;C-vs-DP distinction. That doc also has the data
+        structure guide (need → structure → why) and the full recognition
+        signals table (signal → technique → why). One shelf doc per question:
+        this is the thinking, that is the toolkit it reaches for.
       </p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Paradigm</th>
-            <th>What it is</th>
-            <th>When to use it</th>
-            <th>Example problems</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><dfn>Brute force</dfn></td>
-            <td>Try all possibilities. Simple, often slow, but correct.</td>
-            <td>
-              <strong>Always start here</strong> if the input is small. Get it
-              correct first, optimize later. The first solution is often brute
-              force; the skill is knowing when to upgrade.
-            </td>
-            <td>
-              Find all pairs that sum to N (nested loop); check if a number is
-              prime (test all divisors).
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>Greedy</dfn></td>
-            <td>
-              Make the locally optimal choice at each step, hoping for a global
-              optimum.
-            </td>
-            <td>
-              When the problem has <em>optimal substructure</em> AND a
-              <em>greedy choice property</em> (local optimum = global optimum).
-              Not always applicable — prove it works before trusting it.
-            </td>
-            <td>
-              Minimum coin change (certain coin systems); activity selection;
-              Huffman coding.
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>Divide &amp; conquer</dfn></td>
-            <td>
-              Divide the problem into <strong>independent</strong> sub-problems,
-              solve each, merge results.
-            </td>
-            <td>
-              When sub-problems are <strong>independent</strong> (solving one
-              doesn't depend on another). Three steps: Divide, Conquer, Merge
-              (<a
-                href="https://www.geeksforgeeks.org/introduction-to-divide-and-conquer-algorithm-data-structure-and-algorithm-tutorials/"
-                >GeeksForGeeks</a
-              >).
-            </td>
-            <td>Merge sort, quick sort, binary search, FFT, Tower of Hanoi.</td>
-          </tr>
-          <tr>
-            <td><dfn>Dynamic programming</dfn></td>
-            <td>
-              Solve each sub-problem once, store the result, reuse it when the
-              same sub-problem recurs.
-            </td>
-            <td>
-              When sub-problems <strong>overlap</strong> (the same sub-problem
-              appears multiple times). The key distinction from D&amp;C:
-              overlapping vs independent sub-problems.
-            </td>
-            <td>
-              Fibonacci, knapsack, edit distance, longest common subsequence,
-              coin change (general).
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>Backtracking</dfn></td>
-            <td>
-              Systematically try all possibilities, abandoning a path as soon as
-              it's shown to be invalid ("backtrack").
-            </td>
-            <td>
-              When you need to explore all possibilities but can prune early.
-              Constraint satisfaction, combinatorial search.
-            </td>
-            <td>
-              N-Queens, Sudoku solver, generating all permutations, maze
-              solving.
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>Hash table</dfn></td>
-            <td>
-              Use a hash map (object/Map) for O(1) lookup, turning nested-loop
-              searches into single passes.
-            </td>
-            <td>
-              When you need fast lookup, counting, or deduplication. Often the
-              upgrade from brute force that takes O(n²) → O(n).
-            </td>
-            <td>
-              <strong>Word frequency counting (your HackerRank problem)</strong
-              >, two-sum, finding duplicates, first non-repeating character.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <blockquote class="callout">
-        <p>
-          <strong>The critical distinction — D&amp;C vs DP:</strong> Divide
-          &amp; Conquer is for <em>independent</em> sub-problems (merge sort:
-          each half is sorted independently). Dynamic Programming is for
-          <em>overlapping</em> sub-problems (Fibonacci: fib(5) needs fib(4) and
-          fib(3), but fib(4) also needs fib(3) — so you store fib(3) rather than
-          recomputing). If the sub-problems don't overlap, use D&amp;C. If they
-          do, use DP. This single distinction is one of the most tested in
-          interviews and competitions.
-        </p>
-      </blockquote>
-
-      <h3>Choosing the data structure</h3>
-      <p>
-        Paradigms choose the <em>approach</em>; data structures choose the
-        <em>operations</em>. During Phase 2, after picking a paradigm, ask what
-        operations you need (lookup, counting, ordering, min/max, adjacency) —
-        that dictates the structure:
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Need</th>
-            <th>Natural data structure</th>
-            <th>Why</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Fast lookup by key</td>
-            <td>Map / object</td>
-            <td>Average O(1) lookup</td>
-          </tr>
-          <tr>
-            <td>Count occurrences</td>
-            <td>Map</td>
-            <td>Keys store running counts</td>
-          </tr>
-          <tr>
-            <td>Remove duplicates</td>
-            <td>Set</td>
-            <td>Unique membership, O(1) add/check</td>
-          </tr>
-          <tr>
-            <td>Preserve order</td>
-            <td>Array</td>
-            <td>Ordered iteration, indexing</td>
-          </tr>
-          <tr>
-            <td>First-in-first-out</td>
-            <td>Queue</td>
-            <td>FIFO behavior (BFS)</td>
-          </tr>
-          <tr>
-            <td>Last-in-first-out</td>
-            <td>Stack</td>
-            <td>LIFO behavior (DFS, undo)</td>
-          </tr>
-          <tr>
-            <td>Min/max quickly</td>
-            <td>Heap / priority queue</td>
-            <td>Efficient min/max extraction (Top K, Dijkstra)</td>
-          </tr>
-          <tr>
-            <td>Relationships</td>
-            <td>Graph / adjacency list</td>
-            <td>Nodes and edges</td>
-          </tr>
-          <tr>
-            <td>Hierarchy</td>
-            <td>Tree</td>
-            <td>Parent/child structure</td>
-          </tr>
-          <tr>
-            <td>Fast prefix search</td>
-            <td>Trie</td>
-            <td>Prefix matching</td>
-          </tr>
-          <tr>
-            <td>Range queries</td>
-            <td>Sorted array / prefix sums</td>
-            <td>Efficient range operations</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Paradigm recognition — reading the signal in the problem</h3>
-      <p>
-        The most practical recognition skill (<a href="#sec-mental-models-how-expert-problem-solvers-actually-reason">Mental models</a>) is matching
-        <em>phrases in the problem statement</em> to a paradigm. These signals
-        are heuristics, not proofs — but they're right often enough to start:
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Signal in problem statement</th>
-            <th>Likely paradigm</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>"Count occurrences" / "how many times"</td>
-            <td>Hash map (<a href="#sec-algorithm-design-paradigms-the-technique-catalog">Algorithm design paradigms</a>)</td>
-          </tr>
-          <tr>
-            <td>"Find duplicates"</td>
-            <td>Set / hash map</td>
-          </tr>
-          <tr>
-            <td>"Two elements that sum to X"</td>
-            <td>Hash map or two pointers</td>
-          </tr>
-          <tr>
-            <td>Input is sorted</td>
-            <td>Binary search / two pointers</td>
-          </tr>
-          <tr>
-            <td>"All combinations" / "all permutations"</td>
-            <td>Backtracking</td>
-          </tr>
-          <tr>
-            <td>"Shortest path" in unweighted graph</td>
-            <td>BFS</td>
-          </tr>
-          <tr>
-            <td>"Shortest path" with positive weights</td>
-            <td>Dijkstra</td>
-          </tr>
-          <tr>
-            <td>"Dependencies must be ordered"</td>
-            <td>Topological sort</td>
-          </tr>
-          <tr>
-            <td>"Maximum/minimum subarray"</td>
-            <td>Kadane / DP</td>
-          </tr>
-          <tr>
-            <td>"Overlapping intervals"</td>
-            <td>Sort + greedy</td>
-          </tr>
-          <tr>
-            <td>"Top K elements"</td>
-            <td>Heap</td>
-          </tr>
-          <tr>
-            <td>"Optimal solution with overlapping subproblems"</td>
-            <td>Dynamic programming</td>
-          </tr>
-          <tr>
-            <td>"Split into independent halves"</td>
-            <td>Divide &amp; conquer</td>
-          </tr>
-          <tr>
-            <td>Small n, "find any solution"</td>
-            <td>Brute force</td>
-          </tr>
-        </tbody>
-      </table>
-      <blockquote class="callout">
-        <p>
-          <strong>The recognition loop:</strong> these signals are not learned by
-          reading — they're learned by filing (<a href="#sec-the-look-back-phase-in-depth-what-everyone-skips">The "Look back" phase in depth</a>). Each problem you solve and
-          file under its signal adds one more row to your mental version of this
-          table. After 50 filed problems, "count occurrences" fires the hash-map
-          reflex before you finish the sentence.
-        </p>
-      </blockquote>
 
       <p>
         <strong
@@ -2061,7 +1833,8 @@
         faster.
       </p>
 
-      <h3>Edge case catalog — the systematic check</h3>
+      <details>
+        <summary><h3 style="display: inline;">Edge case catalog — the systematic check</h3></summary>
       <p>
         After your solution works on the example, run through this checklist of
         edge cases. These are the cases that fail in production and in
@@ -2132,6 +1905,7 @@
           </tr>
         </tbody>
       </table>
+      </details>
 
       <h3>Can you derive the result differently?</h3>
       <p>
@@ -2275,7 +2049,8 @@
         This is the reasoning that AI (<a href="#sec-the-future-where-problem-solving-methodology-is-heading">The future</a>) can't do for you.
       </p>
 
-      <h4>Verification strategy — testing is part of solving</h4>
+      <details>
+        <summary><h4 style="display: inline;">Verification strategy — testing is part of solving</h4></summary>
       <p>
         The edge-case catalog above is part of verification. The full toolbox,
         from cheapest to most powerful:
@@ -2328,6 +2103,7 @@
           </tr>
         </tbody>
       </table>
+      </details>
 
       <h2 id="sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</h2>
 
@@ -2964,71 +2740,22 @@
             <td>
               The metacognitive check: "Is this approach worth continuing?" The
               sunk cost is irrelevant. Only the expected future value of each
-              option matters. Switch approaches when the current one has
-              diminishing returns.
+              option matters. Judge only the <em>next</em> 30 minutes, not the
+              last. Switch approaches when the current one has diminishing
+              returns.
             </td>
           </tr>
-        </tbody>
-      </table>
-
-      <h3>Emotional and cognitive regulation — the traps that feel like thinking</h3>
-      <p>
-        Schoenfeld's fifth resource is "beliefs" (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>): what you believe about
-        problem-solving changes how well you solve. Several failure modes aren't
-        about technique at all — they're about your state while solving. These
-        traps are worth naming because you can't debug a problem you can't name:
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>State</th>
-            <th>What it feels like</th>
-            <th>The fix</th>
-          </tr>
-        </thead>
-        <tbody>
           <tr>
             <td><strong>Panic</strong></td>
             <td>
               "I don't know where to start." Working memory seizes; the blank
-              page intimidates.
+              page intimidates. (Schoenfeld's "beliefs" resource — what you
+              believe about problem-solving changes how well you solve.)
             </td>
             <td>
               Return to the smallest concrete step: write Input / Operation /
               Output — just the first line. Action dissolves the panic faster
               than reassurance.
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Tunnel vision (Einstellung)</strong></td>
-            <td>
-              "This approach must work, I'll tweak it once more." Fixated on the
-              first idea that came to mind.
-            </td>
-            <td>
-              The metacognitive check (<a href="#sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element">Schoenfeld's extension</a>): "Am I progressing or spinning? Is
-              this the right paradigm?" Timebox the current approach.
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Sunk cost</strong></td>
-            <td>
-              "I've already spent 30 minutes on this, I can't abandon it."
-            </td>
-            <td>
-              Judge only the <em>next</em> 30 minutes, not the last. The
-              investment is gone either way.
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Fluency illusion</strong></td>
-            <td>
-              "I understand this solution now" — after reading it, not solving
-              it.
-            </td>
-            <td>
-              Re-solve from memory later (<a href="#sec-fluency-vs-storage-strength-in-problem-solving">Fluency vs storage strength in problem-solving</a>). Understanding that can't be
-              reproduced is fluency, not storage.
             </td>
           </tr>
           <tr>
@@ -3051,7 +2778,8 @@
         of it.
       </p>
 
-      <h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
+      <details>
+        <summary><h2 style="display: inline;">Ecosystem — tooling catalog with decision metrics</h2></summary>
 
       <p>
         Problem-solving is only as good as the practice environment that builds
@@ -3251,6 +2979,7 @@
           >
         </p>
       </blockquote>
+      </details>
 
       <h2 id="sec-the-future-where-problem-solving-methodology-is-heading">The future — where problem-solving methodology is heading</h2>
 
