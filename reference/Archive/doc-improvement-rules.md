@@ -235,6 +235,17 @@ Does the doc reference its neighbors?
 
 ### Duplication detection
 
+**CRITICAL: Before replacing ANY content with a pointer, verify the target
+doc has the same EXPLANATIONS, not just the same CONCEPTS.** This is
+the #1 cause of content loss on the shelf. A concept appearing in another
+doc (e.g. "test pyramid exists") is not the same as the doc's
+explanation (e.g. "unit tests are cheap and fast, integration tests
+catch contract breaks, E2E tests verify user flows — the pyramid shape
+minimizes feedback loop cost"). If the target doc lacks the explanations,
+MERGE them into the target doc FIRST, then replace with a pointer.
+Never replace detailed content with a pointer to a doc that only
+mentions the concept in passing.
+
 For every claim, table, or framework:
 1. Grep the shelf for the same claim/table/framework
 2. If it appears in another doc: **which doc owns this?**
@@ -386,6 +397,24 @@ must be analysed for: missing theory, missing boundary conditions,
 duplication, misplaced content, mental models, transfer conditions.
 Do one doc at a time so you don't overload your context. If you don't
 have enough knowledge to fill a gap, search for it.
+
+**Redo previous work when the rules file improves.** If the rules file
+gains a new check (e.g., mental models, boundary conditions, transfer
+conditions), go back to every previously-improved doc and verify it
+passes the new check. A doc that was "good enough" under an earlier
+version of the rules may have gaps the new rules catch.
+
+**Audit past deletions.** When you remove content deemed "duplication,"
+go back and verify:
+1. The target doc has the same EXPLANATIONS, not just the same CONCEPTS
+2. If explanations are missing, MERGE them into the target FIRST
+3. Then replace with a pointer
+This is the #1 cause of content loss. A concept in another doc (e.g.
+"test pyramid exists") is not the same as the explanation (e.g.
+"unit tests are cheap and fast, integration tests catch contract
+breaks, E2E tests verify user flows — the pyramid shape minimizes
+feedback loop cost"). If the target doc only has the concept, you
+must add the explanation before pointing.
 
 Improvement is not the same as making the doc shorter. A doc that is
 long because the topic is deep is a good doc. A doc that is long
