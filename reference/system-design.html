@@ -18,10 +18,10 @@
         </p>
       </header>
 
-<nav class="doc-toc" style="position: sticky; top: 0; z-index: 10; background: var(--bg, #fff); border-bottom: 1px solid #ddd; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+<nav class="doc-toc">
   <details open>
-    <summary style="cursor: pointer; font-weight: bold;">Jump to section</summary>
-    <ul style="columns: 2; column-gap: 2rem; list-style: none; padding: 0.5rem 0 0 0; margin: 0;">
+    <summary>Jump to</summary>
+    <ul>
       <li><a href="#sec-how-to-use-this-doc">How to use this doc</a></li>
       <li><a href="#sec-definition-what-system-design-is-and-what-it-is-not">Definition</a></li>
       <li><a href="#sec-history-from-flowcharts-to-distributed-systems">History</a></li>
@@ -1183,7 +1183,8 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 
 ---
 
-<h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</h2>
+<details>
+<summary><h2 id="sec-ecosystem-tooling-catalog-with-decision-metrics" style="display: inline;">Ecosystem — tooling catalog with decision metrics</h2></summary>
 
 <p>The system design discipline is only as good as the tools that make its decisions visible, testable, and reversible. This section catalogs the primary tooling categories, with decision metrics for each.</p>
 
@@ -1254,6 +1255,7 @@ Resolve Service → Kafka (RedirectOccurred) → Analytics Worker → ClickHouse
 </table>
 
 <p><strong>Selection heuristic:</strong> Start with ADRs + Diagrams + Observability (the "minimum viable architecture toolkit"). Add Contract Management when API count >5. Add Chaos Engineering when SLOs exist but are untested. Add IaC/GitOps when infra changes >1/week. Add Formal Spec only for protocols with catastrophic failure cost (payments, consensus, auth). The tool serves the decision — not the reverse.</p>
+</details>
 
 ---
 
