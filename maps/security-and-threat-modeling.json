@@ -61,5 +61,42 @@
       "(§7)",
       "(<a href=\"./backend-engineering.html#sec-state-the-identity-and-session-decision\">§7</a>)"
     ]
-  ]
+  ],
+  "dispositions7": {
+    "R14": {
+      "status": "PRE",
+      "anchor": "#sec-mental-models-frames-for-thinking-about-security",
+      "note": "defense-in-depth, CIA-triad and attacker-cost frames over NIST/STRIDE canon"
+    },
+    "R15": {
+      "status": "PRE",
+      "anchor": "#sec-most-common-failure-modes",
+      "note": "failure table with fixes; Log4Shell case supplies war-story support"
+    },
+    "R16": {
+      "status": "SKIP",
+      "note": "vocabulary owned by shelf glossary per constitution; no search-vocabulary id in this doc"
+    },
+    "R17": {
+      "status": "PRE",
+      "anchor": "#sec-history-the-constraint-inversions",
+      "note": "constraint inversions anchored on Log4Shell (2021); perimeter-to-zero-trust arc"
+    },
+    "R18": {
+      "status": "PRE",
+      "anchor": "#sec-risk-management-the-decision-framework",
+      "note": "NIST CSF scaffold as the risk-decision framework; threat-model process is the integration half"
+    },
+    "R19": {
+      "status": "PRE",
+      "anchor": "#sec-ecosystem-tooling-catalog-with-decision-metrics",
+      "note": "tooling catalog with decision metrics; SLSA levels give measurable supply-chain tiers"
+    },
+    "R20": {
+      "status": "PRE",
+      "anchor": "#sec-worked-example-threat-modeling-a-file-upload-endpoint",
+      "note": "STRIDE applied to a file-upload endpoint; security-checklist section carries gate half"
+    },
+    "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+  }
 }

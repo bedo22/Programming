@@ -1,21 +1,58 @@
 {
- "WANT": {},
- "FOLDS": [
-  [
-   "<a href=\"./version-control-ci-cd-deployment.html\">Version Control, CI/CD</a> §5b",
-   "<a href=\"./version-control-ci-cd-deployment.html#sec-semver-and-releases-naming-the-snapshots-you-ship\">Version Control, CI/CD §5b</a>"
+  "WANT": {},
+  "FOLDS": [
+    [
+      "<a href=\"./version-control-ci-cd-deployment.html\">Version Control, CI/CD</a> §5b",
+      "<a href=\"./version-control-ci-cd-deployment.html#sec-semver-and-releases-naming-the-snapshots-you-ship\">Version Control, CI/CD §5b</a>"
+    ],
+    [
+      "<a href=\"./frontend-income-markets.html\">Frontend Income Markets</a> §7",
+      "<a href=\"../frontend-income-markets.html#sec-products-templates-and-unknown-options\">Frontend Income Markets §7</a>"
+    ],
+    [
+      "<a href=\"./version-control-ci-cd-deployment.html\">التحكم بالإصدارات وCI/CD</a> §٥ب",
+      "<a href=\"./version-control-ci-cd-deployment.html#sec-semver-and-releases-naming-the-snapshots-you-ship\">التحكم بالإصدارات وCI/CD §٥ب</a>"
+    ],
+    [
+      "<a href=\"../frontend-income-markets.html\">أسواق دخل الواجهة الأمامية</a> §٧",
+      "<a href=\"../frontend-income-markets.html#sec-products-templates-and-unknown-options\">أسواق دخل الواجهة الأمامية §٧</a>"
+    ]
   ],
-  [
-   "<a href=\"./frontend-income-markets.html\">Frontend Income Markets</a> §7",
-   "<a href=\"../frontend-income-markets.html#sec-products-templates-and-unknown-options\">Frontend Income Markets §7</a>"
-  ],
-  [
-   "<a href=\"./version-control-ci-cd-deployment.html\">التحكم بالإصدارات وCI/CD</a> §٥ب",
-   "<a href=\"./version-control-ci-cd-deployment.html#sec-semver-and-releases-naming-the-snapshots-you-ship\">التحكم بالإصدارات وCI/CD §٥ب</a>"
-  ],
-  [
-   "<a href=\"../frontend-income-markets.html\">أسواق دخل الواجهة الأمامية</a> §٧",
-   "<a href=\"../frontend-income-markets.html#sec-products-templates-and-unknown-options\">أسواق دخل الواجهة الأمامية §٧</a>"
-  ]
- ]
+  "dispositions7": {
+    "R14": {
+      "status": "PRE",
+      "anchor": "#sec-mental-models-frames-for-thinking-about-open-source",
+      "note": "doc-native frames over cited definitional canon; leverage thinking lives here"
+    },
+    "R15": {
+      "status": "PRE",
+      "anchor": "#sec-most-common-failure-modes",
+      "note": "failure table with fixes; code-review section adds R15 support"
+    },
+    "R16": {
+      "status": "SKIP",
+      "note": "vocabulary owned by shelf glossary per constitution; no search-vocabulary id in this doc"
+    },
+    "R17": {
+      "status": "PRE",
+      "anchor": "#sec-history-how-the-commons-came-to-be",
+      "note": "commons/license-schism history; cathedral-bazaar essay anchors peer production"
+    },
+    "R18": {
+      "status": "PRE",
+      "anchor": "#sec-licenses-the-legal-contract-permissively-or-copyleft",
+      "note": "permissive-vs-copyleft license choice is the doc's decision-function core (choosealicense tree)"
+    },
+    "R19": {
+      "status": "PRE",
+      "anchor": "#sec-business-models-how-open-source-pays-for-itself",
+      "note": "economics/measures of sustainability: hosting, support, open-core splits"
+    },
+    "R20": {
+      "status": "PRE",
+      "anchor": "#sec-worked-example-one-contribution-end-to-end",
+      "note": "end-to-end contribution worked example; summary section carries checklist half"
+    },
+    "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+  }
 }
