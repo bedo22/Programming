@@ -113,7 +113,7 @@ honestly in five maps; api-design ledger row reconstructed; react digest
 authored-vs-verified corrected; problem-solving raw seeds re-fetched into
 reference/sources/raw-seeds/problem-solving/ after the /tmp loss.
 
-### Phase 1 — seven-type backfill (supersedes DOC ORDER until all green)
+### Phase 1 — seven-type backfill ✅ COMPLETE (v97–v103, 2026-08-22)
 Order: observability → how-developers-think → software-testing-and-debugging →
 api-design → react-2024-and-beyond. One doc at a time; full twin hygiene.
 Per doc:
@@ -127,6 +127,11 @@ Per doc:
    + one distilled war story (R20) from fetched sources — clears its floor deviation.
 4. Mirror via twin pipeline (splice for structure); update digest shell Δ list and
    dispositions7 (THIN/MISSING → PRE w/ anchor or ADD w/ delta id).
+
+OUTCOME: all five docs gates-green (twins/coverage/content-types exit 0). Leverage
+Map / خريطة الرافعة coined in glossary cross-cutting tables per user ruling (v100).
+react floor deviation closed via WAIVER-form note citing Δ1 (v90) + Δ2 (v103).
+Terminology policy now standing: new terms get a glossary dfn first, then reuse.
 5. Gates: verify-twins ALL PASSED + coverage exit 0 + content-types exit 0.
 6. Ledger row statuses flip; goal.md line; commit + tag.
 PHASE 1 DONE = `content-types.py` exit 0 on all five completed docs.
