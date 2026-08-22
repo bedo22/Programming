@@ -9,7 +9,9 @@
 - api-design/system-design theory tables: formalizes that during partition you choose C or A.
 
 ## Key findings (one line each, with supporting quote)
-- PDF fetched (6pp). [Deep distillation pending — formal proofs not yet extracted; cite for the theorem statement only.]
+- **The impossibility is proven for the asynchronous model** — abstract: "there are three properties that are commonly desired: consistency, availability, and partition tolerance. It is impossible to achieve all three," proven "in the asynchronous network model," with solutions discussed "in the partially synchronous" setting.
+- **The three guarantees are named explicitly** — Consistency, Availability, Partition-tolerance, each defined before formalization.
+- [Formal proofs not extracted — cite theorem statement only.]
 
 ## Notes / caveats
 - Replaces dead Brewer 2012 cite in both docs (marked with transitional † note).
