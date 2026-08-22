@@ -275,6 +275,68 @@
   </tbody>
 </table>
 
+<h2 id="sec-leverage-map-where-operational-practice-mass-concentrates">The leverage map — where operational practice mass concentrates</h2>
+
+<p>Not everything in this discipline deserves equal study time. The tiers below are derived from the sources this doc is grounded in — not from vibes: Google's SRE book carries the monitoring/alerting core, Brendan Gregg's USE method carries the resource lens, and Charity Majors' writing carries the high-cardinality exploration layer. The working default: master the first tier and you can run most real-world operations; reach for tier two when its trigger event occurs; tier three enters only by deliberate decision.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>Symptoms-over-causes alerting, expressed through the four golden signals (latency, traffic, errors, saturation)</td>
+      <td>The alert that fires on user-felt impact is the only one reliably worth its cost; causes multiply, symptoms stay few</td>
+      <td>SRE book, <em>Monitoring Distributed Systems</em> (four golden signals verified in this doc's digestion)</td>
+    </tr>
+    <tr>
+      <td>USE method — for every resource, check Utilization, Saturation, Errors</td>
+      <td>One checklist that turns "the system is slow" into a bounded search across every resource</td>
+      <td>Brendan Gregg, usemethod.com (definition verified verbatim during digestion)</td>
+    </tr>
+    <tr>
+      <td>SLOs with error budgets — and burn-rate alerts bound to them</td>
+      <td>The promise contract that decides when reliability work outranks features; without it, alerting has no arbiter</td>
+      <td>SRE book SLO chapter (source key <code>sre-slo-chapter</code>)</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Learn when needed</strong></td>
+      <td>Incident response process + blameless postmortems</td>
+      <td>Triggered by incidents, not daily work; the learning loop that converts failure into design input</td>
+      <td>SRE book, <em>Postmortem Culture</em>; PagerDuty incident-response docs</td>
+    </tr>
+    <tr>
+      <td>High-cardinality exploratory debugging</td>
+      <td>The fallback when pre-aggregated dashboards cannot localize a failure — interrogate raw events instead</td>
+      <td>Charity Majors, observability writing (grounded in this doc's definition section)</td>
+    </tr>
+    <tr>
+      <td>Runbooks + OpenTelemetry-standard instrumentation</td>
+      <td>Makes the known response boring and keeps new telemetry vendor-neutral</td>
+      <td>opentelemetry.io docs; PagerDuty runbook guidance</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Rare specialist</strong></td>
+      <td>Chaos engineering — practicing failure on purpose</td>
+      <td>Pays only after tier-one monitoring exists; otherwise you are setting fires without detectors</td>
+      <td>Principles of chaos engineering canon (gap G-ob10 — hedged until fetched)</td>
+    </tr>
+    <tr>
+      <td>Capacity planning / load-testing mathematics</td>
+      <td>Matters at scale boundaries, which most services meet rarely</td>
+      <td>Gap G-ob9 — doc-native treatment until canon is fetched</td>
+    </tr>
+    <tr>
+      <td>Telemetry cost engineering (sampling, retention tiers)</td>
+      <td>Real money, late in maturity — enter when the bill outruns the insight</td>
+      <td>Gap G-ob11 — hedged in the cost-management section</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage maps rot faster than the practices they rank — re-check these tiers against the sources whenever this doc's Track pass touches it.</p>
+
 <h2 id="sec-slo-design-choosing-what-to-promise">SLO design — choosing what to promise</h2>
 
 <p>Vocabulary (SLI, SLO, SLA, error budget) is defined in <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a>. This section owns the practice: which SLIs to pick, what targets to set, and how the budget is governed.</p>

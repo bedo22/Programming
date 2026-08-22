@@ -28,6 +28,7 @@ Status: TRACK A COMPLETE (2026-08-22). De-numbered: 174 refs both twins (in-doc 
 | #sec-intersection-with-neighbors-the-ownership-contract | n/a shelf-internal | exempt |
 | #sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful | USE method ✓ · symptoms-vs-causes ✓ (Δ1/Δ2 authored) | |
 | #sec-mental-models-how-operators-actually-reason | sre effective-troubleshooting | hypothesis loop |
+| #sec-leverage-map-where-operational-practice-mass-concentrates | obs-Δ3 tiers over this shell's verified sources (SRE/USE/charity.wtf) | added v97; G-ob9..11 referenced in-tier |
 | #sec-slo-design-choosing-what-to-promise | cross-key sre-slo-chapter | |
 | #sec-alert-design-turning-targets-into-contracts-with-humans | monitoring chapter (golden signals, symptoms) | Δ2 |
 | #sec-incident-response-from-detection-to-recovery | PagerDuty docs (partial) | G-ob5 |
@@ -60,3 +61,8 @@ Status: TRACK A COMPLETE (2026-08-22). De-numbered: 174 refs both twins (in-doc 
 ## Content authored from this digestion
 - v91 Track B: obs-Δ1 USE-method definition quote → theory section; obs-Δ2 symptoms-vs-causes
   → alert-design context. Both mirrored to AR twin.
+- v97 Phase-1 backfill: obs-Δ3 leverage map (three master-first tiers) → new section after
+  mental-models, EN+AR. Tiers derived from THIS shell's verified sources only — SRE
+  monitoring chapter (golden signals), USE verbatim, SLO chapter key, charity.wtf,
+  PagerDuty/OTel docs; gaps G-ob9..G-ob11 referenced honestly inside their tiers.
+  Dispositions7 R14 flipped MISSING→PRE.
