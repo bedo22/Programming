@@ -929,5 +929,36 @@
    "SDP §6",
    "SDP <a href=\"./software-development-process.html#sec-xp-lean-devops-the-rest-of-the-landscape\">§6</a>"
   ]
- ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "SKIP",
+   "note": "no mental-models/principles or leverage id exists in this doc — leverage-tier content is owned by each discipline doc, not by the shelf-wide index"
+  },
+  "R15": {
+   "status": "SKIP",
+   "note": "no 'failure' id in this doc; failure-mode vocabulary rows (Design Theater, Failure Domain, circuit breaker, postmortem terms) delegate to owner docs' failure sections"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "no search-vocabulary id — this doc IS the glossary; R16 vocabulary is owned by glossary itself"
+  },
+  "R17": {
+   "status": "SKIP",
+   "note": "no history/evolution id; historical framing travels inside term definitions (Royce 1970, Agile Manifesto 2001) with pointers into owner history sections"
+  },
+  "R18": {
+   "status": "SKIP",
+   "note": "no choosing/integration/patterns id — the doc holds definition tables, not decision tables; choosing guidance lives in the owner docs"
+  },
+  "R19": {
+   "status": "SKIP",
+   "note": "no metrics/measures/economics/big-o id; Big-O and SLO/error-budget rows point into cs-and-software-engineering and observability owners"
+  },
+  "R20": {
+   "status": "SKIP",
+   "note": "no worked-example/checklist id — worked examples live in owner docs (api-design, ui-ux-web-design, html-and-css); this doc only indexes them"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+ }
 }

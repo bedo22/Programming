@@ -13,12 +13,47 @@
  },
  "FOLDS": [
   [
-   "Problem-Solving</a> §7b",
-   "Problem-Solving</a> <a href=\"./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog\">§7b</a>"
+   "Problem-Solving</a> \u00a77b",
+   "Problem-Solving</a> <a href=\"./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog\">\u00a77b</a>"
   ],
   [
-   "Problem-Solving §7b",
-   "Problem-Solving <a href=\"./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog\">§7b</a>"
+   "Problem-Solving \u00a77b",
+   "Problem-Solving <a href=\"./problem-solving.html#sec-algorithm-design-paradigms-the-technique-catalog\">\u00a77b</a>"
   ]
- ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-paradigm-selection-the-thinking-that-reaches-for-the-toolkit",
+   "note": "the doc's mental-models section: six-paradigm selection heuristics + trade-off framework"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-failure-modes-the-edge-case-checklist"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "no search-vocabulary id; term vocabulary owned by glossary.html per shelf convention"
+  },
+  "R17": {
+   "status": "SKIP",
+   "note": "no history/evolution section; complexity-theory history lives in cs-and-software-engineering by shelf split"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-pattern-recognition-cheat-sheet-signal-technique",
+   "note": "signal-to-technique decision table \u2014 the doc's decision-function core"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-complexity-the-quick-review",
+   "note": "Big-O cost model + amortized analysis = this doc's metrics/economics"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-summary-the-complete-mental-checklist",
+   "note": "twelve-line mental checklist; LRU-cache worked example lives under sec-stacks-queues-and-linked-lists"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon (Kleinberg & Tardos, Zingaro, Big-O cheat sheet, MDN) by design; justified N/A additions per SHELF-DONE rule"
+ }
 }

@@ -25,5 +25,40 @@
    "§0b–0g",
    "<a href=\"#sec-definition-what-backend-engineering-is-and-is-not\">§0b–0g</a>"
   ]
- ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-mental-models-frames-for-thinking-about-the-server",
+   "note": "frames table is this doc's leverage map; no tiered master-first ladder by design"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "no search-vocabulary section; terminology owned by glossary (owner-pointer discipline)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-history-the-constraint-inversions",
+   "note": "inversion history; mirrored later in sec-evolution-the-constraint-inversions"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-state-the-identity-and-session-decision",
+   "note": "revoke-driven choosing table; ecosystem catalog carries decision metrics too"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-ecosystem-tooling-catalog-with-decision-metrics",
+   "note": "decision metrics columns are the doc's measures; pool arithmetic lives in data-access"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-trace-the-loop-end-to-end"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+ }
 }

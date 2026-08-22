@@ -26,5 +26,41 @@
     ["§١ج", "<a href=\"./how-developers-think-frontend.html#sec-evolution-constraint-inversions-across-the-same-idea\">§١ج</a>"],
     ["§٥أ", "<a href=\"./how-developers-think-frontend.html#sec-frontend-state-decisions-the-taxonomy\">§٥أ</a>"],
     ["§١٠", "<a href=\"./nextjs-deep-dive.html#sec-auth-env-and-security-frontend-adjacent\">§١٠</a>"]
-  ]
+  ],
+  "dispositions7": {
+    "R14": {
+      "status": "PRE",
+      "anchor": "#sec-principles",
+      "note": "nine principle/why rows concentrating the doc's practice mass (source-of-truth placement, validate at every layer, trace the full journey)"
+    },
+    "R15": {
+      "status": "PRE",
+      "anchor": "#sec-most-common-failure-modes-the-seam-anti-patterns",
+      "note": "seam anti-pattern table (failure / where it bites / fix) verified in EN doc 2026-08-22"
+    },
+    "R16": {
+      "status": "SKIP",
+      "note": "no search-vocabulary id; cross-discipline terminology owned by reference/ar/glossary.html per shelf convention"
+    },
+    "R17": {
+      "status": "PRE",
+      "anchor": "#sec-history-the-boundary-keeps-moving",
+      "note": "three boundary moves (LAMP convergence, SPA separation, RSC reconvergence) teach that beginners' fixed-wall picture is wrong — the seam is a per-feature decision"
+    },
+    "R18": {
+      "status": "PRE",
+      "anchor": "#sec-where-does-this-belong-the-central-question",
+      "note": "'Thing x Client? x Server? x Database?' decision table with stated defaults ('the server is the source of truth for domain state...') — the doc's central choosing tool"
+    },
+    "R19": {
+      "status": "SKIP",
+      "note": "no metrics/measures/economics/big-o section; doc carries almost no numbers beyond era years in history"
+    },
+    "R20": {
+      "status": "PRE",
+      "anchor": "#sec-worked-example-tracing-one-feature-across-the-seam",
+      "note": "add-to-cart feature traced across all layers end to end"
+    },
+    "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+  }
 }

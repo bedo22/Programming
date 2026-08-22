@@ -6,5 +6,42 @@
   "10": "sec-the-most-common-failure-modes",
   "12": "sec-the-future-where-design-thinking-is-going",
   "3b": "sec-migration-paths-adopting-design-thinking-in-existing-orgs"
+ },
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-mental-models-how-designers-actually-reason",
+   "note": "eight reasoning frames ranked by decision context and 'what it replaces' — the doc's leverage surface; no literal tier table, so expect a weak-signature advisory"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes",
+   "note": "six failure modes with why-it-happens column plus the 2018+ academic critique"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "no vocabulary/search-vocabulary section exists in this doc; term-of-art ownership lives in reference/glossary.html per shelf convention"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-evolution-from-industrial-design-to-software-and-policy",
+   "note": "constraint-inversion retelling — how the discipline flips as each era's dominant constraint changes"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-migration-paths-adopting-design-thinking-in-existing-orgs",
+   "note": "five adopt-or-don't decision tables with triggers, risks, success signals and timelines"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-ecosystem-tooling-catalog-with-decision-metrics",
+   "note": "decision metrics per tooling category are mostly qualitative heuristics (>10/week is the only hard numeral) — expect weak-signature advisory"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-reduce-missed-medication-doses",
+   "note": "full five-stage war story ending in quantified test results (6.7% vs 13.3% vs ~30%)"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
  }
 }

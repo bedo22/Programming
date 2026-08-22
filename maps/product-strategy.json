@@ -15,7 +15,50 @@
     "10": "sec-product-strategy-tooling-catalog-with-decision-metrics"
   },
   "FOLDS": [
-    ["§13", "<a href=\"./system-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§13</a>"],
-    ["§١٣", "<a href=\"./system-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§١٣</a>"]
-  ]
+    [
+      "§13",
+      "<a href=\"./system-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§13</a>"
+    ],
+    [
+      "§١٣",
+      "<a href=\"./system-design.html#sec-ecosystem-tooling-catalog-with-decision-metrics\">§١٣</a>"
+    ]
+  ],
+  "dispositions7": {
+    "R14": {
+      "status": "PRE",
+      "anchor": "#sec-mental-models-how-senior-strategists-think",
+      "note": "the doc's principles section: outcomes-over-outputs, trio, WSJF, portfolio-of-bets heuristics"
+    },
+    "R15": {
+      "status": "PRE",
+      "anchor": "#sec-failure-modes-the-traps",
+      "note": "nine-row trap table with fixes, incl. zombie-product/deprecation cross-links"
+    },
+    "R16": {
+      "status": "SKIP",
+      "note": "no search-vocabulary id; term vocabulary owned by glossary.html per shelf convention"
+    },
+    "R17": {
+      "status": "PRE",
+      "anchor": "#sec-history-from-project-delivery-to-outcome-management",
+      "note": "1950s-to-AI-era evolution table; constraint inversions live in the adjacent sec-evolution section"
+    },
+    "R18": {
+      "status": "PRE",
+      "anchor": "#sec-build-vs-buy-vs-partner-the-strategic-matrix",
+      "note": "build/buy/partner decision table — the doc's integration/choosing decision-function core"
+    },
+    "R19": {
+      "status": "PRE",
+      "anchor": "#sec-measurement-product-analytics",
+      "note": "metrics/economics: input-outcome-guardrail stack, AARRR/HEART, North Star; unit economics in sec-business-viability"
+    },
+    "R20": {
+      "status": "PRE",
+      "anchor": "#sec-worked-example-from-opportunity-to-outcome",
+      "note": "end-to-end worked example; sec-the-complete-mental-checklist carries the checklist half"
+    },
+    "floor_note": "WAIVER: rich authored doc delegating facts to cited canon (canon-wiki + practitioner sites) by design; justified N/A additions per SHELF-DONE rule"
+  }
 }

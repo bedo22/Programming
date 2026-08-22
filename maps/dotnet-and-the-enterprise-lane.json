@@ -45,5 +45,41 @@
    "(§)",
    "(section)"
   ]
- ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "SKIP",
+   "note": "no mental-models/principles h2 in this doc; its leverage content is the definition/lane-map framing itself"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-literacy-pitfalls-failure-modes",
+   "note": "'failure' in id; pitfalls table traces to confirmed lane-map rows"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "no search-vocabulary h2; terminology owned by glossary per shelf convention"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-decoding-the-version-what-net-means-in-a-listing",
+   "note": "product-line evolution (Framework 2002-2019 -> Core 2016-2020 -> unified .NET) is this doc's settled-history content"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-when-not-to-pick-net",
+   "note": "choosing section - the mirror decision table of the lane map"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-the-net-market-map-where-the-lane-actually-is",
+   "note": "economics-of-the-lane content (market positioning); no perf-metrics/big-O claims exist in this doc"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-reading-a-net-codebase",
+   "note": "worked example reading a real-shaped endpoint end to end"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+ }
 }

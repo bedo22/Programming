@@ -37,3 +37,4 @@ Apply the plan to finish all waves
 - 2026-08-22: v119 — INCOME-STREAM CONTENT UPGRADE (user directive): is-Δ1 sourced ground-rules block both twins; 4 canon seeds verified; user cells untouched; gates exit 0 ×3. GOAL SCOPE COMPLETE: 6/6 failing twins reconciled + worksheet upgraded.
 - 2026-08-22: v120 — DIGEST CAMPAIGN BATCH 1: shells for frontend-camps-survey, angular-evolution, payments-and-commerce; coverage ×3 + content-types ×3 all exit 0. 23 docs remain.
 - 2026-08-22: v121 — DIGEST CAMPAIGN BATCH 2: cs/swdp/version-control shells + boards; URL-regex paren bug fixed via gate; vc map bootstrapped. 20 docs remain.
+- 2026-08-22: v122 — DIGEST BATCH 3: 11 shells green (subagent fan-out + inline repairs); user directive adopted: use durable nudgeable subagents henceforth. Gates ×11 exit 0. Remaining: 9 docs.
