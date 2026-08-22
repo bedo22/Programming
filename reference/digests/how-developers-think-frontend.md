@@ -88,6 +88,7 @@ Supplementary: Wikipedia Spiral model · IID · XP · The Lean Startup · Workin
 | #sec-round-3-edge-cases-and-polish-the-difference-between-works-and-ships | gap → G1 | |
 | #sec-frontend-state-decisions-the-taxonomy | n/a owner: ui-ux state matrix | cross-doc |
 | #sec-mental-models-how-developers-actually-reason-across-rounds | gap → G1 | |
+| #sec-leverage-map-where-the-loop-practice-mass-concentrates | hdt-Δ6 tiers over this shell's digested sources (Miller/Cowan, SEI, Manifesto, XP/IID/LeanStartup) | added v99; tier-one rows cite G1 accepted-framework basis |
 | #sec-where-data-structures-algorithms-actually-show-up-in-frontend | gap → G1 | |
 | #sec-the-honest-truth-about-how-senior-devs-work | gap → G1; Δ3 supports | |
 | #sec-your-takeaway-the-deliberate-practice-loop | gap → G2 (Ericsson unlocated) | |
@@ -118,3 +119,8 @@ Supplementary: Wikipedia Spiral model · IID · XP · The Lean Startup · Workin
   (rank checklist by risk; spiral was risk-driven). All mirrored to AR twin.
 - Declined: hdt-Δ5b (Baddeley episodic buffer — scope creep for this doc's claim);
   G2 left open pending Ericsson hunt (prescriptive "50 times" is low-risk).
+- pass v99 (Phase-1 backfill): hdt-Δ6 leverage map (three master-first tiers) → new
+  section after mental-models, EN+AR. Tiers drawn only from THIS shell's digested
+  sources — Miller/Working-memory pages, SEI spiral, Manifesto verbatim,
+  XP/IID/Lean Startup records; tier-one rows cite G1 accepted-framework basis.
+  Dispositions7 R14 flipped THIN→PRE.

@@ -587,6 +587,63 @@ Cart = Map<productId, quantity>   ← or just an array, decide later
 
 ---
 
+<h2 id="sec-leverage-map-where-the-loop-practice-mass-concentrates">The leverage map — where the loop's practice mass concentrates</h2>
+
+<p>Twenty-five sections is a lot of terrain; it is not equally load-bearing. These tiers are derived from this doc's own grounded sources — the cognitive-science pair (Miller's span, Cowan's estimate), Boehm's risk-driven spiral via the SEI material, the Agile Manifesto text, and the XP/IID/Lean Startup lineage records — not from vibes. Working default: tier one runs every feature you build; tier two enters when its situation appears; tier three is context you carry, not a tool you pick up.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>Sketch the data shape before writing components (Round 0's hardest question)</td>
+      <td>The shape decides what state exists, which components stay dumb pipes, and where the event flow lives — every later round inherits it</td>
+      <td>This doc's own synthesis (gap G1, accepted as authored framework); worked-example section</td>
+    </tr>
+    <tr>
+      <td>Hold the three threads lightly — Model, View, Flow — one per pass</td>
+      <td>Working memory holds ~4 chunks, not feature plans; serializing threads is the only way each pass fits and stays correct</td>
+      <td>Miller's span + Cowan's estimate (fetched Wikipedia pages, digested here)</td>
+    </tr>
+    <tr>
+      <td>Externalize each pass — skeleton first, deepen second, polish third</td>
+      <td>Offloading to an external representation is the same move Pólya prescribed; the rounds make it a habit instead of a hope</td>
+      <td>Cognitive-science section; owner pointer → <a href="./problem-solving.html">Problem-Solving</a></td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Learn when needed</strong></td>
+      <td>Rank the Round-0 checklist by risk (likelihood × impact × invisibility)</td>
+      <td>Boehm's spiral was explicitly risk-driven — depth of investigation should track size of risk, not order on the page</td>
+      <td>hdt-Δ1; SEI spiral material (fetched)</td>
+    </tr>
+    <tr>
+      <td>Vocabulary-map terms — wireframe, prototype, spike, MVP — when scoping with others</td>
+      <td>A named artifact prevents a whole class of "I thought you meant…" failures; MVP attribution runs through Ries's build-measure-learn</td>
+      <td>Vocabulary-map section; Lean Startup record (digested)</td>
+    </tr>
+    <tr>
+      <td>Round-3 edge-and-polish discipline</td>
+      <td>The difference between works and ships; needed at release time, wasted if perfected too early</td>
+      <td>Round-3 section (practice synthesis)</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>IID lineage detail — Mercury veterans' IBM division building the shuttle's onboard software (Larman &amp; Basili 2003)</td>
+      <td>Makes the history concrete and memorable; context flavor, not an operating tool</td>
+      <td>hdt-Δ2; IID record (digested)</td>
+    </tr>
+    <tr>
+      <td>Org-scale process argument — manifesto value pairs as the rhythm debate at company scale; XP's C3 origin story</td>
+      <td>Fires in planning debates and hiring conversations, rarely inside a component file</td>
+      <td>hdt-Δ4 (Manifesto verbatim); hdt-Δ5 (XP/C3 1996)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
+
 <h2 id="sec-where-data-structures-algorithms-actually-show-up-in-frontend">Where data structures & algorithms actually show up in frontend</h2>
 
 <p>You don't start with "what algorithm should I use?" You start with "what's the simplest structure?" and only reach for a specific algorithm when you <em>feel the pain</em> — slow rendering, sluggish search, duplicate logic.</p>
