@@ -6,18 +6,24 @@ README). Doc cites these as its external canon; one-to-one mapping below.
 
 ## Fetch ledger (every cited seed URL, verbatim)
 
+Raw seeds live in sources/raw-seeds/problem-solving/*.md (markdown snapshots of the
+same pages); file sizes there are the canonical record. All living pages.
+
 | cited URL | status | source-dated |
 |---|---|---|
-| How to Solve It (wiki) | OK 38.9KB — 1945 verified | living page |
-| Schoenfeld (wiki) | OK 21.8KB — 1985 *Mathematical Problem Solving* + "Control" verified | living page |
-| Computational thinking (wiki) | OK 62KB — pillars (decomposition/abstraction/algorithms/patterns) verified | living page |
-| Einstellung effect (wiki) | OK 45KB — effect verified | living page |
-| Expertise (wiki) | OK 86KB — **Ericsson deliberate practice + 10,000-hour framing present** | living page |
-| Practice (deliberate) (wiki) | OK 63KB — companion lane | living page |
-| Rubber duck debugging (wiki) | OK 23KB — origin attributed to *The Pragmatic Programmer* (Hunt & Thomas) | living page |
-| Cognitive load (wiki) | OK 155KB — theory canon | living page |
-| Stepwise refinement (wiki) | OK 73KB — Wirth lineage | living page |
-| Competitive programming (wiki) | OK 44KB — context lane | living page |
+| https://en.wikipedia.org/wiki/How_to_Solve_It | OK — 1945 verified | living page |
+| https://en.wikipedia.org/wiki/Alan_Schoenfeld | OK — 1985 *Mathematical Problem Solving* + "Control" verified | living page |
+| https://en.wikipedia.org/wiki/Computational_thinking | OK — pillars verified | living page |
+| https://en.wikipedia.org/wiki/Einstellung_effect | OK — effect verified | living page |
+| https://en.wikipedia.org/wiki/Expertise | OK — **Ericsson deliberate practice + 10,000-hour framing present** | living page |
+| https://en.wikipedia.org/wiki/Practice_(learning_method) | OK — companion lane | living page |
+| https://en.wikipedia.org/wiki/Rubber_duck_debugging | OK — attributed to *The Pragmatic Programmer* (Hunt & Thomas) | living page |
+| https://en.wikipedia.org/wiki/Cognitive_load | OK — theory canon | living page |
+| https://en.wikipedia.org/wiki/Stepwise_refinement | OK — Wirth lineage | living page |
+| https://en.wikipedia.org/wiki/Competitive_programming | OK — context lane | living page |
+
+Also cited by the doc: https://en.wikipedia.org/wiki/Debugging (general canon, no
+dedicated seed needed).
 
 (source-dated per currency convention skill v1.7; all living pages.)
 
