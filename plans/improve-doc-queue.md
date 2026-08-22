@@ -152,10 +152,10 @@ minimum two substantive additions per the normal rule. Prior template-era additi
 (vocabulary blocks, teacher sections, markers) are existing content — swept and
 verified during A like everything else; they do NOT count toward B's minimum.
 1 api-design ✅v79 (full A+B pilot) · 2 how-developers-think-frontend ✅v80 (A+B) ·
-3 software-testing-and-debugging ✅v81 (A+B) · 4 system-design 🔶 Track A done v88-89,
-Track B pending · 5 javascript-the-language · 6 class-to-hooks-paradigm-shift ·
-7 html-and-css · 8 what-is-state-prequel · 9 ui-ux-web-design ·
-10 javascript-across-stacks
+3 software-testing-and-debugging ✅v81 (A+B) · 4 system-design ✅v105 (Track B) ·
+5 javascript-the-language ✅v106 · 6 class-to-hooks-paradigm-shift ✅v107 ·
+7 html-and-css ✅v108 · 8 what-is-state-prequel ✅v109 · 9 ui-ux-web-design ✅v110 ·
+10 javascript-across-stacks ✅v111 — **WAVE 1 COMPLETE**
 
 Wave 1.5 KEY HARVEST — ✅ COMPLETE (v86–v89): ~27 source keys in reference/sources/;
 remaining deep-reads: lamport/brewer formal proofs (scans), team-topologies extraction.
@@ -164,26 +164,31 @@ Migration debt tracker lives in skill sources.md.
 Wave 2 — high-deficiency, full A+B:
 11 react-2024-and-beyond ✅v90 (full A+B) · 12 observability-and-operations ✅v91–92
 (full A+B; 174 refs de-numbered, 41 nested-anchor pairs repaired) ·
-13 income-stream-landscape ⚠️RECLASSIFIED: interactive personal worksheet
-(localStorage cells s0–s3), not a reference doc — light factual Track A only,
-user data OFF-LIMITS, flagged for async review ·
-14 problem-solving 🔶 seeds fetched (10/10 warm in /tmp/digest-sources/ps),
-digest+matrix+Track B next session · 15 cs-and-software-engineering ·
-16 version-control-ci-cd-deployment · 17 software-development-process ·
-18 data-modeling-and-databases · 19 sql-and-postgresql · 20 security-and-threat-modeling
+13 income-stream-landscape ✅v112 reclassified worksheet (light Track A) +
+✅v119 user-directed content upgrade is-Δ1 (sourced ground-rules block, both twins;
+user data cells untouched) ·
+14 problem-solving ✅v113–v115 full A+B (+ twin repairs v114; G-ps2 closed v116) ·
+15 cs-and-software-engineering ✅v121 digest + justified-N/A ·
+16 version-control-ci-cd-deployment ✅v117 sync + v121 digest ·
+17 software-development-process ✅v117 sync + v121 digest ·
+18 data-modeling-and-databases 🔄 digest in flight (durable subagent) ·
+19 sql-and-postgresql 🔄 digest in flight (durable subagent) ·
+20 security-and-threat-modeling 🔄 digest in flight (durable subagent)
 
 Wave 3 — remaining core:
-21 backend-engineering · 22 full-stack · 23 frontend-camps-survey · 24 nextjs-deep-dive ·
-25 angular-evolution · 26 algorithms-and-data-structures · 27 design-thinking ·
-28 beyond-the-browser · 29 terminal-and-deployment-substrate · 30 terminal-applications
+21 backend-engineering ✅v122 · 22 full-stack ✅v122 · 23 frontend-camps-survey ✅v118 sync + v120 digest · 24 nextjs-deep-dive ✅v122 ·
+25 angular-evolution ✅v117 sync + v120 digest · 26 algorithms-and-data-structures ✅v114 AR-restore + v122 digest · 27 design-thinking ✅v122 ·
+28 beyond-the-browser ✅v118 + v122 · 29 terminal-and-deployment-substrate 🔄 in flight · 30 terminal-applications 🔄 in flight
 
 Wave 4 — career/business tier (lighter sources; interviews/blog posts acceptable as
 supporting tier):
-31 freelance-web-practice · 32 frontend-income-markets · 33 income-stream-landscape
-(dup guard: if already done at #13, mark here) · 34 hiring-process-and-interviews ·
-35 product-strategy · 36 product-shapes · 37 payments-and-commerce · 38 open-source ·
-39 recurring-fear-of-replacement · 40 dotnet-and-the-enterprise-lane ·
-41 wordpress-and-cms-internet · 42 glossary (A only, LAST)
+31 freelance-web-practice ✅v122 · 32 frontend-income-markets 🔄 in flight ·
+33 income-stream-landscape ✅ (dup of #13 — see above) · 34 hiring-process-and-interviews 🔄 in flight ·
+35 product-strategy ✅v122 · 36 product-shapes ✅v122 · 37 payments-and-commerce ✅v118 + v120 digest ·
+38 open-source 🔄 in flight ·
+39 recurring-fear-of-replacement 🔄 in flight · 40 dotnet-and-the-enterprise-lane ✅v122 ·
+41 wordpress-and-cms-internet 🔶 EN-only doc (no AR twin) — digest pending, LAST ·
+42 glossary ✅v122 (A only as planned)
 
 ## SHELF DONE = all of:
 - Every doc: digest exists, coverage gate 0, digest links wired EN+AR, sweep logged
