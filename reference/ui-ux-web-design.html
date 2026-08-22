@@ -50,6 +50,53 @@
 
 ---
 
+<h2 id="sec-search-vocabulary-what-ui-ux-calls-things">Search vocabulary — what UI/UX calls things</h2>
+
+<p>You cannot look up a design problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>usability</dfn></td>
+      <td>How effectively, efficiently, and satisfactorily users can do what they came to do</td>
+      <td>The ISO-defined umbrella term — without it you're searching "easy to use" and getting blog posts</td>
+    </tr>
+    <tr>
+      <td><dfn>affordance</dfn></td>
+      <td>What an object suggests about how it can be used — a button that looks pressable</td>
+      <td>Norman's term separating physical suggestion from digital convention; unlocks the whole perception-design literature</td>
+    </tr>
+    <tr>
+      <td><dfn>heuristic</dfn></td>
+      <td>A rule-of-thumb evaluation principle (Nielsen's ten being the canonical set)</td>
+      <td>The expert-review vocabulary — "heuristic evaluation" is a searchable method, not just advice</td>
+    </tr>
+    <tr>
+      <td><dfn>dark pattern</dfn></td>
+      <td>An interface choice engineered to trick users into unintended actions</td>
+      <td>The named enemy in ethics discussions; regulation texts now use it too</td>
+    </tr>
+    <tr>
+      <td><dfn>accessibility</dfn></td>
+      <td>Design that works across abilities — keyed to WCAG criteria</td>
+      <td>The field's formal name (a11y in tags); searching it finds criteria checklists, not vibes</td>
+    </tr>
+    <tr>
+      <td><dfn>persona</dfn></td>
+      <td>A research-derived composite user standing in for a segment</td>
+      <td>The unit of user-research communication — separates evidence-based UX from opinion-based</td>
+    </tr>
+    <tr>
+      <td><dfn>cognitive load</dfn></td>
+      <td>The working-memory cost of an interface at a given moment</td>
+      <td>The mechanism behind most "simplify this screen" advice; ties UI back to the shelf's memory-model foundations</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-definition-what-ui-ux-is-and-what-it-is-not">Definition — what UI/UX <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
@@ -388,6 +435,58 @@
 <p><strong>The legal floor is real.</strong> WCAG AA is not just a quality bar — it is increasingly a <em>legal</em> one: the ADA (US) applies to public-facing sites, Section 508 (US federal), and the European Accessibility Act (EAA, enforceable 2025) extends to most EU-facing commercial products. "Accessibility as default, not checklist" is the professional stance because the alternative is a lawsuit for the client — not just an unhappy user. The platform mechanics live in <a href="./html-and-css.html">HTML &amp; CSS</a>; this doc owns the design discipline that makes them a floor, not a retrofit.</p>
 
 ---
+
+<h2 id="sec-leverage-map-where-ui-practice-mass-concentrates">The leverage map — where UI practice mass concentrates</h2>
+
+<p>Eighteen sections of design theory are not equally load-bearing. These tiers derive from this doc's own cited canon — Nielsen's heuristics, Shneiderman's golden rules, Norman's affordance framing, the WCAG criteria — plus this doc's failure-modes table, not from vibes. Working default: tier one shapes every screen you ship; tier two enters when its situation appears; tier three is regime and standards depth you adopt when the product earns it.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>Nielsen's ten heuristics as an evaluation reflex</td>
+      <td>System-status visibility, error prevention, recognition over recall — the fastest defect-finder in design review</td>
+      <td>NN/g ten-heuristics article (fetched, verbatim)</td>
+    </tr>
+    <tr>
+      <td>Pattern-choice discipline — pick between known patterns by context, not novelty</td>
+      <td>The patterns table's "choose X when…" rows prevent most navigation/form failures before they exist</td>
+      <td>This doc's patterns table (R18 function)</td>
+    </tr>
+    <tr>
+      <td>Semantic-first accessibility</td>
+      <td>Free keyboard/focus/role/name from correct HTML; ARIA only for semantic gaps — the floor under everything else</td>
+      <td>This doc's principles table; WCAG 2.2 quickref (cited)</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Learn when needed</strong></td>
+      <td>Research triage — usability measurement deciding what to fix first</td>
+      <td>Bites once real users exist; severity ranking turns observations into a queue instead of an argument</td>
+      <td>Research section; ISO 9241 usability definition (cited)</td>
+    </tr>
+    <tr>
+      <td>Ethics guardrails — dark-pattern recognition, inclusive defaults</td>
+      <td>Regulatory and reputational pressure makes this operational the moment growth tactics appear</td>
+      <td>Ethics section; WCAG canon (cited)</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>Platform-canon fluency — HIG and Material as design-law libraries</td>
+      <td>Matters when targeting platform-native feel or contributing to a design system; otherwise reference material</td>
+      <td>HIG + Material 3 (cited, continuously updated)</td>
+    </tr>
+    <tr>
+      <td>Perceptual-theory depth — Gestalt mechanics behind the rules</td>
+      <td>Pays when teaching or breaking new ground; working knowledge of the principles suffices for daily screens</td>
+      <td>Gestalt seed (fetched); underlying-theory section</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
 
 <h2 id="sec-the-rhythm-not-the-algorithm">The rhythm, not the algorithm</h2>
 
