@@ -53,10 +53,10 @@
 
 <p>Reading order: standalone, after System Design and Backend Engineering. Cross-links:</p>
 <ul>
-  <li>Upstream to <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a> (reliability, SLO vocabulary, recovery) and <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a> (the four signals, correlation, trace propagation) — this doc consumes that architecture and does not re-teach it.</li>
-  <li>Sibling to <a href="./backend-engineering.html">Backend Engineering</a> <a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">§8b</a> — the request-loop signals (requestId, P99, status rates) are instrumentation this doc's procedures assume.</li>
-  <li>Downstream of <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a> — the SDLC names the operational layer; this doc is its full treatment.</li>
-  <li>Adjacent to <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> — testing is evidence <em>before</em> deploy; operations is evidence <em>after</em>. The hypothesis-driven debugging loop they share lives in <a href="./problem-solving.html">Problem-Solving</a> <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">§9</a>.</li>
+  <li>Upstream to <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a> (reliability, SLO vocabulary, recovery) and <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a> (the four signals, correlation, trace propagation) — this doc consumes that architecture and does not re-teach it.</li>
+  <li>Sibling to <a href="./backend-engineering.html">Backend Engineering</a> <a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">the server-side observability loop</a> — the request-loop signals (requestId, P99, status rates) are instrumentation this doc's procedures assume.</li>
+  <li>Downstream of <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">deployment &amp; incident management</a> — the SDLC names the operational layer; this doc is its full treatment.</li>
+  <li>Adjacent to <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> — testing is evidence <em>before</em> deploy; operations is evidence <em>after</em>. The hypothesis-driven debugging loop they share lives in <a href="./problem-solving.html">Problem-Solving</a> <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted"><a href="#sec-common-failure-modes">failure modes</a></a>.</li>
   <li>Consumed by <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — detection and containment read the same signals without owning the machinery.</li>
   <li>Reference: <a href="./glossary.html">Glossary</a> (the glossary cites this doc as <em>Ops</em>).</li>
 </ul>
@@ -72,7 +72,7 @@
     <tr>
       <td><strong>What deserves a target?</strong></td>
       <td>Which measurements are worth committing to?</td>
-      <td>Signal architecture (what to emit) is System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>; choosing which few become commitments is an operational judgment.</td>
+      <td>Signal architecture (what to emit) is System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>; choosing which few become commitments is an operational judgment.</td>
     </tr>
     <tr>
       <td><strong>What deserves an alert?</strong></td>
@@ -134,7 +134,7 @@
     <tr>
       <td><strong>The AI era (2023–)</strong></td>
       <td>LLM calls become spans; agents become systems you must observe; drift replaces crash as the feared failure.</td>
-      <td>An expanding <em>event horizon</em> — see <a href="#sec-the-future-where-the-operational-layer-is-heading">§11</a>.</td>
+      <td>An expanding <em>event horizon</em> — see <a href="#sec-the-future-where-the-operational-layer-is-heading">the future of operations</a>.</td>
     </tr>
   </tbody>
 </table>
@@ -162,7 +162,7 @@
       <td><strong>Free-text logs → correlated telemetry</strong></td>
       <td>Searchable strings; every team invents its own vocabulary.</td>
       <td>Structured logs + requestIds + trace context; one journey across logs, metrics, and traces.</td>
-      <td>Localization became a property of the platform (System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>), not a skill of the senior engineer.</td>
+      <td>Localization became a property of the platform (System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>), not a skill of the senior engineer.</td>
     </tr>
     <tr>
       <td><strong>Uptime as the metric → user impact as the metric</strong></td>
@@ -182,23 +182,23 @@
   <tbody>
     <tr>
       <td><strong>System Design</strong> (<a href="./system-design.html">architecture</a>)</td>
-      <td>SLI/SLO/SLA vocabulary, RPO/RTO, four signals, correlation IDs, trace propagation, DR patterns (<a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>, <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>)</td>
+      <td>SLI/SLO/SLA vocabulary, RPO/RTO, four signals, correlation IDs, trace propagation, DR patterns (<a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a>, <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>)</td>
       <td>System Design <em>designs</em> the system to be understood; Ops <em>operates</em> through failure and reports what the design missed. Vocabulary lives there; the practice of choosing targets, designing alerts, and running incidents lives here.</td>
     </tr>
     <tr>
       <td><strong>Backend Engineering</strong> (<a href="./backend-engineering.html">the request loop</a>)</td>
-      <td>RequestId correlation, P99 timing, status-rate counting, error-contract shapes (<a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">§8b</a>)</td>
+      <td>RequestId correlation, P99 timing, status-rate counting, error-contract shapes (<a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">the server-side observability loop</a>)</td>
       <td>Backend Engineering <em>emits</em> the loop's signals at the code level; Ops <em>consumes</em> them as evidence, and adds the operational judgments the code level cannot make (who gets paged, when, and with what authority).</td>
     </tr>
     <tr>
       <td><strong>Software Development Process</strong> (<a href="./software-development-process.html">the lifecycle</a>)</td>
-      <td>Operations as an SDLC phase, SEV severities, hotfix paths, the loop back into the backlog (<a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a>)</td>
+      <td>Operations as an SDLC phase, SEV severities, hotfix paths, the loop back into the backlog (<a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">deployment &amp; incident management</a>)</td>
       <td>SDP places operations in the lifecycle and names its parts; Ops is the full treatment — alert design, incident command, postmortem craft, runbooks.</td>
     </tr>
     <tr>
       <td><strong>Testing &amp; Debugging</strong> (<a href="./software-testing-and-debugging.html">evidence</a>)</td>
       <td>Hypothesis-driven debugging, reproduction discipline, root-cause thinking</td>
-      <td>Testing is evidence <em>before</em> deploy, in a controlled environment; Ops is evidence <em>after</em> deploy, in production, under time pressure, with real users as the test suite. The shared debugging method lives in Problem-Solving <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">§9</a>.</td>
+      <td>Testing is evidence <em>before</em> deploy, in a controlled environment; Ops is evidence <em>after</em> deploy, in production, under time pressure, with real users as the test suite. The shared debugging method lives in Problem-Solving <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted"><a href="#sec-common-failure-modes">failure modes</a></a>.</td>
     </tr>
     <tr>
       <td><strong>Security &amp; Threat Modeling</strong> (<a href="./security-and-threat-modeling.html">adversarial thinking</a>)</td>
@@ -215,20 +215,22 @@
 
 <h2 id="sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">Underlying theory — what makes operations reliable rather than hopeful</h2>
 
-<p>The architecture of the signals (the four signals — metrics, logs, traces, profiles — plus correlation and trace propagation) is System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>'s table — this section covers the theory <em>under</em> the practice.</p>
+<p>The architecture of the signals (the four signals — metrics, logs, traces, profiles — plus correlation and trace propagation) is System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>'s table — this section covers the theory <em>under</em> the practice.</p>
+
+<p>Two named heuristics anchor this section, both grounded: Brendan Gregg's <strong>USE Method</strong> — "a methodology for analyzing the performance of any system" that builds a checklist of Utilization, Saturation, and Errors for every resource (obs-Δ1) — and the SRE book's <strong>symptoms-versus-causes</strong> split for alerts: monitoring should answer two questions, "what's broken, and why?" (obs-Δ2).</p>
 
 <h3>Error-budget arithmetic</h3>
 <ul>
   <li><strong>Availability SLO example:</strong> 99.9% over 30 days allows ~43 minutes of error budget. A 10-minute incident burns ~23% of the month's budget — four of those and the budget is nearly gone (~92%).</li>
   <li><strong>Burn rate:</strong> how fast the budget is being consumed relative to the SLO window. 1× = exactly on target; 2× = budget gone in half the window. Burn-rate alerting (multi-window, short + long) catches both fast spikes and slow grinds — the two shapes of budget erosion.</li>
-  <li><strong>The policy consequence:</strong> a spent budget is not a shame event; it is a <em>decision trigger</em> — reliability work outranks features until the budget recovers. That inversion is the whole point of having a budget (vocabulary: System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>).</li>
+  <li><strong>The policy consequence:</strong> a spent budget is not a shame event; it is a <em>decision trigger</em> — reliability work outranks features until the budget recovers. That inversion is the whole point of having a budget (vocabulary: System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a>).</li>
 </ul>
 
 <h3>The cognition of production debugging</h3>
 <ul>
-  <li>Production debugging is hypothesis testing under time pressure (the method: Problem-Solving <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">§9</a>). The operational discipline exists to shorten the loop: <em>detect → localize → mitigate → verify → learn</em>.</li>
-  <li>Localization without traces is guesswork by availability heuristic — the engineer debugs whatever service they know best, not whatever service failed. This is the Einstellung effect (Problem-Solving <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">§1e</a>) wearing an on-call badge.</li>
-  <li>Cognitive load is the opponent: an on-call engineer juggling the incident, the timeline, the chat, and the dashboard is doing the opposite of deep work. Roles and runbooks exist to move load from the human to the process (underlying theory: cognitive load, Problem-Solving <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">§1e</a>).</li>
+  <li>Production debugging is hypothesis testing under time pressure (the method: Problem-Solving <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted"><a href="#sec-common-failure-modes">failure modes</a></a>). The operational discipline exists to shorten the loop: <em>detect → localize → mitigate → verify → learn</em>.</li>
+  <li>Localization without traces is guesswork by availability heuristic — the engineer debugs whatever service they know best, not whatever service failed. This is the Einstellung effect (Problem-Solving <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works"><a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">the underlying theory</a></a>) wearing an on-call badge.</li>
+  <li>Cognitive load is the opponent: an on-call engineer juggling the incident, the timeline, the chat, and the dashboard is doing the opposite of deep work. Roles and runbooks exist to move load from the human to the process (underlying theory: cognitive load, Problem-Solving <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works"><a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">the underlying theory</a></a>).</li>
 </ul>
 
 <blockquote class="callout">
@@ -263,7 +265,7 @@
     <tr>
       <td><strong>Every incident ends in the backlog</strong></td>
       <td>An incident without action items is a story; with action items, it is an investment. The loop closes when learnings return to the product backlog.</td>
-      <td>When a postmortem produces no changes — the meeting was theater (<a href="#sec-common-failure-modes">§9</a>).</td>
+      <td>When a postmortem produces no changes — the meeting was theater (<a href="#sec-common-failure-modes">failure modes</a>).</td>
     </tr>
     <tr>
       <td><strong>The system is the unit of learning</strong></td>
@@ -275,7 +277,7 @@
 
 <h2 id="sec-slo-design-choosing-what-to-promise">SLO design — choosing what to promise</h2>
 
-<p>Vocabulary (SLI, SLO, SLA, error budget) is defined in <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>. This section owns the practice: which SLIs to pick, what targets to set, and how the budget is governed.</p>
+<p>Vocabulary (SLI, SLO, SLA, error budget) is defined in <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a>. This section owns the practice: which SLIs to pick, what targets to set, and how the budget is governed.</p>
 
 <h3>Choosing SLIs — measure the journeys, not the boxes</h3>
 <table>
@@ -298,7 +300,7 @@
     </tr>
     <tr>
       <td><strong>Durability</strong></td>
-      <td>Share of acknowledged writes that survive (link: RPO/RTO vocabulary in System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>)</td>
+      <td>Share of acknowledged writes that survive (link: RPO/RTO vocabulary in System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a>)</td>
       <td>Does the system promise to keep data? (Silent data loss is the failure no dashboard shows.)</td>
     </tr>
     <tr>
@@ -339,7 +341,7 @@
     <tr>
       <td><strong>Event / anomaly</strong></td>
       <td>A specific event happens (DLQ receives a message, a poison message appears, a key expires)</td>
-      <td>Known-machinery failures with known fixes (see System Design <a href="./system-design.html#sec-event-and-queue-reliability-the-operational-layer-under-async">§6e</a> for DLQ alerting)</td>
+      <td>Known-machinery failures with known fixes (see System Design <a href="./system-design.html#sec-event-and-queue-reliability-the-operational-layer-under-async">event &amp; queue reliability</a> for DLQ alerting)</td>
       <td>Duplicate signal from the same root cause; the "alert storm"</td>
     </tr>
   </tbody>
@@ -348,7 +350,7 @@
 <h3>The alert design checklist</h3>
 <ul>
   <li><strong>Actionable:</strong> the receiver can do something with it. "Rate is high" is a fact; "cache hit ratio dropped below 80% — check the cache-key change from release 4.2 (runbook: cache-storm)" is an action.</li>
-  <li><strong>Directed:</strong> page a human for SEV-1/2 only; ticket everything else. Severity vocabulary lives in <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a> (SEV-1 = users blocked, SEV-2 = degraded, SEV-3 = minor impact, SEV-4 = cosmetic).</li>
+  <li><strong>Directed:</strong> page a human for SEV-1/2 only; ticket everything else. Severity vocabulary lives in <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">deployment &amp; incident management</a> (SEV-1 = users blocked, SEV-2 = degraded, SEV-3 = minor impact, SEV-4 = cosmetic).</li>
   <li><strong>Non-redundant:</strong> one alert per root cause, not one per symptom. Five dashboards screaming about the same dead database is a storm, not information.</li>
   <li><strong>Owned:</strong> every alert has a human owner and a review date. Alerts are code; they accrue debt and need refactors.</li>
   <li><strong>Escapable:</strong> a documented dismissal path ("known issue, tracked in ticket X") so on-call can silence a known false alarm without guilt — the alternative is teaching people to ignore the pager.</li>
@@ -392,7 +394,7 @@
     </tr>
     <tr>
       <td><strong>Follow-up</strong></td>
-      <td>Postmortem (<a href="#sec-postmortems-learning-making-failure-an-investment">§5</a>); action items enter the backlog; comms close out; runbooks updated</td>
+      <td>Postmortem (<a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a>); action items enter the backlog; comms close out; runbooks updated</td>
       <td>The organization learns; the next incident is cheaper</td>
     </tr>
   </tbody>
@@ -410,7 +412,7 @@
 <h2 id="sec-postmortems-learning-making-failure-an-investment">Postmortems &amp; learning — making failure an investment</h2>
 
 <h3>Blameless by design</h3>
-<p>A blameless postmortem is not "no accountability." It is the discipline of asking <em>what in the system made this failure possible</em> before asking <em>who</em>. Every "human error" explanation is a design question in disguise: the deploy button that lacked a confirmation, the runbook that rotted, the alert that fired at 3am with no action. The system is the unit of learning (<a href="#sec-mental-models-how-operators-actually-reason">§1f</a>).</p>
+<p>A blameless postmortem is not "no accountability." It is the discipline of asking <em>what in the system made this failure possible</em> before asking <em>who</em>. Every "human error" explanation is a design question in disguise: the deploy button that lacked a confirmation, the runbook that rotted, the alert that fired at 3am with no action. The system is the unit of learning (<a href="#sec-mental-models-how-operators-actually-reason">how operators reason</a>).</p>
 
 <h3>The postmortem template</h3>
 <table>
@@ -445,11 +447,11 @@
 </table>
 
 <h3>The loop closes in the backlog</h3>
-<p>Postmortem action items are product work: they compete for the same sprint capacity as features, and the error budget decides the winner (<a href="#sec-slo-design-choosing-what-to-promise">§2</a>). This is the same loop <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a> describes ("operational learnings return to the backlog") — this doc's contribution is the craft that makes the learnings real: owners, tickets, and verification instead of vibes.</p>
+<p>Postmortem action items are product work: they compete for the same sprint capacity as features, and the error budget decides the winner (<a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>). This is the same loop <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">deployment &amp; incident management</a> describes ("operational learnings return to the backlog") — this doc's contribution is the craft that makes the learnings real: owners, tickets, and verification instead of vibes.</p>
 
 <h2 id="sec-runbooks-making-the-known-response-boring">Runbooks — making the known response boring</h2>
 
-<p>A runbook is a written procedure for a known scenario, written <em>before</em> the incident — the difference between "we'll figure it out" and "we already did, here's how." The test of a runbook is not that it exists; it is that it has been executed in a drill (<a href="#sec-mental-models-how-operators-actually-reason">§1f</a>).</p>
+<p>A runbook is a written procedure for a known scenario, written <em>before</em> the incident — the difference between "we'll figure it out" and "we already did, here's how." The test of a runbook is not that it exists; it is that it has been executed in a drill (<a href="#sec-mental-models-how-operators-actually-reason">how operators reason</a>).</p>
 
 <h3>The runbook shape</h3>
 <table>
@@ -491,11 +493,11 @@
     </tr>
     <tr>
       <td><strong>Observability ships with the service</strong></td>
-      <td>The architecture (System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>) demands it; the practice enforces it at review time — a service without signals is unmergeable.</td>
+      <td>The architecture (System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>) demands it; the practice enforces it at review time — a service without signals is unmergeable.</td>
     </tr>
     <tr>
       <td><strong>The error budget decides, not the loudest voice</strong></td>
-      <td>Reliability work vs. feature work becomes arithmetic instead of argument (the whole point of <a href="#sec-slo-design-choosing-what-to-promise">§2</a>).</td>
+      <td>Reliability work vs. feature work becomes arithmetic instead of argument (the whole point of <a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>).</td>
     </tr>
     <tr>
       <td><strong>Rollback is the default mitigation</strong></td>
@@ -555,7 +557,7 @@
 
 <h2 id="sec-capacity-planning-load-testing-knowing-the-ceiling">Capacity planning &amp; load testing — knowing the ceiling</h2>
 
-<p>The theory — Little's Law, Amdahl's Law, headroom targets, the latency knee — lives in <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-capacity-planning-how-to-estimate-load-storage-and-latency">§6b</a>; this section owns the practice of testing the ceiling and tuning autoscaling against it.</p>
+<p>The theory — Little's Law, Amdahl's Law, headroom targets, the latency knee — lives in <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-capacity-planning-how-to-estimate-load-storage-and-latency">capacity planning</a>; this section owns the practice of testing the ceiling and tuning autoscaling against it.</p>
 
 <table>
   <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
@@ -580,7 +582,7 @@
 
 <h2 id="sec-deployment-operations-the-two-decisions-the-toolbox-doesn-t-own">Deployment operations — the two decisions the toolbox doesn't own</h2>
 
-<p>The deployment toolbox — rolling, blue-green, canary, feature flags, rollback and migration limits — is owned by <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> <a href="./version-control-ci-cd-deployment.html#sec-deployment-strategies-the-ship-it-safely-toolbox">§5</a> and <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-release-strategies-and-environments">§9i</a>. Operations adds two decisions around that toolbox:</p>
+<p>The deployment toolbox — rolling, blue-green, canary, feature flags, rollback and migration limits — is owned by <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> <a href="./version-control-ci-cd-deployment.html#sec-deployment-strategies-the-ship-it-safely-toolbox"><a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a></a> and <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-release-testing-branching-the-delivery-mechanics">release strategies &amp; environments</a>. Operations adds two decisions around that toolbox:</p>
 
 <table>
   <thead><tr><th>Decision</th><th>What to do</th><th>Decision metric</th></tr></thead>
@@ -592,7 +594,7 @@
     </tr>
     <tr>
       <td><strong>Budget-based abort</strong></td>
-      <td>Judge the canary against the error budget: if SLO burn exceeds the threshold (<a href="#sec-slo-design-choosing-what-to-promise">§2</a>, <a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§3</a>), abort and roll back — never forward-fix mid-incident (<a href="#sec-incident-response-from-detection-to-recovery">§4</a>, <a href="#sec-principles-the-shared-constants">§7</a>)</td>
+      <td>Judge the canary against the error budget: if SLO burn exceeds the threshold (<a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>, <a href="#sec-alert-design-turning-targets-into-contracts-with-humans">alert design</a>), abort and roll back — never forward-fix mid-incident (<a href="#sec-incident-response-from-detection-to-recovery">incident response</a>, <a href="#sec-principles-the-shared-constants">principles</a>)</td>
       <td>Canary burn vs. the abort threshold; time from abort decision to full revert</td>
     </tr>
   </tbody>
@@ -600,7 +602,7 @@
 
 <h2 id="sec-chaos-engineering-practicing-failure-on-purpose">Chaos engineering — practicing failure on purpose</h2>
 
-<p>Drills (<a href="#sec-mental-models-how-operators-actually-reason">§1f</a>, <a href="#sec-runbooks-making-the-known-response-boring">§6</a>) exercise <em>known</em> procedures; chaos engineering exercises <em>unknown</em> failure by injecting it deliberately, in controlled doses.</p>
+<p>Drills (<a href="#sec-mental-models-how-operators-actually-reason">how operators reason</a>, <a href="#sec-runbooks-making-the-known-response-boring">runbooks</a>) exercise <em>known</em> procedures; chaos engineering exercises <em>unknown</em> failure by injecting it deliberately, in controlled doses.</p>
 
 <table>
   <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
@@ -635,11 +637,11 @@
 
 <h2 id="sec-operational-gates-shift-left-and-the-launch-gate">Operational gates — shift-left and the launch gate</h2>
 
-<p>Postmortems learn <em>after</em> failure (<a href="#sec-postmortems-learning-making-failure-an-investment">§5</a>); these two gates learn <em>before</em> it — one during the work, one at the launch.</p>
+<p>Postmortems learn <em>after</em> failure (<a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a>); these two gates learn <em>before</em> it — one during the work, one at the launch.</p>
 
 <h3>Shift-left — operational concerns enter the work before the code</h3>
 
-<p>"Observability ships with the service" (<a href="#sec-principles-the-shared-constants">§7</a>) becomes concrete when operational concerns enter the work <em>before</em> the code does.</p>
+<p>"Observability ships with the service" (<a href="#sec-principles-the-shared-constants">principles</a>) becomes concrete when operational concerns enter the work <em>before</em> the code does.</p>
 
 <table>
   <thead><tr><th>Practice</th><th>What to do</th><th>Decision metric</th></tr></thead>
@@ -666,7 +668,7 @@
     </tr>
     <tr>
       <td><strong>Debt in the backlog</strong></td>
-      <td>Missing runbooks, stale alerts, untested backups tracked as operational debt (<a href="#sec-operational-debt-toil-paying-what-you-postponed">§7i</a>)</td>
+      <td>Missing runbooks, stale alerts, untested backups tracked as operational debt (<a href="#sec-operational-debt-toil-paying-what-you-postponed">toil & operational debt</a>)</td>
       <td>Debt tickets created per release</td>
     </tr>
   </tbody>
@@ -797,7 +799,7 @@
 
 <h2 id="sec-operational-team-metrics-measuring-the-operation-itself">Operational team metrics — measuring the operation itself</h2>
 
-<p>The service has SLOs (<a href="#sec-slo-design-choosing-what-to-promise">§2</a>); the operations <em>team</em> needs its own scoreboard, or improvement is vibes.</p>
+<p>The service has SLOs (<a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>); the operations <em>team</em> needs its own scoreboard, or improvement is vibes.</p>
 
 <table>
   <thead><tr><th>Metric</th><th>What it measures</th><th>Reasonable target</th></tr></thead>
@@ -819,7 +821,7 @@
     </tr>
     <tr>
       <td><strong>Pages per week per engineer</strong></td>
-      <td>On-call load (<a href="#sec-on-call-design-the-rotation-is-a-product-not-a-duty">§7b</a>)</td>
+      <td>On-call load (<a href="#sec-on-call-design-the-rotation-is-a-product-not-a-duty">on-call design</a>)</td>
       <td>&lt; 2</td>
     </tr>
     <tr>
@@ -829,12 +831,12 @@
     </tr>
     <tr>
       <td><strong>Drill frequency</strong></td>
-      <td>Runbooks executed in drills (<a href="#sec-runbooks-making-the-known-response-boring">§6</a>)</td>
+      <td>Runbooks executed in drills (<a href="#sec-runbooks-making-the-known-response-boring">runbooks</a>)</td>
       <td>At least once per quarter</td>
     </tr>
     <tr>
       <td><strong>Toil percentage</strong></td>
-      <td>Share of on-call time on repetitive work (<a href="#sec-operational-team-metrics-measuring-the-operation-itself">§7j</a>)</td>
+      <td>Share of on-call time on repetitive work (<a href="#sec-operational-team-metrics-measuring-the-operation-itself">team metrics</a>)</td>
       <td>&lt; 50%</td>
     </tr>
   </tbody>
@@ -842,7 +844,7 @@
 
 <h2 id="sec-worked-example-the-checkout-incident">Worked example — the checkout incident</h2>
 
-<p>One incident, end to end, exercising every section of this doc. The system: a storefront (Gateway → Checkout API → Inventory API → Postgres), with requestIds and OpenTelemetry traces wired per System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>, and a checkout SLO of 99.9% availability / p99 &lt; 300ms per System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a> vocabulary.</p>
+<p>One incident, end to end, exercising every section of this doc. The system: a storefront (Gateway → Checkout API → Inventory API → Postgres), with requestIds and OpenTelemetry traces wired per System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>, and a checkout SLO of 99.9% availability / p99 &lt; 300ms per System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a> vocabulary.</p>
 
 <h3>Detection — 09:41 UTC (Tuesday)</h3>
 <p>A burn-rate alert fires: checkout error budget burning at 14× over the short window. The alert links to the cache-storm runbook (it does not — yet — describe this exact change, but it names the first checks). One engineer confirms user impact: checkout p99 is 2.1s and error rate is 8%. SEV-2 declared.</p>
@@ -919,7 +921,7 @@
     <tr>
       <td><strong>No drills</strong></td>
       <td>The failover "should work"; the restore is attempted for the first time during the outage</td>
-      <td>Treating procedures as paperwork instead of machinery (System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>: a backup never restored is a hope)</td>
+      <td>Treating procedures as paperwork instead of machinery (System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a>: a backup never restored is a hope)</td>
     </tr>
     <tr>
       <td><strong>On-call without authority</strong></td>
@@ -951,7 +953,7 @@
       <td><strong>Traces</strong></td>
       <td>OpenTelemetry SDKs + Collector, Jaeger, Tempo</td>
       <td>Need request paths across services → the standard, not the vendor</td>
-      <td>Sampling control; drop% of traces end-to-end; context propagation coverage (System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>)</td>
+      <td>Sampling control; drop% of traces end-to-end; context propagation coverage (System Design <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a>)</td>
     </tr>
     <tr>
       <td><strong>APM / errors</strong></td>
@@ -981,7 +983,7 @@
       <td><strong>AI-era observability</strong></td>
       <td>Langfuse, OpenLLMetry, agent-tracing layers on OTel</td>
       <td>Need to observe LLM calls and agent loops → spans with tokens, latency, drift</td>
-      <td>Cost per trace; prompt/response capture policy; drift detection (see <a href="#sec-the-future-where-the-operational-layer-is-heading">§11</a>)</td>
+      <td>Cost per trace; prompt/response capture policy; drift detection (see <a href="#sec-the-future-where-the-operational-layer-is-heading">the future of operations</a>)</td>
     </tr>
   </tbody>
 </table>
@@ -990,27 +992,28 @@
 <h2 id="sec-the-future-where-the-operational-layer-is-heading">The future — where the operational layer is heading</h2>
 
 <ul>
-  <li><strong>LLM calls as spans.</strong> A prompt is a request; a completion is a response; a model call is a span in a trace. The correlation loop of <a href="#sec-worked-example-the-checkout-incident">§8</a> extends unchanged: one requestId carries a user's journey through gateway, logic, and model.</li>
-  <li><strong>Agents as systems to observe.</strong> The Agent Development Lifecycle (<a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">§9d</a>) ends in "deploy with guardrails, monitor for drift." Drift — an agent's behavior diverging from its intended task — replaces the crash as the feared failure mode, and detection needs the same signals: budgets, traces, and alerts that respect humans.</li>
+  <li><strong>LLM calls as spans.</strong> A prompt is a request; a completion is a response; a model call is a span in a trace. The correlation loop of <a href="#sec-worked-example-the-checkout-incident">the checkout incident</a> extends unchanged: one requestId carries a user's journey through gateway, logic, and model.</li>
+  <li><strong>Agents as systems to observe.</strong> The Agent Development Lifecycle (<a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">the AI-augmented SDLC</a>) ends in "deploy with guardrails, monitor for drift." Drift — an agent's behavior diverging from its intended task — replaces the crash as the feared failure mode, and detection needs the same signals: budgets, traces, and alerts that respect humans.</li>
   <li><strong>eBPF and continuous profiling.</strong> Kernel-level instrumentation and always-on sampling shrink the gap between "the system looks fine" and "here is exactly where the CPU went" — more of the unknown made answerable before the question is asked.</li>
   <li><strong>AI-assisted incident response.</strong> Summaries, correlation suggestions, and runbook lookups will compress the investigation loop. The constants do not move: a human owns the decision, the timeline stays honest, and every incident still ends in an action item.</li>
 </ul>
 
 <h2 id="sec-primary-sources">Primary sources</h2>
+<p><strong>Source digest:</strong> <a href="../digests/observability-and-operations.md">working digestion of these sources</a>. <span class="unverified">†</span> = claim awaiting a located primary source.</p>
 
 <ol>
-  <li>"Site Reliability Engineering" — Google SRE Book (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs, error budgets, on-call, toil, postmortem culture. The foundational primary source for <a href="#sec-slo-design-choosing-what-to-promise">§2</a>–<a href="#sec-principles-the-shared-constants">§7</a>.</li>
-  <li>"The Site Reliability Workbook" (2018) — <a href="https://sre.google/workbook/table-of-contents/">sre.google/workbook</a> — practical SLO and alerting exercises behind <a href="#sec-slo-design-choosing-what-to-promise">§2</a>–<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§3</a>.</li>
-  <li>OpenTelemetry documentation — <a href="https://opentelemetry.io/docs/">opentelemetry.io/docs</a> — the vendor-neutral standard for traces, metrics, and logs behind <a href="#sec-history-from-paging-to-telemetry-to-learning-machines">§1b</a> and <a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">§10</a>.</li>
-  <li>The USE Method — Brendan Gregg — <a href="https://www.brendangregg.com/usemethod.html">brendangregg.com/usemethod.html</a> — utilization/saturation/errors for resource analysis (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§1e</a>, <a href="#sec-capacity-planning-load-testing-knowing-the-ceiling">§7c</a>).</li>
-  <li>The RED Method — Tom Wilkie — <a href="https://grafana.com/blog/the-red-method-how-to-instrument-your-services/">Grafana Labs blog</a> — rate/errors/duration for service-level metrics (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§1e</a>).</li>
-  <li>"Monitoring Distributed Systems" (the four golden signals) — <a href="https://sre.google/sre-book/monitoring-distributed-systems/">sre.google/sre-book</a> — latency, traffic, errors, saturation (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§1e</a>).</li>
-  <li>"Effective Troubleshooting" — <a href="https://sre.google/sre-book/effective-troubleshooting/">sre.google/sre-book</a> — the hypothesis loop applied in production (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§1e</a>, <a href="#sec-worked-example-the-checkout-incident">§8</a>).</li>
-  <li>"Postmortem Culture: Learning from Failure" — <a href="https://sre.google/sre-book/postmortem-culture/">sre.google/sre-book</a> — blameless postmortems as a system property (<a href="#sec-postmortems-learning-making-failure-an-investment">§5</a>).</li>
-  <li>PagerDuty Incident Response Documentation (open source) — <a href="https://github.com/PagerDuty/incident-response-docs">github.com/PagerDuty/incident-response-docs</a> — severity taxonomy and incident roles (Incident Commander, Scribe, Comms) behind <a href="#sec-incident-response-from-detection-to-recovery">§4</a>.</li>
-  <li>Charity Majors — "Observability is a Many-Splendored Thing" — <a href="https://charity.wtf/p/observability-is-a-many-splendored-thing">charity.wtf</a> — the observability-vs-monitoring framing used in <a href="#sec-definition-what-observability-operations-is-and-what-it-is-not">§1</a> and <a href="#sec-mental-models-how-operators-actually-reason">§1f</a> (reachability verified).</li>
-  <li>John Allspaw — "Blameless PostMortems and a Just Culture" — <a href="https://codeascraft.com/2012/05/22/blameless-postmortems/">codeascraft.com</a> — the origin of blameless culture in engineering (<a href="#sec-postmortems-learning-making-failure-an-investment">§5</a>; reachability to verify from this environment — Etsy blocks automated fetches).</li>
-  <li>John Allspaw — "The Infinite Hows" — <a href="https://www.oreilly.com/radar/the-infinite-hows/">oreilly.com/radar</a> — why "what happened" is the wrong first question (<a href="#sec-postmortems-learning-making-failure-an-investment">§5</a>; reachability to verify — paywalled/403 for automated fetches).</li>
+  <li>"Site Reliability Engineering" — Google SRE Book (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs, error budgets, on-call, toil, postmortem culture. The foundational primary source for <a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>–<a href="#sec-principles-the-shared-constants">principles</a>.</li>
+  <li>"The Site Reliability Workbook" (2018) — <a href="https://sre.google/workbook/table-of-contents/">sre.google/workbook</a> — practical SLO and alerting exercises behind <a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>–<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">alert design</a>.</li>
+  <li>OpenTelemetry documentation — <a href="https://opentelemetry.io/docs/">opentelemetry.io/docs</a> — the vendor-neutral standard for traces, metrics, and logs behind <a href="#sec-history-from-paging-to-telemetry-to-learning-machines">operations history</a> and <a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">tooling catalog</a>.</li>
+  <li>The USE Method — Brendan Gregg — <a href="https://www.brendangregg.com/usemethod.html">brendangregg.com/usemethod.html</a> — utilization/saturation/errors for resource analysis (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">the underlying theory</a>, <a href="#sec-capacity-planning-load-testing-knowing-the-ceiling">capacity planning</a>).</li>
+  <li>The RED Method — Tom Wilkie — <a href="https://grafana.com/blog/the-red-method-how-to-instrument-your-services/">Grafana Labs blog</a> — rate/errors/duration for service-level metrics (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">the underlying theory</a>).</li>
+  <li>"Monitoring Distributed Systems" (the four golden signals) — <a href="https://sre.google/sre-book/monitoring-distributed-systems/">sre.google/sre-book</a> — latency, traffic, errors, saturation (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">the underlying theory</a>).</li>
+  <li>"Effective Troubleshooting" — <a href="https://sre.google/sre-book/effective-troubleshooting/">sre.google/sre-book</a> — the hypothesis loop applied in production (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">the underlying theory</a>, <a href="#sec-worked-example-the-checkout-incident">the checkout incident</a>).</li>
+  <li>"Postmortem Culture: Learning from Failure" — <a href="https://sre.google/sre-book/postmortem-culture/">sre.google/sre-book</a> — blameless postmortems as a system property (<a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a>).</li>
+  <li>PagerDuty Incident Response Documentation (open source) — <a href="https://github.com/PagerDuty/incident-response-docs">github.com/PagerDuty/incident-response-docs</a> — severity taxonomy and incident roles (Incident Commander, Scribe, Comms) behind <a href="#sec-incident-response-from-detection-to-recovery">incident response</a>.</li>
+  <li>Charity Majors — "Observability is a Many-Splendored Thing" — <a href="https://charity.wtf/p/observability-is-a-many-splendored-thing">charity.wtf</a> — the observability-vs-monitoring framing used in <a href="#sec-definition-what-observability-operations-is-and-what-it-is-not">what observability & operations are</a> and <a href="#sec-mental-models-how-operators-actually-reason">how operators reason</a> (reachability verified).</li>
+  <li>John Allspaw — "Blameless PostMortems and a Just Culture" — <a href="https://codeascraft.com/2012/05/22/blameless-postmortems/">codeascraft.com</a> — the origin of blameless culture in engineering (<a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a>; reachability to verify from this environment — Etsy blocks automated fetches).</li>
+  <li>John Allspaw — "The Infinite Hows" — <a href="https://www.oreilly.com/radar/the-infinite-hows/">oreilly.com/radar</a> — why "what happened" is the wrong first question (<a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a>; reachability to verify — paywalled/403 for automated fetches).</li>
 </ol>
 
 <p>The fully grounded resource list (with trust notes) lives in <code>RESOURCES.md</code>.</p>
@@ -1018,17 +1021,17 @@
 <h2 id="sec-summary-the-operational-checklist">Summary — the operational checklist</h2>
 
 <ul>
-  <li>Can you name the journeys users actually take, and the SLO for each? (If not: <a href="#sec-slo-design-choosing-what-to-promise">§2</a>)</li>
-  <li>Does every alert page a human only when a budget burns, and ticket the rest? (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§3</a>)</li>
-  <li>Does every alert have a runbook, an owner, and a dismissal path? (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§3</a>, <a href="#sec-runbooks-making-the-known-response-boring">§6</a>)</li>
-  <li>Is the definition of "health" built on user impact, not host pings? (<a href="#sec-evolution-constraint-inversions-in-the-operational-layer">§1c</a>)</li>
-  <li>When the pager fires, does one person decide, one person write the timeline, and one voice speak? (<a href="#sec-incident-response-from-detection-to-recovery">§4</a>)</li>
-  <li>Is rollback the default mitigation, with authority granted to the person holding the pager? (<a href="#sec-incident-response-from-detection-to-recovery">§4</a>, <a href="#sec-principles-the-shared-constants">§7</a>)</li>
-  <li>Does every incident produce action items with owners — and do those items enter the backlog like any other work? (<a href="#sec-postmortems-learning-making-failure-an-investment">§5</a>, <a href="#sec-mental-models-how-operators-actually-reason">§1f</a>)</li>
-  <li>Have the runbooks been executed in a drill this quarter? (<a href="#sec-runbooks-making-the-known-response-boring">§6</a>, <a href="#sec-mental-models-how-operators-actually-reason">§1f</a>)</li>
-  <li>Is the error budget consumed publicly, and does it decide feature-vs-reliability arguments? (<a href="#sec-slo-design-choosing-what-to-promise">§2</a>, <a href="#sec-principles-the-shared-constants">§7</a>)</li>
-  <li>Could a brand-new engineer localize a failed request with one requestId and one trace? (<a href="#sec-worked-example-the-checkout-incident">§8</a> — that is the whole point)</li>
-  <li>Can you name your operational maturity level, and the next practice to adopt from it? (If not: <a href="#sec-operational-maturity-where-you-are-and-the-next-practice-to-adopt">§7h</a>)</li>
+  <li>Can you name the journeys users actually take, and the SLO for each? (If not: <a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>)</li>
+  <li>Does every alert page a human only when a budget burns, and ticket the rest? (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">alert design</a>)</li>
+  <li>Does every alert have a runbook, an owner, and a dismissal path? (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">alert design</a>, <a href="#sec-runbooks-making-the-known-response-boring">runbooks</a>)</li>
+  <li>Is the definition of "health" built on user impact, not host pings? (<a href="#sec-evolution-constraint-inversions-in-the-operational-layer">operational inversions</a>)</li>
+  <li>When the pager fires, does one person decide, one person write the timeline, and one voice speak? (<a href="#sec-incident-response-from-detection-to-recovery">incident response</a>)</li>
+  <li>Is rollback the default mitigation, with authority granted to the person holding the pager? (<a href="#sec-incident-response-from-detection-to-recovery">incident response</a>, <a href="#sec-principles-the-shared-constants">principles</a>)</li>
+  <li>Does every incident produce action items with owners — and do those items enter the backlog like any other work? (<a href="#sec-postmortems-learning-making-failure-an-investment">postmortems & learning</a>, <a href="#sec-mental-models-how-operators-actually-reason">how operators reason</a>)</li>
+  <li>Have the runbooks been executed in a drill this quarter? (<a href="#sec-runbooks-making-the-known-response-boring">runbooks</a>, <a href="#sec-mental-models-how-operators-actually-reason">how operators reason</a>)</li>
+  <li>Is the error budget consumed publicly, and does it decide feature-vs-reliability arguments? (<a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>, <a href="#sec-principles-the-shared-constants">principles</a>)</li>
+  <li>Could a brand-new engineer localize a failed request with one requestId and one trace? (<a href="#sec-worked-example-the-checkout-incident">the checkout incident</a> — that is the whole point)</li>
+  <li>Can you name your operational maturity level, and the next practice to adopt from it? (If not: <a href="#sec-operational-maturity-where-you-are-and-the-next-practice-to-adopt">operational maturity</a>)</li>
 </ul>
 
 <footer class="lesson-foot">

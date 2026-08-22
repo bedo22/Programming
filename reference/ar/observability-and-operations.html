@@ -51,10 +51,10 @@
 
 <p>ترتيب القراءة: مستقلة، بعد التصميم المعماري وهندسة الواجهات الخلفية. روابط متقاطعة:</p>
 <ul>
-  <li>منبعها: <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a> (الموثوقية، مفردات SLO، التعافي) و<a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a> (الإشارات الأربع، الارتباط، نشر التتبع) — تستهلك هذه الوثيقة تلك المعمارية ولا تعيد تدريسها.</li>
-  <li>أخت لها: <a href="../backend-engineering.html">هندسة الواجهات الخلفية</a> <a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">§٨ب</a> — إشارات حلقة الطلب (requestId وP99 ومعدلات الحالة) أدواتُ قياس تفترضها إجراءات هذه الوثيقة.</li>
-  <li>فرع عنها: <a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a> — يسمّي SDLC الطبقة التشغيلية؛ وهذه الوثيقة معالجتُها الكاملة.</li>
-  <li>مجاورة لـ<a href="../software-testing-and-debugging.html">Testing &amp; Debugging</a> — الاختبار دليل <em>قبل</em> النشر؛ والتشغيل دليل <em>بعده</em>. حلقة التصحيح المبنية على الفرضيات التي يتشاركانها تعيش في <a href="./problem-solving.html">حل المشكلات</a> <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">§9</a>.</li>
+  <li>منبعها: <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a> (الموثوقية، مفردات SLO، التعافي) و<a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a> (الإشارات الأربع، الارتباط، نشر التتبع) — تستهلك هذه الوثيقة تلك المعمارية ولا تعيد تدريسها.</li>
+  <li>أخت لها: <a href="../backend-engineering.html">هندسة الواجهات الخلفية</a> <a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">حلقة المراقبة من جهة الخادم</a> — إشارات حلقة الطلب (requestId وP99 ومعدلات الحالة) أدواتُ قياس تفترضها إجراءات هذه الوثيقة.</li>
+  <li>فرع عنها: <a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">النشر وإدارة الحوادث</a> — يسمّي SDLC الطبقة التشغيلية؛ وهذه الوثيقة معالجتُها الكاملة.</li>
+  <li>مجاورة لـ<a href="../software-testing-and-debugging.html">Testing &amp; Debugging</a> — الاختبار دليل <em>قبل</em> النشر؛ والتشغيل دليل <em>بعده</em>. حلقة التصحيح المبنية على الفرضيات التي يتشاركانها تعيش في <a href="./problem-solving.html">حل المشكلات</a> <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">التنقيح كحل مشكلات</a>.</li>
   <li>تستهلكها <a href="../security-and-threat-modeling.html">الأمن ونمذجة التهديدات</a> — يقرأ الاكتشاف والاحتواء الإشارات نفسها دون امتلاك الآلية.</li>
   <li>مرجع: <a href="./glossary.html">المصطلحات</a> (يشير إليها المصطلحات باسم <em>Ops</em>).</li>
 </ul>
@@ -70,7 +70,7 @@
     <tr>
       <td><strong>ما الذي يستحق هدفًا؟</strong></td>
       <td>أيُّ القياسات تستحق الالتزام بها؟</td>
-      <td>معمارية الإشارات (ما الذي يُبث) من شأن التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>؛ وأما اختيار أيّ القلائل تصير التزاماتٍ فحكمٌ تشغيلي.</td>
+      <td>معمارية الإشارات (ما الذي يُبث) من شأن التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a>؛ وأما اختيار أيّ القلائل تصير التزاماتٍ فحكمٌ تشغيلي.</td>
     </tr>
     <tr>
       <td><strong>ما الذي يستحق تنبيهًا؟</strong></td>
@@ -132,7 +132,7 @@
     <tr>
       <td><strong>عصر الذكاء الاصطناعي (2023–)</strong></td>
       <td>تصير استدلالاتُ LLM مقاطعَ span؛ وتصير الوكلاءُ أنظمةً يجب مراقبتها؛ ويحل الانحراف محل الانهيار بوصفه الفشلَ المخوف.</td>
-      <td><em>أفق حدث</em> يتسع — انظر <a href="#sec-the-future-where-the-operational-layer-is-heading">§١١</a>.</td>
+      <td><em>أفق حدث</em> يتسع — انظر <a href="#sec-the-future-where-the-operational-layer-is-heading">المستقبل</a>.</td>
     </tr>
   </tbody>
 </table>
@@ -160,7 +160,7 @@
       <td><strong>سجلات نص حر ← قياس متشابك</strong></td>
       <td>سلاسلُ قابلة للبحث؛ وكل فريق يخترع مفرداته.</td>
       <td>سجلاتٌ منظمة + معرّفات طلبات + سياق تتبع؛ رحلة واحدة عبر السجلات والمقاييس والتتبعات.</td>
-      <td>صار تحديدُ الموضع خاصيةً في المنصة (التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>)، لا مهارةَ المهندس الأقدم.</td>
+      <td>صار تحديدُ الموضع خاصيةً في المنصة (التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a>)، لا مهارةَ المهندس الأقدم.</td>
     </tr>
     <tr>
       <td><strong>وقت التشغيل مقياسًا ← أثر المستخدم مقياسًا</strong></td>
@@ -180,23 +180,23 @@
   <tbody>
     <tr>
       <td><strong>التصميم المعماري</strong> (<a href="./system-design.html">المعمارية</a>)</td>
-      <td>مفردات SLI/SLO/SLA، وRPO/RTO، والإشارات الأربع، ومعرّفات الارتباط، ونشر التتبع، وأنماط التعافي من الكوارث (<a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>، <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>)</td>
+      <td>مفردات SLI/SLO/SLA، وRPO/RTO، والإشارات الأربع، ومعرّفات الارتباط، ونشر التتبع، وأنماط التعافي من الكوارث (<a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>، <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a>)</td>
       <td>التصميم المعماري <em>يصمم</em> النظام ليكون مفهومًا؛ والتشغيل <em>يعمل</em> عبر الفشل ويُبلغ عما فات التصميم. المفردات تعيش هناك؛ وممارسةُ اختيار الأهداف وتصميم التنبيهات وإدارة الحوادث تعيش هنا.</td>
     </tr>
     <tr>
       <td><strong>هندسة الواجهات الخلفية</strong> (<a href="../backend-engineering.html">حلقة الطلب</a>)</td>
-      <td>ارتباط requestId، وتوقيت P99، وعدّ معدلات الحالة، وأشكالُ عقد الأخطاء (<a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">§٨ب</a>)</td>
+      <td>ارتباط requestId، وتوقيت P99، وعدّ معدلات الحالة، وأشكالُ عقد الأخطاء (<a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">حلقة المراقبة من جهة الخادم</a>)</td>
       <td>هندسة الواجهات الخلفية <em>تبث</em> إشاراتِ الحلقة على مستوى الكود؛ والتشغيل <em>يستهلكها</em> بوصفها أدلة، ويضيف الأحكامَ التشغيلية التي لا يستطيع مستوى الكود إصدارها (من يُنبّه، ومتى، وبأي سلطة).</td>
     </tr>
     <tr>
       <td><strong>عملية تطوير البرمجيات</strong> (<a href="./software-development-process.html">دورة الحياة</a>)</td>
-      <td>التشغيل بوصفه مرحلةَ SDLC، ومستوياتُ خطورة SEV، ومساراتُ الإصلاح السريع، والحلقةُ العائدة إلى الأعمال المتراكمة (<a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a>)</td>
+      <td>التشغيل بوصفه مرحلةَ SDLC، ومستوياتُ خطورة SEV، ومساراتُ الإصلاح السريع، والحلقةُ العائدة إلى الأعمال المتراكمة (<a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">النشر وإدارة الحوادث</a>)</td>
       <td>تضع عمليةُ التطوير التشغيلَ في دورة الحياة وتسمّي أجزاءه؛ والتشغيل هو المعالجة الكاملة — تصميم التنبيهات، وقيادة الحادث، وصنعة التقرير البعدي، وأدلة التشغيل.</td>
     </tr>
     <tr>
       <td><strong>Testing &amp; Debugging</strong> (<a href="../software-testing-and-debugging.html">الأدلة</a>)</td>
       <td>التصحيح المبني على الفرضيات، وانضباطُ إعادة الإنتاج، والتفكيرُ في السبب الجذري</td>
-      <td>الاختبار أدلةٌ <em>قبل</em> النشر، في بيئة مضبوطة؛ والتشغيل أدلةٌ <em>بعده</em>، في الإنتاج، تحت ضغط الوقت، والمستخدمون الحقيقيون مجموعةُ الاختبار. الطريقة المشتركة تعيش في حل المشكلات <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">§9</a>.</td>
+      <td>الاختبار أدلةٌ <em>قبل</em> النشر، في بيئة مضبوطة؛ والتشغيل أدلةٌ <em>بعده</em>، في الإنتاج، تحت ضغط الوقت، والمستخدمون الحقيقيون مجموعةُ الاختبار. الطريقة المشتركة تعيش في حل المشكلات <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">التنقيح كحل مشكلات</a>.</td>
     </tr>
     <tr>
       <td><strong>الأمن ونمذجة التهديدات</strong> (<a href="../security-and-threat-modeling.html">التفكير الخصمي</a>)</td>
@@ -211,20 +211,22 @@
   </tbody>
 </table><h2 id="sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">النظرية الكامنة — ما الذي يجعل التشغيل موثوقًا لا مفعولًا بالأمل</h2>
 
-<p>معماريةُ الإشارات (الإشارات الأربع — المقاييس والسجلات والتتبعات والملفات الشخصية — إضافةً إلى الارتباط ونشر التتبع) جدولُ التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a> — ويغطي هذا القسم النظريةَ <em>تحت</em> الممارسة.</p>
+<p>معماريةُ الإشارات (الإشارات الأربع — المقاييس والسجلات والتتبعات والملفات الشخصية — إضافةً إلى الارتباط ونشر التتبع) جدولُ التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a> — ويغطي هذا القسم النظريةَ <em>تحت</em> الممارسة.
+
+<p>واثنان من الاستدلالات المسماة يرسّخان هذا القسم، كلاهما موثّق: طريقة <strong>USE</strong> لبرندان غريغ — «منهجية لتحليل أداء أي نظام» تبني قائمة تحقق من الاستخدام والتشبع والأخطاء لكل مورد (obs-Δ1) — وثنائية <strong>الأعراض مقابل الأسباب</strong> من كتاب SRE للتنبيهات: يجب أن تجيب المراقبة عن سؤالين، «ما المعطوب، ولماذا؟» (obs-Δ2).</p></p>
 
 <h3>حساب ميزانية الأخطاء</h3>
 <ul>
   <li><strong>مثال SLO للتوفّر:</strong> 99.9% على مدى 30 يومًا يتيح نحو 43 دقيقة من ميزانية الأخطاء. حادثٌ من 10 دقائق يحرق نحو 23% من ميزانية الشهر — أربعة حوادث كهذه وتكاد الميزانية تنفد (نحو 92%).</li>
   <li><strong>معدل الاحتراق:</strong> سرعةُ استهلاك الميزانية نسبةً إلى نافذة SLO. 1× = مطابقةُ الهدف تمامًا؛ 2× = تنفد الميزانية في نصف النافذة. تنبيهُ معدل الاحتراق (متعدد النوافذ، قصيرة وطويلة) يلتقط القمم السريعة والتآكل البطيء معًا — شكلا تآكل الميزانية.</li>
-  <li><strong>النتيجة السياسية:</strong> الميزانية المنفقة ليست حدثَ عار؛ إنها <em>محفّز قرار</em> — عملُ الموثوقية يتقدّم على الميزات حتى تستعيد الميزانيةُ عافيتها. ذلك الانعكاس هو بيتُ القصيد من وجود ميزانية (المفردات: التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>).</li>
+  <li><strong>النتيجة السياسية:</strong> الميزانية المنفقة ليست حدثَ عار؛ إنها <em>محفّز قرار</em> — عملُ الموثوقية يتقدّم على الميزات حتى تستعيد الميزانيةُ عافيتها. ذلك الانعكاس هو بيتُ القصيد من وجود ميزانية (المفردات: التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>).</li>
 </ul>
 
 <h3>الإدراك في تصحيح أخطاء الإنتاج</h3>
 <ul>
-  <li>تصحيح أخطاء الإنتاج اختبارُ فرضياتٍ تحت ضغط الوقت (الطريقة: حل المشكلات <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">§9</a>). يوجد الانضباطُ التشغيلي ليُقصّر الحلقة: <em>اكتشف ← حدّد الموضع ← خفّف ← تحقق ← تعلّم</em>.</li>
-  <li>تحديدُ الموضع دون تتبعاتٍ تخمينٌ بإرشاد التوافر — يصحّح المهندسُ الخدمةَ التي يعرفها أفضل، لا الخدمةَ التي فشلت. هذا تأثيرُ أينشتل (حل المشكلات <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">§1e</a>) وهو يرتدي شارةَ المناوبة.</li>
-  <li>العبءُ المعرفي هو الخصم: مهندسُ المناوبة الذي يوفّق بين الحادث والخط الزمني والدردشة ولوحة المعلومات يفعل عكسَ العمل العميق. توجد الأدوارُ وأدلةُ التشغيل لنقل العبء من الإنسان إلى العملية (النظرية الكامنة: العبء المعرفي، حل المشكلات <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">§1e</a>).</li>
+  <li>تصحيح أخطاء الإنتاج اختبارُ فرضياتٍ تحت ضغط الوقت (الطريقة: حل المشكلات <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">التنقيح كحل مشكلات</a>). يوجد الانضباطُ التشغيلي ليُقصّر الحلقة: <em>اكتشف ← حدّد الموضع ← خفّف ← تحقق ← تعلّم</em>.</li>
+  <li>تحديدُ الموضع دون تتبعاتٍ تخمينٌ بإرشاد التوافر — يصحّح المهندسُ الخدمةَ التي يعرفها أفضل، لا الخدمةَ التي فشلت. هذا تأثيرُ أينشتل (حل المشكلات <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">علم النفس وراء الطريقة</a>) وهو يرتدي شارةَ المناوبة.</li>
+  <li>العبءُ المعرفي هو الخصم: مهندسُ المناوبة الذي يوفّق بين الحادث والخط الزمني والدردشة ولوحة المعلومات يفعل عكسَ العمل العميق. توجد الأدوارُ وأدلةُ التشغيل لنقل العبء من الإنسان إلى العملية (النظرية الكامنة: العبء المعرفي، حل المشكلات <a href="./problem-solving.html#sec-underlying-theory-the-cognitive-science-behind-why-the-method-works">علم النفس وراء الطريقة</a>).</li>
 </ul>
 
 <blockquote class="callout">
@@ -259,7 +261,7 @@
     <tr>
       <td><strong>كل حادث ينتهي في الأعمال المتراكمة</strong></td>
       <td>حادثٌ بلا بنود عمل قصةٌ؛ وببنود عمل استثمار. تُغلق الحلقة حين تعود التعلماتُ إلى أعمال المنتج المتراكمة.</td>
-      <td>حين لا يُنتج تقريرٌ بعدي أيَّ تغيير — كان الاجتماعُ مسرحًا (<a href="#sec-common-failure-modes">§٩</a>).</td>
+      <td>حين لا يُنتج تقريرٌ بعدي أيَّ تغيير — كان الاجتماعُ مسرحًا (<a href="#sec-common-failure-modes">أنماط الفشل الشائعة</a>).</td>
     </tr>
     <tr>
       <td><strong>النظام هو وحدة التعلّم</strong></td>
@@ -271,7 +273,7 @@
 
 <h2 id="sec-slo-design-choosing-what-to-promise">تصميم SLO — اختيار ما تعد به</h2>
 
-<p>المفردات (SLI وSLO وSLA وميزانية الأخطاء) معرَّفة في <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>. هذا القسم يملك الممارسة: أيَّ SLIs تختار، وما الأهدافَ التي تضعها، وكيف تُحكم الميزانية.</p>
+<p>المفردات (SLI وSLO وSLA وميزانية الأخطاء) معرَّفة في <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>. هذا القسم يملك الممارسة: أيَّ SLIs تختار، وما الأهدافَ التي تضعها، وكيف تُحكم الميزانية.</p>
 
 <h3>اختيار SLIs — قِس الرحلات، لا الصناديق</h3>
 <table>
@@ -294,7 +296,7 @@
     </tr>
     <tr>
       <td><strong>المتانة</strong></td>
-      <td>حصةُ الكتابات المقرّة التي تنجو (الرابط: مفردات RPO/RTO في التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>)</td>
+      <td>حصةُ الكتابات المقرّة التي تنجو (الرابط: مفردات RPO/RTO في التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>)</td>
       <td>هل يعد النظامُ بالاحتفاظ بالبيانات؟ (فقدانُ البيانات الصامت هو الفشل الذي لا تظهره أيُّ لوحة معلومات.)</td>
     </tr>
     <tr>
@@ -335,7 +337,7 @@
     <tr>
       <td><strong>الحدث / الشذوذ</strong></td>
       <td>يحدث حدثٌ معيَّن (يتلقى DLQ رسالةً، تظهر رسالةٌ سامة، ينتهي مفتاحٌ)</td>
-      <td>إخفاقاتُ آلةٍ معروفة بإصلاحاتٍ معروفة (انظر التصميم المعماري <a href="./system-design.html#sec-event-and-queue-reliability-the-operational-layer-under-async">§6e</a> لتنبيه DLQ)</td>
+      <td>إخفاقاتُ آلةٍ معروفة بإصلاحاتٍ معروفة (انظر التصميم المعماري <a href="./system-design.html#sec-event-and-queue-reliability-the-operational-layer-under-async">موثوقية الأحداث والطوابير</a> لتنبيه DLQ)</td>
       <td>إشارةٌ مكررة من السبب الجذري نفسه؛ «عاصفةُ التنبيهات»</td>
     </tr>
   </tbody>
@@ -344,7 +346,7 @@
 <h3>قائمة فحص تصميم التنبيه</h3>
 <ul>
   <li><strong>قابل للتنفيذ:</strong> يستطيع المستلم أن يفعل شيئًا. «المعدل مرتفع» حقيقةٌ؛ «انخفضت نسبةُ ضرب الكاش دون 80% — تحقق من تغيير مفتاحِ الكاش في الإصدار 4.2 (دليل التشغيل: عاصفةُ الكاش)» إجراءٌ.</li>
-  <li><strong>موجَّه:</strong> أيقظ إنسانًا لـSEV-1/2 فقط؛ وحوّل كل ما سواه إلى تذاكر. مفرداتُ الخطورة تعيش في <a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a> (SEV-1 = مستخدمون محجوبون، SEV-2 = متدهور، SEV-3 = أثر بسيط، SEV-4 = تجميلي).</li>
+  <li><strong>موجَّه:</strong> أيقظ إنسانًا لـSEV-1/2 فقط؛ وحوّل كل ما سواه إلى تذاكر. مفرداتُ الخطورة تعيش في <a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">النشر وإدارة الحوادث</a> (SEV-1 = مستخدمون محجوبون، SEV-2 = متدهور، SEV-3 = أثر بسيط، SEV-4 = تجميلي).</li>
   <li><strong>غير متكرر:</strong> تنبيهٌ واحد لكل سببٍ جذري، لا تنبيهٌ لكل عرض. خمسُ لوحات تصرخ حول قاعدة بياناتٍ ميتة واحدة عاصفةٌ، لا معلومات.</li>
   <li><strong>مملوك:</strong> لكل تنبيهٍ مالكٌ بشري وتاريخُ مراجعة. التنبيهاتُ كود؛ تتراكم عليها الديون وتحتاج إعادةَ هيكلة.</li>
   <li><strong>قابل للإغلاق:</strong> مسارُ إغلاقٍ موثّق («مشكلة معروفة، متتبَّعة في تذكرة X») كي يستطيع المناوب إسكاتَ إنذارٍ خاطئ معروفٍ دون ذنب — البديلُ تعليمُ الناس تجاهلَ البيجر.</li>
@@ -388,7 +390,7 @@
     </tr>
     <tr>
       <td><strong>المتابعة</strong></td>
-      <td>التقريرُ البعدي (<a href="#sec-postmortems-learning-making-failure-an-investment">§٥</a>)؛ بنودُ الإجراء تدخل الأعمالَ المتراكمة؛ تُختتم الاتصالاتُ؛ تُحدَّث أدلةُ التشغيل</td>
+      <td>التقريرُ البعدي (<a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم</a>)؛ بنودُ الإجراء تدخل الأعمالَ المتراكمة؛ تُختتم الاتصالاتُ؛ تُحدَّث أدلةُ التشغيل</td>
       <td>تتعلّم المنظمةُ؛ الحادثُ التالي أرخص</td>
     </tr>
   </tbody>
@@ -404,7 +406,7 @@
 </ul><h2 id="sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم — جعل الفشل استثمارًا</h2>
 
 <h3>بلا لومٍ بالتصميم</h3>
-<p>التقريرُ البعدي بلا لومٍ ليس «بلا مساءلة». إنه انضباطُ سؤالِ <em>ما الذي في النظام جعل هذا الفشلَ ممكنًا</em> قبل سؤال <em>من</em>. كلُّ تفسير «خطأ بشري» سؤالُ تصميمٍ متنكر: زرُّ نشرٍ بلا تأكيد، ودليلُ تشغيلٍ تعفّن، وتنبيهٌ انطلق في الثالثة فجرًا بلا إجراء. النظامُ هو وحدة التعلّم (<a href="#sec-mental-models-how-operators-actually-reason">§١و</a>).</p>
+<p>التقريرُ البعدي بلا لومٍ ليس «بلا مساءلة». إنه انضباطُ سؤالِ <em>ما الذي في النظام جعل هذا الفشلَ ممكنًا</em> قبل سؤال <em>من</em>. كلُّ تفسير «خطأ بشري» سؤالُ تصميمٍ متنكر: زرُّ نشرٍ بلا تأكيد، ودليلُ تشغيلٍ تعفّن، وتنبيهٌ انطلق في الثالثة فجرًا بلا إجراء. النظامُ هو وحدة التعلّم (<a href="#sec-mental-models-how-operators-actually-reason">النماذج الذهنية</a>).</p>
 
 <h3>قالب التقرير البعدي</h3>
 <table>
@@ -439,11 +441,11 @@
 </table>
 
 <h3>تُغلق الحلقة في الأعمال المتراكمة</h3>
-<p>بنودُ إجراء التقرير البعدي عملُ منتج: تتنافس على نفس سعة السبرنت مثل الميزات، وميزانيةُ الأخطاء هي التي تقرر الفائزَ (<a href="#sec-slo-design-choosing-what-to-promise">§٢</a>). هذه هي الحلقةُ نفسها التي يصفها <a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">§9h</a> («تعود التعلماتُ التشغيلية إلى الأعمال المتراكمة») — ومساهمةُ هذه الوثيقة هي الصنعةُ التي تجعل التعلمات حقيقية: ملاكٌ وتذاكرُ وتحققٌ بدل الأجواء.</p>
+<p>بنودُ إجراء التقرير البعدي عملُ منتج: تتنافس على نفس سعة السبرنت مثل الميزات، وميزانيةُ الأخطاء هي التي تقرر الفائزَ (<a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>). هذه هي الحلقةُ نفسها التي يصفها <a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">النشر وإدارة الحوادث</a> («تعود التعلماتُ التشغيلية إلى الأعمال المتراكمة») — ومساهمةُ هذه الوثيقة هي الصنعةُ التي تجعل التعلمات حقيقية: ملاكٌ وتذاكرُ وتحققٌ بدل الأجواء.</p>
 
 <h2 id="sec-runbooks-making-the-known-response-boring">أدلة التشغيل — جعل الاستجابة المعروفة مملة</h2>
 
-<p>دليلُ التشغيل إجراءٌ مكتوبٌ لسيناريو معروف، مكتوبٌ <em>قبل</em> الحادث — الفرقُ بين «سنتدبر الأمر» و«فعلناها من قبل، هكذا». اختبارُ دليل التشغيل ليس أنه موجود؛ إنه أنه نُفّذ في تدريبٍ (<a href="#sec-mental-models-how-operators-actually-reason">§١و</a>).</p>
+<p>دليلُ التشغيل إجراءٌ مكتوبٌ لسيناريو معروف، مكتوبٌ <em>قبل</em> الحادث — الفرقُ بين «سنتدبر الأمر» و«فعلناها من قبل، هكذا». اختبارُ دليل التشغيل ليس أنه موجود؛ إنه أنه نُفّذ في تدريبٍ (<a href="#sec-mental-models-how-operators-actually-reason">النماذج الذهنية</a>).</p>
 
 <h3>شكل دليل التشغيل</h3>
 <table>
@@ -485,11 +487,11 @@
     </tr>
     <tr>
       <td><strong>المراقبة تُشحن مع الخدمة</strong></td>
-      <td>تطلبها المعماريةُ (التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>)؛ وتفرضها الممارسةُ وقت المراجعة — خدمةٌ بلا إشارات غيرُ قابلة للدمج.</td>
+      <td>تطلبها المعماريةُ (التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a>)؛ وتفرضها الممارسةُ وقت المراجعة — خدمةٌ بلا إشارات غيرُ قابلة للدمج.</td>
     </tr>
     <tr>
       <td><strong>ميزانية الأخطاء تقرر، لا الصوت الأعلى</strong></td>
-      <td>عملُ الموثوقية مقابل عملِ الميزات يصير حسابًا لا جدالًا (بيتُ القصيد من <a href="#sec-slo-design-choosing-what-to-promise">§٢</a>).</td>
+      <td>عملُ الموثوقية مقابل عملِ الميزات يصير حسابًا لا جدالًا (بيتُ القصيد من <a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>).</td>
     </tr>
     <tr>
       <td><strong>التراجع هو تخفيف الأثر الافتراضي</strong></td>
@@ -549,7 +551,7 @@
 
 <h2 id="sec-capacity-planning-load-testing-knowing-the-ceiling">تخطيط السعة واختبار الحمل — معرفة السقف</h2>
 
-<p>النظريةُ — قانونُ ليتل، وقانونُ أمدال، وأهدافُ هامش السعة، وركبةُ زمن الاستجابة — تعيش في <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-capacity-planning-how-to-estimate-load-storage-and-latency">§6b</a>؛ وهذا القسم يملك ممارسةَ اختبار السقف وضبط التوسع التلقائي مقابله.</p>
+<p>النظريةُ — قانونُ ليتل، وقانونُ أمدال، وأهدافُ هامش السعة، وركبةُ زمن الاستجابة — تعيش في <a href="./system-design.html">التصميم المعماري</a> <a href="./system-design.html#sec-capacity-planning-how-to-estimate-load-storage-and-latency">تخطيط السعة</a>؛ وهذا القسم يملك ممارسةَ اختبار السقف وضبط التوسع التلقائي مقابله.</p>
 
 <table>
   <thead><tr><th>الممارسة</th><th>ما الذي تفعله</th><th>مقياس القرار</th></tr></thead>
@@ -574,7 +576,7 @@
 
 <h2 id="sec-deployment-operations-the-two-decisions-the-toolbox-doesn-t-own">تشغيل النشر — القراران اللذان لا تملكهما أدوات النشر</h2>
 
-<p>صندوقُ أدوات النشر — المتدرج، والأزرق-الأخضر، والقناري، ومفاتيحُ الميزات، والتراجعُ وحدودُ الترحيل — مملوكٌ من <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD والنشر</a> <a href="./version-control-ci-cd-deployment.html#sec-deployment-strategies-the-ship-it-safely-toolbox">§5</a> و<a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-release-strategies-and-environments">§9i</a>. يضيف التشغيلُ قرارين حول ذلك الصندوق:</p>
+<p>صندوقُ أدوات النشر — المتدرج، والأزرق-الأخضر، والقناري، ومفاتيحُ الميزات، والتراجعُ وحدودُ الترحيل — مملوكٌ من <a href="./version-control-ci-cd-deployment.html">التحكم بالإصدارات وCI/CD والنشر</a> <a href="./version-control-ci-cd-deployment.html#sec-deployment-strategies-the-ship-it-safely-toolbox">صندوق أدوات النشر الآمن</a> و<a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-release-testing-branching-the-delivery-mechanics">استراتيجيات الإصدار والبيئات</a>. يضيف التشغيلُ قرارين حول ذلك الصندوق:</p>
 
 <table>
   <thead><tr><th>القرار</th><th>ما الذي تفعله</th><th>مقياس القرار</th></tr></thead>
@@ -586,7 +588,7 @@
     </tr>
     <tr>
       <td><strong>إحباط قائم على الميزانية</strong></td>
-      <td>احكم على القناري بميزانية الأخطاء: إذا تجاوز احتراقُ SLO العتبةَ (<a href="#sec-slo-design-choosing-what-to-promise">§٢</a>، <a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§٣</a>)، أحبط وتراجع — ولا تُصلح تقدميًا وسط حادثٍ أبدًا (<a href="#sec-incident-response-from-detection-to-recovery">§٤</a>، <a href="#sec-principles-the-shared-constants">§٧</a>)</td>
+      <td>احكم على القناري بميزانية الأخطاء: إذا تجاوز احتراقُ SLO العتبةَ (<a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>، <a href="#sec-alert-design-turning-targets-into-contracts-with-humans">تصميم التنبيهات</a>)، أحبط وتراجع — ولا تُصلح تقدميًا وسط حادثٍ أبدًا (<a href="#sec-incident-response-from-detection-to-recovery">الاستجابة للحوادث</a>، <a href="#sec-principles-the-shared-constants">المبادئ</a>)</td>
       <td>احتراقُ القناري مقابل عتبةِ الإحباط؛ الوقتُ من قرار الإحباط إلى التراجع الكامل</td>
     </tr>
   </tbody>
@@ -594,7 +596,7 @@
 
 <h2 id="sec-chaos-engineering-practicing-failure-on-purpose">هندسة الفوضى — ممارسة الفشل عمدًا</h2>
 
-<p>التدريباتُ (<a href="#sec-mental-models-how-operators-actually-reason">§١و</a>، <a href="#sec-runbooks-making-the-known-response-boring">§٦</a>) تدرّب إجراءاتٍ <em>معروفة</em>؛ وهندسةُ الفوضى تدرّب فشلًا <em>غير معروف</em> بحقنه عمدًا، بجرعاتٍ مضبوطة.</p>
+<p>التدريباتُ (<a href="#sec-mental-models-how-operators-actually-reason">النماذج الذهنية</a>، <a href="#sec-runbooks-making-the-known-response-boring">أدلة التشغيل</a>) تدرّب إجراءاتٍ <em>معروفة</em>؛ وهندسةُ الفوضى تدرّب فشلًا <em>غير معروف</em> بحقنه عمدًا، بجرعاتٍ مضبوطة.</p>
 
 <table>
   <thead><tr><th>الممارسة</th><th>ما الذي تفعله</th><th>مقياس القرار</th></tr></thead>
@@ -627,11 +629,11 @@
   </tbody>
 </table><h2 id="sec-operational-gates-shift-left-and-the-launch-gate">البوابات التشغيلية — الإزاحة إلى اليسار وبوابة الإطلاق</h2>
 
-<p>تتعلّم التقاريرُ البعدية <em>بعد</em> الفشل (<a href="#sec-postmortems-learning-making-failure-an-investment">§٥</a>)؛ وتتعلّم هاتان البوابتان <em>قبله</em> — إحداهما أثناء العمل، والأخرى عند الإطلاق.</p>
+<p>تتعلّم التقاريرُ البعدية <em>بعد</em> الفشل (<a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم</a>)؛ وتتعلّم هاتان البوابتان <em>قبله</em> — إحداهما أثناء العمل، والأخرى عند الإطلاق.</p>
 
 <h3>الإزاحة إلى اليسار — تدخل اهتماماتُ التشغيل العملَ قبل الكود</h3>
 
-<p>«المراقبةُ تُشحن مع الخدمة» (<a href="#sec-principles-the-shared-constants">§٧</a>) تصير ملموسةً حين تدخل اهتماماتُ التشغيل العملَ <em>قبل</em> الكود.</p>
+<p>«المراقبةُ تُشحن مع الخدمة» (<a href="#sec-principles-the-shared-constants">المبادئ</a>) تصير ملموسةً حين تدخل اهتماماتُ التشغيل العملَ <em>قبل</em> الكود.</p>
 
 <table>
   <thead><tr><th>الممارسة</th><th>ما الذي تفعله</th><th>مقياس القرار</th></tr></thead>
@@ -658,7 +660,7 @@
     </tr>
     <tr>
       <td><strong>الديون في الأعمال المتراكمة</strong></td>
-      <td>أدلةُ تشغيلٍ ناقصة، وتنبيهاتٌ بالية، ونسخٌ احتياطية غير مختبرة تُتتبَّع ديونًا تشغيلية (<a href="#sec-operational-debt-toil-paying-what-you-postponed">§٧i</a>)</td>
+      <td>أدلةُ تشغيلٍ ناقصة، وتنبيهاتٌ بالية، ونسخٌ احتياطية غير مختبرة تُتتبَّع ديونًا تشغيلية (<a href="#sec-operational-debt-toil-paying-what-you-postponed">الديون التشغيلية والكدح</a>)</td>
       <td>تذاكرُ ديونٍ منشأة لكل إصدار</td>
     </tr>
   </tbody>
@@ -787,7 +789,7 @@
 
 <h2 id="sec-operational-team-metrics-measuring-the-operation-itself">مقاييس فريق التشغيل — قياس العملية نفسها</h2>
 
-<p>لخدمتك SLOs (<a href="#sec-slo-design-choosing-what-to-promise">§٢</a>)؛ وفريقُ التشغيل <em>نفسه</em> يحتاج لوحةَ نتائجَ خاصةً به، وإلا فالتقدمُ أجواء.</p>
+<p>لخدمتك SLOs (<a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>)؛ وفريقُ التشغيل <em>نفسه</em> يحتاج لوحةَ نتائجَ خاصةً به، وإلا فالتقدمُ أجواء.</p>
 
 <table>
   <thead><tr><th>المقياس</th><th>ما يقيسه</th><th>هدفٌ معقول</th></tr></thead>
@@ -809,7 +811,7 @@
     </tr>
     <tr>
       <td><strong>التنبيهات لكل مهندسٍ كل أسبوع</strong></td>
-      <td>حملُ المناوبة (<a href="#sec-on-call-design-the-rotation-is-a-product-not-a-duty">§٧ب</a>)</td>
+      <td>حملُ المناوبة (<a href="#sec-on-call-design-the-rotation-is-a-product-not-a-duty">تصميم المناوبة</a>)</td>
       <td>&lt; 2</td>
     </tr>
     <tr>
@@ -819,12 +821,12 @@
     </tr>
     <tr>
       <td><strong>وتيرة التدريب</strong></td>
-      <td>أدلةُ التشغيل المنفَّذة في التدريبات (<a href="#sec-runbooks-making-the-known-response-boring">§٦</a>)</td>
+      <td>أدلةُ التشغيل المنفَّذة في التدريبات (<a href="#sec-runbooks-making-the-known-response-boring">أدلة التشغيل</a>)</td>
       <td>مرةً كل ربع سنة على الأقل</td>
     </tr>
     <tr>
       <td><strong>نسبة الكدح</strong></td>
-      <td>حصةُ وقت المناوبة على العمل المتكرر (<a href="#sec-operational-team-metrics-measuring-the-operation-itself">§٧j</a>)</td>
+      <td>حصةُ وقت المناوبة على العمل المتكرر (<a href="#sec-operational-team-metrics-measuring-the-operation-itself">مقاييس فريق التشغيل</a>)</td>
       <td>&lt; 50%</td>
     </tr>
   </tbody>
@@ -832,7 +834,7 @@
 
 <h2 id="sec-worked-example-the-checkout-incident">مثال محلول — حادثة الخروج من المتجر</h2>
 
-<p>حادثٌ واحد، من البداية إلى النهاية، يمر بكل قسمٍ في هذه الوثيقة. النظامُ: واجهةُ متجرٍ (Gateway ← API الخروج ← API المخزون ← Postgres)، مع معرّفاتِ طلباتٍ وتتبعاتِ OpenTelemetry موصولةٍ حسب التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>، وSLO خروجٍ 99.9% توفرًا / p99 &lt; 300ms حسب مفردات التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>.</p>
+<p>حادثٌ واحد، من البداية إلى النهاية، يمر بكل قسمٍ في هذه الوثيقة. النظامُ: واجهةُ متجرٍ (Gateway ← API الخروج ← API المخزون ← Postgres)، مع معرّفاتِ طلباتٍ وتتبعاتِ OpenTelemetry موصولةٍ حسب التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a>، وSLO خروجٍ 99.9% توفرًا / p99 &lt; 300ms حسب مفردات التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>.</p>
 
 <h3>الاكتشاف — 09:41 بالتوقيت العالمي (الثلاثاء)</h3>
 <p>ينطلق تنبيهُ معدل الاحتراق: ميزانيةُ أخطاء الخروج تحترق بمعدل 14× عبر النافذة القصيرة. يرتبط التنبيهُ بدليلِ تشغيل عاصفةِ الكاش (لا يصف — بعد — هذا التغييرَ الدقيق، لكنه يسمّي الفحوصَ الأولى). يؤكد مهندسٌ واحد أثرَ المستخدم: p99 للخروج 2.1 ثانية ومعدلُ الخطأ 8%. يُعلن SEV-2.</p>
@@ -909,7 +911,7 @@
     <tr>
       <td><strong>لا تدريبات</strong></td>
       <td>التبديلُ الاحتياطي «يجب أن يعمل»؛ تُجرَّب الاستعادةُ أول مرة أثناء الانقطاع</td>
-      <td>معاملةُ الإجراءات كأوراقٍ لا كآلات (التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>: نسخةٌ احتياطية لم تُستَعَد أملٌ)</td>
+      <td>معاملةُ الإجراءات كأوراقٍ لا كآلات (التصميم المعماري <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">الموثوقية وتعافي الكوارث</a>: نسخةٌ احتياطية لم تُستَعَد أملٌ)</td>
     </tr>
     <tr>
       <td><strong>مناوبة بلا سلطة</strong></td>
@@ -940,7 +942,7 @@
       <td><strong>التتبعات</strong></td>
       <td>OpenTelemetry SDKs + Collector, Jaeger, Tempo</td>
       <td>تحتاج مساراتِ طلباتٍ عبر الخدمات ← المعيارَ، لا البائع</td>
-      <td>التحكمُ في أخذ العينات؛ نسبةُ الإسقاط للتتبعات من طرفٍ إلى طرف؛ تغطيةُ نشر السياق (التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>)</td>
+      <td>التحكمُ في أخذ العينات؛ نسبةُ الإسقاط للتتبعات من طرفٍ إلى طرف؛ تغطيةُ نشر السياق (التصميم المعماري <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">تصميم المراقبة</a>)</td>
     </tr>
     <tr>
       <td><strong>APM / الأخطاء</strong></td>
@@ -970,7 +972,7 @@
       <td><strong>مراقبة عصر الذكاء الاصطناعي</strong></td>
       <td>Langfuse, OpenLLMetry, طبقاتُ تتبع الوكلاء على OTel</td>
       <td>تحتاج مراقبةَ استدلالاتِ LLM وحلقاتِ الوكلاء ← مقاطعَ span بالرموز وزمنِ الاستجابة والانحراف</td>
-      <td>التكلفةُ لكل تتبع؛ سياسةُ التقاط المطالبة/الاستجابة؛ كشفُ الانحراف (انظر <a href="#sec-the-future-where-the-operational-layer-is-heading">§١١</a>)</td>
+      <td>التكلفةُ لكل تتبع؛ سياسةُ التقاط المطالبة/الاستجابة؛ كشفُ الانحراف (انظر <a href="#sec-the-future-where-the-operational-layer-is-heading">المستقبل</a>)</td>
     </tr>
   </tbody>
 </table>
@@ -979,27 +981,27 @@
 <h2 id="sec-the-future-where-the-operational-layer-is-heading">المستقبل — إلى أين تتجه الطبقة التشغيلية</h2>
 
 <ul>
-  <li><strong>استدلالاتُ LLM مقاطعَ span.</strong> المطالبةُ طلب؛ والاستجابةُ رد؛ واستدعاءُ النموذج مقطعُ span في تتبع. حلقةُ الارتباط من <a href="#sec-worked-example-the-checkout-incident">§٨</a> تمتد دون تغيير: requestId واحدٌ يحمل رحلةَ المستخدم عبر البوابة والمنطق والنموذج.</li>
-  <li><strong>الوكلاءُ أنظمةٌ يجب مراقبتها.</strong> تنتهي دورةُ حياة تطوير الوكلاء (<a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">§9d</a>) بـ«انشر بحواجزَ حماية، وراقب الانحراف». الانحرافُ — تباعدُ سلوك الوكيل عن مهمته المقصودة — يحل محل الانهيار بوصفه نمطَ الفشل المخوف، والاكتشافُ يحتاج الإشاراتِ نفسها: ميزانياتٍ، وتتبعاتٍ، وتنبيهاتٍ تحترم البشر.</li>
+  <li><strong>استدلالاتُ LLM مقاطعَ span.</strong> المطالبةُ طلب؛ والاستجابةُ رد؛ واستدعاءُ النموذج مقطعُ span في تتبع. حلقةُ الارتباط من <a href="#sec-worked-example-the-checkout-incident">مثال محلول</a> تمتد دون تغيير: requestId واحدٌ يحمل رحلةَ المستخدم عبر البوابة والمنطق والنموذج.</li>
+  <li><strong>الوكلاءُ أنظمةٌ يجب مراقبتها.</strong> تنتهي دورةُ حياة تطوير الوكلاء (<a href="./software-development-process.html">عملية تطوير البرمجيات</a> <a href="./software-development-process.html#sec-the-future-ai-augmented-sdlc-and-the-agent-development-lifecycle">دورة التطوير المعززة بالذكاء الاصطناعي</a>) بـ«انشر بحواجزَ حماية، وراقب الانحراف». الانحرافُ — تباعدُ سلوك الوكيل عن مهمته المقصودة — يحل محل الانهيار بوصفه نمطَ الفشل المخوف، والاكتشافُ يحتاج الإشاراتِ نفسها: ميزانياتٍ، وتتبعاتٍ، وتنبيهاتٍ تحترم البشر.</li>
   <li><strong>eBPF والتنميط المستمر.</strong> أدواتُ القياس على مستوى النواة وأخذُ العينات الدائمُ التشغيل يقلّصان الفجوةَ بين «يبدو النظامُ جيدًا» و«هنا بالضبط أين ذهبت CPU» — مزيدٌ من المجهول يصير قابلًا للإجابة قبل أن يُطرح السؤال.</li>
   <li><strong>الاستجابةُ للحوادث بمساعدة الذكاء الاصطناعي.</strong> ستضغط الملخصاتُ واقتراحاتُ الارتباط وبحثُ أدلة التشغيل حلقةَ التحقيق. الثوابتُ لا تتحرك: إنسانٌ يملك القرار، وخطٌ زمني يبقى صادقًا، وكلُّ حادثٍ ما زال ينتهي ببند إجراء.</li>
 </ul>
 
-<h2 id="sec-primary-sources">المصادر الأساسية</h2>
+<h2 id="sec-primary-sources">المصادر الأساسية</h2><p><strong>Source digest:</strong> <a href="../../digests/observability-and-operations.md">هضم عملي لهذه المصادر</a>. <span class="unverified">†</span> = ادّعاء بانتظار العثور على مصدره الأولي.</p>
 
 <ol>
-  <li>«Site Reliability Engineering» — كتاب SRE من Google (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs وميزانياتُ الأخطاء والمناوبة والكدح وثقافةُ التقارير البعدية. المصدرُ الأساسي التأسيسي لـ<a href="#sec-slo-design-choosing-what-to-promise">§٢</a>–<a href="#sec-principles-the-shared-constants">§٧</a>.</li>
-  <li>«The Site Reliability Workbook» (2018) — <a href="https://sre.google/workbook/table-of-contents/">sre.google/workbook</a> — تمارينُ عملية في SLO والتنبيه خلف <a href="#sec-slo-design-choosing-what-to-promise">§٢</a>–<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§٣</a>.</li>
-  <li>توثيقُ OpenTelemetry — <a href="https://opentelemetry.io/docs/">opentelemetry.io/docs</a> — المعيارُ المستقل عن البائعين للتتبعات والمقاييس والسجلات خلف <a href="#sec-history-from-paging-to-telemetry-to-learning-machines">§١ب</a> و<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">§١٠</a>.</li>
-  <li>منهجُ USE — Brendan Gregg — <a href="https://www.brendangregg.com/usemethod.html">brendangregg.com/usemethod.html</a> — الاستخدام/التشبع/الأخطاء لتحليل الموارد (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§١هـ</a>، <a href="#sec-capacity-planning-load-testing-knowing-the-ceiling">§٧ج</a>).</li>
-  <li>منهجُ RED — Tom Wilkie — <a href="https://grafana.com/blog/the-red-method-how-to-instrument-your-services/">مدونة Grafana Labs</a> — المعدل/الأخطاء/المدة لمقاييس مستوى الخدمة (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§١هـ</a>).</li>
-  <li>«Monitoring Distributed Systems» (الإشاراتُ الذهبية الأربع) — <a href="https://sre.google/sre-book/monitoring-distributed-systems/">sre.google/sre-book</a> — زمنُ الاستجابة وحركةُ المرور والأخطاءُ والتشبع (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§١هـ</a>).</li>
-  <li>«Effective Troubleshooting» — <a href="https://sre.google/sre-book/effective-troubleshooting/">sre.google/sre-book</a> — حلقةُ الفرضيات مطبقةً في الإنتاج (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">§١هـ</a>، <a href="#sec-worked-example-the-checkout-incident">§٨</a>).</li>
-  <li>«Postmortem Culture: Learning from Failure» — <a href="https://sre.google/sre-book/postmortem-culture/">sre.google/sre-book</a> — التقاريرُ البعدية بلا لومٍ بوصفها خاصيةَ نظام (<a href="#sec-postmortems-learning-making-failure-an-investment">§٥</a>).</li>
-  <li>توثيقُ الاستجابة للحوادث من PagerDuty (مفتوح المصدر) — <a href="https://github.com/PagerDuty/incident-response-docs">github.com/PagerDuty/incident-response-docs</a> — تصنيفُ الخطورة وأدوارُ الحادث (قائد الحادث، والمدوّن، والتواصل) خلف <a href="#sec-incident-response-from-detection-to-recovery">§٤</a>.</li>
-  <li>Charity Majors — «Observability is a Many-Splendored Thing» — <a href="https://charity.wtf/p/observability-is-a-many-splendored-thing">charity.wtf</a> — التأطيرُ المراقبة-مقابل-الرصد المستخدم في <a href="#sec-definition-what-observability-operations-is-and-what-it-is-not">§١</a> و<a href="#sec-mental-models-how-operators-actually-reason">§١و</a> (تم التحقق من الوصول إليه).</li>
-  <li>John Allspaw — «Blameless PostMortems and a Just Culture» — <a href="https://codeascraft.com/2012/05/22/blameless-postmortems/">codeascraft.com</a> — أصلُ ثقافةِ بلا لومٍ في الهندسة (<a href="#sec-postmortems-learning-making-failure-an-investment">§٥</a>؛ الوصولُ للتحقق من هذه البيئة — تحجب Etsy الجلبَ الآلي).</li>
-  <li>John Allspaw — «The Infinite Hows» — <a href="https://www.oreilly.com/radar/the-infinite-hows/">oreilly.com/radar</a> — لماذا «ماذا حدث» سؤالٌ أولُ خاطئ (<a href="#sec-postmortems-learning-making-failure-an-investment">§٥</a>؛ الوصولُ للتحقق — محجوب/403 للجلب الآلي).</li>
+  <li>«Site Reliability Engineering» — كتاب SRE من Google (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs وميزانياتُ الأخطاء والمناوبة والكدح وثقافةُ التقارير البعدية. المصدرُ الأساسي التأسيسي لـ<a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>–<a href="#sec-principles-the-shared-constants">المبادئ</a>.</li>
+  <li>«The Site Reliability Workbook» (2018) — <a href="https://sre.google/workbook/table-of-contents/">sre.google/workbook</a> — تمارينُ عملية في SLO والتنبيه خلف <a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>–<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">تصميم التنبيهات</a>.</li>
+  <li>توثيقُ OpenTelemetry — <a href="https://opentelemetry.io/docs/">opentelemetry.io/docs</a> — المعيارُ المستقل عن البائعين للتتبعات والمقاييس والسجلات خلف <a href="#sec-history-from-paging-to-telemetry-to-learning-machines">التاريخ</a> و<a href="#sec-ecosystem-tooling-catalog-with-decision-metrics">النظام البيئي</a>.</li>
+  <li>منهجُ USE — Brendan Gregg — <a href="https://www.brendangregg.com/usemethod.html">brendangregg.com/usemethod.html</a> — الاستخدام/التشبع/الأخطاء لتحليل الموارد (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">النظرية الكامنة</a>، <a href="#sec-capacity-planning-load-testing-knowing-the-ceiling">تخطيط السعة واختبار الحمل</a>).</li>
+  <li>منهجُ RED — Tom Wilkie — <a href="https://grafana.com/blog/the-red-method-how-to-instrument-your-services/">مدونة Grafana Labs</a> — المعدل/الأخطاء/المدة لمقاييس مستوى الخدمة (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">النظرية الكامنة</a>).</li>
+  <li>«Monitoring Distributed Systems» (الإشاراتُ الذهبية الأربع) — <a href="https://sre.google/sre-book/monitoring-distributed-systems/">sre.google/sre-book</a> — زمنُ الاستجابة وحركةُ المرور والأخطاءُ والتشبع (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">النظرية الكامنة</a>).</li>
+  <li>«Effective Troubleshooting» — <a href="https://sre.google/sre-book/effective-troubleshooting/">sre.google/sre-book</a> — حلقةُ الفرضيات مطبقةً في الإنتاج (<a href="#sec-underlying-theory-what-makes-operations-reliable-rather-than-hopeful">النظرية الكامنة</a>، <a href="#sec-worked-example-the-checkout-incident">مثال محلول</a>).</li>
+  <li>«Postmortem Culture: Learning from Failure» — <a href="https://sre.google/sre-book/postmortem-culture/">sre.google/sre-book</a> — التقاريرُ البعدية بلا لومٍ بوصفها خاصيةَ نظام (<a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم</a>).</li>
+  <li>توثيقُ الاستجابة للحوادث من PagerDuty (مفتوح المصدر) — <a href="https://github.com/PagerDuty/incident-response-docs">github.com/PagerDuty/incident-response-docs</a> — تصنيفُ الخطورة وأدوارُ الحادث (قائد الحادث، والمدوّن، والتواصل) خلف <a href="#sec-incident-response-from-detection-to-recovery">الاستجابة للحوادث</a>.</li>
+  <li>Charity Majors — «Observability is a Many-Splendored Thing» — <a href="https://charity.wtf/p/observability-is-a-many-splendored-thing">charity.wtf</a> — التأطيرُ المراقبة-مقابل-الرصد المستخدم في <a href="#sec-definition-what-observability-operations-is-and-what-it-is-not">التعريف</a> و<a href="#sec-mental-models-how-operators-actually-reason">النماذج الذهنية</a> (تم التحقق من الوصول إليه).</li>
+  <li>John Allspaw — «Blameless PostMortems and a Just Culture» — <a href="https://codeascraft.com/2012/05/22/blameless-postmortems/">codeascraft.com</a> — أصلُ ثقافةِ بلا لومٍ في الهندسة (<a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم</a>؛ الوصولُ للتحقق من هذه البيئة — تحجب Etsy الجلبَ الآلي).</li>
+  <li>John Allspaw — «The Infinite Hows» — <a href="https://www.oreilly.com/radar/the-infinite-hows/">oreilly.com/radar</a> — لماذا «ماذا حدث» سؤالٌ أولُ خاطئ (<a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم</a>؛ الوصولُ للتحقق — محجوب/403 للجلب الآلي).</li>
 </ol>
 
 <p>قائمةُ الموارد الكاملة المُرساة (مع ملاحظات الثقة) تعيش في <code>RESOURCES.md</code>.</p>
@@ -1007,17 +1009,17 @@
 <h2 id="sec-summary-the-operational-checklist">الملخص — قائمة الفحص التشغيلية</h2>
 
 <ul>
-  <li>هل تستطيع تسميةَ الرحلاتِ التي يخوضها المستخدمون فعلًا، وSLO لكل منها؟ (إن لا: <a href="#sec-slo-design-choosing-what-to-promise">§٢</a>)</li>
-  <li>هل يوقظ كلُّ تنبيهٍ إنسانًا فقط حين تحترق ميزانيةٌ، ويحوّل البقيةَ إلى تذاكر؟ (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§٣</a>)</li>
-  <li>هل لكل تنبيهٍ دليلُ تشغيلٍ ومالكٌ ومسارُ إغلاق؟ (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">§٣</a>، <a href="#sec-runbooks-making-the-known-response-boring">§٦</a>)</li>
-  <li>هل تعريفُ «الصحة» مبنيٌّ على أثرِ المستخدم، لا فحوصِ المضيف؟ (<a href="#sec-evolution-constraint-inversions-in-the-operational-layer">§١ج</a>)</li>
-  <li>حين ينطلق البيجر، هل يقرر شخصٌ واحد، ويكتب شخصٌ واحد الخطَّ الزمني، ويتكلم صوتٌ واحد؟ (<a href="#sec-incident-response-from-detection-to-recovery">§٤</a>)</li>
-  <li>هل التراجعُ هو تخفيفُ الأثر الافتراضي، مع سلطةٍ ممنوحةٍ لحامل البيجر؟ (<a href="#sec-incident-response-from-detection-to-recovery">§٤</a>، <a href="#sec-principles-the-shared-constants">§٧</a>)</li>
-  <li>هل ينتج كلُّ حادثٍ بنودَ إجراءٍ بملاك — وهل تدخل تلك البنودُ الأعمالَ المتراكمة كأي عملٍ آخر؟ (<a href="#sec-postmortems-learning-making-failure-an-investment">§٥</a>، <a href="#sec-mental-models-how-operators-actually-reason">§١و</a>)</li>
-  <li>هل نُفِّذت أدلةُ التشغيل في تدريبٍ هذا الربع؟ (<a href="#sec-runbooks-making-the-known-response-boring">§٦</a>، <a href="#sec-mental-models-how-operators-actually-reason">§١و</a>)</li>
-  <li>هل تُستهلك ميزانيةُ الأخطاء علنًا، وهل تقرر جدالاتِ الميزات-مقابل-الموثوقية؟ (<a href="#sec-slo-design-choosing-what-to-promise">§٢</a>، <a href="#sec-principles-the-shared-constants">§٧</a>)</li>
-  <li>هل يستطيع مهندسٌ جديدٌ كليًا تحديدَ موضع طلبٍ فاشلٍ بمعرّفِ طلبٍ واحدٍ وتتبعٍ واحد؟ (<a href="#sec-worked-example-the-checkout-incident">§٨</a> — هذا بيتُ القصيد)</li>
-  <li>هل تستطيع تسميةَ مستوى نضجك التشغيلي، والممارسةَ التالية لتبنيها منه؟ (إن لا: <a href="#sec-operational-maturity-where-you-are-and-the-next-practice-to-adopt">§٧h</a>)</li>
+  <li>هل تستطيع تسميةَ الرحلاتِ التي يخوضها المستخدمون فعلًا، وSLO لكل منها؟ (إن لا: <a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>)</li>
+  <li>هل يوقظ كلُّ تنبيهٍ إنسانًا فقط حين تحترق ميزانيةٌ، ويحوّل البقيةَ إلى تذاكر؟ (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">تصميم التنبيهات</a>)</li>
+  <li>هل لكل تنبيهٍ دليلُ تشغيلٍ ومالكٌ ومسارُ إغلاق؟ (<a href="#sec-alert-design-turning-targets-into-contracts-with-humans">تصميم التنبيهات</a>، <a href="#sec-runbooks-making-the-known-response-boring">أدلة التشغيل</a>)</li>
+  <li>هل تعريفُ «الصحة» مبنيٌّ على أثرِ المستخدم، لا فحوصِ المضيف؟ (<a href="#sec-evolution-constraint-inversions-in-the-operational-layer">التطور</a>)</li>
+  <li>حين ينطلق البيجر، هل يقرر شخصٌ واحد، ويكتب شخصٌ واحد الخطَّ الزمني، ويتكلم صوتٌ واحد؟ (<a href="#sec-incident-response-from-detection-to-recovery">الاستجابة للحوادث</a>)</li>
+  <li>هل التراجعُ هو تخفيفُ الأثر الافتراضي، مع سلطةٍ ممنوحةٍ لحامل البيجر؟ (<a href="#sec-incident-response-from-detection-to-recovery">الاستجابة للحوادث</a>، <a href="#sec-principles-the-shared-constants">المبادئ</a>)</li>
+  <li>هل ينتج كلُّ حادثٍ بنودَ إجراءٍ بملاك — وهل تدخل تلك البنودُ الأعمالَ المتراكمة كأي عملٍ آخر؟ (<a href="#sec-postmortems-learning-making-failure-an-investment">التقارير البعدية والتعلّم</a>، <a href="#sec-mental-models-how-operators-actually-reason">النماذج الذهنية</a>)</li>
+  <li>هل نُفِّذت أدلةُ التشغيل في تدريبٍ هذا الربع؟ (<a href="#sec-runbooks-making-the-known-response-boring">أدلة التشغيل</a>، <a href="#sec-mental-models-how-operators-actually-reason">النماذج الذهنية</a>)</li>
+  <li>هل تُستهلك ميزانيةُ الأخطاء علنًا، وهل تقرر جدالاتِ الميزات-مقابل-الموثوقية؟ (<a href="#sec-slo-design-choosing-what-to-promise">تصميم SLO</a>، <a href="#sec-principles-the-shared-constants">المبادئ</a>)</li>
+  <li>هل يستطيع مهندسٌ جديدٌ كليًا تحديدَ موضع طلبٍ فاشلٍ بمعرّفِ طلبٍ واحدٍ وتتبعٍ واحد؟ (<a href="#sec-worked-example-the-checkout-incident">مثال محلول</a> — هذا بيتُ القصيد)</li>
+  <li>هل تستطيع تسميةَ مستوى نضجك التشغيلي، والممارسةَ التالية لتبنيها منه؟ (إن لا: <a href="#sec-operational-maturity-where-you-are-and-the-next-practice-to-adopt">النضج التشغيلي</a>)</li>
 </ul>
 
 <footer class="lesson-foot">
