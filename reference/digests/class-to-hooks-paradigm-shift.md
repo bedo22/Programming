@@ -87,7 +87,7 @@ cross-doc keys abramov-two-reacts / rules-of-react / react-compiler-v1 (react sh
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-ch1 | leverage-map tier provenance | doc-native synthesis | accepted authored framework |
-| G-ch2 | "Making Sense of React Hooks" talk transcript | medium/dev.to mirrors JS-walled this pass | hunt next touch |
+| G-ch2 | "Making Sense of React Hooks" | **CLOSED-WITH-HEDGE 2026-08-22**: canonical URL confirmed = medium.com/@dan_abramov/making-sense-of-react-hooks-fdbde8803889 (Dan Abramov, Oct 2018); original Cloudflare-walled; third-party confirmation via Simon Willison link-post (31-Oct-2018): "the most comprehensive justification … for the new React hooks API" | closed |uch |
 | G-ch3 | Fiber reconciler internals deep source | canon papers known, unfetched | fetch next touch |
 
 ## Content authored from this digestion

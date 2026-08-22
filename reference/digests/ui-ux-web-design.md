@@ -21,8 +21,8 @@ cited-URL reconciliation + 3 grounding fetches. Keys under raw-seeds/ui-ux-web-d
 | https://m3.material.io/ | platform canon — Material 3; design-system rows | continuously updated |
 | https://jnd.org/the-design-of-everyday-things/ | book canon — Norman; affordance/signifier concepts | eternal book |
 | https://www.cs.umd.edu/~ben/shneiderman.golden.rules.html | canon — Shneiderman's eight golden rules | dated(2000s page) |
-| https://doi.org/10.1037/h0054411 | DOI canon — psychology primary (as cited by doc) | eternal paper |
-| https://doi.org/10.1037/h0055392 | DOI canon — psychology primary (as cited by doc) | eternal paper |
+| https://doi.org/10.1080/17470215208416600 | CORRECTED LINK (v116): doc previously mis-cited h0054411 as Hick; Crossref identity check caught it | eternal paper |
+| https://doi.org/10.1037/h0055392 | VERIFIED (Crossref): Fitts (1954), JEP — doc link correct | eternal paper |
 | https://www.iso.org/standard/63500.html | standards canon — ISO 9241 usability definition | dated(current edition) |
 | https://www.w3.org/WAI/WCAG22/quickref/ | spec canon — accessibility criteria | dated(2026-08) |
 | https://www.rfc-editor.org/rfc/rfc9457 | spec canon — cross-doc API error contract pointer | stable RFC |
@@ -80,7 +80,7 @@ All cited sources accounted for; none dead this pass. Platform-canonical pages
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-ux1 | leverage-map provenance | tiers derived from cited canon + own failure table | accepted authored framework |
-| G-ux2 | two DOI papers identity confirmation | DOIs resolve to APA records only this pass | verify titles next touch |
+| G-ux2 | two DOI papers identity confirmation | **CLOSED 2026-08-22 via Crossref API**: h0055392 = Fitts (1954) motor-capacity paper — doc's link CORRECT; h0054411 = Kinsey volunteer-error paper — doc's Hick label was WRONG. FIX APPLIED both twins: Hick now cites doi 10.1080/17470215208416600 (QJEP 4(1) 11–26) | closed · defect fixed v116 |
 
 ## Content authored from this digestion
 

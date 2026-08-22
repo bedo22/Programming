@@ -55,7 +55,7 @@ Status: TRACK A COMPLETE (2026-08-22). De-numbered: 174 refs both twins (in-doc 
 
 | id | claim/area | hunts | status |
 |---|---|---|---|
-| G-ob5 | PagerDuty incident roles deep-read | 1 fetch done, extraction pending | next touch |
+| G-ob5 | PagerDuty incident roles deep-read | **CLOSED 2026-08-22**: roles page lives at /before/different_roles/ (path had moved) — fetched via Wayback; IC/Deputy/Scribe/SME verified ×39 mentions | closed |
 | G-ob6..G-ob11 | infinite-hows / paging history / load-testing / chaos principles / cost mgmt / on-call canon | seeds known, unfetched | hedged or doc-native today; hunt at Track B if a delta needs them |
 
 ## Content authored from this digestion

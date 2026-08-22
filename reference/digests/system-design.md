@@ -65,11 +65,11 @@ Supplementary fetched: c4model.com; parnas replacement PDF (extracted).
 | G-sd1 | migration timeline ranges | hedged conventions in-text | convention-tier, no † needed |
 | G-sd2 | CSP/Amdahl/erasure-coding theory rows | canon papers known but unfetched | fetch on next touch |
 | G-sd3 | six mental-model lenses provenance | doc-native synthesis (no external assertion) | accepted authored framework |
-| G-sd4 | Little's Law L=λW attribution | Little 1961 paper unlocated | fetch next touch |
-| G-sd5 | cache stampede/hot-key patterns | Zhang et al. "Revisiting caching" candidate | fetch next touch |
-| G-sd6 | outbox/DLQ canonical write-ups | pending | hunt next touch |
+| G-sd4 | Little's Law L=λW attribution | **CLOSED 2026-08-22**: _debt-harvest/littles-law.html — L=λW verbatim + Little's 1961 proof noted | closed |
+| G-sd5 | cache stampede/hot-key patterns | **CLOSED 2026-08-22**: _debt-harvest/cache-stampede.html concept page + Vattani "Cache Stampede Prevention" citation; Zhang candidate superseded (not needed) | closed |
+| G-sd6 | outbox/DLQ canonical write-ups | **CLOSED 2026-08-22**: microservices.io transactional-outbox + Azure Service Bus dead-letter queues docs fetched | closed |
 | G-sd7 | DDD strategic design (Evans/Vernon) | books skipped | accepted as canon cite |
-| G-sd8 | ADR origin (Nygard 2011 blog) | cognitect URL cited | fetch next touch |
+| G-sd8 | ADR origin (Nygard 2011 blog) | **CLOSED 2026-08-22**: Nygard "Documenting Architecture Decisions" (2011) fetched, title/author/date verbatim | closed |
 
 ## DEFECTS found & fixed
 - Parnas cite dead 404 → replaced with win.tue.nl PDF; text EXTRACTED via pdf-inspector

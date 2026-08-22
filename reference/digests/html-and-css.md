@@ -102,7 +102,7 @@ doc paraphrases — fetch-on-demand if a table row ever needs deep verification.
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-hc1 | leverage-map tier provenance | doc-native synthesis | accepted authored framework |
-| G-hc2 | Lie & Bert-Bos CHI 1994 paper exact cite | canon known, PDF unlocated | fetch next touch |
+| G-hc2 | Lie & Bert-Bos CHI 1994 paper exact cite | **CLOSED-REFRAMED 2026-08-22**: the citable primary is Lie's 10-Oct-1994 CERN proposal "Cascading HTML Style Sheets -- a proposal" — fetched from w3.org/howcome (css-history.html corroborates). CHI'94-paper framing was a wrong target; correction recorded here | closed |
 
 ## Content authored from this digestion
 

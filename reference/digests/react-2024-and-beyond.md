@@ -46,8 +46,8 @@ Status: TRACK A COMPLETE (2026-08-22). 11/11 seeds fetched (1 dead cite repaired
 
 | id | claim/area | hunts | status |
 |---|---|---|---|
-| G-r1 | CVE-2025-55183 security incident details | cve.org link cited but not yet fetched | fetch next touch |
-| G-r2 | Actions/form-actions primary docs | react.dev reference pending | fetch next touch |
+| G-r1 | CVE-2025-55183 security incident details | **CLOSED 2026-08-22**: NVD API record fetched — RSC information leak, affects react-server-dom-* 19.0.0–19.2.1 (cve.org itself JS-walled) | closed |
+| G-r2 | Actions/form-actions primary docs | **CLOSED 2026-08-22**: react.dev /reference/react/useActionState + /reference/react-dom/components/form fetched and content-verified | closed |
 
 ## Content authored from this digestion
 - v90 Track B AUTHORED (one addition): compiler ship-by-default grounding via two

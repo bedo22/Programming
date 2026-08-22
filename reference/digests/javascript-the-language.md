@@ -104,7 +104,7 @@ Supplementary: none yet — Self-lineage paper for the prototype model → G-js1
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-js0 | leverage-map tier provenance | doc-native synthesis from own failure-modes table | accepted authored framework |
-| G-js1 | Self-language lineage of prototype model | paper unlocated this pass | fetch next touch |
+| G-js1 | Self-language lineage of prototype model | **CLOSED 2026-08-22**: _debt-harvest/self-language.html verified (prototype-based; ECOOP'96 Prototype-Based Languages ref) | closed |
 | G-js2 | engine market-share figures | volatile; hedged in-text | convention-tier |
 
 ## Content authored from this digestion

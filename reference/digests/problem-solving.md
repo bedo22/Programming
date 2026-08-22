@@ -106,7 +106,7 @@ dedicated seed needed).
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-ps1 | leverage-map provenance | tiers derived from seeds + own catalogs | accepted authored framework |
-| G-ps2 | Wing 2006 CT paper exact cite | canon known, paper unlocated this pass | fetch next touch |
+| G-ps2 | Wing 2006 CT paper exact cite | **CLOSED 2026-08-22**: cite extracted from existing computational-thinking seed — Wing, J. M. (2006). "Computational thinking." CACM 49(3): 33–35. doi:10.1145/1118178.1118215 (+ CMU PDF mirror) | closed |
 
 ## Content authored from this digestion
 

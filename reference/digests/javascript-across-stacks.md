@@ -71,7 +71,7 @@ raw-seeds/javascript-across-stacks/.
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-jas1 | leverage-map provenance | tiers derived from fetched runtime lineages + own tables | accepted authored framework |
-| G-jas2 | mobile bridge internals deep source | React Native new-architecture docs pending | fetch next touch |
+| G-jas2 | mobile bridge internals deep source | **CLOSED 2026-08-22**: New Architecture overview fetched via Wayback (reactnative.dev stalls light GET) — Fabric/New Architecture terminology verified | closed |
 
 ## Content authored from this digestion
 

@@ -68,8 +68,8 @@ raw-seeds/what-is-state-prequel/.
 
 | id | claim/area | hunts | status |
 |---|---|---|---|
-| G-st1 | Shannon 1948 information-theory seed | canon known, not fetched this pass | fetch next touch |
-| G-st2 | Church lambda-calculus seed | same | fetch next touch |
+| G-st1 | Shannon 1948 information-theory seed | **CLOSED 2026-08-22**: raw-seeds/_debt-harvest/shannon-1948.html fetched+verified ("1948 article by Claude S…") | closed |
+| G-st2 | Church lambda-calculus seed | **CLOSED 2026-08-22**: _debt-harvest/church-lambda.html verified (Alonzo Church, 1930s origin) | closed |
 
 ## Content authored from this digestion
 
