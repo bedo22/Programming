@@ -1,3 +1,40 @@
 {
- "WANT": {}
+ "WANT": {},
+ "FOLDS": [],
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-leverage-map-where-system-design-practice-mass-concentrates",
+   "note": "three evidence-derived tiers authored v105 (Parnas information-hiding / CAP constraint frame / macro-pattern consequences; capacity+data-trades+SLOs learn-when-needed; org-congruence+consensus-internals rare)"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-common-failure-modes"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-system-design-calls-things",
+   "note": "eight terms-of-art block authored v105 (bounded context/idempotency/sharding/eventual consistency/circuit breaker/backpressure/hot key/cache stampede)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-evolution-paradigms-through-one-lens"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-methodologies-heuristics",
+   "note": "'Reach for / Be careful' heuristic tables; twelve-factor + reactive-manifesto grounded"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-capacity-planning-how-to-estimate-load-storage-and-latency",
+   "note": "Little's Law arithmetic present; attribution fetch pending G-sd4 (hedged in-text)"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-design-a-url-shortener",
+   "note": "two worked examples carry the story function; Parnas dead-cite repair documented in digest DEFECTS"
+  },
+  "floor_note": "WAIVER: Track B additions authored as prose patches — v77 pre-UDA deltas (tracked in skill sources.md) + v105 sd-Δ1 vocabulary & sd-Δ2 leverage map; pending-fetch gaps honestly hedged (G-sd2/4/5/6/8)"
+ }
 }

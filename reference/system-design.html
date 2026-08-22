@@ -123,6 +123,58 @@
 
 ---
 
+<h2 id="sec-search-vocabulary-what-system-design-calls-things">Search vocabulary — what system design calls things</h2>
+
+<p>You cannot look up an architecture problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>bounded context</dfn></td>
+      <td>The scope within which a model's terms have one meaning — where "Customer" stops being ambiguous</td>
+      <td>The DDD concept behind most service-boundary debates; without it, "microservice boundaries" searches return blog folklore</td>
+    </tr>
+    <tr>
+      <td><dfn>idempotency</dfn></td>
+      <td>A property of operations: applying them twice has the effect of applying them once</td>
+      <td>The search term for every retry-safety design question at any layer of this doc</td>
+    </tr>
+    <tr>
+      <td><dfn>sharding</dfn></td>
+      <td>Splitting one logical dataset across many nodes by key</td>
+      <td>Distinguishes horizontal-partitioning literature from replication articles when scaling writes</td>
+    </tr>
+    <tr>
+      <td><dfn>eventual consistency</dfn></td>
+      <td>Replicas converge given time without writes in flight — reads may be stale meanwhile</td>
+      <td>The name of the trade Dynamo-style systems sell; unlocks the whole consistency-models literature tree</td>
+    </tr>
+    <tr>
+      <td><dfn>circuit breaker</dfn></td>
+      <td>A client-side guard that fails fast after a dependency degrades, instead of piling up timeouts</td>
+      <td>The standard vocabulary linking reliability patterns to their implementations in libraries</td>
+    </tr>
+    <tr>
+      <td><dfn>backpressure</dfn></td>
+      <td>Propagating downstream slowness upstream as reduced demand, rather than buffering infinitely</td>
+      <td>The word for queue-growth failures that "add more consumers" advice never fixes</td>
+    </tr>
+    <tr>
+      <td><dfn>hot key</dfn></td>
+      <td>A single partition key receiving disproportionate traffic, defeating even distribution</td>
+      <td>The precise term for "one shard is overloaded while others idle" — generic load queries miss it</td>
+    </tr>
+    <tr>
+      <td><dfn>cache stampede</dfn></td>
+      <td>Many simultaneous requests rebuilding one expired entry, hammering the origin together</td>
+      <td>Names the failure behind most "cache made it slower" incidents; a.k.a. dogpile/thundering herd in older posts</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-history-from-flowcharts-to-distributed-systems">History — from flowcharts to distributed systems</h2>
 
 <table>
@@ -483,6 +535,63 @@
 <p>These models are not checklists — they are <em>lenses</em>. An architect switches lenses per decision: Context Map for boundaries, Consistency Budget for data, Failure Domain for resilience, Latency Curve for capacity, Reversibility for commitments, Trust Boundary for security.</p>
 
 ---
+
+<h2 id="sec-leverage-map-where-system-design-practice-mass-concentrates">The leverage map — where system design practice mass concentrates</h2>
+
+<p>Twenty-four sections of architecture are not equally load-bearing. These tiers derive from this doc's own grounded sources — Parnas's criteria (fetched PDF), Gilbert &amp; Lynch's CAP proof, Fowler's microservices article, the twelve-factor and reactive-manifesto texts, Amazon's Dynamo paper, and the SRE book's SLO chapter — not from vibes. Working default: tier one shapes every design you draw; tier two enters when its situation appears; tier three is depth you add when the system earns it.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>Information hiding as the unit of decomposition — modules own the decisions likely to change</td>
+      <td>Parnas's criterion predates every buzzword on this shelf and still decides whether boundaries age well; most "wrong service split" stories are this principle violated</td>
+      <td>Parnas criteria PDF (fetched, extracted; repaired cite)</td>
+    </tr>
+    <tr>
+      <td>CAP as constraint frame — pick the trade per subsystem, never "all three"</td>
+      <td>The proof forbids CP+AP; internalizing it converts consistency debates from ideology into per-flow decisions</td>
+      <td>Gilbert &amp; Lynch (digested cross-doc key)</td>
+    </tr>
+    <tr>
+      <td>Macro-pattern consequences literacy — what monolith vs services costs in deploys, data, teams</td>
+      <td>"Independently deployable suites" is a trade, not an upgrade; knowing the price list prevents cargo-cult splits</td>
+      <td>Fowler microservices article (fetched)</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Learn when needed</strong></td>
+      <td>Capacity arithmetic — load, storage, latency budgets before hardware choices</td>
+      <td>Formulas are standard (Little's Law attribution → G-sd4); the skill is applying them to YOUR numbers, not memorizing them</td>
+      <td>Capacity-planning section (hedged conventions, G-sd4 open)</td>
+    </tr>
+    <tr>
+      <td>Data-layer trades — sharding keys, replication lag tolerance, evolution plans</td>
+      <td>Dynamo's eventual-consistency bargain only pays when read patterns tolerate staleness; the key choice outlives every framework</td>
+      <td>Amazon Dynamo post (digested); data-architecture section</td>
+    </tr>
+    <tr>
+      <td>Reliability targets — SLOs, degradation modes, recovery paths</td>
+      <td>Systems fail; designed systems choose how. Error budgets connect here to observability practice</td>
+      <td>SRE SLO chapter (cross-doc key); reliability section</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>Org-congruence design — team topologies shaping architecture (and back)</td>
+      <td>Pays at org scale; below ~two teams it is theory overhead</td>
+      <td>Team Topologies (partial extraction); Conway-adjacent rows</td>
+    </tr>
+    <tr>
+      <td>Formal consensus internals + DDD strategic depth</td>
+      <td>Paxos-class protocols and bounded-context cataloging earn their cost only at genuine scale/corner-case pressure</td>
+      <td>Hedged — Paxos fetch pending (G-sd2); DDD canon cites (G-sd7)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
 
 <h2 id="sec-architectural-layer-macro-patterns-with-consequences">Architectural layer (macro) — patterns with consequences</h2>
 

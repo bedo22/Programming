@@ -32,6 +32,7 @@ Supplementary fetched: c4model.com; parnas replacement PDF (extracted).
 | doc section | covered by | note |
 |---|---|---|
 | #sec-how-to-use-this-doc | n/a navigation | exempt |
+| #sec-search-vocabulary-what-system-design-calls-things | sd-Δ1 terms-of-art block (bounded context/idempotency/sharding/eventual consistency/circuit breaker/backpressure/hot key/cache stampede) | added v105; grounded in doc's own usage |
 | #sec-definition-what-system-design-is-and-what-it-is-not | fowler-microservices-article ("no precise definition… suites of independently deployable services") | |
 | #sec-history-from-flowcharts-to-distributed-systems | twelve-factor-app · reactive-manifesto · fowler-microservices-article | book rows (GoF/Tanenbaum) = canon cites, skipped |
 | #sec-evolution-paradigms-through-one-lens | fowler-microservices-article | pattern synthesis doc-native |
@@ -39,6 +40,7 @@ Supplementary fetched: c4model.com; parnas replacement PDF (extracted).
 | #sec-intersection-with-neighbors | n/a shelf-internal | exempt |
 | #sec-underlying-theory-what-makes-a-system-designed-not-assembled | parnas-criteria (information hiding, PDF-extracted) · gilbert-lynch-brewers-conjecture (CAP proof) · lamport-time-clocks (scanned; ordering claims rest on canon summary) | CSP/Amdahl/erasure rows → G-sd2 |
 | #sec-mental-models-how-architects-actually-reason | gap G-sd3 (doc-native lens synthesis) | |
+| #sec-leverage-map-where-system-design-practice-mass-concentrates | sd-Δ2 tiers over this shell's sources (parnas-criteria PDF, Gilbert&Lynch CAP, fowler-microservices, Dynamo, SRE SLO) | added v105; pending-fetch tiers honestly hedged (G-sd2/4/7) |
 | #sec-architectural-layer-macro-patterns-with-consequences | fowler-microservices-article | |
 | #sec-capacity-planning-how-to-estimate-load-storage-and-latency | gap G-sd4 (Little's Law primary unlocated; formulas standard) | |
 | #sec-data-architecture-storage-partitioning-replication-and-evolution | amazon-dynamo-post (eventual-consistency passage) | |
@@ -76,3 +78,9 @@ Supplementary fetched: c4model.com; parnas replacement PDF (extracted).
 
 ## Content authored from this digestion
 - v77 additions predate UDA; grounding migration tracked in skill sources.md.
+- pass v105 (Track B under dispositions7 discipline): sd-Δ1 search-vocabulary block
+  (eight terms of art) after definition EN+AR · sd-Δ2 leverage map (three tiers:
+  information-hiding / CAP-as-constraint / pattern-consequences) after mental-models
+  EN+AR. Dispositions7 block CREATED (all seven types registered PRE with anchors;
+  R19 hedged pending G-sd4 fetch). Pending fetches remain open gaps: G-sd2 (Paxos),
+  G-sd8 (ADR Nygard), G-sd9 (you-build-it), G-sd10 (C4 USENIX).
