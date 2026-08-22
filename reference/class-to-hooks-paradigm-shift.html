@@ -39,6 +39,53 @@
 
 <p>An honesty note: tier boundaries are practitioner judgment, not measurement — testable against your own history: your last ten confusing React bugs almost certainly live in T1 semantics working exactly as specified.</p>
 
+<h2 id="sec-search-vocabulary-what-class-to-hooks-calls-things">Search vocabulary — what the class-to-hooks shift calls things</h2>
+
+<p>You cannot look up a migration problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>lifecycle method</dfn></td>
+      <td>The class-era hooks (<code>componentDidMount</code> and siblings) where side effects and fetches lived</td>
+      <td>The term every legacy codebase search needs — and the translation table's whole left column</td>
+    </tr>
+    <tr>
+      <td><dfn>custom hook</dfn></td>
+      <td>A function named <code>use*</code> composing built-in hooks into reusable logic</td>
+      <td>The standard answer to "how do I share logic without HOCs/render props" — searches without it land on pre-2019 patterns</td>
+    </tr>
+    <tr>
+      <td><dfn>stale closure</dfn></td>
+      <td>A callback capturing old state because its scope snapshot never updated</td>
+      <td>The precise name for the classic "why does my interval see old state" bug — generic closure results won't cover the React-specific variant</td>
+    </tr>
+    <tr>
+      <td><dfn>reconciliation</dfn></td>
+      <td>The engine's diffing pass deciding what re-rendered output actually changes in the DOM</td>
+      <td>Unlocks why keys matter, why component identity breaks, and why rendering is cheap but commit is not</td>
+    </tr>
+    <tr>
+      <td><dfn>memoization</dfn></td>
+      <td>Caching computed values or components to skip work (<code>useMemo</code>/<code>memo</code>)</td>
+      <td>The pivot term between hand-optimization habits and compiler-era defaults this doc tracks</td>
+    </tr>
+    <tr>
+      <td><dfn>controlled component</dfn></td>
+      <td>A form input whose value is driven by React state rather than the DOM</td>
+      <td>The term separating form-library debates from uncontrolled-input documentation; predates and survives Actions</td>
+    </tr>
+    <tr>
+      <td><dfn>this binding</dfn></td>
+      <td>How <code>this</code> is determined at call sites — the class era's central trap</td>
+      <td>The search phrase behind most "method is undefined / state lost" legacy bugs, and the reason arrow methods became convention</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-before-the-classes-a-word-on-foundations">Before the classes: a word on foundations</h2>
 
 <p>This section used to hold a deep prequel on programming primitives, the four theories of computation (Turing machine, lambda calculus, von Neumann architecture, information theory), the data→value→variable→state chain, types, and lifetime. That prequel now lives in its own reference doc — <a href="./what-is-state-prequel.html">What Is "State"? — A Prequel to Programming in React</a> — and the JavaScript language foundation (history, design, runtime model) lives in <a href="./javascript-the-language.html">JavaScript: The Language</a>. Read both if the phrase "Turing's state register is the same concept as <code>useState</code>" doesn't feel immediately obvious.</p>
@@ -267,6 +314,8 @@ function Counter() {
 
 <h2 id="sec-the-four-eras-a-timeline">The four eras — a timeline</h2>
 
+<p>Before era 1 there was the pre-history: Jordan Walke, a software engineer at Facebook, built the prototype that became React (named <em>FaxJS</em> by the time it ran on Facebook's news feed), and the team announced it publicly in May 2013. Every era below is downstream of one internal tool's escape.</p>
+
 <table>
   <thead><tr><th>Era</th><th>Years</th><th>Style</th><th>State?</th><th>Side effects?</th></tr></thead>
   <tbody>
@@ -480,6 +529,8 @@ const EnhancedComponent = withAuth(withTheme(withRouter(MyComponent)));
 <h2 id="sec-era-3-hooks-2018-making-functions-first-class">Era 3 — Hooks (2018): making functions first-class</h2>
 
 <p>Hooks shipped in React 16.8 (February 2019). The name is literal: a hook <em>hooks into</em> React's features (state, effects, context, refs) from inside a function. The function is no longer stateless — it just delegates its state to React via a hook call.</p>
+
+<p>The team's own founding rationale survives verbatim in the introduction that shipped with hooks: "<strong>Classes confuse both people and machines</strong>", and class components were "a barrier to learning React" — you had to understand <code>this</code>, bindings, and lifecycle ordering just to share logic. The adoption argument was equally deliberate: hooks were pitched under "No Breaking Changes" — the entire class era keeps running unchanged; functions simply became first-class beside it. That is why this doc reads eras as strata, not replacements.</p>
 
 <pre><code>function Counter() {
   const [count, setCount] = useState(0);     <span class="comment-line">// ask React for a state slot</span>

@@ -1,5 +1,41 @@
 {
  "WANT": {},
  "FOLDS": [],
- "_note": "De-numbered in improve-doc pass v63 (2026-08-21): all positional numeral refs replaced by named anchor links, both twins."
+ "_note": "De-numbered in improve-doc pass v63 (2026-08-21): all positional numeral refs replaced by named anchor links, both twins.",
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-the-leverage-map-where-the-work-concentrates",
+   "note": "v1.2-era section already in tier format; doc-native synthesis (G-ch1 accepted)"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-failure-modes-when-modern-react-just-doesn-t-work"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-class-to-hooks-calls-things",
+   "note": "seven terms-of-art block authored v107 (lifecycle method/custom hook/stale closure/reconciliation/memoization/controlled component/this binding)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-why-not-just-use-functional-programming-without-hooks"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-state-design-where-state-should-live",
+   "note": "decision tables; lifecycle-to-hooks translation table supports"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-the-four-eras-a-timeline",
+   "note": "era dates grounded v107 (FaxJS/May 2013/16.8 Feb 2019)"
+  },
+  "R20": {
+   "status": "ADD",
+   "delta": "ch-Δ1",
+   "note": "pre-history paragraph (Walke/FaxJS/news-feed → May 2013) added v107 to four-eras EN+AR; ch-Δ2 verbatim motivation quotes into era-3"
+  },
+  "floor_note": "WAIVER: three prose-patch additions on record — ch-Δ1 pre-history + ch-Δ2 verbatim quotes + ch-Δ3 vocabulary block (all v106-107); Wave-1 alumni rule: fresh Track B satisfied"
+ }
 }
