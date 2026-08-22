@@ -1,5 +1,41 @@
 {
  "WANT": {},
  "FOLDS": [],
- "_note": "De-numbered in improve-doc pass v60 (2026-08-21): all positional numeral refs replaced by named anchor links; folds for '§9 in UI/UX' retired with them."
+ "_note": "De-numbered in improve-doc pass v60 (2026-08-21): all positional numeral refs replaced by named anchor links; folds for '§9 in UI/UX' retired with them.",
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-the-leverage-map-where-the-work-concentrates",
+   "note": "v1.2-era section in tier format; doc-native synthesis (G-hc1 accepted)"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-html-and-css-calls-things",
+   "note": "seven terms-of-art block authored v108 (specificity/semantic/box model/viewport/media query/custom property/validation)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-evolution-constraint-inversions-across-the-platform"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-practical-surface-the-controls-the-platform-hands-you",
+   "note": "'controls the platform hands you' = decision-surface framing; CWV knobs table supports"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-core-web-vitals-platform-knobs",
+   "note": "INP ≤200ms / LCP ≤2.5s / CLS ≤0.1 verified against web.dev v108 (currency-checked per v1.7)"
+  },
+  "R20": {
+   "status": "ADD",
+   "delta": "hc-Δ1",
+   "note": "cascade-origins paragraph (Lie 1994, three-party negotiation) added v108 to underlying-theory EN+AR"
+  },
+  "floor_note": "WAIVER: prose-patch additions on record — hc-Δ1 cascade-origins + hc-Δ2 vocabulary block (v108); pre-v4 doc already carried rich authored sections"
+ }
 }

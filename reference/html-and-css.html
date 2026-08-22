@@ -61,6 +61,53 @@
 <p>An honesty note: the tier boundaries are practitioner judgment, not measurement — but the ordering claim is testable against your own backlog. Count the last ten CSS bugs you fixed: most will trace to T1 primitives misused, not T3 features missing.</p>
 
 ---
+<h2 id="sec-search-vocabulary-what-html-and-css-calls-things">Search vocabulary — what HTML &amp; CSS calls things</h2>
+
+<p>You cannot look up a platform problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>specificity</dfn></td>
+      <td>The scoring that decides which rule wins when several target the same element</td>
+      <td>The word that turns "my CSS isn't applying" from mystery into arithmetic; pairs with cascade origins</td>
+    </tr>
+    <tr>
+      <td><dfn>semantic</dfn></td>
+      <td>Markup chosen for meaning (<code>article</code>, <code>nav</code>) rather than default styling</td>
+      <td>The term of art for accessibility- and SEO-oriented markup debates — "meaningful tags" finds nothing</td>
+    </tr>
+    <tr>
+      <td><dfn>box model</dfn></td>
+      <td>content + padding + border + margin as the layout arithmetic every element runs</td>
+      <td>The search phrase behind most sizing surprises, and the reason <code>box-sizing: border-box</code> is universal</td>
+    </tr>
+    <tr>
+      <td><dfn>viewport</dfn></td>
+      <td>The visible window onto the page — and the meta tag that defines it on mobile</td>
+      <td>Distinguishes responsive-design discussions from desktop-only ones; missing viewport meta is its own failure class</td>
+    </tr>
+    <tr>
+      <td><dfn>media query</dfn></td>
+      <td>Conditional CSS keyed on device traits (width, preference, capability)</td>
+      <td>The gateway term to every responsive pattern; also how dark-mode and reduced-motion support are keyed</td>
+    </tr>
+    <tr>
+      <td><dfn>custom property</dfn></td>
+      <td>CSS variables (<code>--name</code>) resolved through inheritance and the cascade</td>
+      <td>The modern theming vocabulary — design-token articles assume it; older "CSS variables" results predate the spec</td>
+    </tr>
+    <tr>
+      <td><dfn>validation</dfn></td>
+      <td>The platform's built-in form checking (required, type, pattern) before any JS runs</td>
+      <td>The term separating free constraint validation from framework form libraries re-implementing it</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-definition-what-html-css-is-and-what-it-is-not">Definition — what HTML & CSS <em>is</em> and what it is <em>not</em></h2>
 
 <h3>What it is</h3>
@@ -230,6 +277,8 @@
 
 ---
 <h2 id="sec-underlying-theory-the-algorithms-the-platform-runs">Underlying theory — the algorithms the platform runs</h2>
+
+<p>One design decision makes every algorithm in this table socially possible: the cascade resolves conflicts across <em>origins</em> — user-agent styles, user styles, and author styles — in that order of increasing specificity. Håkon Wium Lie's 1994 proposal was radical precisely because it let three parties who never meet (browser vendor, user, page author) negotiate the same pixel without anyone winning outright. When you debug "why didn't my style apply," you are walking this origins ladder, not fighting a bug.</p>
 
 <table>
   <thead><tr><th>Theory / Algorithm</th><th>Spec / Origin</th><th>What the platform does with it</th></tr></thead>
