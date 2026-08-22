@@ -146,12 +146,14 @@ martinfowler.com/eaaDev/TimeClock.html.
 |---|---|---|
 | #sec-how-to-use-this-doc | n/a — navigation, no factual claims | matrix-exempt |
 | #sec-definition-what-api-design-is-and-what-it-is-not | Fielding (contract concept); OpenAPI spec (description vs design) | |
+| #sec-search-vocabulary-what-api-design-calls-things | api-Δ5 terms-of-art block (idempotency key/endpoint/cursor pagination/breaking change/rate limiting/problem details/HATEOAS) | added v102; grounded in doc's own usage + RFC 9457 record |
 | #sec-history-from-rpc-to-graphql-to-events | Fielding; RMM/Fowler; grpc.com; graphql.org | dates verified |
 | #sec-evolution-constraint-inversions-across-the-same-idea | synthesis of fetched histories | pattern-level, no new facts |
 | #sec-migration-paths-between-api-styles | gap → see Gaps G1 | practitioner timelines |
 | #sec-intersection-with-neighbors-where-it-borders-other-practices | n/a — shelf-internal relations | matrix-exempt |
 | #sec-underlying-theory-what-makes-a-contract-designed-not-accidental | Fielding; RFC791; RMM; Lamport; Dynamo/CAP | CSP+ISP rows → Gaps G2 |
 | #sec-mental-models-how-api-designers-actually-reason | RFC9457; Lamport; OpenAPI | media-type versioning → G3 |
+| #sec-leverage-map-where-api-design-practice-mass-concentrates | api-Δ6 tiers over this shell's sources (fielding-rest, spec family, RFC 9457, Gilbert&Lynch, RMM) | added v102; async/AI tiers reference digested records honestly |
 | #sec-the-rhythm-not-the-algorithm | n/a — shelf-doctrine framing | matrix-exempt |
 | #sec-methodologies-styles-the-named-approaches | Fielding/RMM; graphql.org; grpc.com; AsyncAPI→G4 | |
 | #sec-principles-the-shared-constants | RFC9457; W3C Trace Context→G5 | |
@@ -199,3 +201,9 @@ in-text or get † when a specific number/fact stays unlocated after 3 hunts.
   "diagnostic, not prescription"; tension recorded above) · Δ5 (clinic progression —
   doc has a full worked example; adding a second would duplicate R8/R13 coverage) ·
   Δ7 (RFC 9457 credit-card example — worked example's error envelope already serves).
+- pass v102 (Phase-1 backfill): api-Δ5 search-vocabulary block (seven terms of art)
+  after the definition section, EN+AR · api-Δ6 leverage map (three master-first tiers:
+  resource-first modeling / convention discipline / idempotency keys; evolution matrix
+  + style selection + Problem Details as learn-when-needed; async surfaces + AI-safe
+  tools as rare specialist) after mental-models, EN+AR. Dispositions7 R14 MISSING→PRE
+  and R16 THIN→PRE.

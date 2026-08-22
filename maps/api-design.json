@@ -12,8 +12,9 @@
  },
  "dispositions7": {
   "R14": {
-   "status": "MISSING",
-   "note": "no master-first tiers anywhere; ledger SKIP conflated R15's diagnostic function with leverage — backfill required"
+   "status": "PRE",
+   "anchor": "#sec-leverage-map-where-api-design-practice-mass-concentrates",
+   "note": "three evidence-derived tiers authored v102 from the doc's own grounded sources (fielding-rest, OpenAPI/AsyncAPI/CloudEvents spec family, RFC 9457, Gilbert&Lynch, richardson-maturity)"
   },
   "R15": {
    "status": "PRE",
@@ -21,9 +22,9 @@
    "note": "T19 failure-mode/what-it-looks-like/why table verified 2026-08-22"
   },
   "R16": {
-   "status": "THIN",
-   "anchor": "#sec-definition-what-api-design-is-and-what-it-is-not",
-   "note": "only 'Confused with' disambiguation; no terms-of-art block; glossary owns shared terms — backfill candidate"
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-api-design-calls-things",
+   "note": "seven terms-of-art block authored v102 (idempotency key/endpoint/cursor pagination/breaking change/rate limiting/problem details/HATEOAS); glossary still owns cross-discipline terms"
   },
   "R17": {
    "status": "PRE",

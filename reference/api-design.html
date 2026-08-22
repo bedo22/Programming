@@ -105,6 +105,53 @@
 
 ---
 
+<h2 id="sec-search-vocabulary-what-api-design-calls-things">Search vocabulary — what API design calls things</h2>
+
+<p>You cannot look up a contract problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>idempotency key</dfn></td>
+      <td>A client-supplied token letting a server deduplicate repeated writes — the retry-safety mechanism</td>
+      <td>The standard answer to "what happens when the network retries my POST for me?"</td>
+    </tr>
+    <tr>
+      <td><dfn>endpoint</dfn></td>
+      <td>One addressable verb+path pair on the contract surface</td>
+      <td>The unit most style debates, docs, and rate limits are actually about</td>
+    </tr>
+    <tr>
+      <td><dfn>cursor pagination</dfn></td>
+      <td>Page-by-opaque-token traversal instead of page-number arithmetic</td>
+      <td>The fix for the classic offset-pagination failure (rows shifting under the reader); searching "pagination" alone finds the broken pattern first</td>
+    </tr>
+    <tr>
+      <td><dfn>breaking change</dfn></td>
+      <td>Any contract edit that can fail an existing client — removals, renames, semantic shifts</td>
+      <td>The trigger concept for versioning policy and compatibility matrices; every provider's docs organize around it</td>
+    </tr>
+    <tr>
+      <td><dfn>rate limiting</dfn></td>
+      <td>Capping request rates per client — with headers that tell the client where it stands</td>
+      <td>The shared vocabulary between API providers and client-side backoff implementations</td>
+    </tr>
+    <tr>
+      <td><dfn>problem details</dfn></td>
+      <td>A standardized error-payload shape (RFC 9457) so machines can read failures, not just humans</td>
+      <td>The term of art for "errors as contracts" — without it you reinvent error formats per endpoint</td>
+    </tr>
+    <tr>
+      <td><dfn>hypermedia / HATEOAS</dfn></td>
+      <td>Responses carrying the links to permissible next steps, not just data</td>
+      <td>The name for the constraint most REST conversations gesture at but rarely implement; knowing it unlocks the maturity-model literature</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-history-from-rpc-to-graphql-to-events">History — from RPC to GraphQL to events</h2>
 
 <table>
@@ -413,6 +460,63 @@
 <p><strong>Anti-pattern:</strong> Writing the OpenAPI file after the code ships. The schema is the contract — if it's generated from implementation, the implementation <em>is</em> the contract, and you've lost the ability to design it.</p>
 
 ---
+
+<h2 id="sec-leverage-map-where-api-design-practice-mass-concentrates">The leverage map — where API design practice mass concentrates</h2>
+
+<p>Twenty-five sections of contract theory are not equally load-bearing. These tiers derive from this doc's own grounded sources — Fielding's REST constraints, the OpenAPI/AsyncAPI/CloudEvents specification family, Postel's RFC 791, the Problem Details RFC, Gilbert &amp; Lynch on what consistency can and cannot promise — not from vibes. Working default: tier one shapes every endpoint you ship; tier two enters when its situation appears; tier three is architecture you choose, not habit you keep.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>Resource-first modeling — contracts shaped around nouns and their state transitions, not remote actions</td>
+      <td>The RPC-shaped failure mode (verbing nouns) is this doc's most common one because it is where most real contracts go wrong</td>
+      <td>Fielding's REST constraints (source key <code>fielding-rest</code>); failure-modes table</td>
+    </tr>
+    <tr>
+      <td>Convention discipline — pagination/filtering/sorting defaults, stated once and kept everywhere</td>
+      <td>Every collection endpoint reuses the same decisions; predictability is what makes a contract feel designed rather than accidental</td>
+      <td>This doc's conventions table (T9: Convention → Recommendation)</td>
+    </tr>
+    <tr>
+      <td>Idempotency keys on mutations</td>
+      <td>The retry-safety line between "network blip" and "duplicate shipment" — cheap to add, expensive to retrofit</td>
+      <td>Failure-modes table (retries corrupt row); validation-and-transactional-safety section</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Learn when needed</strong></td>
+      <td>Schema-evolution rules — breaking vs additive changes, and the compatibility matrix that tracks them</td>
+      <td>Contracts outlive any single deployment; the matrix is how multi-client reality gets managed without heroics</td>
+      <td>This doc's schema-evolution section; versioning conventions rows</td>
+    </tr>
+    <tr>
+      <td>Style selection per use case — REST/JSON vs Protobuf vs GraphQL ("use when" tables)</td>
+      <td>No style wins globally; the skill is matching interaction pattern to style constraints and knowing the trade you made</td>
+      <td>Methodologies-styles tables; GraphQL FAQ + gRPC intro records (digested)</td>
+    </tr>
+    <tr>
+      <td>Problem Details error contracts (RFC 9457)</td>
+      <td>Machines read failures only when failures have a shape; ad-hoc errors push parsing into every client</td>
+      <td>RFC 9457 record (source key <code>rfc9457-problem-details</code>)</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>Event/async contract surfaces — AsyncAPI documents, CloudEvents envelopes</td>
+      <td>Pays once interactions decouple in time; before that it is ceremony on top of request/response reality</td>
+      <td>AsyncAPI 2.6 + CloudEvents 1.0.2 records (digested)</td>
+    </tr>
+    <tr>
+      <td>AI-safe tool contracts + maturity-model depth lenses</td>
+      <td>Emerging consumer class (agents calling APIs) and Richardson's ladder as a gauge — context for strategy talks, not daily design</td>
+      <td>This doc's AI-safe-tool section (doc-native); richardson-maturity-model key</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
 
 <h2 id="sec-the-rhythm-not-the-algorithm">The rhythm, not the algorithm</h2>
 
