@@ -108,17 +108,24 @@ already handled). Their Track B is fresh: author from THIS doc's extraction delt
 minimum two substantive additions per the normal rule. Prior template-era additions
 (vocabulary blocks, teacher sections, markers) are existing content — swept and
 verified during A like everything else; they do NOT count toward B's minimum.
-1 api-design ✅(pilot — the only completed A+B) · 2 how-developers-think-frontend ·
-3 software-testing-and-debugging · 4 system-design · 5 javascript-the-language ·
-6 class-to-hooks-paradigm-shift · 7 html-and-css · 8 what-is-state-prequel ·
-9 ui-ux-web-design · 10 javascript-across-stacks
+1 api-design ✅v79 (full A+B pilot) · 2 how-developers-think-frontend ✅v80 (A+B) ·
+3 software-testing-and-debugging ✅v81 (A+B) · 4 system-design 🔶 Track A done v88-89,
+Track B pending · 5 javascript-the-language · 6 class-to-hooks-paradigm-shift ·
+7 html-and-css · 8 what-is-state-prequel · 9 ui-ux-web-design ·
+10 javascript-across-stacks
+
+Wave 1.5 KEY HARVEST — ✅ COMPLETE (v86–v89): ~27 source keys in reference/sources/;
+remaining deep-reads: lamport/brewer formal proofs (scans), team-topologies extraction.
+Migration debt tracker lives in skill sources.md.
 
 Wave 2 — high-deficiency, full A+B:
-11 react-2024-and-beyond ✅v90 · 12 observability-and-operations ✅v91-92 ·
+11 react-2024-and-beyond ✅v90 (full A+B) · 12 observability-and-operations ✅v91–92
+(full A+B; 174 refs de-numbered, 41 nested-anchor pairs repaired) ·
 13 income-stream-landscape ⚠️RECLASSIFIED: interactive personal worksheet
 (localStorage cells s0–s3), not a reference doc — light factual Track A only,
-user data OFF-LIMITS, flagged for async review · 14 problem-solving ·
-15 cs-and-software-engineering ·
+user data OFF-LIMITS, flagged for async review ·
+14 problem-solving 🔶 seeds fetched (10/10 warm in /tmp/digest-sources/ps),
+digest+matrix+Track B next session · 15 cs-and-software-engineering ·
 16 version-control-ci-cd-deployment · 17 software-development-process ·
 18 data-modeling-and-databases · 19 sql-and-postgresql · 20 security-and-threat-modeling
 
