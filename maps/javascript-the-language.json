@@ -1,5 +1,42 @@
 {
  "WANT": {},
  "FOLDS": [],
- "_note": "De-numbered in improve-doc pass v62 (2026-08-21): all positional numeral refs replaced by named anchor links, both twins."
+ "_note": "De-numbered in improve-doc pass v62 (2026-08-21): all positional numeral refs replaced by named anchor links, both twins.",
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-the-leverage-map-where-the-work-concentrates",
+   "note": "v1.2-era section already in current three-tier T1/T2/T3 format; tiers derived from doc's own failure-modes table (doc-native synthesis, G-js0 accepted)"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-failure-modes-where-the-model-breaks-in-practice"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-javascript-calls-things",
+   "note": "seven terms-of-art block authored v106 (closure/hoisting/prototype chain/type coercion/event loop/microtask/strict mode)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-the-design-first-class-functions-closures-the-lambda-calculus-heart",
+   "note": "lambda-calculus/Scheme lineage section carries inversion content (class-syntax vs prototype reality)"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-principles-the-design-bets-that-survive-every-change",
+   "note": "design-bets framing = decision points with defaults"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-standardization-ecmascript-tc39-the-es6-2015-tipping-point",
+   "note": "ES6 2015 + annual cadence dates; engine-share figures hedged per currency convention v1.7"
+  },
+  "R20": {
+   "status": "ADD",
+   "delta": "js-Δ1",
+   "note": "ten-days sourcing note + Dec 4 1995 announcement date added v106 to the founding section EN+AR (prose patch, grounded in wiki-brendan-eich + wiki-javascript seeds)"
+  },
+  "floor_note": "WAIVER: prose-patch additions on record — js-Δ1/Δ2 history grounding + js-Δ3 vocabulary block (all v106); pre-v4 doc already carried rich authored sections (leverage map, principles)"
+ }
 }

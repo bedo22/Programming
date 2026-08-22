@@ -43,9 +43,58 @@
 
 <p>An honesty note: the tier boundaries are practitioner judgment, not measurement — but testable the same way as any leverage claim: audit your last ten confusing JS bugs; most will live in T1 semantics working exactly as specified.</p>
 
+<h2 id="sec-search-vocabulary-what-javascript-calls-things">Search vocabulary — what JavaScript calls things</h2>
+
+<p>You cannot look up a language problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>closure</dfn></td>
+      <td>A function that keeps access to the scope where it was defined, even after that scope has returned</td>
+      <td>The single most load-bearing word in JS search queries — callbacks, hooks, module patterns, and half the interview questions all resolve through it</td>
+    </tr>
+    <tr>
+      <td><dfn>hoisting</dfn></td>
+      <td>Declarations being processed before code runs — why <code>var</code> reads as <code>undefined</code> and <code>let</code> throws</td>
+      <td>The name for "why can I call this before defining it"; without the term you're searching symptoms, not causes</td>
+    </tr>
+    <tr>
+      <td><dfn>prototype chain</dfn></td>
+      <td>The linked series of objects consulted when a property lookup misses</td>
+      <td>Distinguishes inheritance-model discussions from class-syntax tutorials; the mechanism predates and outlives the <code>class</code> keyword</td>
+    </tr>
+    <tr>
+      <td><dfn>type coercion</dfn></td>
+      <td>Automatic conversion between types — the machinery behind <code>==</code>'s surprises</td>
+      <td>The term that separates "JavaScript is broken" posts from the actual spec rules; pairs with the <code>===</code> habit this doc teaches</td>
+    </tr>
+    <tr>
+      <td><dfn>event loop</dfn></td>
+      <td>The scheduler draining the microtask queue then macrotask queue between stack frames</td>
+      <td>The umbrella term for all async-ordering searches — setTimeout races, promise ordering, render timing</td>
+    </tr>
+    <tr>
+      <td><dfn>microtask</dfn></td>
+      <td>A queued unit (promise callbacks) that drains completely before the next macrotask</td>
+      <td>The precise word when "why did my promise run before my timeout" needs an answer; generic async searches bury it</td>
+    </tr>
+    <tr>
+      <td><dfn>strict mode</dfn></td>
+      <td>The opt-in (<code>'use strict'</code>) semantics converting silent failures into thrown errors</td>
+      <td>The key to a whole class of legacy-vs-modern behavior differences — and mandatory inside ES modules</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-the-10-days-in-may-1995">The 10 days in May 1995</h2>
 
 <p>May 1995. Netscape Navigator 1.1 ships. The web is static HTML. Marc Andreessen wants the browser to be programmable — not just display documents, but react to the user. He tasks Brendan Eich, a 34-year-old systems programmer who joined Netscape that April, with building a scripting language for the browser. Constraints: must run in the browser, must be easy for non-programmers (designers, HTML authors), must ship in Netscape 2.0 by September.</p>
+
+<p>Two dates anchor what follows. The "ten days" of this section's title is Eich's own recollection — he completed the first working version in ten days to accommodate Netscape's schedule (recorded in biographical coverage; treat it as the founding anecdote it is, not an engineering estimate). And on December 4, 1995, Sun and Netscape jointly announced JavaScript — the rename from LiveScript being part of the Java-cross-marketing bargain that section covers next.</p>
 
 <p>Eich has 10 days to produce a working prototype. He draws on two lineages:</p>
 
