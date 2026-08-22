@@ -36,3 +36,4 @@ Apply the plan to finish all waves
 - 2026-08-22: v118 — TWIN RECONCILIATION GROUP 2 + FULL-SHELF CERTIFICATION: frontend-camps (EN gained camp E/F triples) and payments (preamble h3→strong-lead) to ALL PASSED; sweep certifies 41/41 twins green shelf-wide. NEXT: income-stream-landscape content upgrade per user directive.
 - 2026-08-22: v119 — INCOME-STREAM CONTENT UPGRADE (user directive): is-Δ1 sourced ground-rules block both twins; 4 canon seeds verified; user cells untouched; gates exit 0 ×3. GOAL SCOPE COMPLETE: 6/6 failing twins reconciled + worksheet upgraded.
 - 2026-08-22: v120 — DIGEST CAMPAIGN BATCH 1: shells for frontend-camps-survey, angular-evolution, payments-and-commerce; coverage ×3 + content-types ×3 all exit 0. 23 docs remain.
+- 2026-08-22: v121 — DIGEST CAMPAIGN BATCH 2: cs/swdp/version-control shells + boards; URL-regex paren bug fixed via gate; vc map bootstrapped. 20 docs remain.

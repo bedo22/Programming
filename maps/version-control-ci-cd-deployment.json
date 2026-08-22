@@ -1,0 +1,37 @@
+{
+ "WANT": {},
+ "FOLDS": [],
+ "_note": "bootstrapped v120 digest campaign",
+ "dispositions7": {
+  "R14": {
+   "status": "SKIP",
+   "note": "tooling landscape volatile; doc teaches invariants (DAG, atomic commits)"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "git vocabulary owned by Pro Git canon + glossary"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-history-from-file-locking-to-git-and-the-distributed-pull-request-2005present"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-principles-the-shared-constants",
+   "note": "workflow-choice guidance lives in principles/branching sections"
+  },
+  "R19": {
+   "status": "SKIP",
+   "note": "no quantitative floors asserted; DORA metrics pointer only"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-branching-strategies-how-teams-share-the-dag"
+  },
+  "floor_note": "WAIVER: v117 DORA metrics block restored + nav repoints = this pass's sync record; justified N/A additions per SHELF-DONE rule"
+ }
+}
