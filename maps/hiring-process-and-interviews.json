@@ -1,56 +1,91 @@
 {
-  "WANT": {
-    "1": "sec-the-resume-the-application-the-signal-gate",
-    "2": "sec-the-cover-letter-the-application-package",
-    "3": "sec-the-screening-call-the-technical-screen",
-    "4": "sec-the-remote-async-interview-time-zones-recorded-rounds-english",
-    "5": "sec-the-hr-behavioral-interview-the-messy-questions",
-    "6": "sec-the-system-design-round",
-    "7": "sec-panel-rounds-culture-fit-the-reference-check",
-    "9": "sec-questions-to-ask-them-the-two-way-interview",
-    "10": "sec-the-offer-negotiation-and-onboarding",
-    "11": "sec-multiple-offers-counter-offers-rejection"
-  },
-  "FOLDS": [
-    [
-      "<a href=\"./frontend-income-markets.html\">Frontend Income Markets</a> §Caveats",
-      "<a href=\"./frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets\">Frontend Income Markets §Caveats</a>"
-    ],
-    [
-      "<a href=\"./freelance-web-practice.html\">Freelance Web Practice</a> §Portfolio",
-      "<a href=\"./freelance-web-practice.html#sec-marketing-and-reporting-nobody-visits-to-40-inquiries\">Freelance Web Practice §Portfolio</a>"
-    ],
-    [
-      "<a href=\"./problem-solving.html\">Problem-Solving</a> §Pólya's four phases",
-      "<a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">Problem-Solving §Pólya's four phases</a>"
-    ],
-    [
-      "<a href=\"./freelance-web-practice.html\">Freelance Web Practice</a> §Scoping",
-      "<a href=\"./freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost\">Freelance Web Practice §Scoping</a>"
-    ],
-    [
-      "<a href=\"./system-design.html\">System Design</a> §The discipline",
-      "<a href=\"./system-design.html#sec-definition-what-system-design-is-and-what-it-is-not\">System Design §The discipline</a>"
-    ],
-    [
-      "<a href=\"../frontend-income-markets.html\">أسواق دخل الواجهة الأمامية</a> §Caveats",
-      "<a href=\"../frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets\">أسواق دخل الواجهة الأمامية §Caveats</a>"
-    ],
-    [
-      "<a href=\"../freelance-web-practice.html\">ممارسة العمل الحر على الويب</a> §Portfolio",
-      "<a href=\"../freelance-web-practice.html#sec-marketing-and-reporting-nobody-visits-to-40-inquiries\">ممارسة العمل الحر على الويب §Portfolio</a>"
-    ],
-    [
-      "<a href=\"./problem-solving.html\">حل المشكلات</a> §مراحل بوليا الأربع",
-      "<a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">حل المشكلات §مراحل بوليا الأربع</a>"
-    ],
-    [
-      "<a href=\"../freelance-web-practice.html\">ممارسة العمل الحر على الويب</a> §Scoping",
-      "<a href=\"../freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost\">ممارسة العمل الحر على الويب §Scoping</a>"
-    ],
-    [
-      "<a href=\"./system-design.html\">التصميم المعماري</a> §The discipline",
-      "<a href=\"./system-design.html#sec-definition-what-system-design-is-and-what-it-is-not\">التصميم المعماري §The discipline</a>"
-    ]
+ "WANT": {
+  "1": "sec-the-resume-the-application-the-signal-gate",
+  "2": "sec-the-cover-letter-the-application-package",
+  "3": "sec-the-screening-call-the-technical-screen",
+  "4": "sec-the-remote-async-interview-time-zones-recorded-rounds-english",
+  "5": "sec-the-hr-behavioral-interview-the-messy-questions",
+  "6": "sec-the-system-design-round",
+  "7": "sec-panel-rounds-culture-fit-the-reference-check",
+  "9": "sec-questions-to-ask-them-the-two-way-interview",
+  "10": "sec-the-offer-negotiation-and-onboarding",
+  "11": "sec-multiple-offers-counter-offers-rejection"
+ },
+ "FOLDS": [
+  [
+   "<a href=\"./frontend-income-markets.html\">Frontend Income Markets</a> §Caveats",
+   "<a href=\"./frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets\">Frontend Income Markets §Caveats</a>"
+  ],
+  [
+   "<a href=\"./freelance-web-practice.html\">Freelance Web Practice</a> §Portfolio",
+   "<a href=\"./freelance-web-practice.html#sec-marketing-and-reporting-nobody-visits-to-40-inquiries\">Freelance Web Practice §Portfolio</a>"
+  ],
+  [
+   "<a href=\"./problem-solving.html\">Problem-Solving</a> §Pólya's four phases",
+   "<a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">Problem-Solving §Pólya's four phases</a>"
+  ],
+  [
+   "<a href=\"./freelance-web-practice.html\">Freelance Web Practice</a> §Scoping",
+   "<a href=\"./freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost\">Freelance Web Practice §Scoping</a>"
+  ],
+  [
+   "<a href=\"./system-design.html\">System Design</a> §The discipline",
+   "<a href=\"./system-design.html#sec-definition-what-system-design-is-and-what-it-is-not\">System Design §The discipline</a>"
+  ],
+  [
+   "<a href=\"../frontend-income-markets.html\">أسواق دخل الواجهة الأمامية</a> §Caveats",
+   "<a href=\"../frontend-income-markets.html#sec-local-employment-egypt-and-similar-markets\">أسواق دخل الواجهة الأمامية §Caveats</a>"
+  ],
+  [
+   "<a href=\"../freelance-web-practice.html\">ممارسة العمل الحر على الويب</a> §Portfolio",
+   "<a href=\"../freelance-web-practice.html#sec-marketing-and-reporting-nobody-visits-to-40-inquiries\">ممارسة العمل الحر على الويب §Portfolio</a>"
+  ],
+  [
+   "<a href=\"./problem-solving.html\">حل المشكلات</a> §مراحل بوليا الأربع",
+   "<a href=\"./problem-solving.html#sec-the-universal-meta-rhythm-polya-s-four-phases\">حل المشكلات §مراحل بوليا الأربع</a>"
+  ],
+  [
+   "<a href=\"../freelance-web-practice.html\">ممارسة العمل الحر على الويب</a> §Scoping",
+   "<a href=\"../freelance-web-practice.html#sec-the-scoping-call-where-projects-are-won-or-lost\">ممارسة العمل الحر على الويب §Scoping</a>"
+  ],
+  [
+   "<a href=\"./system-design.html\">التصميم المعماري</a> §The discipline",
+   "<a href=\"./system-design.html#sec-definition-what-system-design-is-and-what-it-is-not\">التصميم المعماري §The discipline</a>"
   ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "SKIP",
+   "note": "no matching section; funnel frames are doc-native teaching with no dedicated mental-models/principles section"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes",
+   "note": "failure-mode section present; multiple-offers section adds rejection-handling support"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "vocabulary owned by shelf glossary per constitution"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-how-hiring-changed-why-the-funnel-looks-like-this",
+   "note": "era-by-era history of why the funnel grew filters"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-the-offer-negotiation-and-onboarding",
+   "note": "accept/decline/counter decision guidance; multiple-offers section extends the choice table"
+  },
+  "R19": {
+   "status": "SKIP",
+   "note": "no metrics/measures/economics section; compensation market numbers owned by income docs"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-one-funnel-end-to-end",
+   "note": "end-to-end funnel worked example; summary checklist closes the doc"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+ }
 }

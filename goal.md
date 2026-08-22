@@ -42,3 +42,4 @@ Apply the plan to finish all waves
 - 2026-08-22: v124 — TAKEOVER of a66ae45b stems after second empty failure: 3 shells built+green inline. Process data point: durable≠reliable; two-strike rule now — one nudge, then parent takeover.
 - 2026-08-22: doctrine fix per user — durable subagents revive on a plain "continue" message; failure notices are pauses. Nudge-first, takeover-last.
 - 2026-08-22: v125 — BATCH 4a: open-source/recurring-fear/security shells via durable subagent (first-iteration green); doctrine fix recorded. 5 remain (bcf162d9).
+- 2026-08-22: v126 — BATCH 4b FINAL: last three shells via revived subagent. DIGEST CAMPAIGN COMPLETE: 42/42 docs carry Track A shells + dispositions7 boards.

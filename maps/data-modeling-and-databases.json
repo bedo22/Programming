@@ -49,5 +49,42 @@
    "§6e",
    "<a href=\"./system-design.html#sec-event-and-queue-reliability-the-operational-layer-under-async\">§6e</a>"
   ]
- ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-mental-models-frames-for-thinking-about-the-vault",
+   "note": "vault/schema-as-contract/access-path frames present"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-most-common-failure-modes",
+   "note": "failure diagnostics section present"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "vocabulary owned by shelf glossary per constitution"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-history-from-navigational-to-relational-and-back",
+   "note": "navigational-to-relational history grounded in Codd paper"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-ecosystem-tooling-catalog-with-decision-metrics",
+   "note": "decision tables with when-to-choose guidance; relationship-patterns section adds pattern choices"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-reading-explain-analyze-the-tuning-loop",
+   "note": "EXPLAIN ANALYZE timing/cost measures; no big-o claims made"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-design-the-schema-for-a-shipment-tracking-system",
+   "note": "end-to-end schema worked example; summary checklist closes the doc"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+ }
 }

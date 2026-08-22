@@ -1,7 +1,46 @@
 {
-  "WANT": {},
-  "FOLDS": [
-    ["Camps survey §6", "<a href=\"./frontend-camps-survey.html#sec-camp-f-wasm-and-non-js-ui-engines\">Camps survey §6</a>"],
-    ["مسح المعسكرات §6", "<a href=\"./frontend-camps-survey.html#sec-camp-f-wasm-and-non-js-ui-engines\">مسح المعسكرات §6</a>"]
+ "WANT": {},
+ "FOLDS": [
+  [
+   "Camps survey §6",
+   "<a href=\"./frontend-camps-survey.html#sec-camp-f-wasm-and-non-js-ui-engines\">Camps survey §6</a>"
+  ],
+  [
+   "مسح المعسكرات §6",
+   "<a href=\"./frontend-camps-survey.html#sec-camp-f-wasm-and-non-js-ui-engines\">مسح المعسكرات §6</a>"
   ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "SKIP",
+   "note": "no matching section; owned by owner docs (income-stream-landscape carries the stream mental models)"
+  },
+  "R15": {
+   "status": "SKIP",
+   "note": "no matching section; failure modes for income streams live in income-stream-landscape"
+  },
+  "R16": {
+   "status": "SKIP",
+   "note": "vocabulary owned by shelf glossary per constitution"
+  },
+  "R17": {
+   "status": "SKIP",
+   "note": "no matching section; no history/evolution narrative in this market survey"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-skill-market-matrix-what-to-study-for-which-stream",
+   "note": "if-you-want-X-prioritize-Y decision table; sequencing plan adds order-of-attack choices"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-freelance-platforms",
+   "note": "fee percentages and race-to-bottom economics arithmetic live here; figures hedged as volatile"
+  },
+  "R20": {
+   "status": "SKIP",
+   "note": "no worked-example/checklist section; doc closes with a sequencing plan, not a case study"
+  },
+  "floor_note": "WAIVER: rich authored doc delegating facts to cited canon by design; justified N/A additions per SHELF-DONE rule"
+ }
 }
