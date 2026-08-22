@@ -106,3 +106,24 @@ Working repo is now ~/projects/Programming (Linux-native, canonical history + ta
 - **v61 repair** — v60's AR patches (audience/currency markers, §9 rename, CWV thresholds, vocabulary block) were silently lost when a hotfix `cp` overwrote the work copy pre-splice; re-applied directly. Tooling hardened: verify-twins.py gained a real **visible h3 parity** gate (old "h3 balance" only checked tag well-formedness — twin asymmetries were invisible); doc-profile.py gained **parse-integrity gate** + bilingual EN/AR marker detection; ledger notation formalized in the skill (id / id=pre / id→doc / id=N/A(type)).
 - **v66 class-to-hooks reconciliation COMPLETE** — six EN h3 sections translated into the AR twin (four-pillars, pivot, good/painful, why-hooks-solve+why-2019, deeper-reason capture-vs-mutate); visible h3 parity 26/26 strict, H3_PARITY_EXCEPTIONS entry removed (ledger now empty). Ratio 1.14 stays a recorded verbose-twin exception. First doc in the shelf with zero twin debt after improve-doc pass.
 - **Correction (v67)** — v66's note called class-to-hooks "first doc with zero twin debt"; inaccurate. html-and-css has been at zero debt since v61 AND carries zero exceptions (ratio 0.84 in band, h3 parity 18/18 strict). Accurate statement: html-and-css = zero debt, zero exceptions; class-to-hooks = zero debt after reconciliation, one recorded ratio exception.
+
+## improve-doc CAMPAIGN v4 (2026-08-21 → 08-22, checkpoints v96–v123)
+
+- Phase 0 audit + Phase 1 backfill (v96–v103) and DOC ORDER #4–#10 full A+B
+  (v104–v111): every reference doc carries a digest shell, dispositions7 board,
+  evidence-grounded additions mirrored to AR twins via the locked pipeline.
+- User rulings institutionalized: Archive deletions accepted (v98); glossary-first
+  coinage (Leverage Map / خريطة الرافعة, v100); income-stream worksheet user-data
+  cells OFF-LIMITS (v112) with a sourced teaching block added by directive (v119).
+- Skill improved: v1.6 content-types gate; v1.7 currency conventions
+  (source-dated ledger column, claim-class coverage rows). Debt harvest closed ALL
+  open G-* hunts (v116; 16 sources via scrape-skill escalation) and caught a real
+  mis-citation (ui-ux Hick DOI fixed both twins).
+- Twin debt zeroed: full-shelf sweep 41/41 verify-twins PASSED (v118) after
+  reconciling six docs (angular ×4 h3 blocks, cs, swdp, vc DORA+nav repoints,
+  frontend-camps EN camp E/F triples, payments preamble).
+- Digest-completion campaign (v120→): shells for all remaining docs; 31/42 at v123;
+  final 9 in flight via durable subagents. wordpress-and-cms-internet documented as
+  EN-only tier (G-wp2 defers AR decision to owner).
+- Ratio exceptions unchanged and recorded in verify-twins.py. Open questions logged
+  in goal.md; nothing blocks.
