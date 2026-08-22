@@ -173,6 +173,7 @@ const posts = await getPosts();
 <h2 id="sec-camp-e-the-other-major-ui-libraries-signals-world">Camp E — The other major UI libraries (signals world)</h2>
 
 <p>Not everything is React. By 2026 the non-React mainstream largely standardized on <strong>signals</strong> (or signal-like runes) for fine-grained updates:</p>
+<h3>What you will see</h3>
 
 <table>
   <thead><tr><th>Stack</th><th>Reactivity unit</th><th>Notes for a React reader</th></tr></thead>
@@ -186,6 +187,14 @@ const posts = await getPosts();
 </table>
 
 <p>React's answer remains the Compiler + re-render model, not signals-as-public-API (<a href="./react-2024-and-beyond.html">React 2024+</a> <a href="#sec-camp-c-client-spas">§3</a>, <a href="#sec-the-ai-era-layer-tooling-not-a-ui-camp">§8</a>). <strong>Do not translate 1:1.</strong> In signals frameworks, changing a cell updates bindings; the component function often does not re-run top-to-bottom the way a React function component does.</p>
+<h3>When it wins</h3>
+
+<p>High-frequency granular updates — real-time dashboards, in-browser game engines. Teams that prefer "state as values" over "state as closures captured per render." Qwik: products where TTI (time-to-interactive) is the #1 KPI.</p>
+
+<h3>When it loses</h3>
+
+<p>The React ecosystem is required (huge component libraries, hiring, existing knowledge). The team knows React's mental model well; the switching cost exceeds the benefit.</p>
+
 
 <blockquote class="callout">
   <p><strong>C++ analogy.</strong> React re-render ≈ recomputing a pure function of state and diffing the result. Signals ≈ dirty-flagging dependent nodes in a graph and updating only those nodes. Both can implement the same UI; the debugging stories differ.</p>
@@ -241,7 +250,8 @@ const posts = await getPosts();
 
 <h2 id="sec-camp-f-wasm-and-non-js-ui-engines">Camp F — WASM and non-JS UI engines</h2>
 
-<p>WebAssembly lets languages like Rust, C++, C#, and Zig run in the browser (and on the edge) at near-native speed. Frontend use cases cluster around:</p>
+<p>WebAssembly lets languages like Rust, C++, C#, and Zig run in the browser (and on the edge) at near-native speed. Frontend use cases cluster around:</p><h3>What you will see</h3>
+
 <ul>
   <li><strong>Heavy compute in the client:</strong> image/video codecs, CAD, games, crypto, data viz pipelines.</li>
   <li><strong>Porting existing C++ engines</strong> to the web (your background is an asset here).</li>
@@ -250,7 +260,13 @@ const posts = await getPosts();
 
 <p>JS still usually owns the DOM glue. Frameworks like Yew / Leptos (Rust), Blazor (C#), and custom engines exist, but most production "WASM frontends" are hybrid: React/Vue shell + WASM modules for hot paths.</p>
 
-<p><strong>When it wins:</strong> algorithmic bulk that would jank on the main thread in plain JS. <strong>When it loses:</strong> ordinary forms and CRUD — the toolchain tax is not worth it.</p>
+<h3>When it wins</h3>
+
+<p>Heavy compute that must run in the browser (editors, CAD, ML inference, crypto). Code sharing with a backend/mobile stack written in Rust, Go, or C++.</p>
+
+<h3>When it loses</h3>
+
+<p>Ordinary CRUD, forms, marketing pages — the WASM toolchain tax is not worth it. The team lacks systems-language skills.</p>
 
 <h2 id="sec-identifying-the-camp-from-a-repository">Identifying the camp from a repository</h2>
 
