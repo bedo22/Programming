@@ -38,3 +38,4 @@ Apply the plan to finish all waves
 - 2026-08-22: v120 — DIGEST CAMPAIGN BATCH 1: shells for frontend-camps-survey, angular-evolution, payments-and-commerce; coverage ×3 + content-types ×3 all exit 0. 23 docs remain.
 - 2026-08-22: v121 — DIGEST CAMPAIGN BATCH 2: cs/swdp/version-control shells + boards; URL-regex paren bug fixed via gate; vc map bootstrapped. 20 docs remain.
 - 2026-08-22: v122 — DIGEST BATCH 3: 11 shells green (subagent fan-out + inline repairs); user directive adopted: use durable nudgeable subagents henceforth. Gates ×11 exit 0. Remaining: 9 docs.
+- 2026-08-22: v123 — WORDPRESS DIGEST (EN-only doc): shell + board, gates exit 0 x2; AR absence recorded as design state. Subagents still running on final 9.
