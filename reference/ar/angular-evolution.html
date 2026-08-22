@@ -264,6 +264,76 @@ export class CounterComponent {
 
 <p>Zone.js يبث "شيء تغير" لكل المكونات. الإشارات تعرف <em>بالضبط أي مكون يعتمد على أي إشارة</em>. بمجرد وجود رسم تبعيات الإشارة، يصبح zone.js زائداً عن الحاجة — يمكن لـ Angular تشغيل كشف التغيير فقط على المكونات التي تشترك في إشارات تغيرت، بالإضافة إلى أسلافها في سلسلة تمرير المدخلات.</p>
 
+<h3>تحكم القوالب الحديث — Modern control flow</h3>
+
+<p>منذ v17 تستخدم قوالب Angular تحكمًا مدمجًا بدل التوجيهات البنيوية. الكود الأقدم يستعمل <code>*ngIf</code> / <code>*ngFor</code>؛ والحديث قد يستعمل <code>@if</code> / <code>@for</code> / <code>@switch</code> / <code>@defer</code> — تعرّف على الاثنين:</p>
+
+<pre><code>@if (items.length) {
+  &lt;ul&gt;
+    @for (item of items; track item.id) {
+      &lt;li&gt;{{ item.name }}&lt;/li&gt;
+    } @empty {
+      &lt;li&gt;لا عناصر&lt;/li&gt;
+    }
+  &lt;/ul&gt;
+}</code></pre>
+
+<ul>
+  <li><strong><code>@if</code></strong> — عرض شرطي (بديل <code>*ngIf</code>).</li>
+  <li><strong><code>@for</code></strong> — عرض قائمة مع <code>track</code> (بديل <code>*ngFor</code> مع «track by»). و<code>@empty</code> يعالج الحالة الفارغة.</li>
+  <li><strong><code>@switch</code></strong> — عرض متعدد الفروع (بديل <code>*ngSwitch</code>).</li>
+  <li><strong><code>@defer</code></strong> — تحميل وعرض قالب عند الطلب.</li>
+</ul>
+
+<h3>سطح API الإشارات الحديث</h3>
+
+<p>خلاف الثلاثية الأساسية، يضيف Angular الحديث (v17–v22) ربطات قائمة على الإشارات ومصادر غير متزامنة. خاص بالإصدارات؛ تحقق قبل الاعتماد على أيٍّ منها في الكود:</p>
+
+<table>
+  <thead><tr><th>API</th><th>الغرض</th><th>متى وصلت</th></tr></thead>
+  <tbody>
+    <tr><td><code>input()</code> / <code>input.required()</code></td><td>مدخلات قائمة على الإشارات (تصريحية، تُقرأ داخل <code>computed</code>)</td><td>v17، و<code>input.required()</code> من v17.2+</td></tr>
+    <tr><td><code>output()</code></td><td>مخرجات/باعث أحداث قائم على الإشارات</td><td>v17.2+</td></tr>
+    <tr><td><code>model()</code></td><td>إشارة بربط ثنائي الاتجاه (بديل أنماط <code>[(ngModel)]</code>)</td><td>v17.2+</td></tr>
+    <tr><td><code>linkedSignal()</code></td><td>إشارة قابلة للكتابة تصفَّر حين يتغير مصدرها</td><td>v19 (مستقرة v20)</td></tr>
+    <tr><td><code>toSignal()</code> / <code>toObservable()</code></td><td>جسور بين مرصدات RxJS والإشارات</td><td>v16 preview، مستقرة v20</td></tr>
+    <tr><td><code>untracked()</code></td><td>قراءة إشارة دون إنشاء اعتمادية</td><td>v16+</td></tr>
+    <tr><td><code>effect()</code> options / <code>DestroyRef</code></td><td>التنظيف والتكامل مع دورة الحياة للتأثيرات</td><td>v16+</td></tr>
+    <tr><td><code>httpResource()</code> / <code>resource()</code> / <code>rxResource()</code></td><td>جلب بيانات غير متزامن قائم على الإشارات؛ <code>httpResource</code> يغلّف <code>HttpClient</code></td><td>تجريبية v20، مستقرة v22</td></tr>
+  </tbody>
+</table>
+
+<h3>حقن الاعتماديات — لماذا أبقت Angular على الأصناف</h3>
+
+<p>الـDI سببٌ من أسباب عدم انتقال Angular إلى الخطافات. حقن Angular متمركز حول الأصناف والمحاقن: تُبنى الخدمة ويُدار عمرها عبر تسلسل المحاقن، وتُحقن إما عبر المُنشئ أو (حديثًا) دالة <code>inject()</code>. حقنٌ على طراز الخطافات يتطلب تصميمًا مختلفًا — لا يمكنك الحقن في ترتيب نداءات الدالة كما يفعل React.</p>
+
+<ul>
+  <li><strong>الحقن بالمُنشئ</strong> — <code>constructor(private http: HttpClient)</code>؛ النمط الكلاسيكي (ما يزال يعمل).</li>
+  <li><strong><code>inject()</code></strong> — حقن وظيفي صالح في مهيئات الحقول وداخل سياق الحقن؛ العبارة الحديثة المعتادة.</li>
+  <li><strong><code>providedIn: 'root'</code></strong> — خدمة مزودة في الجذر دون قائمة موفرين صريحة.</li>
+  <li><strong>المحاقن الهرمية</strong> — كل مكوّن يمكنه توفير نسخته الخاصة، فيقصر عمر الخدمة على شجرة فرعية.</li>
+  <li><strong>رموز الحقن</strong> — معرفات (symbols أو مراجع أصناف) تسمّي ما تحقنه.</li>
+</ul>
+
+<blockquote class="callout">
+  <p>يمنح DI الخدماتَ نموذج بناء واضحًا ويجعل الاختبار سهلًا (احقن نسخة وهمية). يمكن لـReact محاكاة DI بالسياق أو المخازن الخارجية، لكن DI في Angular ميزة إطار من الدرجة الأولى — وهو سبب واحد لحداثة Angular التي أدخلت الإشارات داخل الأصناف بدل حذفها.</p>
+</blockquote>
+
+<h3>النماذج — حيث تلتقي الحالة والتحقق وكشف التغيير</h3>
+
+<p>كود Angular المؤساسي مليء بالنماذج. تعرّف على الأجيال الأربعة:</p>
+
+<table>
+  <thead><tr><th>نوع النموذج</th><th>ما تراه</th><th>متى كان شائعًا</th></tr></thead>
+  <tbody>
+    <tr><td>نماذج معتمدة على القالب</td><td><code>ngModel</code>، <code>#form="ngForm"</code></td><td>نماذج أبسط، كود أقدم</td></tr>
+    <tr><td>النماذج التفاعلية</td><td><code>FormGroup</code>، <code>FormControl</code>، <code>FormBuilder</code></td><td>تطبيقات مؤسسية</td></tr>
+    <tr><td>النماذج المطبوعة</td><td><code>FormControl&lt;string&gt;</code> مطبع</td><td>Angular 14+</td></tr>
+    <tr><td>نماذج الإشارات</td><td>تحقق قائم على المخططات، ربط <code>[formField]</code></td><td>تجريبية v21، مستقرة v22 — تطبيقات جديدة/حديثة</td></tr>
+  </tbody>
+</table>
+
+
 <p>Angular 18 (2024) قدم <code>provideZonelessChangeDetection</code> تجريبياً. Angular 20+ (2026) تتجه نحو جعل بدون zone.js الافتراضي للمشاريع الجديدة. هذا هو تعريف هجرة العصر: أزل zone.js، اعتمد كلياً على الإشارات للتفاعلية. الثمن: كل الحالة المشتركة يجب أن تمر عبر <code>signal()</code> أو نماذج مغلفة بـ <code>signal()</code>. المكسب: كشف تغيير بدون هدر — فقط المكونات التي تحتاج التحديث تتحدث.</p>
 
 <h2 id="sec-mental-models-how-to-think-in-each-era">النماذج الذهنية — كيف تفكر في كل عصر</h2>

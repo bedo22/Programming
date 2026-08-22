@@ -2018,6 +2018,68 @@
         <p><strong>قاعدة إعادة الهيكلة:</strong> لا تُعيد الهيكلة وتُضيف ميزات في نفس الوقت. أعد الهيكلة أولاً (كل الاختبارات تمر)، ثم أضف الميزة على الأساس النظيف. الخلط بينهما يجعل من المستحيل تحديد أي تغيير أخلّ بالاختبار.</p>
       </blockquote>
 
+<h3>«قبل وبعد» — إعادة هيكلة عملية محلولة</h3>
+<p>هذه دالة حقيقية كانت «تعمل» لكنها حملت ريائح متعددة. تتبّع التحسين:</p>
+<pre style="background:#f4f4f4; padding:1rem; overflow-x:auto; font-size:.85rem;">
+// قبل: دالة طويلة، كود مكرر، أرقام سحرية، تدريب عميق
+function process(data, type) {
+  let result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (type === 'active') {
+      if (data[i].status === 3) {
+        if (data[i].age > 18) {
+          result.push(data[i]);
+        }
+      }
+    } else if (type === 'all') {
+      if (data[i].status === 3) {
+        result.push(data[i]);
+      }
+    } else if (type === 'minors') {
+      if (data[i].status === 3) {
+        if (data[i].age <= 18) {
+          result.push(data[i]);
+        }
+      }
+    }
+  }
+  return result;
+}
+</pre>
+<p><strong>الريائح المرصودة:</strong> دالة طويلة، تكرار فحص <code>status === 3</code>، رقم سحري <code>3</code>، تدريب عميق، اسم غامض (<code>process</code>).</p>
+<pre style="background:#f4f4f4; padding:1rem; overflow-x:auto; font-size:.85rem;">
+// بعد: دوال مستخرجة، ثوابت مسماة، بنود حراسة، أسماء واضحة
+const STATUS_APPROVED = 3;
+
+function isApproved(user) {
+  return user.status === STATUS_APPROVED;
+}
+
+function filterUsers(users, predicate) {
+  return users.filter(predicate);
+}
+
+function getActiveAdults(users) {
+  return filterUsers(users, u => isApproved(u) && u.age > 18);
+}
+
+function getApprovedUsers(users) {
+  return filterUsers(users, u => isApproved(u));
+}
+
+function getApprovedMinors(users) {
+  return filterUsers(users, u => isApproved(u) && u.age <= 18);
+}
+
+function filterByType(users, type) {
+  if (type === 'active') return getActiveAdults(users);
+  if (type === 'all') return getApprovedUsers(users);
+  if (type === 'minors') return getApprovedMinors(users);
+  return [];
+}
+</pre>
+<p><strong>ما الذي تحسن:</strong> كل دالة لها عمل واحد واسم واضح. فحص <code>status === 3</code> موجود في مكان واحد. التدريب زال. يستطيع مطور جديد قراءة <code>getActiveAdults</code> وفهمها دون قراءة التنفيذ. هذه هي قابلية الصيانة (<a href="#sec-the-parameters-quality-attributes-what-you-measure">§٤</a>) في العمل.</p>
+
       <h2 id="sec-principles-the-shared-constants">المبادئ — الثوابت المشتركة</h2>
 
       <p>
