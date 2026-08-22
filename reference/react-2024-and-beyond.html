@@ -86,7 +86,7 @@
 
 <h2 id="sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">The React Compiler is stable (Oct 2025) and ship-by-default (2026)</h2>
 
-<p>The <a href="https://react.dev/blog/2025/10/07/react-compiler-1">React Compiler v1.0</a> shipped October 7, 2025 — the first stable release after nearly a decade of research (the team's Prepack experiments started in 2017). The compiler is a Babel plugin that lowers your code into its own High-Level Intermediate Representation, runs data-flow and mutability analysis, and inserts memoization where it helps — including in places where <code>useMemo</code> cannot legally go, like after an early return.</p>
+<p>The <a href="https://react.dev/blog/2025/10/07/react-compiler-1">React Compiler v1.0</a> shipped October 7, 2025 — the first stable release after nearly a decade of research (the team's Prepack experiments started in 2017). The announcement’s own framing: it "works on both React and React Native, and automatically optimizes components and hooks without requiring rewrites," and was "battle tested on major apps at Meta" before its stable release. The compiler is a Babel plugin that lowers your code into its own High-Level Intermediate Representation, runs data-flow and mutability analysis, and inserts memoization where it helps — including in places where <code>useMemo</code> cannot legally go, like after an early return.</p>
 
 <p>What changed in 2025-2026: <strong>new apps now start with the compiler on by default.</strong> Expo SDK 54+ enables it in new templates. Vite and Next.js <code>create-*</code> templates include it as an opt-in choice. The compiler also powers the <em>lint</em> rules in <code>eslint-plugin-react-hooks</code>'s <code>recommended</code>/<code>recommended-latest</code> presets — so even teams not ready to adopt the compiler get its validation. The rules encode the <a href="https://react.dev/reference/rules">Rules of React</a> and surface latent bugs (set-state-in-render, set-state-in-effect, unsafe ref access during render).</p>
 
@@ -184,7 +184,7 @@
 
 <h3>6 Streaming and partial prerendering</h3>
 
-<p>Server rendering can ship progressively. Streaming (Suspense on the server) sends the shell first and each suspended server component's content as it finishes; <a href="https://react.dev/blog/2023/10/04/partial-prerendering">partial prerendering (PPR, Oct 2023)</a> pre-renders the static shell at build time and streams only the dynamic parts per request. When reading code, a "shell plus suspense around one region" shape usually means the slow, user-specific part is isolated so the static majority ships instantly — the same Suspense mental model, now precomputed.</p>
+<p>Server rendering can ship progressively. Streaming (Suspense on the server) sends the shell first and each suspended server component's content as it finishes; <a href="https://react.dev/blog/2023/03/22/react-labs-what-we-have-been-working-on-march-2023">partial prerendering (PPR, Oct 2023)</a> pre-renders the static shell at build time and streams only the dynamic parts per request. When reading code, a "shell plus suspense around one region" shape usually means the slow, user-specific part is isolated so the static majority ships instantly — the same Suspense mental model, now precomputed.</p>
 
 <h2 id="sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">The security boundary: RSC changed what a "trust boundary" means (Dec 2025 – Jan 2026)</h2>
 
