@@ -114,8 +114,11 @@ verified during A like everything else; they do NOT count toward B's minimum.
 9 ui-ux-web-design · 10 javascript-across-stacks
 
 Wave 2 — high-deficiency, full A+B:
-11 react-2024-and-beyond · 12 observability-and-operations ·
-13 income-stream-landscape · 14 problem-solving · 15 cs-and-software-engineering ·
+11 react-2024-and-beyond ✅v90 · 12 observability-and-operations ✅v91-92 ·
+13 income-stream-landscape ⚠️RECLASSIFIED: interactive personal worksheet
+(localStorage cells s0–s3), not a reference doc — light factual Track A only,
+user data OFF-LIMITS, flagged for async review · 14 problem-solving ·
+15 cs-and-software-engineering ·
 16 version-control-ci-cd-deployment · 17 software-development-process ·
 18 data-modeling-and-databases · 19 sql-and-postgresql · 20 security-and-threat-modeling
 

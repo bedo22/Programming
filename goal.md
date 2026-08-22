@@ -8,3 +8,4 @@ Apply the plan to finish all waves
 - 2026-08-22: v90 — react-2024-and-beyond full A+B under PLAN v4: 11 seeds fetched via scrapling, dead PPR cite repaired, shell gate green (16/16 matrix), Track B compiler grounding delta mirrored; ledger row w/ dispositions.
 - 2026-08-22: v91 — observability-and-operations full A+B: de-numbered 174 refs (incl. cross-doc + mixed-digit), 41 nested-anchor corruption repaired, 9 seeds fetched (codeascraft JS-walled→SRE substitute), shell gate green, USE/symptoms-vs-causes deltas mirrored; ledger row.
 - 2026-08-22: v91 fix — coverage matrix completed (8 missing rows added after gate caught premature commit); gate exit 0 confirmed.
+- 2026-08-22: income-stream-landscape RECLASSIFIED — interactive personal worksheet (localStorage editable cells s0–s3), not a reference doc; light factual Track A only, user data off-limits, flagged for async review. Wave 2 continues.
