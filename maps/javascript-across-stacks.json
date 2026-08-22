@@ -1,5 +1,40 @@
 {
  "WANT": {},
  "FOLDS": [],
- "_note": "De-numbered in improve-doc pass v69 (2026-08-21): all positional numeral refs replaced by named anchor links, both twins (incl. the §3.1–3.2 range form)."
+ "_note": "De-numbered in improve-doc pass v69 (2026-08-21): all positional numeral refs replaced by named anchor links, both twins (incl. the §3.1–3.2 range form).",
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-leverage-map-where-cross-stack-practice-mass-concentrates",
+   "note": "three evidence-derived tiers authored v111 (event-loop portability/TS-at-scale/lane-constraint literacy) — replaces prior R14 N/A under fresh-B rule"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-failure-modes"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-js-across-stacks-calls-things",
+   "note": "seven terms-of-art block authored v111 (runtime/event loop/WASM/transpile/cold start/edge/garbage collection)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-choosing-a-stack"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-the-embedded-iot-perspective",
+   "note": "RAM floors + engine class (JerryScript seed); kB/frame figures hedged per v1.7"
+  },
+  "R20": {
+   "status": "ADD",
+   "delta": "jas-Δ1",
+   "note": "Node-2009 JSConf-Europe dating sentence added v111 to backend section EN+AR (seed-backed) — the birthday of the cross-stack thesis itself"
+  },
+  "floor_note": "WAIVER: three prose-patch additions on record — jas-Δ1 Node dating + jas-Δ2 leverage map + jas-Δ3 vocabulary block (all v111)"
+ }
 }

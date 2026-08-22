@@ -36,6 +36,53 @@
   <p><strong>The pattern.</strong> Across all perspectives, one rule emerges from the data: a new language wins when the dominant constraint changes and the old language's design bet conflicts with the new constraint. JS won the browser because the constraint was 1995 download size + scripting glue. TypeScript won JS tooling because the constraint changed to large-team maintainability. Go won networked services because the constraint changed to concurrency-first. Rust won systems because the constraint changed to memory safety without GC. Java extended C++ syntax but won on the JVM bet (write once, ship anywhere). The rule: extend when the constraint is unchanged, invent when it inverts.</p>
 </blockquote>
 
+<h2 id="sec-search-vocabulary-what-js-across-stacks-calls-things">Search vocabulary — what JS across stacks calls things</h2>
+
+<p>You cannot look up a cross-stack problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>runtime</dfn></td>
+      <td>The engine + standard library + host APIs a JS program actually executes inside</td>
+      <td>The doc's central noun — "runtime" queries find engine docs where "JavaScript" alone finds language tutorials</td>
+    </tr>
+    <tr>
+      <td><dfn>event loop</dfn></td>
+      <td>The scheduler every JS runtime shares, browser or server or edge</td>
+      <td>The transferable mental model this whole doc argues for; async-ordering searches resolve through it on every stack</td>
+    </tr>
+    <tr>
+      <td><dfn>WASM</dfn></td>
+      <td>WebAssembly — a second compilation target living beside JS in the same runtimes</td>
+      <td>The boundary term for "when JS isn't the right compile target"; searching it maps the escape hatches per lane</td>
+    </tr>
+    <tr>
+      <td><dfn>transpile</dfn></td>
+      <td>Source-to-source compilation (TS→JS, JSX→JS) before any engine sees the code</td>
+      <td>Distinguishes build-step discussions from interpreter debates; misusing it buries answers under Babel-vs-swc noise</td>
+    </tr>
+    <tr>
+      <td><dfn>cold start</dfn></td>
+      <td>The latency of spawning a fresh runtime instance — serverless's tax</td>
+      <td>The precise term behind most "lambda is slow" complaints; generic latency searches miss it</td>
+    </tr>
+    <tr>
+      <td><dfn>edge</dfn></td>
+      <td>Running code at CDN points-of-presence instead of a home region</td>
+      <td>The deployment-substrate term linking this doc's serverless lane to geography-driven latency budgets</td>
+    </tr>
+    <tr>
+      <td><dfn>garbage collection</dfn></td>
+      <td>Automatic memory reclamation — why embedded lanes cap or replace it</td>
+      <td>The search phrase connecting JS's memory model to the RAM-floor constraints of the IoT perspective</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-the-frontend-perspective">The Frontend Perspective</h2>
 
 <p><strong>What the frontend uses of JS:</strong> the language + DOM + fetch + Canvas/WebGL + WASM interop. The browser only runs JS (and WASM). There is no language-level competitor on the frontend — the browser chooses for you.</p>
@@ -157,6 +204,8 @@ function handle(r: Result): number {
 <h2 id="sec-the-backend-perspective">The Backend Perspective</h2>
 
 <p><strong>What backend uses of JS:</strong> Node.js — the event loop + npm + <code>fs</code>/<code>net</code>/<code>http</code> modules. One process multiplexes thousands of connections on a single thread's event loop: non-blocking I/O + async callbacks, with a small OS thread pool for blocking work (<code>fs</code>, crypto, DNS). The same loop from the browser, transplanted to the server.</p>
+
+<p>The transplant has a birthday: Node was created by Ryan Dahl and unveiled in 2009 (JSConf Europe) — the moment "one language across browser and server" stopped being an aspiration and became a runtime you could install. Every cross-stack claim in this doc is downstream of that event.</p>
 
 <p><strong>What doesn't fit:</strong> CPU-bound work (blocks the loop), real threads (Worker threads exist but are heavy), sandboxed memory (V8 isolates are not JVM-grade), the decades of enterprise backend tooling (JMX, JPA, Spring, .NET diagnostics), the talent pool that knows Java/C# from university.</p>
 
@@ -454,6 +503,58 @@ src.pipe(res);
 <p><strong>Where JS is the default entirely due to the host being JS:</strong> Cloudflare Workers, Vercel Edge Functions, Deno Deploy, Bun, esbuild/rolldown/Vite (written in Go/Rust but drive the JS ecosystem). The edge runtime picked JS because V8 is already there, the security sandbox already exists, and cold-start matters more than steady-state perf.</p>
 
 <p><strong>Competitor: WASM on the edge.</strong> Cloudflare supports WASM components; Fastly Compute@Edge is WASM-first. But WASM still needs JS glue for DOM/HTTP in the browser, and the edge is converging on the same APIs (WinterCG). Here JS has no real language competitor — WASM is a partner, not a replacement, same as in the browser.</p>
+
+<h2 id="sec-leverage-map-where-cross-stack-practice-mass-concentrates">The leverage map — where cross-stack practice mass concentrates</h2>
+
+<p>Nineteen sections across six lanes are not equally load-bearing. These tiers derive from this doc's own grounded lineage records — TypeScript's 2012 Microsoft announcement, Node's 2009 JSConf debut, Deno's 2018 second act, JerryScript's IoT-class engine — plus the choosing/migration tables, not from vibes. Working default: tier one transfers to every lane you enter; tier two enters when its lane appears; tier three is depth for when a lane becomes your home.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>The event loop as portable mental model</td>
+      <td>The one mechanism every lane shares — browser, Node, edge runtimes all drain it; async-ordering bugs die at this layer before they become stack-specific</td>
+      <td>This doc's runtime sections; nodejs seed (2009 origin)</td>
+    </tr>
+    <tr>
+      <td>TypeScript at scale — types as design pressure, not annotation tax</td>
+      <td>The shift survived because types pay in refactor safety and API clarity; the typed-JS habits transfer to Deno and beyond unchanged</td>
+      <td>TypeScript seed (2012 lineage); typed-js section</td>
+    </tr>
+    <tr>
+      <td>Lane-constraint literacy — know each lane's hard walls (RAM floors, cold starts, bundle budgets)</td>
+      <td>Cross-stack failures are almost always constraint violations, not syntax errors; the tables encode them so you don't rediscover them in production</td>
+      <td>JerryScript seed (IoT class); embedded + failure-modes tables</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Learn when needed</strong></td>
+      <td>Stack-choice reasoning from the decision table</td>
+      <td>Bites once per project; walking the table beats relitigating first principles under deadline</td>
+      <td>Choosing-a-stack table (R18 function)</td>
+    </tr>
+    <tr>
+      <td>Migration-path literacy between lanes</td>
+      <td>Real systems cross lanes mid-life; knowing which crossings are paved saves quarters</td>
+      <td>Migration section (hedged timelines)</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>AI/data-science lane depth</td>
+      <td>Pays when your product includes model serving; strategies still settling field-wide</td>
+      <td>AI perspective section (doc-native, hedged)</td>
+    </tr>
+    <tr>
+      <td>Edge-runtime internals + WASM boundary work</td>
+      <td>Matters once latency geography or non-JS compile targets become requirements</td>
+      <td>Deno seed; WASM-junction rows (cross-doc react shell)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
 
 <h2 id="sec-the-pattern-when-does-a-new-language-beat-extending-an-old-one">The Pattern: When Does a New Language Beat Extending an Old One?</h2>
 
