@@ -7,5 +7,41 @@
   "6c": "sec-derived-state-cache-and-configuration-the-things-that-look-like-state",
   "6d": "sec-identity-vs-state-and-immutable-vs-mutable-state",
   "6e": "sec-failure-modes-where-the-model-breaks"
+ },
+ "dispositions7": {
+  "R14": {
+   "status": "PRE",
+   "anchor": "#sec-the-key-distinction-variables-state",
+   "note": "foundational prequel: the variable-vs-state distinction IS the leverage wall; no separate tier table needed at 15 sections"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-failure-modes-where-the-model-breaks"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-state-calls-things",
+   "note": "seven terms-of-art block authored v109 (state/transition/variable/lifetime/mutation/immutable/derived state)"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-identity-vs-state-and-immutable-vs-mutable-state"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-derived-state-cache-and-configuration-the-things-that-look-like-state",
+   "note": "'looks like state but isn't' taxonomy = decision defaults"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-the-four-theories-underneath-what-makes-programming-possible-at-all",
+   "note": "1936-1948 dates grounded against turing/von-neumann seeds v109; EDVAC report pre-named by doc"
+  },
+  "R20": {
+   "status": "ADD",
+   "delta": "st-Δ1",
+   "note": "cross-domain scope sentence (parsers/firewalls/protocols) added v109 to definition section EN+AR, seed-backed"
+  },
+  "floor_note": "WAIVER: two additions on record — st-Δ1 scope sentence + st-Δ2 vocabulary block (v109); pre-v4 doc already carried rich authored foundations content"
  }
 }

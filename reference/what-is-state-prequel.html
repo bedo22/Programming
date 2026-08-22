@@ -26,7 +26,9 @@
 
 <p>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</p>
 
-<h2 id="sec-when-did-programming-appear">When did "programming" appear?</h2>
+<h2 id="sec-when-did-programming-appear">
+
+hen did "programming" appear?</h2>
 
 <p>Two words people use loosely that we have to separate first: <strong>algorithm</strong> and <strong>program</strong>.</p>
 
@@ -48,6 +50,53 @@
 </ul>
 
 <p>So: the <em>algorithm</em> as a concept is older than mathematics itself; the <em>word</em> "algorithm" is ~1,200 years old (from Al-Khwarizmi); the <em>idea of programming a machine</em> is from the 1840s (Lovelace); the <em>practice</em> of running programs on real machines from the 1940s (Zuse, then ENIAC); and what you'd recognize as programming today from the 1950s (Fortran). The 70 years since Fortran are variations on one theme: tell a machine how to transform inputs into outputs.</p>
+
+<h2 id="sec-search-vocabulary-what-state-calls-things">Search vocabulary — what state calls things</h2>
+
+<p>You cannot look up a foundations problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>state</dfn></td>
+      <td>The condition a system is in right now — the values that shape what happens next</td>
+      <td>Every framework's docs assume it; searching "state management" without this foundation returns tool ads, not understanding</td>
+    </tr>
+    <tr>
+      <td><dfn>transition</dfn></td>
+      <td>A rule taking the system from one state to another — Turing's move, Redux's action</td>
+      <td>The shared vocabulary of state machines, reducers, and protocol specs</td>
+    </tr>
+    <tr>
+      <td><dfn>variable</dfn></td>
+      <td>A named binding in code — one possible container for state, not state itself</td>
+      <td>The variable-vs-state distinction is this doc's load-bearing wall; searches conflate them constantly</td>
+    </tr>
+    <tr>
+      <td><dfn>lifetime</dfn></td>
+      <td>How long a value exists from creation to destruction</td>
+      <td>The term behind memory bugs, stale closures, and cache invalidation alike</td>
+    </tr>
+    <tr>
+      <td><dfn>mutation</dfn></td>
+      <td>Changing a value in place rather than producing a new one</td>
+      <td>Splits every "why didn't my update render" discussion into its two camps</td>
+    </tr>
+    <tr>
+      <td><dfn>immutable</dfn></td>
+      <td>Values that cannot be mutated — changes produce new values instead</td>
+      <td>The search term for React-style update discipline and functional-core designs</td>
+    </tr>
+    <tr>
+      <td><dfn>derived state</dfn></td>
+      <td>Values computable from other state — cached conclusions, not sources of truth</td>
+      <td>The precise term for "should I store this or compute it" — the shelf's most reused design question</td>
+    </tr>
+  </tbody>
+</table>W
 
 <h2 id="sec-the-four-theories-underneath-what-makes-programming-possible-at-all">The four theories underneath — what makes programming possible at all</h2>
 
@@ -323,7 +372,9 @@ function D(P) {
   </tbody>
 </table>
 
-<p>This test is the spine of the whole reference shelf. <a href="#sec-the-key-distinction-variables-state">The key distinction</a> sharpens it into lifetimes and reachability; <a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration</a> separates the state-like pretenders (derived, cache, config); <a href="#sec-failure-modes-where-the-model-breaks">Failure modes</a> collects the ways even careful developers misapply in practice.</p>
+<p>The same word earns its keep far beyond apps: parsers, firewalls, network protocols, and encryption all run on this exact idea — a condition that persists between steps and shapes what the next step is allowed to do. Learn it here once, and protocol state machines are the same lesson wearing different clothes.</p>
+
+<p>This test is the spine of the whole reference shelf. <a href="#sec-the-key-distinction-variables-state">The key distinction</a> sharpens it into lifetimes and reachability;<p>This test is the spine of the whole reference shelf. <a href="#sec-the-key-distinction-variables-state">The key distinction</a> sharpens it into lifetimes and reachability; <a href="#sec-derived-state-cache-and-configuration-the-things-that-look-like-state">Derived state, cache, and configuration</a> separates the state-like pretenders (derived, cache, config); <a href="#sec-failure-modes-where-the-model-breaks">Failure modes</a> collects the ways even careful developers misapply in practice.</p>
 
 <h2 id="sec-state-changes-one-step-at-a-time">State changes — one step at a time</h2>
 
