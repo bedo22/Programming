@@ -4,16 +4,18 @@
  "_note": "De-numbered + corruption-repaired in improve-doc pass v68 (2026-08-21): 44 numeral refs named, 12 nested-anchor folds flattened, 2 base64-corrupted folds rebuilt as proper links, both twins.",
  "dispositions7": {
   "R14": {
-   "status": "MISSING",
-   "note": "failure-modes table is R15 function, not leverage tiers — backfill required"
+   "status": "PRE",
+   "anchor": "#sec-leverage-map-where-react-practice-mass-concentrates",
+   "note": "three evidence-derived tiers authored v103 (two-Reacts model, rules-as-contract, compiler-era defaults; actions/migrations/security learn-when-needed; Preact/signals/governance rare)"
   },
   "R15": {
    "status": "PRE",
    "anchor": "#sec-failure-modes"
   },
   "R16": {
-   "status": "THIN",
-   "note": "single vocabulary mention; no terms-of-art block"
+   "status": "PRE",
+   "anchor": "#sec-search-vocabulary-what-react-2024-calls-things",
+   "note": "seven terms-of-art block authored v103 (Server Component/hydration/memoization/Suspense/signal/partial prerendering/form action)"
   },
   "R17": {
    "status": "PRE",
@@ -30,10 +32,10 @@
    "note": "kB footprint figures"
   },
   "R20": {
-   "status": "THIN",
-   "anchor": "#sec-react-19-the-platform-shift",
-   "note": "dated history woven through sections; no worked example or distilled story"
+   "status": "ADD",
+   "delta": "react-Δ2",
+   "note": "CRA-sunset war story (Feb 2025, grounded in cra-sunset fetch) added v103 to migration-paths section, EN+AR — distilled dated incident with lesson"
   },
-  "floor_note": "DEVIATION (not waived): single addition (compiler delta, commit 7115c62) vs floor of two — second addition owed in remediation"
+  "floor_note": "WAIVER: two grounded prose-patch additions on record — react-Δ1 compiler ship-by-default verbatim quotes (v90, commit 7115c62) + react-Δ2 CRA-sunset war story (v103); prior deviation closed"
  }
 }

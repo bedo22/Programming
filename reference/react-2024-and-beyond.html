@@ -32,6 +32,53 @@
   <p><strong>Scope.</strong> This guide covers what changed in React after the hooks paradigm settled: the platform ship (React 19), the Compiler, React Server Components, governance, security, the framework era, and the ecosystem consequences. It assumes you already understand hooks from the class-to-hooks doc and <em>does not</em> re-teach them. It does not teach React fundamentals, does not compare all frontend camps (<a href="./frontend-camps-survey.html">frontend-camps-survey</a>), and does not deeply cover Next.js internals (<a href="./nextjs-deep-dive.html">nextjs-deep-dive</a>).</p>
 </blockquote>
 
+<h2 id="sec-search-vocabulary-what-react-2024-calls-things">Search vocabulary — what React 2024+ calls things</h2>
+
+<p>You cannot look up a rendering problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>Server Component</dfn></td>
+      <td>A component that renders only on the server and serializes its output — never ships to or runs in the browser</td>
+      <td>The RSC era's central noun; searching "React server" without it surfaces years of SSR articles that answer a different question</td>
+    </tr>
+    <tr>
+      <td><dfn>hydration</dfn></td>
+      <td>The client pass that attaches interactivity to server-rendered markup</td>
+      <td>The word for most "my page flashes then goes interactive" behavior; hydration-mismatch errors have their own debugging literature</td>
+    </tr>
+    <tr>
+      <td><dfn>memoization</dfn></td>
+      <td>Caching a computation's result so re-renders skip it</td>
+      <td>The compiler era's pivot term — hand-rolled memoization (<code>memo</code>/<code>useMemo</code>) vs automatic optimization is the migration axis</td>
+    </tr>
+    <tr>
+      <td><dfn>Suspense</dfn></td>
+      <td>The boundary primitive letting UI declare "not ready yet" and swap in fallbacks</td>
+      <td>Unifies streaming SSR, lazy loading, and data-fetching states under one searchable name</td>
+    </tr>
+    <tr>
+      <td><dfn>signal</dfn></td>
+      <td>Fine-grained reactive state that updates dependents directly, without re-rendering a component tree</td>
+      <td>The name of the alternative React deliberately declined; searching it finds the whole fine-grained-vs-reconciler debate</td>
+    </tr>
+    <tr>
+      <td><dfn>partial prerendering</dfn></td>
+      <td>Serving a static shell instantly while dynamic holes stream in</td>
+      <td>The framework-routing-era term for static-and-dynamic hybrid serving; too new to have colloquial synonyms</td>
+    </tr>
+    <tr>
+      <td><dfn>form action</dfn></td>
+      <td>A server function bound directly to a form submission — progressive enhancement as a first-class path</td>
+      <td>Distinguishes React 19 Actions from every older "form library" result polluting the query</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-react-19-the-platform-shift">React 19 — the platform shift</h2>
 
 <p>React 19 (Dec 2024) turned several community patterns into platform features. This is the release the compiler and RSC depend on, and the one every "2024 and beyond" check in this guide is measured against. The mental model from class-to-hooks is unchanged — what changed is that more things the ecosystem used to build with libraries are now part of React itself.</p>
@@ -284,6 +331,8 @@
   </tbody>
 </table>
 
+<p><strong>War story — the CRA sunset (February 2025).</strong> For most of a decade, <code>create-react-app</code> was the default answer to "how do I start a React app" — and then react.dev's sunset post retired it, telling the ecosystem to start with a framework instead. The lesson is not "CRA was bad"; it is that the <em>onboarding path itself is versioned</em>. Apps scaffolded on a once-official tool needed exactly the migrations in this table, and teams that treated scaffolding as a permanent foundation discovered it was a dated snapshot of ecosystem consensus. When you inherit a CRA app, the trigger column above tells you which row applies; when you start fresh, the default has simply moved.</p>
+
 <h2 id="sec-failure-modes">Failure modes</h2>
 
 <table>
@@ -319,6 +368,63 @@
     <tr><td>Upgrade carefully</td><td>Compiler and framework security changes require disciplined upgrades (<a href="#sec-the-react-compiler-is-stable-oct-2025-and-ship-by-default-2026">the Compiler</a>, <a href="#sec-the-security-boundary-rsc-changed-what-a-trust-boundary-means-dec-2025-jan-2026">the security boundary</a>)</td></tr>
   </tbody>
 </table>
+
+<h2 id="sec-leverage-map-where-react-practice-mass-concentrates">The leverage map — where React practice mass concentrates</h2>
+
+<p>Not every section of this doc earns equal study time. These tiers derive from this doc's own grounded sources — Abramov's two-Reacts framing, the compiler's v1 announcement, the rules-of-react reference, react.dev's foundation and CRA-sunset posts, and Preact's signals/goals pages — not from vibes. Working default: tier one governs every component you write; tier two enters when its situation appears; tier three is context for decisions, not a daily habit.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>The two-React mental model — client React and server React as one program split across two processes</td>
+      <td>RSC, boundaries, serialization rules, and half the failure modes below are unreadable without it; it is this doc's load-bearing wall</td>
+      <td>Abramov's "The Two Reacts" (fetched); RSC section</td>
+    </tr>
+    <tr>
+      <td>The Rules of React as contract, not style guide</td>
+      <td>The compiler automates optimization only for code that keeps them — violating them now breaks silently under ship-by-default</td>
+      <td>rules-of-react reference + compiler v1 post (both fetched)</td>
+    </tr>
+    <tr>
+      <td>Compiler-era defaults — stop hand-memoizing, keep lint on, test hotspots</td>
+      <td>Hand-rolled memoization migrated from craft to liability; knowing when NOT to optimize is the new senior signal</td>
+      <td>react-compiler-v1 verbatim quotes (Δ1, v90); migration table row</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Learn when needed</strong></td>
+      <td>Server Actions treated as public endpoints — validation and authz at every boundary</td>
+      <td>Only bites once you ship server functions; then it is the security-critical habit that matters most</td>
+      <td>Security-boundary section; failure-modes table (G-r1 CVE pending fetch)</td>
+    </tr>
+    <tr>
+      <td>Migration-path selection when inheriting apps</td>
+      <td>CRA sunset made migration a mainstream skill, not an edge case; the right row of the table saves weeks</td>
+      <td>cra-sunset post (fetched); war story above (Δ2, v102)</td>
+    </tr>
+    <tr>
+      <td>Actions/forms for form-heavy flows</td>
+      <td>Progressive enhancement returned as first-class; changes how forms, pending states, and mutations get designed</td>
+      <td>React 19 platform-shift section; actions deep-dive → G-r2</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>Preact and the structural branch — what React looks like at 3.5&nbsp;kB</td>
+      <td>Matters for bundle-budget-critical or non-React-compat deployments; otherwise context</td>
+      <td>Preact goals + differences pages (fetched)</td>
+    </tr>
+    <tr>
+      <td>Signals debate + governance context</td>
+      <td>Fine-grained reactivity arguments and the Feb 2026 foundation shift shape strategy talks, rarely component code</td>
+      <td>preact-signals quote (grounded); react-foundation post (fetched)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
 
 <h2 id="sec-ecosystem-the-tools-worth-naming">Ecosystem — the tools worth naming</h2>
 
