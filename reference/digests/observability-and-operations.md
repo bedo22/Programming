@@ -41,6 +41,14 @@ Status: TRACK A COMPLETE (2026-08-22). De-numbered: 174 refs both twins (in-doc 
 | #sec-operational-gates-shift-left-and-the-launch-gate | doc-native | |
 | #sec-observability-cost-management-the-budget-for-the-lens | gap G-ob11 (hedged) | |
 | #sec-operational-maturity-where-you-are-and-the-next-practice-to-adopt | doc-native ladder | |
+| #sec-operational-debt-toil-paying-what-you-postponed | gap G-ob12 (SRE toil chapters pending fetch) | |
+| #sec-operational-team-metrics-measuring-the-operation-itself | gap G-ob13 (team-metrics canon) | |
+| #sec-worked-example-the-checkout-incident | illustrative (labeled) | |
+| #sec-common-failure-modes | traces to confirmed sections | |
+| #sec-ecosystem-tooling-catalog-with-decision-metrics | volatile facts — hedged | |
+| #sec-the-future-where-the-operational-layer-is-heading | signals — hedged | |
+| #sec-primary-sources | n/a self-reference | exempt |
+| #sec-summary-the-operational-checklist | derives from confirmed sections | |
 
 ## Gaps
 
