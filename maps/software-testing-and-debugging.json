@@ -1,4 +1,37 @@
 {
  "WANT": {},
- "FOLDS": []
+ "FOLDS": [],
+ "dispositions7": {
+  "R14": {
+   "status": "MISSING",
+   "note": "metrics-with-warning-signs table carries diagnostics (R15 function), not practice tiers — backfill required"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes"
+  },
+  "R16": {
+   "status": "THIN",
+   "note": "sparse vocabulary mentions; shared terms owned by glossary"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-evolution-the-constraint-inversions"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-test-doubles-mocks-stubs-fakes-and-spies",
+   "note": "'Good use / Common abuse' doubles table; techniques 'When it earns its keep'"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-testing-metrics-how-to-know-whether-the-evidence-is-useful",
+   "note": "99.9%→~43min error-budget arithmetic"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-a-feature-tested-from-unit-to-production"
+  },
+  "floor_note": "WAIVER: v81 Δ1–Δ3 authored (commit 57c7090)"
+ }
 }

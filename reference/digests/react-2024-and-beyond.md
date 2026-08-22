@@ -48,5 +48,14 @@ Status: TRACK A COMPLETE (2026-08-22). 11/11 seeds fetched (1 dead cite repaired
 | G-r2 | Actions/form-actions primary docs | react.dev reference pending | fetch next touch |
 
 ## Content authored from this digestion
-- v90 Track B: compiler ship-by-default grounding; foundation-governance sentence;
-  Preact signals contrast sentence. (see ledger)
+- v90 Track B AUTHORED (one addition): compiler ship-by-default grounding via two
+  verbatim announcement quotes ("works on both React and React Native, and
+  automatically optimizes components and hooks without requiring rewrites";
+  "battle tested on major apps at Meta"). FLOOR DEVIATION: second addition owed —
+  tracked in maps/react-2024-and-beyond.json dispositions7 floor_note (un-waived).
+- VERIFIED PRE-EXISTING (not authored here): the foundation-governance facts
+  (Linux Foundation launch 2026-02-24, Platinum board incl. Amazon/Callstack/Expo/
+  Huawei/Meta/Microsoft/Software Mansion/Vercel, Seth Webster as ED) and the
+  fine-grained-signals definition. This digestion grounded them against fetched
+  seeds; re-verified live 2026-08-22 against the foundation post and Preact
+  signals announcement (all names/terms confirmed present).

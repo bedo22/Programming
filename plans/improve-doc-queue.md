@@ -7,7 +7,7 @@ goal.md under "Open questions" and moves to the next doc rather than blocking.
 Mechanisms referenced (read once per session):
 - `plans/source-digestion-workflow.md` — pipeline
 - `plans/credibility.md` — T1/T2/T3 claim tiers
-- skill `improve-doc` v1.4+: `sources.md`, `insight.md`, `digest-coverage.py`, `doc-profile.py`
+- skill `improve-doc` v1.6+: `sources.md`, `insight.md`, `digest-coverage.py`, `doc-profile.py`, `content-types.py`
 - `translate-to-arabic` skill: twin pipeline + `verify-twins.py`
 - Host constitution: AGENTS.md (schema rules — non-negotiable)
 
@@ -71,10 +71,16 @@ return to stage-only until told otherwise.
    Diátaxis type makes a type structurally inapplicable (e.g., inversions in a pure
    reference sheet) skips cleanly. The dispositions together ARE the value pass;
    "minimum two additions" remains as floor, not as permission to ignore the rest.
+   Dispositions are RECORDED MECHANICALLY: a `dispositions7` block in
+   `maps/<stem>.json` (statuses PRE w/ anchor · ADD w/ delta id · SKIP w/ why ·
+   THIN = present-but-below-density, gate-red) — the ledger table mirrors it;
+   `~/.agents/skills/improve-doc/scripts/content-types.py` validates anchors, delta ids, and the floor.
 4. Per-type quality bars come from the skill's `diataxis.md` digest (type compass +
    quality expectations); the digest's Δ items are the raw material for ADDs.
 4. Mirror everything to AR twin (pipeline; direct patches for prose, splice for structure).
-5. Gates: `verify-twins.py` ALL PASSED + parse integrity both twins + coverage gate still 0.
+5. Gates: `verify-twins.py` ALL PASSED + parse integrity both twins + coverage gate still 0
+   + `python3 ~/.agents/skills/improve-doc/scripts/content-types.py <stem>` exit 0 (seven-type gate: THIN/MISSING
+   anywhere = red; two-addition floor enforced; advisory weak-signature flags allowed).
 6. Ledger row in `reference/Archive/rules-compliance.md` (R-id 4-status notation +
    new-claims tiering + the seven-disposition table). Progress log line. Commit + tag.
 
@@ -99,6 +105,38 @@ the shells' triage entries + the snapshots themselves. Target ~20 keys across th
 four docs; each key follows _TEMPLATE.md (distillation-grade for primaries).
 Shells are NOT redone — they already comply; only their Δ pointers gain key targets.
 Order: api-design keys → hdt keys → std keys → system-design keys.
+
+## REMEDIATION PHASES (inserted 2026-08-22, after the change-review audit)
+
+Phase 0 (DONE, v96): content-types gate shipped in skill v1.6; dispositions7 seeded
+honestly in five maps; api-design ledger row reconstructed; react digest
+authored-vs-verified corrected; problem-solving raw seeds re-fetched into
+reference/sources/raw-seeds/problem-solving/ after the /tmp loss.
+
+### Phase 1 — seven-type backfill (supersedes DOC ORDER until all green)
+Order: observability → how-developers-think → software-testing-and-debugging →
+api-design → react-2024-and-beyond. One doc at a time; full twin hygiene.
+Per doc:
+1. R14 leverage map authored from THAT doc's own digest/seeds — evidence-derived
+   master-first tiers ("master first / learn when needed / rare specialist");
+   ratios cited T1 or hedged labeled-convention (insight.md forbids unsourced ones).
+   New section, `sec-leverage-map-<context>` id identical both twins, spine-safe slot.
+2. R16 where THIN: terms-of-art block ("this is called X when…") grounded in seeds;
+   or explicit glossary-owner disposition via boundaries rule.
+3. react only: second Track B addition (from Δ backlog or G-r2 Actions deep-read)
+   + one distilled war story (R20) from fetched sources — clears its floor deviation.
+4. Mirror via twin pipeline (splice for structure); update digest shell Δ list and
+   dispositions7 (THIN/MISSING → PRE w/ anchor or ADD w/ delta id).
+5. Gates: verify-twins ALL PASSED + coverage exit 0 + content-types exit 0.
+6. Ledger row statuses flip; goal.md line; commit + tag.
+PHASE 1 DONE = `content-types.py` exit 0 on all five completed docs.
+
+### Phase 2 — resume campaign queue
+DOC ORDER resumes at #4 system-design Track B (owed since v89) under dispositions7
+discipline, then #5 javascript-the-language onward. problem-solving (#14): Track A
+resumes from rescued raw-seeds — carve source keys per _TEMPLATE.md, build shell +
+matrix, then Track B with dispositions7. Wave 1.5 leftovers (lamport/brewer scans,
+team-topologies extraction) remain tracked debt, not blockers.
 
 ## DOC ORDER (interleave A+B per doc before next)
 
@@ -145,6 +183,7 @@ supporting tier):
 ## SHELF DONE = all of:
 - Every doc: digest exists, coverage gate 0, digest links wired EN+AR, sweep logged
 - Every doc: Track B row in ledger (additions OR justified N/A)
+- Every doc: `content-types.py` exit 0 — all seven types PRE/ADD/SKIP(justified), zero THIN/MISSING
 - All twins: verify-twins green at last touch
 - goal.md log shows one line per doc per track
 - Final checkpoint: `Checkpoint vX: shelf campaign complete` + tag

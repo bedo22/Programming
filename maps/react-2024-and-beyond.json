@@ -1,5 +1,39 @@
 {
  "WANT": {},
  "FOLDS": [],
- "_note": "De-numbered + corruption-repaired in improve-doc pass v68 (2026-08-21): 44 numeral refs named, 12 nested-anchor folds flattened, 2 base64-corrupted folds rebuilt as proper links, both twins."
+ "_note": "De-numbered + corruption-repaired in improve-doc pass v68 (2026-08-21): 44 numeral refs named, 12 nested-anchor folds flattened, 2 base64-corrupted folds rebuilt as proper links, both twins.",
+ "dispositions7": {
+  "R14": {
+   "status": "MISSING",
+   "note": "failure-modes table is R15 function, not leverage tiers — backfill required"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-failure-modes"
+  },
+  "R16": {
+   "status": "THIN",
+   "note": "single vocabulary mention; no terms-of-art block"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-the-signals-question-and-why-react-didn-t-adopt-them"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-migration-paths-into-react-2024",
+   "note": "'Reach for / Be careful' decision tables"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-preact-the-structural-branch-that-asks-what-if-react-were-3-5-kb",
+   "note": "kB footprint figures"
+  },
+  "R20": {
+   "status": "THIN",
+   "anchor": "#sec-react-19-the-platform-shift",
+   "note": "dated history woven through sections; no worked example or distilled story"
+  },
+  "floor_note": "DEVIATION (not waived): single addition (compiler delta, commit 7115c62) vs floor of two — second addition owed in remediation"
+ }
 }

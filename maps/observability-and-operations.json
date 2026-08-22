@@ -1,4 +1,36 @@
 {
  "WANT": {},
- "FOLDS": []
+ "FOLDS": [],
+ "dispositions7": {
+  "R14": {
+   "status": "MISSING",
+   "note": "no practice tiers anywhere — backfill required"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-common-failure-modes"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-definition-what-observability-operations-is-and-what-it-is-not"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-evolution-constraint-inversions-in-the-operational-layer"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-alert-design-turning-targets-into-contracts-with-humans"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-slo-design-choosing-what-to-promise",
+   "note": "burn-rate arithmetic present"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-the-checkout-incident"
+  },
+  "floor_note": "WAIVER: v91 obs-Δ1 (USE def) + obs-Δ2 (symptoms-vs-causes) authored (commit ed7dbcd)"
+ }
 }

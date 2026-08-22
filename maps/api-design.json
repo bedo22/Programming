@@ -9,5 +9,39 @@
   "8f": "sec-realtime-and-streaming-contracts",
   "8g": "sec-schema-evolution-the-compatibility-matrix",
   "8h": "sec-security-browser-contracts"
+ },
+ "dispositions7": {
+  "R14": {
+   "status": "MISSING",
+   "note": "no master-first tiers anywhere; ledger SKIP conflated R15's diagnostic function with leverage — backfill required"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-the-most-common-failure-modes",
+   "note": "T19 failure-mode/what-it-looks-like/why table verified 2026-08-22"
+  },
+  "R16": {
+   "status": "THIN",
+   "anchor": "#sec-definition-what-api-design-is-and-what-it-is-not",
+   "note": "only 'Confused with' disambiguation; no terms-of-art block; glossary owns shared terms — backfill candidate"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-evolution-constraint-inversions-across-the-same-idea"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-methodologies-styles-the-named-approaches",
+   "note": "'When you reach for it' + Identifier 'Use when' tables"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-collections-pagination-filtering-sorting-and-search"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-design-a-public-shipment-tracking-api"
+  },
+  "floor_note": "WAIVER: pilot pre-dates the disposition system; v79 authored 10 extraction deltas both twins (commit 98ff9fe)"
  }
 }
