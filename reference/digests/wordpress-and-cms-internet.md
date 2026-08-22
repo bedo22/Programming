@@ -1,7 +1,8 @@
 # wordpress-and-cms-internet — source digestion shell
 
-Status: TRACK A COMPLETE (2026-08-22). EN-only doc (no AR twin by design — plan marks
-it LAST/A-only tier). 9 unique cited URLs reconciled below per v1.7.
+Status: TRACK A COMPLETE (2026-08-22). CORRECTION (same day): an earlier version of
+this shell wrongly called the doc EN-only; reference/ar/wordpress-and-cms-internet.html
+EXISTS and passes verify-twins. Doc has a full AR twin. 9 unique cited URLs reconciled below per v1.7.
 
 ## Cited-URL reconciliation (coverage gate requirement)
 
@@ -46,7 +47,7 @@ it LAST/A-only tier). 9 unique cited URLs reconciled below per v1.7.
 | id | claim/area | hunts | status |
 |---|---|---|---|
 | G-wp1 | CMS market-share percentages | w3techs cited as living tracker; numbers deliberately not frozen into digest | convention-tier hedge |
-| G-wp2 | AR twin absence | per plan this doc is EN-only tier; flag for future translation decision | accepted design state |
+| G-wp2 | ~~AR twin absence~~ WITHDRAWN — earlier pass misverified; AR twin exists and is green | corrected same day, see ledger | resolved (false alarm) |
 
 ## Content authored from this digestion
 

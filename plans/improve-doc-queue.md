@@ -187,8 +187,8 @@ supporting tier):
 35 product-strategy ✅v122 · 36 product-shapes ✅v122 · 37 payments-and-commerce ✅v118 + v120 digest ·
 38 open-source 🔄 in flight ·
 39 recurring-fear-of-replacement 🔄 in flight · 40 dotnet-and-the-enterprise-lane ✅v122 ·
-41 wordpress-and-cms-internet 🔶 EN-only doc (no AR twin) — digest pending, LAST ·
-42 glossary ✅v122 (A only as planned)
+41 wordpress-and-cms-internet ✅v123 digest (+v127 correction: AR twin EXISTS and is green — earlier EN-only claim withdrawn) ·
+42 glossary ✅v122 (A only as planned) — SHELF COMPLETE
 
 ## SHELF DONE = all of:
 - Every doc: digest exists, coverage gate 0, digest links wired EN+AR, sweep logged

@@ -123,7 +123,7 @@ Working repo is now ~/projects/Programming (Linux-native, canonical history + ta
   reconciling six docs (angular ×4 h3 blocks, cs, swdp, vc DORA+nav repoints,
   frontend-camps EN camp E/F triples, payments preamble).
 - Digest-completion campaign (v120→): shells for all remaining docs; 31/42 at v123;
-  final 9 in flight via durable subagents. wordpress-and-cms-internet documented as
-  EN-only tier (G-wp2 defers AR decision to owner).
+  final 9 in flight via durable subagents. wordpress-and-cms-internet digested; a v123 EN-only misclaim was
+  withdrawn same day (v127) after definitive stem-set diff showed its AR twin green.
 - Ratio exceptions unchanged and recorded in verify-twins.py. Open questions logged
   in goal.md; nothing blocks.
