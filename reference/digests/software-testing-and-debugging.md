@@ -52,17 +52,27 @@ Supplementary: Wikipedia Software testing (67KB).
 - Δ Doc delta: std-Δ4 property-based section could cite fast-check/Hypothesis docs
   directly (currently only tooling table names them). Minor.
 
+## Content authored in later passes
+
+- pass v101 (Phase-1 backfill): std-Δ5 search-vocabulary block (seven terms of art)
+  after the definition section, EN+AR; std-Δ6 leverage map (three master-first tiers:
+  pyramid shape / lowest-trustworthy-evidence / red-green-refactor; doubles+budgets+V&V
+  as learn-when-needed; property-based + AI-era honestly hedged) after mental-models,
+  EN+AR. Dispositions7 R14 MISSING→PRE and R16 THIN→PRE.
+
 ## Coverage matrix
 
 | doc section | covered by source | note |
 |---|---|---|
 | #sec-how-to-use-this-doc | n/a navigation | exempt |
 | #sec-definition-what-testing-is-and-what-it-is-not | IEEE 1012 ✓ | |
+| #sec-search-vocabulary-what-testing-calls-things | std-Δ5 terms-of-art block (oracle/flaky/smoke/regression/canary/fixture/assertion) | added v101; definitions grounded in the doc's own usage |
 | #sec-history-from-debugging-to-continuous-and-ai-era-testing | JUnit/TDD wikis; sw-testing | |
 | #sec-evolution-the-constraint-inversions | synthesis of fetched histories | pattern-level |
 | #sec-intersection-with-neighbors-evidence-at-every-boundary | n/a shelf-internal | exempt |
 | #sec-underlying-theory-oracles-isolation-determinism-and-risk | sw-testing article (oracle concept) | |
 | #sec-mental-models-how-senior-engineers-think-about-tests | Fowler bliki | std-Δ1 here |
+| #sec-leverage-map-where-testing-practice-mass-concentrates | std-Δ6 tiers over this shell's fetched sources (Cohn/Fowler/Vocke, Beck TDD, SRE SLO, IEEE 1012) | added v101; property-based tier honestly hedged pending canon |
 | #sec-testing-levels-from-one-unit-to-the-whole-system | Vocke | std-Δ2 here |
 | #sec-testing-techniques-how-to-choose-inputs-that-matter | sw-testing; property-based → G1 | |
 | #sec-test-doubles-mocks-stubs-fakes-and-spies | Vocke (test doubles) | Meszaros origin → G2 |

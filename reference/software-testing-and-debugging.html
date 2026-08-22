@@ -85,6 +85,53 @@
   <li><strong>Not only for QA teams.</strong> Developers, designers, testers, operators, and AI tools all produce and consume testing evidence.</li>
 </ul>
 
+<h2 id="sec-search-vocabulary-what-testing-calls-things">Search vocabulary — what this field calls things</h2>
+
+<p>You cannot look up a problem you cannot name. These terms of art appear throughout this doc; each is also the query that unlocks the wider world beyond it.</p>
+
+<table>
+  <thead>
+    <tr><th>Term</th><th>What it names</th><th>Why it matters for searching</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><dfn>test oracle</dfn></td>
+      <td>The thing that decides whether output is correct — a spec, a reference implementation, or a property</td>
+      <td>Most beginner confusion ("what should this test assert?") is really an oracle problem</td>
+    </tr>
+    <tr>
+      <td><dfn>flaky test</dfn></td>
+      <td>Same code, different verdicts across runs — usually timing, ordering, or shared state leaking in</td>
+      <td>The standard term teams use when quarantining unreliable tests; searching "unreliable test" finds almost nothing</td>
+    </tr>
+    <tr>
+      <td><dfn>smoke test</dfn></td>
+      <td>The shallowest broad check — "is it broken at all?" — run before deeper suites are worth starting</td>
+      <td>Names the tier between "compiles" and "fully tested" that otherwise has no word</td>
+    </tr>
+    <tr>
+      <td><dfn>regression test</dfn></td>
+      <td>A test pinning a once-broken behavior so it stays fixed</td>
+      <td>Distinguishes new-coverage work from bug-pinning work; job posts and tooling both assume it</td>
+    </tr>
+    <tr>
+      <td><dfn>canary</dfn></td>
+      <td>Shipping a change to a small traffic slice first, watching signals before widening</td>
+      <td>Bridges this doc's production-verification section to deployment practice vocabulary</td>
+    </tr>
+    <tr>
+      <td><dfn>test fixture</dfn></td>
+      <td>The arranged preconditions a test needs — data, files, server state — before the assertion can run</td>
+      <td>Framework docs (JUnit's own lineage here) organize their entire setup API around it</td>
+    </tr>
+    <tr>
+      <td><dfn>assertion</dfn></td>
+      <td>The executable claim a test makes about output; everything else is arrangement</td>
+      <td>Separating claims from setup is what makes failure messages readable and suites debuggable</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="sec-history-from-debugging-to-continuous-and-ai-era-testing">History — from debugging to continuous and AI-era testing</h2>
 
 <p>Testing evolved from an afterthought into an engineering feedback system:</p>
@@ -181,6 +228,63 @@
   <li><strong>A flaky suite is a broken communication channel.</strong> If the team stops trusting red, red becomes decorative. Flakiness is not an annoyance; it is a quality defect in the evidence system.</li>
   <li><strong>Tests are design pressure.</strong> If a unit is painful to test, the pain often reveals hidden coupling, unclear boundaries, or too many responsibilities. TDD uses that pressure deliberately.</li>
 </ul>
+
+<h2 id="sec-leverage-map-where-testing-practice-mass-concentrates">The leverage map — where testing practice mass concentrates</h2>
+
+<p>Not every practice in this doc earns equal study time. These tiers are derived from this doc's own grounded sources — Fowler's and Vocke's pyramid writing (Cohn's 2009 original behind them), Beck's TDD record, the SRE book's SLO chapter, IEEE 1012's V&amp;V framing — not from vibes. Working default: tier one shapes every suite you write; tier two enters when its situation appears; tier three is regime you adopt, not habit you keep.</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Practice</th><th>Why it carries mass</th><th>Grounded in</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><strong>Master first</strong></td>
+      <td>Pyramid-shaped suites — many fast isolated tests, few broad slow ones, E2E at a bare minimum</td>
+      <td>E2E carries the highest maintenance cost in the literature; shape decides whether the suite gets run at all</td>
+      <td>Cohn (2009, etymology) via Fowler's bliki; Vocke's practical pyramid (both fetched)</td>
+    </tr>
+    <tr>
+      <td>The lowest level that produces trustworthy evidence for the question asked</td>
+      <td>The one rule that resolves unit-vs-integration-vs-E2E choices without dogma; pairs with honest "unit" definitional fuzziness</td>
+      <td>Vocke (what-is-a-unit nuance); this doc's levels table (std-Δ2)</td>
+    </tr>
+    <tr>
+      <td>Red-green-refactor as design pressure</td>
+      <td>TDD's mechanism is feedback speed, not ceremony — tests push design from the inside</td>
+      <td>Beck's TDD record (fetched Wikipedia article)</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><strong>Learn when needed</strong></td>
+      <td>Test doubles at boundaries — never live third parties</td>
+      <td>Doubles make boundary suites deterministic; the no-live-services rule keeps them that way in CI</td>
+      <td>Vocke's doubles guidance (fetched); this doc's doubles table</td>
+    </tr>
+    <tr>
+      <td>Error budgets and "nines" once code reaches production verification</td>
+      <td>The reliability arithmetic ("an SLO for meeting other SLOs") that tells you when testing has done its job and observability takes over</td>
+      <td>SRE book SLO chapter (std-Δ3, fetched)</td>
+    </tr>
+    <tr>
+      <td>Verification vs validation distinction</td>
+      <td>"Did we build it right" vs "did we build the right thing" — the frame regulated industries will demand</td>
+      <td>IEEE 1012 (fetched)</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Rare specialist</strong></td>
+      <td>Property-based testing — generated inputs checked against invariants</td>
+      <td>Pays in algorithmic cores where example tests miss edge classes; canon fetch still pending (gap G-class)</td>
+      <td>Hedged pointer — fast-check/Hypothesis docs pending fetch</td>
+    </tr>
+    <tr>
+      <td>AI-era nondeterministic-system strategies</td>
+      <td>Matters only once your system includes model output; strategies are still settling field-wide</td>
+      <td>This doc's AI-era section (doc-native, hedged)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Leverage rankings rot faster than the practices they rank — re-check these tiers against the sources whenever a Track pass touches this doc.</p>
 
 <h2 id="sec-testing-levels-from-one-unit-to-the-whole-system">Testing levels — from one unit to the whole system</h2>
 
