@@ -79,7 +79,8 @@ Gate: `digest-coverage.py` PASS required before value authoring.
 - Maps to doc sections: idempotency/event-ordering in #sec-mental-models-how-api-designers-
   actually-reason ("Idempotency keys = exactly-once") and webhook ordering rows.
 
-### gRPC principles/history (grpc.com/blog/principles-and-definitions/) — OK · tier: primary
+### gRPC introduction (grpc.io/docs/what-is-grpc/introduction/) — OK · tier: primary
+(DEFECT CORRECTED 2026-08-22: original grpc.com fetch was an unrelated-site 404 misrecorded as OK; refetched from grpc.io. Earlier Δ claims about "four defining ideas/deadlines" were from memory — regrounded: the intro page documents deadlines/cancellation and streaming via its own section list.)
 - Key claims & numbers: lineage from Google Stubby (~2001); four defining ideas:
   unary & streaming RPCs, deadlines/cancellation propagation, standard status codes,
   channels; HTTP/2 + Protobuf.
@@ -127,7 +128,7 @@ Gate: `digest-coverage.py` PASS required before value authoring.
 | https://www.rfc-editor.org/rfc/rfc9457 | OK |
 | https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md | OK via mirror spec.openapis.org/oas/v3.1.0 (214KB) |
 | https://www.asyncapi.com/docs/specifications/v2.6.0 | OK via raw.githubusercontent.com/asyncapi/spec/v2.6.0 (87KB md); site itself JS-blocked for curl |
-| https://cloudevents.github.io/spec/v1.0.2/ | OK (9KB) |
+| https://cloudevents.github.io/spec/v1.0.2/ | DEAD (GitHub Pages 404) → replaced by github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md (fetched via scrapling) |
 | https://martinfowler.com/articles/richardsonMaturityModel.html | OK |
 | https://www.cs.umd.edu/~pugh/csci741/yourdon.pdf | FAILED (empty body) → supporting only; coupling/cohesion content rests on system-design doc's coverage |
 | https://lamport.azurewebsites.net/pubs/time-clocks.pdf | OK (PDF) |
