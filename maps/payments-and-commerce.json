@@ -17,5 +17,38 @@
    "Backend Engineering §3",
    "Backend Engineering <a href=\"./backend-engineering.html#sec-background-work-queues-jobs-and-why-you-defer\">§3</a>"
   ]
- ]
+ ],
+ "dispositions7": {
+  "R14": {
+   "status": "SKIP",
+   "note": "PSP-choice tiers are volatile vendor landscape; doc deliberately teaches invariants instead"
+  },
+  "R15": {
+   "status": "PRE",
+   "anchor": "#sec-most-common-failure-modes"
+  },
+  "R16": {
+   "status": "PRE",
+   "anchor": "#sec-underlying-theory-the-invariants-of-money-in-motion",
+   "note": "authorization/capture/settlement/idempotency vocabulary taught in-doc"
+  },
+  "R17": {
+   "status": "PRE",
+   "anchor": "#sec-history-how-money-learned-to-move-digitally"
+  },
+  "R18": {
+   "status": "PRE",
+   "anchor": "#sec-integration-patterns-where-the-code-meets-the-money"
+  },
+  "R19": {
+   "status": "PRE",
+   "anchor": "#sec-pci-dss-and-compliance-the-rules-you-inherited",
+   "note": "PCI DSS versions hedged to standards body"
+  },
+  "R20": {
+   "status": "PRE",
+   "anchor": "#sec-worked-example-a-small-saas-takes-its-first-payment"
+  },
+  "floor_note": "WAIVER: rich doc delegating facts to live PSP canon by design; justified N/A per SHELF-DONE rule"
+ }
 }
