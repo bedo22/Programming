@@ -18,9 +18,23 @@
 
 ## Key findings (one line each, with supporting quote)
 
-- [OCR PENDING] — the hosted copy is scan-quality (pdf-inspector: all 6 pages need OCR,
-  zero extractable text). Thesis statements above rest on the canonical summary until
-  OCR or a typeset copy is obtained. Do NOT quote page numbers.
+- **The changeability criterion, verbatim** — "There are a number of design decisions
+  which are questionable and likely to change under many circumstances," followed by
+  his list: input format, the decision to keep all lines in core, character-packing
+  choices.
+- **Decomposition goals stated** — modules should allow work "with little need for
+  communication"; "product flexibility—it should be possible to make drastic changes
+  to one module without a need to change others"; "comprehensibility—it should be
+  possible to study the system one module at a time."
+- **The efficiency cost is admitted** — the unconventional (information-hiding)
+  decomposition, "if implemented with the conventional assumption that a module
+  consists of one or more subroutines, will be less efficient in most cases."
+  Parnas trades runtime efficiency for changeability — the paper's honest cost line.
+
+## Source note
+
+Typeset copy located and fully extracted (colostate mirror, 27K chars) replacing the
+scan-hosted copy; original scan retained at win.tue.nl for provenance.
 
 ## Notes / caveats
 
@@ -34,4 +48,4 @@
 
 ## Verification history
 
-- 2026-08-22: partial (PDF fetch ok; scan-quality, OCR pending)
+- 2026-08-22: upgraded — typeset colostate mirror found via web search, fully extracted; quotes above verbatim from extraction
