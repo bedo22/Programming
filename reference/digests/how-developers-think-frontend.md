@@ -91,7 +91,7 @@ Supplementary: Wikipedia Spiral model · IID · XP · The Lean Startup · Workin
 | #sec-leverage-map-where-the-loop-practice-mass-concentrates | hdt-Δ6 tiers over this shell's digested sources (Miller/Cowan, SEI, Manifesto, XP/IID/LeanStartup) | added v99; tier-one rows cite G1 accepted-framework basis |
 | #sec-where-data-structures-algorithms-actually-show-up-in-frontend | gap → G1 | |
 | #sec-the-honest-truth-about-how-senior-devs-work | gap → G1; Δ3 supports | |
-| #sec-your-takeaway-the-deliberate-practice-loop | gap → G2 (Ericsson unlocated) | |
+| #sec-your-takeaway-the-deliberate-practice-loop | CLOSED v115: Ericsson located via problem-solving seeds (expertise/practice, raw-seeds/problem-solving/) + ps doc already teaches deliberate practice 9x | Δ-ps-cross |
 | #sec-what-is-this-process-called-entity-types-and-terminology | Lean Startup | |
 | #sec-why-is-it-a-rhythm-not-a-structured-algorithm | Agile Manifesto | Δ4 |
 | #sec-history-of-this-loop-from-nasa-to-react | Spiral; IID; XP | Δ2, Δ5 |
@@ -108,7 +108,7 @@ Supplementary: Wikipedia Spiral model · IID · XP · The Lean Startup · Workin
 | id | claim/area | where | hunts | status |
 |---|---|---|---|---|
 | G1 | Three-thread model + rounds taxonomy provenance | core sections | doc presents as own synthesized framework (consistent w/ "it doesn't have one canonical name" row) | accepted as authored framework — no † needed (no factual assertion) |
-| G2 | "build it 50 times"/deliberate-practice efficacy claim | takeaway loop | Ericsson deliberate-practice literature not yet located this pass | hunt during Track B; else hedge exists ("by doing it 50 times" is prescriptive, low risk) |
+| G2 | "build it 50 times"/deliberate-practice efficacy claim | takeaway loop | **CLOSED 2026-08-22 (v115)**: Ericsson literature located — reference/sources/raw-seeds/problem-solving/{expertise,practice}.md contain deliberate-practice canon; sibling problem-solving doc grounds it in its fluency section. Cross-doc owner-pointer: problem-solving owns the practice-science depth. | closed |
 
 ## Content authored from this digestion
 

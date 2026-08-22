@@ -38,18 +38,17 @@ dedicated seed needed).
 ### Schoenfeld — tier: primary
 - Establishes VERBATIM: 1985 *Mathematical Problem Solving*; the "Control" decisions
   band (what to do at each minute of work) as the metacognition extension.
-- Δ Doc delta:
-  - **ps-Δ1** the metacognition section can name the 1985 volume and the Control-band
-    terminology as sourced anchors rather than paraphrase-only.
+- Δ Doc delta: NONE NEEDED — checked during Track B: doc already cites the volume
+  (3x "Mathematical Problem Solving", 7x "1985"). Doc was ahead of inventory.
 - Maps to: #sec-schoenfeld-s-extension-metacognition-the-missing-fifth-element.
 
 ### Expertise / Practice seeds — tier: primary (cross-doc payoff)
 - Establishes: **Ericsson's deliberate-practice research and the 10,000-hour popular
   framing** — present in both seeds.
-- Δ Doc delta:
-  - **ps-Δ2** fluency-vs-storage section gains the Ericsson grounding line.
-  - CROSS-DOC: this ALSO closes G2 in digests/how-developers-think-frontend.md
-    ("Ericsson literature not yet located") — record the pointer there at Track B.
+- Δ Doc delta: NONE NEEDED in this doc — Ericsson already cited 3x, deliberate
+  practice taught 9x. The REAL payoff is CROSS-DOC: closes G2 in
+  digests/how-developers-think-frontend.md ("Ericsson unlocated") — CLOSED v115 with
+  owner-pointer to this doc's fluency section.
 - Maps to: #sec-fluency-vs-storage-strength-in-problem-solving.
 
 ### Computational thinking — tier: primary
@@ -111,6 +110,7 @@ dedicated seed needed).
 
 ## Content authored from this digestion
 
-- Track B plan (v113): ps-Δ1 Schoenfeld sourcing line · ps-Δ2 Ericsson grounding +
-  cross-doc G2 closure note in hdt digest · ps-Δ3 search-vocabulary block ·
-  ps-Δ4 leverage map. Dispositions7 to be CREATED at Track B commit.
+- Track B executed (v115): planned ps-Δ1 (Schoenfeld) + ps-Δ2 (Ericsson line) found
+  PRE-EXISTING on verification — recorded honestly above instead of duplicated.
+  AUTHORED: ps-Δ1 search-vocabulary block after definition · ps-Δ2 leverage map after
+  mental-models (both EN+AR). Dispositions7 CREATED at commit.
