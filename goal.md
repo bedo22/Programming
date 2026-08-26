@@ -45,3 +45,4 @@ Apply the plan to finish all waves
 - 2026-08-22: v126 — BATCH 4b FINAL: last three shells via revived subagent. DIGEST CAMPAIGN COMPLETE: 42/42 docs carry Track A shells + dispositions7 boards.
 - 2026-08-22: CORRECTION pre-certification: wordpress HAS an AR twin; v123 EN-only claim withdrawn everywhere. True shelf: 41 teaching docs, 41 twins, 41 digests.
 - 2026-08-22: v128 — SHELF CAMPAIGN COMPLETE. Certification sweep: 41/41 digests, coverage 0×41, content-types 0×41, twins green ×41, boards 41/41, Track B rows complete. PLAN v4 DONE.
+- 2026-08-22: v129 — SECURITY HYGIENE: webdev-vitals.html public client-side Google API keys sanitized (9 subs). Public strings, not real secrets; GitHub false positive. Gates re-passed.
