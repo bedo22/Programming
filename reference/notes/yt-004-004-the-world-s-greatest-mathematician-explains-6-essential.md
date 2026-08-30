@@ -8,7 +8,7 @@
 |---|---|
 | الملف المصدر | `transcripts/clean/004 - The world's greatest mathematician explains 6 essential concepts of math | Terence Tao.en-orig.txt` |
 | Session | yt-004 |
-| حالة الملاحظة | مسودة |
+| حالة الملاحظة | جاهزة |
 | أعلام محالة للشيخ | لا |
 
 ### المحور 1: Theme 1 — centuries ago which are um ver

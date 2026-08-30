@@ -8,7 +8,7 @@
 |---|---|
 | الملف المصدر | `transcripts/clean/002 - Every Programming Website Explained in under 6 minutes.en-orig.txt` |
 | Session | yt-002 |
-| حالة الملاحظة | مسودة |
+| حالة الملاحظة | جاهزة |
 | أعلام محالة للشيخ | لا |
 
 ### المحور 1: Theme 1 — inspect the source code read i

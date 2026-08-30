@@ -8,7 +8,7 @@
 |---|---|
 | الملف المصدر | `transcripts/clean/003 - I built the ultimate AI design workflow that is basically free (& can even be local).en-orig.txt` |
 | Session | yt-003 |
-| حالة الملاحظة | مسودة |
+| حالة الملاحظة | جاهزة |
 | أعلام محالة للشيخ | لا |
 
 ### المحور 1: Theme 1 — And then at the end I ll show 

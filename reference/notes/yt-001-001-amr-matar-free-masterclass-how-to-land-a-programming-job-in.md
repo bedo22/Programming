@@ -8,7 +8,7 @@
 |---|---|
 | الملف المصدر | `transcripts/clean/001 - Amr Matar Free Masterclass — How To Land A Programming Job in 2026.ar-orig.txt` |
 | Session | yt-001 |
-| حالة الملاحظة | مسودة |
+| حالة الملاحظة | جاهزة |
 | أعلام محالة للشيخ | لا |
 
 ### المحور 1: Theme 1 — تمام بيقول الصوت واضح تنحنح لو
