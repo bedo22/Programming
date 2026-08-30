@@ -14,14 +14,17 @@
 ### المحور 1: Theme 1 — And then at the end I ll show 
 - خلاصة (هضم) — Segment 00:01 — distilled
 - اقتباس حرفي: > «And then at the end I ll show you» (yt-003، 00:01)
+- اقتباس حرفي: > «what I think is the real cheat code right» (yt-003، 00:01)
 
 ### المحور 2: Theme 2 — fine in code but terrible on s
 - خلاصة (هضم) — Segment 00:06 — distilled
 - اقتباس حرفي: > «fine in code but terrible on screen If you» (yt-003، 00:06)
+- اقتباس حرفي: > «take just one thing from this video make it» (yt-003، 00:06)
 
 ### المحور 3: Theme 3 — subscribe to the channel I ll 
 - خلاصة (هضم) — Segment 00:11 — distilled
 - اقتباس حرفي: > «subscribe to the channel I ll see you in» (yt-003، 00:11)
+- اقتباس حرفي: > «ll see you in the next video Until then» (yt-003، 00:11)
 
 ## نصوص وآثار
 

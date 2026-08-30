@@ -14,14 +14,17 @@
 ### المحور 1: Theme 1 — centuries ago which are um ver
 - خلاصة (هضم) — Segment 00:01 — distilled
 - اقتباس حرفي: > «centuries ago which are um very familiar um in» (yt-004، 00:01)
+- اقتباس حرفي: > «the early stages to to most people but mathematicians» (yt-004، 00:01)
 
 ### المحور 2: Theme 2 — still ask this question people
 - خلاصة (هضم) — Segment 00:42 — distilled
 - اقتباس حرفي: > «still ask this question people also ask what happened» (yt-004، 00:42)
+- اقتباس حرفي: > «if instead of a continuous space um you have» (yt-004، 00:42)
 
 ### المحور 3: Theme 3 — valuable things and they need 
 - خلاصة (هضم) — Segment 01:24 — distilled
 - اقتباس حرفي: > «valuable things and they need to be supported Four» (yt-004، 01:24)
+- اقتباس حرفي: > «times a year we print a magazine worth putting» (yt-004، 01:24)
 
 ## نصوص وآثار
 
