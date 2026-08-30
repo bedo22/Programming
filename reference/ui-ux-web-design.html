@@ -1197,6 +1197,18 @@
 
 ---
 
+<h2 id="sec-2026-ai-slop-design-skills-and-the-screenshot-loop">2026 — AI slop, design skills, and the screenshot loop (yt-003)</h2>
+
+<p>The front-end's 2026 bottleneck is not code. «The code part is basically solved» <span class="cite">(yt-003, 00:00)</span> — any decent model emits a working React app. What fails is taste: «same purple gradient, the same Inter font, the same three-card feature grid with rounded corners» <span class="cite">(yt-003, 00:00)</span>. The speaker's label is «I call it AI slop and everyone is tired of it» <span class="cite">(yt-003, 00:00)</span>. Three layers turned that observation into a workflow.</p>
+
+<p><strong>Direction over generation.</strong> The response to slop was a wave of markdown design skills that teach the agent to think before it writes. The session notes «There are entire lists floating around with 45-plus design skills» <span class="cite">(yt-003, 00:00)</span> but argues the count is the trap: every skill eats context, and the agent spends half its brain choosing. Practical default: 3–4 skills covering four layers — direction, system, feedback, polish — not 40.</p>
+
+<p><strong>The loop that matters.</strong> The third layer is the one the speaker calls most important: the agent must see its own output. «A design skill without a screenshot loop is a creative director who never looks at the work» <span class="cite">(yt-003, 00:06)</span>. The mechanics: the agent opens its own work in a headless browser, screenshots every page, and grades against the design file — generate, screenshot, compare, fix, repeat. The failure it catches is «fine in code, but terrible on screen» <span class="cite">(yt-003, 00:06)</span> — overflow, broken mobile, low contrast that looked correct in CSS. Without the loop, bold aesthetic choices ship with low-contrast text that passes the code check and fails the user.</p>
+
+<p><strong>Cost as a design material.</strong> The session pairs the loop with a model choice: GLM 5.3 Flash (320B MoE, 18B active, 1M context, $0.15/0.50) as a fast, cheap visual executor. Once the skill file provides the thinking, the model only needs to execute and follow the screenshot critique — iteration becomes nearly free, so «five completely different aesthetic directions» become affordable. The doc's leverage rule still holds: direction (the skill) is scarce, execution is cheap.</p>
+
+<p><strong>What this adds to the shelf.</strong> The doc's future table already lists "AI as designer's intern" — this session makes it operable: one design.md as source of truth, one screenshot loop as eyes, 3–4 skills max. See the synthesis at <a href="./topics/002-programming-ecosystem-sites-and-tracks.html">Programming Ecosystem — Sites and Tracks</a> for the broader site/track map.</p>
+
 <details>
 <summary><h3 style="display:inline">Search vocabulary — what things are called</h3></summary>
 <p>You cannot search for a problem you cannot name. The terms of art this doc uses, each one a working search key:</p>
