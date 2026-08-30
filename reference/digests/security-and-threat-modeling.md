@@ -48,6 +48,7 @@ artifacts in the citation set.
 | #sec-the-future-where-security-is-going | doc-native signals, hedged | volatile→hedged |
 | #sec-summary-the-complete-mental-checklist | derives from confirmed sections | inherits classes |
 
+| #sec-2026-screenshot-loop-eyes-yt-003 | field notes 2026 — dated transcript evidence yt-003 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

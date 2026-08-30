@@ -45,6 +45,7 @@ teaching grounded in those canon references.
 | #sec-the-future-where-money-movement-is-going | signals — hedged | volatile→hedged |
 | #sec-summary-the-complete-mental-checklist | derives from confirmed sections | inherits classes |
 
+| #sec-2026-50k-payments-math-yt-008 | field notes 2026 — dated transcript evidence yt-008 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

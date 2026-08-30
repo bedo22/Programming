@@ -48,6 +48,7 @@ teaching grounded in those references.
 | #sec-the-complete-mental-checklist | derives from confirmed sections | inherits classes |
 | #sec-product-strategy-tooling-catalog-with-decision-metrics | volatile vendor catalog inside a details disclosure, hedged | volatile→hedged |
 
+| #sec-2026-50k-product-math-yt-008 | field notes 2026 — dated transcript evidence yt-008 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

@@ -43,6 +43,7 @@ doc-native professional practice delegating tool facts to that canon.
 | #sec-the-future-where-freelance-web-work-is-going | signals — hedged | volatile→hedged |
 | #sec-summary-the-complete-mental-checklist | derives from confirmed sections | inherits classes |
 
+| #sec-2026-egypt-field-notes-dollar-tracks | field notes 2026 — dated transcript evidence yt-006/007/008 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

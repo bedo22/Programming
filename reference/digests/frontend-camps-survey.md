@@ -39,6 +39,7 @@ Factual claims about specific stacks are owned by the shelf's dedicated docs
 Note: camps E/F gained the What-you-will-see/Wins/Loses h3 structure on the EN side at
 v118 (AR was ahead) — recorded there; no further delta needed.
 
+| #sec-2026-sites-tracks-field-notes | field notes 2026 — dated transcript evidence yt-002/005 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

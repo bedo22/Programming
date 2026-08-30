@@ -101,6 +101,7 @@ dedicated seed needed).
 | #sec-the-future-where-problem-solving-methodology-is-heading | signals — hedged | volatile→hedged |
 | #sec-summary-the-complete-mental-checklist | derives from confirmed sections | inherits classes |
 
+| #sec-2026-tao-foundations-yt-004 | field notes 2026 — dated transcript evidence yt-004 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

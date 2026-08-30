@@ -88,6 +88,7 @@ classified per v1.7 currency conventions.
 | #sec-measurement-why-measure-first-is-harder-than-it-sounds | doc-native teaching + wiki/arxiv canon (see ledger) | eternal principles; volatile facts hedged |
 | #sec-summary-the-complete-evaluation-checklist | doc-native teaching + wiki/arxiv canon (see ledger) | eternal principles; volatile facts hedged |
 
+| #sec-2026-tao-six-concepts-yt-004 | field notes 2026 — dated transcript evidence yt-004 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

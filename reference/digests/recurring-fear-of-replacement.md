@@ -47,6 +47,7 @@ dated source is taught as evidence inside a wave, not as current truth.
 | #sec-primary-sources | cited canon ledger (reconciled in this shell) | pointer section |
 | #sec-ask-your-teacher | n/a discussion prompts | exempt |
 
+| #sec-2026-egypt-easy-money-myth-yt-006 | field notes 2026 — dated transcript evidence yt-006 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

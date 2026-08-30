@@ -39,6 +39,7 @@ Status: TRACK A COMPLETE (2026-08-22). 6 unique cited URLs reconciled per v1.7 c
 | #sec-summary-the-complete-mental-checklist | derives from confirmed sections | checklist distillation |
 | #sec-the-ecosystem-tools-and-where-they-sit-in-the-funnel | doc-native catalog | volatile tooling landscape → hedged |
 
+| #sec-2026-egypt-job-market-yt-001 | field notes 2026 — dated transcript evidence yt-001 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

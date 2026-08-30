@@ -21,6 +21,7 @@ No cited URLs — the doc cites nothing external (claim-inventory mode; reconcil
 | #sec-skill-market-matrix-what-to-study-for-which-stream | doc-native decision matrix ("If you want… prioritize…") | decision table carries R18 function; eternal study priorities |
 | #sec-a-sane-sequencing-plan | doc-native sequencing guidance | eternal ordering logic; income numbers volatile → hedged |
 
+| #sec-2026-egypt-income-500-50k-yt | field notes 2026 — dated transcript evidence yt-006/007/008 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

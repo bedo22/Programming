@@ -46,6 +46,7 @@ sibling owner docs by design.
 | #sec-the-most-common-failure-modes | traces back to confirmed sections; concurrency collisions ground in race-condition canon (see ledger) | R15 support · eternal |
 | #sec-summary-the-complete-mental-checklist | derives from confirmed sections | inherits classes |
 
+| #sec-2026-stack-choice-yt-001-005 | field notes 2026 — dated transcript evidence yt-001/005 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |

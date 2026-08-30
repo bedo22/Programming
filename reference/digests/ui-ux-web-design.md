@@ -75,6 +75,7 @@ All cited sources accounted for; none dead this pass. Platform-canonical pages
 | #sec-the-future-where-ui-ux-is-going | signals — hedged | volatile→hedged |
 | #sec-summary-the-usability-checklist | derives from confirmed sections | inherits classes |
 
+| #sec-2026-ai-slop-design-skills-and-the-screenshot-loop | field notes 2026 — dated transcript evidence yt-003 | dated(2026-08) |
 ## Gaps
 
 | id | claim/area | hunts | status |
