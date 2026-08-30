@@ -1,0 +1,15 @@
+corpus:
+  transcripts_dir: transcripts/clean
+  key_pattern: "yt-(\\d{3})"
+  quote: {open: "«", close: "»"}
+  claim_source: auto
+  docs_dir: reference
+  playlist_name: "YouTube Programming"
+gates:
+  floor: auto
+  neglect_ratio: 0.10
+  thin_ratio: 0.20
+  essay_proxy: {quote_share: 0.55, min_words: 1200, min_paras: 6, ar_ratio: 0.78}
+  quarantine: null
+triage:
+  promote_to_gate: false
