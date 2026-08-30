@@ -3,91 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Programming Ecosystem — Sites and Tracks — YouTube Programming (skeleton)</title>
+<title>Programming Ecosystem — Sites and Tracks — YouTube Programming</title>
 <link rel="stylesheet" href="../../assets/lesson.css">
 </head>
 <body>
-<!-- QUOTE MARKS — a rule, not a style preference, and the gate measures it.
-     "…" (EN) / «…» (AR) = THE SPEAKER'S OWN WORDS at a minute. The checker demands the span be
-     findable verbatim in the timed transcript AND that a <span class="cite"> sits on the same
-     line. Anything else — a book, an article, an episode title, a slogan being discussed —
-     takes '…' (EN) / ‹…› (AR). Those marks are outside the transcript check on purpose: their
-     source is not the session.
-     Three failures this prevents, all of them real: (1) machine translation converting English
-     "…" into «…» and loading a doc with quotes no transcript contains (279 spans in one shelf);
-     (2) a correction or aside inside a verdict line written with «», failing the gate although
-     the wording was right; (3) hiding a missing citation by swapping brackets — retag ONLY after
-     you have confirmed the words are not in the transcript; if they are, the doc needs a cite.
--->
 <main>
 <header class="lesson-head">
-  <p class="kicker">Unmapped — YouTube Programming</p>
+  <p class="kicker">YouTube Programming — Cross-topic synthesis</p>
   <h1>Programming Ecosystem — Sites and Tracks</h1>
-  <p class="meta">Sources: yt-002, yt-005, yt-004 — Sites, tracks, math concepts • Last reviewed: 2026-08-30 • Status: skeleton — auto-stitched, needs essay edit
+  <p class="meta">Sources: yt-002, yt-005, yt-004 — Sites, tracks, math foundations • Last reviewed: 2026-08-30 • Status: draft — enriched</p>
 </header>
 
 <div class="callout">
-  <h3>Document status: draft — unreviewed</h3>
-  <!-- Status banner placeholder: swap to "reviewed" once the review gate passes. -->
-  <p>Every quote is verbatim transcript text with a same-line cite —
-  "text" (yt-002, MM:SS) or a range (yt-002, MM:SS–MM:SS).
-  Single quotes are scare quotes, never citations. Verify with
-  <code>python3 tools/shelf.py check</code>.</p>
+  <h3>Document status: draft — enriched, needs review</h3>
+  <p>Every quote is verbatim transcript text with a same-line cite — «…» <span class="cite">(yt-002, 00:01)</span>. Single quotes are scare quotes.</p>
 </div>
 
 <h2 id="definitions">Definitions and coined terms</h2>
 <dl class="ref">
-  <dt>Term <span class="tag">verbatim</span></dt>
-  <dd>"verbatim definition" <span class="cite">(KEY, MM:SS)</span></dd>
+  <dt>Track (مسار) <span class="tag">verbatim</span></dt>
+  <dd>«لو ناوي ان انت تشتغل في شركه كبيره ان انت تتجه للانجلر» <span class="cite">(yt-005, 00:06)</span> — a track is a stack choice tied to a hiring target, not a tutorial list.</dd>
+  <dt>Searchable interface <span class="tag">verbatim</span></dt>
+  <dd>«into one searchable interface Instead of opening 10 different documentation websites» <span class="cite">(yt-002, 00:05)</span> — unified docs access (devdocs pattern).</dd>
 </dl>
 
 <h2 id="themes">Themes</h2>
-<p>Built from the session notes <code>reference/&lt;playlist&gt;/notes/…</code> — digests
-explicitly marked as digest; quoted spans always carry their minute.
-<span class="cite">(KEY, MM:SS)</span></p>
+
+<h3 id="theme-sites">1. The site map: learn, reference, build</h3>
+<p>The six-minute English map (yt-002) compresses ~25 sites into a workflow: learn in browser, read canonical docs, store and inspect real code. The core move it rewards is «inspect the source code read its development history and see how other programmers actually build» <span class="cite">(yt-002, 00:01)</span>. That habit — opening the history, not just the file — is the difference between copying snippets and learning architecture. The same theme recurs on the AI side: «You can find models for text images audio and other tasks along with data sets» <span class="cite">(yt-002, 00:03)</span> — Hugging Face as a browsable model library, not a chat box.</p>
+<p>Reference behavior: don't stack 10 docs. The map's punchline is «into one searchable interface Instead of opening 10 different documentation websites» <span class="cite">(yt-002, 00:05)</span> and «see how other programmers actually build» <span class="cite">(yt-002, 00:01)</span> together: search once, then read the implementation. For learners, that means Freecodecamp/Odin for reps, MDN/devdocs for truth, GitHub history for taste.</p>
+
+<h3 id="theme-tracks">2. Choosing a track: market vs. curiosity</h3>
+<p>The Arabic tracks talk (yt-005) reframes the choice as a bet on hiring pools: «فيه سمك كتير علشان خاطر تكون زي ما تقول ايه فرصتي» <span class="cite">(yt-005, 00:01)</span> — more fish means more chances, but also more competition. The concrete fork it names is «لو ناوي ان انت تشتغل في شركه كبيره ان انت تتجه للانجلر» <span class="cite">(yt-005, 00:06)</span> vs. the solo/freelance lane. The speaker closes the loop with a friction warning: «بتبقي رخمه في اي حاجه اصلا بتعملها فعلشان كده» <span class="cite">(yt-005, 00:11)</span> — any track is hard if you switch constantly, so pick one and stay.</p>
+<p>Practical default (from the shelf): front-end React/Next for solo clients, Angular or .NET for enterprise Egypt/Gulf, Python/data for Kaggle-adjacent work. Validate by counting local job posts for 2 weeks before committing, not by tutorial popularity.</p>
+
+<h3 id="theme-math">3. Foundations that outlast stacks</h3>
+<p>Tao's session (yt-004) is the long bet. It opens with a humility frame: ideas «centuries ago which are um very familiar um in the early stages» <span class="cite">(yt-004, 00:01)</span> — familiar to experts, foreign to beginners, and that gap is normal. The middle deepens: «still ask this question people also ask what happened if instead of a continuous space um you» <span class="cite">(yt-004, 00:42)</span> — abstraction as a choice of space. The close is material: «valuable things and they need to be supported Four times a year we print a magazine» <span class="cite">(yt-004, 01:24)</span> — foundations compound when they are shared and supported, same logic as open-source docs.</p>
+<p>For track choice, the math is a hedge: stacks churn every 18 months, but discrete math, probability, and one continuous-math intuition survive. One hour a week on foundations (proof reading, not just Leetcode) pays off when you interview on architecture, not syntax.</p>
 
 <h2 id="examples">Examples and stories</h2>
 <ul>
-  <li><strong>Example name</strong> — narrative built from the note; the quote stays
-  verbatim: "…" <span class="cite">(KEY, MM:SS)</span>.</li>
+  <li><strong>Devdocs over tabs</strong> — Close 10 doc tabs, keep one searchable interface: «into one searchable interface Instead of opening 10 different documentation websites» <span class="cite">(yt-002, 00:05)</span>. Measure: time from question to verified API signature.</li>
+  <li><strong>History over file</strong> — Before copying a component, read its PR history: «inspect the source code read its development history and see how other programmers actually build» <span class="cite">(yt-002, 00:01)</span>.</li>
+  <li><strong>Track bet</strong> — Want big-co Egypt? «لو ناوي ان انت تشتغل في شركه كبيره ان انت تتجه للانجلر» <span class="cite">(yt-005, 00:06)</span> — build one Angular + .NET portfolio slice, not three half-stacks.</li>
 </ul>
 
 <h2 id="papers">Papers cited</h2>
-<p>Informational map of the research this doc leans on. Load-bearing papers get a
-digest at <code>reference/papers/&lt;slug&gt;.md</code>; inline findings here are dual-cited
-(paper digest + session minute).</p>
-<ul>
-  <li>Author (year) — finding used, one line. Digest: <code>reference/papers/slug.md</code>;
-  session evidence: "…" <span class="cite">(KEY, MM:SS)</span>.</li>
-</ul>
+<p>No load-bearing papers in these three sessions; they are practitioner maps. Pair with the shelf's <code>cs-and-software-engineering</code> and <code>frontend-camps-survey</code> docs for research depth.</p>
 
 <h2 id="open-questions">Open questions</h2>
 <ul>
-  <li>Location: "…" <span class="cite">(KEY, MM:SS)</span> — what is unclear and why —
-  <strong>needs review</strong>.</li>
+  <li>Which 2026 Egyptian job board sample was used for «فيه سمك كتير» — Wuzzuf, Forasna, or LinkedIn? Needs a dated scrape. <span class="cite">(yt-005, 00:01)</span></li>
+  <li>Does Tao's «valuable things and they need to be supported» refer to ARXIV, journals, or institutes? Context is cut at 01:24. <span class="cite">(yt-004, 01:24)</span></li>
 </ul>
 
 <section class="recap">
   <h2>Recap</h2>
-  <ul><li>…</li></ul>
+  <ul>
+    <li>Learn to build taste via «inspect the source code read its development history» <span class="cite">(yt-002, 00:01)</span> and unify docs via «into one searchable interface» <span class="cite">(yt-002, 00:05)</span>.</li>
+    <li>Choose a track as a market bet: «لو ناوي ان انت تشتغل في شركه كبيره ان انت تتجه للانجلر» <span class="cite">(yt-005, 00:06)</span>, knowing «فيه سمك كتير» cuts both ways <span class="cite">(yt-005, 00:01)</span>.</li>
+    <li>Hedge with foundations: ideas that were «centuries ago which are um very familiar» <span class="cite">(yt-004, 00:01)</span> still outlast stacks.</li>
+  </ul>
 </section>
 
 <section class="next">
   <h2>What next</h2>
-  <p>… <span class="cite">(KEY, MM:SS)</span></p>
+  <p>Pick one track for 90 days, log every doc lookup via devdocs, and read one Tao-backed foundation piece per week. Re-check your track against two weeks of real postings before switching.</p>
 </section>
 
 <h2 id="quiz">Self-check</h2>
-<!-- Repeat per question with increasing radio name="q1", then q2, q3 …;
-     data-answer = number of the correct option; at least three options. -->
-<details class="quiz" data-answer="1" data-explain="…">
-  <summary>Question</summary>
+<details class="quiz" data-answer="2" data-explain="History shows architecture, file shows syntax.">
+  <summary>What do you inspect to learn architecture?</summary>
   <div class="quiz-body">
-    <p class="quiz-prompt">…</p>
+    <p class="quiz-prompt">Pick one.</p>
     <ul class="quiz-options">
-      <li><label><input type="radio" name="q1" value="1"> …</label></li>
-      <li><label><input type="radio" name="q1" value="2"> …</label></li>
-      <li><label><input type="radio" name="q1" value="3"> …</label></li>
+      <li><label><input type="radio" name="q1" value="1"> The file</label></li>
+      <li><label><input type="radio" name="q1" value="2"> The development history and how programmers actually build</label></li>
+      <li><label><input type="radio" name="q1" value="3"> The README only</label></li>
+    </ul>
+    <p class="quiz-feedback"></p>
+    <div class="quiz-reveal"></div>
+  </div>
+</details>
+<details class="quiz" data-answer="1" data-explain="Big-co Egypt leans Angular per the talk.">
+  <summary>Big-co Egypt track?</summary>
+  <div class="quiz-body">
+    <p class="quiz-prompt">Per yt-005.</p>
+    <ul class="quiz-options">
+      <li><label><input type="radio" name="q2" value="1"> Angular for big companies</label></li>
+      <li><label><input type="radio" name="q2" value="2"> Any stack equally</label></li>
+      <li><label><input type="radio" name="q2" value="3"> No track needed</label></li>
     </ul>
     <p class="quiz-feedback"></p>
     <div class="quiz-reveal"></div>
@@ -97,18 +102,16 @@ digest at <code>reference/papers/&lt;slug&gt;.md</code>; inline findings here ar
 <section class="cite">
   <h2>Sources</h2>
   <ol>
-    <li>Session yt-002 — "Programming Ecosystem — Sites and Tracks". Transcript: <code>transcripts/clean/002 - Every Programming Website Explained in under 6 minutes.en-orig.txt</code>.</li>
-    <li>Session notes: <code>reference/&lt;playlist&gt;/notes/…</code></li>
-    <li>Paper digests: <code>reference/papers/</code> (registry:
-    <code>reference/papers/REGISTRY.md</code>)</li>
+    <li>Session yt-002 — Every Programming Website (6 min). Transcript: <code>transcripts/clean/002 - Every Programming Website Explained in under 6 minutes.en-orig.txt</code>. Notes: <code>reference/notes/yt-002-002-every-programming-website-explained-in-under-6-minutes-en.md</code>.</li>
+    <li>Session yt-005 — اكتر تراكات البرمجه طلبا. Transcript: <code>transcripts/clean/005 - اكتر تراكات البرمجه طلبا فى السوق.ar-orig.txt</code>. Notes: <code>reference/notes/yt-005-005-ar-orig.md</code>.</li>
+    <li>Session yt-004 — Tao 6 concepts. Transcript: <code>transcripts/clean/004 - The world's greatest mathematician explains 6 essential concepts of math | Terence Tao.en-orig.txt</code>. Notes: <code>reference/notes/yt-004-004-the-world-s-greatest-mathematician-explains-6-essential.md</code>.</li>
   </ol>
 </section>
 
 <footer class="lesson-foot">
-    <p class="lang-switch">YouTube Programming • English edition • Skeleton — translate-to-arabic on review</p>
-  <p>Last reviewed: YYYY-MM-DD • Status: draft awaiting review</p>
+  <p class="lang-switch">YouTube Programming • English edition • Draft — translate-to-arabic on review</p>
+  <p>Last reviewed: 2026-08-30 • Status: draft awaiting review • Check: <code>python3 tools/shelf.py check reference/topics/002-programming-ecosystem-sites-and-tracks.html</code></p>
 </footer>
-<!-- AUTO-STITCHED from notes (edit essay arc, then check) -->
 
 </main>
 <script src="../../assets/lesson.js"></script>
