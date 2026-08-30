@@ -1,0 +1,24 @@
+# MEH.yaml — input for `scaffold --from-yaml` / `draft-note --from-yaml`
+# One entry per محور. `khu` is digest (هضم), `quotes` are verbatim strings
+# as spoken; minutes are resolved via CleanSource + subseq (not raw.find).
+# Maps to trimmed templates/session-note.md 6+2: Themes(=meh) merges Definitions,
+# Claims(=meh محاور), Sources(=nusus+masadir), Q&A(=asila, delete if N/A),
+# Fidelity flags/log(=alam+amana), qisas→appended to Themes as stories.
+# Empty → TRIAGE review-queue, not GATE — old notes with old headings still GATE PASS.
+meh:
+  - idx: 1
+    title: "example title"
+    khu: "one-sentence digest of this محور"
+    quotes: ["verbatim quote as spoken"]
+  - idx: 2
+    title: "second محور"
+    khu: "digest"
+    quotes: ["first quote", "second quote"]
+# Optional sections — fill or leave empty; empty → TRIAGE review-queue (not GATE)
+qisas: []        # قصص وأمثلة → folded into Themes stories register
+nusus: []        # نصوص وآثار → Sources (with link)
+asila: []        # أسئلة وأجوبة مختارة → Q&A (delete if empty)
+alam: []         # أعلام للمراجعة | للشيخ | → Fidelity flags
+masadir: []      # مصادر متحققة → Sources
+amana: []        # ملاحظات للأمانة → Fidelity log
+# Legacy: segment map is now a comment in Metadata, not a counted section.

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<link rel="stylesheet" href="../../assets/lesson.css">
+</head>
+<body>
+<!-- QUOTE MARKS — a rule, not a style preference, and the gate measures it.
+     "…" (EN) / «…» (AR) = THE SPEAKER'S OWN WORDS at a minute. The checker demands the span be
+     findable verbatim in the timed transcript AND that a <span class="cite"> sits on the same
+     line. Anything else — a book, an article, an episode title, a slogan being discussed —
+     takes '…' (EN) / ‹…› (AR). Those marks are outside the transcript check on purpose: their
+     source is not the session.
+     Three failures this prevents, all of them real: (1) machine translation converting English
+     "…" into «…» and loading a doc with quotes no transcript contains (279 spans in one shelf);
+     (2) a correction or aside inside a verdict line written with «», failing the gate although
+     the wording was right; (3) hiding a missing citation by swapping brackets — retag ONLY after
+     you have confirmed the words are not in the transcript; if they are, the doc needs a cite.
+-->
+<main>
+<header class="lesson-head">
+  <p class="kicker">{kicker} — المجالس {range}</p>
+  <h1>{title}</h1>
+  <p class="meta">المصادر: <code>{source}</code> • آخر مراجعة: {date}</p>
+</header>
+
+<div class="callout">
+  <h3>حالة الوثيقة: مسودة — غير معتمدة</h3>
+  <p>كل اقتباس منسوب إلى موضعه ({cite} N، HH:MM) ومطابق حرفيًا لنص ASR الموقّت. ما يحمل وسم «للشيخ» يُحال إليه. تحقق بـ <code>python3 tools/shelf.py check</code>.</p>
+</div>
+{body}
+</main>
+</body>
+</html>

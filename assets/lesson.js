@@ -1,18 +1,12 @@
 // ponytail: small quiz + predict-output widget. No deps. Reads options from data attributes. Reused by every lesson.
 (function(){
-  var ar = document.documentElement.lang === 'ar';
-  var MSG = ar ? {
-    correctQuiz: 'صحيح. ',
-    wrongQuiz: 'ليس تمامًا — حاول مجددًا. (اختر خيارًا آخر أو اكشف الإجابة أدناه.)',
-    correctPredict: 'صحيح — هذا بالضبط ما يُنفَّذ.',
-    wrongPredict: 'ليس تمامًا. المتوقع: '
-  } : {
+  var MSG = {
     correctQuiz: 'Correct. ',
     wrongQuiz: 'Not quite — try again. (Pick another option or reveal the answer below.)',
     correctPredict: 'Correct — that is exactly what runs.',
     wrongPredict: 'Not quite. Expected: '
   };
-  function markSelected(optionInputs, labels){
+  function markSelected(optionInputs){
     optionInputs.forEach(inp=>{
       if(inp.checked) inp.closest('label').classList.add('selected');
       else inp.closest('label').classList.remove('selected');
@@ -25,12 +19,10 @@
     var reveal = q.querySelector(':scope > .quiz-body > .quiz-reveal');
     var answer = q.getAttribute('data-answer');
     var explanation = q.getAttribute('data-explain') || '';
-    var revealed=false;
-    inputs.forEach(function(inp,i){
+    inputs.forEach(function(inp){
       inp.addEventListener('change', function(){
-        markSelected(inputs, labels);
-        var val = inp.value;
-        var correct = val === answer;
+        markSelected(inputs);
+        var correct = inp.value === answer;
         feedback.textContent = correct ? MSG.correctQuiz.trim() : MSG.wrongQuiz;
         feedback.className = 'quiz-feedback ' + (correct ? 'correct' : 'wrong');
         if(reveal){
@@ -42,7 +34,6 @@
             reveal.style.display = 'none';
           }
         }
-        revealed = correct;
       });
     });
   }
