@@ -426,8 +426,8 @@ def scan_lines(txt, own_pl=None, own_key=None):
                     or "المرجع" in _post or "المرجع" in _pre
                     or "القرآن" in _pre or "سورة" in _pre
                     or "حديث" in _post or "أثر" in _post
-                    or "البخاري" in _post or "مسلم" in _post or "الترمذي" in _post or "quran.com" in _post or "sunnah.com" in _post
-                    or "البخاري" in _pre or "مسلم" in _pre or "الترمذي" in _pre):
+                    or "البخاري" in _post or "مسلم" in _post or "الترمذي" in _post or "مبدأ" in _post or "ديوان" in _post or "شعر" in _post or "quran.com" in _post or "sunnah.com" in _post
+                    or "البخاري" in _pre or "مسلم" in _pre or "الترمذي" in _pre or "مبدأ" in _pre or "ديوان" in _pre or "شعر" in _pre):
                     rec["text"] = True
                 if in_vtable:
                     rec["text"] = True
@@ -451,7 +451,7 @@ def scan_lines(txt, own_pl=None, own_key=None):
         if rec.get("text"):
             continue
         base = rec["line"]  # 1-based line of the quote
-        if any(("التحقق" in lines[k] or "المرجع" in lines[k] or "البخاري" in lines[k] or "مسلم" in lines[k] or "الترمذي" in lines[k])
+        if any(("التحقق" in lines[k] or "المرجع" in lines[k] or "البخاري" in lines[k] or "مسلم" in lines[k] or "الترمذي" in lines[k] or "مبدأ" in lines[k] or "ديوان" in lines[k] or "شعر" in lines[k])
                for k in range(base, min(len(lines), base + 3))
                if 0 <= k < len(lines)):
             rec["text"] = True
