@@ -13,4 +13,7 @@ The file tools/shelf.py remains the CLI shim for `python3 tools/shelf.py ...`.
 # released 1.1.0 at the S9.2 promotion gate. S0.4.
 # 1.2.0 = T9.1/T9.2 onboarding (ADR 0007): prefixless keys, per-playlist
 # top-level transcript dirs, self-resolving keyword cites, claims contract.
-__version__ = "1.2.22"
+# 1.2.23 = B-wave CLI migration: gates + coverage + build-meh + render-tool-docs
+#          as registry commands (shelf_core/gatelib.py one home; scripts/ become
+#          re-export shims); PEP 562 lazy-ROOT consumers (build-meh resolver)
+__version__ = "1.2.23"

@@ -48,10 +48,14 @@ def cmd_selftest():
         print(f"  [{'PASS' if cond else 'FAIL'}] {name}"
               + (f" — {detail}" if detail and not cond else ""))
 
-    def fx(code, expect_rc=0, root=None):
+    def fx(code, expect_rc=0, root=None, tools=None):
         """Run python code against the fixture corpus (ROOT=fxroot)."""
         _r = root if root is not None else fxroot
-        full = _PATCH.format(tools=str(ROOT / "tools"), root=str(_r)) + code
+        # B-wave: a tools=None default keeps the established behavior (the
+        # shelf-local synced copy); gate-command guards pass tools=<running
+        # package> so the guard tests THIS code, not the sync state.
+        _t = tools if tools is not None else ROOT / "tools"
+        full = _PATCH.format(tools=str(_t), root=str(_r)) + code
         r = subprocess.run([sys.executable, "-c", full],
                            capture_output=True, text=True, cwd=str(_r))
         return r
@@ -113,12 +117,13 @@ def cmd_selftest():
                 "\n## Papers cited\n- none\n", encoding="utf-8")
             return p
 
-        def run(*args):
+        def run(*args, tools=None):
             return fx(
                 "import sys\n"
                 "sys.argv = ['shelf.py'] + " + repr([str(a) for a in args]) + "\n"
                 "from shelf_core import dispatch\n"
-                "dispatch.main()"
+                "dispatch.main()",
+                tools=tools
             )
 
         print("citation grammar:")
@@ -447,6 +452,37 @@ Federal Reserve window at midnight" <span class="cite">(zz-001,
         _outer_after = INVENTORY.read_text(encoding="utf-8") if INVENTORY.exists() else None
         ok("outer reference/inventory.md untouched by selftest",
            _outer_before == _outer_after, "regenerated the project's inventory")
+
+        # ---------- B-wave: gate commands over the LIVE fixture ----------
+        # The gate-command guards run against the RUNNING package (not the
+        # shelf-local synced copy) — they test the port; the sync state is
+        # covered by doctor's version check and the promotion pass.
+        import shelf_core as _sc
+        _pkg_tools = str(Path(_sc.__file__).resolve().parent.parent)
+        # notes-gate port, happy path: the fixture true-quote note must GATE
+        # PASS — in-process pins, contamination, pitfalls, verdict-contradictions
+        # all run inside the command now.
+        _p_good = fxroot / "reference" / "notes" / "fx-true-only.md"
+        r = run("notes-gate", str(_p_good), tools=_pkg_tools)
+        ok("notes-gate: fixture true-quote note passes (in-process)",
+           r.returncode == 0 and "GATE PASS" in r.stdout, r.stdout + r.stderr)
+        # notes-gate port, SEEN-FAILING bad case: Han contamination must fail the
+        # gate (rule 5 — a first-green guard is suspect until it has caught a break).
+        _bad = fxroot / "reference" / "notes" / "fx-bad-script.md"
+        _bad.write_text("مقدمة عربية قصيرة\n\nحرف صيني هنا: 港\n", encoding="utf-8")
+        r = run("notes-gate", str(_bad), tools=_pkg_tools)
+        ok("notes-gate: FOREIGN SCRIPT Han fails (guard seen failing)",
+           r.returncode == 1 and "FOREIGN SCRIPT Han" in r.stdout, r.stdout + r.stderr)
+        _bad.unlink()
+        # doc-coverage loud-empty (W4.5): the fixture docs dir is configured —
+        # but earlier checks leave fixture docs in it (fx-ar/fx-doc-*). Those
+        # artifacts are consumed by their own checks, so clear the dir here to
+        # reach the empty state; the fixture is rebuilt per run + removed in finally.
+        for _leftover in (fxroot / "reference" / "docs").glob("*.html"):
+            _leftover.unlink()
+        r = run("doc-coverage", tools=_pkg_tools)
+        ok("doc-coverage: empty docs dir is loud exit 2 (W4.5)",
+           r.returncode == 2 and "no docs under" in r.stderr, r.stdout + r.stderr)
     finally:
         import shutil
         shutil.rmtree(base, ignore_errors=True)
@@ -514,6 +550,34 @@ Federal Reserve window at midnight" <span class="cite">(zz-001,
     ok("F18 text lanes: vtable + التحقق quotes mark text-source",
        len(_f18) == 2 and all(r.get("text") for r in _f18),
        f"records={len(_f18)} flags={[bool(r.get('text')) for r in _f18]}")
+    # ---------- B-wave: gates as registry commands (CLI wave 1.2.23) ----------
+    # The six scripts/doc-gate|notes-gate|doc-coverage|notes-coverage|
+    # build_meh|render-tool-docs ports must resolve through the SAME registry
+    # dispatch uses (ADR 0006): entry present, module importable, func callable,
+    # describe contract non-empty. Red witnessed 2026-02: a bogus entry
+    # ("doc-gateX") fails this guard. The gate-level bad cases live inside the
+    # fixture block above (Han contamination seen failing there).
+    print("B-wave gate commands:")
+    import importlib as _imp
+    from shelf_core.registry import COMMANDS as _CMD
+    _b_ok, _b_detail = True, ""
+    for _n in ("doc-gate", "notes-gate", "doc-coverage", "notes-coverage",
+               "build-meh", "render-tool-docs"):
+        _e = _CMD.get(_n)
+        if not _e:
+            _b_ok, _b_detail = False, f"missing registry entry {_n}"
+            break
+        try:
+            _m = _imp.import_module(f".commands.{_e['module']}", package="shelf_core")
+            if not callable(getattr(_m, _e["func"], None)):
+                raise ImportError(f"{_e['func']} not callable")
+            if not _e.get("describe", {}).get("checks"):
+                raise ValueError("describe contract missing checks")
+        except Exception as _x:
+            _b_ok, _b_detail = False, f"{_n}: {_x}"
+            break
+    ok("B-wave commands resolve: importable func + describe contract", _b_ok, _b_detail)
+
     failed = [name for name, cond in results if not cond]
     print(f"\nSelftest: {len(results) - len(failed)}/{len(results)} passed.")
     if failed:

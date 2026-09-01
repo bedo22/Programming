@@ -206,4 +206,86 @@ COMMANDS = {
             "adrs": ["0004"],
         },
     },
+    # ── B-wave: gates + coverage as registry commands (CLI wave) ─────────────
+    # Ports of scripts/doc-gate|notes-gate|doc-coverage|notes-coverage|
+    # build_meh|render-tool-docs. scripts/ copies remain as the transition
+    # path until the Phase C cutover deletes them; both run the same gatelib.
+    "doc-gate": {
+        "module": "docgate", "func": "cmd_doc_gate",
+        "help": "GATE per-doc: check+responsibility+neglect+quarantine+essay-proxy+scripts",
+        "args": [("paths", {"nargs": "*"})],
+        "describe": {
+            "checks": ["shelf check via in-process cmd_check (returncode only)",
+                       "responsibility corpus-cites floor; neglect/thin triage",
+                       "quarantine pattern; essay-proxy share/words/paras (ar_ratio, defs-aware)",
+                       "script contamination + PITFALLS I/J; template exemption"],
+            "exits": {"0": "all docs pass", "1": "GATE FAILs listed"},
+            "pitfalls": ["--all sweeps reference/**/*.html (default when no paths)",
+                         "floor auto: 12 if avg-buckets>40 else 7 (freeze in config)"],
+            "adrs": ["0002"],
+        },
+    },
+    "notes-gate": {
+        "module": "notesgate", "func": "cmd_notes_gate",
+        "help": "GATE per-note: pins+contamination+empty-scaffold+verdict-contradictions",
+        "args": [("paths", {"nargs": "*"})],
+        "describe": {
+            "checks": ["pins in-process (fallback: tools/shelf.py subprocess while present)",
+                       "empty-scaffold via config-driven status labels (W4.13)",
+                       "FOREIGN SCRIPT + PITFALLS I/J; verdict contradictions >=0.95 overlap",
+                       "review-queue TRIAGE (never blocks); template exemption"],
+            "exits": {"0": "all notes pass", "1": "GATE FAILs listed"},
+            "pitfalls": ["templates (قالب/template/skeleton) exempt loudly",
+                         "bucket-ref validity owned by pins (W4.12 dead-check removed)"],
+            "adrs": ["0002"],
+        },
+    },
+    "doc-coverage": {
+        "module": "doccoverage", "func": "cmd_doc_coverage",
+        "help": "TRIAGE ledger: per-session representation of every doc (gates.coverage_profile selects profile)",
+        "args": [("paths", {"nargs": "*"})],
+        "describe": {
+            "checks": ["per-session quote/claim coverage vs floors (floor_high/low, repr_pct)",
+                       "profile fork: quotes-responsibility (_fork_main family) vs generic",
+                       "ambiguous note globs printed; bucket fallback labeled"],
+            "exits": {"0": "report printed", "1": "flagged docs", "2": "no docs_dir configured / no docs"},
+            "pitfalls": ["Politics+fqhn run the quotes-responsibility fork",
+                         "module-level exit(2) became in-command (same code, same message)"],
+            "adrs": ["0002"],
+        },
+    },
+    "notes-coverage": {
+        "module": "notescoverage", "func": "cmd_notes_coverage",
+        "help": "TRIAGE ledger: how completely each note distills its transcript",
+        "args": [("paths", {"nargs": "*"})],
+        "describe": {
+            "checks": ["buckets/quotes/cited/claims per note; quotes-per-claim density",
+                       "SCAFFOLD/THIN/ZERO flags (gate.thin_quotes_per_claim)"],
+            "exits": {"0": "report printed", "2": "no notes found"},
+            "pitfalls": ["claim grammar = notes.claims_count (A5.3, one home)"],
+            "adrs": ["0002"],
+        },
+    },
+    "build-meh": {
+        "module": "buildmeh", "func": "cmd_build_meh",
+        "help": "draft a MEH.yaml from an agent's structured reading of one lecture",
+        "args": [],
+        "describe": {
+            "checks": ["MEH.yaml shape; transcript segment slicing by construction"],
+            "exits": {"0": "yaml written", "1": "invalid input"},
+            "pitfalls": ["ROOT was __file__-derived in the script; now find_root (cwd)"],
+            "adrs": ["0001"],
+        },
+    },
+    "render-tool-docs": {
+        "module": "rendertooldocs", "func": "cmd_render_tool_docs",
+        "help": "regenerate references/tools/<name>.md from the registry (--describe) — never hand-edit",
+        "args": [("--out", {"nargs": "?"})],
+        "describe": {
+            "checks": ["one generated page per registry command (ADR 0006)"],
+            "exits": {"0": "pages regenerated"},
+            "pitfalls": ["generated tree: hand edits lost on next run"],
+            "adrs": ["0006"],
+        },
+    },
 }

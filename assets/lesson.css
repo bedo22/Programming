@@ -1,152 +1,23 @@
-/* ponytail: one stylesheet, every lesson links it. Tufte-ish: serif body, generous margins, narrow measure, restrained colour. */
-:root{
-  --ink:#1a1a1a;
-  --ink-soft:#444;
-  --rule:#d8d4cc;
-  --paper:#faf8f3;
-  --paper-warm:#f1ece0;
-  --accent:#6a4c1a;          /* dark ochre for emphasis */
-  --accent-soft:#a9844d;
-  --code-bg:#f4efe4;
-  --good:#3f6b2a;
-  --bad:#a53030;
-  --muted:#7a7368;
-  --measure: 38rem;           /* comfortable line length */
-}
-*,*::before,*::after{box-sizing:border-box}
-html{font-size:18px}                 /* lift root size so 1rem reads */
-body{
-  margin:0; padding:3rem 1.5rem 6rem;
-  background:var(--paper);
-  color:var(--ink);
-  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
-  line-height:1.6;
-  text-rendering:optimizeLegibility;
-  -webkit-font-smoothing:antialiased;
-}
-main{max-width:var(--measure); margin:0 auto}
-header.lesson-head{
-  border-bottom:1px solid var(--rule);
-  padding-bottom:1.25rem; margin-bottom:2rem;
-}
-header.lesson-head .kicker{
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  font-size:.75rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--muted); margin:0 0 .25rem;
-}
-header.lesson-head h1{
-  font-size:1.9rem; line-height:1.2; margin:.2rem 0 .8rem; font-weight:600;
-}
-header.lesson-head .meta{
-  font-family:ui-sans-serif,system-ui,sans-serif; font-size:.82rem; color:var(--muted);
-}
-h2{font-size:1.3rem; margin:2.2rem 0 .6rem; font-weight:600; line-height:1.25}
-h3{font-size:1.05rem; margin:1.5rem 0 .4rem; font-weight:600; color:var(--ink-soft)}
-p{margin:.6rem 0}
-a{color:var(--accent); text-decoration:underline; text-underline-offset:2px}
-a:hover{color:var(--ink)}
-code,kbd,samp,input,textarea{
-  font-family:ui-monospace,"SFMono-Regular","JetBrains Mono",Consolas,Menlo,monospace;
-  font-size:.92em;
-  direction:ltr;
-  text-align:left;
-  unicode-bidi:embed;
-}
-input,textarea{font-size:1rem}
-code{background:var(--code-bg); padding:.08em .32em; border-radius:3px; color:var(--ink)}
-pre{
-  background:var(--code-bg); padding:1rem 1.1rem; border-radius:6px;
-  overflow-x:auto; border:1px solid var(--rule); margin:1rem 0 1.4rem; line-height:1.5;
-  direction:ltr; text-align:left; unicode-bidi:embed;
-}
-/* code blocks: always LTR even inside RTL pages */
-pre>code, .predict-code{direction:ltr; text-align:left; unicode-bidi:embed}
-/* reveal hints: follow page direction (RTL on Arabic pages) */
-[dir="rtl"] .predict-reveal,
-[dir="rtl"] .quiz-reveal{direction:rtl; text-align:right; unicode-bidi:embed}
-pre code{background:none; padding:0; color:var(--ink)}
-.comment-line{color:var(--muted); font-style:italic}
-.output{color:var(--muted)}
-.tag-output{color:var(--ink-soft); font-family:ui-sans-serif,system-ui,sans-serif; font-size:.78rem; letter-spacing:.04em; text-transform:uppercase}
-section.recap,section.win,section.next,section.teacher{
-  border-left:3px solid var(--rule); padding:.3rem 0 .3rem 1rem; margin:1.6rem 0;
-  background:transparent;
-}
-section.win{border-left-color:var(--good)}
-section.teacher{border-left-color:var(--accent-soft)}
-section.next{border-left-color:var(--accent)}
-ul,ol{margin:.5rem 0 1rem; padding-left:1.4rem}
-li{margin:.3rem 0}
-.cite{font-family:ui-sans-serif,system-ui,sans-serif; font-size:.82rem; color:var(--muted); display:block; margin:.4rem 0 1.2rem}
-.cite::before{content:"Primary source → "}
-.callout{
-  background:var(--paper-warm); border:1px solid var(--rule);
-  padding:.9rem 1.1rem; border-radius:4px; margin:1.2rem 0; font-size:.95rem;
-}
-.callout h3{margin-top:0; color:var(--ink)}
-.bad{color:var(--bad)} .good{color:var(--good)}
-footer.lesson-foot{
-  margin-top:3rem; padding-top:1rem; border-top:1px solid var(--rule);
-  font-family:ui-sans-serif,system-ui,sans-serif; font-size:.82rem; color:var(--muted);
-  display:flex; flex-wrap:wrap; gap:.4rem 1.4rem; justify-content:space-between;
-}
+/* lesson.css — minimal shared styling for pipeline-generated docs.
+   W4.20: cmd_draft's template links this as {{ASSET_PREFIX}}/lesson.css and
+   evdoc's as ../../assets/lesson.css — the hook existed but the file did not,
+   so every fresh clone shipped a broken stylesheet link. This is a floor, not
+   a design system: readable defaults for the structural hooks the templates
+   emit; a shelf overrides it freely in its own assets/lesson.css. */
 
-/* ---- Quiz widget ---- */
-.quiz{margin:1.6rem 0; border:1px solid var(--rule); border-radius:6px; overflow:hidden; background:#fffefb}
-.quiz > summary{
-  list-style:none; cursor:pointer; padding:.8rem 1.1rem; background:var(--paper-warm);
-  font-family:ui-sans-serif,system-ui,sans-serif; font-weight:600; font-size:.95rem; color:var(--ink);
-}
-.quiz > summary::-webkit-details-marker{display:none}
-.quiz > summary::before{content:"Q  "; color:var(--accent-soft); letter-spacing:.1em}
-.quiz-body{padding:1rem 1.1rem 1.2rem}
-.quiz-prompt{margin-top:0; font-family:ui-sans-serif,system-ui,sans-serif; font-size:.95rem; color:var(--ink)}
-.quiz-options{list-style:none; padding:0; margin:.6rem 0 1rem; display:flex; flex-direction:column; gap:.5rem}
-.quiz-options label{
-  display:block; padding:.65rem .9rem; border:1px solid var(--rule); border-radius:4px;
-  cursor:pointer; font-family:ui-sans-serif,system-ui,sans-serif; font-size:.9rem; background:#fffefb;
-}
-.quiz-options label:hover{background:var(--paper-warm)}
-.quiz-options input{display:none}
-.quiz-options label.selected{background:var(--paper-warm); border-color:var(--accent-soft)}
-.quiz-feedback{font-family:ui-sans-serif,system-ui,sans-serif; font-size:.92rem; margin-top:.6rem; min-height:1.2em}
-.quiz-feedback.correct{color:var(--good)}
-.quiz-feedback.wrong{color:var(--bad)}
-.quiz-reveal{font-family:ui-monospace,Consolas,Menlo,monospace; font-size:.85rem; background:var(--code-bg); border:1px solid var(--rule); border-radius:4px; padding:.6rem .8rem; margin-top:.6rem; white-space:pre-wrap; word-break:break-word; overflow-wrap:break-word}
-
-/* ---- Predict-the-output interactive ---- */
-.predict{margin:1.4rem 0; border:1px solid var(--rule); border-radius:6px; background:#fffefb; padding:1rem 1.1rem 1.2rem}
-.predict-prompt{font-family:ui-sans-serif,system-ui,sans-serif; font-size:.95rem; margin-top:0}
-.predict-code{white-space:pre; margin:.6rem 0 .8rem}
-.predict input[type=text]{
-  width:100%; padding:.55rem .7rem; border:1px solid var(--rule); border-radius:4px;
-  font-family:ui-monospace,Consolas,monospace; font-size:.9rem; background:#fffefb;
-}
-.predict button{
-  margin-top:.5rem; padding:.45rem .9rem; border:1px solid var(--accent-soft);
-  background:var(--paper-warm); border-radius:4px;
-  font-family:ui-sans-serif,system-ui,sans-serif; font-size:.88rem; cursor:pointer; color:var(--ink);
-}
-.predict button:hover{background:#e9e0cc}
-.predict-feedback{font-family:ui-sans-serif,system-ui,sans-serif; font-size:.9rem; margin-top:.6rem; min-height:1.2em}
-.predict-feedback.correct{color:var(--good)}
-.predict-feedback.wrong{color:var(--bad)}
-.predict-reveal{font-family:ui-monospace,monospace; font-size:.85rem; background:var(--code-bg); border:1px solid var(--rule); border-radius:4px; padding:.5rem .8rem; margin-top:.5rem; white-space:pre-wrap; word-break:break-word; overflow-wrap:break-word}
-
-@media print{
-  body{background:#fff; padding:1.5rem}
-  .quiz, .predict, .dd-figure{break-inside:avoid}
-  a{color:var(--ink); text-decoration:none}
-}
-
-/* Editorial diagrams (diagram-design skill) */
-.dd-figure{margin:1.6rem 0; padding:.65rem; background:var(--paper-warm,#fff);
-  border:1px solid var(--rule,rgba(45,49,66,.12)); border-radius:8px}
-.dd-figure .dd-svg{display:block; width:100%; height:auto}
-.dd-figure figcaption{margin-top:.5rem; font-family:ui-sans-serif,system-ui,sans-serif;
-  font-size:.85rem; color:var(--ink, #8a8f98); line-height:1.5}
-.dd-figure figcaption strong{color:var(--ink, #2d3142)}
-
-/* Unverified-claim marker (improve-doc sources.md v1.4) */
-.unverified { color: #b45309; cursor: help; font-weight: bold; }
-[dir="rtl"] .unverified { font-family: inherit; }
+body { max-width: 46rem; margin: 1rem auto; padding: 0 1rem;
+       font-size: 1.05rem; line-height: 1.9; }
+blockquote { margin-inline: 0; padding-inline: 1rem;
+             border-inline-start: 3px solid #b8b2a7; color: #3a352d; }
+.cite { font-size: .78em; color: #6b6459; white-space: nowrap; }
+.kicker { font-weight: 600; letter-spacing: .04em; color: #6b6459; }
+.lesson-head { border-bottom: 1px solid #e2ddd2; padding-bottom: .6rem; }
+.lesson-foot { border-top: 1px solid #e2ddd2; margin-top: 2rem;
+               padding-top: .6rem; font-size: .9em; color: #6b6459; }
+.meta { font-size: .92em; color: #6b6459; }
+.callout { border: 1px solid #e2ddd2; border-radius: 6px; padding: .8rem 1rem; }
+.quiz-body { border: 1px solid #e2ddd2; border-radius: 6px; padding: .8rem 1rem; margin: 1rem 0; }
+.next { margin-top: 1.5rem; font-weight: 600; }
+.lang-switch { float: inline-end; font-size: .9em; }
+table { border-collapse: collapse; }
+th, td { border: 1px solid #e2ddd2; padding: .35rem .6rem; text-align: start; }

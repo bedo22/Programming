@@ -24,17 +24,13 @@ import sys, re, glob as _glob
 from pathlib import Path
 
 
-def _imports():
-    # H2.2: flat fallback removed
-    from shelf_core.config import load_config, find_root, corpus_cfg
-    from shelf_core.playlists import docs_dir
-    from shelf_core.match import tokens
-    from shelf_core.transcript import found_minutes
-    from shelf_core.notes import scan_lines, find_note, khu_rows
-    from shelf_core.transcript import check_quote, CleanSource
-    from shelf_core.citation import fmt_cite, fmt_mmss
-    return (load_config, find_root, corpus_cfg, docs_dir, tokens, found_minutes, khu_rows,
-            scan_lines, fmt_mmss, find_note, check_quote, CleanSource)
+from shelf_core.config import load_config, find_root, corpus_cfg
+from shelf_core.playlists import docs_dir
+from shelf_core.match import tokens
+from shelf_core.transcript import found_minutes
+from shelf_core.notes import scan_lines, find_note, khu_rows
+from shelf_core.transcript import check_quote, CleanSource
+from shelf_core.citation import fmt_cite, fmt_mmss
 
 
 def parse_any(secs):
@@ -108,8 +104,6 @@ def _pool_dump(keys_raw, root, scan_lines, tokens, found_minutes):
 
 
 def cmd_evdoc(argv):
-    (load_config, find_root, corpus_cfg, docs_dir, tokens, found_minutes, khu_rows,
-     scan_lines, fmt_mmss, find_note, check_quote, CleanSource) = _imports()
     yaml_path, out_override, dump_keys, seed_keys = None, None, None, None
     allow_ambiguous = False   # W4.17: explicit escape hatch for cross-key probes
     i = 0

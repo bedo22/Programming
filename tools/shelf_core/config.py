@@ -60,10 +60,38 @@ def gates_cfg(config: dict | None = None, root: Path | None = None) -> dict:
     return g if isinstance(g, dict) else {}
 
 
-# Paths — single source (was hardcoded in _legacy.py, now here)
-# _legacy.py lived at tools/shelf.py (2 levels to root), now at tools/shelf_core/_legacy.py (3 levels)
-ROOT = Path(__file__).resolve().parent.parent.parent
-REF = ROOT / "reference"
-TEMPLATES = ROOT / "templates"
-TRANSCRIPTS = ROOT / "transcripts"
-INVENTORY = REF / "inventory.md"
+# Paths — single source, resolved LAZILY per process (PEP 562 __getattr__).
+# Was: ROOT = Path(__file__).parent³ — module-location-derived, correct only
+# while the package always ran as synced files *inside* a shelf. With the
+# installed `shelf` CLI (editable venv pointing at the dev tree), __file__
+# names the dev tree no matter where the command runs, so `doctor` from a
+# shelf reported the dev tree's paths (witnessed red, 2026-09-01).
+# Now: first attribute access resolves find_root() (cwd walk-up to
+# config/project.yaml — the shelf the command was invoked from), then freezes
+# into module globals for the process. Consumers keep binding
+# `from .config import ROOT` unchanged: they import at process start (one
+# shelf per invocation) and dereference only at call time (CodeGraph:
+# ROOT 15 callers, TEMPLATES 7, INVENTORY 8, TRANSCRIPTS 5, REF 1; no
+# import-time joins anywhere).
+# Selftest's _PATCH still shadows these: it assigns real module attributes
+# BEFORE consumer imports, and its subprocesses also run cwd=fxroot, so both
+# mechanisms agree on the fixture root.
+def _resolve_paths():
+    root = find_root()
+    return root, root / "reference", root / "templates", root / "transcripts"
+
+
+def __getattr__(name):
+    if name == "ROOT":
+        root, _, _, _ = _resolve_paths()
+        globals()["ROOT"] = root  # freeze for the process
+        return root
+    if name in ("REF", "TEMPLATES", "TRANSCRIPTS", "INVENTORY"):
+        root, ref, tpl, tr = _resolve_paths()
+        globals()["ROOT"] = root
+        globals()["REF"] = ref
+        globals()["TEMPLATES"] = tpl
+        globals()["TRANSCRIPTS"] = tr
+        globals()["INVENTORY"] = ref / "inventory.md"
+        return globals()[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
