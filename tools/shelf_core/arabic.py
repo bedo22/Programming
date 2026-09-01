@@ -90,11 +90,10 @@ def fold_commas(s: str) -> str:
     return (s or "").replace("\u060c", ",").replace("؛", ";")
 
 
-def ar_norm(s: str, *, drop_hamza: bool = True, strip_punct: bool = True,
+def ar_norm(s: str, *, strip_punct: bool = True,
             fold_definite: bool = False, folds=FOLD_TABLE) -> str:
     """Canonical Arabic for COMPARISON. Never use this to write a note.
 
-    drop_hamza    : also remove the standalone glottal stop (verify's stricter form).
     strip_punct   : remove punctuation, including BOTH commas (text comparison).
     fold_definite : collapse a separately-written ``ال`` onto the word (match.norm's behaviour).
     """
@@ -103,8 +102,7 @@ def ar_norm(s: str, *, drop_hamza: bool = True, strip_punct: bool = True,
     s = HARAKAT_RE.sub("", s)
     for a, b in folds:
         s = s.replace(a, b)
-    if drop_hamza:
-        s = s.replace("ء", "")
+
     if fold_definite:
         s = re.sub(r"(?<![\w])ال\s+", "ال", s)
     if strip_punct:

@@ -102,7 +102,7 @@ _HARAKAT_RE = re.compile(r"[\u064B-\u0652\u0640\u0670]")
 def _norm_label(s: str) -> str:
     """Normalize a metadata label/value for tolerant comparison: strip Arabic
     harakat + tatweel, fold alef/ta-marbuta/etc. No shelf specifics here."""
-    return ar_norm(s or "", drop_hamza=False, strip_punct=False)  # exactly the old fold set
+    return ar_norm(s or "",  strip_punct=False)  # exactly the old fold set
 
 
 # ---------------- verdict grammar (A5.3(b): the ONE home) ----------------

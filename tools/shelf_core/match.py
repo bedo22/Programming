@@ -39,7 +39,7 @@ def norm(s: str) -> str:
     left in prose (receipt V1.5). The ASCII comma is in the punctuation class alongside
     the Arabic one: that asymmetry is what let a generator and a matcher disagree in
     silence (Pitfall Y)."""
-    return ar_norm(s, drop_hamza=False, fold_definite=True, folds=FOLD_TABLE_MIN)
+    return ar_norm(s, fold_definite=True, folds=FOLD_TABLE_MIN)
 
 
 def uth_variants(s):
@@ -110,6 +110,15 @@ def normalize_for_match(s: str):
             continue
         if ch in "أإآ":
             out.append("ا"); pos.append(i); i += 1; continue
+        # 1.2.20: casefold per char (1:1 so the position map stays exact).
+        # The pins/verify lane normalizes BOTH sides through this function;
+        # without the fold the EN shelves matched case-sensitively (cs-001:
+        # 34 spans, 0 verified — title-case note vs lowercase ASR). Arabic is
+        # case-free: no-op. tokens() got its fold in 1.2.19; this is the lane
+        # that actually drives verdicts.
+        _lo = ch.lower()
+        if _lo != ch and len(_lo) == 1:
+            out.append(_lo); pos.append(i); i += 1; continue
         if ch == "ة":
             out.append("ه"); pos.append(i); i += 1; continue
         if ch == "ى":
