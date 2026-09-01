@@ -211,6 +211,19 @@ def check_doc(doc: Path, pl: str, fails: list, verbose=True):
                                     doc.name, rec["key"])
         if verdict is None:
             continue
+        # F18: doc-lane parity with the note lane's F11c text-source advisory.
+        # Records marked text (التحقق: line / fork verification table) park
+        # MISSING/MISMATCH as advisory instead of a gating fail: the doc's own
+        # verification line asserts the text authority; the transcript cite
+        # only locates the discussion (measured: the Uthmani quran.com fetch
+        # quote in ونفس-عمق-118-122 gated although its التحقق line names
+        # الغاشية 88:21–22).
+        if verdict in ("MISSING", "MISMATCH") and rec.get("text"):
+            disp = rec["quote"] if len(rec["quote"]) <= 40 else rec["quote"][:37] + "…"
+            msg = (f'{doc.name}: text-source quote parks advisory: "{disp}" '
+                   f'{fmt_cite(rec["key"], rec["secs"])} — {vmsg}')
+            print(f"  ⚠ {msg}")
+            continue
         disp = rec["quote"] if len(rec["quote"]) <= 40 else rec["quote"][:37] + "…"
         if verdict == "OK":
             if verbose:

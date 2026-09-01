@@ -323,7 +323,19 @@ def scan_lines(txt, own_pl=None, own_key=None):
     Yields {line, quote, key, secs, cited}."""
     records = []
     carry = None  # (key, secs) from the last item line, for blockquote quotes
+    # F18: fork verification-table context — a markdown table whose header
+    # holds النص الحرفي is the fork's ASR-vs-canonical documentation layer
+    # (transcription + correction + attribution cells). Quotes inside it are
+    # the fork's textual analysis, not transcript claims: they park in the
+    # F11c text-source lane instead of gating (measured: 11 of the 14 note
+    # rows in the v16 contiguity census sat in such tables).
+    in_vtable = False
     for line_no, s in _iter_note_lines(txt):
+        if s.lstrip().startswith("|"):
+            if "النص الحرفي" in s:
+                in_vtable = True
+        elif s.strip():
+            in_vtable = False
         events = []
         for qm in QUOTE_RE.finditer(s):
             # QUOTE_RE is config-driven and always has ONE group = the quote text.
@@ -397,7 +409,12 @@ def scan_lines(txt, own_pl=None, own_key=None):
                 # target is the text authority, so transcript mismatch parks
                 # as advisory (claims lane), never gating.
                 nxt2 = next((p3 for p3, k3, _ in events[i + 1:] if k3 == "q"), len(s))
-                if TEXT_CITE_RE.search(s[val[2]:nxt2]):
+                # F18: التحقق: also appears BEFORE the quote inside one HTML
+                # block (doc <li>: "— التحقق: قرآن: الغاشية 88 («Uthmani…»)")
+                # — so the pre-window is part of the same convention.
+                if TEXT_CITE_RE.search(s[val[2]:nxt2]) or "التحقق:" in s[:val[1]]:
+                    rec["text"] = True
+                if in_vtable:
                     rec["text"] = True
                 records.append(rec)
             else:
@@ -410,6 +427,18 @@ def scan_lines(txt, own_pl=None, own_key=None):
             carry = (line_cites[-1][0], line_cites[-1][1])
         elif not is_bq:
             carry = None
+    # F18 post-pass: the fork's list form puts the verification line BELOW the
+    # blockquote ("— التحقق: الإسراء 70 والإنسان 3 —") — outside any
+    # single-line span. One backward-cheap sweep over the assembled records;
+    # window +1..+3 is the convention's fixed shape (quote, blank, التحقق).
+    lines = txt.split("\n")
+    for rec in records:
+        if rec.get("text"):
+            continue
+        base = rec["line"]  # 1-based line of the quote
+        if any("التحقق:" in lines[k] for k in range(base, min(len(lines), base + 3))
+               if 0 <= k < len(lines)):
+            rec["text"] = True
     return records
 
 

@@ -483,6 +483,13 @@ Federal Reserve window at midnight" <span class="cite">(zz-001,
         _auto_ok = True
     ok("claims_count refuses 'auto' loudly (stale-config guard)", _auto_ok,
        "silent zero returned for removed source")
+    # 1.2.19 guard: tokens() casefolds — EN shelves need case-insensitive
+    # matching (title-case note vs lowercase ASR), Arabic unaffected.
+    from shelf_core.match import tokens as _tok
+    ok("tokens casefold: EN case-insensitive, AR untouched",
+       _tok("Illiquidity Is Not Great") == _tok("illiquidity is not great")
+       and _tok("مؤمن") == ["مؤمن"],
+       "case leaked into token comparison")
     failed = [name for name, cond in results if not cond]
     print(f"\nSelftest: {len(results) - len(failed)}/{len(results)} passed.")
     if failed:

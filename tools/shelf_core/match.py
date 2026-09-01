@@ -121,7 +121,13 @@ def normalize_for_match(s: str):
 
 
 def tokens(s: str) -> list:
-    return re.findall(r"[\w]+", norm(s))
+    # 1.2.19: casefold here, at the ONE token gate every comparison flows
+    # through (pins/check/lift/coverage). Arabic is case-free so this is a
+    # no-op on the AR shelves; on EN shelves the missing fold made the
+    # matcher case-sensitive — cs-001 measured 34 cited spans, 0 verified,
+    # because the note's title-case cannot meet ASR's lowercase (the exact
+    # "Flags: 0 is a refusal" class).
+    return re.findall(r"[\w]+", norm(s).casefold())
 
 
 # P6.8: the ONE tolerance set — findmin/lift's "same tolerance as the shelf"

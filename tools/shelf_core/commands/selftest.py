@@ -483,6 +483,37 @@ Federal Reserve window at midnight" <span class="cite">(zz-001,
         _auto_ok = True
     ok("claims_count refuses 'auto' loudly (stale-config guard)", _auto_ok,
        "silent zero returned for removed source")
+    # 1.2.19 guard: tokens() casefolds — EN shelves need case-insensitive
+    # matching (title-case note vs lowercase ASR), Arabic unaffected.
+    from shelf_core.match import tokens as _tok
+    ok("tokens casefold: EN case-insensitive, AR untouched",
+       _tok("Illiquidity Is Not Great") == _tok("illiquidity is not great")
+       and _tok("مؤمن") == ["مؤمن"],
+       "case leaked into token comparison")
+    # 1.2.21 guard: F18 text-source lanes — fork verification-table quotes and
+    # quotes with a following التحقق: line park in the F11c advisory lane
+    # (text=True), never gate as transcript claims. HERMETIC: the «» quote
+    # style comes from corpus config, which the skill tree has none of —
+    # patch the notes-module QUOTE_RE for this assertion only (same masked-
+    # red class as the F1 guard: never trust ambient config in selftest).
+    import re as _re
+    _f18_note = (
+        "| الموضع | النص الحرفي | الملاحظة |\n"
+        "|---|---|---|\n"
+        "| 00:20 | «فظلت اعناقها لها خاضعين» | تشويه ASR | مراجع |\n"
+        "1. **item** — (cs-001, 00:10):\n"
+        "   > «قول الشيخ الحرفي هنا»\n"
+        "\n"
+        "   — التحقق: الإسراء 70 — نص.\n")
+    _orig_qre = _n.QUOTE_RE
+    _n.QUOTE_RE = _re.compile(r"«([^»]+)»")
+    try:
+        _f18 = _n.scan_lines(_f18_note, own_key="cs-001")
+    finally:
+        _n.QUOTE_RE = _orig_qre
+    ok("F18 text lanes: vtable + التحقق quotes mark text-source",
+       len(_f18) == 2 and all(r.get("text") for r in _f18),
+       f"records={len(_f18)} flags={[bool(r.get('text')) for r in _f18]}")
     failed = [name for name, cond in results if not cond]
     print(f"\nSelftest: {len(results) - len(failed)}/{len(results)} passed.")
     if failed:
