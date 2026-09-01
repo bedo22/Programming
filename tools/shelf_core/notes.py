@@ -334,7 +334,11 @@ def scan_lines(txt, own_pl=None, own_key=None):
         if s.lstrip().startswith("|"):
             if "النص الحرفي" in s:
                 in_vtable = True
-        elif s.strip():
+        elif s.lstrip().startswith("#"):
+            in_vtable = False
+        elif s.strip() == "":
+            pass
+        elif "|" not in s and "»" not in s:
             in_vtable = False
         events = []
         for qm in QUOTE_RE.finditer(s):
@@ -409,10 +413,20 @@ def scan_lines(txt, own_pl=None, own_key=None):
                 # target is the text authority, so transcript mismatch parks
                 # as advisory (claims lane), never gating.
                 nxt2 = next((p3 for p3, k3, _ in events[i + 1:] if k3 == "q"), len(s))
-                # F18: التحقق: also appears BEFORE the quote inside one HTML
+                # F18: التحقق also appears BEFORE the quote inside one HTML
                 # block (doc <li>: "— التحقق: قرآن: الغاشية 88 («Uthmani…»)")
                 # — so the pre-window is part of the same convention.
-                if TEXT_CITE_RE.search(s[val[2]:nxt2]) or "التحقق:" in s[:val[1]]:
+                # F19: also check pre-window for any text-source marker
+                # (القرآن/سورة/حديث before quote, as in abz-017 heading form).
+                # F19: broader text-source signals in attribution windows
+                _post = s[val[2]:nxt2]
+                _pre = s[:val[1]]
+                if (TEXT_CITE_RE.search(_post) or TEXT_CITE_RE.search(_pre)
+                    or "التحقق" in _post or "التحقق" in _pre
+                    or "المرجع" in _post or "المرجع" in _pre
+                    or "القرآن" in _pre or "سورة" in _pre
+                    or "حديث" in _post or "أثر" in _post
+                    or "البخاري" in _post or "مسلم" in _post or "quran.com" in _post or "sunnah.com" in _post):
                     rec["text"] = True
                 if in_vtable:
                     rec["text"] = True
@@ -436,7 +450,8 @@ def scan_lines(txt, own_pl=None, own_key=None):
         if rec.get("text"):
             continue
         base = rec["line"]  # 1-based line of the quote
-        if any("التحقق:" in lines[k] for k in range(base, min(len(lines), base + 3))
+        if any(("التحقق" in lines[k] or "المرجع" in lines[k] or "البخاري" in lines[k] or "مسلم" in lines[k])
+               for k in range(base, min(len(lines), base + 3))
                if 0 <= k < len(lines)):
             rec["text"] = True
     return records

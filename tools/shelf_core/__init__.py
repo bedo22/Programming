@@ -20,4 +20,4 @@ The file tools/shelf.py remains the CLI shim for `python3 tools/shelf.py ...`.
 #         free-prose statuses validate as enum-value + annotation; 2 selftest guards
 # 1.2.0 = T9.1/T9.2 onboarding (ADR 0007): prefixless keys, per-playlist
 # top-level transcript dirs, self-resolving keyword cites, claims contract.
-__version__ = "1.2.21"
+__version__ = "1.2.22"

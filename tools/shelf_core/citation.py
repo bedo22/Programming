@@ -219,7 +219,7 @@ def cite_match_parts(m, own_pl=None):
 # متحققة), NOT the spoken transcript. Whole-word parenthetical forms only; the
 # session cite marks WHERE it was discussed, this marks WHAT the text is.
 TEXT_CITE_RE = re.compile(
-    r"\((?:رواه|أخرجه|خرّجه|روي|سورة|قرآن|مصادر متحققة|صحّه|صححه|صحوه)[^)]{0,80}\)")
+    r"\((?:رواه|أخرجه|خرّجه|روي|سورة|قرآن|مصادر متحققة|صحّه|صححه|صحوه|حديث|أثر|المرجع)[^)]{0,80}\)")
 
 
 def iter_cites(line, own_pl=None):
