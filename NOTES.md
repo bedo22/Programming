@@ -26,3 +26,11 @@
 - **Problem-solving reference created and expanded** (`reference/problem-solving.html`, 823 lines, 24 sections, 17 tables). Now follows the same structural template as the other reference docs: Definition → History → Evolution → Intersection → Underlying theory → Mental models → Methodology (Pólya, CT, heuristics, metacognition, stepwise refinement, paradigms) → Principles → Worked example → Failure modes → Ecosystem → Future → Summary. Glossary updated with 12 new terms. RESOURCES.md updated with 12 sources (Pólya, Schoenfeld, Wing, Hunt & Thomas, Wirth, Dromey, Agans, competitive programming, Luchins/Einstellung, Sweller/cognitive load, Simon & Chase/expertise, Ericsson/deliberate practice). **Lessons TBD** — learner will decide whether it needs a full episode or a bridge lesson.
 - **`.cite` rule (learned):** the `.cite` class auto-prepends "Primary source → ", so use it ONLY for the single primary-source block in each lesson's `.next` section — never on inline attributions (that caused a double prefix in Lesson 1, now fixed). Apply to all future lessons.
 - Re-verify `speakingjs.com` reachability before using it as a primary-read recommendation.
+
+## 2026-09-01 — shelf-pipeline 1.2.18 sync (wave 1)
+
+- claim_source `auto` → `محاور` (notes carry ### المحور headers, 3/note; C# rows absent — behavior-neutral, was 0+3=3).
+- New 1.2.18 guard: `claims_count` refuses loudly on removed/unknown sources — stale configs crash instead of silently counting zero.
+- `assets/lesson.css`: sync overwrote the local Tufte design; **restored from git** — divergence intentional, protect on future syncs.
+- Gates: selftest 26/26, doctor clean, pins yt-001 Flags: 0 (6 verified).
+- Full check: 63 failures — **pre-existing doc debt newly visible** (47 broken links: flat `reference/*.html` docs use `../digests/…` paths that overshoot; 16 Unmapped-block docs). Notes lane green. Link fix = future mini-wave.
