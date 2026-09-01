@@ -75,6 +75,30 @@ class RawSource:
         return subseq(qt, self.all_tokens, index=self.index)
 
 
+_marker_re = re.compile(r"^\[(\d{1,2}):(\d{2})\]\s*$", re.M)
+
+def _parse_clean_buckets_paras(raw: str):
+    buckets: dict[int, list] = {}
+    paras: dict[int, str] = {}
+    current = None
+    buf: list[str] = []
+    for line in raw.split("\n"):
+        hm = _marker_re.match(line.strip())
+        if hm:
+            if current is not None and buf:
+                paras[current] = " ".join(buf)
+            current = int(hm.group(1)) * 60 + int(hm.group(2))
+            buckets.setdefault(current, [])
+            buf = []
+            continue
+        if current is not None and line.strip():
+            buckets[current].extend(tokens(line))
+            buf.append(line.strip())
+    if current is not None and buf:
+        paras[current] = " ".join(buf)
+    return buckets, paras
+
+
 def clean_buckets(sess_key: str):
     """{marker-minute: bucket tokens} for the session's clean file (cached).
 
@@ -84,52 +108,30 @@ def clean_buckets(sess_key: str):
     notes/docs mutate, and those have no token caches). A tool that edited a
     clean transcript mid-process would read stale buckets — that tool would be
     violating the doctrine, not the cache."""
-    rec = get_session(sess_key)
-    if rec is None:
-        return None
-    f = ROOT / rec["rel"]
-    if f not in _bucket_cache:
-        buckets = {}
-        current = None
-        for line in f.read_text(encoding="utf-8", errors="replace").split("\n"):
-            hm = re.match(r"^\[(\d{1,2}):(\d{2})\]\s*$", line.strip())
-            if hm:
-                current = int(hm.group(1)) * 60 + int(hm.group(2))
-                buckets.setdefault(current, [])
-                continue
-            if current is not None and line.strip():
-                buckets[current].extend(tokens(line))
-        _bucket_cache[f] = buckets
-    return _bucket_cache[f]
+    b, _ = _ensure_clean_caches(sess_key)
+    return b
 
 
 _para_cache: dict = {}
 
 
-def clean_paragraphs(sess_key: str):
-    """{minute: raw paragraph text} between [MM:SS] markers (cached)."""
+def _ensure_clean_caches(sess_key: str):
     rec = get_session(sess_key)
     if rec is None:
-        return None
+        return None, None
     f = ROOT / rec["rel"]
-    if f not in _para_cache:
-        paras = {}
-        current = None
-        buf = []
-        for line in f.read_text(encoding="utf-8", errors="replace").split("\n"):
-            hm = re.match(r"^\[(\d{1,2}):(\d{2})\]\s*$", line.strip())
-            if hm:
-                if current is not None and buf:
-                    paras[current] = " ".join(buf)
-                current = int(hm.group(1)) * 60 + int(hm.group(2))
-                buf = []
-                continue
-            if current is not None and line.strip():
-                buf.append(line.strip())
-        if current is not None and buf:
-            paras[current] = " ".join(buf)
-        _para_cache[f] = paras
-    return _para_cache[f]
+    if f not in _bucket_cache or f not in _para_cache:
+        raw = f.read_text(encoding="utf-8", errors="replace")
+        buckets, paras = _parse_clean_buckets_paras(raw)
+        _bucket_cache.setdefault(f, buckets)
+        _para_cache.setdefault(f, paras)
+    return _bucket_cache.get(f), _para_cache.get(f)
+
+
+def clean_paragraphs(sess_key: str):
+    """{minute: raw paragraph text} between [MM:SS] markers (cached)."""
+    _, p = _ensure_clean_caches(sess_key)
+    return p
 
 
 _norm_cache: dict = {}

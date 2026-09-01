@@ -1,47 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""shelf — fidelity-gated production pipeline for a transcript reference shelf.
-
-Born on the Investing shelf (its history is in the 1.0.0 CHANGELOG entry);
-now grammar- and path-configurable per shelf via `config/project.yaml`
-(C3.x): key_pattern, cite keyword, quote style, playlists, gate floors.
-What THIS run resolves — root, grammar, paths — prints via
-`python3 tools/shelf.py doctor` (read it before asking "why did it do
-that?"; the grammar-home table is `references/DESIGN.md`).
-
-Stdlib only. Immutable transcripts in, distilled notes and HTML topic docs out,
-with a mechanical check gate over every verbatim quote.
-
-Usage:
-    python3 tools/shelf.py inventory              # index all sessions -> reference/inventory.md
-    python3 tools/shelf.py lines KEY [LO] [HI]    # numbered view of a session's clean transcript
-    python3 tools/shelf.py lift KEY               # paste-ready quotes from stdin phrases
-    python3 tools/shelf.py pins [--fix] KEY|NOTE.md
-                                                  # verify every quote's minute (exit 0 = clean)
-    python3 tools/shelf.py scaffold KEY|A-B       # blank session note(s) from the template
-    python3 tools/shelf.py scaffold doc KEY [--topics] [TITLE]
-                                                  # topic-doc skeleton from the house template
-    python3 tools/shelf.py draft KEY              # doc draft from a filled session note
-    python3 tools/shelf.py check [SCOPE]          # the gate: all | cs|ex|rr | block | KEY | A-B
-                                                  # | a direct path to one .md/.html file
-    python3 tools/shelf.py quotes KEY              # diagnostic: extract all quoted spans with locations
-    python3 tools/shelf.py selftest               # fixture-based self test (cleans up after itself)
-
-Session keys: bare NNN means cs (e.g. ``pins 002`` == ``pins cs-002``);
-``cs-NNN`` / ``rr-NNN`` are zero-padded 3-digit; extras are slugs: ``ex-<slug>``.
-Scopes for check (and bare A-B scaffolding): nothing (= all), a playlist slug
-(cs/ex/rr), a block name, a single key, or A-B (bare A-B applies to cs).
-
-Citation grammar: verbatim quotes use straight DOUBLE quotes "..." with a
-trailing same-line cite — "text" (cs-002, 07:31) or a range
-(cs-002, 07:31–07:58); the comma-less form "text" (cs-002 07:31) is accepted
-too. Single-quoted '...' is scare quoting and is never scanned. A floating
-HH:MM is never a cite; minutes count only right after a session key. Every
-double-quoted span of >=4 tokens without a same-line cite is flagged ("uncited
-quote"); 1–3-token quoted spans are labels and skipped.
-
-This script never writes under transcripts/ — read-only there.
-"""
+"""dispatch — top-level shelf command. See `shelf.py --help` and `shelf.py --describe` for the full command registry."""
 import sys
 
 # H2.7 receipt: an "optional clean candidates fallback" block stood here,

@@ -52,15 +52,9 @@ def main(argv: list[str] | None = None):
         from shelf_core.dispatch import describe_command
         describe_command(argv[0])
         sys.exit(0)
-    # argparse here is for HELP only -- dispatch re-reads sys.argv and the commands parse
-    # their own flags. parse_args() therefore acted as a GATE: a flag not listed in
-    # build_parser() was rejected before the command ever ran (the "dead-shim" bug: it bit
-    # --json and --find, and Pitfall R was written and reproduced in the same session).
-    # parse_known_args keeps the help and lets a command's own flags through; unrecognised
-    # input is reported rather than silently swallowed, so typos stay visible.
-    _ns, _extra = build_parser().parse_known_args(argv)
-    if _extra:
-        print("shelf: passing through unrecognised arguments: " + " ".join(_extra), file=sys.stderr)
+    # Keep --version / --help via argparse (AGENTS.md contract)
+    if "--version" in argv or "-h" in argv or "--help" in argv:
+        build_parser().parse_args(argv)
     from shelf_core import dispatch as legacy
     sys.argv = ["shelf.py"] + argv
     legacy.main()
