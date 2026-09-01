@@ -34,3 +34,14 @@
 - `assets/lesson.css`: sync overwrote the local Tufte design; **restored from git** — divergence intentional, protect on future syncs.
 - Gates: selftest 26/26, doctor clean, pins yt-001 Flags: 0 (6 verified).
 - Full check: 63 failures — **pre-existing doc debt newly visible** (47 broken links: flat `reference/*.html` docs use `../digests/…` paths that overshoot; 16 Unmapped-block docs). Notes lane green. Link fix = future mini-wave.
+
+### Link-fix mini-wave closed (2026-09-01, later same day)
+
+- 45/47 broken links fixed mechanically (../ overshoot from flat reference/
+  docs — stripped after verifying every target + anchor exists). 47 -> 2.
+- Remaining 2 = literal {image}/{url} template placeholders in
+  html-and-css.html — content gap, needs the real asset/URL (doc backlog).
+- Metadata verdicts (16 -> 0): config note_meta mapping added (AR labels,
+  status_values census 8/8 = جاهزة). Notes untouched.
+- Full check: 63 -> 3 (the two placeholders + one duplicate). Sessions 8/8
+  with notes, all citations/quotes/links/statuses intact per-note.

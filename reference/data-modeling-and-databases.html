@@ -32,7 +32,7 @@ api-design.html          backend-engineering.html</pre>
   <ul>
     <li><a href="./system-design.html">System Design</a> — decides <em>which</em> database (Postgres vs. Redis vs. Kafka) and owns data across services. This doc designs the tables <em>inside</em> that choice.</li>
     <li><a href="./api-design.html">API Design</a> — the contract at the edge; the resource model on the wire. This doc is the same model as durable rows. API Design is the contract; Data Modeling is the vault.</li>
-    <li><a href="./backend-engineering.html">Backend Engineering</a> — the request loop that lives against the vault: data access (ORM vs. raw SQL, <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>), transactions and concurrency (<a href="../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>). This doc is the design work <em>before</em> the loop touches a row.</li>
+    <li><a href="./backend-engineering.html">Backend Engineering</a> — the request loop that lives against the vault: data access (ORM vs. raw SQL, <a href="backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>), transactions and concurrency (<a href="backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>). This doc is the design work <em>before</em> the loop touches a row.</li>
     <li><a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a> — schema changes are deployments; migrations ship through the same pipeline as code.</li>
     <li>Reference: <a href="./glossary.html">Glossary</a> — shared vocabulary across all reference docs.</li>
   </ul>
@@ -45,7 +45,7 @@ api-design.html          backend-engineering.html</pre>
 
 <h2 id="sec-how-to-use-this-doc">How to use this doc</h2>
 
-<p>Reading order: read this after you've seen <a href="./system-design.html">System Design</a> (so you know why the store was chosen) and after <a href="./backend-engineering.html">Backend Engineering</a> <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>–<a href="../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a> (so you know what the loop needs from the vault). Most readers come back to it when a query is slow, a migration is scary, or a schema is being born. Cross-links:</p>
+<p>Reading order: read this after you've seen <a href="./system-design.html">System Design</a> (so you know why the store was chosen) and after <a href="./backend-engineering.html">Backend Engineering</a> <a href="backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>–<a href="backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a> (so you know what the loop needs from the vault). Most readers come back to it when a query is slow, a migration is scary, or a schema is being born. Cross-links:</p>
 <ul>
   <li>Sibling to <a href="./api-design.html">API Design</a> — the contract exposes the vault; rename a column and you break the contract.</li>
   <li>Downstream from <a href="./system-design.html">System Design</a> — data ownership and store choice set the sandbox this doc designs in.</li>
@@ -87,7 +87,7 @@ api-design.html          backend-engineering.html</pre>
 <tbody>
 <tr><td>System Design</td><td>Table shapes, keys, constraints, indexes, migration design within one store</td><td>Which store, partitioning, replication, consistency across services, failure domains (<a href="./system-design.html#sec-data-architecture-storage-partitioning-replication-and-evolution">§6c</a>)</td></tr>
 <tr><td>API Design</td><td>The resource model as tables; why the schema must not leak through the wire</td><td>The contract spec, OpenAPI, versioning policy, schema-evolution compatibility matrix</td></tr>
-<tr><td>Backend Engineering</td><td>The schema the loop reads and writes; migration execution day-to-day</td><td>The request loop, ORM call patterns, transaction boundaries in handlers (<a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>)</td></tr>
+<tr><td>Backend Engineering</td><td>The schema the loop reads and writes; migration execution day-to-day</td><td>The request loop, ORM call patterns, transaction boundaries in handlers (<a href="backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>)</td></tr>
 <tr><td>Version Control, CI/CD &amp; Deployment</td><td>Forward-only migration files, expand–contract phases</td><td>Deploy strategies, canaries, rollback limits, environment parity</td></tr>
 <tr><td>Software Testing &amp; Debugging</td><td>Constraint violations as test assertions, migration tests</td><td>Unit tests, integration tests, property tests</td></tr>
 </tbody>
@@ -98,7 +98,7 @@ api-design.html          backend-engineering.html</pre>
 <p><strong>Where the operational concerns live</strong> — this doc deliberately stops at the schema; the running system is owned next door:</p>
 <ul>
   <li>Partitioning, capacity planning, store choice, replication → <a href="./system-design.html">System Design</a> (<a href="./system-design.html#sec-capacity-planning-how-to-estimate-load-storage-and-latency">§6b</a>–<a href="./system-design.html#sec-data-architecture-storage-partitioning-replication-and-evolution">§6c</a>); monitoring → its observability section (<a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">§6g</a>); backup and point-in-time recovery → its reliability section (<a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">§6f</a>).</li>
-  <li>N+1, transaction boundaries, lock contention, connection pooling → <a href="./backend-engineering.html">Backend Engineering</a> (<a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>).</li>
+  <li>N+1, transaction boundaries, lock contention, connection pooling → <a href="./backend-engineering.html">Backend Engineering</a> (<a href="backend-engineering.html#sec-data-access-orms-vs-raw-sql">§1e</a>, <a href="backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">§5</a>).</li>
   <li>Deploy-time migration risk, rollback limits → <a href="./version-control-ci-cd-deployment.html">Version Control, CI/CD &amp; Deployment</a>.</li>
 </ul>
 

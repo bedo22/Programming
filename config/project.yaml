@@ -3,6 +3,12 @@ corpus:
   key_pattern: "yt-(\\d{3})"
   quote: {open: "«", close: "»"}
   claim_source: محاور  # 1.2.18: notes carry ### المحور headers (3/note); auto removed — silent-0 guard
+  note_meta:                                    # notes write AR metadata labels (fqhn template lineage)
+    status: "حالة الملاحظة"
+    status_values: ["مسودة", "مُقطَّرة", "جاهزة"]  # census: 8/8 notes = جاهزة
+    scaffold_status: "مسودة"
+    flags: "أعلام محالة للشيخ"
+    flags_no: "لا"
   docs_dir: reference
   playlist_name: "YouTube Programming"
 gates:

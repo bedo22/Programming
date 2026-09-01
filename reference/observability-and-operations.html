@@ -54,7 +54,7 @@
 <p>Reading order: standalone, after System Design and Backend Engineering. Cross-links:</p>
 <ul>
   <li>Upstream to <a href="./system-design.html">System Design</a> <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">reliability &amp; disaster recovery</a> (reliability, SLO vocabulary, recovery) and <a href="./system-design.html#sec-observability-designing-systems-that-can-be-understood-in-production">observability design</a> (the four signals, correlation, trace propagation) — this doc consumes that architecture and does not re-teach it.</li>
-  <li>Sibling to <a href="./backend-engineering.html">Backend Engineering</a> <a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">the server-side observability loop</a> — the request-loop signals (requestId, P99, status rates) are instrumentation this doc's procedures assume.</li>
+  <li>Sibling to <a href="./backend-engineering.html">Backend Engineering</a> <a href="backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">the server-side observability loop</a> — the request-loop signals (requestId, P99, status rates) are instrumentation this doc's procedures assume.</li>
   <li>Downstream of <a href="./software-development-process.html">Software Development Process</a> <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">deployment &amp; incident management</a> — the SDLC names the operational layer; this doc is its full treatment.</li>
   <li>Adjacent to <a href="./software-testing-and-debugging.html">Testing &amp; Debugging</a> — testing is evidence <em>before</em> deploy; operations is evidence <em>after</em>. The hypothesis-driven debugging loop they share lives in <a href="./problem-solving.html">Problem-Solving</a> <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted"><a href="#sec-common-failure-modes">failure modes</a></a>.</li>
   <li>Consumed by <a href="./security-and-threat-modeling.html">Security &amp; Threat Modeling</a> — detection and containment read the same signals without owning the machinery.</li>
@@ -187,7 +187,7 @@
     </tr>
     <tr>
       <td><strong>Backend Engineering</strong> (<a href="./backend-engineering.html">the request loop</a>)</td>
-      <td>RequestId correlation, P99 timing, status-rate counting, error-contract shapes (<a href="../backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">the server-side observability loop</a>)</td>
+      <td>RequestId correlation, P99 timing, status-rate counting, error-contract shapes (<a href="backend-engineering.html#sec-observability-see-the-loop-not-just-run-it">the server-side observability loop</a>)</td>
       <td>Backend Engineering <em>emits</em> the loop's signals at the code level; Ops <em>consumes</em> them as evidence, and adds the operational judgments the code level cannot make (who gets paged, when, and with what authority).</td>
     </tr>
     <tr>
@@ -1061,7 +1061,7 @@
 </ul>
 
 <h2 id="sec-primary-sources">Primary sources</h2>
-<p><strong>Source digest:</strong> <a href="../digests/observability-and-operations.md">working digestion of these sources</a>. <span class="unverified">†</span> = claim awaiting a located primary source.</p>
+<p><strong>Source digest:</strong> <a href="digests/observability-and-operations.md">working digestion of these sources</a>. <span class="unverified">†</span> = claim awaiting a located primary source.</p>
 
 <ol>
   <li>"Site Reliability Engineering" — Google SRE Book (2016) — <a href="https://sre.google/sre-book/table-of-contents/">sre.google/sre-book</a> — SLOs, error budgets, on-call, toil, postmortem culture. The foundational primary source for <a href="#sec-slo-design-choosing-what-to-promise">SLO design</a>–<a href="#sec-principles-the-shared-constants">principles</a>.</li>

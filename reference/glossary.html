@@ -580,52 +580,52 @@
     <tr>
       <td><dfn>Hash Map</dfn></td>
       <td>A key→value store with O(1) average lookup. The key is hashed to a bucket; collisions are handled by chaining or open addressing, and the load factor (keys ÷ buckets) drives resizing. Use <code>Map</code>/<code>Set</code>, never a plain object, for real key semantics. Owns the count/seen/complement patterns.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</a></td>
     </tr>
     <tr>
       <td><dfn>Two Pointers</dfn></td>
       <td>Left/right pointers moving one direction each over a sorted (or palindromic) input. O(n) because each element is visited at most twice. Pair sums, dedup, in-place reversal, three-sum.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</a></td>
     </tr>
     <tr>
       <td><dfn>Sliding Window</dfn></td>
       <td>Expand right, shrink left while a constraint breaks, record the best. Amortized O(n). The pattern behind "longest substring with no repeats", "max sum of k-length window", "minimum window".</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-arrays-strings-and-hashing-the-80">Arrays, strings, and hashing — the 80%</a></td>
     </tr>
     <tr>
       <td><dfn>Monotonic Stack</dfn></td>
       <td>A stack kept ordered by popping while the new element violates the order. Yields "next greater element" in O(n) — the superpower pattern for a whole family of stack problems.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-stacks-queues-and-linked-lists-the-shapes">Stacks, queues, and linked lists — the shapes</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-stacks-queues-and-linked-lists-the-shapes">Stacks, queues, and linked lists — the shapes</a></td>
     </tr>
     <tr>
       <td><dfn>Trie</dfn></td>
       <td>A tree of shared prefixes; each node is a character, words share their prefixes structurally. O(length) lookups for prefix operations — autocomplete, word break, prefix counts. Structural sharing beats storing every prefix.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-trees-and-heaps-the-hierarchies">Trees and heaps — the hierarchies</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-trees-and-heaps-the-hierarchies">Trees and heaps — the hierarchies</a></td>
     </tr>
     <tr>
       <td><dfn>Union-Find</dfn></td>
       <td>A near-O(1) connectivity data structure: <code>find</code> walks to a root, <code>union</code> links roots (with path compression and union by rank). Beats re-running BFS when edges arrive one by one — connected components, cycle detection, Kruskal's MST.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-graphs-the-model-of-connections">Graphs — the model of connections</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-graphs-the-model-of-connections">Graphs — the model of connections</a></td>
     </tr>
     <tr>
       <td><dfn>Topological Sort</dfn></td>
       <td>Ordering a DAG's nodes so every edge points forward — Kahn's algorithm or DFS post-order; doubles as cycle detection. The "prerequisites / dependencies / ordering" pattern.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-graphs-the-model-of-connections">Graphs — the model of connections</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-graphs-the-model-of-connections">Graphs — the model of connections</a></td>
     </tr>
     <tr>
       <td><dfn>Binary Search</dfn></td>
       <td>Halving a search space via a monotonic predicate, not just sorted arrays: "first index where isGood(i) is true" over half-open range <code>[lo, hi)</code>. The template that never off-by-ones; also answers "minimize the max X" monotonic problems.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-sorting-and-searching-the-preprocessing-moves">Sorting and searching — the preprocessing moves</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-sorting-and-searching-the-preprocessing-moves">Sorting and searching — the preprocessing moves</a></td>
     </tr>
     <tr>
       <td><dfn>Dynamic Programming</dfn></td>
       <td>Cached enumeration of overlapping subproblems: define state, write the transition, set base cases, then memoize (or tabulate). The "minimize cost / maximize value / choose subsets" pattern. Memoized recursion first is the lazy correct path.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-dynamic-programming-the-state-machine-of-optimization">Dynamic programming — the state machine of optimization</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-dynamic-programming-the-state-machine-of-optimization">Dynamic programming — the state machine of optimization</a></td>
     </tr>
     <tr>
       <td><dfn>Exchange Argument</dfn></td>
       <td>The proof a greedy choice is safe: "if an optimal solution differs from mine, I can swap my choice in without making it worse." Without that argument, greedy is a gamble and DP is the safe answer.</td>
-      <td>Algorithms <a href="../algorithms-and-data-structures.html#sec-greedy-the-beautiful-lie">Greedy — the beautiful lie</a></td>
+      <td>Algorithms <a href="algorithms-and-data-structures.html#sec-greedy-the-beautiful-lie">Greedy — the beautiful lie</a></td>
     </tr>
   </tbody>
 </table>
@@ -785,37 +785,37 @@
     <tr>
       <td><dfn>Observability</dfn></td>
       <td>System Design</td>
-      <td>System Design <a href="./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled">Underlying theory — what makes a system designed not assembled</a>, <a href="./system-design.html#sec-architectural-layer-macro-patterns-with-consequences">Architectural layer (macro) — patterns with consequences</a>, <a href="./system-design.html#sec-why-it-is-a-method-not-an-algorithm">Why it is a method, not an algorithm</a>; API Design <a href="./api-design.html#sec-principles-the-shared-constants">Principles — the shared constants</a>; Dev Loop <a href="./how-developers-think-frontend.html#sec-the-three-thread-mental-model-not-a-sequence-a-loop">The three-thread mental model — not a sequence, a loop</a>; Ops <a href="../observability-and-operations.html#sec-slo-design-choosing-what-to-promise">SLO design — choosing what to promise</a>, <a href="../observability-and-operations.html#sec-incident-response-from-detection-to-recovery">Incident response — from detection to recovery</a></td>
+      <td>System Design <a href="./system-design.html#sec-underlying-theory-what-makes-a-system-designed-not-assembled">Underlying theory — what makes a system designed not assembled</a>, <a href="./system-design.html#sec-architectural-layer-macro-patterns-with-consequences">Architectural layer (macro) — patterns with consequences</a>, <a href="./system-design.html#sec-why-it-is-a-method-not-an-algorithm">Why it is a method, not an algorithm</a>; API Design <a href="./api-design.html#sec-principles-the-shared-constants">Principles — the shared constants</a>; Dev Loop <a href="./how-developers-think-frontend.html#sec-the-three-thread-mental-model-not-a-sequence-a-loop">The three-thread mental model — not a sequence, a loop</a>; Ops <a href="observability-and-operations.html#sec-slo-design-choosing-what-to-promise">SLO design — choosing what to promise</a>, <a href="observability-and-operations.html#sec-incident-response-from-detection-to-recovery">Incident response — from detection to recovery</a></td>
     </tr>
     <tr>
       <td><dfn>Alert Fatigue</dfn></td>
       <td>Ops</td>
-      <td>Ops <a href="../observability-and-operations.html#sec-incident-response-from-detection-to-recovery">Incident response — from detection to recovery</a>, <a href="../observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty">On-call design — the rotation is a product, not a duty</a>, <a href="../observability-and-operations.html#sec-common-failure-modes">Common failure modes</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a></td>
+      <td>Ops <a href="observability-and-operations.html#sec-incident-response-from-detection-to-recovery">Incident response — from detection to recovery</a>, <a href="observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty">On-call design — the rotation is a product, not a duty</a>, <a href="observability-and-operations.html#sec-common-failure-modes">Common failure modes</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a></td>
     </tr>
     <tr>
       <td><dfn>Incident Response</dfn></td>
       <td>Ops</td>
-      <td>Ops <a href="../observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment">Postmortems &amp;amp; learning — making failure an investment</a>, <a href="../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>; Security &amp; Threat Modeling <a href="./security-and-threat-modeling.html#sec-risk-management-the-decision-framework">Risk management — the decision framework</a></td>
+      <td>Ops <a href="observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment">Postmortems &amp;amp; learning — making failure an investment</a>, <a href="observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>; Security &amp; Threat Modeling <a href="./security-and-threat-modeling.html#sec-risk-management-the-decision-framework">Risk management — the decision framework</a></td>
     </tr>
     <tr>
       <td><dfn>Postmortem</dfn></td>
       <td>Ops</td>
-      <td>Ops <a href="../observability-and-operations.html#sec-runbooks-making-the-known-response-boring">Runbooks — making the known response boring</a>, <a href="../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>; Problem-Solving <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving — the same four phases, inverted</a></td>
+      <td>Ops <a href="observability-and-operations.html#sec-runbooks-making-the-known-response-boring">Runbooks — making the known response boring</a>, <a href="observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>; Problem-Solving <a href="./problem-solving.html#sec-debugging-as-problem-solving-the-same-four-phases-inverted">Debugging as problem-solving — the same four phases, inverted</a></td>
     </tr>
     <tr>
       <td><dfn>Runbook</dfn></td>
       <td>Ops</td>
-      <td>Ops <a href="../observability-and-operations.html#sec-principles-the-shared-constants">Principles — the shared constants</a>, <a href="../observability-and-operations.html#sec-common-failure-modes">Common failure modes</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>; Security &amp; Threat Modeling <a href="./security-and-threat-modeling.html#sec-underlying-theory-threat-modeling">Underlying theory — threat modeling</a></td>
+      <td>Ops <a href="observability-and-operations.html#sec-principles-the-shared-constants">Principles — the shared constants</a>, <a href="observability-and-operations.html#sec-common-failure-modes">Common failure modes</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a>; Security &amp; Threat Modeling <a href="./security-and-threat-modeling.html#sec-underlying-theory-threat-modeling">Underlying theory — threat modeling</a></td>
     </tr>
     <tr>
       <td><dfn>On-Call</dfn></td>
       <td>Ops</td>
-      <td>Ops <a href="../observability-and-operations.html#sec-incident-response-from-detection-to-recovery">Incident response — from detection to recovery</a>, <a href="../observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment">Postmortems &amp;amp; learning — making failure an investment</a>, <a href="../observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty">On-call design — the rotation is a product, not a duty</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a></td>
+      <td>Ops <a href="observability-and-operations.html#sec-incident-response-from-detection-to-recovery">Incident response — from detection to recovery</a>, <a href="observability-and-operations.html#sec-postmortems-learning-making-failure-an-investment">Postmortems &amp;amp; learning — making failure an investment</a>, <a href="observability-and-operations.html#sec-on-call-design-the-rotation-is-a-product-not-a-duty">On-call design — the rotation is a product, not a duty</a>; SDP <a href="./software-development-process.html#sec-operations-and-incident-management-the-sdlc-doesn-t-end-at-deploy">Operations and incident management — the SDLC doesn&#x27;t end at deploy</a></td>
     </tr>
     <tr>
       <td><dfn>Error Budget</dfn></td>
       <td>System Design</td>
-      <td>System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">Reliability and disaster recovery — SLOs, degradation, and recovery</a>; Ops <a href="../observability-and-operations.html#sec-alert-design-turning-targets-into-contracts-with-humans">Alert design — turning targets into contracts with humans</a>, <a href="../observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a></td>
+      <td>System Design <a href="./system-design.html#sec-reliability-and-disaster-recovery-slos-degradation-and-recovery">Reliability and disaster recovery — SLOs, degradation, and recovery</a>; Ops <a href="observability-and-operations.html#sec-alert-design-turning-targets-into-contracts-with-humans">Alert design — turning targets into contracts with humans</a>, <a href="observability-and-operations.html#sec-ecosystem-tooling-catalog-with-decision-metrics">Ecosystem — tooling catalog with decision metrics</a></td>
     </tr>
     <tr>
       <td><dfn>Trust Boundary</dfn></td>
@@ -891,7 +891,7 @@
     <tr>
       <td><dfn>Idempotency Key</dfn></td>
       <td>Money edition: a per-logical-operation key on charges — same key = same charge, forever. The guard against double charges on retry.</td>
-      <td>Payments &amp; Commerce <a href="./payments-and-commerce.html#sec-integration-patterns-where-the-code-meets-the-money">Integration patterns — where the code meets the money</a>; Backend Engineering <a href="../backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">Transactions and concurrency — &quot;the row changed since I read it&quot;</a></td>
+      <td>Payments &amp; Commerce <a href="./payments-and-commerce.html#sec-integration-patterns-where-the-code-meets-the-money">Integration patterns — where the code meets the money</a>; Backend Engineering <a href="backend-engineering.html#sec-transactions-and-concurrency-the-row-changed-since-i-read-it">Transactions and concurrency — &quot;the row changed since I read it&quot;</a></td>
     </tr>
     <tr>
       <td><dfn>Webhook as Source of Truth</dfn></td>
@@ -1023,7 +1023,7 @@
     <tr>
       <td><dfn>JOIN</dfn></td>
       <td>The pairing rule that recombines relational tables: INNER keeps matches only, LEFT keeps all left rows with NULLs for the unmatched. The N+1 fix, and the reason foreign keys need indexes.</td>
-      <td>SQL &amp; PostgreSQL <a href="./sql-and-postgresql.html#sec-joins-the-core-skill">JOINs — the core skill</a>; Backend Engineering <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">Data access — ORMs vs. raw SQL</a> (N+1); Data Modeling &amp; Databases <a href="./data-modeling-and-databases.html#sec-indexing-strategies-the-read-path">Indexing strategies — the read path</a></td>
+      <td>SQL &amp; PostgreSQL <a href="./sql-and-postgresql.html#sec-joins-the-core-skill">JOINs — the core skill</a>; Backend Engineering <a href="backend-engineering.html#sec-data-access-orms-vs-raw-sql">Data access — ORMs vs. raw SQL</a> (N+1); Data Modeling &amp; Databases <a href="./data-modeling-and-databases.html#sec-indexing-strategies-the-read-path">Indexing strategies — the read path</a></td>
     </tr>
     <tr>
       <td><dfn>CTE</dfn> (Common Table Expression)</td>
@@ -1051,12 +1051,12 @@
     <tr>
       <td><dfn>ASP.NET Core</dfn></td>
       <td>Microsoft's web framework: middleware chain → controller → service → EF Core → SQL Server. The Backend Engineering request loop in a different costume — read, don't retrain.</td>
-      <td>.NET &amp; the Enterprise Lane <a href="./dotnet-and-the-enterprise-lane.html#sec-the-request-loop-c-edition">The request loop, C# edition</a>; Backend Engineering <a href="../backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</a></td>
+      <td>.NET &amp; the Enterprise Lane <a href="./dotnet-and-the-enterprise-lane.html#sec-the-request-loop-c-edition">The request loop, C# edition</a>; Backend Engineering <a href="backend-engineering.html#sec-the-backend-mental-model-one-request-at-a-time">The backend mental model — one request at a time</a></td>
     </tr>
     <tr>
       <td><dfn>EF Core</dfn></td>
       <td>The .NET ORM: DbContext + DbSet map to schema; LINQ translates to SQL; <code>.Include</code> prevents the N+1. Change tracking writes back only what changed.</td>
-      <td>.NET &amp; the Enterprise Lane <a href="./dotnet-and-the-enterprise-lane.html#sec-ef-core-the-orm-you-already-understand">EF Core — the ORM you already understand</a>; Backend Engineering <a href="../backend-engineering.html#sec-data-access-orms-vs-raw-sql">Data access — ORMs vs. raw SQL</a> (ORM decision)</td>
+      <td>.NET &amp; the Enterprise Lane <a href="./dotnet-and-the-enterprise-lane.html#sec-ef-core-the-orm-you-already-understand">EF Core — the ORM you already understand</a>; Backend Engineering <a href="backend-engineering.html#sec-data-access-orms-vs-raw-sql">Data access — ORMs vs. raw SQL</a> (ORM decision)</td>
     </tr>
     <tr>
       <td><dfn>T-SQL</dfn></td>
