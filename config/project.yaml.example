@@ -1,0 +1,24 @@
+# Example config/project.yaml — copy to config/project.yaml and edit
+# Zero-config fallback is Investing (rr/cs/ex, "text" (rr-002, 07:31)). This file shows AR-style overrides.
+corpus:
+  transcripts_dir: "نص-مجالس-فقه-النفس/clean"   # or "transcripts/rational-reminder/clean"
+  clean_candidates:                            # fallback when transcripts_dir missing
+    - "نص مجالس فقه النفس/clean"
+    - "arabic_subs/clean"
+    - "نص-ألف-باء-الزواج/clean"
+  key_pattern: "is-(\\d{3})"                   # rr-(\\d{3}) | is-(\\d{3}) | cs-(\\d{3})
+  quote: {open: "«", close: "»"}              # EN: {open: '"', close: '"'}
+  claim_source: "auto"                         # auto | C# | محاور
+  ar_first: false
+  coverage_scope: "reference/*/*.html"
+  exclude_dirs: [investor-approaches, canon, sources, papers, topics]
+
+gates:
+  floor: auto                                  # auto | 12 | 7 | <int>
+  neglect_ratio: 0.10
+  thin_ratio: 0.20
+  essay_proxy: {quote_share: 0.55, min_words: 1200, min_paras: 6}
+  quarantine: null                             # e.g. "rr-32[45]"
+
+triage:
+  promote_to_gate: false

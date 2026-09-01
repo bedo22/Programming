@@ -4,28 +4,15 @@
 from __future__ import annotations
 import sys, re
 from pathlib import Path
-try:
-    from shelf_core.playlists import *
-    from shelf_core.transcript import *
-    from shelf_core.notes import *
-    from shelf_core.notes import _EXEMPT_SECTIONS  # underscore not exported by *
-    from shelf_core.citation import *
-    from shelf_core.match import tokens, subseq
-    from shelf_core.transcript import _slice_verbatim
-    from shelf_core.config import ROOT, REF
-    from shelf_core.citation import *
-except ImportError:
-    from playlists import *  # type: ignore
-    from transcript import *  # type: ignore
-    from notes import *  # type: ignore
-    try:
-        from notes import _EXEMPT_SECTIONS  # type: ignore
-    except ImportError:
-        pass
-    from citation import *  # type: ignore
-    from match import tokens, subseq  # type: ignore
-    from transcript import _slice_verbatim  # type: ignore
-    from config import ROOT, REF  # type: ignore
+# H2.1/H2.2: explicit imports — the duplicated citation star-imports and the
+# flat fallbacks are gone (H2.4: unused _EXEMPT_SECTIONS/ROOT/REF dropped).
+from shelf_core.match import subseq, tokens
+from shelf_core.playlists import parse_session_key, session_key_of
+from shelf_core.notes import header_is_exempt, note_source_key
+from shelf_core.transcript import (CleanSource, _slice_verbatim, check_quote,
+                                   clean_paragraphs, found_minutes)
+from shelf_core.citation import (CITE_KEYWORD, CITE_RE, QUOTE_MIN_TOKENS, QUOTE_RE,
+                                 cite_match_parts, fmt_mmss, kw_cite_allowed)
 def cmd_lift(argv):
     """Turn candidate phrases (stdin, one per line) into paste-ready units:
         "verbatim span from the transcript" — (KEY, MM:SS)
@@ -46,21 +33,19 @@ def cmd_lift(argv):
         if len(qt) < 3:
             print(f"  SKIP(short): {p[:50]}")
             continue
-        hit = None
-        for m in sorted(paras):
-            if subseq(qt, tokens(paras[m]), gap_r=0.85, miss_r=0.30):
-                hit = m
-                break
-        if hit is None and len(qt) >= 6:   # fallback: first 8 tokens
+        # W4.10: collect ALL matching buckets — a phrase occurring at 00:12 and
+        # 41:30 used to report only the first with no hint of the other.
+        hits = [m for m in sorted(paras)
+                if subseq(qt, tokens(paras[m]), gap_r=0.85, miss_r=0.30)]
+        if not hits and len(qt) >= 6:   # fallback: first 8 tokens
             head = qt[:min(8, len(qt))]
-            for m in sorted(paras):
-                if subseq(head, tokens(paras[m]), gap_r=1.0, miss_r=0.0):
-                    hit = m
-                    break
-        if hit is None:
+            hits = [m for m in sorted(paras)
+                    if subseq(head, tokens(paras[m]), gap_r=1.0, miss_r=0.0)]
+        if not hits:
             print(f"  NOTFOUND: {p[:60]}")
             n_nf += 1
             continue
+        hit = hits[0]
         span = _slice_verbatim(paras[hit], qt)
         if span is None:   # phrase straddling a minute boundary — try neighbors
             for m2 in (hit - 1, hit + 1):
@@ -74,9 +59,12 @@ def cmd_lift(argv):
                   "(a word of the phrase is not in the transcript — fix the phrase)")
             n_nf += 1
             continue
-        print(f'"{span}" — ({key}, {fmt_mmss(hit)})')
+        also = f"  also at {', '.join(fmt_mmss(m) for m in hits[1:])}" if len(hits) > 1 else ""
+        print(f'"{span}" — ({key}, {fmt_mmss(hit)}){also}')
         n_ok += 1
     print(f"\nResult: {n_ok} lifted, {n_nf} unusable.")
+    # W4.10: a batch that lifted NOTHING is a failed batch, not a quiet pass.
+    sys.exit(0 if n_ok else 1)
 
 
 def _pair_line_events(s):
@@ -176,6 +164,14 @@ def fix_note(note: Path) -> int:
             _ckey, secs = cite_match_parts(cm)
             if _ckey is None or not secs:
                 continue
+            if _ckey != sess_key:
+                # W4.3: never re-point a cite to another session. The rewrite
+                # below stamps THIS note's sess_key; a cite whose key differs
+                # may be legitimately cross-session (citation.py's ts/is
+                # receipt documents the corruption class), so it is skipped
+                # loudly, not "fixed".
+                print(f"  skip (other-session cite {_ckey}): {cm.group(0)[:60]}")
+                continue
             verdict, _ = check_quote(src, qm.group(1), secs, "fix", sess_key)
             if verdict != "MISMATCH":
                 continue
@@ -193,7 +189,11 @@ def fix_note(note: Path) -> int:
                 new_cite = f"({sess_key}, {rng})"
             elif kw_cite_allowed(sess_key):       # keyword form المجلس N، MM:SS
                 num = sess_key.split("-")[-1]
-                inner = f"{CITE_KEYWORD, kw_cite_allowed} {num}، {rng}"
+                # Receipt (V1.1): this line was `f"{CITE_KEYWORD, kw_cite_allowed} …"`
+                # — an f-string over a tuple — so `pins --fix` wrote
+                # "('المجلس', <function kw_cite_allowed at 0x…>) N، MM:SS" into notes.
+                # The carry-path twin below was always correct: copy from it, not from memory.
+                inner = f"{CITE_KEYWORD} {num}، {rng}"
                 new_cite = f"({inner})" if wrapped else inner
                 if wrapped:
                     ts -= 1
@@ -222,6 +222,12 @@ def fix_note(note: Path) -> int:
                     continue
                 _ckey, secs = cite_match_parts(_ccm)
                 if _ckey is None or not secs:
+                    continue
+                if _ckey != sess_key:
+                    # W4.3 (carry twin): minutes would be found in THIS note's
+                    # transcript while the cite keeps ITS key — a stealth
+                    # re-point. Skip loudly.
+                    print(f"  skip (other-session carry cite {_ckey}): {_ccm.group(0)[:60]}")
                     continue
                 verdict, _ = check_quote(src, qm.group(1), secs, "fix", sess_key)
                 if verdict != "MISMATCH":

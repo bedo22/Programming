@@ -26,7 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 
 from shelf_core.config import load_config, find_root  # noqa: E402
-from shelf_core.notes import scan_lines  # noqa: E402
+from shelf_core.notes import parse_note, claims_count  # noqa: E402
 from shelf_core.transcript import clean_buckets  # noqa: E402
 from shelf_core.playlists import notes_dir, playlist_keys  # noqa: E402
 
@@ -39,7 +39,6 @@ def main(argv: list[str] | None = None):
     claim_source = str(corpus.get("claim_source", "auto"))
     meta = corpus.get("note_meta", {}) or {}
     scaffold_status = str(meta.get("scaffold_status", "مسودة"))
-    status_label = str(meta.get("status", "حالة الملاحظة"))
     thin_thr = float(gate.get("thin_quotes_per_claim", 2.0))
 
     files: list[Path] = []
@@ -54,30 +53,22 @@ def main(argv: list[str] | None = None):
         print("no notes found")
         return 2
 
-    def claims(txt: str) -> int:
-        n = 0
-        for line in txt.splitlines():
-            if claim_source in ("C#", "auto") and re.match(r"\|\s*C\d+\s*\|", line):
-                n += 1
-            elif claim_source in ("محاور", "auto") and re.match(r"###\s*المحور", line):
-                n += 1
-        return n
+    def claims(d) -> int:
+        # A5.3(a)+(d): the claims grammar has ONE home — notes.claims_count
+        # (| C# | rows + diacritic-tolerant ### المحاور headers). draft_note's
+        # confirmed header format is recorded there: '### المحور {idx}: {title}'.
+        return claims_count(d["raw"], claim_source)
 
     rows, flagged = [], 0
     print(f"{'note':10} {'status':7} {'claims':>6} {'buckets':>7} {'quotes':>6} "
           f"{'cited':>6} {'q/claim':>7}  flag")
     for p in files:
-        k = ""
-        m = re.search(r"\w+-(\d{3})", p.name)
-        if m:
-            k = f"{p.name.split('-')[0]}-{m.group(1)}"
-        txt = p.read_text(encoding="utf-8", errors="replace")
-        recs = scan_lines(txt)
-        quoted = [r for r in recs if len(r["quote"].split()) >= 4]
+        d = parse_note(p)
+        k = f"{d['ident'][0]}-{d['ident'][1]}" if d["ident"][0] else ""
+        quoted = [r for r in d["quotes"] if len(r["quote"].split()) >= 4]
         cited = [r for r in quoted if r["cited"]]
-        st_m = re.search(rf"^\|\s*{re.escape(status_label)}\s*\|([^|]*)\|", txt, re.M)
-        status = st_m.group(1).strip() if st_m else "?"
-        claims_n = claims(txt)
+        status = d["status"] if d["status"] else "?"
+        claims_n = claims(d)
         buckets = len(clean_buckets(k) or {}) if k else 0
         dens = (len(quoted) / claims_n) if claims_n else 0.0
         flag = ""

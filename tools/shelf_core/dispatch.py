@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""shelf — fidelity-gated production pipeline for the investing reference shelf.
+"""shelf — fidelity-gated production pipeline for a transcript reference shelf.
+
+Born on the Investing shelf (its history is in the 1.0.0 CHANGELOG entry);
+now grammar- and path-configurable per shelf via `config/project.yaml`
+(C3.x): key_pattern, cite keyword, quote style, playlists, gate floors.
+What THIS run resolves — root, grammar, paths — prints via
+`python3 tools/shelf.py doctor` (read it before asking "why did it do
+that?"; the grammar-home table is `references/DESIGN.md`).
 
 Stdlib only. Immutable transcripts in, distilled notes and HTML topic docs out,
 with a mechanical check gate over every verbatim quote.
@@ -35,132 +42,39 @@ quote"); 1–3-token quoted spans are labels and skipped.
 
 This script never writes under transcripts/ — read-only there.
 """
-import bisect
-import re
 import sys
-from pathlib import Path
 
-try:
-    from .config import ROOT, REF, TEMPLATES, TRANSCRIPTS, INVENTORY
-except ImportError:
-    from config import ROOT, REF, TEMPLATES, TRANSCRIPTS, INVENTORY  # type: ignore
-
-# --- config-driven overrides (generic source of truth, absorbs AR fork) ---
-# If config/project.yaml exists, corpus.* overrides EN defaults so the same
-# binary works for Investing (rr/cs/ex, "text" (rr-002, 07:31)) and فقه-النفس
-# (is-NNN, «text» — المجلس N، HH:MM / سطر M, multi-clean fallback).
-CONFIG_PATH = ROOT / "config" / "project.yaml"
-CONFIG: dict = {}
-if CONFIG_PATH.exists():
-    try:
-        import yaml  # type: ignore
-        CONFIG = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8")) or {}
-    except Exception:
-        CONFIG = {}
-_corpus = CONFIG.get("corpus", {}) if isinstance(CONFIG, dict) else {}
-if _corpus.get("transcripts_dir"):
-    # e.g. "نص-ألف-باء-الزواج/clean" or "transcripts/rational-reminder/clean"
-    td = _corpus["transcripts_dir"]
-    TRANSCRIPTS = ROOT / td if not str(td).startswith("/") else Path(td)
-# Optional clean candidates fallback (AR multi-clean)
-_CLEAN_CANDIDATES: list[Path] | None = None
-if _corpus.get("clean_candidates"):
-    _CLEAN_CANDIDATES = [ROOT / p for p in _corpus["clean_candidates"]]
-# Quote style (AR: «» vs EN: "")
-QUOTE_OPEN = _corpus.get("quote", {}).get("open", '"') if isinstance(_corpus.get("quote"), dict) else '"'
-QUOTE_CLOSE = _corpus.get("quote", {}).get("close", '"') if isinstance(_corpus.get("quote"), dict) else '"'
-# AR-specific regexes (always defined, used when quote style is «» or key_pattern is is-)
-LINE_RE = re.compile(r"سطر\s+([\d\s–\-،,]+)")
-MIN_RE_AR = re.compile(r"(?:المجلس\s+\d{1,3}\s*[،,]\s*|المجلس\s+|—\s*)(\d{1,2}:\d{2})(?:[–\-]\s*(\d{1,2}:\d{2}))?(?!\d)")
+# H2.7 receipt: an "optional clean candidates fallback" block stood here,
+# defining _CLEAN_CANDIDATES from corpus.clean_candidates — but a repo-wide
+# grep found ZERO consumers (nothing ever read the name). Deleted: dead config
+# surface implies a feature someone half-shipped. If multi-clean fallback is
+# ever needed, reintroduce it WITH its consumer in the same commit.
 
 # ---------------- playlists ----------------
-# slug -> directory name under reference/ and transcripts/, plus display name.
-# Helpers moved to shelf_core.helpers (batch, 818 lines) — re-exported
-try:
-    from .playlists import *
-    from .transcript import *
-    from .notes import *
-    from .citation import *
-except ImportError:
-    from playlists import *  # type: ignore
-    from transcript import *  # type: ignore
-    from notes import *  # type: ignore
-    from citation import *  # type: ignore
+# H2.2: the star re-export block here (`from .playlists import *` etc. plus the
+# flat fallbacks) provided names to NOTHING — every shim that used them moved to
+# shelf_core.commands.* (an unbound-name audit of this module returns an empty
+# set without the block). Deleted: it was a fourth import surface masking errors.
 # cmd_inventory moved to shelf_core.commands.inventory (via helpers)
-try:
-    from .commands.inventory import cmd_inventory
-except ImportError:
-    from commands.inventory import cmd_inventory  # type: ignore
+# P6.5: the elif chain is GONE — dispatch iterates the one registry
+# (shelf_core.registry.COMMANDS). A command not in the registry is unknown;
+# a module missing from disk fails loudly at import (never a silent None).
 
 
-# cmd_lines moved to shelf_core.commands.lines
-try:
-    from .commands.lines import cmd_lines
-except ImportError:
-    from commands.lines import cmd_lines  # type: ignore
-
-
-# cmd_lift moved to shelf_core.commands.lift
-try:
-    from .commands.lift import cmd_lift
-except ImportError:
-    from commands.lift import cmd_lift  # type: ignore
-# cmd_pins moved to shelf_core.commands.pins
-try:
-    from .commands.pins import cmd_pins
-except ImportError:
-    from commands.pins import cmd_pins  # type: ignore
-# cmd_scaffold moved to shelf_core.commands.scaffold
-try:
-    from .commands.scaffold import cmd_scaffold
-except ImportError:
-    from commands.scaffold import cmd_scaffold  # type: ignore
-# cmd_draft moved to shelf_core.commands.draft
-try:
-    from .commands.draft import cmd_draft
-except ImportError:
-    from commands.draft import cmd_draft  # type: ignore
-# cmd_check moved to shelf_core.commands.check
-try:
-    from .commands.check import cmd_check
-except ImportError:
-    from commands.check import cmd_check  # type: ignore
-# cmd_selftest moved to shelf_core.commands.selftest
-try:
-    from .commands.selftest import cmd_selftest
-except ImportError:
-    from commands.selftest import cmd_selftest  # type: ignore
-# cmd_quotes moved to shelf_core.commands.quotes
-try:
-    from .commands.quotes import cmd_quotes
-except ImportError:
-    from commands.quotes import cmd_quotes  # type: ignore
-# draft-note (absorbed from Politics/is-040 builder, verified matcher)
-try:
-    from .commands.draft_note import cmd_draft_note
-except ImportError:
-    try:
-        from commands.draft_note import cmd_draft_note  # type: ignore
-    except ImportError:
-        cmd_draft_note = None  # type: ignore
-
-# evdoc (evidence-doc one-write from EVIDOC.yaml — doc-side mirror of draft-note)
-try:
-    from .commands.evdoc import cmd_evdoc
-except ImportError:
-    try:
-        from commands.evdoc import cmd_evdoc  # type: ignore
-    except ImportError:
-        cmd_evdoc = None  # type: ignore
-
-# verify (verification lane tooling: worklist | quran | dorar | locate | apply)
-try:
-    from .commands.verify import cmd_verify
-except ImportError:
-    try:
-        from commands.verify import cmd_verify  # type: ignore
-    except ImportError:
-        cmd_verify = None  # type: ignore
+def describe_command(cmd: str):
+    """D8.14: print a tool's contract from the registry (ADR 0006 source)."""
+    import json
+    from .registry import COMMANDS
+    entry = COMMANDS.get(cmd)
+    if entry is None:
+        sys.exit(f"Unknown command: {cmd} — run `python3 tools/shelf.py` for usage")
+    d = entry.get("describe", {})
+    print(json.dumps({
+        "name": cmd, "module": entry["module"], "func": entry["func"],
+        "help": entry["help"], "usage_args": [a for a, _ in entry["args"]],
+        "checks": d.get("checks", []), "exits": d.get("exits", {}),
+        "pitfalls": d.get("pitfalls", []), "adrs": d.get("adrs", []),
+    }, ensure_ascii=False, indent=1))
 
 
 def main():
@@ -168,38 +82,32 @@ def main():
         print(__doc__)
         sys.exit(0)
     cmd = sys.argv[1]
-    if cmd == "inventory":
-        cmd_inventory()
-    elif cmd == "lines":
-        cmd_lines(sys.argv[2:])
-    elif cmd == "lift":
-        cmd_lift(sys.argv[2:])
-    elif cmd == "pins":
-        cmd_pins(sys.argv[2:])
-    elif cmd == "scaffold":
-        cmd_scaffold(sys.argv[2:])
-    elif cmd == "draft":
-        cmd_draft(sys.argv[2:])
-    elif cmd == "draft-note":
-        if cmd_draft_note is None:
-            sys.exit("draft-note not available")
-        cmd_draft_note(sys.argv[2:])
-    elif cmd == "evdoc":
-        if cmd_evdoc is None:
-            sys.exit("evdoc not available")
-        cmd_evdoc(sys.argv[2:])
-    elif cmd == "verify":
-        if cmd_verify is None:
-            sys.exit("verify not available")
-        cmd_verify(sys.argv[2:])
-    elif cmd == "check":
-        cmd_check(sys.argv[2:])
-    elif cmd == "quotes":
-        cmd_quotes(sys.argv[2:])
-    elif cmd == "selftest":
-        cmd_selftest()
-    else:
+    from .registry import COMMANDS
+    entry = COMMANDS.get(cmd)
+    if entry is None:
         sys.exit(f"Unknown command: {cmd} — run `python3 tools/shelf.py` for usage")
+    # D8.14: `--describe` prints the tool's contract from the registry —
+    # checks, exits, PITFALLS tags, ADR links. ADR 0006: this is the source
+    # the renderer generates references/tools/<name>.md from.
+    if len(sys.argv) > 2 and sys.argv[2] == "--describe":
+        describe_command(cmd)
+        sys.exit(0)
+    import importlib
+    import inspect
+    mod = importlib.import_module(f".commands.{entry['module']}", package="shelf_core")
+    fn = getattr(mod, entry["func"], None)
+    if fn is None:
+        sys.exit(f"{entry['module']}.{entry['func']} not available")
+    if len(inspect.signature(fn).parameters) == 0:
+        # was: dispatch passed sys.argv[2:] to every command, so zero-arg
+        # commands (inventory, selftest) crashed with TypeError before ever
+        # running (fixed P6.10 — the smoke read exit 1 as 'usage' and missed
+        # it). The signature inspection remains because the CLASS — a
+        # registry that assumes uniform command signatures — regenerates
+        # whenever a new zero-arg command is registered.
+        fn()                      # zero-arg commands (inventory, selftest)
+    else:
+        fn(sys.argv[2:])
 
 
 if __name__ == "__main__":

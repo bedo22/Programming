@@ -1,0 +1,36 @@
+# EVIDOC.yaml — input for `scaffold evdoc --from-yaml` (evidence-doc one-write)
+# The DOC-side mirror of MEH.yaml. Use this path when the doc is a *selected,
+# narrated arc over quotes* (evidence docs, quote-verified essays, non-EN
+# template language). Use `scaffold doc --from-notes` only when notes carry
+# the doc's own section headers (rr-style EN digest: paste-then-edit wins).
+#
+# Sections come in three kinds:
+#   kind: quotes  (default) — frame prose + probe-resolved verbatim quotes
+#   kind: list    — frame + bullet items (free text, cite inline yourself)
+#   kind: prose   — frame paragraph only
+# `probe` MUST be a prefix of a real note quote (the tool fails loudly on a
+# bad probe — same loud-fail contract as MEH 0-items). `intro` precedes each
+# quote on the same line. Frames must be >= gates.essay_proxy substantive
+# length (300 chars prose) or the tool warns before you hit doc-gate.
+meta:
+  title: "الثورة العباسية ودولة السفاح — الأدلة الحرفية من الجلسات"
+  kicker: "العباسيون: من ظل دعوة الحميمة إلى مذابح السفاح"
+  range: "023-025"                      # output name: <range>-<slug>.html
+  source_range: "نص-politics-islamism/clean/023-025 …ar-orig.txt"
+  review_date: "2026-08-28"
+sections:
+  - title: "العودة إلى العباس — الجد المشترك"
+    frame: >-
+      (300+ chars of narrative prose — the WHY, not the quotes)
+    quotes:
+      - {probe: "لابد ان نعود", intro: "افتتاح الجلسة يضبط القاعدة المنهجية:"}
+      - {probe: "فكانت اول من كسى", intro: "سابقة رمزية حملوها فخرًا:"}
+  - title: "نصوص دينية وردت في الجلسات"
+    kind: list
+    frame: "وردت في الجلسات نصوص تحتاج تحققًا خارجيًا قبل اعتماد لفظها:"
+    items:
+      - "آية ... — قُرئت في خطاب السرداب — **للشيخ**."
+  - title: "خلاصة منهجية"
+    kind: prose
+    frame: >-
+      (closing synthesis paragraph)

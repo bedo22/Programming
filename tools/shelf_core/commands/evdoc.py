@@ -25,21 +25,16 @@ from pathlib import Path
 
 
 def _imports():
-    try:
-        from shelf_core.config import load_config, find_root
-        from shelf_core.playlists import docs_dir
-        from shelf_core.match import tokens
-        from shelf_core.transcript import found_minutes
-        from shelf_core.notes import scan_lines
-        from shelf_core.citation import fmt_mmss
-    except ImportError:
-        from config import load_config, find_root  # type: ignore
-        from playlists import docs_dir  # type: ignore
-        from match import tokens  # type: ignore
-        from transcript import found_minutes  # type: ignore
-        from notes import scan_lines  # type: ignore
-        from citation import fmt_mmss  # type: ignore
-    return load_config, find_root, docs_dir, tokens, found_minutes, scan_lines, fmt_mmss
+    # H2.2: flat fallback removed
+    from shelf_core.config import load_config, find_root, corpus_cfg
+    from shelf_core.playlists import docs_dir
+    from shelf_core.match import tokens
+    from shelf_core.transcript import found_minutes
+    from shelf_core.notes import scan_lines, find_note, khu_rows
+    from shelf_core.transcript import check_quote, CleanSource
+    from shelf_core.citation import fmt_cite, fmt_mmss
+    return (load_config, find_root, corpus_cfg, docs_dir, tokens, found_minutes, khu_rows,
+            scan_lines, fmt_mmss, find_note, check_quote, CleanSource)
 
 
 def parse_any(secs):
@@ -52,7 +47,10 @@ def parse_any(secs):
 
 
 def _note_files(root, sk):
-    return _glob.glob(str(root / "reference" / "notes" / f"{sk}-*.md"))
+    # W4.21: resolve via find_note (registry + loud ambiguity refusal) instead
+    # of a first-hit glob that silently picked among duplicate notes.
+    p = find_note(sk)
+    return [str(p)] if p else []
 
 
 def _harvest(root, scan_lines):
@@ -77,13 +75,10 @@ def _seed(keys_raw, root, scan_lines, tokens, found_minutes):
             continue
         txt = Path(hits[0]).read_text(encoding="utf-8")
         print(f"== {sk}")
-        # khu digest: المحاور table rows / bold titles
-        for line in txt.splitlines():
-            if "المحاور" in line or re.match(r"^\| *المحور", line):
-                continue
-            m = re.match(r"^\|\s*\d+\s*\|\s*([^|]{10,80})\|", line)
-            if m:
-                print(f"  [khu] {m.group(1).strip()}")
+        # khu digest via the parse layer (A5.3 audit: the numbered-table row
+        # grammar lives in notes.khu_rows alone).
+        for ktext in khu_rows(txt):
+            print(f"  [khu] {ktext}")
         recs = [r for r in scan_lines(txt) if r.get("cited")]
         for r in sorted(recs, key=lambda r: -len(r["quote"]))[:3]:
             key = r["key"] if r["key"].startswith(("is-", "rr-")) else f"is-{int(r['key']):03d}"
@@ -113,10 +108,14 @@ def _pool_dump(keys_raw, root, scan_lines, tokens, found_minutes):
 
 
 def cmd_evdoc(argv):
-    (load_config, find_root, docs_dir, tokens, found_minutes, scan_lines, fmt_mmss) = _imports()
+    (load_config, find_root, corpus_cfg, docs_dir, tokens, found_minutes, khu_rows,
+     scan_lines, fmt_mmss, find_note, check_quote, CleanSource) = _imports()
     yaml_path, out_override, dump_keys, seed_keys = None, None, None, None
+    allow_ambiguous = False   # W4.17: explicit escape hatch for cross-key probes
     i = 0
     while i < len(argv):
+        if argv[i] == "--allow-ambiguous":
+            allow_ambiguous = True; i += 1; continue
         if argv[i] == "--from-yaml" and i + 1 < len(argv):
             yaml_path = Path(argv[i + 1]); i += 2; continue
         if argv[i] == "--out" and i + 1 < len(argv):
@@ -148,8 +147,12 @@ def cmd_evdoc(argv):
     if not sections:
         sys.exit("EVIDOC parsed to 0 sections — refusing to write a shell")
 
-    corpus = cfg.get("corpus", {})
-    cite_kw = corpus.get("cite_pattern", "المجلس")
+    # C3.8: corpus section via the ONE loader helper (was cfg.get re-derivation)
+    corpus = corpus_cfg(cfg, root)
+    # P6.14: cite_kw defaults EMPTY — a shelf that hasn't configured a keyword
+    # gets no keyword assumption (the retired 'المجلس' default was another
+    # shelf's vocabulary leaking into every build).
+    cite_kw = corpus.get("cite_pattern", "")
     anchor = meta.get("anchor", "is")
 
     pool = _harvest(root, scan_lines)
@@ -158,7 +161,8 @@ def cmd_evdoc(argv):
 
     QO = corpus.get("quote", {}).get("open", "«")
     QC = corpus.get("quote", {}).get("close", "»")
-    frame_min = 300  # mirrors doc-gate substantive-para threshold
+    # P6.14: shared with doc-gate — one key, one threshold (default 300).
+    frame_min = int(((cfg.get("gates") or {}).get("essay_proxy") or {}).get("min_para_chars", 300))
     fails, warns, num_q, paras = [], [], 0, 0
     body = []
     for sec in sections:
@@ -178,27 +182,57 @@ def cmd_evdoc(argv):
             body.append("<ul>")
             for it in sec.get("items", []):
                 # list items are free text: «» without a same-line cite would
-                # fail check (doc hard lane) — warn at generation time
-                for qq in re.findall(r"«([^»]+)»", it):
-                    if cite_kw not in it.split(qq)[-1][:80]:
-                        warns.append(f"list item has «» without same-line cite: …{qq[:40]}… "
-                                     "(de-quote or add cite)")
+                # fail check (doc hard lane) — warn at generation time. Only
+                # well-defined when a cite keyword IS configured (P6.14: the
+                # empty default would make the containment test vacuous).
+                if cite_kw:
+                    for qq in re.findall(r"«([^»]+)»", it):
+                        if cite_kw not in it.split(qq)[-1][:80]:
+                            warns.append(f"list item has «» without same-line cite: …{qq[:40]}… "
+                                         "(de-quote or add cite)")
                 body.append(f"  <li>{it}</li>"); paras += 1
             body.append("</ul>")
             continue
         meta_bits = []
         for item in sec.get("quotes", []):
             probe, intro = item.get("probe", ""), item.get("intro", "")
-            hits = [(qq, v) for qq, v in pool.items() if qq.startswith(probe)]
+            # P6.14: a probe under 12 chars is a weak anchor — it prefix-matches
+            # half the pool and the nearest-3 suggestion on a miss is noise.
+            # Warn, don't fail: a deliberate short probe is the author's call.
+            if len(probe) < 12:
+                warns.append(f"probe < 12 chars ({probe!r}) in {title[:40]} — weak anchor, "
+                             "prefix-matches broadly; extend it to the distinctive span")
+            # W4.17: optional per-item `key:` scope; unscoped probes that span
+            # MULTIPLE session keys refuse loudly (or run with --allow-ambiguous)
+            # — silent first-hit-wins across sessions wrote the wrong session's
+            # words into the doc under this section's frame.
+            scope = item.get("key")
+            hits = [(qq, v) for qq, v in pool.items()
+                    if qq.startswith(probe) and (not scope or str(v[0]) == scope)]
             if not hits:
                 close = sorted(pool, key=lambda q: sum(1 for a, b in zip(q, probe) if a == b), reverse=True)[:3]
                 fails.append((title[:30], probe[:40], close))
                 continue
+            keys_hit = sorted({str(v[0]) for _q, v in hits})
+            if len(keys_hit) > 1 and not allow_ambiguous:
+                fails.append((title[:30],
+                              f"AMBIGUOUS probe {probe[:40]!r}: {' / '.join(keys_hit)}"
+                              " — add 'key: <session>' to the item or run with --allow-ambiguous",
+                              []))
+                continue
             qq, (nkey, secs) = hits[0]
             # pre-verify: note cite must still locate the quote in the transcript
-            key = nkey if nkey.startswith(("is-", "rr-")) else f"{anchor}-{int(nkey):03d}"
-            if not found_minutes(key, tokens(qq)):
-                fails.append((title[:30], f"STALE note cite {nkey} {secs}: {qq[:60]}", []))
+            # W4.19: was nkey.startswith(("is-","rr-")) — hardcoded prefixes
+            # crashed int() on any other slug ("fx-001" -> ValueError). A key
+            # containing "-" is already whole; only bare numbers get the anchor.
+            key = nkey if "-" in nkey else f"{anchor}-{int(nkey):03d}"
+            # W4.18: pre-verify via the GATE (check_quote — gate-asking), not a
+            # presence-only found_minutes probe: a quote present elsewhere at
+            # the wrong minute is MISMATCH and refuses the build, parity with
+            # draft_note's receipted doctrine.
+            verdict, _msg = check_quote(CleanSource(key), qq, secs or [], "", key)
+            if verdict in ("MISSING", "MISMATCH"):
+                fails.append((title[:30], f"STALE note cite {nkey} {secs}: {qq[:60]} ({verdict})", []))
                 continue
             num_q += 1
             sec = secs[0] if isinstance(secs, list) else parse_any(secs)
@@ -220,6 +254,10 @@ def cmd_evdoc(argv):
         slug = raw.strip("-")[:48] or "doc"
         out = dest / f"{meta.get('range', 'doc')}-{slug}.html"
     out.parent.mkdir(parents=True, exist_ok=True)
+    if out.exists() and "--force" not in argv:
+        # W4.2: same one-write doctrine as cmd_draft/W4.1 — a rebuilt doc
+        # silently replaced whatever edits landed on the rendered file.
+        sys.exit(f"Already exists: {out} — use --force to regenerate")
     out.write_text(html, encoding="utf-8")
     print(f"BUILT -> {out} ({len(sections)} sections, {num_q} quotes, {paras} paras)")
     for w in warns:
@@ -238,9 +276,12 @@ def _render(root, corpus, meta, cite_kw, body):
                .replace("{range}", meta.get("range", ""))
                .replace("{source}", meta.get("source_range", ""))
                .replace("{date}", meta.get("review_date", ""))
-               .replace("{cite}", cite_kw)
-               .replace("{body}", body))
-    if "{" in html and "}" in html and re.search(r"\{\w+\}", html):
-        left = re.findall(r"\{\w+\}", html)
+               .replace("{cite}", cite_kw))
+    # P6.14: the unresolved-placeholder check runs BEFORE {body} insertion —
+    # a quote containing {word} (a code sample, a shell snippet) must not kill
+    # the build; only TEMPLATE placeholders count as unresolved. {body} itself
+    # is a template placeholder and is excluded (it is about to be filled).
+    left = [x for x in re.findall(r"\{\w+\}", html) if x != "{body}"]
+    if left:
         sys.exit(f"template placeholders unresolved: {left[:5]}")
-    return html
+    return html.replace("{body}", body)

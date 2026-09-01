@@ -2,7 +2,7 @@ corpus:
   transcripts_dir: transcripts/clean
   key_pattern: "yt-(\\d{3})"
   quote: {open: "«", close: "»"}
-  claim_source: auto
+  claim_source: محاور  # 1.2.18: notes carry ### المحور headers (3/note); auto removed — silent-0 guard
   docs_dir: reference
   playlist_name: "YouTube Programming"
 gates:

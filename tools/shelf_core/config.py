@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 
@@ -28,18 +29,35 @@ def load_config(root: Path | None = None) -> dict:
     try:
         import yaml  # type: ignore
         return yaml.safe_load(p.read_text(encoding="utf-8")) or {}
-    except Exception:
+    except Exception as e:
+        # C3.3: a MALFORMED config used to be silently swallowed to {} — the shelf
+        # then ran EN defaults with no hint why (verified: malformed YAML, silent
+        # {}). Absence stays silent (a zero-config shelf is legitimate);
+        # corruption is announced once, on stderr.
+        print(f"config at {p} unreadable: {e} — running EN defaults", file=sys.stderr)
         return {}
 
 
 def corpus_cfg(config: dict | None = None, root: Path | None = None) -> dict:
     cfg = config if config is not None else load_config(root)
-    return cfg.get("corpus", {}) if isinstance(cfg, dict) else {}
+    if not isinstance(cfg, dict):
+        print(f"config unreadable: top-level YAML is {type(cfg).__name__}, "
+              "expected a mapping — running EN defaults", file=sys.stderr)
+        return {}
+    c = cfg.get("corpus", {})
+    if not isinstance(c, dict):
+        print(f"config 'corpus' section is {type(c).__name__}, "
+              "expected a mapping — running EN defaults", file=sys.stderr)
+        return {}
+    return c
 
 
 def gates_cfg(config: dict | None = None, root: Path | None = None) -> dict:
     cfg = config if config is not None else load_config(root)
-    return cfg.get("gates", {}) if isinstance(cfg, dict) else {}
+    if not isinstance(cfg, dict):
+        return {}
+    g = cfg.get("gates", {})
+    return g if isinstance(g, dict) else {}
 
 
 # Paths — single source (was hardcoded in _legacy.py, now here)

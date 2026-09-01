@@ -1,0 +1,88 @@
+# config/project.yaml.investing — the Investing shelf's corpus profile (P6.1)
+#
+# This file is DATA: every Investing-specific fact that used to be baked into
+# tools/shelf_core/playlists.py (playlist names/dirs, extras sessions, domain
+# aliases, duplicates, block structure) now lives here. sync.sh copies it into
+# an Investing project as config/project.yaml; the package itself keeps only
+# generic machinery, so a shelf is its config, not its code.
+#
+# Shapes the loader understands (all optional, all validated loudly):
+#   corpus.playlists:          slug -> {dir, name}; dir is the per-playlist
+#                              folder under transcripts/ (clean), reference/
+#                              (notes, docs). The key_pattern slug auto-registers
+#                              FLAT (transcripts_dir layout) unless declared here.
+#   corpus.default_playlist:   bare-NNN keys and unscoped drafts bind to it.
+#   corpus.key_pattern:        primary session-key grammar (cite grammar too).
+#   corpus.transcripts_dir:    flat layout clean transcripts.
+#   corpus.listed_sessions:    pl -> [[slug, filename], ...] for playlists whose
+#                              sessions are listed explicitly (extras) instead
+#                              of numeric NN-prefixed files.
+#   corpus.extra_aliases:      display alias -> canonical session key.
+#   corpus.duplicate_sessions: duplicate key -> canonical key (one note).
+#   corpus.block_membership:   pl -> [[block name, [session nums...]], ...]
+#                              (non-contiguous membership; do NOT turn into ranges)
+#   corpus.blocks:             pl -> [[lo, hi, name], ...] (mechanical batches)
+#   cite/note_meta/essay_proxy/gates sections follow the same schema as any shelf.
+
+corpus:
+  key_pattern: "cs-(\\d{3})"
+  cite_pattern: "المجلس"
+  default_playlist: cs
+  transcripts_dir: transcripts/common-sense/clean
+  docs_dir: reference/common-sense
+
+  playlists:
+    cs: {dir: common-sense, name: "Common Sense Investing"}
+    ex: {dir: extras, name: Extras}
+    rr: {dir: rational-reminder, name: Rational Reminder}
+
+  listed_sessions:
+    ex:
+      - [are-your-etfs-causing-market-bubbles, "Are Your ETFs Causing Market Bubbles？.en.txt"]
+      - [case-for-buying-home-peter-guay, "The Case for Buying a Home (Rent VS Buy) ｜ Peter Guay.en.txt"]
+      - [renting-vs-buying-the-case-for-owning, "Renting vs. Buying a Home： The Case for Owning.en.txt"]
+      - [renting-vs-buying-what-people-get-wrong, "Renting vs. Buying a Home： What People Get Wrong.en.txt"]
+      - [should-i-borrow-to-invest-part-1, "Should I Borrow to Invest？ Part 1.en.txt"]
+      - [using-your-money-to-be-happier, "Using Your Money To Be Happier.en.txt"]
+
+  extra_aliases:
+    ex-rentbuy-case-for-owning: ex-renting-vs-buying-the-case-for-owning
+    ex-rentbuy-get-wrong: ex-renting-vs-buying-what-people-get-wrong
+    ex-guay-case-for-buying: ex-case-for-buying-home-peter-guay
+    ex-using-money-to-be-happier: ex-using-your-money-to-be-happier
+
+  duplicate_sessions:
+    cs-080: cs-079   # byte-identical re-release — one note (DOMAIN-MAP anomaly #2)
+
+  # Blocks per playlist. The cs map is the APPROVED structure from
+  # reference/DOMAIN-MAP.md (non-contiguous session lists — do not turn into
+  # ranges). rr has no approved map yet ("phase 2"); its mechanical batches are
+  # provisional scoping aids until that lands. Every cs session 001–095 (no 016)
+  # is covered by exactly one block.
+  block_membership:
+    cs:
+      - ["Why beating the market is so hard", [40, 45, 54, 33, 93, 92, 55, 48, 90]]
+      - ["Active management fails", [13, 68, 77, 31]]
+      - ["The case for index funds", [70, 19, 47, 42, 84, 94, 95]]
+      - ["Risk, returns & asset allocation", [23, 59, 69, 4, 60, 39, 29, 37]]
+      - ["Behaviour, timing & downturns", [18, 24, 74, 87, 25, 32, 26, 41, 44, 30, 9]]
+      - ["Factor investing", [8, 34, 46, 49, 52, 63]]
+      - ["Income strategies & dividends", [22, 53, 79, 80]]   # 080 = alias of 079
+      - ["Fixed income, cash & rates", [2, 50, 56, 86, 28]]
+      - ["Housing & mortgage debt", [17, 58, 67, 71, 72, 20]]
+      - ["Alternative assets & products", [1, 5, 10, 21, 35, 38, 61, 81, 82, 91, 3]]
+      - ["Implementation: ETFs & portfolios", [15, 43, 73, 83]]
+      - ["Tax & registered accounts", [51, 57, 64, 65, 85]]
+      - ["Retirement funding", [27, 62]]
+      - ["Advice industry & regulation", [7, 11, 66, 78, 88, 89, 36]]
+      - ["Money & happiness (CS side)", [6]]
+      - ["Crypto", [75, 76]]
+      - ["Specials (no topical doc)", [12, 14]]
+
+  blocks:
+    rr:
+      - [1, 85, "RR batch 1 (001-085)"]
+      - [86, 170, "RR batch 2 (086-170)"]
+      - [171, 255, "RR batch 3 (171-255)"]
+      - [256, 340, "RR batch 4 (256-340)"]
+      - [341, 430, "RR batch 5 (341-430)"]

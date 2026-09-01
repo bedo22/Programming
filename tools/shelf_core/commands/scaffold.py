@@ -4,51 +4,40 @@
 from __future__ import annotations
 import sys, re
 from pathlib import Path
-try:
-    from shelf_core.playlists import *
-    # star-import skips underscore names — pull explicitly (doc-branch needs them)
-    from shelf_core.playlists import _slug_title
-    from shelf_core.commands.pins import _template, _scaffold_note
-    from shelf_core.notes import _asset_prefix
-    from shelf_core.transcript import *
-    from shelf_core.notes import *
-    from shelf_core.citation import *
-    from shelf_core.match import tokens, subseq
-    from shelf_core.config import ROOT, REF
-    from shelf_core.citation import *
-except ImportError:
-    from playlists import *  # type: ignore
-    from playlists import _slug_title  # type: ignore
-    from pins import _template, _scaffold_note  # type: ignore
-    from notes import _asset_prefix  # type: ignore
-    from transcript import *  # type: ignore
-    from notes import *  # type: ignore
-    from citation import *  # type: ignore
-    from match import tokens, subseq  # type: ignore
-    from config import ROOT, REF  # type: ignore
+# H2.1/H2.2: explicit imports (tokens/subseq imported but unused here).
+from shelf_core.config import REF, ROOT
+from shelf_core.citation import CITE_RE, QUOTE_RE
+from shelf_core.playlists import (PLAYLIST_NAMES, _slug_title, docs_dir, get_session,
+                                  parse_session_key, session_key_of, topics_dir,
+                                  DEFAULT_PLAYLIST)
+from shelf_core.notes import _asset_prefix, os_rel, find_note, parse_note, STITCH_SECTIONS, _norm_label
+from shelf_core.commands.pins import _template, _scaffold_note
 def cmd_scaffold(argv):
     # scaffold --from-yaml shim → dispatch to draft-note (same verified matcher)
     if "--from-yaml" in argv:
-        try:
-            from shelf_core.commands.draft_note import cmd_draft_note
-        except ImportError:
-            from commands.draft_note import cmd_draft_note  # type: ignore
+        # H2.2: flat fallback removed
+        from shelf_core.commands.draft_note import cmd_draft_note
         # scaffold is-040 --from-yaml MEH.yaml  →  draft-note is-040 --from-yaml MEH.yaml
-        # Keep template as spec: draft-note already stamps templates/session-note.md sections
+        # Keep template as spec: draft-note stamps the section grammar from
+        # shelf_core.notes constants (the TEMPLATES session-note file encodes
+        # the same grammar — one owner, notes.py; A5.3)
         return cmd_draft_note(argv)
     if not argv:
         sys.exit("usage: scaffold KEY | scaffold A-B | "
                  "scaffold doc KEY [--topics] [TITLE] | "
                  "scaffold KEY --from-yaml MEH.yaml (via draft-note)")
-    if re.fullmatch(r"\d{1,3}-\d{1,3}", argv[0]):   # bare range applies to cs
+    if re.fullmatch(r"\d{1,3}-\d{1,3}", argv[0]):   # bare range binds to the default playlist
         a, b = (int(x) for x in argv[0].split("-"))
         done = attempted = 0
         for n in range(a, b + 1):
-            key = f"cs-{n:03d}"
+            key = f"{DEFAULT_PLAYLIST}-{n:03d}"
             if get_session(key) is None:
                 continue
             attempted += 1
             done += 1 if _scaffold_note(key) else 0
+        if not attempted:
+            print(f"scope bound to playlist '{DEFAULT_PLAYLIST}' — 0 files matched")
+            sys.exit(2)
         print(f"Created {done} of {attempted} note scaffolds "
               "(numbers absent from the corpus skipped)")
         return
@@ -95,27 +84,42 @@ def cmd_scaffold(argv):
         if from_notes_raw:
             keys = [k.strip() for k in from_notes_raw.split(",") if k.strip()]
             stitched = ["<!-- AUTO-STITCHED from notes (edit essay arc, then check) -->", ""]
+            _stitched_report, _skipped_report = [], []
             for sk in keys:
                 s_slug, s_ident = parse_session_key(sk)
                 s_key = session_key_of(s_slug, s_ident)
                 npath = None
-                # Find note file via glob reference/notes/<key>-*.md
-                import glob as _glob
-                hits = _glob.glob(str(REF / f"*/notes/{s_key}-*.md")) + _glob.glob(str(REF / f"notes/{s_key}-*.md"))
-                if hits:
-                    npath = Path(hits[0])
+                # W4.21: note discovery via find_note — the registry-driven,
+                # ambiguity-refusing resolver (first-hit glob[0] previously
+                # picked silently among duplicates).
+                _np = find_note(s_key)
+                if _np:
+                    npath = Path(_np)
                 if npath and npath.exists():
-                    txt = npath.read_text(encoding="utf-8", errors="replace")
-                    # Extract Themes / Claims blocks (trimmed 6+2, old aliases tolerated)
-                    for hdr in ["## Themes", "## Claims and evidence", "## Sources", "## محاور", "## قصص"]:
-                        m = re.search(rf"{re.escape(hdr)}.*?(?=\n## |\Z)", txt, flags=re.S)
-                        if m:
-                            block = m.group(0).strip()
+                    # A5.3(c): stitch via NoteDoc sections against the config-
+                    # driven vocabulary (note_meta.stitch_sections). The retired
+                    # hardcoded list carried five headers and omitted نصوص وآثار.
+                    d = parse_note(npath)
+                    for vocab in STITCH_SECTIONS:
+                        vk = _norm_label(vocab)
+                        _hit = False
+                        for s in d["sections"]:
+                            if not _norm_label(s["header"]).startswith(vk):
+                                continue
+                            _hit = True
+                            block = ("\n".join([f"## {s['header']}"] +
+                                               [ln for _, ln in s["body"]])).strip()
                             # No truncate — full stitch, bloat ledgered by check/doc-gate essay proxy (quote_share/words/paras)
                             # Tail often holds C7/C8 nuance; 1200-head truncation silently lost it.
-                            stitched.append(f"<!-- FROM {s_key}: {hdr} -->")
+                            stitched.append(f"<!-- FROM {s_key}: {s['header']} -->")
                             stitched.append(block)
                             stitched.append("")
+                        # P6.9: a vocabulary entry with no matching section is a
+                        # DECISION the operator makes, not a silence.
+                        if not _hit:
+                            _skipped_report.append(f"{s_key}: no section matching '{vocab}'")
+                        else:
+                            _stitched_report.append(f"{s_key}: '{vocab}' stitched")
             # Inject before </main> or append
             if "</main>" in tpl:
                 tpl = tpl.replace("</main>", "\n".join(stitched) + "\n</main>")
@@ -124,6 +128,11 @@ def cmd_scaffold(argv):
         out.write_text(tpl, encoding="utf-8")
         if from_notes_raw:
             print(f"Doc -> {os_rel(out, ROOT)} (auto-stitched from {from_notes_raw}, edit essay arc then verify with `check`)")
+            # P6.9: what was stitched AND what was skipped by vocabulary
+            for r in _stitched_report:
+                print(f"  stitched: {r}")
+            for r in _skipped_report:
+                print(f"  skipped:  {r}")
         else:
             print(f"Doc -> {os_rel(out, ROOT)} (fill sections from the session notes, "
                   "then verify with `check`)")

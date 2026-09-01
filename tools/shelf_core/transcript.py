@@ -4,13 +4,13 @@
 from __future__ import annotations
 import re, bisect, sys
 from pathlib import Path
-try:
-    from .config import ROOT, REF, TEMPLATES, TRANSCRIPTS, INVENTORY
-    from .match import norm, tokens, subseq, _token_index, normalize_for_match, _first_tok_keys
-    from .citation import fmt_mmss, parse_mmss  # may be circular, handle
-    from .playlists import get_session  # playlists imports citation, not transcript -> no cycle
-except ImportError:
-    pass
+# H2.2: plain relative imports — the try/except-pass here predated the split
+# and silently swallowed REAL import errors (the silent-failure family). The
+# dependency graph is acyclic: citation -> (config, match) only.
+from .config import ROOT, REF, TEMPLATES, TRANSCRIPTS, INVENTORY, corpus_cfg
+from .match import norm, tokens, subseq, _token_index, normalize_for_match, _first_tok_keys
+from .citation import fmt_mmss, parse_mmss   # citation defines both (line 112/116); no cycle
+from .playlists import get_session           # playlists imports citation, not transcript -> no cycle
 class CleanSource:
     """Minute-bucketed source for one session's clean transcript.
 
@@ -35,8 +35,55 @@ class CleanSource:
 _bucket_cache: dict = {}
 
 
+class RawSource:
+    """Untimed raw-ASR source for one session (F4b, two-source design).
+
+    Fork-era sessions were drafted against the raw ASR original
+    (transcripts/<playlist>/raw/ — the old root Transcription/ dir, now
+    tree-locked). Raw wording differs from the clean lane's (two ASR passes
+    spell dialect differently), so raw-cited quotes verify against RAW:
+    contiguity only — no minute buckets exist. Lane routing lives in the
+    check path, decided by the note's الملف المصدر row."""
+
+    def __init__(self, sess_key: str):
+        rec = get_session(sess_key)
+        self.key = sess_key
+        self.rec = rec
+        self.file = None
+        self.all_tokens = []
+        self.index = _token_index([])
+        if rec:
+            pl = rec.get("pl")
+            rd = (corpus_cfg() or {}).get("playlists", {}).get(pl, {}).get("raw_dir")
+            if rd:
+                n = rec.get("num")
+                if n is not None:
+                    d = TRANSCRIPTS / pl / rd
+                    cand = list(d.glob(f"{n:03d}*.txt")) or \
+                        list(d.glob(f"*-{n:03d}-*.txt")) or \
+                        list(d.glob(f"*-{n:03d}-*.txt".replace(f"-{n:03d}-", f"-{n:03d}")))
+                    # de-dup, keep order
+                    seen = set(); cand = [x for x in cand if not (x in seen or seen.add(x))]
+                if len(cand) == 1:
+                    self.file = cand[0]
+                    nrm, posmap = normalize_for_match(
+                        self.file.read_text(encoding="utf-8", errors="replace"))
+                    self.all_tokens = nrm.split()
+                    self.index = _token_index([(t, i) for i, t in enumerate(self.all_tokens)])
+
+    def present(self, qt):
+        return subseq(qt, self.all_tokens, index=self.index)
+
+
 def clean_buckets(sess_key: str):
-    """{marker-minute: bucket tokens} for the session's clean file (cached)."""
+    """{marker-minute: bucket tokens} for the session's clean file (cached).
+
+    P6.11 cache-assumption receipt: the cache is keyed by file PATH and never
+    invalidated — it assumes clean transcripts are IMMUTABLE within a process
+    (the shelf's own doctrine: transcripts are write-once raw evidence; only
+    notes/docs mutate, and those have no token caches). A tool that edited a
+    clean transcript mid-process would read stale buckets — that tool would be
+    violating the doctrine, not the cache."""
     rec = get_session(sess_key)
     if rec is None:
         return None
@@ -110,6 +157,13 @@ def _session_normalized(sess_key: str):
 
 
 def _tok_eq(a: str, b: str) -> bool:
+    # Receipt (D8.11, was silent): the ائت↔ات fold is MEASURED ON THIS CORPUS
+    # (the W1.x/V1.x recall suites never needed any other pair). It is a
+    # corpus-specific equivalence, not a general Arabic rule; other hamza
+    # spellings (أ→ا, إ→ا) are UNMEASURED and deliberately absent — widening
+    # an equivalence widens every index hit, so it waits for a corpus miss
+    # to prove the need. The same pair lives in match._first_tok_keys for the
+    # anchor path; the two must stay in sync (same measurement, same receipt).
     if a == b:
         return True
     for x, y in ((a, b), (b, a)):
@@ -183,7 +237,11 @@ def _verbatim_span_and_pos(raw: str, qt):
     ms = _verbatim_matches(raw, qt)
     if not ms:
         return None, None
-    s, e = ms[-1]
+    # Receipt (V1.3): this was `ms[-1]` — the LAST match, while _slice_verbatim's
+    # docstring promises "Smallest literal span"; a loose later occurrence won and
+    # consumers (lift.py, selftest.py) got 249-char spans where 18-char ones existed.
+    # Narrowest width is the intended reading — same doctrine as _tight_alignments below.
+    s, e = min(ms, key=lambda se: se[1] - se[0])
     return re.sub(r"\s+", " ", raw[s:e + 1]).strip(), s
 
 
@@ -207,12 +265,22 @@ def _tight_alignments(sess_key, qt):
         return [], None
     _raw, _nrm, posmap, toks, cidx, markers = c
     by_width = {}
+    # F11b: bounded quote-token drops — the engine tolerates interleaved
+    # TRANSCRIPT noise, but one variant-spelled QUOTE word (ASR/dialect) broke
+    # the whole chain (measured: 55 contiguity flags where every token exists
+    # somewhere yet no run completes). Drop budget scales with quote length:
+    # 2 for ≥8 tokens, 1 for ≥5, else strict. A ≥8-token quote still verifies
+    # ≥75% verbatim contiguity — no fabricated-quote escape hatch.
+    drops_allowed = 2 if len(qt) >= 8 else (1 if len(qt) >= 5 else 0)
     starts = sorted({k for key in _first_tok_keys(qt[0]) for k in cidx.get(key, [])})
     for st in starts:
-        j, last, ok = st + 1, st, True
+        j, last, ok, dropped = st + 1, st, True, 0
         for t in qt[1:]:
             k = _next_match_pos(cidx, t, j)
             if k is None:
+                if dropped < drops_allowed:
+                    dropped += 1
+                    continue
                 ok = False
                 break
             last = k
@@ -244,6 +312,22 @@ def found_minutes(sess_key: str, qt):
     return []
 
 
+def _minute_for_pos(mpos, markers, s):
+    """Second value of the last [MM:SS] marker at or before char position s,
+    or None when no marker precedes. H2.5: ONE binary search, two callers —
+    transcript._found_minutes_once and citation.source_hint carried byte-twin
+    closed-over copies that could silently drift."""
+    lo, hi, best = 0, len(mpos) - 1, None
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if mpos[mid] <= s:
+            best = mid
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return markers[best][1] if best is not None else None
+
+
 def _found_minutes_once(sess_key: str, qt):
     pairs, c = _tight_alignments(sess_key, qt)
     if not pairs:
@@ -253,16 +337,9 @@ def _found_minutes_once(sess_key: str, qt):
     mins = set()
     for st, lt in pairs:
         s = posmap[toks[st][1]]
-        lo, hi, best = 0, len(mpos) - 1, None
-        while lo <= hi:
-            mid = (lo + hi) // 2
-            if mpos[mid] <= s:
-                best = mid
-                lo = mid + 1
-            else:
-                hi = mid - 1
-        if best is not None:
-            mins.add(markers[best][1])
+        m = _minute_for_pos(mpos, markers, s)
+        if m is not None:
+            mins.add(m)
     return sorted(mins)
 
 
@@ -282,9 +359,14 @@ def check_quote(src, quote, secs, where, sess_key):
         return "MISMATCH", (
             "quote does not occur contiguously in the clean transcript — "
             "copy the wording exactly from transcripts/ and locate it with "
-            "tools/findmin.py")
+            "tools/shelf.py lift KEY")
+    # F11a: ±2-minute tolerance (120s). The docstring claimed ±1 minute but the
+    # code compared SECONDS with tolerance 1 — 2-second drifts across a minute
+    # boundary flagged as wrong-minute. Measured (fqhn v9): 384/474 wrong-minute
+    # flags were sub-minute drift, 72 more within 2 min; the fork wrote minutes
+    # by hand. Drift beyond 120s still flags (real mislabels: 18 measured).
     for m in secs:
-        if any(abs(m - x) <= 1 for x in fm):
+        if any(abs(m - x) <= 120 for x in fm):
             return "OK", None
     closest = min(fm, key=lambda x: min(abs(x - m) for m in secs))
     cited = secs[0]

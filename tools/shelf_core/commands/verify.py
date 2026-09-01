@@ -10,6 +10,7 @@ Usage:
   shelf verify dorar "نص الحديث"            # dorar grade cards (scrapling stealth)
   shelf verify locate "عبارة" [--book X]     # ar.wikisource search + located context
   shelf verify shamela find "<title>"        # local Shamela catalogue: edition, printed pagination, citable url (LOCATE only, never a verdict)
+                                             #   db path: config verify.shamela.path, or env SHAMELA_DB (canonical; legacy SHEMELA_DB accepted)
   shelf verify apply --from-json VERDICTS.json [--dossier is-024/slug]
                                             # write dossier + update note rows IN PLACE
 
@@ -19,17 +20,31 @@ re-running a drain costs no network and cannot drift between runs.
 import sys, os, re, json, glob, hashlib, subprocess, time, urllib.request, urllib.parse
 from pathlib import Path
 
-from shelf_core.match import norm_uthmani as norm  # single owner: shelf_core/match.py (see the note there)
+from shelf_core.match import norm_uthmani as norm, uth_variants as _uthv  # single owner: shelf_core/match.py (see the note there)
+# A5.3(b): the note grammar lives in the parse layer — _items_of/_note_verdicts
+# consume NoteDoc instead of private نصوص/التحقق regex forks.
+from shelf_core.notes import (parse_note, find_section, verdict_of, VERDICT_KW,
+                              VERDICT_VAL_RE, VERDICT_LINE_RE)
 
 UA = {"User-Agent": "shelf-verify/1.0 (shelf-pipeline skill)"}
 
 
 def _root():
-    try:
-        from shelf_core.config import find_root
-    except ImportError:
-        from config import find_root  # type: ignore
+    # H2.2: flat-layout fallback removed — the package is always a package.
+    from shelf_core.config import find_root
     return find_root()
+
+
+def _worklist_dir(root):
+    """A5.6/P6.6: the tenant path 'plans/khilafah-verification' is now a config
+    key (verify.plan_dir, with A5.6's verify.worklist_dir accepted as an
+    alias) or --worklist-dir; the old Politics path stays the default so
+    existing shelves keep working."""
+    from shelf_core.config import load_config
+    cfg = load_config(root) or {}
+    v = cfg.get("verify", {}) or {}
+    d = v.get("plan_dir") or v.get("worklist_dir") or "plans/khilafah-verification"
+    return root / d
 
 
 def _cache_dir(root):
@@ -81,22 +96,21 @@ HADITH_RE = re.compile(r"حديث|منسوب.*النبي|رواه|أخرجه|ب�
 
 
 def _items_of(path):
-    txt = Path(path).read_text(encoding="utf-8")
-    sec = re.search(r"## نصوص وآثار(.*?)(?=\n## |\Z)", txt, re.S)
+    # A5.3(b): NoteDoc sections + items replace the private نصوص/block regexes.
+    d = parse_note(Path(path))
+    sec = find_section(d, "نصوص")
     if not sec:
         return []
+    sec_lns = {sec["line"]} | {ln for ln, _ in sec["body"]}
     out = []
-    for block in re.split(r"\n(?=\s*\d+\.\s+\*\*)", sec.group(1)):
+    for it in d["items"]:
+        if it["line"] not in sec_lns:
+            continue
         # A row WITHOUT any verdict line is the most open row there is. Skipping it made
         # the meter report 0 while 67 rows had never entered the queue at all.
-        if "التحقق" not in block and not re.search(r">\s*«", block):
+        if VERDICT_KW not in it["block"] and not it["quote"]:
             continue
-        t = re.search(r"\*\*(.+?)\*\*", block)
-        q = re.search(r">\s*«([^»]+)»", block)
-        v = re.search(r"التحقق[:：]?\s*([^\n]+)", block)
-        out.append({"title": (t.group(1) if t else "").strip(),
-                    "quote": (q.group(1) if q else "").strip(),
-                    "ver": (v.group(1) if v else "").strip()})
+        out.append({"title": it["title"], "quote": it["quote"], "ver": it["verdict"]})
     return out
 
 
@@ -113,7 +127,9 @@ def _ayah_ref(item):
 def cmd_worklist(argv):
     root = _root()
     only = argv[argv.index("--key") + 1] if "--key" in argv else None
-    notes = sorted(glob.glob(str(root / "reference" / "notes" / "is-0[0-4][0-9]-*.md")),
+    # W4.8: was is-0[0-4][0-9]-* — the worklist silently stopped at session 049.
+    # Full registry-driven enumeration is P6.5's work; until then cover all is-.
+    notes = sorted(glob.glob(str(root / "reference" / "notes" / "is-*.md")),
                    key=lambda p: os.path.basename(p)[:6])
     uniq, per_note = {}, {}
     for n in notes:
@@ -137,7 +153,7 @@ def cmd_worklist(argv):
             if cls == "quran" and not rec["ayah"]:
                 rec["ayah"] = _ayah_ref(it)
     out = {"unique": len(uniq), "items": list(uniq.values()), "per_note": per_note}
-    dest = root / "plans" / "khilafah-verification" / "worklist.json"
+    dest = _worklist_dir(root) / "worklist.json"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     by = {}
@@ -186,10 +202,11 @@ def cmd_quran(argv):
         out = []
         for k in cands[:5]:
             txt, _ = _quran_verse(root, k)
+            uvs = _uthv(txt)                       # both readings of the superscript alef
+            fvs = _uthv(find)
             aw = [w for w in norm(find).split() if len(w) > 2]
-            u = norm(txt)
-            hit = sum(1 for w in aw if w in u)
-            exact = norm(find) in u
+            hit = sum(1 for w in aw if any(w in x for x in uvs))
+            exact = any(f in x for f in fvs for x in uvs)
             status = "MATCH" if exact else (f"partial {hit}/{len(aw)}" if aw else "?")
             n, a = k.split(":")
             print(f"  {k:<9} {status:<14} {txt[:64]}")
@@ -198,7 +215,9 @@ def cmd_quran(argv):
         if not out:
             print("  NO candidate carries the phrase contiguously -- this is NOT a verse match.")
             print("  Re-core with fewer distinctive words, or mark للشيخ. Do not cite the top hit.")
-        return out
+        status = "MATCH" if out else "NO-CONTIGUOUS"
+        return _emit_json({"lane": "quran", "status": status,
+                           "find": find, "candidates": cands[:5], "hits": out})
 
     if not ref:
         sys.exit('usage: verify quran --ref SURAH:AYAH [--stem phrase] | --find "asr phrase"')
@@ -212,8 +231,21 @@ def cmd_quran(argv):
         hit = sum(1 for w in aw if w in u)
         status = "MATCH" if norm(stem) in u else (f"partial {hit}/{len(aw)}" if aw else "?")
         print(f"  asr-stem: «{stem}» -> {status}")
-        return {"ref": ref, "uthmani": txt, "status": status}
+        return _emit_json({"lane": "quran", "status": status, "ref": ref,
+                           "uthmani": txt})
 
+
+
+
+def _emit_json(obj):
+    """P12 (Politics P3 row 58): the fleet consumer contract — scripts parse a
+    `::JSON:: {…}` line from stdout. cmd_dorar returned objects that never
+    reached stdout; cmd_quran printed human grading only, so quran-resweep.py
+    captured NO-OUTPUT for every row. Emit one machine line, keep the human
+    grading untouched above it."""
+    import json as _json
+    print("::JSON:: " + _json.dumps(obj, ensure_ascii=False))
+    return obj
 
 # ---------------------------------------------------------------- dorar
 def _dorar_search(query, root):
@@ -222,9 +254,17 @@ def _dorar_search(query, root):
     url = "https://dorar.net/hadith/search?" + urllib.parse.urlencode({"q": query})
     def fetch():
         tmp = Path(root) / "_verify" / ".cache" / (hashlib.sha1(url.encode()).hexdigest()[:16] + ".md")
-        subprocess.run(["scrapling", "extract", "stealthy-fetch", url, str(tmp)],
-                       capture_output=True, timeout=120)
-        return {"url": url, "text": tmp.read_text(encoding="utf-8") if tmp.exists() else ""}
+        try:
+            subprocess.run(["scrapling", "extract", "stealthy-fetch", url, str(tmp)],
+                           capture_output=True, timeout=120)
+        except FileNotFoundError as e:
+            raise RuntimeError(f"scrapling not available: {e} — not cached; "
+                               "install scrapling or retry later") from e
+        # W4.7: a transient scrapling failure must STAY a failure — returning {}
+        # here let _cached store the emptiness forever (cache unpoisonable).
+        if not tmp.exists() or tmp.stat().st_size == 0:
+            raise RuntimeError(f"scrapling produced no output for {url} — not cached; retry later")
+        return {"url": url, "text": tmp.read_text(encoding="utf-8")}
     data, src = _cached(f"dorar:{query}:page", fetch)
     return data, src
 
@@ -331,7 +371,9 @@ def cmd_locate(argv):
             txt = p.get("revisions", [{}])[0].get("slots", {}).get("main", {}).get("*", "")
         except Exception as e:
             print(f"   !! {t}: {e}"); continue
-        i = txt.find(norm(phrase)[:12]) if False else txt.find(phrase.split()[0])
+        # H2.4: dead `if False` arm removed — raw first-word find only; a normalized
+        # probe here would break offset math (known orthography limitation).
+        i = txt.find(phrase.split()[0])
         print(f"   == {t} [{s2}] chars={len(txt)}")
         if i != -1:
             print("      ...", re.sub(r"\s+", " ", txt[max(0, i-160):i+320]))
@@ -354,6 +396,12 @@ def _ws_body(title):
 def _norm_txt(s):
     # Hamza carriers differ between ASR and manuscript orthography (وطأته / وطاته);
     # dropping the standalone hamza keeps both spellings comparable.
+    # NOT a duplicate of match.norm: the `norm` imported here is norm_uthmani, the Quran
+    # containment grader (see the import above). An earlier "unification" pass rewrote this to the
+    # general fold and silently swapped the grader -- which broke the dorar lane, because the
+    # import it needed was never added either (str.replace with no match is silent). Reverted:
+    # one authority for "same Arabic wording" does not mean collapsing a deliberately different
+    # comparison into it.
     return norm(s).replace("ء", "")
 
 
@@ -410,7 +458,6 @@ def _word_cover(quote, text, phrase=""):
     run = max(best_run, len(pw) if phrase_hit else 0)
     # A run of names and particles ("أن علي بن أبي طالب") is not a wording match.
     # Confirmation needs real content words in the matched run.
-    content = sum(1 for w in qw[:0] )  # placeholder, replaced below
     return {"found": sum(1 for w in qw if w in hay), "need": len(qw), "run": run,
             "phrase_hit": phrase_hit, "at": best_at or (phrase and _window(text, " ".join(pw)) or ""),
             "content": best_content,
@@ -443,7 +490,7 @@ def cmd_rescan(argv):
     """
     root = _root()
     out = argv[argv.index("--out") + 1] if "--out" in argv else None
-    wl = root / "plans" / "khilafah-verification" / "worklist.json"
+    wl = _worklist_dir(root) / "worklist.json"
     if not wl.exists():
         sys.exit("no worklist.json — run: shelf verify worklist")
     items = json.loads(wl.read_text(encoding="utf-8")).get("items", [])
@@ -561,10 +608,17 @@ def cmd_apply(argv):
             skipped.append((note, "no note")); continue
         p = Path(hits[0])
         txt = p.read_text(encoding="utf-8")
-        sec = re.search(r"(## نصوص وآثار.*?)(?=\n## |\Z)", txt, re.S)
+        # A5.3(b): section location via NoteDoc (find_section); the splice
+        # below reproduces the retired regex's exact offsets — body from the
+        # header line to the next level-2 header, remainder keeps its leading
+        # newline.
+        d = parse_note(p)
+        sec = find_section(d, "نصوص")
         if not sec:
             skipped.append((note, "no نصوص section")); continue
-        body = sec.group(1)
+        lines = txt.split("\n")
+        start, end = sec["line"] - 1, sec["end"]
+        body = "\n".join(lines[start:end])
         parts = re.split(r"(\n(?=\s*\d+\.\s+\*\*))", body)
         done = False
         for i, part in enumerate(parts):
@@ -573,7 +627,7 @@ def cmd_apply(argv):
             hay = norm((qm.group(1) if qm else "") + " " + part)
             if not qm or probe not in hay:
                 continue
-            lm = re.search(r"التحقق[:：][^\n]*", part)
+            lm = VERDICT_LINE_RE.search(part)
             if lm is None:
                 # First-ever verdict on a row that never had one. The writer used to skip
                 # such rows — the same blind spot that hid 67 rows from the worklist.
@@ -592,14 +646,23 @@ def cmd_apply(argv):
                 amended.append((note, stem, v["amend"]))
             else:
                 new_line = v["line"].strip()
-            newpart, cnt = re.subn(r"—?\s*التحقق[:：][^\n]*", new_line, part, count=1)
+            newpart, cnt = VERDICT_LINE_RE.subn(new_line, part, count=1)
             if cnt:
                 parts[i] = newpart
                 done = True
             break
         if not done:
+            # P6.6 (accepted behavior, cmd-verify.md finding 10): if one stem
+            # prefixes another, the first ADD inserts its verdict line into the
+            # shared block and the second stem then also matches it — the
+            # second ADD/SKIP decision prints either way. This is a deliberate
+            # one-item-at-a-time tool with printed outcomes, not a silent
+            # collision: the operator sees exactly what was added.
             skipped.append((note, stem, "stem not found in any item")); continue
-        p.write_text(txt[:sec.start(1)] + "".join(parts) + txt[sec.end(1):], encoding="utf-8")
+        new_txt = ("\n".join(lines[:start]) + "\n" if start else "") + "".join(parts)
+        if end < len(lines):
+            new_txt += "\n" + "\n".join(lines[end:])
+        p.write_text(new_txt, encoding="utf-8")
         touched[note] = touched.get(note, 0) + 1
     for n, s in added:
         print(f"  ADD  ({n}, {s[:34]}) — first verdict on this row")
@@ -637,15 +700,16 @@ def _shamela_root(root):
     must say so out loud -- "not found in the catalogue" and "catalogue not mounted" are
     different sentences and only one of them is evidence.
     """
-    try:
-        from shelf_core.config import load_config
-    except ImportError:
-        from config import load_config  # type: ignore
+    # H2.2: flat fallback removed
+    from shelf_core.config import load_config
     try:
         cfg = load_config(Path(root)) or {}
     except Exception:
         cfg = {}
-    explicit = (((cfg.get("verify") or {}).get("shamela") or {}).get("path")) or os.environ.get("SHEMELA_DB")
+    # C3.7: canonical spelling is SHAMELA_DB (Shamela is the site); SHEMELA_DB
+    # is the legacy misspelling, still accepted so old wrappers keep working.
+    explicit = (((cfg.get("verify") or {}).get("shamela") or {}).get("path")) \
+        or os.environ.get("SHAMELA_DB") or os.environ.get("SHEMELA_DB")
     for c in ([explicit] if explicit else list(SHAMELA_DEFAULTS)):
         if c and (Path(c) / "master.db").exists():
             return Path(c), ("config/env" if explicit else "default path")
@@ -785,34 +849,32 @@ _Q_RE = re.compile(r"«([^»]{8,})»")
 
 
 def _note_verdicts(root):
-    """Parse every note's «نصوص وآثار» rows into verdicts keyed by normalised quote."""
+    """Parse every note's نصوص rows into verdicts keyed by normalised quote.
+    A5.3(b): NoteDoc items + verdict_of replace the private section/block/
+    verdict regexes; the tail's amana/dossier/href handling stays here
+    (verify-domain, not note grammar)."""
     out = []
     ndir = os.path.join(root, "reference", "notes")
     for path in sorted(glob.glob(os.path.join(ndir, "is-*.md"))):
-        note = os.path.basename(path).split("-")[0] + "-" + os.path.basename(path).split("-")[1]
-        text = open(path, encoding="utf-8").read()
-        m = re.search(r"## نصوص وآثار.*?(?=\n## |\Z)", text, flags=re.S)
-        if not m:
+        d = parse_note(Path(path))
+        note = f"{d['ident'][0]}-{d['ident'][1]}" if d["ident"][0] else d["path"].name
+        sec = find_section(d, "نصوص")
+        if not sec:
             continue
-        blocks = re.split(r"(?m)^\s*\d+\.\s+\*\*", m.group(0))
-        for b in blocks[1:]:
-            qm = _Q_RE.search(b)
-            vm = re.search(r"—\s*التحقق:\s*(?:\*\*)?\s*([^*\n—]+?)\s*(?:\*\*)?\s*—?\s*(.*)", b, flags=re.S)
-            if not qm or not vm:
+        sec_lns = {sec["line"]} | {ln for ln, _ in sec["body"]}
+        for it in d["items"]:
+            if it["line"] not in sec_lns:
                 continue
-            # Status is the bolded token (or the text up to the first dash). A lazy
-            # capture here once produced <strong>ل</strong> — لشيخ — …
-            raw = re.sub(r"\s+", " ", vm.group(0)).strip()
-            sm = re.search(r"التحقق[:：]\s*\*\*([^*]+)\*\*", raw)
-            if sm:
-                status = sm.group(1).strip()
-                tail = raw[sm.end():]
-            else:
-                sm = re.search(r"التحقق[:：]\s*", raw)
-                rest = raw[sm.end():] if sm else raw
-                status, _, tail = rest.partition(" —")
-                status = status.strip().rstrip("—").strip()
+            b = it["block"]
+            qm = _Q_RE.search(b)
+            status, tail = verdict_of(b)
+            if not qm or (not status and not tail):
+                continue
+            # parity with the retired grammar: tail strips unconditionally; the
+            # collapsed verdict LINE is what the المجلس cite search reads.
             tail = tail.strip(" —")
+            vm2 = VERDICT_VAL_RE.search(b)
+            raw = re.sub(r"\s+", " ", vm2.group(0)).strip() if vm2 else ""
             amana = ""
             if "| الأمانة:" in tail:
                 tail, amana = tail.split("| الأمانة:", 1)
@@ -841,15 +903,16 @@ def _note_verdicts(root):
 
 
 def _run_len(a, b):
-    """Longest contiguous token run shared by two normalised quotes."""
-    ta, tb = a.split(), set(b.split())
-    best = i = 0
-    while i < len(ta):
-        j = i + 1
-        while j <= len(ta) and " ".join(ta[i:j]) in b:
-            best = max(best, j - i)
-            j += 1
-        i += 1
+    """Longest contiguous token run shared by two normalised quotes.
+    W4.9: was substring containment on the raw strings — "قال النبي" counted
+    a run inside "وقال النبيه". SequenceMatcher over token lists counts exact
+    contiguous token blocks only."""
+    from difflib import SequenceMatcher
+    ta, tb = a.split(), b.split()
+    sm = SequenceMatcher(None, ta, tb, autojunk=False)
+    best = 0
+    for blk in sm.get_matching_blocks():
+        best = max(best, blk.size)
     return best
 
 

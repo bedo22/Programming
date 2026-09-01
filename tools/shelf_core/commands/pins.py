@@ -2,35 +2,17 @@
 # -*- coding: utf-8 -*-
 """commands/pins — moved from _legacy.py (batch)."""
 from __future__ import annotations
-import sys, re, re
+import sys, re
 from pathlib import Path
-try:
-    from shelf_core.playlists import *
-    from shelf_core.playlists import _slug_title  # underscore not exported by *
-    from shelf_core.transcript import *
-    from shelf_core.notes import *
-    from shelf_core.notes import _scanned_region, os_rel  # underscore not exported by *
-    from shelf_core.citation import *
-    from shelf_core.match import tokens, subseq
-    from shelf_core.config import ROOT, REF
-    from shelf_core.citation import *
-    from shelf_core.commands.lift import fix_note  # pins --fix reuses lift's fixer
-except ImportError:
-    from playlists import *  # type: ignore
-    from playlists import _slug_title  # type: ignore
-    from transcript import *  # type: ignore
-    from notes import *  # type: ignore
-    try:
-        from notes import _scanned_region, os_rel  # type: ignore
-    except ImportError:
-        pass
-    from citation import *  # type: ignore
-    from match import tokens, subseq  # type: ignore
-    from config import ROOT, REF  # type: ignore
-    try:
-        from lift import fix_note  # type: ignore
-    except ImportError:
-        from commands.lift import fix_note  # type: ignore
+# H2.1/H2.2: explicit imports (tokens/subseq were imported but unused here).
+from shelf_core.config import ROOT, TEMPLATES
+from shelf_core.playlists import (DUPLICATE_SESSIONS, PLAYLIST_NAMES, _slug_title,
+                                  get_session, notes_dir, parse_session_key, session_key_of)
+from shelf_core.notes import (scanned_region, find_note, note_source_key, os_rel,
+                              report_records, scan_lines, note_ident)
+from shelf_core.transcript import CleanSource
+from shelf_core.commands.lift import fix_note  # pins --fix reuses lift's fixer
+
 def cmd_pins(argv):
     """pins [--fix] KEY|NOTE.md [KEY|NOTE.md ...] — extract every double-quoted span,
     verify its same-line cite against the transcript, flag uncited quotes.
@@ -72,7 +54,7 @@ def _pins_one(arg, fix):
         if note is None:
             sys.exit(f"No note for session {sess_key} — run `scaffold {sess_key}` first")
         txt = note.read_text(encoding="utf-8")
-    if "\ufffd" in _scanned_region(txt):
+    if "\ufffd" in scanned_region(txt):
         print("✗ Note contains U+FFFD replacement characters in the scanned region "
               "— tokens silently shatter and quotes read as 'not found'; fix the "
               "word from the source first.")
@@ -88,10 +70,42 @@ def _pins_one(arg, fix):
         else:
             print("No auto-fixable citations.\n")
         txt = note.read_text(encoding="utf-8")
-    records = scan_lines(txt)
-    c = report_records(records, src, sess_key, note.name)
-    print(f"\nQuoted spans: {c['quoted']} ({c['checked']} verified, "
+    # T9.1: the note's own playlist feeds keyword-cite resolution
+    # (corpus.cite_playlist=self) — compute BEFORE scan_lines.
+    _own_pl = None
+    _ni = note_ident(note)
+    if _ni and _ni[0]:
+        _own_pl = _ni[0]
+    records = scan_lines(txt, own_pl=_own_pl)
+    from shelf_core.notes import _uncited_quotes_skip as _uq
+    _skip = _uq()
+    # T9.2: claims contract — with corpus.uncited_quotes=skip the uncited «»
+    # records must not reach report_records (its summary still counts them).
+    # Count them BEFORE the filter so the skip is loud, never silent.
+    _narrative = 0
+    if _skip:
+        _narrative = sum(1 for r in records if not r["cited"])
+        records = [r for r in records if r["cited"]]
+    c = report_records(records, src, sess_key, note.name, uncited_skip=_skip)
+    _n_total = c["quoted"] + _narrative   # claims lane is measured, not verified
+    if _skip and _narrative:
+        print(f"  (claims: {_narrative} uncited «» spans skipped as narrative "
+              f"per corpus.uncited_quotes=skip — measured by doc-coverage, "
+              f"not pins)")
+    print(f"\nQuoted spans: {_n_total} ({c['checked']} verified, "
           f"{c['labels']} skipped as 1–3-token labels).")
+    # A gate that examined nothing must not report green. Every cite in this shelf's ts- notes was
+    # unparseable for the whole life of the batch -- an ASCII-vs-Arabic comma mismatch between the
+    # generator and the matcher -- and every run said "Flags: 0" while quietly reporting
+    # "0 verified". Zero flags with zero checks is not a pass, it is the tool not looking.
+    _unverified_cited = c["quoted"] and not c["checked"]
+    _all_empty = not _n_total
+    if _unverified_cited or _all_empty:
+        _n = sum(1 for r in records if r["cited"]) if _skip else c["quoted"]
+        print(f"\n✗ NOTHING WAS VERIFIED in {note.name}: {_n} cited spans found, 0 verified. "
+              f"'Flags: 0' here means the matcher saw nothing -- check that the cite form this "
+              f"note writes is the form CITE_RE accepts (comma, keyword, key width).")
+        return 1
     parts = []
     if c["uncited"]:
         parts.append(f"{c['uncited']} uncited")

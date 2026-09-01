@@ -11,6 +11,12 @@ from pathlib import Path
 
 import _shelf_lib as lib
 
+# W4.13: config-driven label/value constants from the parse layer (the one
+# source for note-metadata conventions). _shelf_lib's tools-path bootstrap
+# makes shelf_core importable from scripts.
+from shelf_core.notes import (STATUS_LABEL, STATUS_VALUES,  # noqa: E402
+                              parse_note, find_section)  # A5.3(f)
+
 
 def _toks(s: str) -> list[str]:
     s = re.sub(r"[^\w\s\u0600-\u06FF]", " ", s)
@@ -30,10 +36,17 @@ def _verdict_contradictions(text: str) -> list[str]:
     Keyed on timecode + near-identical quote. The threshold matters: at 0.55 token overlap the
     detector produced 8 candidates of which 2 were wrong (shared function words, and a header
     that merely lists quotes). At >= 0.95 it produced 8 with 0 false positives.
+
+    P6.13: the quote-length cap is 15-1000 (was 15-220) — long verbatim texts
+    (a 4-line hadith passage) were invisible to BOTH lanes, so a stale verdict
+    on a long quote never contradicted. CONTROL (per PROTOCOL, a threshold
+    change ships its control): the measured 8-candidate set re-run at both caps
+    produces the SAME candidate list and the SAME 0 false positives at 0.95
+    (recorded in reports/p613-verdict-cap-control.md).
     """
     prose = []
     for m in re.finditer(
-        r"(\d{2}:\d{2})[^\n]*\n+\s*>\s*«([^»]{15,220})»\s*\n+\s*—\s*التحقق:\s*\*\*(متحقق|للشيخ|متنازع)[^*]*\*\*",
+        r"(\d{2}:\d{2})[^\n]*\n+\s*>\s*«([^»]{15,1000})»\s*\n+\s*—\s*التحقق:\s*\*\*(متحقق|للشيخ|متنازع)[^*]*\*\*",
         text,
     ):
         prose.append((m.group(1), _toks(m.group(2)), m.group(3)))
@@ -41,7 +54,7 @@ def _verdict_contradictions(text: str) -> list[str]:
         return []
     out = []
     for m in re.finditer(
-        r"\|\s*(\d{2}:\d{2})\s*\|\s*«([^»]{15,220})»[^|]*\|[^|]*\|\s*\*\*(متحقق|للشيخ|متنازع)\*\*\s*\|",
+        r"\|\s*(\d{2}:\d{2})\s*\|\s*«([^»]{15,1000})»[^|]*\|[^|]*\|\s*\*\*(متحقق|للشيخ|متنازع)\*\*\s*\|",
         text,
     ):
         tc, qt, st = m.group(1), _toks(m.group(2)), m.group(3)
@@ -126,6 +139,9 @@ def main(argv: list[str] | None = None):
             if not pins_ok:
                 shelf_py = root / "tools" / "shelf.py"
                 if shelf_py.exists():
+                    # P6.13 provenance: the fallback is a DIFFERENT execution path —
+                    # say so next to the verdict, never silently.
+                    print(f"pins via subprocess fallback ({shelf_py}) — semantics may differ; run sync.sh")
                     r = subprocess.run(["python3", str(shelf_py), "pins", str(p)], capture_output=True, text=True)
                     if r.returncode == 0:
                         pins_ok = True
@@ -137,9 +153,14 @@ def main(argv: list[str] | None = None):
         if not pins_ok:
             problems.append(f"pins FAILED ({pins_err or 'nonzero'})")
 
-        # 2. empty-scaffold
-        if len(text.strip()) < 300 or "حالة الملاحظة" in text and "| draft |" in text and text.count("«") < 1:
-            # very short or still draft template
+        # 2. empty-scaffold — W4.13: the old condition hardcoded the AR label
+        # (حالة الملاحظة) AND the EN value (| draft |) together, so NEITHER
+        # convention could satisfy it (an AR scaffold's status value is مسودة).
+        # Both strings now come from the parse layer's config-driven constants,
+        # satisfiable in whichever convention the shelf configures.
+        _draft_status = next(iter(STATUS_VALUES), "draft")
+        if len(text.strip()) < 300 or (
+                STATUS_LABEL in text and f"| {_draft_status} |" in text):
             if text.count("«") == 0 and text.count('"') == 0:
                 problems.append("empty-scaffold (no quotes)")
 
@@ -161,21 +182,21 @@ def main(argv: list[str] | None = None):
         for msg in _verdict_contradictions(text):
             problems.append(msg)
 
-        # 4. bucket-ref validity — cited HH:MM / سطر must exist in clean
-        # Extract cites: HH:MM after المجلس or key pattern
-        cite_re = lib.cite_regex(config)
-        cites = list(cite_re.finditer(text))
-        # Also check MIN_RE_AR for سطر
-        for m in re.finditer(r"سطر\s+[\d\s–\-،,]+", text):
-            # line-based early sessions — assume valid if format ok
-            pass
+        # 4. bucket-ref validity — W4.12: the check that stood here was DEAD:
+        # `cites` was extracted and never read, and the سطر loop was `pass`
+        # ("assume valid"). Time-anchoring is owned by pins (check_quote — the
+        # gate-asking verdict), which runs on every note; notes-gate never
+        # re-implements it. (PIPELINE.md §5 row updated in Phase 8.)
 
         # 5. review-queue TRIAGE (never blocks) — individual-shelf reality:
         #    | للشيخ | / ## مصادر empty is trustworthiness intent, not GATE.
         #    Solo individual cannot review every ayah; queue drains weekly if time.
+        # A5.3(f): section presence via NoteDoc (find_section, tolerant) — the
+        # hardcoded '## نصوص وآثار' literals are gone.
+        doc = parse_note(text)
         triage_notes: list[str] = []
-        has_nusus = "## نصوص وآثار" in text or "## نصوص" in text
-        has_masadir = "## مصادر متحققة" in text or "## مصادر" in text
+        has_nusus = find_section(doc, "نصوص") is not None
+        has_masadir = find_section(doc, "مصادر") is not None
         has_alam = "للشيخ" in text or "أعلام للمراجعة" in text
         # Detect religious quote without مصادر row
         if has_nusus and ("قال تعالى" in text or "قال رسول الله" in text):
@@ -185,8 +206,9 @@ def main(argv: list[str] | None = None):
             # Cloudflare-blocked). An _verify/ dossier path also counts.
             masadir_block = ""
             if has_masadir:
-                mm = re.search(r"## مصادر.*?(?=\n## |\Z)", text, flags=re.S)
-                masadir_block = mm.group(0) if mm else ""
+                sec = find_section(doc, "مصادر")
+                masadir_block = ("\n".join([f"## {sec['header']}"] +
+                                           [ln for _, ln in sec["body"]])) if sec else ""
             verified = any(s in masadir_block for s in (
                 "quran.com", "dorar.net", "ar.wikisource.org",
                 "api.quran.com", "_verify/"))

@@ -4,26 +4,19 @@
 from __future__ import annotations
 import sys, re
 from pathlib import Path
-try:
-    from shelf_core.playlists import *
-    from shelf_core.transcript import *
-    from shelf_core.notes import *
-    from shelf_core.notes import _scanned_region  # underscore not exported by *
-    from shelf_core.citation import *
-    from shelf_core.match import tokens, subseq
-    from shelf_core.config import ROOT, REF
-    from shelf_core.citation import *
-except ImportError:
-    from playlists import *  # type: ignore
-    from transcript import *  # type: ignore
-    from notes import *  # type: ignore
-    try:
-        from notes import _scanned_region  # type: ignore
-    except ImportError:
-        pass
-    from citation import *  # type: ignore
-    from match import tokens, subseq  # type: ignore
-    from config import ROOT, REF  # type: ignore
+# H2.1/H2.2: explicit imports (AST-derived; subseq/REF were imported but unused).
+from shelf_core.config import ROOT
+from shelf_core.match import tokens
+from shelf_core.playlists import (BLOCKS, DEFAULT_PLAYLIST, PLAYLIST_NAMES, block_of,
+                                  docs_dir, get_session, numeric_slugs, parse_session_key,
+                                  playlist_keys, session_key_of, topics_dir)
+from shelf_core.notes import (FLAGS_LABEL, FLAGS_NO, FLAGS_YES, STATUS_LABEL, STATUS_VALUES,
+                              TITLE_ROW_RE, _asset_prefix, scanned_region, find_note,
+                              parse_note, os_rel, report_records, scan_html)
+from shelf_core.transcript import CleanSource, check_quote
+from shelf_core.citation import QUOTE_MIN_TOKENS, fmt_cite, fmt_mmss, source_hint
+# note-parsing helpers live in scaffold.py after the split (used by --from-notes)
+from shelf_core.commands.scaffold import _parse_note_definitions, _parse_note_papers
 def cmd_draft(argv):
     if not argv:
         sys.exit("usage: draft KEY")
@@ -258,54 +251,72 @@ def check_doc(doc: Path, pl: str, fails: list, verbose=True):
 
 
 def check_note(note: Path, fails: list, verbose=True):
-    txt = note.read_text(encoding="utf-8")
+    # A5.3(f): ONE parse_note — resolved status/flags/scaffold/key/quotes from
+    # NoteDoc instead of five separate text walks (the ×4 label incoherence
+    # family closes: the labels come from the parse layer's note_meta constants).
+    d = parse_note(note)
     name = note.name
-    # Config-driven metadata labels (corpus.note_meta), diacritic-tolerant.
-    st = meta_status(txt)
+    st = d["status"]
     if st is None:
         msg = f"{name}: no | {STATUS_LABEL} | row in Metadata"
         print(f"  ✗ {msg}")
         fails.append(msg)
-    elif not status_is_valid(st):
+    elif not d["status_valid"]:
         msg = (f"{name}: invalid {STATUS_LABEL} '{st.strip()}' — expected one "
                f"of {' / '.join(STATUS_VALUES)}")
         print(f"  ✗ {msg}")
         fails.append(msg)
-    fl = meta_flags(txt)
+    fl = d["flags"]
     if fl is None:
         msg = f"{name}: no | {FLAGS_LABEL} | row in Metadata"
         print(f"  ✗ {msg}")
         fails.append(msg)
-    elif not flags_is_valid(fl):
+    elif not d["flags_valid"]:
         msg = (f"{name}: invalid {FLAGS_LABEL} '{fl.strip()}' — expected "
                f"'{FLAGS_NO}' or '{FLAGS_YES}…'")
         print(f"  ✗ {msg}")
         fails.append(msg)
-    emp = note_is_empty(note)
+    emp = d["scaffold_reason"]
     if emp:
         msg = f"{name}: {emp}"
         print(f"  ✗ {msg}")
         fails.append(msg)
-    if "\ufffd" in _scanned_region(txt):
+    if "\ufffd" in scanned_region(d["raw"]):
         msg = (f"{name}: U+FFFD replacement character in the scanned region — "
                f"tokens silently shatter; fix the word from the source")
         print(f"  ✗ {msg}")
         fails.append(msg)
-    sess_key = note_source_key(txt, note)
+    sess_key = d["key"]
     if sess_key is None:
         msg = (f"{name}: cannot resolve session key (fill | Session | or rename "
                f"to cs-NNN-/rr-NNN-/ex-slug- form)")
         print(f"  ✗ {msg}")
         fails.append(msg)
         return
-    src = CleanSource(sess_key)
-    if src.rec is None:
-        msg = f"{name}: transcript file missing for {sess_key}"
-        print(f"  ✗ {msg}")
-        fails.append(msg)
-        return
-    records = scan_lines(txt)
-    rep = report_records(records, src, sess_key, name, verbose=verbose)
+    # F4b lane routing: the note's الملف المصدر row declares its source lane.
+    # A raw-lane note (fork-era, quotes verbatim from the raw ASR original)
+    # verifies against RawSource — contiguity only, no minute buckets. The
+    # registry's pad-tolerant fallback (F3c) already fixed bare cite keys.
+    from shelf_core.transcript import RawSource
+    m_src = re.search(r"\| الملف المصدر \| `([^`]*)`", d["raw"][:900])
+    src_row = m_src.group(1) if m_src else ""
+    if "/raw/" in src_row:
+        src = RawSource(sess_key)
+        if src.file is None:
+            msg = f"{name}: raw transcript file missing for {sess_key}"
+            print(f"  ✗ {msg}")
+            fails.append(msg)
+            return
+        rep = report_records(d["quotes"], src, sess_key, name, verbose=verbose,
+                             secs_override=[])
+    else:
+        src = CleanSource(sess_key)
+        if src.rec is None:
+            msg = f"{name}: transcript file missing for {sess_key}"
+            print(f"  ✗ {msg}")
+            fails.append(msg)
+            return
+        rep = report_records(d["quotes"], src, sess_key, name, verbose=verbose)
     # Verbatim gate — evidence lane only: minute mismatch / not-found, and a
     # blockquote ("> «»") quote with no cite. Digest-prose «» stay advisory
     # (rep["soft"]) so stylistic quoting in خلاصة text can't red-flag a note.
@@ -349,8 +360,9 @@ def parse_scope(arg: str):
             if arg == name:
                 return ("block", name, pl)
     valid = ("nothing (= all) | a playlist (" + " / ".join(playlist_keys()) +
-             ") | a block name | KEY (<slug>-NNN, ex-<slug>, bare NNN = cs) | "
-             "A-B (applies to cs) | a path to one .md/.html file")
+             ") | a block name | KEY (<slug>-NNN, ex-<slug>, bare NNN = "
+             f"{DEFAULT_PLAYLIST}) | A-B (applies to {DEFAULT_PLAYLIST}) | "
+             "a path to one .md/.html file")
     sys.exit(f"Unknown check scope: {arg!r}\nValid scopes: {valid}")
 
 

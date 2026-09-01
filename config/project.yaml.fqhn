@@ -1,0 +1,111 @@
+# config/project.yaml — فقه-النفس shelf profile (S9.3)
+#
+# Installed by the S9.3 live-repo upgrade. Facts moved OUT of project scripts
+# INTO config: cite keyword, session space, docs/notes locations, gate floors,
+# the docs-skip set (with the 2026-08-24 user decision on the umbrella doc),
+# and the per-playlist measurement table for doc-coverage --playlists.
+#
+# The fork's adaptation now lives in the skill's doc-coverage.py as the
+# `quotes-responsibility` profile (port receipt in that file); selecting it
+# here reproduces the fork's outputs byte-for-byte on this corpus
+# (tests: shelf-improvements/tests-scratch/s93-dc-*.txt).
+
+corpus:
+  cite_pattern: "المجلس"
+  notes_dir: reference/notes
+  transcripts_dir: "نص مجالس فقه النفس/clean"
+  claim_source: quotes        # claims-equivalent = « quoted spans (the pinnable units)
+  # T9.2: this corpus's quote delimiter + pins contract. Every «» span is a
+  # claim (doc-coverage's claims source); pins minute-verifies only REF'd
+  # spans («…» — المجلس N، MM:SS) and SKIPS uncited ones as narrative —
+  # the monolith's contract, declared instead of hardcoded.
+  quote:
+    open: "«"
+    close: "»"
+  uncited_quotes: skip
+  # T9.1/ADR 0007 — the playlist registry. This corpus PREDATES the slug
+  # grammar: main-playlist notes/transcripts are bare-NNN (047-*.md /
+  # "047 - *.txt"), so the main playlist declares key_prefix: '' (only the
+  # default playlist may). Sub-playlists keep the slug- prefix. Every clean
+  # dir sits at TOP level (outside transcripts/) — declared per playlist as
+  # the one tree-locked-model exception. Sessions are scanned from disk, so
+  # the --playlists table below stays the doc-coverage measurement view.
+  default_playlist: ونفس
+  playlists:
+    ونفس:
+      dir: "نص مجالس فقه النفس"
+      name: مجالس فقه النفس
+      notes_flat: true
+      key_prefix: ""
+      transcripts_dir: "نص مجالس فقه النفس/clean"
+      docs_dir: reference          # main docs live at the reference root
+    abz:
+      dir: ألف-باء-الزواج
+      name: ألف باء الزواج
+      notes_flat: true
+      transcripts_dir: "نص-ألف-باء-الزواج/clean"
+    farah:
+      dir: فقه-الفرح
+      name: فقه الفرح
+      notes_flat: true
+      transcripts_dir: "نص-فقه-الفرح/clean"
+    amshaj:
+      dir: أمشاج
+      name: أمشاج
+      notes_flat: true
+      transcripts_dir: "نص-أمشاج/clean"
+    ikhlas:
+      dir: فقه-الإخلاص
+      name: فقه الإخلاص
+      notes_flat: true
+      transcripts_dir: "نص-فقه-الإخلاص/clean"
+    trb:
+      dir: مجالس-التربية
+      name: مجالس التربية
+      notes_flat: true
+      transcripts_dir: "نص-التربية-في-فقه-النفس/clean"
+    abtr:
+      dir: ألف-باء-التربية
+      name: ألف باء التربية
+      notes_flat: true
+      transcripts_dir: "نص-ألف-باء-التربية/clean"
+    quran:
+      dir: فقه-النفس-في-القرآن-1442
+      name: فقه النفس في القرآن
+      notes_flat: true
+      transcripts_dir: "نص-فقه-النفس-في-القرآن-1442/clean"
+    mnfs:
+      dir: مع-نفسي
+      name: مع نفسي
+      notes_flat: true
+      transcripts_dir: "نص-مع-نفسي/clean"
+
+gates:
+  coverage_profile: quotes-responsibility
+  docs_dir: reference
+  session_max: 174            # main playlist's session space
+  floor_high: 12
+  floor_low: 7
+  bucket_avg_threshold: 40    # avg note-quotes > 40 => floor_high
+  neglect_pct: 0.10           # unclaimed below this = NEGLECTED
+  thin_pct: 0.20              # unclaimed below this = THIN (deepen)
+  min_quotes: 10              # sessions with fewer quotes skip ratio tiers
+  docs_skip:
+    - index.html
+    - قالب-وثيقة.html
+    - معجم-المصطلحات.html
+    # block umbrella/index doc: delegates all quotes to linked topic docs
+    # (same class as index.html) — user decision 2026-08-24
+    - اقرأ-001-027.html
+
+  # --playlists measurement mode: slug -> [docs subdir under reference/,
+  # note prefix, highest session number] (per-playlist session space).
+  playlists:
+    abz:    [ألف-باء-الزواج, abz-, 68]
+    farah:  [فقه-الفرح, farah-, 7]
+    amshaj: [أمشاج, amshaj-, 30]
+    ikhlas: [فقه-الإخلاص, ikhlas-, 31]
+    trb:    [مجالس-التربية, trb-, 39]
+    abtr:   [ألف-باء-التربية, abtr-, 120]
+    quran:  [فقه-النفس-في-القرآن-1442, quran-, 35]
+    mnfs:   [مع-نفسي, mnfs-, 30]

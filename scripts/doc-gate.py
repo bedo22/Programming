@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 
 import _shelf_lib as lib
+from shelf_core.notes import html_measure  # A5.7: walker-based doc measurements
 
 ROOT = Path(lib.find_root()).resolve()
 config = lib.load_config(ROOT)
@@ -23,6 +24,9 @@ gates = config.get("gates", {})
 triage = config.get("triage", {})
 
 KEY_PAT = lib.key_pattern(config)
+# W4.15: the splice below must not ADD a capture group (findall would return
+# tuples). Neutralize inner groups exactly as citation._key_nc does.
+KEY_PAT_NC = re.sub(r"\((?!\?)", "(?:", KEY_PAT)
 Q_OPEN, Q_CLOSE = lib.quote_style(config)
 CITE = lib.cite_regex(config)
 
@@ -43,6 +47,10 @@ EP_MIN_WORDS = EP.get("min_words", 1200)
 # Override per project with gates.essay_proxy.ar_ratio (set it to 1.0 to disable).
 EP_AR_RATIO = EP.get("ar_ratio", 0.78)
 EP_MIN_PARAS = EP.get("min_paras", 6)
+# P6.14: the substantive-para char threshold is CONFIGURABLE and shared with
+# evdoc's frame floor — one key (gates.essay_proxy.min_para_chars, default
+# 300 = the retired hardcode inside html_measure), both consumers.
+EP_MIN_PARA_CHARS = EP.get("min_para_chars", 300)
 
 NOTES = lib.notes_dir(ROOT, config)
 
@@ -104,7 +112,10 @@ def main(paths):
                 floor = int(FLOOR_CFG)
             uncovered = [k for k in keys if cross.get(k, 0) < floor]
             if uncovered:
-                problems.append("responsibility FAIL (max-cites-any-doc < floor %d): %s" % (floor, ", ".join(f"{k}(cross={cross.get(k,0)})" for k in uncovered)))
+                # W4.14 DECISION (recorded): KEEP corpus-sum semantics — `cross`
+                # counts cites across ALL docs; the message now says what the
+                # number IS (was 'max-cites-any-doc', which described nothing).
+                problems.append("responsibility FAIL (corpus-cites < floor %d): %s" % (floor, ", ".join(f"{k}(cross={cross.get(k,0)})" for k in uncovered)))
             for k in keys:
                 mass = claim_mass(k)
                 if not mass:
@@ -132,11 +143,15 @@ def main(paths):
             problems.append(f"PITFALL {fail}")
 
         if Q_OPEN == "«":
-            qspans = re.findall(r"«([^»\n]{10,400})»\s*(?:—|-)?\s*(?:<span class=\"cite\">|\(is-)", txt)
+            qspans = re.findall(r"«([^»\n]{10,400})»\s*(?:—|-)?\s*(?:<span class=\"cite\">|\(" + KEY_PAT_NC + ")", txt)
         else:
-            qspans = re.findall(r'"([^"\n]{10,400})"\s*(?:—|—|-)?\s*(?:<span class="cite">|\(rr-)', txt)
+            qspans = re.findall(r'"([^"\n]{10,400})"\s*(?:—|—|-)?\s*(?:<span class="cite">|\(' + KEY_PAT_NC + ")", txt)
         qwords = sum(len(q.split()) for q in qspans)
-        total_words = len(re.sub(r"<[^>]+>", " ", txt).split())
+        # A5.7: the length/paragraph/definition measurements walk the document
+        # with html.parser (style/script bodies never count; nesting-robust).
+        # W4.15's regex pre-strip measured the same text except on docs whose
+        # style/script bodies contain markup that fooled the tag stripper.
+        total_words, paras, defs = html_measure(txt, para_chars=EP_MIN_PARA_CHARS)
         if total_words:
             share = qwords / total_words
             if share > EP_QUOTE_SHARE:
@@ -146,15 +161,11 @@ def main(paths):
         if total_words < floor:
             note = f" (AR-scaled from {EP_MIN_WORDS} at measured twin ratio {EP_AR_RATIO})" if is_ar else ""
             problems.append(f"only {total_words} words (below {floor}{note})")
-        prose = strip_quotes(txt)
-        paras = [p for p in re.split(r"</dd>|</p>|</li>", prose) if len(p.strip()) > 300]
         # The paragraph floor is an ESSAY rule. A reference table cannot satisfy it honestly:
         # politics-glossary carries ~90 definitions of 80-300 chars (2,090 words of content)
         # and scored 2, because no cell reaches 300 chars and the split never saw </td>.
         # So measure the unit the document actually uses — but only when the doc really IS
         # table-dominant (>=20 substantial cells), which a thin doc cannot fake with padding.
-        defs = [c for c in re.split(r"</td>", prose)
-                if len(re.sub(r"<[^>]+>", " ", c).strip()) >= 80]
         if len(defs) >= 20:
             units, kind = len(paras) + len(defs), "substantive paras+definitions"
         else:
