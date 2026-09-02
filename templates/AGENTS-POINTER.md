@@ -1,4 +1,4 @@
-# AGENTS.md — this shelf runs on shelf-pipeline <X.Y.Z>
+# AGENTS.md — this shelf runs on the installed shelf CLI (live version: `shelf --version`)
 
 Identity: transcripts → notes → docs, config-driven registry
 (`config/project.yaml` — a shelf is its config). Placement and grammar
